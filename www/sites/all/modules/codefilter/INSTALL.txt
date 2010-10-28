@@ -1,0 +1,18 @@
+INSTALLATION
+
+  1. Copy the codefilter folder to the Drupal modules/ directory, so that all
+     files are in modules/codefilter.
+
+  2. Go to administer > modules, and enable the codefilter.module
+
+  3. Go to administer > input formats. Click 'configure' for the format you wish
+     to enable codefilter in, and check the codefilter checkbox on the next
+     page.
+   
+  4. Go to the input format's ordering page and rearrange the filtering chain to
+     resolve any conflicts. For example, to prevent invalid XHTML in the form of
+     '<p><div class="codefilter">' make sure "Code filter" comes before the
+     "Line break converter."
+
+  5. (optionally) Edit your theme to provide a div.codeblock style for blocks of
+     code.

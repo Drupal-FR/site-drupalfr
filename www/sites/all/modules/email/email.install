@@ -1,0 +1,81 @@
+<?php
+
+
+/**
+ * Implementation of hook_install().
+ */
+function email_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'email');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function email_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'email');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Notify content module when this module is enabled.
+ */
+function email_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'email');
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * Notify content module when this module is disabled.
+ */
+function email_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'email');
+}
+
+/**
+ * Implemenation of hook_update_N();
+ *
+ * Update from 5.x to 6.x
+ *
+ * Set all columns to accept NULL values and set empty string values in the
+ * database to NULL.
+ */
+function email_update_6001() {
+  if ($abort = content_check_update('email')) {
+    return $abort;
+  }
+  
+  drupal_load('module', 'content');
+  $ret = array();
+  $ret[] = update_sql("UPDATE {". content_instance_tablename() ."} SET widget_type = 'email_textfield' WHERE widget_type = 'email'");
+  content_associate_fields('email');
+  content_clear_type_cache(TRUE);
+
+  include_once(drupal_get_path('module', 'content') .'/content.install');
+  $types = content_types_install();
+  foreach ($types as $type_name => $fields) {
+    foreach ($fields as $field) {
+      switch ($field['type']) {
+        case 'email':
+          $db_info = content_database_info($field);
+          $table = $db_info['table'];
+          foreach ($db_info['columns'] as $column => $attributes) {
+            $attributes['not null'] = FALSE;
+            $column = $attributes['column'];
+            db_change_field($ret, $table, $column, $column, $attributes);
+            db_field_set_no_default($ret, $table, $column);
+            $ret[] = update_sql("UPDATE {". $table ."} SET ". $column ." = NULL WHERE ". $column ." = ''");
+
+          }
+          break;
+      }
+    }
+  }
+  return $ret;
+}
+

@@ -1,0 +1,24 @@
+<?php
+// $Id: commentrss.install,v 1.1.2.2.2.1.2.2 2009/07/17 15:56:31 davereid Exp $
+
+/**
+ * @file
+ *   Provides install and uninstall functions for commentrss.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function commentrss_uninstall() {
+  // Delete all variables.
+  variable_del('commentrss_site');
+  variable_del('commentrss_node');
+  variable_del('commentrss_term');
+}
+
+/**
+ * Empty update since menu items have changed.
+ */
+function commentrss_update_6200() {
+  return array();
+}

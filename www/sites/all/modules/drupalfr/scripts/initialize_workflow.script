@@ -1,0 +1,33 @@
+<?php
+
+variable_set('userpoints_display_message', FALSE);
+
+// Initialize userpoints, based on 1 post or comment = 1 point.
+$userpoints = array();
+
+$res = db_query("SELECT c.cid, c.uid FROM {comments} c LEFT JOIN {node} n ON n.nid = c.nid AND n.type = '%s'", 'forum');
+while ($comment = db_fetch_object($res)) {
+  $userpoints[$comment->uid]++;
+}
+
+$res = db_query("SELECT n.nid, n.uid FROM {node} n WHERE n.type = '%s'", 'forum');
+while ($comment = db_fetch_object($res)) {
+  $userpoints[$comment->uid]++;
+}
+
+foreach ($userpoints as $uid => $points) {
+  userpoints_userpointsapi(array(
+    'uid' => $uid,
+    'points' => $points,
+  ));
+}
+
+// Open all the questions.
+$res = db_query("SELECT n.nid FROM {node} n WHERE n.type = '%s'", 'forum');
+while ($node = db_fetch_object($res)) {
+  $node = node_load($node->nid);
+  $node->field_workflow_status[0]['value'] = 'pending';
+  content_update($node);
+  echo ".";
+}
+

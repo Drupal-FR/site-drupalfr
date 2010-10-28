@@ -1,0 +1,118 @@
+<?php
+// $Id: xmlsitemap_i18n.module,v 1.1.2.10 2010/02/11 02:25:42 davereid Exp $
+
+/**
+ * Implements hook_xmlsitemap_context().
+ */
+function xmlsitemap_i18n_xmlsitemap_context() {
+  global $language;
+
+  $context['language'] = $language->language;
+  return $context;
+}
+
+function xmlsitemap_i18n_xmlsitemap_context_url_options(array $context) {
+  $options = array();
+  if (isset($context['language'])) {
+    $options['language'] = xmlsitemap_language_load($context['language']);
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_xmlsitemap_context().
+ */
+function xmlsitemap_i18n_xmlsitemap_context_fallback() {
+  $context['language'] = language_default('language');
+  return $context;
+}
+
+function xmlsitemap_i18n_xmlsitemap_context_info() {
+  $context['language'] = array(
+    'label' => t('Language'),
+    'summary callback' => 'locale_language_name',
+    'settings callback' => 'xmlsitemap_i18n_xmlsitemap_language_context_settings',
+  );
+  return $context;
+}
+
+function xmlsitemap_i18n_xmlsitemap_language_context_settings(stdClass $sitemap) {
+  $form['language'] = array(
+    '#type' => 'select',
+    '#title' => t('Language'),
+    '#options' => locale_language_list(),
+    '#default_value' => issset($sitemap->context['language']) ? $sitemap->context['language'] : '',
+    '#description' => t("Each language's sitemap will respect the <a href=\"@i18n-settings\">multilingual content selection mode</a>.", array('@i18n-settings' => url('admin/settings/language/i18n'))),
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Set the regeneration needed flag if multilingual settings are changed.
+ */
+function xmlsitemap_i18n_form_i18n_admin_settings_alter(&$form, $form_state) {
+  array_unshift($form['#submit'], 'xmlsitemap_form_submit_flag_regenerate');
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Allow the user to have multilingual sitemaps.
+ */
+function xmlsitemap_i18n_form_xmlsitemap_settings_form_alter(&$form, $form_state) {
+  $form['xmlsitemap']['xmlsitemap_languages']['#options'] = locale_language_list();
+  $form['xmlsitemap']['xmlsitemap_languages']['#description'] = t("Each language's sitemap will respect the <a href=\"@i18n-settings\">multilingual content selection mode</a>.", array('@i18n-settings' => url('admin/settings/language/i18n')));
+}
+
+/**
+ * Implements hook_xmlsitemap_query_alter().
+ *
+ * @see i18n_db_rewrite_where()
+ */
+function xmlsitemap_i18n_xmlsitemap_query_alter(array &$query, array &$args, array $context) {
+  $mode = variable_get('i18n_selection_mode', 'simple');
+
+  if (!isset($context['language']) || $mode == 'off') {
+    return;
+  }
+
+  // Get languages to simplify query building.
+  $current = $context['language'];
+  $default = i18n_default_language();
+
+  if ($mode == 'mixed' && $current == $default) {
+    // If mode is mixed but current = default, is the same as 'simple'.
+    $mode = 'simple';
+  }
+
+  switch ($mode) {
+    case 'simple':
+      // Current language and language neutral.
+      $query['WHERE'] .= " AND x.language IN ('%s', '')";
+      $args[] = $current;
+      break;
+    case 'mixed':
+      // Mixed current language (if available) or default language (if not) and language neutral.
+      $query['WHERE'] .= " AND x.language IN ('%s', '%s', '')";
+      $args[] = $current;
+      $args[] = $default;
+      break;
+    case 'default':
+      // Only default language and language neutral.
+      $query['WHERE'] .= " AND x.language IN ('%s', '')";
+      $args[] = $default;
+      break;
+    case 'strict':
+      // Only current language (for nodes), simple for all other types.
+      $query['WHERE'] .= " AND ((x.type = 'node' AND x.language = '%s') OR (x.type <> 'node' AND x.language IN ('%s', '')))";
+      $args[] = $current;
+      $args[] = $current;
+      break;
+    case 'off':
+      // All content. No language conditions apply. Handled by if statement
+      // above.
+      break;
+  }
+}

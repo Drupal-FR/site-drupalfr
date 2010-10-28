@@ -1,0 +1,17 @@
+<?php
+// $Id: admin_views.module,v 1.1.2.3 2010/03/11 01:10:55 sun Exp $
+
+/**
+ * @file
+ * Replaces all system object management pages in Drupal core with real views.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function admin_views_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+

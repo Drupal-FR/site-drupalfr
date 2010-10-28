@@ -1,0 +1,897 @@
+<?php
+// $Id: phone.module,v 1.29 2010/01/02 14:10:50 thierrygd Exp $
+
+// Copyright 2009 Thierry GUEGAN http://www.arvoriad.com 
+
+/**
+ * @file
+ * Defines phone number fields for CCK.
+ * Provide some verifications on the phone numbers 
+ */
+
+/**
+ * Implementation of hook_field_info().
+ *
+ * Here we indicate that the content module will use its default
+ * handling for the view of this field.
+ *
+ * Callbacks can be omitted if default handing is used.
+ * They're included here just so this module can be used
+ * as an example for custom modules that might do things
+ * differently.
+ *
+ * If your module will provide its own Views tables or arguments,
+ * change CONTENT_CALLBACK_DEFAULT to CONTENT_CALLBACK_CUSTOM.
+ *
+ * IMPORTANT! - field and widget names will be truncated to 32 characters in
+ * the database and in internal arrays, like content_fields().
+ */
+function phone_field_info() {
+  return array(
+    'fr_phone' => array('label' => t('French Phone Numbers')),
+    'it_phone' => array('label' => t('Italian Phone Numbers')),    
+    'ch_phone' => array('label' => t('Swiss Phone Numbers')),        
+    'ca_phone' => array('label' => t('US & Canadian Phone Numbers')),
+    'cr_phone' => array('label' => t('Costa Rican Phone Numbers')),
+    'pa_phone' => array('label' => t('Panamanian Phone Numbers')),            
+    'uk_phone' => array('label' => t('British (UK) Phone Numbers')),
+    'ru_phone' => array('label' => t('Russian Phone Numbers')),
+    'es_phone' => array('label' => t('Spanish Phone Numbers')),
+    'au_phone' => array('label' => t('Australian Phone Numbers')),
+    'cs_phone' => array('label' => t('Czech Phone Numbers')), 
+    'hu_phone' => array('label' => t('Hungarian Phone Numbers')),
+    'nl_phone' => array('label' => t('Dutch Phone Numbers')),
+    'il_phone' => array('label' => t('Israelian Phone Numbers')),
+    'nz_phone' => array('label' => t('New Zealand Phone Numbers')), 
+    'br_phone' => array('label' => t('Brazilian Phone Numbers')),
+    'hk_phone' => array('label' => t('Hong-Kong Phone Numbers')),
+    'mo_phone' => array('label' => t('Macao Phone Numbers')),
+    'ph_phone' => array('label' => t('Philippine Phone Numbers')),
+    'jo_phone' => array('label' => t('Jordanian Phone Numbers')),
+    'eg_phone' => array('label' => t('Egyptian Phone Numbers')),
+    'int_phone'=> array('label' => t('International Phone Numbers per E.123'))
+   );
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function phone_theme() {
+  return array(
+    'phone_textfield' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'phone_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ *
+ * Handle the settings for a field.
+ *
+ * @param $op
+ *   The operation to be performed. Possible values:
+ *   - "form": Display the field settings form.
+ *   - "validate": Check the field settings form for errors.
+ *   - "save": Declare which fields to save back to the database.
+ *   - "database columns": Declare the columns that content.module should create
+ *     and manage on behalf of the field. If the field module wishes to handle
+ *     its own database storage, this should be omitted.
+ *   - "filters": Declare the Views filters available for the field.
+ *     (this is used in CCK's default Views tables definition)
+ *     They always apply to the first column listed in the "database columns"
+ *     array.
+ * @param $field
+ *   The field on which the operation is to be performed.
+ * @return
+ *   This varies depending on the operation.
+ *   - "form": an array of form elements to add to
+ *     the settings page.
+ *   - "validate": no return value. Use form_set_error().
+ *   - "save": an array of names of form elements to
+ *     be saved in the database.
+ *   - "database columns": an array keyed by column name, with arrays of column
+ *     information as values. This column information must include "type", the
+ *     MySQL data type of the column, and may also include a "sortable" parameter
+ *     to indicate to views.module that the column contains ordered information.
+ *     TODO: Details of other information that can be passed to the database layer can
+ *     be found in the API for the Schema API.
+ *   - "filters": an array of 'filters' definitions as expected by views.module
+ *     (see Views Documentation).
+ *     When providing several filters, it is recommended to use the 'name'
+ *     attribute in order to let the user distinguish between them. If no 'name'
+ *     is specified for a filter, the key of the filter will be used instead. 
+ */
+function phone_field_settings($op, $field) {      
+  switch ($op) { 
+    case 'form':
+      $form = array();
+      $form['phone_country_code'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Add the country code if not filled by the user'),
+        '#default_value' => isset($field['phone_country_code']) ? $field['phone_country_code'] : '',
+      );
+      if ($field['type'] == 'int_phone') {
+        $form['phone_int_help'] = array(
+          '#type' => 'markup',
+          '#value' => t('International phone numbers are in the form +XX YYYYYYY where XX is a country code and YYYYYYY is the local number. This field type is based off of the <a href="http://www.itu.int/rec/T-REC-E.123/en">E.123 specification</a>.'),
+        );
+        $form['phone_default_country_code'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Default country code to add to international numbers without one (omit + sign)'),
+          '#default_value' => isset($field['phone_default_country_code']) ? $field['phone_default_country_code'] : '1',
+        );
+        $form['phone_int_max_length'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Maximum length of international numbers, according to the ITU this is 15'),
+          '#default_value' => isset($field['phone_int_max_length']) ? $field['phone_int_max_length'] : '15',
+        );
+      }      
+      if ($field['type'] == 'ca_phone') {
+        $form['ca_phone_separator'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Separator'),
+          '#default_value' => isset($field['ca_phone_separator']) ? $field['ca_phone_separator'] : '-',
+          '#size' => 2,
+        );
+        $form['ca_phone_parentheses'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use parentheses around area code'),
+          '#default_value' => isset($field['ca_phone_parentheses']) ? $field['ca_phone_parentheses'] : 1,
+        );
+      }            
+      return $form;
+
+    case 'save':
+      $settings = array('phone_country_code');
+      if ($field['type'] == 'ca_phone') {
+        array_push($settings, 'ca_phone_separator', 'ca_phone_parentheses');
+      }
+      if ($field['type'] == 'int_phone') {
+        array_push($settings, 'phone_int_help', 'phone_default_country_code', 'phone_int_max_length');
+      }      
+      return $settings;        
+    case 'database columns':
+      if ($field['type'] == 'fr_phone'
+       || $field['type'] == 'it_phone'
+       || $field['type'] == 'ch_phone'
+       || $field['type'] == 'ca_phone'
+       || $field['type'] == 'cr_phone'
+       || $field['type'] == 'pa_phone'       
+       || $field['type'] == 'pa_phone'       
+       || $field['type'] == 'uk_phone'
+       || $field['type'] == 'ru_phone'
+       || $field['type'] == 'es_phone'
+       || $field['type'] == 'au_phone'
+       || $field['type'] == 'cs_phone'
+       || $field['type'] == 'hu_phone'
+       || $field['type'] == 'nl_phone'
+       || $field['type'] == 'il_phone'
+       || $field['type'] == 'nz_phone'
+       || $field['type'] == 'br_phone'
+       || $field['type'] == 'hk_phone'
+       || $field['type'] == 'mo_phone'
+       || $field['type'] == 'ph_phone'
+       || $field['type'] == 'jo_phone'
+       || $field['type'] == 'eg_phone'
+       || $field['type'] == 'int_phone'
+       ) { 
+      	$columns = array(
+        	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+      	);
+      }   
+      return $columns;     
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ *
+ * Define the behavior of a field type.
+ *
+ * @param $op
+ *   What kind of action is being performed. Possible values:
+ *   - "load": The node is about to be loaded from the database. This hook
+ *     should be used to load the field.
+ *   - "validate": The user has just finished editing the node and is
+ *     trying to preview or submit it. This hook can be used to check or
+ *     even modify the node. Errors should be set with form_set_error().
+ *   - "presave": The user has just finished editing the node and the node has
+ *     passed validation. This hook can be used to modify the node.
+ *   - "insert": The node is being created (inserted in the database).
+ *   - "update": The node is being updated.
+ *   - "delete": The node is being deleted.
+ * @param &$node
+ *   The node the action is being performed on. This argument is passed by
+ *   reference for performance only; do not modify it.
+ * @param $field
+ *   The field the action is being performed on.
+ * @param &$node_field
+ *   The contents of the field in this node. Changes to this variable will
+ *   be saved back to the node object.
+ * @return
+ *   This varies depending on the operation.
+ *   - The "load" operation should return an object containing extra values
+ *     to be merged into the node object.
+ *   - The "insert", "update", "delete", "validate", and "presave" operations
+ *     have no return value.
+ *
+ * In most cases, only "validate" operations is relevant ; the rest
+ * have default implementations in content_field() that usually suffice. 
+ */
+function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
+  switch ($op) {
+    case 'validate': // corresponds to hook phone_widget validate in phone-5.x
+      foreach ($node_field as $delta => $item) {
+        if ($item['value'] != '') {
+          if ($field['type'] == 'fr_phone' && !valid_phone_number('fr', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid French phone number<br>French phone numbers should only contain numbers and spaces and be like 99 99 99 99 99', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'it_phone' && !valid_phone_number('it', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Italian phone number<br>Italian phone numbers should only ...', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'ch_phone' && !valid_phone_number('ch', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Swiss phone number<br>Swiss phone numbers should only contain numbers and spaces and be like 099 999 99 99', array('%value' => $item['value'])));
+          }          
+          if ($field['type'] == 'ca_phone' && !valid_phone_number('ca', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
+          }
+	  if ($field['type'] == 'cr_phone' && !valid_phone_number('cr', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Costa Rican phone number!<br>Costa Rican phone numbers should contain only numbers and spaces be like 99 99 99 99 with an optional prefix of "+506" or "00506".', array('%value' => $item['value'])));
+          } 
+	  if ($field['type'] == 'pa_phone' && !valid_phone_number('pa', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Panamanian phone number!<br>Panamanian phone numbers should contain only numbers, spaces and dashes be like 9999-999, 9999 999 or 9999999 with an optional prefix of "+507" or "00507".', array('%value' => $item['value'])));
+          }           
+          if ($field['type'] == 'uk_phone' && !valid_phone_number('uk', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid British phone number<br>British Phone numbers should .... ', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'ru_phone' && !valid_phone_number('ru', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Russian phone number<br>Russian Phone numbers should .... ', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'es_phone' && !valid_phone_number('es', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Spanish phone number<br>Spanish phone numbers should only contains numbers and spaces and be like 999 999 999', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'au_phone' && !valid_phone_number('au', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'cs_phone' && !valid_phone_number('cs', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Czech phone number!<br>Czech phone numbers should contain only numbers and spaces be like 999 999 999 with an optional prefix of "+420" or "00420".', array('%value' => $item['value'])));
+          }
+          if ($field['type'] == 'hu_phone' && !valid_phone_number('hu', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Hungarian phone number!<br>Hungarian phone numbers should contain only numbers and spaces be like 70 999 9999 with an optional prefix of "+36" or "06".', array('%value' => $item['value'])));
+          }                  
+          if ($field['type'] == 'nl_phone' && !valid_phone_number('nl', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Dutch phone number!<br>Dutch phone numbers should contain only numbers and spaces and - and be like 099-9999999 with an optional prefix of "+31".', array('%value' => $item['value'])));
+          }     
+          if ($field['type'] == 'il_phone' && !valid_phone_number('il', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Israelian phone number!<br>Israelian phone numbers should .....', array('%value' => $item['value'])));
+          }           
+          if ($field['type'] == 'nz_phone' && !valid_phone_number('nz', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid New Zealand phone number!<br>New Zealand phone numbers should contain only numbers, spaces, brackets and "-". They should look like 04 123 4567 or can optionally omit the leading 0 and have a prefix of "+64".', array('%value' => $item['value'])));
+          }                  
+          if ($field['type'] == 'br_phone' && !valid_phone_number('br', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Brazilian phone number!<br>Brazilian phone numbers should contain only numbers and spaces and - and be like 099 9999-9999 or 99 9999-9999 with an optional prefix of "+55".', array('%value' => $item['value'])));
+          }        
+          if ($field['type'] == 'hk_phone' && !valid_phone_number('hk', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Hong Kong phone number!<br>Hong Kong phone numbers should contain only numbers and spaces and be like 9999 9999 with an optional prefix of "+852" or "852".', array('%value' => $item['value'])));
+          }      
+          if ($field['type'] == 'mo_phone' && !valid_phone_number('mo', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Macau phone number!<br>Macau phone numbers should contain only numbers and spaces and be like 9999 9999 with an optional prefix of "+853" or "853".', array('%value' => $item['value'])));
+          }   
+          if ($field['type'] == 'ph_phone' && !valid_phone_number('ph', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Philippine phone number<br />Example of valid Philippine phone numbers: +63 (2) 123-4567 or +63 (2) 123-4567 loc. 123	or mobile +63 (919) 123-4567', array('%value' => $item['value'])));
+          }            
+          if ($field['type'] == 'jo_phone' && !valid_phone_number('jo', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Jordanian phone number!<br>Please check the spaces and dashes in your number ...', array('%value' => $item['value'])));
+          }           
+          if ($field['type'] == 'eg_phone' && !valid_phone_number('eg', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Egyptian phone number!<br>Telephone numbers in Egypt have the format +20 (#[#]) 1234567[8], where the digts between ( ) is the area or network code, without a leading zero; and digits between [ ] are optional', array('%value' => $item['value'])));
+          }                    
+          if ($field['type'] == 'int_phone' && !valid_phone_number('int', $item['value'])) {
+            form_set_error($field['field_name'],t('"%value" is not a valid international phone number<br>International phone numbers should contain a country code prefixed by a plus sign followed by the local number.', array('%value' => $item['value'])));
+          }
+        }
+      }
+      break;
+
+    case 'presave': // corresponds to hook phone_widget 'process form values' in phone-5.x
+      foreach ($node_field as $delta => $item) {
+        //format the phone number
+        if ($item['value'] != '') {
+          if ($field['type'] == 'fr_phone') {
+            $node_field[$delta]['value'] = format_phone_number('fr', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'it_phone') {
+            $node_field[$delta]['value'] = format_phone_number('it', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'ch_phone') {
+            $node_field[$delta]['value'] = format_phone_number('ch', $node_field[$delta]['value'], $field);
+          }          
+          if ($field['type'] == 'ca_phone') {
+            $node_field[$delta]['value'] = format_phone_number('ca', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'cr_phone') {
+            $node_field[$delta]['value'] = format_phone_number('cr', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'pa_phone') {
+            $node_field[$delta]['value'] = format_phone_number('pa', $node_field[$delta]['value'], $field);
+          }           
+          if ($field['type'] == 'uk_phone') {
+            $node_field[$delta]['value'] = format_phone_number('uk', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'ru_phone') {
+            $node_field[$delta]['value'] = format_phone_number('ru', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'es_phone') {
+            $node_field[$delta]['value'] = format_phone_number('es', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'au_phone') {
+            $node_field[$delta]['value'] = format_phone_number('au', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'cs_phone') {
+            $node_field[$delta]['value'] = format_phone_number('cs', $node_field[$delta]['value'], $field);
+          }
+          if ($field['type'] == 'hu_phone') {
+            $node_field[$delta]['value'] = format_phone_number('hu', $node_field[$delta]['value'], $field);
+          }  
+          if ($field['type'] == 'nl_phone') {
+            $node_field[$delta]['value'] = format_phone_number('nl', $node_field[$delta]['value'], $field);
+          } 
+          if ($field['type'] == 'il_phone') {
+            $node_field[$delta]['value'] = format_phone_number('il', $node_field[$delta]['value'], $field);
+          }           
+          if ($field['type'] == 'nz_phone') {
+            $node_field[$delta]['value'] = format_phone_number('nz', $node_field[$delta]['value'], $field);
+          }           
+          if ($field['type'] == 'br_phone') {
+            $node_field[$delta]['value'] = format_phone_number('br', $node_field[$delta]['value'], $field);
+          }  
+          if ($field['type'] == 'hk_phone') {
+            $node_field[$delta]['value'] = format_phone_number('hk', $node_field[$delta]['value'], $field);
+          }     
+          if ($field['type'] == 'mo_phone') {
+            $node_field[$delta]['value'] = format_phone_number('mo', $node_field[$delta]['value'], $field);
+          }      
+          if ($field['type'] == 'ph_phone') {
+            $node_field[$delta]['value'] = format_phone_number('ph', $node_field[$delta]['value'], $field);
+          }                     
+          if ($field['type'] == 'jo_phone') {
+            $node_field[$delta]['value'] = format_phone_number('jo', $node_field[$delta]['value'], $field);
+          }         
+          if ($field['type'] == 'eg_phone') {
+            $node_field[$delta]['value'] = format_phone_number('eg', $node_field[$delta]['value'], $field);
+          }                           
+          if ($field['type'] == 'int_phone') {
+            $node_field[$delta]['value'] = format_phone_number('int', $node_field[$delta]['value'], $field);
+          }               
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_field_view_item().
+ *
+ */
+/*
+function phone_field_view_item($field, $node_field_item) {
+    $phonenumber = check_plain($node_field_item['value']);
+    return $phonenumber;
+}
+*/
+ 
+/**
+ *Implementation of hook_field_formatter_info().
+ *
+ * The default behavior of formatters is that they will create
+ * a theme for a single field value.
+ *
+ * Setting 'multiple values' to CONTENT_HANDLE_FIELD will create
+ * a formatter that will receive all the values of a field so you
+ * can, for instance, plot all the values on a map or in a graph.
+ *
+ * The 'view' operation (handled by the Content module) constructs the
+ * $node in a way that you can use drupal_render() to display the
+ * formatted output for an individual field.
+ *
+ * i.e. print drupal_render($node->field_foo);
+ *
+ * The code now supports both single value formatters, which theme an
+ * individual item value as has been done in previous version of CCK,
+ * and multiple value formatters, which theme all values for the field
+ * in a single theme. The multiple value formatters could be used, for
+ * instance, to plot field values on a single map or display them
+ * in a graph. Single value formatters are the default, multiple value
+ * formatters can be designated as such in formatter_info().
+ *
+ * The node array will look like:
+ *
+ *  'Single value' formatter:
+ *   $node->content['field_foo'] = array(
+ *     '#type' => 'content_field',
+ *     '#title' => 'label'
+ *     '#field_name' => 'field_name',
+ *     '#node' => $node,
+ *     'items' =>
+ *       0 => array(
+ *         '#theme' => $theme,
+ *         '#field_name' => 'field_name',
+ *         '#type_name' => $node->type,
+ *         '#formatter' => $formatter_name,
+ *         '#item' => $items[0],
+ *       ),
+ *       1 => array(
+ *         '#theme' => $theme,
+ *         '#field_name' => 'field_name',
+ *         '#type_name' => $node->type,
+ *         '#formatter' => $formatter_name,
+ *         '#item' => $items[1],
+ *       ),
+ *     ),
+ *   );
+ *  'Multiple value' formatter:
+ *   $node->content['field_foo'] = array(
+ *     '#type' => 'content_field',
+ *     '#title' => 'label'
+ *     '#field_name' => 'field_name',
+ *     '#node' => $node,
+ *     'items' => array(
+ *       '#theme' => $theme,
+ *       '#field_name' => 'field_name',
+ *       '#type_name' => $node->type,
+ *       '#formatter' => $formatter_name,
+ *       0 => array(
+ *         '#item' => $items[0],
+ *       ),
+ *       1 => array(
+ *         '#item' => $items[1],
+ *       ),
+ *     ), 
+ *   );
+ */
+function phone_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => 'Default',
+      'field types' => array('fr_phone', 
+      			'it_phone',
+      			'ch_phone',
+      			'ca_phone', 
+    			'cr_phone',
+    			'pa_phone',    			
+      			'uk_phone', 
+      			'ru_phone',
+      			'es_phone',
+      			'au_phone',
+      			'cs_phone', 
+      			'hu_phone',
+      			'nl_phone',
+      			'il_phone',      			
+      			'nz_phone',
+      			'br_phone',
+      			'hk_phone',
+      			'mo_phone',
+      			'ph_phone',     			
+      			'jo_phone',
+      			'eg_phone',
+      			'int_phone'
+      			),
+      'multiple values' => CONTENT_HANDLE_CORE,		
+    ),
+  );
+ } 
+ 
+/**
+ * Implementation of hook_field_formatter().
+ *
+ * Prepare an individual item for viewing in a browser.
+ *
+ * @param $field
+ *   The field the action is being performed on.
+ * @param $item
+ *   An array, keyed by column, of the data stored for this item in this field.
+ * @param $formatter
+ *   The name of the formatter being used to display the field.
+ * @param $node
+ *   The node object, for context. Will be NULL in some cases.
+ *   Warning: when displaying field retrieved by Views, $node will not
+ *   be a "full-fledged" node object, but an object containg the data returned
+ *   by the Views query (at least nid, vid, changed)
+ * @return
+ *   An HTML string containing the formatted item.
+ *
+ * In a multiple-value field scenario, this function will be called once per
+ * value currently stored in the field. This function is also used as the handler
+ * for viewing a field in a views.module tabular listing.
+ *
+ * It is important that this function at the minimum perform security
+ * transformations such as running check_plain() or check_markup().
+ */
+function phone_field_formatter($field, $item, $formatter, $node) {
+  if (!isset($item['value'])) {
+    return '';
+  }
+  if ($field['text_processing']) {
+    $text = check_markup($item['value'], $item['format'], is_null($node) || isset($node->in_preview));
+  }
+  else {
+    $text = check_plain($item['value']);
+  }
+  // iPhone Support 
+  if (strpos($_SERVER['HTTP_USER_AGENT'], 'iPhone') !== FALSE) {
+     $text = '<a href="tel:' . $text . '">' . $text . '</a>';
+  }  
+  return $text;
+}
+
+/**
+ * Implementation of hook_widget_info().
+ *
+ * Here we indicate that the content module will handle
+ * the default value and multiple values for these widgets.
+ *
+ * Callbacks can be omitted if default handing is used.
+ * They're included here just so this module can be used
+ * as an example for custom modules that might do things
+ * differently.
+ *
+ * IMPORTANT! - field and widget names will be truncated to 32 characters in
+ * the database and in internal arrays, like content_fields(). 
+ */
+function phone_widget_info() {
+  return array(
+    'phone_textfield' => array(
+      'label' => t('Textfield'),
+      'field types' => array('fr_phone', 
+      			'it_phone', 
+      			'ch_phone',
+      			'ca_phone', 
+    			'cr_phone',
+    			'pa_phone',    			
+      			'uk_phone', 
+      			'ru_phone',
+      			'es_phone',
+      			'au_phone',
+      			'cs_phone',
+      			'hu_phone',
+      			'nl_phone',
+      			'il_phone',      			
+      			'nz_phone',
+      			'br_phone',
+      			'hk_phone',
+       			'mo_phone',
+       			'ph_phone',       			
+       			'jo_phone',
+       			'eg_phone',
+      			'int_phone'
+      			),
+      'multiple values' => CONTENT_HANDLE_CORE,
+      'callbacks' => array(
+      'default value' => CONTENT_CALLBACK_DEFAULT,
+      ),      			
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget_settings().
+ *
+ * Handle the parameters for a widget.
+ *
+ * @param $op
+ *   The operation to be performed. Possible values:
+ *   - "form": Display the widget settings form.
+ *   - "validate": Check the widget settings form for errors.
+ *   - "save": Declare which pieces of information to save back to the database.
+ * @param $widget
+ *   The widget on which the operation is to be performed.
+ * @return
+ *   This varies depending on the operation.
+ *   - "form": an array of form elements to add to the settings page.
+ *   - "validate": no return value. Use form_set_error().
+ *   - "save": an array of names of form elements to be saved in the database. 
+ */
+function phone_widget_settings($op, $widget) {
+  switch ($op) {
+    case 'form':
+
+    case 'validate':
+      break; //do nothing 
+
+    case 'save':
+      return array();
+  }
+}
+
+/**
+ * Implementation of hook_widget().
+ *
+ * Attach a single form element to the form. It will be built out and
+ * validated in the callback(s) listed in hook_elements. We build it
+ * out in the callbacks rather than here in hook_widget so it can be
+ * plugged into any module that can provide it with valid
+ * $field information.
+ *
+ * Content module will set the weight, field name and delta values
+ * for each form element. This is a change from earlier CCK versions
+ * where the widget managed its own multiple values.
+ *
+ * If there are multiple values for this field, the content module will
+ * call this function as many times as needed.
+ *
+ * @param $form
+ *   the entire form array, $form['#node'] holds node information
+ * @param $form_state
+ *   the form_state, $form_state['values'][$field['field_name']]
+ *   holds the field's form values.
+ * @param $field
+ *   the field array
+ * @param $items
+ *   array of default values for this field
+ * @param $delta
+ *   the order of this item in the array of subelements (0, 1, 2, etc)
+ *
+ * @return
+ *   the form item for a single element for this field 
+ */
+function phone_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $element = array(
+    '#type' => $field['widget']['type'],
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
+  );
+  return $element;
+}
+
+
+
+
+/**
+ * Implementation of hook_content_is_empty().
+ *
+ * NEW REQUIRED HOOK!
+ *
+ * This function tells the content module whether or not to consider
+ * the $item to be empty. This is used by the content module
+ * to remove empty, non-required values before saving them.
+ */
+function phone_content_is_empty($item, $field) {
+  if (empty($item['value'])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ *
+ * Any FAPI callbacks needed for individual widgets can be declared here,
+ * and the element will be passed to those callbacks for processing.
+ *
+ * Drupal will automatically theme the element using a theme with
+ * the same name as the hook_elements key.
+ *
+ * Autocomplete_path is not used by text_widget but other widgets can use it
+ * (see nodereference and userreference).
+ */
+ function phone_elements() {
+  return array(
+    'phone_textfield' => array(
+      '#input' => TRUE,
+      '#columns' => array('value'), '#delta' => 0,
+      '#process' => array('phone_textfield_process'),
+      '#autocomplete_path' => FALSE,
+      ),
+  );
+}
+
+/**
+ * FAPI theme for an individual text elements.
+ *
+ * The textfield or textarea is already rendered by the
+ * textfield or textarea themes and the html output
+ * lives in $element['#children']. Override this theme to
+ * make custom changes to the output.
+ *
+ * $element['#field_name'] contains the field name
+ * $element['#delta]  is the position of this element in the group
+ */
+function theme_phone_textfield($element) {
+  return $element['#children'];
+}
+
+/**
+ * Process an individual element.
+ *
+ * Build the form element. When creating a form using FAPI #process,
+ * note that $element['#value'] is already set.
+ *
+ * The $fields array is in $form['#field_info'][$element['#field_name']].
+ */
+function phone_textfield_process($element, $edit, $form_state, $form) {
+  $field = $form['#field_info'][$element['#field_name']];
+  $field_key = $element['#columns'][0];
+  $delta = $element['#delta'];
+  $element[$field_key] = array(
+    '#type' => 'textfield',
+    '#default_value' => isset($element['#value'][$field_key]) ? $element['#value'][$field_key] : NULL,
+    '#autocomplete_path' => FALSE,
+    // The following values were set by the content module and need
+    // to be passed down to the nested element.
+    '#title' => $element['#title'],
+    '#description' => $element['#description'],
+    '#required' => $element['#required'],
+    '#field_name' => $element['#field_name'],
+    '#type_name' => $element['#type_name'],
+    '#delta' => $element['#delta'],
+    '#columns' => $element['#columns'],
+  );
+
+  if (!empty($field['max_length'])) {
+    $element[$field_key]['#maxlength'] = $field['max_length'];
+  }
+  if (!empty($field['text_processing'])) {
+    $filter_key = $element['#columns'][1];
+    $format = isset($element['#value'][$filter_key]) ? $element['#value'][$filter_key] : FILTER_FORMAT_DEFAULT;
+    $parents = array_merge($element['#parents'] , array($filter_key));
+    $element[$filter_key] = filter_form($format, 1, $parents);
+  }
+
+  // Used so that hook_field('validate') knows where to flag an error.
+  $element['_error_element'] = array(
+    '#type' => 'value',
+    '#value' => implode('][', array_merge($element['#parents'], array($field_key))),
+  );
+
+  return $element;
+}
+
+/**
+ * Theme function for 'default' text field formatter.
+ */
+function theme_phone_formatter_default($element) {
+  return $element['#item']['value'];
+}
+
+/**
+ * Verification for Phone Numbers.  
+ *
+ * @param string $countrycode
+ * @param string $phonenumber
+ * @return boolean Returns boolean FALSE if the phone number is not valid.  
+ */
+function valid_phone_number($countrycode, $phonenumber) {
+
+  $countrycode = trim($countrycode); 
+  $phonenumber = trim($phonenumber);
+
+  if ($countrycode == 'fr' 
+  	|| $countrycode == 'it'  
+  	|| $countrycode == 'ch'
+  	|| $countrycode == 'ca'
+  	|| $countrycode == 'cr'
+  	|| $countrycode == 'pa'  	
+  	|| $countrycode == 'uk'
+  	|| $countrycode == 'ru'
+  	|| $countrycode == 'es'
+  	|| $countrycode == 'au'
+  	|| $countrycode == 'cs'
+  	|| $countrycode == 'hu' 
+  	|| $countrycode == 'nl'
+  	|| $countrycode == 'il'  	
+  	|| $countrycode == 'nz'
+  	|| $countrycode == 'br'
+  	|| $countrycode == 'hk'
+  	|| $countrycode == 'mo'
+  	|| $countrycode == 'ph'  	
+  	|| $countrycode == 'jo'
+  	|| $countrycode == 'eg'
+  	|| $countrycode == 'int'
+  	) { 
+	
+        //drupal_set_message('langue = ' . $countrycode, 'error');
+
+  	$valid_phone_function = 'valid_'. $countrycode . '_phone_number';  	
+  	module_load_include('inc', 'phone', 'phone.'. $countrycode);
+  	
+	if (function_exists($valid_phone_function)) {
+	    return $valid_phone_function($phonenumber);
+	}
+	else  { 
+	    return FALSE; 	
+	}
+  }
+  else {
+  	//Country not taken into account yet 
+  	return FALSE; 
+  }
+}  
+
+/**
+ * Verification for Phone Numbers.  
+ *
+ * @param string $countrycode
+ * @param string $phonenumber
+ * @return boolean Returns boolean FALSE if the phone number is not valid.  
+ */
+function format_phone_number($countrycode, $phonenumber, $field) {
+
+  $countrycode = trim($countrycode); 
+  $phonenumber = trim($phonenumber);
+
+  if ($countrycode == 'fr' 
+  	|| $countrycode == 'it'
+  	|| $countrycode == 'ch'
+  	|| $countrycode == 'ca'
+  	|| $countrycode == 'cr'
+  	|| $countrycode == 'pa'  	
+  	|| $countrycode == 'uk'
+  	|| $countrycode == 'ru'
+  	|| $countrycode == 'es'
+  	|| $countrycode == 'au'
+   	|| $countrycode == 'cs'
+   	|| $countrycode == 'hu'
+   	|| $countrycode == 'nl'
+   	|| $countrycode == 'il'   	
+   	|| $countrycode == 'nz'
+   	|| $countrycode == 'br'
+  	|| $countrycode == 'hk'
+  	|| $countrycode == 'mo'
+  	|| $countrycode == 'ph'  	
+  	|| $countrycode == 'jo'
+  	|| $countrycode == 'eg'
+   	|| $countrycode == 'int'
+  	) { 
+	
+        //drupal_set_message('langue = ' . $countrycode, 'error');       
+
+  	$format_phone_function = 'format_'. $countrycode . '_phone_number';  	
+  	module_load_include('inc', 'phone', 'phone.'. $countrycode);
+  	
+	if (function_exists($format_phone_function)) {
+	    return $format_phone_function($phonenumber, $field);
+	}
+	else {
+	    return FALSE; 
+	}
+  }
+  else {
+  	//Country not taken into account yet   
+  	return FALSE; 
+  }
+}  
+
+/**
+* Implementation of hook token_list
+*/
+function phone_token_list($type = 'all') {
+  if ($type == 'field' || $type == 'all') {
+    $tokens['phone']['raw']       = t('Raw phone numbers');
+    $tokens['phone']['formatted'] = t('Formatted phone numbers');
+    return $tokens;
+  }
+}
+
+/**
+* Implementation of hook token_values
+*/
+function phone_token_values($type, $object = NULL, $options = array()) {
+  if ($type == 'field') {
+    $item = $object[0];
+    $tokens['raw']       = $item['phone'];
+    $tokens['formatted'] = $item['view'];
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_simpletest().
+ */
+function phone_simpletest() {
+  $dir = drupal_get_path('module', 'phone'). '/tests';
+  $tests = file_scan_directory($dir, '\.test$');
+  return array_keys($tests);
+}

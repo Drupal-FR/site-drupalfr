@@ -1,0 +1,93 @@
+<?php
+// $Id: phone.install,v 1.9 2010/01/02 14:10:50 thierrygd Exp $
+
+/**
+ * @file
+ * Defines phone number fields for CCK.
+ * Installation file
+ */
+
+/**
+ * Implementation of hook_content_notify().
+ *
+ * This hook should be implemented inside hook_install(), hook_uninstall(),
+ * hook_enable() and hook_disable(), and is used to notify the content
+ * module when a field module is added or removed so it can respond
+ * appropriately. One use of this hook is to allow the content module
+ * to remove fields and field data created by this module when the
+ * module is uninstalled.
+ *
+ * The recommended location for these hooks is in the module's .install file.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function phone_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'phone');
+  drupal_set_message(t('Phone module installed successfully.')); 
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function phone_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'phone');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Notify content module when this module is enabled.
+ */
+function phone_enable() {
+  drupal_load('module', 'content');
+  
+  //The 2 next lines are for 5.x to 6.x upgrade 
+  db_query("UPDATE {". content_instance_tablename() ."} SET widget_module = 'phone' WHERE widget_type = 'phone'");  
+  db_query("UPDATE {". content_instance_tablename() ."} SET widget_type = 'phone_textfield' WHERE widget_type = 'phone'");
+  
+  content_notify('enable', 'phone');
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * Notify content module when this module is disabled.
+ */
+function phone_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'phone');
+}
+
+/**
+ * Fixing update : field setting 'not null' => TRUE can cause problems with MySQL in strict mode
+ */
+function phone_update_6200() {
+  $ret = array();
+
+  module_load_include('inc', 'content', 'includes/content.crud');
+  $fields = content_fields();
+
+  foreach ($fields as $field) {
+      
+    if (substr($field['type'], 3) == 'phone') {
+  
+      //drupal_set_message('field type = phone ==> ' . $field['type']); 
+            
+      $db_info = content_database_info($field);
+      if (isset($db_info['columns']['value'])) {
+        $table = $db_info['table'];
+        $value_column = $db_info['columns']['value']['column'];
+        //drupal_set_message('table = ' . $table, 'error');  
+        //drupal_set_message('value_column = ' . $value_column, 'error');  
+
+        $ret[] = update_sql("ALTER TABLE {" . $table ."} CHANGE " .$value_column . " " .$value_column . " VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL");
+      }
+    }
+  }
+  drupal_set_message("Phone fields have been updated.");
+  return $ret;
+}

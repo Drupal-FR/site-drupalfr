@@ -1,0 +1,107 @@
+/* $Id: admin_menu_toolbar.css,v 1.2.2.4 2009/11/12 03:12:40 sun Exp $ */
+
+/**
+ * @file
+ * Toolbar style for Administration menu.
+ *
+ * @todo Separate shortcut functionality into own module/widget.
+ */
+
+body div#toolbar {
+  top: 30px;
+}
+
+#admin-menu {
+  font: normal 11px/20px "Lucida Grande", Verdana, sans-serif;
+}
+#admin-menu-wrapper {
+  padding: 5px 10px 0;
+}
+#admin-menu-shadow {
+  background: transparent url(toolbar.png) 0 -85px repeat-x;
+  bottom: -15px;
+  height: 15px;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+#admin-menu li.admin-menu-icon > a {
+  padding: 3px 8px 2px;
+}
+html body.admin-menu {
+  margin-top: 30px !important;
+}
+
+/* Remove border from all lists and actions */
+#admin-menu li.admin-menu-action a {
+  border-left: 0;
+}
+#admin-menu ul > li > a {
+  border-right: 0;
+  margin-bottom: 3px;
+  padding: 3px 8px;
+}
+#admin-menu ul li.admin-menu-toolbar-category > a {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+#admin-menu ul li.admin-menu-toolbar-category > a.active-trail {
+  text-shadow: #333 0 1px 0;
+  background: url(toolbar.png) 0 0 repeat-x;
+}
+#admin-menu ul li.admin-menu-toolbar-category > a:hover {
+  background-color: #444;
+}
+#admin-menu ul li.admin-menu-tab a {
+  border-right: 0;
+}
+#admin-menu li li.expandable ul {
+  margin: -23px 0 0 160px;
+}
+
+/* Shortcuts toggle */
+#admin-menu li.admin-menu-shortcuts {
+  float: right;
+}
+#admin-menu li.admin-menu-shortcuts span.toggle {
+  background: url(toolbar.png) 0 -60px no-repeat;
+  cursor: pointer;
+  display: block;
+  height: 25px;
+  overflow: hidden;
+  text-indent: -999px;
+  width: 25px;
+}
+#admin-menu li.admin-menu-shortcuts-active span.toggle {
+  background-position: -25px -60px;
+}
+
+/* Shortcuts widget */
+#admin-menu li.admin-menu-shortcuts-active ul {
+  display: block !important;
+  left: 0 !important;
+  width: 100%;
+}
+#admin-menu li.admin-menu-shortcuts ul {
+  background-color: #666;
+  padding: 5px 10px;
+}
+#admin-menu li.admin-menu-shortcuts ul li {
+  background: transparent none;
+  opacity: 1;
+  width: auto;
+}
+#admin-menu li.admin-menu-shortcuts ul li a {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-top: 0;
+  padding: 5px 10px 5px 5px;
+  margin-right: 5px;
+}
+#admin-menu li.admin-menu-shortcuts ul li a:hover {
+  background: #555;
+}
+#admin-menu li.admin-menu-shortcuts ul li a.active:hover,
+#admin-menu li.admin-menu-shortcuts ul li a.active {
+  background: url(toolbar.png) 0 -20px repeat-x;
+}

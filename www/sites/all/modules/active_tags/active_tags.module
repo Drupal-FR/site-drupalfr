@@ -1,0 +1,79 @@
+<?php
+// $Id: active_tags.module,v 1.2.2.9 2010/01/17 15:34:01 dragonwize Exp $
+
+/**
+ * @file
+ *  Active Tags widget for free tagging taxonomies
+ */
+
+/**
+ * Attaches active_tags widget to fields.
+ *
+ * @param $field_ids
+ *  mixed - Either a single field id or an array of ids.
+ */
+function active_tags_enable_widget($field_ids) {
+  static $set_ids = array();
+  // Load id into array if a string is passed in.
+  if ($field_ids && !is_array($field_ids)) {
+    $field_ids = array($field_ids);
+  }
+  // Ensure we are only adding each setting once.
+  // This is important when previewing a node.
+  foreach ($field_ids as $id) {
+    if (!in_array($id, $set_ids)) {
+      $ids[] = $id;
+      $set_ids[] = $id;
+    }
+  }
+  if (!empty($ids)) {
+    drupal_add_css(drupal_get_path('module', 'active_tags') .'/active_tags.css', 'module');
+    drupal_add_js(array('active_tags' => $ids), 'setting');
+    drupal_add_js(drupal_get_path('module', 'active_tags') .'/active_tags.js', 'module', 'footer');
+  }
+}
+
+/**
+ * Implementation of hook_form_alter.
+ */
+function active_tags_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id === 'taxonomy_form_vocabulary') {
+    $form['settings']['active_tags'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Active Tags'),
+      '#weight' => 10,
+      '#default_value' => (isset($form['vid'])) ? variable_get('active_tags_'. $form['vid']['#value'], 0) : 0,
+      '#description' => t('Swaps this vocabulary widget for an enhanced tag field if browser supports javascript.'),
+    );
+    $form['#submit'][] = 'active_tags_form_vocabulary_submit';
+  }
+
+  if ($form['#id'] === 'node-form' && isset($form['taxonomy']['tags'])) {
+    $form['#after_build'][] = 'active_tags_node_form_attach';
+  }
+}
+
+/**
+ * Enables Active Tags for core taxonomy tag vocabularies.
+ */
+function active_tags_node_form_attach($form, $form_state) {
+  $settings = array();
+  foreach ($form['taxonomy']['tags'] as $id => $values) {
+    if (variable_get('active_tags_'. $id, 0) == 1) {
+      $settings[] = "#edit-taxonomy-tags-$id-wrapper";
+    }
+  }
+  // Only load files if we found active tags enabled fields.
+  if (!empty($settings)) {
+    active_tags_enable_widget($settings, $form_state['submitted']);
+  }
+  return $form;
+}
+
+/**
+ * Stores active_tags settings from taxonomy vocabulary form.
+ */
+function active_tags_form_vocabulary_submit($form, &$form_state) {
+  variable_set('active_tags_'. $form_state['values']['vid'], $form_state['values']['active_tags']);
+  return TRUE;
+}

@@ -1,0 +1,264 @@
+<?php
+// $Id: typogrify.module,v 1.6.2.5 2009/04/28 21:49:37 mikl Exp $
+
+/**
+ * @file typogrify.module
+ * Typogrify: Brings typographical refinemnts to drupal
+ *
+ * Hook together all the typogrify components.
+ */
+
+/**
+ * Implementation of hook_filter().
+ */
+function typogrify_filter($op, $delta = 0, $format = -1, $text = '') {
+  switch ($op) {
+    case 'list':
+      return array(t('Typogrify'));
+
+    case 'description':
+      return t('Adds typographic refinements.');
+
+    case 'settings':
+      return _typogrify_settings($format);
+
+    case 'process':
+      return _typogrify_process($text, $format);
+
+    default:
+      return $text;
+  }
+
+}
+
+/**
+ * Implementation of hook_filter_tips().
+ */
+function typogrify_filter_tips($delta = 0, $format = -1, $long) {
+  if ($long) {
+    $output = t('Typogrify.module brings the typographic refinements of Typogrify to Drupal.<ul>
+<li>Wraps ampersands (the $ldquo;&amp;&rdquo; character) with &lt;span class=\"amp\"&gt;&amp;&lt;/span&gt;.</li>
+<li>Prevents single words from wrapping onto their own line using Shaun Inman\'s Widont technique.</li>
+<li>Converts straight quotation marks to typographer\'s quotation marks, using SmartyPants.</li>
+<li>Converts multiple hyphens to en dashes and em dashes (according to your preferences), using SmartyPants.</li>
+<li>Wraps multiple capital letters with &lt;span class=\"caps\"&gt;CAPS&lt;/span&gt;.</li>
+<li>Wraps initial quotation marks with &lt;span class=\"quo\"&gt;&lt;/span&gt; or &lt;span class=\"dquo\"&gt;&lt;/span&gt;.</li>
+<li>Adds a css style sheet that uses the &lt;span&gt; tags to substitute a showy ampersand in headlines, switch caps to small caps, and hang initial quotation marks.</li></ul>');
+  }
+  else {
+    $output = t('Adds typographic refinements.');
+  }
+
+  return $output;
+}
+
+/**
+ * Implementation of hook_filter_init().
+ */
+function typogrify_init() {
+  drupal_add_css(drupal_get_path('module', 'typogrify') . '/typogrify.css');
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function typogrify_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/settings/modules#description':
+      $output = t('Adds typographic refinements.');
+      break;
+
+    case 'admin/help#typogrify':
+      $output = t('Adds typographic refinements.');
+      break;
+  }
+
+  return $output;
+}
+
+/********************************************************************
+ * Module Functions
+ ********************************************************************/
+
+function _typogrify_process($text, $format) {
+  $characters_to_convert = array();
+  
+  // Load Helpers.
+  module_load_include('class.php', 'typogrify');
+  module_load_include('php', 'typogrify', 'unicode-conversion');
+  if (!function_exists('marksmarty_filter')) {
+    module_load_include('php', 'typogrify', 'smartypants');
+  }
+
+  // Wrap ampersands.
+  if (variable_get('typogrify_is_amp_on_' . $format, 1) == 1) {
+    $text = Typogrify::amp($text);
+  }
+
+  // Remove widows.
+  if (variable_get('typogrify_is_widont_on_' . $format, 1) == 1) {
+    $text = Typogrify::widont($text);
+  }
+
+  // Smartypants formatting.
+  if (variable_get('marksmarty_is_smarty_on_' . $format, 1) == 1) {
+    global $_typogrify_smartypants_attr;
+    $_typogrify_smartypants_attr = variable_get('marksmarty_smarty_hyphens_' . $format, 1);
+    $text = SmartyPants($text);
+  }
+
+  // Wrap caps.
+  if (variable_get('typogrify_is_caps_on_' . $format, 1) == 1) {
+    $text = Typogrify::caps($text);
+  }
+
+  // Wrap initial quotes.
+  if (variable_get('typogrify_is_initial_quotes_on_' . $format, 1) == 1) {
+    $text = Typogrify::initial_quotes($text);
+  }
+
+  // Build a list of ligatures to convert.
+  foreach (unicode_conversion_map('ligature') as $pair => $ligature) {
+    $setting = 'typogrify_use_' . $pair . '_ligature_' . $format;
+    if (variable_get($setting, 0) == 1) {
+      $characters_to_convert[] = $pair;
+    }
+  }
+
+  // Build a list of arrows to convert.
+  foreach (unicode_conversion_map('arrow') as $ascii => $unicode) {
+    $setting = 'typogrify_use_unicode_for_' . $ascii . '_' . $format;
+    if (variable_get($setting, 0) == 1) {
+      $characters_to_convert[] = $ascii;
+    }
+  }
+
+  // Convert ligatures and arrows
+  if (count($characters_to_convert) > 0) {
+    $text = convert_characters($text, $characters_to_convert);
+  }
+
+  return $text;
+}
+
+function _typogrify_settings($format) {
+  module_load_include('class.php', 'typogrify');
+  module_load_include('php', 'typogrify', 'unicode-conversion');
+  if (!function_exists('smartypants')) {
+    module_load_include('php', 'typogrify', 'smartypants');
+  }
+
+  $form['typogrify_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Typogrify'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['typogrify_settings']['help'] = array(
+    '#type' => 'markup',
+    '#value' => '<p>Enable the following typographic refinements:</p>',
+  );
+
+  // Smartypants settings
+  // We impersonate Marksmarty to ensure that settings are honored by
+  // both marksmarty.module and typogrify.module.
+  if (!function_exists('marksmarty_filter')) {
+  // Smartypants settings.
+    $form['typogrify_settings']['marksmarty_is_smarty_on_' . $format] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Use typographers quotation marks and dashes (!smartylink)', array('!smartylink' => l('SmartyPants', 'http://daringfireball.net/projects/smartypants/'))),
+      '#default_value' => variable_get('marksmarty_is_smarty_on_' . $format, 1),
+    );
+
+    // Smartypants hyphenation settings.
+    // Uses the same values as the parse attributes in the SmartyPants 
+    // function (@see SmartyPants in smartypants.php)
+    $form['typogrify_settings']['marksmarty_smarty_hyphens_' . $format] = array(
+      '#type' => 'select',
+      '#title' => t('Hyphenation settings for SmartyPants'),
+      '#default_value' => variable_get('marksmarty_smarty_hyphens_' . $format, 3),
+      '#options' => array(
+        1 => t('“--” for em-dashes; no en-dash support'),
+        3 => t('“--” for em-dashes; “---” for en-dashes'),
+        2 => t('“---” for em-dashes; “--” for en-dashes'),
+      ),
+    );
+  }
+  // Wrap ampersand settings.
+  $form['typogrify_settings']['typogrify_is_amp_on_' . $format] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wrap ampersands'),
+    '#default_value' => variable_get('typogrify_is_amp_on_' . $format, 1),
+  );
+
+  // Remove widows settings.
+  $form['typogrify_settings']['typogrify_is_widont_on_' . $format] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Remove widows'),
+    '#default_value' => variable_get('typogrify_is_widont_on_' . $format, 1),
+  );
+
+  // Wrap caps settings.
+  $form['typogrify_settings']['typogrify_is_caps_on_' . $format] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wrap caps'),
+    '#default_value' => variable_get('typogrify_is_caps_on_' . $format, 1),
+  );
+
+  // Wrap initial quotes settings.
+  $form['typogrify_settings']['typogrify_is_initial_quotes_on_' . $format] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wrap quotation marks'),
+    '#default_value' => variable_get('typogrify_is_initial_quotes_on_' . $format, 1),
+  );
+
+  // Ligature conversion settings.
+  $form['typogrify_settings']['ligatures'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Ligatures'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  foreach (unicode_conversion_map('ligature') as $pair => $ligature) {
+    $setting = 'typogrify_use_' . $pair . '_ligature_' . $format;
+    $form['typogrify_settings']['ligatures'][$setting] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Convert @pair to !ligature', array('@pair' => $pair, '!ligature' => $ligature)),
+      '#default_value' => variable_get($setting, 0),
+    );
+  }
+
+
+  // Arrow conversion settings.
+  $form['typogrify_settings']['arrows'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Arrows'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  foreach (unicode_conversion_map('arrow') as $ascii => $unicode) {
+    $setting = 'typogrify_use_unicode_for_'. $ascii .'_'. $format;
+    $form['typogrify_settings']['arrows'][$setting] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Convert @ascii to !unicode', array('@ascii' => $ascii, '!unicode' => $unicode)),
+      '#default_value' => variable_get($setting, 0),
+    );
+  }
+
+  // Version Information Settings
+  $version_strings = array();
+  $version_strings[] = t('SmartyPants PHP version: !version', array('!version' => l(SMARTYPANTS_PHP_VERSION, 'http://www.michelf.com/projects/php-smartypants/')));
+  $version_strings[] = t('PHP Typogrify Version: !version', array('!version' => l('1.0', 'http://blog.hamstu.com/')));
+
+  $form['typogrify_settings']['info']['typogrify_status'] = array(
+    '#type' => 'markup',
+    '#value' => theme('item_list', $version_strings, t('Version Information'))
+  );
+
+  return $form;
+}
+

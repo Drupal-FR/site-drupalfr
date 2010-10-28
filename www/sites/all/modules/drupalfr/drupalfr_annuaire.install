@@ -1,0 +1,15 @@
+<?php
+
+function drupalfr_annuaire_install() {
+  drupalfr_add_block(array(
+    'title' => 'Et vous ?',
+    'info' => 'Section: prestataires',
+    'body' => "<p>Vous êtes un prestataire de service Drupal&nbsp;? Pourquoi ne pas vous inscrire dans notre annuaire&nbsp;? C'est facile et rapide.</p><p>Ajouter votre fiche dès aujourd'hui&nbsp;!</p>",
+    'format' => 1,
+    'pages' => "annuaire-pro\nannuaire-pro/*",
+    'visibility' => 1, // Show on only the listed pages.
+    'custom' => 0, // Users can't choose if they can see that block.
+  ));
+}
+
+

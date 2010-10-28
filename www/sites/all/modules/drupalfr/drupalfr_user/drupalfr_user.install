@@ -1,0 +1,9 @@
+<?php
+// $Id$
+
+/**
+ * Implementaton of hook_install().
+ */
+function drupalfr_user_install() {
+  db_query("UPDATE {system} SET weight = 10 WHERE name = 'drupalfr_user' AND type = 'module'");
+}

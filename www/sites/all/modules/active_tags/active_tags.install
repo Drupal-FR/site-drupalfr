@@ -1,0 +1,17 @@
+<?php
+// $Id: active_tags.install,v 1.1.2.1 2009/09/27 15:58:59 dragonwize Exp $
+
+/**
+ * @file
+ *  Install & uninstall functions.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function active_tags_uninstall() {
+  // Delete settings from varible table.
+  $sql = "DELETE FROM {variable}
+          WHERE name LIKE 'active_tags%'";
+  db_query($sql);
+}

@@ -1,0 +1,1407 @@
+# $Id: cs.po,v 1.1.2.2 2009/11/24 20:46:26 sutharsan Exp $
+#
+# Czech translation of Simplenews
+# Copyleft 2009 Tomas Capek <soulcharmer@gmail.com>
+# Generated from files:
+#  simplenews.admin.inc,v 1.5.2.49 2009/03/09 07:45:19 sutharsan
+#  simplenews.module,v 1.76.2.129 2009/03/09 07:45:19 sutharsan
+#  simplenews.install,v 1.8.2.24 2009/03/09 07:45:19 sutharsan
+#  simplenews_action.module,v 1.1.2.6 2009/01/21 08:21:08 sutharsan
+#  simplenews_handler_field_newsletter_s_status.inc,v 1.1.2.4 2009/01/02 11:59:34 sutharsan
+#  simplenews_handler_filter_newsletter_s_status.inc,v 1.1.2.4 2009/01/02 11:59:34 sutharsan
+#  simplenews.js,v 1.1.2.2 2008/09/30 20:07:51 sutharsan
+#  simplenews.subscription.inc,v 1.2.2.10 2009/03/06 20:46:36 sutharsan
+#  simplenews.views.inc,v 1.1.2.4 2009/01/02 11:59:34 sutharsan
+#  simplenews.info,v 1.5.2.1 2008/08/04 06:11:51 sutharsan
+#  simplenews_action.info,v 1.1.2.3 2008/07/15 10:05:08 sutharsan
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-07-24 17:01+0200\n"
+"PO-Revision-Date: 2009-07-24 17:01+0200\n"
+"Last-Translator: Tomas Capek <charmer@solnet.cz>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n==1)?(0):(((n>=2)&&(n<=4))?(1):2));\n"
+
+#: simplenews.admin.inc:21
+msgid "Show issues from"
+msgstr "Zobrazit vydání od"
+
+#: simplenews.admin.inc:26
+msgid "Title"
+msgstr "Nadpis"
+
+#: simplenews.admin.inc:26 simplenews.module:235 simplenews.install:239;244 simplenews_action/simplenews_action.module:211;277
+msgid "Newsletter"
+msgstr "Věstník"
+
+#: simplenews.admin.inc:26
+msgid "Date created"
+msgstr "Datum vytvoření"
+
+#: simplenews.admin.inc:26;1223
+msgid "Published"
+msgstr "Vydáno"
+
+#: simplenews.admin.inc:26;1238 simplenews_handler_field_newsletter_s_status.inc:21 simplenews_handler_filter_newsletter_s_status.inc:17
+msgid "Sent"
+msgstr "Odesláno"
+
+#: simplenews.admin.inc:26
+msgid "Edit"
+msgstr "Upravit"
+
+#: simplenews.admin.inc:53
+msgid "n/a"
+msgstr "není"
+
+#: simplenews.admin.inc:57;701;791
+msgid "edit"
+msgstr "upravit"
+
+#: simplenews.admin.inc:63
+msgid "No newsletters available."
+msgstr "Žádné věstníky k dispozici."
+
+#: simplenews.admin.inc:67;91;1096;1120
+msgid "Filter"
+msgstr "Filtr"
+
+#: simplenews.admin.inc:101;146
+msgid "Newsletter name"
+msgstr "Název věstníku"
+
+#: simplenews.admin.inc:101
+msgid "Subscribers"
+msgstr "Přihlášení"
+
+#: simplenews.admin.inc:101;660;1179
+msgid "Operations"
+msgstr "Akce"
+
+#: simplenews.admin.inc:106
+msgid "edit newsletter"
+msgstr "upravit věstník"
+
+#: simplenews.admin.inc:110
+msgid "There are currently no newsletter series."
+msgstr "Zatím zde nejsou žádné série věstníků."
+
+#: simplenews.admin.inc:133;220;246;312;684 simplenews.module:156
+msgid "Delete"
+msgstr "Smazat"
+
+#: simplenews.admin.inc:149
+msgid "This name of this newsletter."
+msgstr "Jméno tohoto věstníku."
+
+#: simplenews.admin.inc:155
+msgid "Description"
+msgstr "Popis"
+
+#: simplenews.admin.inc:158
+msgid "A description of the newsletter. To be displayed on taxonomy/term pages and RSS feeds."
+msgstr "Popis věstníku. Zobrazí se na stránkách k termínům kategorií a ve výtahu pro RSS."
+
+#: simplenews.admin.inc:163
+msgid "Weight"
+msgstr "Váha"
+
+#: simplenews.admin.inc:165
+msgid "Newsletters are displayed in ascending order by weight."
+msgstr "Věstníky jsou seřazeny vzestupně podle váhy."
+
+#: simplenews.admin.inc:172;858
+msgid "Sender information"
+msgstr "Informace o odesílateli"
+
+#: simplenews.admin.inc:177;864
+msgid "From name"
+msgstr "Jméno odesílatele"
+
+#: simplenews.admin.inc:184;871
+msgid "From email address"
+msgstr "E-mailová adresa odesílatele"
+
+#: simplenews.admin.inc:191
+msgid "HTML to text conversion"
+msgstr "Konverze HTML do textu"
+
+#: simplenews.admin.inc:193
+msgid "When your newsletter is sent as plain text, these options will determine how the conversion to text is performed."
+msgstr "Když je věstník odeslán jako prostý text, tyto volby určí, jak se převedou hypertextové odkazy."
+
+#: simplenews.admin.inc:197
+msgid "Hyperlink conversion"
+msgstr "Převod hypertextových odkazů"
+
+#: simplenews.admin.inc:199
+msgid "Append hyperlinks as a numbered reference list"
+msgstr "Připojit seznam odkazů na konec e-mailu jako číslovaný seznam"
+
+#: simplenews.admin.inc:200
+msgid "Display hyperlinks inline with the text"
+msgstr "Zobrazit odkazy přímo v textu"
+
+#: simplenews.admin.inc:206 simplenews.module:1302 simplenews.js:0
+msgid "Save"
+msgstr "Uložit"
+
+#: simplenews.admin.inc:240;883
+msgid "The sender's email address you supplied is not valid."
+msgstr "Zadaná adresa odesílatele není platná."
+
+#: simplenews.admin.inc:262
+msgid "Created new term %name."
+msgstr "Nový termín '%name' byl vytvořen."
+
+#: simplenews.admin.inc:265 simplenews.install:266
+msgid "Updated term %name."
+msgstr "Termín '%name' byl aktualizován."
+
+#: simplenews.admin.inc:304
+msgid "Note: All subscriptions associated with this newsletter will be lost."
+msgstr "Všechny registrace náležející k tomuto věstníky budou ztraceny."
+
+#: simplenews.admin.inc:309
+msgid "Are you sure you want to delete %title?"
+msgstr "Určitě odstranit %title?"
+
+#: simplenews.admin.inc:311;358
+msgid "This action cannot be undone."
+msgstr "Tuto akci nelze vrátit."
+
+#: simplenews.admin.inc:313;360 simplenews.subscription.inc:142;168
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: simplenews.admin.inc:324
+msgid "Newsletter %title has been deleted."
+msgstr "Věstník %title byl smazán."
+
+#: simplenews.admin.inc:356
+msgid "Are you sure you want to delete these subscriptions?"
+msgstr "Určitě se mají smazat tyto registrace?"
+
+#: simplenews.admin.inc:359
+msgid "Delete all"
+msgstr "Smazat vše"
+
+#: simplenews.admin.inc:369
+msgid "The subscriptions have been deleted."
+msgstr "Registrace byly smazány."
+
+#: simplenews.admin.inc:384;565
+msgid "Email addresses"
+msgstr "E-mailové adresy"
+
+#: simplenews.admin.inc:387
+msgid "Email addresses must be separated by comma, space or newline."
+msgstr "E-mailové adresy musí být odděleny čárkou, mezerou nebo novým řádkem."
+
+#: simplenews.admin.inc:395
+msgid "Subscribe to"
+msgstr "Registrovat k"
+
+#: simplenews.admin.inc:404
+msgid "Site default language"
+msgstr "Výchozí jazyk webu"
+
+#: simplenews.admin.inc:412
+msgid "Anonymous user preferred language"
+msgstr "Preferovaný jazyk anonymních uživatelů"
+
+#: simplenews.admin.inc:415
+msgid "Anonymous users will be subscribed with the selected preferred language. They will receive newsletters in this language if available. Registered users will be subscribed with their preferred language as set on their account page."
+msgstr "Anonymní uživatelé budou přihlašováni ve zvoleném preferovaném jazyce. Pokud to bude možné, budou v tomto jazyce dostávat i věstníky. Registrovaní uživatelé budou přihlašováni v jazyce, který mají nastaven jako preferovaný v nastavení svého účtu."
+
+#: simplenews.admin.inc:424 simplenews.subscription.inc:71;141 simplenews.module:1224;1270;1291
+msgid "Subscribe"
+msgstr "Přihlásit"
+
+#: simplenews.admin.inc:452
+msgid "The following addresses were added or updated: %added."
+msgstr "Následující adresy byly přidány, nebo aktualizovány: %added."
+
+#: simplenews.admin.inc:459
+msgid "The addresses were subscribed to the following newsletters: %newsletters."
+msgstr "Adresy byly přihlášeny k těmto věstníkům: %newsletters."
+
+#: simplenews.admin.inc:462
+msgid "No addresses were added."
+msgstr "Nebyly přidány žádné adresy."
+
+#: simplenews.admin.inc:466;623
+msgid "The following addresses were invalid: %invalid."
+msgstr "Následující adresy jsou neplatné: %invalid."
+
+#: simplenews.admin.inc:478;659;1178
+msgid "Status"
+msgstr "Stav"
+
+#: simplenews.admin.inc:479
+msgid "Active users"
+msgstr "Aktivní uživatelé"
+
+#: simplenews.admin.inc:479
+msgid "Inactive users"
+msgstr "Neaktivní uživatelé"
+
+#: simplenews.admin.inc:480
+msgid "Subscriptions matching the selected states will be exported."
+msgstr "Exportovány budou registrace odpovídající zvoleným stavům."
+
+#: simplenews.admin.inc:489;1045
+msgid "Subscribed to"
+msgstr "Registrován v"
+
+#: simplenews.admin.inc:491
+msgid "Subscriptions matching the selected newsletters will be exported."
+msgstr "Exportovány budou registrace náležející ke zvoleným věstníkům."
+
+#: simplenews.admin.inc:500;508 simplenews.module:196
+msgid "Export"
+msgstr "Export"
+
+#: simplenews.admin.inc:544
+msgid "No addresses were found."
+msgstr "Nebyly nalezeny žádné adresy."
+
+#: simplenews.admin.inc:548
+msgid "Export results"
+msgstr "Výsledek exportu"
+
+#: simplenews.admin.inc:568
+msgid "Email addresses must be separated by comma, space or newline. Email addresses which are no longer subscribed to any newsletter, will be removed from the database."
+msgstr "E-mailové adresy musí být odděleny čárkou, mezerou nebo novým řádkem. Adresy, které již nejsou přihlášeny k žádnému věstníku, budou odstraněny z databáze."
+
+#: simplenews.admin.inc:576
+msgid "Unsubscribe from"
+msgstr "Odhlásit z"
+
+#: simplenews.admin.inc:582 simplenews.subscription.inc:79;167 simplenews.module:1229;1266;1291
+msgid "Unsubscribe"
+msgstr "Odhlásit"
+
+#: simplenews.admin.inc:609
+msgid "The following addresses were unsubscribed or removed: %removed."
+msgstr "Následující adresy byly odhlášeny nebo smazány: %removed."
+
+#: simplenews.admin.inc:616
+msgid "The addresses were unsubscribed from the following newsletters: %newsletters."
+msgstr "Adresy byly odhlášeny z těchto věstníků: %newsletters."
+
+#: simplenews.admin.inc:619
+msgid "No addresses were removed."
+msgstr "Nebyly odstraněny žádné adresy."
+
+#: simplenews.admin.inc:657;1176 simplenews.module:1283
+msgid "Email"
+msgstr "E-mail"
+
+#: simplenews.admin.inc:658;1177
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+#: simplenews.admin.inc:675
+msgid "Update options"
+msgstr "Nastavení aktualizace"
+
+#: simplenews.admin.inc:682
+msgid "Activate"
+msgstr "Aktivovat"
+
+#: simplenews.admin.inc:683
+msgid "Inactivate"
+msgstr "Deaktivovat"
+
+#: simplenews.admin.inc:689 simplenews.subscription.inc:57 simplenews.module:1208
+msgid "Update"
+msgstr "Aktualizovat"
+
+#: simplenews.admin.inc:713
+msgid "No items selected."
+msgstr "Nejsou zvoleny žádné položky."
+
+#: simplenews.admin.inc:725;729
+msgid "The update has been performed."
+msgstr "Aktualizace byla provedena."
+
+#: simplenews.admin.inc:745
+msgid "Content types"
+msgstr "Typy obsahu"
+
+#: simplenews.admin.inc:749
+msgid "Content types to be used as newsletter."
+msgstr "Typy obsahu, které budou moci věstníky využívat."
+
+#: simplenews.admin.inc:752
+msgid "<select>"
+msgstr "=zvolte="
+
+#: simplenews.admin.inc:760
+msgid "Newsletter vocabulary"
+msgstr "Slovník pro věstníky"
+
+#: simplenews.admin.inc:763
+msgid "This vocabulary identifies newsletter series. Note that changing this vocabulary will require existing newsletters to be re-tagged and activated newsletter blocks to be re-activated."
+msgstr "Tento slovník určuje série věstníků. Při jeho změně bude nutné přeznačit existující věstníky a reaktivovat aktivní věstníkové bloky."
+
+#: simplenews.admin.inc:790;791
+msgid "Updated vocabulary %name."
+msgstr "Slovník %name byl aktualizován."
+
+#: simplenews.admin.inc:804
+msgid "Default newsletter options"
+msgstr "Výchozí nastavení věstníku"
+
+#: simplenews.admin.inc:806
+msgid "These options will be the defaults for new newsletters, but can be overridden in the newsletter editing form."
+msgstr "Tato nastavení budou výchozí pro nové věstníky, ale mohou být přenastaveny ve formuláři pro úpravy věstníku."
+
+#: simplenews.admin.inc:808
+msgid "Default newsletter format."
+msgstr "Výchozí formát věstníku."
+
+#: simplenews.admin.inc:810
+msgid "Install <a href=\"@mime_mail_url\">Mime Mail</a> module to send newsletters in HTML format."
+msgstr "Posílání věstníků ve formátu HTML vám umožní modul <a href=\"@mime_mail_url\">Mime Mail</a>."
+
+#: simplenews.admin.inc:814
+msgid "Format"
+msgstr "Formát"
+
+#: simplenews.admin.inc:821
+msgid "Priority"
+msgstr "Priorita"
+
+#: simplenews.admin.inc:822 simplenews.module:624
+msgid "none"
+msgstr "žádná"
+
+#: simplenews.admin.inc:822 simplenews.module:625
+msgid "highest"
+msgstr "nejvyšší"
+
+#: simplenews.admin.inc:822 simplenews.module:626
+msgid "high"
+msgstr "vysoká"
+
+#: simplenews.admin.inc:822 simplenews.module:627
+msgid "normal"
+msgstr "normální"
+
+#: simplenews.admin.inc:822 simplenews.module:628
+msgid "low"
+msgstr "nízká"
+
+#: simplenews.admin.inc:822 simplenews.module:629
+msgid "lowest"
+msgstr "nejnižší"
+
+#: simplenews.admin.inc:823
+msgid "Note that email priority is ignored by a lot of email programs."
+msgstr "Mějte na paměti, že prioritu e-mailů mnoho poštovních aplikací ignoruje."
+
+#: simplenews.admin.inc:828 simplenews.module:634
+msgid "Request receipt"
+msgstr "Vyžadovat doručenku"
+
+#: simplenews.admin.inc:830
+msgid "Request a Read Receipt from your newsletters. A lot of email programs ignore these so it is not a definitive indication of how many people have read your newsletter."
+msgstr "Vyžadovat potvrzení o přečtení věstníku. Mnoho aplikací pro práci s poštou tato potvrzení ignoruje, proto z nich nelze s určitostí vyvozovat, kolik lidí váš věstník četlo."
+
+#: simplenews.admin.inc:834
+msgid "Default send action"
+msgstr "Výchozí akce při poslání"
+
+#: simplenews.admin.inc:835 simplenews.module:553;565
+msgid "Don't send now"
+msgstr "Neposílat nyní"
+
+#: simplenews.admin.inc:835 simplenews.module:554;566
+msgid "Send one test newsletter to the test address"
+msgstr "Odeslat jeden testovací věstník na testovací adresu"
+
+#: simplenews.admin.inc:835 simplenews.module:526;555
+msgid "Send newsletter"
+msgstr "Odeslat věstník"
+
+#: simplenews.admin.inc:840
+msgid "Test addresses"
+msgstr "Zkušební adresy"
+
+#: simplenews.admin.inc:842
+msgid "Supply a comma-separated list of email addresses to be used as test addresses. The override function allows to override these addresses in the newsletter editing form."
+msgstr "Čárkami oddělte jednotlivé e-mailové adresy, které se použijí jako zkušební. Před odesláním věstníku je možné tyto adresy ještě přebít jinými."
+
+#: simplenews.admin.inc:846;1056
+msgid "Email address"
+msgstr "E-mailová adresa"
+
+#: simplenews.admin.inc:853
+msgid "Allow test address override"
+msgstr "Povolit přebití zkušebních adres"
+
+#: simplenews.admin.inc:860
+msgid "Default sender address that will only be used for confirmation emails. You can specify sender information for each newsletter separately on the newsletter's settings page."
+msgstr "Výchozí adresa odesílatele se použije pouze pro potvrzovací e-maily. Pro každý věstník můžete nastavit vlastní informace o odesílateli ve formuláři pro nastavení věstníku."
+
+#: simplenews.admin.inc:897
+msgid "Use cron to send newsletters"
+msgstr "Posílat věstníky cronem"
+
+#: simplenews.admin.inc:899
+msgid "When checked cron will be used to send newsletters (recommended). Test newsletters and confirmation emails will be send immediately. Leave unchecked for testing purposes."
+msgstr "Pokud je povoleno, věstníky se budou vždy odesílat s pomocí cronu (doporučeno). Zkušební věstníky a potvrzovací e-maily se budou posílat ihned. Při testování účely nechte odškrtnuté."
+
+#: simplenews.admin.inc:902
+msgid "Unlimited"
+msgstr "Neomezené"
+
+#: simplenews.admin.inc:904
+msgid "Cron execution must not exceed the PHP maximum execution time of %max seconds. You find the time spend to send emails in the <a href=\"/admin/reports/dblog\">Recent log entries</a>."
+msgstr "Běh cronu nesmí překročit limit PHP pro běh programu (%max sekund). Čas strávený odesíláním e-mailů najdete na stránce <a href=\"/admin/reports/dblog\">Nejnovější záznamy v logu</a>."
+
+#: simplenews.admin.inc:907
+msgid "Cron execution must not exceed the PHP maximum execution time of %max seconds."
+msgstr "Běh cronu nesmí překročit limit PHP pro běh programu (%max sekund)."
+
+#: simplenews.admin.inc:911
+msgid "Cron throttle"
+msgstr "Omezení cronu"
+
+#: simplenews.admin.inc:914
+msgid "Sets the numbers of newsletters sent per cron run. Failure to send will also be counted."
+msgstr "Nastaví počet věstníků, které se odešlou při jednom spuštění cronu. Započítávají se i neúspěšná odeslání."
+
+#: simplenews.admin.inc:918
+msgid "Mail spool expiration"
+msgstr "Vypršení platnosti ve frontě"
+
+#: simplenews.admin.inc:919
+msgid "Immediate"
+msgstr "okamžité"
+
+#: simplenews.admin.inc:919
+msgid "1 day"
+msgstr "1 den"
+
+#: simplenews.admin.inc:919
+msgid "1 week"
+msgstr "1 týden"
+
+#: simplenews.admin.inc:919
+msgid "2 weeks"
+msgstr "2 týdny"
+
+#: simplenews.admin.inc:921
+msgid "Newsletter mails are spooled. How long must messages be retained in the spool after successfull sending. Keeping the message in the spool allows mail statistics (which is not yet implemented). If cron is not used, immediate expiration is advised."
+msgstr "E-maily s věstníky se ukládají do poštovní fronty. Zde nastavíte, kdy vyprší jejich platnost ve frontě po úspěšném odeslání. Uchovávání e-mailů ve frontě umožňuje výpočet statistik pro poštu (zatím neimplementováno). Pokud se nepoužívá cron, je doporučeno nastavit okamžité vypršení platnosti."
+
+#: simplenews.admin.inc:925
+msgid "Log emails"
+msgstr "Zaznamenávat e-maily"
+
+#: simplenews.admin.inc:927
+msgid "When checked all outgoing simplenews emails are logged in the system log. A logged email does not guarantee that it is send or will be delivered. It only indicates that a message is send to the PHP mail() function. No status information is available of delivery by the PHP mail() function."
+msgstr "Pokud je povoleno, budou se všechny odchozí e-maily modulu Novinky zaznamenávat do systémového záznamu. Záznam e-mailu nezaručuje, že byl e-mail skutečně odeslán nebo doručen. Pouze říká, že byl poslán funkci PHP mail(). Stavové informace poskytované touto funkcí nejsou k dispozici."
+
+#: simplenews.admin.inc:943
+msgid "User account"
+msgstr "Uživatelský účet"
+
+#: simplenews.admin.inc:948
+msgid "Synchronize with account"
+msgstr "Synchronizovat s účty"
+
+#: simplenews.admin.inc:950
+msgid "When checked subscriptions will be synchronized with site accounts. When accounts are deteted, subscriptions with the same email address will be removed. When site accounts are blocked/unblocked, subscriptions will be deactivated/activated. When not checked subscriptions will be unchanged when associated accounts are deleted or blocked."
+msgstr "Pokud je povoleno, registrace se budou synchronizovat s uživatelskými účty webu. Pokud dojde ke smazání účtu, smažou se i registrace se stejnou e-mailovou adresou. Pokud dojde k zablokování/odblokování účtu, navázané registrace se deaktivují/aktivují. Pokud není povoleno, blokování nebo smazání účtu nebude mít na stav registrace vliv."
+
+#: simplenews.admin.inc:955
+msgid "Available variables are:"
+msgstr "Dostupné proměnné jsou:"
+
+#: simplenews.admin.inc:959
+msgid "Confirmation emails"
+msgstr "Potvrzovací e-maily"
+
+#: simplenews.admin.inc:961
+msgid "Customize the confimation email which is sent to (un)subscribing visitors."
+msgstr "Nastavte znění a podobu potvrzovacích e-mailů pro návštěvníky zakládající nebo rušící registrace."
+
+#: simplenews.admin.inc:965
+msgid "Subject"
+msgstr "Předmět"
+
+#: simplenews.admin.inc:971
+msgid "Body text of subscribe email"
+msgstr "Text registračního e-mailu"
+
+#: simplenews.admin.inc:977
+msgid "Body text for already subscribed visitor"
+msgstr "Text e-mailu pro návštěvníky, kteří již jsou registrovaní"
+
+#: simplenews.admin.inc:983
+msgid "Body text of unsubscribe email"
+msgstr "Text e-mailu rušícího registraci"
+
+#: simplenews.admin.inc:989
+msgid "Body text for not yet subscribed visitor"
+msgstr "Text e-mailu pro neregistrovaného návštěvníka požadujícího zrušení registrace"
+
+#: simplenews.admin.inc:1025
+msgid "all newsletters"
+msgstr "všechny věstníky"
+
+#: simplenews.admin.inc:1028
+msgid "orphaned newsletters"
+msgstr "zrušené věstníky"
+
+#: simplenews.admin.inc:1047
+msgid "All newsletters"
+msgstr "Všechny věstníky"
+
+#: simplenews.admin.inc:1076
+msgid "Subscription filters"
+msgstr "Filtry registrací"
+
+#: simplenews.admin.inc:1103;1126
+msgid "Reset"
+msgstr "Obnovit"
+
+#: simplenews.admin.inc:1196
+msgid "No subscriptions available."
+msgstr "Žádne registrace nejsou k dispozici."
+
+#: simplenews.admin.inc:1223
+msgid "Not published"
+msgstr "Nevydáno"
+
+#: simplenews.admin.inc:1227
+msgid "Inactive: no newsletters will be sent"
+msgstr "Neaktivní: věstníky nebudou odesílány"
+
+#: simplenews.admin.inc:1227
+msgid "Active: user will receive newsletters"
+msgstr "Aktivní: uživatel bude věstníky dostávat"
+
+
+#: simplenews.admin.inc:1236 simplenews_handler_field_newsletter_s_status.inc:17 simplenews_handler_filter_newsletter_s_status.inc:15
+msgid "Not sent"
+msgstr "Neodeslán"
+
+#: simplenews.admin.inc:1237
+msgid "Currently sending by cron"
+msgstr "Právě odesílán cronem"
+
+#: simplenews.admin.inc:791 simplenews.module:1032;1151;1617;1675;1678;1683;1725;1737;1740
+msgid "simplenews"
+msgstr "věstníky"
+
+#: simplenews.subscription.inc:45 simplenews.module:1309
+msgid "The email address you supplied is not valid."
+msgstr "Zadaná e-mailová adresa není platná."
+
+#: simplenews.subscription.inc:51
+msgid "You must select at least one newsletter."
+msgstr "Vyberte prosím alespoň jeden věstník."
+
+#: simplenews.subscription.inc:69
+msgid "The newsletter subscriptions for %mail have been updated."
+msgstr "Registrace věstníků pro adresu %mail byly aktualizovány."
+
+#: simplenews.subscription.inc:77 simplenews.module:1325
+msgid "You will receive a confirmation email shortly containing further instructions on how to complete your subscription."
+msgstr "Zanedlouho Vám přijde potvrzení e-mailem, ve kterém budou další pokyny, jak registraci dokončit."
+
+#: simplenews.subscription.inc:85 simplenews.module:1334
+msgid "You will receive a confirmation email shortly containing further instructions on how to complete the unsubscription process."
+msgstr "Zanedlouho Vám přijde potvrzení e-mailem, ve kterém budou další pokyny, jak zrušení registrace dokončit."
+
+#: simplenews.subscription.inc:132
+msgid "Are you sure you want to add %user to the %newsletter mailing list?"
+msgstr "Určitě chcete přidat uživatele %user do registrací věstníku %newsletter?"
+
+#: simplenews.subscription.inc:138
+msgid "Confirm subscription"
+msgstr "Potvrzení registrace"
+
+#: simplenews.subscription.inc:140
+msgid "You always have the option of unsubscribing later."
+msgstr "Kdykoliv později máte možnost svou registraci zrušit."
+
+#: simplenews.subscription.inc:148
+msgid "%user was added to the %newsletter mailing list."
+msgstr "Uživatel %user byl přidán do registrací věstníku %newsletter."
+
+#: simplenews.subscription.inc:158
+msgid "Are you sure you want to remove %user from the %newsletter mailing list?"
+msgstr "Určitě chcete smazat uživatele %user z registrací věstníku %newsletter?"
+
+#: simplenews.subscription.inc:164
+msgid "Confirm unsubscription"
+msgstr "Potvrzení zrušení registrace"
+
+#: simplenews.subscription.inc:166
+msgid "This action will only remove you from the newsletter mailing list. If you are registered at our site, your account information will remain unchanged."
+msgstr "Tato akce pouze odstraní Vaši adresu ze seznamu registrací věstníku. Pokud jste současně registrován(a) na našem webu, váš účet a jeho nastavení zůstanou beze změny."
+
+#: simplenews.subscription.inc:174
+msgid "%user was removed from the %newsletter mailing list."
+msgstr "Uživatel %user byl smazán ze seznamu registrací věstníku %newsletter."
+
+#: simplenews.views.inc:17 simplenews.module:2299;215 simplenews.info:0
+msgid "Simplenews"
+msgstr "Novinky"
+
+#: simplenews.views.inc:21
+msgid "Node"
+msgstr "Uzel"
+
+#: simplenews.views.inc:22
+msgid "Using nodes as newsletters."
+msgstr "Používat uzly jako věstníky."
+
+#: simplenews.views.inc:39
+msgid "Sent status"
+msgstr "Stav odeslání"
+
+#: simplenews.views.inc:40
+msgid "Newsletter sent status: Not sent, Pending (being sent or waiting for cron to run), Sent."
+msgstr "Stav odeslání věstníku: Neodeslán, Čekající (právě odesílán nebo čekající na cron), Odeslán."
+
+#: simplenews_handler_field_newsletter_s_status.inc:19 simplenews_handler_filter_newsletter_s_status.inc:16
+msgid "Pending"
+msgstr "Čekající"
+
+#: simplenews.module:76
+msgid "Missing newsletter vocabulary. Please set a vocabulary at <a href=\"@settings\">Simplenews settings</a>."
+msgstr "Chybějící slovník pro věstníky. Nastavte prosím slovník v <a href=\"@settings\">nastavení modulu Novinky</a>."
+
+#: simplenews.module:349
+msgid "No newsletter term is selected, the newsletter taxonomy term is probably not configured correctly.<br /> Check and <strong>save</strong> the <a href=\"@settings\">Simplenews general settings</a>."
+msgstr "Není zvolen žádný věstníkový termín, kategorie pro věstníky zřejmě správně nastavena.<br /> Zkontrolujte a <strong>uložte</strong> <a href=\"@settings\">obecné nastavení modulu Novinky</a>."
+
+#: simplenews.module:357
+msgid "Test email address is empty."
+msgstr "Zkušební e-mailová adresa je prázdná."
+
+#: simplenews.module:360
+msgid "Invalid email address %mail."
+msgstr "Neplatná e-mailová adresa '%mail'."
+
+#: simplenews.module:365
+msgid "Missing test email address."
+msgstr "Zkušební e-mailová adresa chybí."
+
+#: simplenews.module:427
+msgid "Newsletter %title was deleted."
+msgstr "Věstník %title byl smazán."
+
+#: simplenews.module:495
+msgid "This is the designated simplenews vocabulary."
+msgstr "Toto je výchozí slovník pro věstníky."
+
+#: simplenews.module:499
+msgid "These content type(s) are used as newsletter. They can also be set in !simplenews_settings."
+msgstr "Tyto typy obsahu se používají pro věstníky. Lze je nastavit také v !simplenews_settings."
+
+#: simplenews.module:514
+msgid "This will be the body of your newsletter. Available variables are: !site (the name of your website), !uri (a link to your homepage), !uri_brief (homepage link without the http://), !date (today's date), !login_uri (link to login page), !confirm_subscribe_url (subscription confirmation link), !confirm_unsubscribe_url (unsubscription link), !newsletter_url (link to this newsletter issue), !newsletter_name (name of this newsletter series)."
+msgstr "Toto je hlavní část vašeho věstníku. K dispozici jsou tyto proměnné: !site (název vašeho webu), !uri (odkaz na vaši domovskou stránku), !uri_brief (odkaz na domovskou stránku bez http://), !date (dnešní datum), !login_uri (odkaz na přihlašovací stránku), !confirm_subscribe_url (odkaz pro potvrzení registrace), !confirm_unsubscribe_url (odkaz pro zrušení registrace), !newsletter_url (odkaz na vydání tohoto věstníku), !newsletter_name (jméno tohoto věstníku)."
+
+#: simplenews.module:522
+msgid "Invalid vocabulary setting detected. Check and <strong>save</strong> the <a href=\"@settings\">Simplenews general settings</a>."
+msgstr "Bylo zjištěno nesprávné nastavení slovníku. Zkontrolujte a <strong>uložte</strong> <a href=\"@settings\">obecné nastavení modulu Novinky</a>."
+
+#: simplenews.module:536
+msgid "This newsletter issue is part of a translation set. Sending this set is controlled from the <a href=\"@link\">translation source newsletter</a>."
+msgstr "Toto vydání věstníku je součástí překladové sady. Odesílání této sady se ovládá ze <a href=\"@link\">zdroje věstníku pro překlad</a>"
+
+#: simplenews.module:558
+msgid "Send action"
+msgstr "Akce při odeslání"
+
+#: simplenews.module:569
+msgid "Sending"
+msgstr "Odesílám"
+
+#: simplenews.module:572
+msgid "You have no privileges to send this newsletter"
+msgstr "Nemáte oprávnění odeslat tento věstník"
+
+#: simplenews.module:581
+msgid "Test email addresses"
+msgstr "Zkušební e-mailové adresy"
+
+#: simplenews.module:582
+msgid "Supply a comma-separated list of email addresses to be used as test addresses."
+msgstr "Čárkami oddělte jednotlivé e-mailové adresy, které se použijí jako zkušební."
+
+#: simplenews.module:597
+msgid "Email options"
+msgstr "Nastavení pro e-maily"
+
+#: simplenews.module:607
+msgid "Email format"
+msgstr "Formát zprávy"
+
+#: simplenews.module:621
+msgid "Email priority"
+msgstr "Priorita zprávy"
+
+#: simplenews.module:642
+msgid "This newsletter has been sent"
+msgstr "Tento věstník byl odeslán"
+
+#: simplenews.module:680
+msgid "All subscriptions to newsletter %newsletter have been deleted."
+msgstr "Všechny registrace věstníku %newsletter byly smazány."
+
+#: simplenews.module:755
+msgid "Current newsletter subscriptions"
+msgstr "Aktuální registrace věstníku"
+
+#: simplenews.module:762
+msgid "My newsletters"
+msgstr "Moje věstníky"
+
+#: simplenews.module:771;801;86;116;125;133
+msgid "Newsletters"
+msgstr "Věstníky"
+
+#: simplenews.module:783;787
+msgid "None"
+msgstr "žádný"
+
+#: simplenews.module:790
+msgid "Current subscriptions"
+msgstr "Aktuální registrace"
+
+#: simplenews.module:797
+msgid "Manage !my_subscriptions"
+msgstr "Spravovat !my_subscriptions"
+
+#: simplenews.module:797
+msgid "my subscriptions"
+msgstr "moje registrace"
+
+#: simplenews.module:817
+msgid "Newsletter: @title"
+msgstr "Věstník: @title"
+
+#: simplenews.module:825
+msgid "Block message"
+msgstr "Zpráva v bloku"
+
+#: simplenews.module:828;2372
+msgid "Stay informed on our latest news!"
+msgstr "Mějte přehled o našich novinkách!"
+
+#: simplenews.module:832
+msgid "Subscription interface"
+msgstr "Rozhraní pro registrace"
+
+#: simplenews.module:833
+msgid "Subscription form"
+msgstr "Registrační formulář"
+
+#: simplenews.module:833
+msgid "Link to form"
+msgstr "Odkaz do formuláře"
+
+#: simplenews.module:834
+msgid "Note: this requires permission 'subscribe to newsletters'."
+msgstr "Tato akce vyžaduje oprávnění 'registrace k věstníkům'."
+
+#: simplenews.module:839
+msgid "Display link to previous issues"
+msgstr "Zobrazit odkaz ke starším vydáním"
+
+#: simplenews.module:845
+msgid "Display previous issues"
+msgstr "Zobrazit starší vydání"
+
+#: simplenews.module:851
+msgid "Number of issues to display"
+msgstr "Vydání zobrazovat v počtu"
+
+#: simplenews.module:857
+msgid "Display RSS-feed icon"
+msgstr "Zobrazit ikonu pro RSS"
+
+#: simplenews.module:1193
+msgid "Select the newsletter(s) to which you want to subscribe or unsubscribe."
+msgstr "Zvolte věstníky, k jejichž odběru se chcete přihlásit nebo odhlásit."
+
+#: simplenews.module:1204
+msgid "Subscriptions for %mail"
+msgstr "Registrace pro %mail"
+
+#: simplenews.module:1213
+msgid "Manage your newsletter subscriptions"
+msgstr "Spravovat moje registrace k věstníkům"
+
+#: simplenews.module:1216
+msgid "email"
+msgstr "e-mail"
+
+#: simplenews.module:1275
+msgid "User"
+msgstr "Uživatel"
+
+#: simplenews.module:1328
+msgid "You have been subscribed."
+msgstr "Registrace byla dokončena."
+
+#: simplenews.module:1337
+msgid "You have been unsubscribed."
+msgstr "Zrušení registrace bylo úspěšně dokončeno."
+
+#: simplenews.module:1400
+msgid "Newsletter sent."
+msgstr "Věstník byl odeslán."
+
+#: simplenews.module:1404
+msgid "Newsletter pending."
+msgstr "Věstník čeká na odeslání."
+
+#: simplenews.module:1432
+msgid "Test newsletter sent to %recipient."
+msgstr "Zkušební věstník byl odeslán na %recipient."
+
+#: simplenews.module:1532
+msgid "Unassigned newsletter"
+msgstr "Nepřiřazený věstník"
+
+#: simplenews.module:1671
+msgid "Sent via Mime Mail"
+msgstr "Poslat přes Mime Mail"
+
+#: simplenews.module:1725
+msgid "Cron throttle setting"
+msgstr "Nastavení omezení cronu"
+
+#: simplenews.module:2152
+msgid "Simplenews publishes and sends newsletters to lists of subscribers. Both anonymous and authenticated users can opt-in to different mailing lists."
+msgstr "Modul Novinky zajišťuje publikování a odesílání novinek registrovaným uživatelům. K různým věstníkům se mohou registrovat přihlášení i anonymní uživatelé."
+
+#: simplenews.module:2153
+msgid "Simplenews uses nodes for <strong>newsletter issues</strong>. Newsletter issues are grouped by a <strong>newsletter taxonomy term</strong>. Node type and vocabulary are selectable. A newsletter is send to all email addresses which are subscribed to the newsletter. Newsletter issues can be sent only once. Large mailings should be sent by cron to balance the mailserver load."
+msgstr "Pro jednotlivá <strong>vydání věstníku</strong> využívá modul Novinky uzly. Vydání se slučují pod jedním <strong>věstníkovým termínem</strong> v rámci kategorií. Typ uzlu a slovník je možné zvolit. Vydání věstníku se posílá na všechny e-mailové adresy, které jsou k danému věstníku zaregistrovány. Vydání věstníku je jednorázová akce. Rozesílání velkého počtu e-mailů by mělo probíhat přes cron, aby se zabránilo nárazové zátěži na serveru."
+
+#: simplenews.module:2154
+msgid "Simplenews adds elements to the newsletter node add/edit form to manage newsletter format and sending of the newsletter issue. A newsletter issue can be sent for test before sending officially."
+msgstr "Modul Novinky přidává do formuláře pro vytváření resp. editaci věstníku elementy pro nastavení formátu a odesílání věstníků. Vydání věstníku je možné před oficiálním odesláním odeslat zkušebně na vybranou adresu."
+
+#: simplenews.module:2155
+msgid "Both anonymous and authenticated users can <strong>opt-in and opt-out</strong> to a newsletter. A confirmation message is sent to anonymous users at subscription and unsubscription. Users can (un)subscribe using a form and a block. A <strong>subscription block</strong> is available for each newsletter offering a subscription form, a link to recent newsletters and RSS feed. Email addresses can also be imported and exported via the subscription administration pages."
+msgstr "Přihlášení i anonymní uživatelé se mohou k věstníku <strong>registrovat i odregistrovat</strong>. Anonymním uživatelům se při změně stavu registrace posílá potvrzovací e-mail. Přihlášení uživatelé mohou změnit stav své registrace pomocí formuláře nebo bloku. <strong>Blok pro registrace</strong> je k dispozici pro každý věstník a obsahuje formulář pro registraci, odkaz na starší vydání a do RSS. E-mailové adresy lze také importovat nebo exportovat ze stránky nastavení registrací."
+
+#: simplenews.module:2156
+msgid "Configuration"
+msgstr "Konfigurace"
+
+#: simplenews.module:2159
+msgid "Configure permissions"
+msgstr "Nastavit práva"
+
+#: simplenews.module:2162
+msgid "Configure Simplenews"
+msgstr "Nastavení modulu Novinky"
+
+#: simplenews.module:2165
+msgid "Enable a newsletter <a href=\"@admin_blocks\">subscription block</a>."
+msgstr "Povolit <a href=\"@admin_blocks\">blok pro registrace</a> věstníků."
+
+#: simplenews.module:2168
+msgid "Manage your <a href=\"@newsletters\">newsletters</a>, <a href=\"@sent\">sent newsletters</a> and <a href=\"@subscriptions\">subscriptions</a>."
+msgstr "Spravovat <a href=\"@newsletters\">věstníky</a>, <a href=\"@sent\">odeslaná vydání</a> a <a href=\"@subscriptions\">registrace</a>."
+
+#: simplenews.module:2172
+msgid "For more information, see the online handbook entry for <a href=\"@handbook\">Simplenews</a>."
+msgstr "Podrobnější informace najdete ve webové příručce modulu <a href=\"@handbook\">Novinky</a> (anglicky)."
+
+#: simplenews.module:2176
+msgid "Add this newsletter issue to a newsletter by selecting a newsletter from the select list. Send a newsletter or a test newsletter by selecting the appropriate radio button and submitting the node."
+msgstr "Zvolením věstníku z menu přiřadíte toto vydání věstníku ke konkrétnímu typu. Zvolením odpovídajícího tlačítka a posláním stránky můžete věstník rozeslat nebo poslat jen zkušební e-mail."
+
+#: simplenews.module:2178
+msgid "Set default send options at <a href=\"@configuration\">Administer > Site configuration > Simplenews > Newsletter</a>."
+msgstr "Výchozí obecné nastavení pro odesílání věstníků najdete v <a href=\"@configuration\">Administrace > Nastavení webu > Novinky > Věstníky</a>."
+
+#: simplenews.module:2181
+msgid "Set newsletter specific options at <a href=\"@configuration\">Administer > Content management > Newsletters > Newsletters</a>."
+msgstr "Nastavení pro konkrétní věstníky najdete v <a href=\"@configuration\">Administrace > Správa obsahu > Věstníky > Věstníky</a>."
+
+#: simplenews.module:2187
+msgid "These settings are default to all newsletters. Newsletter specific settings can be found at the <a href=\"@page\">newsletter's settings page</a>."
+msgstr "Tyto volby jsou výchozí pro všechny věstníky. Nastavení konkrétních věstníků najdete na stránce <a href=\"@page\">nastavení věstníků</a>."
+
+#: simplenews.module:2189
+msgid "Install <a href=\"@mime_mail_url\">Mime Mail</a> to send HTML emails or emails with attachments (both plain text and HTML)."
+msgstr "Odesílání e-mailů ve formátu HTML nebo e-mailů s přílohou obsahující text jak ve formě obyčejného textu a HTML je možné, pokud nainstalujete modul <a href=\"@mime_mail_url\">Mime Mail</a>."
+
+#: simplenews.module:2194
+msgid "You can create different newsletters (or subjects) to categorize your news (e.g. Cats news, Dogs news, ...)."
+msgstr "Můžete vytvářet různé typy věstníků a tím kategorizovat své elektronické novinky (např. novinky o kočkách, novinky o psech apod.)"
+
+#: simplenews.module:2197
+msgid "'Plain' display settings apply to the content of emails send in plain text format. 'HTML' display settings apply to both HTML and plain text alternative content of emails send in HTML format."
+msgstr "Zobrazení 'obyčejný text' platí pro obsah e-mailů odesílaných v tomto formátu. Zobrazení 'html' platí pro e-maily odesílané ve formátu HTML nebo s přílohou obsahující HTML podobu e-mailu."
+
+#: simplenews.module:2232
+msgid "plain"
+msgstr "obyčejný text"
+
+#: simplenews.module:2234
+msgid "html"
+msgstr "html"
+
+#: simplenews.module:2257
+msgid "We have received a request for subscription of !mailto to the !newsletter_name on !site website at !uri. To confirm this subscription please use the link below.\n\n!confirm_subscribe_url"
+msgstr "Obdrželi jsme žádost o registraci e-mailové adresy !mailto k odebírání věstníku !newsletter_name na webu !site na adrese !uri. Prosím potvrďte registraci kliknutím na odkaz níže.\n\n!confirm_subscribe_url"
+
+#: simplenews.module:2259
+msgid "We have received a request for subscription of !mailto to the !newsletter_name on !site website at !uri. However, this email is already subscribed to this newsletter. If you intended to unsubscribe please visit our site: !uri"
+msgstr "Obdrželi jsme žádost o registraci e-mailové adresy !mailto k odebírání věstníku !newsletter_name na webu !site na adrese !uri. Nicméně tato adresa už zaregistrovaná je. Pokud jste měli v úmyslu registraci zrušit, navštivte prosím náš web: !uri"
+
+#: simplenews.module:2261
+msgid "We have received a request to unsubscribe !mailto from the !newsletter_name on !site website at !uri. To confirm this unsubscription please use the link below.\n\n!confirm_unsubscribe_url"
+msgstr "Obdrželi jsme žádost o zrušení registrace e-mailové adresy !mailto k odebírání věstníku !newsletter_name na webu !site na adrese !uri. Prosím potvrďte zrušení registrace kliknutím na odkaz níže.\n\n!confirm_unsubscribe_url"
+
+#: simplenews.module:2263
+msgid "We have received a request to unsubscribe !mailto from the !newsletter_name on !site website at !uri. However, this email is not subscribed to this newsletter. If you intended to subscribe please visit our site: !uri"
+msgstr "Obdrželi jsme žádost o zrušení registrace e-mailové adresy !mailto k odebírání věstníku !newsletter_name na webu !site na adrese !uri. Nicméně tato adresa není k tomuto věstníku zaregistrována. Pokud jste měli v úmyslu zaregistrování, navštivte prosím náš web: !uri"
+
+#: simplenews.module:2265
+msgid "Confirmation for !newsletter_name from !site"
+msgstr "Potvrzení k věstníku !newsletter_name z webu !site"
+
+#: simplenews.module:2302
+msgid "Email: Plain"
+msgstr "E-mail: obyčejný"
+
+#: simplenews.module:2306
+msgid "Email: HTML"
+msgstr "E-mail: HTML"
+
+#: simplenews.module:2375
+msgid "Manage my subscriptions"
+msgstr "Spravovat moje registrace"
+
+#: simplenews.module:2377;2379
+msgid "Previous issues"
+msgstr "Předchozí vydání"
+
+#: simplenews.module:2381
+msgid "@newsletter feed"
+msgstr "RSS pro @newsletter"
+
+#: simplenews.module:2427
+msgid "Unsubscribe from this newsletter"
+msgstr "Zrušit registraci k tomuto věstníku"
+
+#: simplenews.module:2428
+msgid "This is a test version of the newsletter."
+msgstr "Toto je zkušební verze věstníku."
+
+#: simplenews.module:1032
+msgid "Attempt to unsubscribe from non existing newsletter term ID %id"
+msgstr "Pokus o zrušení registrace neexistujícího věstníkového termínu s ID %id"
+
+#: simplenews.module:1151
+msgid "User %email deleted from the mailing list."
+msgstr "Adresa %email byla smazána ze seznamu adres."
+
+#: simplenews.module:1617
+msgid "Outgoing email. Message type: %type<br />Subject: %subject<br />Recipient: %to"
+msgstr "Odchozí zpráva. Typ: %type<br />Předmět: %subject<br />Příjemce: %to"
+
+#: simplenews.module:1675
+msgid "Outgoing email. Message type: %type<br />Subject: %subject<br />Recipient: %to %mimemail"
+msgstr "Odchozí zpráva. Typ: %type<br />Předmět: %subject<br />Příjemce: %to %mimemail"
+
+#: simplenews.module:1678
+msgid "Outgoing email failed. Message type: %type<br />Subject: %subject<br />Recipient: %to %mimemail"
+msgstr "Odeslání se nezdařilo. Typ: %type<br />Předmět: %subject<br />Příjemce: %to %mimemail"
+
+#: simplenews.module:1683
+msgid "Newsletter not send: node does not exist (nid = @nid; vid = @vid)."
+msgstr "Věstník nebyl odeslán: uzel neexistuje (nid = @nid; vid = @vid)."
+
+#: simplenews.module:1725
+msgid "Sending interrupted: PHP maximum execution time almost exceeded. Remaining newsletters will be send during the next cron run. If this warning occurs regularly you should reduce the !cron_throttle_setting."
+msgstr "Odesílání bylo přerušeno: maximální čas pro spuštění procesu PHP byl téměř dosažen. Zbývající věstníky budou odeslány při příštím běhu cronu. Pokud se toto varování vyskytuje pravidelně, měli byste snížit zátěž cronu !cron_throttle_setting."
+
+#: simplenews.module:1737
+msgid "%count emails sent in %sec seconds."
+msgstr "%count e-mailů odesláno za %sec sekund."
+
+#: simplenews.module:1740
+msgid "%count emails sent."
+msgstr "Bylo odesláno %count e-mailů."
+
+#: simplenews.module:65
+msgid "administer newsletters"
+msgstr "spravovat věstníky"
+
+#: simplenews.module:65
+msgid "administer simplenews subscriptions"
+msgstr "spravovat registrace k věstníkům"
+
+#: simplenews.module:65
+msgid "administer simplenews settings"
+msgstr "spravovat nastavení modulu Novinky"
+
+#: simplenews.module:65
+msgid "send newsletter"
+msgstr "odesílat věstníky"
+
+#: simplenews.module:65
+msgid "subscribe to newsletters"
+msgstr "registrovat se k věstníkům"
+
+#: simplenews.module:87
+msgid "Manage newsletters and subscriptions."
+msgstr "Spravovat věstníky a registrace."
+
+#: simplenews.module:95
+msgid "Sent issues"
+msgstr "Odeslaná vydání"
+
+#: simplenews.module:96
+msgid "List of newsletter issues sent and pending."
+msgstr "Seznam odeslaných nebo čekajících věstníků."
+
+#: simplenews.module:105
+msgid "Draft issues"
+msgstr "Zkušební vydání"
+
+#: simplenews.module:106
+msgid "List of newsletter issues not sent."
+msgstr "Seznam neodeslaných vydání."
+
+#: simplenews.module:117
+msgid "List, add and edit newsletter series."
+msgstr "Vypsat, vytvářet a upravovat vydání."
+
+#: simplenews.module:141
+msgid "List newsletters"
+msgstr "Vypsat věstníky"
+
+#: simplenews.module:146
+msgid "Add newsletter"
+msgstr "Vytvořit věstník"
+
+#: simplenews.module:164;174
+msgid "Subscriptions"
+msgstr "Registrace"
+
+#: simplenews.module:165
+msgid "Newsletter subscription management."
+msgstr "Správa registrací k věstníkům"
+
+#: simplenews.module:182
+msgid "List"
+msgstr "Seznam"
+
+#: simplenews.module:187
+msgid "Mass subscribe"
+msgstr "Hromadná registrace"
+
+#: simplenews.module:205
+msgid "Mass unsubscribe"
+msgstr "Hromadné zrušení reg."
+
+#: simplenews.module:216
+msgid "Manage simplenews configuration."
+msgstr "Spravovat nastavení modulu Novinky."
+
+#: simplenews.module:225
+msgid "General"
+msgstr "Obecné"
+
+#: simplenews.module:226
+msgid "Simplenews content type and vocabulary settings."
+msgstr "Nastavení typu obsahu a slovníku pro modul Novinky."
+
+#: simplenews.module:236
+msgid "Newsletter default settings and sender data."
+msgstr "Výchozí nastavení věstníků a informace o odesílateli. "
+
+#: simplenews.module:245
+msgid "Subscription"
+msgstr "Registrace"
+
+#: simplenews.module:246
+msgid "Subscription settings, opt-in/out confirmation email text."
+msgstr "Nastavení registrací, znění (od)registračních e-mailů."
+
+#: simplenews.module:255
+msgid "Send mail"
+msgstr "Odesílání"
+
+#: simplenews.module:256
+msgid "Send mail, cron and debug options."
+msgstr "Volby pro odesílání, cron a ladění."
+
+#: simplenews.module:266
+msgid "Confirm newsletter subscriptions"
+msgstr "Potvrzovat registrace věstníků"
+
+#: simplenews.module:274
+msgid "Manage newsletter subscriptions"
+msgstr "Spravovat registrace věstníků"
+
+#: simplenews.install:14
+msgid "Subscribers to {simplenews_newsletters}."
+msgstr "Uživatelé registrovaní k {simplenews_newsletters}. "
+
+#: simplenews.install:17
+msgid "Primary key: Unique subscription ID."
+msgstr "Primární klíč: unikátní ID registrace."
+
+#: simplenews.install:22
+msgid "Boolean indicating the status of the subscription."
+msgstr "Logická hodnota stavu registrace."
+
+#: simplenews.install:29
+msgid "The subscription email address."
+msgstr "E-mailová adresa registrace."
+
+#: simplenews.install:36
+msgid "The {users}.uid that has the same email address."
+msgstr "{users}.uid mající stejnou e-mailovou adresu."
+
+#: simplenews.install:46
+msgid "Anonymous subscriber preferred language. Empty for authenticated users."
+msgstr "Preferovaný jazyk anonymního registrovaného uživatele. Prázdné pro přihlášené uživatele."
+
+#: simplenews.install:57
+msgid "Simplenews newsletter data."
+msgstr "Data věstníků modulu Novinky."
+
+#: simplenews.install:60
+msgid "{node} that is used as newsletter."
+msgstr "{node} používaný jako věstník."
+
+#: simplenews.install:66
+msgid "The {node}.vid that identifies the version used as newsletter."
+msgstr "{node}.vid identifikující verzi používanou jako věstník."
+
+#: simplenews.install:72
+msgid "The {term_data}.tid (= newsletter series) this issue belongs to."
+msgstr "{term_data}.tid (=věstník), kterému toto vydání patří."
+
+#: simplenews.install:78
+msgid "Send status of the newsletter issue (0 = not send; 1 = pending; 2 = send). "
+msgstr "Stav odeslání pro vydání věstníku (0 = neodesláno; 1 = čekající; 2 = odesláno)."
+
+#: simplenews.install:85
+msgid "Format of the newsletter (plain or html)."
+msgstr "Formát věstníku (obyčejný nebo html)."
+
+#: simplenews.install:92
+msgid "Email priority according to RFC 2156 and RFC 5231 (0 = none; 1 = highest; 2 = high; 3 = normal; 4 = low; 5 = lowest)."
+msgstr "Priorita e-mailu podle RFC 2156 a RFC 5231 (0 = žádná; 1 = nejvyšší; 2 = vysoká; 3 = běžná; 4 = nízká; 5 = nejnižší)."
+
+#: simplenews.install:99
+msgid "Boolean indicating request for email receipt confirmation according to RFC 2822."
+msgstr "Logická hodnota označující žádost o doručenku podle RFC 2822."
+
+#: simplenews.install:110
+msgid "Newsletter series subscription data."
+msgstr "Data o registracích věstníků."
+
+#: simplenews.install:113
+msgid "The {simplenews_subscriptions}.snid who is subscribed."
+msgstr "{simplenews_subscriptions}.snid zaregistrovaných uživatelů."
+
+#: simplenews.install:119
+msgid "The newsletter series ({term_data}.tid) the subscriber is subscribed to."
+msgstr "Věstník ({term_data}.tid), ke kterému je uživatel zaregistrován."
+
+#: simplenews.install:128;456
+msgid "Spool for temporary storage of newsletter emails."
+msgstr "Fronta pro dočasné uložení e-mailů s věstníky."
+
+#: simplenews.install:131;459
+msgid "The primary identifier for a mail spool record."
+msgstr "Primární identifikátor záznamu poštovní fronty."
+
+#: simplenews.install:137;382;465
+msgid "The formatted email address of mail message receipient."
+msgstr "Formátovaná e-mailová adresa příjemce e-mailu."
+
+#: simplenews.install:144;472
+msgid "The {node}.nid of this newsletter."
+msgstr "{node}.nid tohoto věstníku."
+
+#: simplenews.install:150;478
+msgid "The {node}.vid of this newsletter."
+msgstr "{node}.vid tohoto věstníku."
+
+#: simplenews.install:156;369;484
+msgid "The {term_data}.tid this newsletter issue belongs to."
+msgstr "{term_data}.tid, k němuž tento věstník patří."
+
+#: simplenews.install:162;389;490
+msgid "The send status of the email (0 = hold, 1 = pending, 2 = send)."
+msgstr "Stav odeslání e-mailu (0 = zadržet, 1 = čekající, 2 = poslat)."
+
+#: simplenews.install:170;397;498
+msgid "The time status was set or changed."
+msgstr "Stav času byl nastaven nebo změněn."
+
+#: simplenews.install:188
+msgid "Simplenews installation instructions are available on the <a href=\"!simplenews_help\">Simplenews help page</a>."
+msgstr "Instalační pokyny pro modul Novinky jsou k dispozici na <a href=\"!simplenews_help\">nápovědové stránce modulu</a>."
+
+#: simplenews.install:192
+msgid "The installation of Simplenews was not successful."
+msgstr "Instalace modulu Novinky neproběhla úspěšně."
+
+#: simplenews.install:223 simplenews_action/simplenews_action.module:125
+msgid "Newsletter issue"
+msgstr "Vydání věstníku"
+
+#: simplenews.install:225
+msgid "A newsletter issue to be sent to subscribed email addresses."
+msgstr "Vydání věstníku určené k odeslání na zaregistrované adresy."
+
+#: simplenews.install:260
+msgid "@site_name newsletter"
+msgstr "věstník webu @site_name"
+
+#: simplenews.install:269
+msgid "Deleted term %name."
+msgstr "Smazán termín %name."
+
+#: simplenews.install:360
+msgid ""
+msgstr ""
+
+#: simplenews.install:363
+msgid "The primary identifier for a mail cache record."
+msgstr "Primární identifikátor záznamu poštovní vyrovnávací paměti."
+
+#: simplenews.install:375
+msgid "The subject of this mail message."
+msgstr "Předmět tohoto e-mailu."
+
+#: simplenews.install:404
+msgid "The mail message array."
+msgstr "Pole e-mailové zprávy."
+
+#: simplenews.install:525
+msgid "Subscriber preferred language."
+msgstr "Preferovaný jazyk zaregistrovaného uživatele."
+
+#: simplenews.info:0
+msgid "Send newsletters to subscribed email addresses."
+msgstr "Poslat věstníky na zaregistrované adresy."
+
+#: simplenews.info:0 simplenews_action/simplenews_action.info:0
+msgid "Mail"
+msgstr "Pošta"
+
+#: simplenews.js:0
+msgid "Save and send"
+msgstr "Uložit a poslat"
+
+#: simplenews.js:0
+msgid "Save and send test"
+msgstr "Uložit a poslat na zkoušku"
+
+#: simplenews_action/simplenews_action.module:17
+msgid "Send single simplenews newsletter"
+msgstr "Poslat samostatný věstník"
+
+#: simplenews_action/simplenews_action.module:27
+msgid "Send pending simplenews newsletters"
+msgstr "Poslat čekající věstníky"
+
+#: simplenews_action/simplenews_action.module:36
+msgid "Subscribe the user to a newsletter"
+msgstr "Zaregistrovat uživatele"
+
+#: simplenews_action/simplenews_action.module:44
+msgid "Unsubscribe the user from a newsletter"
+msgstr "Odregistrovat uživatele"
+
+#: simplenews_action/simplenews_action.module:129
+msgid "The newsletter issue to send"
+msgstr "Vydání věstníku bylo odesláno"
+
+#: simplenews_action/simplenews_action.module:132
+msgid "Allow to resend newsletter"
+msgstr "Povolit opětovné poslání věstníku"
+
+#: simplenews_action/simplenews_action.module:135
+msgid "When checked a newsletter will be send even when already send before. The newsletter send status is checked, not the status of individual email addresses. Use this for repeated (e.g. monthly) newsletters."
+msgstr "Pokud je povoleno, věstník bude odeslán, i když už byl odeslán v minulosti. Kontroluje se stav odeslání věstníku, ne stav jednotlivých adres. Použijte pro opakované, např. měsíční věstníky."
+
+#: simplenews_action/simplenews_action.module:148
+msgid "Please select a newsletter issue."
+msgstr "Zvolte prosím vydání věstníku."
+
+#: simplenews_action/simplenews_action.module:191
+msgid "You have been subscribed to newsletter %newsletter."
+msgstr "Vaše registrace k věstníku %newsletter je dokončena."
+
+#: simplenews_action/simplenews_action.module:214
+msgid "The newsletter series the user will be subscribed to."
+msgstr "Věstník, k němuž bude uživatel zaregistrován."
+
+#: simplenews_action/simplenews_action.module:257
+msgid "You have been removed from the %newsletter subscription list."
+msgstr "Zrušení Vaší registrace k věstníku %newsletter je dokončeno."
+
+#: simplenews_action/simplenews_action.module:280
+msgid "The newsletter series the user will be unsubscribed from."
+msgstr "Věstník, z nějž bude uživatel odregistrován."
+
+#: simplenews_action/simplenews_action.module:306
+msgid "After a user has been subscribed"
+msgstr "Po zaregistrování uživatele"
+
+#: simplenews_action/simplenews_action.module:309
+msgid "After a user has been unsubscribed"
+msgstr "Po odregistrování uživatele"
+
+#: simplenews_action/simplenews_action.module:86;171;192;258
+msgid "action"
+msgstr "akce"
+
+#: simplenews_action/simplenews_action.module:86
+msgid "Simplenews newsletter %title send."
+msgstr "Věstník %title byl odeslán."
+
+#: simplenews_action/simplenews_action.module:171
+msgid "Simplenews cron executed."
+msgstr "cron pro věstníky byl spuštěn."
+
+#: simplenews_action/simplenews_action.module:192
+msgid "User %name subscribed to newsletter %newsletter."
+msgstr "Uživatel %name byl zaregistrován k věstníku %newsletter."
+
+#: simplenews_action/simplenews_action.module:258
+msgid "User %name unsubscribed from newsletter %newsletter."
+msgstr "Uživatel %name byl odregistrován z věstníku %newsletter."
+
+#: simplenews_action/simplenews_action.info:0
+msgid "Simplenews action"
+msgstr "Akce modulu Novinky"
+
+#: simplenews_action/simplenews_action.info:0
+msgid "Provide actions for Simplenews."
+msgstr "Poskytuje akce pro modul Novinky."
+

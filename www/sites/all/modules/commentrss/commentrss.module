@@ -1,0 +1,152 @@
+<?php
+// $Id: commentrss.module,v 1.12.2.2.2.6.2.5 2009/09/16 16:45:08 davereid Exp $
+
+/**
+ * @file
+ *   Publishes RSS feeds for comments.
+ */
+
+/**
+ * Disable site comment feed.
+ */
+define('COMMENTRSS_SITE_DISABLED', 0);
+
+/**
+ * Expose site feed on front page only.
+ */
+define('COMMENTRSS_SITE_FRONT_PAGE', 1);
+
+/**
+ * Expose site feed on front page and main content (/node) page too.
+ */
+define('COMMENTRSS_SITE_FRONT_AND_NODE_PAGE', 2);
+
+/**
+ * Expose site feed on all pages.
+ */
+define('COMMENTRSS_SITE_ALL_PAGES', 3);
+
+// == Core hooks ===============================================================
+
+/**
+ * Implementation of hook_help().
+ */
+function commentrss_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/help#commentrss':
+      $output = '<p>'. t('The commentrss module provides RSS feeds for comments. Comment feeds are published on pages which often also provide a feed of nodes. Some types of comment feeds may be disabled if they are not needed.') .'</p>';
+      $output .= '<p>'. t('If comment feeds are enabled for individual nodes then a "wfw:commentRss" element is added to node feeds (based on <a href="@wfw">the Well Formed Web Comment API</a> specification) so that aggregators may discover the corresponding comment feed.', array('@wfw' => 'http://wellformedweb.org/CommentAPI/')) .'</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function commentrss_menu() {
+  $items = array();
+  // Copy of menu item from system.module.
+  $items['admin/content/rss-publishing/default'] = array(
+    'title' => 'General settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  // New local task on the RSS publishing settings page.
+  $items['admin/content/rss-publishing/commentrss'] = array(
+    'title' => 'Comment RSS settings',
+    'description' => 'Configure RSS feeds for comments.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commentrss_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'weight' => 10,
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'commentrss.admin.inc',
+  );
+  // Catch all handler for Comment RSS feeds.
+  $items['crss'] = array(
+    'title' => '',
+    'page callback' => 'commentrss_handler',
+    'page arguments' => array(1, 2),
+    'access arguments' => array('access comments'),
+    'type' => MENU_CALLBACK,
+    'file' => 'commentrss.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function commentrss_init() {
+  // This hook gets called for offline pages and breaks the theme, so
+  // skip running in that case to avoid interfering with that operation.
+  if (!variable_get('site_offline', 0) && user_access('access comments')) {
+    // Expose site feed based on settings.
+    switch (variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
+      case COMMENTRSS_SITE_DISABLED:
+        // No comment RSS feed for site.
+        break;
+      case COMMENTRSS_SITE_FRONT_PAGE:
+        if (!drupal_is_front_page()) {
+          // Only break if not front page.
+          break;
+        }
+      case COMMENTRSS_SITE_FRONT_AND_NODE_PAGE:
+        if (!drupal_is_front_page() || ($_GET['q'] != 'node')) {
+          // Only break if not front page and not node page.
+          break;
+        }
+      case COMMENTRSS_SITE_ALL_PAGES:
+        // Either we need to expose for all pages, or code was falling through
+        // to this point. We should expose the feed in any case.
+        drupal_add_feed(
+          url('crss'),
+          t('@site - All comments', array('@site' => variable_get('site_name', 'Drupal')))
+        );
+        break;
+    }
+
+    // Expose node feed on node view page.
+    if ((arg(0) == 'node') && is_numeric($nid = arg(1)) && is_null(arg(2)) &&
+        variable_get('commentrss_node', TRUE) && ($node = node_load($nid)) &&
+        node_access('view', $node) && ($node->comment != COMMENT_NODE_DISABLED)) {
+
+      drupal_add_feed(
+        url('crss/node/'. $node->nid),
+        t('Comments for "@title"', array('@title' => $node->title))
+      );
+    }
+
+    // Expose term feed on term view page.
+    if ((arg(0) == 'taxonomy') && (arg(1) == 'term') && is_numeric($tid = arg(2)) &&
+        variable_get('commentrss_term', FALSE) && ($term = taxonomy_get_term($tid))) {
+
+      drupal_add_feed(
+        url('crss/term/'. $term->tid),
+        t('Comments for category "@title"', array('@title' => $term->name))
+      );
+    }
+  }
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function commentrss_nodeapi(&$node, $op) {
+  if ($op == 'rss item') {
+    // Add a wfw:commentRss element to node feed entries if:
+    //   node comments are enabled for the node
+    //   comment feeds for individual nodes are enabled
+    if ($node->comment != COMMENT_NODE_DISABLED && variable_get('commentrss_node', TRUE)) {
+      // The "wfw" namespace is added to each element due to a bug in node_feed().
+      // See http://drupal.org/node/157709
+      return array(array(
+        'key' => 'wfw:commentRss',
+        'attributes' => array('xmlns:wfw' => 'http://wellformedweb.org/CommentAPI/'),
+        'value' => url('crss/node/'. $node->nid, array('absolute' => TRUE))));
+    }
+  }
+}

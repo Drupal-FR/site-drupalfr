@@ -1,0 +1,32 @@
+<?php
+// $Id: globalredirect.install,v 1.1.4.4 2008/12/22 10:34:32 njt1982 Exp $
+
+/**
+ * @file
+ * GlobalRedirect Install file - currently only used to clear out variables upon uninstall.
+ */
+function globalredirect_uninstall() {
+  variable_del('globalredirect_menu_check');
+  variable_del('globalredirect_deslash');
+  variable_del('globalredirect_trailingzero');
+  variable_del('globalredirect_nonclean2clean');
+  variable_del('globalredirect_case_sensitive_urls');
+}
+
+
+function globalredirect_update_6100() {
+  $deslash = variable_get('globalredirect_deslah', NULL);
+  $ret = array();
+
+  if (is_null($deslash)) {
+    $ret[] = array('success' => TRUE, 'query' => 'There was no "deslah" option to fix... Nothingto do. Issue #348120 does not apply.');
+  }
+  else {
+    variable_set('globalredirect_deslash', $deslash);
+    variable_del('globalredirect_deslah');
+
+    $ret[] = array('success' => TRUE, 'query' => 'Issue #348120 applies. Copied setting over to correct name. Your deslash settings should work now.');
+  }
+
+  return $ret;
+}

@@ -1,0 +1,119 @@
+<?php
+// $Id: active_tags_popular.module,v 1.1.2.11 2009/05/07 04:20:33 dragonwize Exp $
+
+/**
+ * @file
+ * Adds popular terms to Active Tags widget
+ */
+
+
+/**
+ * Attaches active_tags widget to fields.
+ *
+ * @param $field_ids
+ *  mixed - Either a single field id or an array of ids.
+ */
+function active_tags_popular_enable_widget($field_ids) {
+  static $set_ids = array();
+  // Load id into array if a string is passed in.
+  if ($field_ids && !is_array($field_ids)) {
+    $field_ids = array($field_ids);
+  }
+  // Ensure we are only adding each setting once.
+  // This is important when previewing a node.
+  foreach ($field_ids as $id) {
+    if (!in_array($id, $set_ids)) {
+      $ids[] = $id;
+      $set_ids[] = $id;
+    }
+  }
+  if (!empty($ids)) {
+    $callback = url('taxonomy/active-tags-popular');
+    drupal_add_js(array('active_tags_popular' => $ids, 'active_tags_popular_callback' => $callback), 'setting');
+    drupal_add_js(drupal_get_path('module', 'active_tags_popular') .'/active_tags_popular.js', 'module');
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function active_tags_popular_menu() {
+  $items['taxonomy/active-tags-popular'] = array(
+    'title' => 'Active Tags Popular',
+    'page callback' => 'active_tags_popular_callback',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Gets popular terms from the database for AJAX callback.
+ *
+ * @param $vid
+ *  Vocabulary id.
+ */
+function active_tags_popular_callback($vid) {
+  $matches = array();
+  $result = db_query_range(db_rewrite_sql("SELECT t.tid, t.name, COUNT(tn.tid) AS term_count FROM {term_data} t INNER JOIN {term_node} tn ON t.tid = tn.tid INNER JOIN {node} n ON tn.vid = n.vid WHERE t.vid = %d GROUP BY t.tid, t.name ORDER BY term_count DESC", 't', 'tid'), $vid, 0, variable_get('active_tags_popular_no_'. $vid, 10));
+
+  while ($tag = db_fetch_object($result)) {
+    $matches[] = check_plain($tag->name);
+  }
+
+  drupal_json($matches);
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function active_tags_popular_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id === 'taxonomy_form_vocabulary') {
+    $form['settings']['active_tags_popular'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Active Tags Helper - Popular'),
+      '#weight' => 11,
+      '#default_value' => (isset($form['vid'])) ? variable_get('active_tags_popular_'. $form['vid']['#value'], 0) : 0,
+      '#description' => t('Adds additional helpers to the active tags widget to assist in adding popular tags to posts'),
+    );
+    $form['settings']['active_tags_popular_no'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Number of popular tags to show'),
+      '#weight' => 12,
+      '#size' => 20,
+      '#default_value' => (isset($form['vid'])) ? variable_get('active_tags_popular_no_'. $form['vid']['#value'], 10) : 10,
+    );
+    $form['#submit'][] = 'active_tags_popular_form_vocabulary_submit';
+  }
+
+  if ($form['#id'] === 'node-form' && isset($form['taxonomy']['tags'])) {
+    $form['#after_build'][] = 'active_tags_popular_node_form_attach';
+  }
+}
+
+/**
+ * Enables Active Tags Popular for core taxonomy tag vocabularies.
+ */
+function active_tags_popular_node_form_attach($form, $form_state) {
+  $settings = array();
+  foreach ($form['taxonomy']['tags'] as $id => $values) {
+    if (variable_get('active_tags_popular_'. $id, 0) == 1) {
+      $settings[] = "#edit-taxonomy-tags-$id-wrapper";
+     }
+   }
+  // Only load files if we found active tags enabled fields.
+  if (!empty($settings)) {
+    active_tags_popular_enable_widget($settings);
+  }
+  return $form;
+}
+
+
+/**
+ * Saves settings from taxonomy vocabulary form.
+ */
+function active_tags_popular_form_vocabulary_submit($form, &$form_state) {
+  variable_set('active_tags_popular_'. $form_state['values']['vid'], $form_state['values']['active_tags_popular']);
+  variable_set('active_tags_popular_no_'. $form_state['values']['vid'], $form_state['values']['active_tags_popular_no']);
+  return TRUE;
+}

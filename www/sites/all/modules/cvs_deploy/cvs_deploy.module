@@ -1,0 +1,193 @@
+<?php
+// $Id: cvs_deploy.module,v 1.20.2.2 2009/04/30 07:29:32 dww Exp $
+
+/**
+ * @file
+ *
+ * This module improves the administrative UI for sites that are deployed
+ * directly via a CVS workspace (as opposed to sites built from packaged
+ * releases that are downloaded from drupal.org).
+ *
+ * See the README.txt file for more information.
+ *
+ * @author Derek Wright ("dww") http://drupal.org/user/46549
+ */
+
+/**
+ * Returns the human-readable version string from a given CVS tag.
+ */
+function cvs_deploy_version_from_tag($tag) {
+  // If there's nothing, it must be a HEAD checkout, and therefore,
+  // we have no idea what the version is.
+  $version = '';
+  if (!$tag || $tag == 'HEAD') {
+    $version = 'HEAD';
+  }
+  // See if it's a full, official release from a tag:
+  elseif (preg_match('@^DRUPAL-(\d+)--(\d+)-(\d+)(-.+)?@', $tag, $match)) {
+    $version = $match[1] .'.x-'. $match[2] .'.'. $match[3];
+    if (isset($match[4])) {
+      // This version's tag has 'extra', so clean that up.
+      $version .= '-'. preg_replace('/[_-]/', '', strtolower($match[4]));
+    }
+  }
+  // If not, see if it's from a branch (like a development snapshot).
+  elseif (preg_match('@^DRUPAL-(\d+)(--(\d+))?@', $tag, $match)) {
+    $version = $match[1] .'.x-'. (isset($match[3]) ? $match[3] : '1') .'.x-dev';
+  }
+  return $version;
+}
+
+/**
+ * Implementation of hook_system_info_alter().
+ */
+function cvs_deploy_system_info_alter(&$info, $file) {
+  // First, if we don't know the 'project' attribute, fill it in based on the
+  // CVS/Repository file.
+  if (empty($info['project'])) {
+    $info['project'] = cvs_deploy_get_project_name($file);
+  }
+
+  // Now, alter the version string based on the CVS sticky tag.
+  _cvs_deploy_version_alter($info['version'], $file);
+
+  // Find the timestamp for the most recently modified CVS/Entries file.
+  $mtime = _cvs_deploy_find_latest_update(dirname($file->filename), 0);
+
+  // Only fill this in if the .info file does not define a 'datestamp'.
+  if (empty($info['datestamp'])) {
+    $info['datestamp'] = $mtime;
+  }
+
+  // However, the '_info_file_ctime' should always get the latest value.
+  if (empty($info['_info_file_ctime'])) {
+    $info['_info_file_ctime'] = $mtime;
+  }
+  else {
+    $info['_info_file_ctime'] = max($info['_info_file_ctime'], $mtime);
+  }
+}
+
+/**
+ * Private helper to alter the version of a module based on what we can figure
+ * out about the CVS tag in use.
+ */
+function _cvs_deploy_version_alter(&$version, $file) {
+  static $available = array();
+  $match = array();
+  if (empty($version)) {
+    // The .info file contains no version data. Find the version based
+    // on the sticky tag in the local workspace (the CVS/Tag file).
+    $cvs_dir = dirname($file->filename) .'/CVS';
+    if (is_dir($cvs_dir)) {
+      $tag = '';  // If there's no Tag file, there's no tag, a.k.a. HEAD.
+      if (file_exists($cvs_dir .'/Tag')) {
+        $tag_file = trim(file_get_contents($cvs_dir .'/Tag'));
+        if ($tag_file) {
+          // Get the sticky tag for this workspace: strip off the leading 'T'.
+          $tag = preg_replace('@^(T|N)@', '', $tag_file);
+        }
+      }
+      $version = cvs_deploy_version_from_tag($tag);
+    }
+  }
+  // The weird concatenation prevents CVS from 'expanding' this $Name.
+  elseif (preg_match('/\$'.'Name: (.*?)\$/', $version, $match)) {
+    $version = cvs_deploy_version_from_tag(trim($match[1]));
+  }
+
+  if (module_exists('update') && $version == 'HEAD') {
+    require_once('modules/update/update.compare.inc');
+    // If there's available update_status data, we can use the version string
+    // the release node pointing to HEAD really has. However, we can only
+    // safely grab this data directly from the cache, since if we call
+    // update_get_available() here, we'd enter infinite recursion when that
+    // function invokes update_status_get_projects(), which in turn needs to
+    // process the .info files, which invokes the hook that leads here.
+    if (empty($available)) {
+      if (function_exists('_update_cache_get')) {
+        // 6.11 core and later, using the new private cache system.
+        $cache = _update_cache_get('update_available_releases');
+      }
+      else {
+        // 6.10 core and earlier, using the (fragile) core cache system.
+        $cache = cache_get('update_info', 'cache_update');
+      }
+      if (!empty($cache)) {
+        $available = $cache->data;
+      }
+    }
+    $project = update_get_project_name($file);
+    if (isset($available[$project]['releases'])) {
+      foreach ($available[$project]['releases'] as $release) {
+        if (isset($release['tag']) && $release['tag'] == 'HEAD') {
+          $version = $release['version'];
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Private helper to alter the 'project' of a module based on what directory
+ * in the CVS repository the module has been checked out from.
+ */
+function cvs_deploy_get_project_name($file) {
+  static $projects = array();
+  $name = $file->name;
+  if (empty($projects[$name])) {
+    // TODO: cache this in {cache}, too?
+    $cvs_dir = dirname($file->filename) .'/CVS';
+    if (is_dir($cvs_dir)) {
+      $repository = '';
+      if (file_exists($cvs_dir .'/Repository')) {
+        $repo_file = trim(file_get_contents($cvs_dir .'/Repository'));
+        if ($repo_file) {
+          $parts = explode('/', $repo_file);
+          if ($parts[0] == 'drupal') {
+            $projects[$name] = $parts[0];
+          }
+          else {
+            $projects[$name] = $parts[2];
+          }
+        }
+      }
+    }
+  }
+  return (isset($projects[$name]) ? $projects[$name] : '');
+}
+
+/**
+ * Recursive helper function to find the latest modification time on every
+ * CVS/Entires file in the current directory tree.
+ *
+ * @param $dir
+ *   The directory to search.
+ * @param $timestamp
+ *   The current latest modification timestamp on any CVS/Entries file.
+ * @return
+ *   The latest mtime based on what we learned in the current directory.
+ */
+function _cvs_deploy_find_latest_update($dir, $timestamp) {
+  if (is_dir($dir)) {
+    $fp = opendir($dir);
+    while (FALSE !== ($file = readdir($fp))) {
+      if ($file == '.' || $file == '..') {
+        continue;
+      }
+      if ($file == 'CVS' && is_dir("$dir/CVS")) {
+        $entries_file = $dir .'/CVS/Entries';
+        if (file_exists($entries_file)) {
+          $mtime = filemtime($entries_file);
+          $timestamp = ($mtime > $timestamp) ? $mtime : $timestamp;
+        }
+      }
+      elseif (is_dir("$dir/$file")) {
+        $timestamp = _cvs_deploy_find_latest_update("$dir/$file", $timestamp);
+      }
+    }
+    closedir($fp);
+  }
+  return $timestamp;
+}

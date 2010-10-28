@@ -1,0 +1,96 @@
+<?php
+// $Id: pathfilter.module,v 1.5.2.1.2.1 2008/02/19 19:56:53 jbrown Exp $
+
+/**
+ * @file
+ * This filter takes internal Drupal paths in double quotes, written as
+ * e.g. "internal:node/99", and replaces them with the appropriate absolute
+ * http URL using Drupal's url() function [1]. E.g. for a site located at
+ * http://example.com/mysite
+ *
+ *   "internal:node/99" becomes "http://example.com/mysite/node/99"
+ *
+ * Note: Because it uses url(), if a path alias exists, it will be substituted.
+ *
+ * [1] http://api.drupal.org/api/4.7/function/url
+ *
+ * Author:  Ray Zimmerman (drupal.org user "RayZ")
+ *
+ */
+
+/**
+ * Implementation of hook_filter_tips().
+ */
+function pathfilter_filter_tips($delta, $format, $long = FALSE) {
+  switch ($delta) {
+    case 0:
+      if ($long) {
+        return t('Internal paths in double quotes, written as "internal:node/99", for example, are replaced with the appropriate absolute URL or relative path. Given a site located at http://example.com/mysite, assuming clean URLs are enabled and "internal:admin/user" becomes "http://example.com/mysite/admin/user" and "internal:node/99" becomes "http://example.com/mysite/node/99". If \'node/99\' has a URL alias assigned, such as \'news/latest\' the alias will be substituted giving "http://example.com/mysite/news/latest".');
+      }
+      else {
+        return t('Internal paths in double quotes, written as "internal:node/99", for example, are replaced with the appropriate absolute URL or relative path.');
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_filter().
+ */
+function pathfilter_filter($op, $delta = 0, $format = -1, $text = '') {
+  // The "list" operation provides the module an opportunity to declare both how
+  // many filters it defines and a human-readable name for each filter. Note that
+  // the returned name should be passed through t() for translation.
+  if ($op == 'list') {
+    return array(0 => t('Internal path filter'));
+  }
+
+  // All operations besides "list" provide a $delta argument so we know which
+  // filter they refer to.
+  switch ($delta) {
+    case 0:
+      switch ($op) {
+        // This description is shown in the administrative interface, unlike the
+        // filter tips which are shown in the content editing interface.
+        case 'description':
+          return t('Internal paths in double quotes, written as "internal:node/99", for example, are replaced with the appropriate absolute URL or relative path.');
+
+        // We don't need the "prepare" operation for this filter, but it's required
+        // to at least return the input text as-is.
+        case 'prepare':
+          return $text;
+
+        // The actual filtering is performed here. The supplied text should be
+        // returned, once any necessary substitutions have taken place.
+        case 'process':
+          $absolute = (variable_get('pathfilter_link_type', 'absolute') == 'absolute' ? 'TRUE' : 'FALSE');
+          return preg_replace('/"internal:([^"#\?]+)\??([^"#]+)?#?([^"]+)?"/e',
+              "'\"'. url('$1', array('query' => '$2' ? '$2' : NULL, 'fragment' => '$3' ? '$3' : NULL, 'absolute' => ". $absolute .")) .'\"'", $text);
+        // Filter settings for pathfilter.
+        case 'settings':
+          return _pathfilter_settings();
+      }
+      break;
+  }
+}
+
+/**
+ * Helper settings function for hook_filter('settings').
+ */
+function _pathfilter_settings() {
+  $form = array();
+  $form['pathfilter'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Internal path filter'), 
+    '#collapsible' => TRUE, 
+    '#collapsed' => FALSE,
+  );
+  $form['pathfilter']['pathfilter_link_type'] = array(
+    '#type' => 'radios',
+    '#title' => t('Convert internal paths to'),
+    '#options' => array('absolute' => t('Absolute links'), 'relative' => t('Relative links')),
+    '#default_value' => variable_get('pathfilter_link_type', 'absolute'),
+    '#description' => t('Should internal paths be transformed to absolute URLs, such as %absolute or relative paths, like %relative. Note that your changes may not appear until the cache has been cleared.', array('%absolute' => 'http://www.example.com/my-page', '%relative' => '/my-page')),
+  );
+  return $form;
+}

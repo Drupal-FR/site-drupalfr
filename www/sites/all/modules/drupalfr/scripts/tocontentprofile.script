@@ -1,0 +1,71 @@
+<?php
+
+// Start from a sane user.
+$GLOBALS['user'] = user_load(1);
+
+$res = db_query("SELECT nid FROM {node} WHERE type='profile'");
+while ($node = db_fetch_object($res)) {
+  node_delete($node->nid);
+}
+
+$event_mapping = array(
+  'profile_evenement_drupalcampparis' => 'drupalcamp-paris-1',
+  'profile_evenement_drupalcon_paris2009' => 'drupalcon-paris',
+  'profile_evenement_drupalcon2006' => 'drupalcon-brussels',
+  'profile_evenement_drupalcon2007' => 'drupalcon-barcelona',
+  'profile_evenement_drupalcampparis2' => 'drupalcamp-paris-2',
+  'profile_evenement_drupalcon2008b' => 'drupalcon-szeged',
+  'profile_evenement_drupalngo_2008' => 'drupalngo',
+  'profile_event_drupalcampparis4' => 'drupalcamp-paris-3',
+);
+
+$res = db_query('SELECT uid FROM {users} WHERE status = 1 ORDER BY uid');
+while ($user = db_fetch_object($res)) {
+  $user = user_load($user->uid);
+
+  $profile = (object) array(
+    'type' => 'profile',
+    'status' => 1,
+    'uid' => $user->uid,
+    'title' => '#' . $user->uid,
+  );
+
+  $profile->body = $user->profile_comment;
+  $profile->field_realname[0]['value'] = $user->profile_nomcomplet;
+  $profile->field_nickname[0]['value'] = $user->profile_irc;
+  $profile->field_link[0]['url'] = $user->profile_website;
+  $profile->field_link[0]['attributes']['rel'] = 'nofollow';
+  $profile->field_msn[0]['email'] = $user->profile_msn;
+  $profile->field_icq[0]['value'] = $user->profile_icq;
+  $profile->field_jabber[0]['value'] = $user->profile_jabber;
+
+  foreach ($event_mapping as $source => $dest) {
+    if (!empty($user->$source)) {
+      $profile->field_events[]['value'] = $dest;
+    }
+  }
+
+  if (!empty($user->picture)) {
+    // User pictures are not in files. Create a file first.
+    $file = (object) array(
+      'filepath' => $user->picture,
+      'filename' => basename($user->picture),
+      'filemime' => file_get_mimetype($user->picture),
+      'filesize' => filesize($user->picture),
+      'status' => FILE_STATUS_PERMANENT,
+      'uid' => $user->uid,
+      'timestamp' => filemtime($user->picture),
+    );
+    drupal_write_record('files', $file);
+    $profile->field_picture[0] = (array) $file;
+  }
+
+  node_save($profile);
+  echo ".";
+}
+
+// Disable the profile and tracker modules.
+module_disable(array('profile', 'tracker'));
+
+// Disable user pictures.
+variable_set('user_pictures', 0);

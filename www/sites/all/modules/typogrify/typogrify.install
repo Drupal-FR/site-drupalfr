@@ -1,0 +1,29 @@
+<?php
+// $Id: typogrify.install,v 1.1.2.1 2009/04/26 14:02:45 mikl Exp $
+
+/**
+ * @file typogrify.install
+ * Upgrade hooks for the Typogrify module.
+ */
+
+/**
+ * Add one to the marksmarty_smarty_hyphens_%n setting, so we use the 
+ * same numeric parameters as in the SmartyPants function.
+ */
+function typogrify_update_6001() {
+  $ret = array();
+  $query = db_query("SELECT format, name FROM {filter_formats}");
+  
+  while ($row = db_fetch_array($query)) {
+    $val = variable_get('marksmarty_smarty_hyphens_' . $row['format'], NULL);
+    if (!is_null($val)) {
+      variable_set('marksmarty_smarty_hyphens_' . $row['format'], intval($val) + 1);
+      // This array mess is neccesary to display a status message on the 
+      // upgrade result page.
+      $ret[] = array('query' => t('Upgraded MarkSmarty hyphen settings for %format.', array('%format' => $row['name'])), 'success' => TRUE);
+    }
+  }
+  return $ret;
+}
+    
+

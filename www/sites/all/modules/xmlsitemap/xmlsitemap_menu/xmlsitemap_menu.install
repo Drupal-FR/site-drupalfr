@@ -1,0 +1,97 @@
+<?php
+// $Id: xmlsitemap_menu.install,v 1.1.4.14.2.17 2010/02/03 09:01:00 davereid Exp $
+
+/**
+ * @file
+ * Install and uninstall schema and functions for the xmlsitemap_menu module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function xmlsitemap_menu_uninstall() {
+  drupal_load('module', 'menu');
+  drupal_load('module', 'xmlsitemap');
+  $menus = array_keys(menu_get_menus());
+  foreach ($menus as $menu) {
+    xmlsitemap_link_bundle_delete('menu', $menu);
+  }
+}
+
+// @todo Remove these update functions before alpha.
+function xmlsitemap_menu_update_1() {
+  $value = xmlsitemap_menu_var('menus');
+  variable_set('xmlsitemap_menu_menus', array_filter($value));
+  return array();
+}
+
+function xmlsitemap_menu_update_2() {
+  $ret = array();
+  $field = array(
+    'description' => 'The {menu_links}.menu_name of this menu link.',
+    'type' => 'varchar',
+    'length' => 32,
+    'default' => NULL,
+  );
+  db_add_field($ret, 'xmlsitemap', 'menu_name', $field);
+  db_add_index($ret, 'xmlsitemap', 'menu_name', array('menu_name'));
+  $ret[] = update_sql("UPDATE {xmlsitemap} SET menu_name = (SELECT menu_name FROM {menu_links} WHERE mlid = {xmlsitemap}.id) WHERE type = 'menu'");
+  return $ret;
+}
+
+function xmlsitemap_menu_update_3() {
+  $ret = array();
+  $menus = variable_get('xmlsitemap_menu_menus', array());
+  foreach ($menus as $menu) {
+    variable_set('xmlsitemap_menu_status_' . $menu, TRUE);
+  }
+  variable_del('xmlsitemap_menu_menus');
+  return $ret;
+}
+
+function xmlsitemap_menu_update_4() {
+  return array();
+}
+
+function xmlsitemap_menu_update_5() {
+  return array();
+}
+
+// Skip to 6 since I was stupid and had xmlsitemap_menu_update_5() in xmlsitemap_node.install
+function xmlsitemap_menu_update_6() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 0 WHERE type = 'module' AND name = 'xmlsitemap_menu'");
+  return $ret;
+}
+
+function xmlsitemap_menu_update_7() {
+  $ret = array();
+  $menus = array_keys(menu_get_menus());
+  foreach ($menus as $menu) {
+    if (variable_get('xmlsitemap_menu_priority_' . $menu, 'default') === 'default') {
+      variable_set('xmlsitemap_menu_priority_' . $menu, 0.5);
+    }
+  }
+  return $ret;
+}
+
+/**
+ * Cleanup variables.
+ */
+function xmlsitemap_menu_update_6200() {
+  drupal_load('module', 'menu');
+  $menus = array_keys(menu_get_menus());
+  foreach ($menus as $menu) {
+    $settings = array(
+      'status' => variable_get('xmlsitemap_menu_status_' . $menu, 0),
+      'priority' => variable_get('xmlsitemap_menu_priority_' . $menu, 0.5),
+    );
+    variable_set('xmlsitemap_settings_menu_' . $menu, $settings);
+    variable_del('xmlsitemap_menu_status_' . $menu);
+    variable_del('xmlsitemap_menu_priority_' . $menu);
+    variable_del('xmlsitemap_menu_calculate_priority_' . $menu);
+  }
+  variable_del('xmlsitemap_menu_menus');
+  variable_del('xmlsitemap_menu_calculate_priority');
+  return array();
+}

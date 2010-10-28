@@ -1,0 +1,30 @@
+<?php
+
+function drupalfr_documentation_menu() {
+  $items['documentation'] = array(
+    'title' => 'Documentation',
+    'page callback' => 'drupalfr_documentation_page',
+    'page arguments' => array(),
+    'access arguments' => array('access content'),
+  );
+  $items['documentation/liste'] = array(
+    'title' => 'Documentation',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+function drupalfr_documentation_page() {
+  $output = "";
+  $books = array(4395, 5037, 56, 9619, 4);
+  foreach ($books as $nid) {
+    $book = node_load($nid);
+    $output .= '<h2 style="clear: left;">'. l($book->title, 'node/'. $nid) .'</h2>';
+    $output .= '<p>'. $book->teaser .'</p>';
+    $output .= '<div class="column-left">'. book_children($book->book) .'</div>';
+  }
+  $output .= '<div style="clear: both"></div>';
+  return $output;
+}
+

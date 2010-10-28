@@ -1,0 +1,15 @@
+<?php
+// $Id: admin_devel.module,v 1.1.2.1 2010/03/12 02:17:22 sun Exp $
+
+/**
+ * @file
+ * Administration and debugging functionality for developers and site builders.
+ */
+
+/**
+ * Implements hook_init().
+ */
+function admin_devel_init() {
+  drupal_add_js(drupal_get_path('module', 'admin_devel') . '/admin_devel.js');
+}
+

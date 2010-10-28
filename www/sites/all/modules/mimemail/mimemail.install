@@ -1,0 +1,19 @@
+<?php /* $Id: mimemail.install,v 1.1 2008/08/03 07:16:07 jerdavis Exp $ */
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function mimemail_uninstall() {
+  $variables = array(
+    'mimemail_alter',
+    'mimemail_crlf',
+    'mimemail_engine',
+    'mimemail_incoming',
+    'mimemail_key',
+    'mimemail_textonly',
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}
+

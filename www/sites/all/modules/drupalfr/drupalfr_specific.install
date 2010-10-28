@@ -1,0 +1,135 @@
+<?php
+
+function drupalfr_specific_update_6000() {
+  $ret = array();
+  $res = db_query("SELECT * FROM {menu_links} WHERE menu_name = '%s'", 'primary-links');
+  while ($item = db_fetch_array($res)) {
+    $item['menu_name'] = 'navigation';
+    $item['options'] = unserialize($item['options']);
+    menu_link_save($item);
+  }
+  menu_rebuild();
+  return $ret;
+}
+
+function drupalfr_specific_update_6001() {
+  $ret = array();
+  // Disable nodes that have deprecated PHP code.
+  $ret[] = update_sql("UPDATE {node_revisions} SET format = 1 WHERE format = 2 AND (body LIKE '%%views_build_view%%' OR body LIKE '%%db_num_rows%%')");
+  return $ret;
+}
+
+function drupalfr_specific_update_6002() {
+  // Remove the schema value (there was an old installation of pathauto, we don't want to update it.
+  db_query("DELETE FROM {system} WHERE name = 'pathauto'");
+  db_query("DELETE FROM {variable} WHERE name LIKE 'pathauto%'");
+
+  drupal_install_modules(array('pathauto'));
+
+  // Renormalize the forum aliases.
+  db_query("DELETE FROM {url_alias} WHERE dst LIKE 'forum%'");
+
+  // Rename "Job / Emplois" forum.
+  db_query("UPDATE {term_data} SET name = 'Job & Emplois' WHERE vid = 1 AND name = 'Job / Emplois'");
+  
+  // Initial pathauto configuration.
+  variable_set("pathauto_case", '1');
+  variable_set("pathauto_reduce_ascii", 0);
+  variable_set("pathauto_punctuation_hyphen", 1);
+  variable_set("pathauto_separator", '-');
+  variable_set("pathauto_max_bulk_update", '5000');
+  variable_set("pathauto_max_component_length", '100');
+  variable_set("pathauto_max_length", '100');
+  variable_set("pathauto_ignore_words", 'a,an,as,at,before,but,by,for,from,is,in,into,like,of,off,on,onto,per,since,than,the,this,that,to,up,via,with,l,d,t');
+  variable_set("pathauto_indexaliases", 0);
+  variable_set("pathauto_transliterate", 1);
+  variable_set("pathauto_update_action", '2');
+  variable_set("pathauto_verbose", 0);
+
+  variable_set("pathauto_forum_pattern", 'forum/[catpath-raw]');
+  variable_set("pathauto_forum_applytofeeds", '0/feed');
+
+  variable_set("pathauto_node_pattern", '');
+  variable_set("pathauto_node_annuaire_pattern", 'prestataires/[title-raw]');
+  variable_set("pathauto_node_forum_pattern", 'forum/[termpath-raw]/[nid]-[title-raw]');
+  variable_set("pathauto_node_applytofeeds", 'feed');
+
+  variable_set("pathauto_taxonomy_pattern", '[vocab-raw]/[catpath-raw]');
+  variable_set("pathauto_taxonomy_applytofeeds", '0/feed');
+
+  variable_set("pathauto_tracker_pattern", '');
+  variable_set("pathauto_tracker_applytofeeds", 'feed');
+
+  variable_set("pathauto_user_pattern", 'profil/[user-raw]');
+
+  variable_set("pathauto_punctuation_quotes", 1); // Replace quotes by the separator.
+
+set_time_limit(0);
+
+  _pathauto_include();
+  taxonomy_pathauto_bulkupdate();
+  forum_pathauto_bulkupdate();
+  user_pathauto_bulkupdate();
+
+  return array();
+}
+
+/**
+ * This is a batch API compliant version of node_pathauto_bulkupdate().
+ */
+function _drupalfr_specific_update_6003(&$context) {
+  $ret = array();
+
+  if (!isset($context['sandbox']['progress'])) {
+    $context['sandbox']['types'] = array('forum');
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['total'] = db_result(db_query("SELECT MAX(n.nid) FROM {node} n WHERE n.type IN (". db_placeholders($context['sandbox']['types'], 'varchar') .')', $context['sandbox']['types']));
+    $context['sandbox']['count'] = 0;
+  }
+
+  $result = db_query_range("SELECT n.nid FROM {node} n WHERE n.type IN (". db_placeholders($context['sandbox']['types'], 'varchar') .') AND n.nid > %d ORDER BY n.nid', array_merge($context['sandbox']['types'], array($context['sandbox']['progress'])), 0, 100);
+
+module_load_include('inc', 'pathauto', 'pathauto');
+
+  $placeholders = array();
+  $has_processed = FALSE;
+  while ($node = db_fetch_object($result)) {
+    $context['sandbox']['progress'] = $node->nid;
+    $has_processed = TRUE;
+    $node = node_load($node->nid, NULL, TRUE);
+    $placeholders = pathauto_get_placeholders('node', $node);
+    if ($alias = pathauto_create_alias('node', 'bulkupdate', $placeholders, "node/$node->nid", $node->nid, $node->type, $node->language)) {
+      $context['sandbox']['count']++;
+    }
+  }
+
+  $ret[] = array(
+    'success' => TRUE,
+    'query' => st('Updated path aliases up to nid %nid.', array('%nid' => $context['sandbox']['progress'])),
+  );
+
+  if ($has_processed) {
+    $ret['#finished'] = $context['sandbox']['progress'] / $context['sandbox']['total'];
+  }
+  return $ret;
+}
+
+function drupalfr_specific_update_6004() {
+  $ret = array();
+  // Empty the prefix for French.
+  $ret[] = update_sql("UPDATE {languages} SET prefix = '' WHERE language = 'fr'");
+
+  drupal_install_modules(array('globalredirect'));
+  return $ret;
+}
+
+function drupalfr_specific_update_6005() {
+  $ret = array();
+  // Delete the old "Documentation" nodes.
+  node_delete(345);
+  node_delete(726);
+
+  drupal_install_modules(array('drupalfr_documentation'));
+  return $ret;
+}
+

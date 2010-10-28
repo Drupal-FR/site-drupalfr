@@ -1,0 +1,129 @@
+<?php
+// $Id: admin_menu.install,v 1.4.2.6.2.11 2010/02/19 20:43:03 sun Exp $
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the admin menu module.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function admin_menu_schema() {
+  $schema['cache_admin_menu'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_admin_menu']['description'] = 'Cache table for Administration menu to store client-side caching hashes.';
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function admin_menu_install() {
+  // Create menu.
+  _admin_menu_install_menu();
+  // Create cache table.
+  drupal_install_schema('admin_menu');
+  // Increase the module weight, so admin_menu catches any alterations made by
+  // other modules in hook_menu_alter().
+  db_query("UPDATE {system} SET weight = 100 WHERE name = 'admin_menu'");
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function admin_menu_uninstall() {
+  // Remove cache table.
+  drupal_uninstall_schema('admin_menu');
+  // Delete variables.
+  variable_del('admin_menu_devel_modules');
+  variable_del('admin_menu_devel_modules_enabled');
+  variable_del('admin_menu_devel_modules_skip');
+  variable_del('admin_menu_margin_top');
+  variable_del('admin_menu_position_fixed');
+  variable_del('admin_menu_tweak_modules');
+  variable_del('admin_menu_tweak_tabs');
+  variable_del('admin_menu_show_all');
+  variable_del('admin_menu_display');
+  variable_del('admin_menu_cache_server');
+  variable_del('admin_menu_cache_client');
+}
+
+/**
+ * Helper function to ensure 'admin_menu' menu.
+ */
+function _admin_menu_install_menu() {
+  if (db_result(db_query("SELECT menu_name FROM {menu_custom} WHERE menu_name = 'admin_menu'"))) {
+    return array('success' => TRUE, 'query' => 'Menu for Administration menu already exists.');
+  }
+  return update_sql("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('admin_menu', 'Administration menu', '')");
+}
+
+/**
+ * Ensure that admin_menu is rebuilt after upgrading to D6.
+ */
+function admin_menu_update_6000() {
+  $ret = array();
+  // Drop the {admin_menu} table in admin_menu_update_6000() on sites that used
+  // one of the later patches in #132524.
+  if (db_table_exists('admin_menu')) {
+    db_drop_table($ret, 'admin_menu');
+  }
+  return $ret;
+}
+
+/**
+ * Wipe and rebuild so we can switch the icon path to <front>.
+ */
+function admin_menu_update_6001() {
+  $ret = array();
+  $ret[] = update_sql("DELETE FROM {menu_links} WHERE module = 'admin_menu'");
+  $ret[] = array('success' => TRUE, 'query' => 'Administration menu links deleted for clean rebuild.');
+  menu_cache_clear('admin_menu');
+  return $ret;
+}
+
+/**
+ * Add {cache_admin_menu} table.
+ */
+function admin_menu_update_6300() {
+  $ret = array();
+  if (!db_table_exists('cache_admin_menu')) {
+    $schema = drupal_get_schema_unprocessed('system', 'cache');
+    db_create_table($ret, 'cache_admin_menu', $schema);
+  }
+  return $ret;
+}
+
+/**
+ * Add the "admin_menu" menu.
+ */
+function admin_menu_update_6301() {
+  $ret = array();
+  // Delete obsolete variable.
+  variable_del('admin_menu_rebuild_links');
+  // Create menu.
+  $ret[] = _admin_menu_install_menu();
+  // Clean-up menu links from earlier versions.
+  $ret[] = update_sql("DELETE FROM {menu_links} WHERE module = 'admin_menu' OR menu_name = 'admin_menu'");
+  return $ret;
+}
+
+/*
+function admin_menu_form_update_script_selection_form_alter(&$form, $form_state) {
+  if ($form['start']['admin_menu']['#default_value'] <= 6301) {
+    drupal_set_message("<strong>BACKUP YOUR DATABASE!</strong> Administration menu's upgrade path resets and deletes all custom administrative menu items.", 'error');
+  }
+}
+*/
+
+/**
+ * Increase the module weight.
+ *
+ * @see admin_menu_install()
+ */
+function admin_menu_update_6302() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 100 WHERE name = 'admin_menu'");
+  return $ret;
+}
+
