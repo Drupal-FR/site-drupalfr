@@ -122,7 +122,8 @@ $options['structure-tables'] = array(
     'cache_update', 'cache_views', 'cache_views_data', 'devel_queries',
     'devel_times', 'flood', 'history', 'search_dataset',
     'search_index', 'search_total', 'search_node_links', 'sessions',
-    'watchdog', 'old_revisions', 'access', 'apachesolr_search_node'
+    'watchdog', 'old_revisions', 'access', 'apachesolr_search_node',
+    'semaphore'
   ),
 );
 
