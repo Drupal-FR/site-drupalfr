@@ -8,13 +8,13 @@
 #
 #@author Guillaume Bec <guillaume.bec@gmail.com>
 
-tmpsite=sandfr
-exportfile="/home/drupalfr/export/sandfr-$(date +%F).sql"
-drupal=/home/drupalfr/www/
-sansql=/home/drupalfr/scripts/sanitize.sql
-confdrush=/home/drupalfr/scripts/drushrc.php
+TMPSITE=sandfr
+EXPORTFILE="/home/drupalfr/export/sandfr-$(date +%F).sql"
+DRUPAL=/home/drupalfr/www/
+SANSQL=/home/drupalfr/scripts/sanitize.sql
+CONFDRUSH=/home/drupalfr/scripts/drushrc.php
 DRUSH=/usr/bin/drush
 
-$DRUSH sql-sync -y -r $drupal -c $confdrush --structure-tables-key=sanitize --create-db default $tmpsite
-$DRUSH -y -r $drupal -l $tmpsite sql-cli < $sansql
-$DRUSH -y -r $drupal -l $tmpsite sql-dump > $exportfile
+$DRUSH sql-sync -y -r $DRUPAL -c $CONFDRUSH --structure-tables-key=sanitize --create-db default $TMPSITE
+$DRUSH -y -r $DRUPAL -l $TMPSITE sql-cli < $SANSQL
+$DRUSH -y -r $DRUPAL -l $TMPSITE sql-dump > $EXPORTFILE
