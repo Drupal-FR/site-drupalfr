@@ -15,19 +15,18 @@ UPDATE content_type_profile SET field_jabber_value = nid WHERE field_jabber_valu
 UPDATE content_type_profile SET field_link_url = 'http://drupalfr.org' WHERE field_link_url IS NOT NULL;
 UPDATE content_type_profile SET field_msn_email = CONCAT(nid, '@localhost') WHERE field_msn_email IS NOT NULL;
 UPDATE content_type_profile SET field_realname_value = 'REAL NAME' WHERE field_realname_value IS NOT NULL;
-
 --UPDATE content_type_profile SET field_icq_value = nid, field_jabber_value = nid, field_link_url = 'http://drupalfr.org', field_msn_email = CONCAT(nid, '@localhost'), field_realname_value = 'REAL NAME';
 UPDATE signup_log SET anon_mail = CONCAT(uid, '@localhost');
 
 -- Remove sensitive variables
 DELETE FROM variable WHERE name = 'drupal_private_key';
 DELETE FROM variable WHERE name LIKE '%key%';
+DELETE FROM variable WHERE name = 'cron_semaphore';
 
 -- Get rid of unpublished/blocked nodes, users, comments and related data in other tables.
 DELETE FROM node WHERE status <> 1;
 DELETE FROM comments WHERE status <> 0;
 DELETE FROM users WHERE status <> 1 AND uid <> 0;
--- error
 DELETE node FROM node LEFT JOIN users ON node.uid = users.uid WHERE users.uid IS NULL;
 DELETE node_revisions FROM node_revisions LEFT JOIN node ON node.nid = node_revisions.nid WHERE node.nid IS NULL;
 DELETE comments FROM comments LEFT JOIN node ON node.nid = comments.nid WHERE node.nid IS NULL;
