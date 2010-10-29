@@ -12,8 +12,9 @@ tmpsite=sandfr
 exportfile="/home/drupalfr/export/sandfr-$(date +%F).sql"
 drupal=/home/drupalfr/www/
 sansql=/home/drupalfr/scripts/sanitize.sql
+confdrush=/home/drupalfr/scripts/drushrc.php
+DRUSH=`which drush`
 
-
-drush sql-sync -y -r $drupal -c ./drushrc.php --structure-tables-key=sanitize --create-db default $tmpsite
-drush -y -r $drupal -l $tmpsite sql-cli < $sansql
-drush -y -r $drupal -l $tmpsite sql-dump > $exportfile
+$DRUSH sql-sync -y -r $drupal -c $confdrush --structure-tables-key=sanitize --create-db default $tmpsite
+$DRUSH -y -r $drupal -l $tmpsite sql-cli < $sansql
+$DRUSH -y -r $drupal -l $tmpsite sql-dump > $exportfile
