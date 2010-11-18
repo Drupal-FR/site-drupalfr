@@ -1,0 +1,270 @@
+<?php
+// $Id: captcha.install,v 1.11 2009/12/19 00:24:36 soxofaan Exp $
+
+/**
+ * Implementation of hook_schema().
+ */
+function captcha_schema() {
+  // Table for positions and types of the challenges.
+  $schema['captcha_points'] = array(
+    'description' => 'This table describes which challenges should be added to which forms.',
+    'fields' => array(
+      'form_id' => array(
+        'description' => 'The form_id of the form to add a CAPTCHA to.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'module' => array(
+        'description' => 'The module that provides the challenge.',
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+      'type' => array(
+        'description' => 'The challenge type to use.',
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+    ),
+    'primary key' => array('form_id'),
+  );
+  // Table for the CAPTCHA sessions.
+  $schema['captcha_sessions'] = array(
+    'description' => 'Stores the data about CAPTCHA sessions (solution, IP address, timestamp, ...).',
+    'fields' => array(
+      'csid' => array(
+        'description' => 'CAPTCHA session ID.',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => "User's {users}.uid.",
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'sid' => array(
+        'description' => "Session ID of the user.",
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'ip_address' => array(
+        'description' => 'IP address of the visitor.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+      ),
+      'timestamp' => array(
+        'description' => 'A Unix timestamp indicating when the challenge was generated.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'form_id' => array(
+        'description' => 'The form_id of the form where the CAPTCHA is added to.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'solution' => array(
+        'description' => 'Solution of the challenge.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'status' => array(
+        'description' => 'Status of the CAPTCHA session (unsolved, solved, ...)',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'attempts' => array(
+        'description' => 'The number of attempts.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      )
+    ),
+    'primary key' => array('csid'),
+    'indexes' => array(
+      'csid_ip' => array('csid', 'ip_address'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function captcha_install() {
+  $t = get_t();
+  drupal_install_schema('captcha');
+
+  // insert some defaults
+  $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
+    'user_register', 'user_pass', 'user_login', 'user_login_block', 'forum_node_form');
+  foreach ($form_ids as $form_id) {
+    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
+  }
+
+  // what to do after install?
+  drupal_set_message($t('You can now <a href="!captcha_admin">configure the CAPTCHA module</a> for your site.',
+    array('!captcha_admin' => url('admin/user/captcha'))), 'status');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function captcha_uninstall() {
+  drupal_uninstall_schema('captcha');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'captcha_%'");
+  cache_clear_all('variables', 'cache');
+}
+
+/**
+ * Implementation of hook_update_N()
+ */
+function captcha_update_1() {
+  $items = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $items[] = update_sql("CREATE TABLE {captcha_points} (
+        form_id varchar(128) NOT NULL,
+        module varchar(64) default NULL,
+        type varchar(64) default NULL,
+        PRIMARY KEY (form_id)
+        ) /*!40100 DEFAULT CHARACTER SET utf8 */;"
+      );
+      $succes = TRUE;
+      break;
+    case 'pgsql':
+      $items[] = update_sql("CREATE TABLE {captcha_points} (
+        form_id varchar(128) NOT NULL,
+        module varchar(64) default NULL,
+        type varchar(64) default NULL,
+        PRIMARY KEY (form_id)
+        );"
+      );
+      $succes = TRUE;
+      break;
+    default:
+      drupal_set_message(t('Unsupported database.'), 'error');
+      $succes = FALSE;
+      break;
+  }
+  if ($succes) {
+    // insert some defaults
+    $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
+      'user_register', 'user_pass');
+    foreach ($form_ids as $form_id) {
+      $items[] = update_sql("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('$form_id', NULL, NULL)");
+    }
+  }
+  return $items;
+}
+
+/**
+ * Implementation of hook_update_N()
+ */
+function captcha_update_2() {
+  $items = array();
+  // insert some defaults
+  $form_ids = array('user_login', 'user_login_block');
+  foreach ($form_ids as $form_id) {
+    $items[] = update_sql("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('$form_id', NULL, NULL)");
+  }
+  return $items;
+}
+
+/**
+ * Implementation of hook_update_N()
+ */
+function captcha_update_6200() {
+  $items = array();
+
+  // Table for the CAPTCHA sessions.
+  $schema['captcha_sessions'] = array(
+    'description' => 'Stores the data about CAPTCHA sessions (solution, IP address, timestamp, ...).',
+    'fields' => array(
+      'csid' => array(
+        'description' => 'CAPTCHA session ID.',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => "User's {users}.uid.",
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'sid' => array(
+        'description' => "Session ID of the user.",
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'ip_address' => array(
+        'description' => 'IP address of the visitor.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+      ),
+      'timestamp' => array(
+        'description' => 'A Unix timestamp indicating when the challenge was generated.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'form_id' => array(
+        'description' => 'The form_id of the form where the CAPTCHA is added to.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'solution' => array(
+        'description' => 'Solution of the challenge.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'status' => array(
+        'description' => 'Status of the CAPTCHA session (unsolved, solved, ...)',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'attempts' => array(
+        'description' => 'The number of attempts.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      )
+    ),
+    'primary key' => array('csid'),
+    'indexes' => array(
+      'csid_ip' => array('csid', 'ip_address'),
+    ),
+  );
+
+  db_create_table($items, 'captcha_sessions', $schema['captcha_sessions']);
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_update_N()
+ * Change the captcha points with the old text CAPTCHA, which was
+ * removed from the 6.x-2.x branch, to the simple math CAPTCHA.
+ */
+function captcha_update_6201() {
+  $items = array();
+  $items[] = update_sql("UPDATE {captcha_points} SET module = 'captcha', type = 'Math' WHERE module = 'text_captcha' AND type = 'Text';");
+  return $items;
+}
