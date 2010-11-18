@@ -1,0 +1,935 @@
+<?php
+// $Id: diaporama.module,v 1.1.2.7 2008/10/03 17:13:41 goz Exp $
+
+/**
+ * TODO
+ * 1) Amelioration : Mise en place d'un systeme de pages pour la visualisation des images dans les galleries
+ * 2) Mettre à jour la Traductions
+ * 
+ * *******
+ * Notes:*
+ * ***************************************************************************************
+ * ¤ term_node permet de faire la liaison entre image (nid) et diaporama (tid)           *
+ * ¤ insertion d'un vocabulaire diaporama dans le fichier diaporama.install              *
+ * ¤ vocabulary : inserer un champs diaporama								             *
+ * ¤ un diaporama est reconnaissable par son nid (unique) dans la table drupal_diaporama *
+ * ***************************************************************************************
+ * 
+ */
+
+/**
+ * Implementation of hook_node_info()
+ */
+function diaporama_node_info() {
+  return array(
+    'diaporama' => array(
+      'name' => t('Diaporama'),
+      'module' => 'diaporama',
+      'description' => t("Diaporama permit to see images in flash animation."),
+    )
+  );
+}
+
+/**
+ * Implementation of hook_access().
+ */
+function diaporama_access($op, $node) {
+  global $user;
+	
+  if ($op == 'create') {
+    // Only users with permission to do so may create this node type.
+    return user_access('create diaporama');
+  }
+
+  // Users who create a node may edit or delete it later, assuming they have the
+  // necessary permissions.
+  if ($op == 'update' || $op == 'delete') {
+    if (user_access('edit own diaporama') && ($user->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  if ($op == 'view') {
+	  return user_access('access diaporama');
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function diaporama_perm() {
+  return array('create diaporama', 'edit own diaporama', 'access diaporama', 'administer diaporama');
+}
+
+/**
+ * implementation of hook_form().
+ */
+function diaporama_form(&$node, &$param) {
+	_diaporama_check_settings();
+	drupal_add_js();
+	global $base_url;
+	
+  	$type = node_get_types('type', $node);
+
+	$form['text'] = array(
+		'#value' => '<script type="text/javascript">
+      
+      function diaporama_checkAll(element){
+      	var elementParent = element.parentNode.parentNode.parentNode;
+      	var inputs = elementParent.getElementsByTagName("input");
+
+		var checked = false;
+		if(inputs.length > 0 && inputs[0].checked == false){
+			checked = true;
+		}
+
+		for(var i=0;i<inputs.length;i++){
+			inputs[i].checked = checked;
+		}
+		
+	  }
+	  </script>');
+
+	$form['title'] = array(
+		'#type' => 'textfield',
+		'#title' => check_plain($type->title_label),
+		'#required' => TRUE,
+		'#default_value' => $node->title,
+		'#weight' => -5
+	);
+
+	$form['body_filter']['body'] = array(
+		'#type' => 'textarea',
+		'#title' => check_plain($type->body_label),
+		'#default_value' => $node->body,
+		'#required' => FALSE
+	);
+
+	/* 
+	 * If creating a node $node->nid will be null so fill form with default settings	 * 
+	 */
+	if ($node->nid == '') {
+		$node->width = variable_get('diaporama_width','640');
+		$node->height = variable_get('diaporama_height','480');
+		$node->transition = variable_get('diaporama_transition','fade');
+		$node->speed = variable_get('diaporama_speed',20);
+		$node->timer = variable_get('diaporama_timer',5);
+		$node->showbuttons = variable_get('diaporama_showbuttons',1);
+		$node->alignbuttons = variable_get('diaporama_alignbuttons','bottom');
+		$node->showtitles = variable_get('diaporama_showtitles',1);
+		$node->aligntitles = variable_get('diaporama_aligntitles','bottom');
+		$node->randomstart = variable_get('diaporama_randomstart',1);
+		$node->ratio = variable_get('diaporama_ratio',0);
+		$node->image_node = variable_get('diaporama_imageNode',1);
+	}
+	
+	
+	// récupération des données déjà existantes sur un diaporama
+	foreach(_diaporama_get_datas($node) as $key => $val){
+		$node->$key = $val;
+	}
+	
+	$form['tid'] = array(
+		'#type' => 'hidden',
+		'#default_value' => $node->tid
+	);
+	
+	$form['width'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Width'),
+		'#default_value' => $node->width,
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Width (px) of slideshow"),
+		'#required' => TRUE,
+	);
+	
+	$form['height'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Height'),
+		'#default_value' => $node->height,
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Height (px) of slideshow"),
+		'#required' => TRUE,
+	);
+	
+	$form['ratio'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Keep ratio'),
+		'#default_value' => $node->ratio,
+	);
+	
+	$form['transition'] = array(
+		'#type' => 'select',
+		'#title' => t('Transition'),
+		'#default_value' => $node->transition,
+		'#description' => t("Transition between images"),
+		'#options' => array('fade' => t('Fade'),'slide' => t('Slide'),'push' => t('Push'),'pop' => t('Pop'),'warp' => t('Warp'),'blur' => t('Blur'))
+	);
+	
+	$form['speed'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Speed transition'),
+		'#default_value' => $node->speed,
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Speed transition in ms"),
+		'#required' => TRUE,
+	);
+	
+	$form['timer'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Time display'),
+		'#default_value' => $node->timer,
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Time display in seconds, 0 = infinity"),
+		'#required' => TRUE,
+	);
+	
+	$form['showbuttons'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Show buttons'),
+		'#default_value' => $node->showbuttons,
+	);
+	
+	$form['alignbuttons'] = array(
+		'#type' => 'radios',
+		'#title' => t('Buttons position'),
+		'#default_value' => $node->alignbuttons,
+		'#options' => array(
+			'top' => t('top'),
+			'bottom' => t('bottom'),
+		),
+	);
+	
+	/*
+	 * Disponibles uniquement dans le cadre d'une utilisation de fichiers XML
+	 */
+	$form['showtitles'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Show image title'),
+		'#default_value' => $node->showtitles,
+	);
+	
+	$form['aligntitles'] = array(
+		'#type' => 'radios',
+		'#title' => t('Title position'),
+		'#default_value' => $node->aligntitles,
+		'#options' => array(
+			'top' => t('top'),
+			'bottom' => t('bottom'),
+		),
+	);
+	
+	$form['randomstart'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Random start'),
+		'#default_value' => $node->randomstart,
+	);
+	
+	$form['image_node'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Open image node'),
+		'#default_value' => $node->image_node,
+	);
+
+	$form['galleries'] = array(
+		'#type' => 'item',
+		//'#collapsible' => false,
+		//'#collapsed' => TRUE,
+		'#title' => t('Select images'),
+		'#tree' => TRUE,
+	);
+
+	$form['galleries']['no_galleries'] = array(
+		'#type' => 'fieldset',
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+		'#title' => t('Images without galleries'),
+		'#tree' => TRUE,
+		'#theme' => 'diaporama_form_gallery',
+	);
+
+
+	// Selection de toutes les galeries existantes
+	$tree = taxonomy_get_tree(_image_gallery_get_vid());
+	if ($tree) {
+  			
+		$i = 0;
+		// Affichage de toutes les galeries
+		foreach ($tree as $term) {
+			$i++;
+			$string = "gallery_$i";
+			// Création d'un fieldset par galerie
+			$form['galleries'][$string] = array(
+				'#type' => 'fieldset',
+				'#collapsible' => TRUE,
+				'#collapsed' => TRUE,
+				'#title' => $term->name,
+			    '#tree' => TRUE,
+    			'#theme' => 'diaporama_form_gallery',
+  			);
+  			/* Parcours de la galerie
+  			* On place toutes les photos de la galerie dans le fieldset
+  			* Chaque photo est attribuée à une case à cocher
+  			* */ 
+  			$tid = $term->tid;
+  			$images = array();
+			if ($tid) {
+				// Récupération des images de la galerie
+				//$result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), variable_get('image_images_per_page', 20), 0, NULL, $tid);
+				$result = db_query("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC", $tid);
+				while ($node_images = db_fetch_object($result)) {
+					$images[] = node_load(array('nid' => $node_images->nid));
+				}
+				
+				// Affichage de l'image
+				if(sizeof($images) > 0){
+					foreach($images as $image){
+						$thumbnail = $image->images[thumbnail];
+						if(empty($thumbnail))
+							drupal_set_message(t("Thumbnail file image %title {%nid} is missing !",array('%title'=>$image->title,'%nid'=>$image->nid)),"error");
+						$form['galleries'][$string][$image->nid] = array(
+							'#type' => 'checkbox',
+							'#title' => '<img src="' . $base_url . '/' . $thumbnail . '" />',
+							'#default_value' => $node->galleries[$image->nid],
+							//'#title' => l(image_display($image, IMAGE_THUMBNAIL), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE),
+						);
+						if($node->galleries[$image->nid])
+							$form['galleries'][$string]['#collapsed'] = FALSE;
+					}
+				}else{
+					$form['galleries'][$string]['vide'] = array(
+						'#value' => t('Empty Gallery')
+					);
+				}
+			}
+		}
+	}
+	
+	// Récupération des toutes les images non présentes dans une gallerie
+	//$result = pager_query(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.status=1 AND n.type='image' AND n.nid NOT IN(SELECT t.nid FROM {term_node} t) ORDER BY n.sticky DESC, n.created DESC"), variable_get('image_images_per_page', 20), 0, NULL);
+	$result = db_query("SELECT n.nid FROM {node} n WHERE n.status=1 AND n.type='image' AND n.nid NOT IN(SELECT t.nid FROM {term_node} t LEFT JOIN {term_data} td on t.tid=td.tid LEFT JOIN {vocabulary} v ON (v.vid=td.vid) WHERE v.module='image_gallery') ORDER BY n.sticky DESC, n.created DESC");
+	while ($node_images = db_fetch_object($result)) {
+		$images_noGalleries[] = node_load(array('nid' => $node_images->nid));
+	}
+	
+	// Affichage de l'image
+	if(sizeof($images_noGalleries) > 0){
+		
+		foreach($images_noGalleries as $image){
+			$thumbnail = $image->images[thumbnail];
+			if(empty($thumbnail))
+				drupal_set_message(t("Thumbnail file image %title {%nid} is missing !",array('%title'=>$image->title,'%nid'=>$image->nid)),"error");
+			$form['galleries']['no_galleries'][$image->nid] = array(
+				'#type' => 'checkbox',
+				'#title' => '<img src="' . $base_url . '/' . $thumbnail . '" />',
+				'#default_value' => $node->galleries[$image->nid],
+				//'#title' => l(image_display($image, IMAGE_THUMBNAIL), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE),
+			);
+			if($node->galleries[$image->nid])
+				$form['galleries']['no_galleries']['#collapsed'] = FALSE;
+		}
+	} else { // Aucune image n'est disponible
+		$form['galleries']['no_galleries']['vide'] = array(
+			'#value' => t('No images found')
+		);
+	}	
+	
+	return $form;
+}
+
+/**
+ * Implementation of hook_validate().
+ *
+ *
+ * Errors should be signaled with form_set_error().
+ */
+function diaporama_validate(&$node) {
+	// verifie qu'au moins une image a été selectionnée
+	if(isset($node->galleries)) {
+		foreach($node->galleries as $key_gallery => $images){
+			foreach($images as $nid_image => $check_image){
+				if($check_image){
+					break;
+				}
+			}
+			if($check_image){
+				break;
+			}
+		}
+	}
+		
+	if (!$check_image) {
+		form_set_error('empty', t('You have to select at least one image.'));
+	}
+
+}
+
+/**
+ * Implementation of hook_insert().
+ *
+ */
+function diaporama_insert($node) {
+	$node = _diaporama_save($node);
+	db_query("INSERT INTO {diaporama} (vid, nid, tid, width, height, ratio, transition, speed, timer, showbuttons, showtitles, alignbuttons, aligntitles, randomstart, image_node) VALUES (%d, %d, %d, %d, %d, %d, '%s', %d, %d, %d, %d, '%s', '%s', %d, %d)", $node->vid, $node->nid, $node->tid, $node->width, $node->height, $node->ratio, $node->transition, $node->speed, $node->timer, $node->showbuttons, $node->showtitles, $node->alignbuttons, $node->aligntitles, $node->randomstart, $node->image_node);
+}
+
+/**
+ * Implementation of hook_update().
+ *
+ */
+function diaporama_update($node) {
+	
+  // if this is a new node or we're adding a new revision,
+  if ($node->revision) {
+    diaporama_insert($node);
+  }
+  else {
+  	_diaporama_update_images_delete($node);
+    db_query("UPDATE {diaporama} SET width = '%d', height = '%d', ratio = '%d', transition = '%s', speed = '%d', timer = '%d', showbuttons = '%d', alignbuttons = '%s', showtitles = '%d', aligntitles = '%s', randomstart = '%d', image_node = '%d' WHERE vid = %d", array($node->width, $node->height, $node->ratio, $node->transition, $node->speed, $node->timer, $node->showbuttons, $node->alignbuttons, $node->showtitles, $node->aligntitles, $node->randomstart, $node->image_node, $node->vid));
+    $node = _diaporama_save($node);
+  }
+}
+
+/**
+ * Implementation de hook_term_path()
+ * 
+ */
+function diaporama_term_path($term) {
+  if($res = db_fetch_object(db_query('SELECT nid FROM {diaporama} WHERE tid = %d', $term->tid)))
+	return 'node/'. $res->nid;
+}
+
+function _diaporama_save($node){
+	// Création du repertoire correspondant à la taille du diaporama
+	if(_diaporama_check_directory($node)){
+		$vid = _diaporama_get_vid();
+		
+		// création d'un term.
+		
+		if(!empty($node->tid) && $node->tid > 0 && !$node->revision){
+			$term = array('tid'=>$node->tid,'name'=>$node->title,'description'=>'','vid'=>$vid,'weight'=>'0');
+		}else{
+			$term = array('name'=>$node->title,'description'=>'','vid'=>$vid,'weight'=>'0');
+		}
+		taxonomy_save_term($term);
+		
+		if(empty($node->tid) || $node->tid <= 0 || $node->revision){ // Le term_data vient d'etre créé. On le récupère.
+			// Si le tid n'existe pas
+			// 1. Création d'un diaporama. Création d'un tid
+			// 2. Revert d'une révision. Dans ce cas, création d'un tid et on récupère les images liées à la révision récupérée.
+			
+			$result = db_query("SELECT tid FROM {term_data} WHERE name = '%s' AND vid='%d' ORDER BY tid DESC LIMIT 1", array($node->title, $vid));
+			if($res = db_fetch_object($result))
+				$node->tid = $res->tid;
+				
+			// Vérifie s'il existe des révisions de ce diaporama
+			// Si il y a des révisions, on récupère les précédentes images
+			if(isset($node->revision_timestamp) && !empty($node->revision_timestamp)){
+				$nidImages = db_query('SELECT tn.nid FROM {term_node} tn LEFT JOIN {diaporama} d ON d.tid=tn.tid LEFT JOIN {node_revisions} nr ON nr.vid=d.vid WHERE nr.timestamp=%d', $node->revision_timestamp);
+				while($res = db_fetch_object($nidImages)){
+					$nidTmp = $res->nid;
+					$node->galleries->no_galleries->{$nidTmp} = 1;
+				}
+			}
+		}
+		
+		_diaporama_images_save($node);
+		_diaporama_xml_save($node);
+		return $node;
+	}
+}
+
+/**
+ * Enregistrement des images à mettre dans le diaporama
+ */
+function _diaporama_images_save($node){
+	// suppression de tous les enregistrements liés au diaporama dans la table term_node
+	// table term_node :
+	// nid : nid de l'image
+	// tid : tid du diaporama
+	
+	
+	if(isset($node->galleries)){
+		db_query('DELETE FROM {term_node} WHERE tid = %d', $node->tid);
+		
+		foreach($node->galleries as $key_gallery => $images){
+			foreach($images as $nid_image => $check_image){
+				if($check_image){
+					// récupération des terms liés à l'image dans la table term_node
+					$terms = taxonomy_node_get_terms($nid_image);
+					$terms_array = array();
+					foreach($terms as $key => $val){
+						if($val->tid != $node->tid)
+							array_push($terms_array, $val->tid);
+					}
+					array_push($terms_array, $node->tid);
+					// Ajout dans la base de données (table term_node) des images en prenant en compte leurs assignations précédentes.
+					taxonomy_node_save($nid_image, $terms_array);
+				}
+			}
+		}
+		module_invoke_all('taxonomy', $hook, 'term', $form_values);
+
+		cache_clear_all();
+	}	
+}
+
+/**
+ * Suppression des images non utilisées d'un diaporama lors d'un update
+ */
+function _diaporama_update_images_delete($node){
+	// recherche de l'ancienne taille et de l'ancien ratio
+	$result_ancien = db_query("SELECT d.nid, d.tid, width, height, ratio FROM {diaporama} d INNER JOIN {term_node} t ON t.tid = d.tid WHERE d.nid = %d and d.vid= %d", array($node->nid, $node->vid));
+	if($diaporama_ancien = db_fetch_object($result_ancien)){
+		_diaporama_images_delete($diaporama_ancien);
+		/*$result = db_query("SELECT t.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid WHERE t.tid = %d AND t.nid NOT IN (SELECT t.nid FROM {term_node} t INNER JOIN {diaporama} d ON t.tid = d.tid WHERE width = %d AND height = %d AND ratio = %d AND d.nid <> %d)", array($diaporama_ancien->tid, $diaporama_ancien->width, $diaporama_ancien->height, $diaporama_ancien->ratio, $diaporama_ancien->nid));
+		while ($image = db_fetch_object($result)){
+			unlink(variable_get('diaporama_default_path','files/diaporamas') . "/" . $diaporama_ancien->width . "x" . $diaporama_ancien->height . "_" . $diaporama_ancien->ratio . "/" . $image->nid . ".jpg");
+		}*/
+	}
+}
+
+/**
+ * Suppression des images d'un diaporama
+ */
+function _diaporama_images_delete($node){
+	$result = db_query("SELECT t.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid WHERE t.tid = %d AND t.nid NOT IN (SELECT t.nid FROM {term_node} t INNER JOIN {diaporama} d ON t.tid = d.tid WHERE width = %d AND height = %d AND ratio = %d AND d.nid <> %d)", array($node->tid, $node->width, $node->height, $node->ratio, $node->nid));
+	while ($image = db_fetch_object($result)){
+		unlink(variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . "/" . $node->width . "x" . $node->height . "_" . $node->ratio . "/" . $image->nid . ".jpg");
+	}
+}
+
+/**
+ * Création de l'image à la taille des propriétés du diaporama
+ */
+function _diaporama_image_save($node, $nid, $filepath_source){
+	global $base_url;
+	//vérifie l'image source
+	if(!file_exists($filepath_source)){
+		drupal_set_message(t("File %fs doesn't exist",array('%fs'=>$filepath_source)),"error");
+		return false;
+	}
+	// vérifie que l'image n'existe pas déjà dans files/diaporamas/widthxheight
+	$repertoire = variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . "/" . $node->width . "x" . $node->height . "_" . $node->ratio;
+	if(file_exists($repertoire . "/" . $nid . ".jpg")){
+		return true;
+	}
+	// cree l'image a la nouvelle taille
+	if($node->ratio){ // garder le ratio de l'image
+		$success = image_scale($filepath_source, $repertoire . "/" . $nid . ".jpg", $node->width, $node->height);	
+	}else{
+		$success = image_resize($filepath_source, $repertoire . "/" . $nid . ".jpg", $node->width, $node->height);	
+	}
+	if($success){
+		return $repertoire . "/" . $nid . ".jpg";
+	}else{
+		drupal_set_message(t( "%rep/%img: creation failed",array('%rep'=>$repertoire,'%img'=>$nid)),"error");
+		return false;
+	}
+}
+
+function _diaporama_check_directory($node){
+	$diaporama_path = file_create_path(variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . "/" . $node->width . "x" . $node->height . "_" . $node->ratio);
+
+	if (!file_check_directory($diaporama_path, FILE_CREATE_DIRECTORY)) {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ *
+ * When a node revision is deleted, we need to remove the corresponding record
+ * from our table. The only way to handle revision deletion is by implementing
+ * hook_nodeapi().
+ */
+function diaporama_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'delete revision':
+      // Notice that we're matching a single revision based on the node's vid.
+      if($node->tid)
+		taxonomy_del_term($node->tid);
+      db_query('DELETE FROM {diaporama} WHERE vid = %d', $node->vid);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_delete().
+ *
+ * When a node is deleted, we need to remove all related records from out table.
+ */
+function diaporama_delete($node) {
+	if($res = db_fetch_object(db_query('SELECT tid FROM {diaporama} WHERE nid = %d', $node->nid)))
+		$node->tid = $res->tid;
+	// suppression des images si aucun autre diaporama ne les utilise
+	_diaporama_images_delete($node);
+	// suppression des références image / diaporama
+	//db_query('DELETE FROM {term_node} WHERE tid = (SELECT tid FROM {diaporama} WHERE nid = %d)', $node->nid);
+	// Notice that we're matching all revision, by using the node's nid.
+	// suppression du lien image / diaporama
+	if($node->tid)
+		taxonomy_del_term($node->tid);
+	
+	// suppression du fichier xml du diaporama
+	_diaporama_xml_delete($node);
+	
+	// suppression du diaporama
+	db_query('DELETE FROM {diaporama} WHERE nid = %d', $node->nid);
+}
+
+/**
+ * Implementation of hook_load().
+ *
+ * Now that we've defined how to manage the node data in the database, we
+ * need to tell Drupal how to get the node back out. This hook is called
+ * every time a node is loaded, and allows us to do some loading of our own.
+ */
+function diaporama_load($node) {
+  $diaporama = db_fetch_object(db_query('SELECT nid, width, height, ratio, transition, speed, timer, showbuttons, showtitles, aligntitles, alignbuttons, randomstart, image_node FROM {diaporama} WHERE vid = %d', $node->vid));
+  return $diaporama;
+}
+
+/**
+ * Implementation of hook_view().
+ *
+ * This is a typical implementation that simply runs the node text through
+ * the output filters.
+ */
+function diaporama_view($node, $teaser = FALSE, $page = FALSE) {
+  // visible seulement si l'utilisateur a les droits
+  //if(user_access('access diaporama')){
+	  $node = node_prepare($node, $teaser);
+	  $node->content['myfield'] = array(
+		'#value' => theme('diaporama_order_info', $node),
+		'#weight' => 0,
+	  );
+  
+  //}else{ $node = ""; }
+
+  return $node;
+}
+
+/**
+ * A custom theme function.
+ *
+ * By using this function to format our node-specific information, themes
+ * can override this presentation if they wish. We also wrap the default
+ * presentation in a CSS class that is prefixed by the module name. This
+ * way, style sheets can modify the output without requiring theme code.
+ */
+function theme_diaporama_order_info($node) {
+	global $base_url;
+	
+  $output = '<div class="diaporama_order_info" style="text-align: center; align=top">';
+  $output .= '<object type="application/x-shockwave-flash" data="' . $base_url . "/" . variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . '/dewslider.swf?xml=' . $base_url . "/" . variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . '/diaporama_' . $node->nid . '.xml" width="' . $node->width . '" height="' . $node->height . '">
+<param name="movie" value="' . $base_url . "/" . variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . '/dewslider.swf?xml=' . $base_url . "/" . variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . '/diaporama_' . $node->nid . '.xml" />
+</object>';
+  $output .= '</div>';
+  return $output;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function diaporama_menu($may_cache) {
+
+	$items = array();
+
+	if ($may_cache) {
+		// page principale d'administration
+		$items[] = array(
+			'path' => 'admin/settings/diaporama',
+			'title' => t('Diaporama'),
+			'callback' => 'drupal_get_form',
+			'callback arguments' => 'diaporama_admin_settings',
+			'description' => t('Configure diaporama properties.'),
+			'access' => user_access('administer diaporama'),
+			'type' => MENU_NORMAL_ITEM,
+		);
+	}
+
+  return $items;
+}
+
+function replaceDoubleQuote($str){
+	$str = str_replace('"','&#34;',$str);
+	return $str;
+}
+
+/**
+ * Configuration des options par défaut d'un diaporama
+ */
+function diaporama_admin_settings(){
+	_diaporama_check_settings();
+	
+	$form['diaporama'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Diaporama settings'),
+	);
+	
+	$form['diaporama']['diaporama_width'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Width'),
+		'#default_value' => variable_get('diaporama_width', 640),
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Width (px) of slideshow"),
+		'#required' => TRUE,
+	);
+	
+	$form['diaporama']['diaporama_height'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Height'),
+		'#default_value' => variable_get('diaporama_height', 480),
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Height (px) of slideshow"),
+		'#required' => TRUE,
+	);
+	
+	$form['diaporama']['diaporama_ratio'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Keep ratio'),
+		'#default_value' => variable_get('diaporama_ratio', 0),
+	);
+	
+	$form['diaporama']['diaporama_transition'] = array(
+		'#type' => 'select',
+		'#title' => t('Transition'),
+		'#default_value' => variable_get('diaporama_transition', 'Fade'),
+		'#description' => t("Transition between images"),
+		'#options' => array('fade' => t('Fade'),'slide' => t('Slide'),'push' => t('Push'),'pop' => t('Pop'),'warp' => t('Warp'),'blur' => t('Blur'))
+	);
+	
+	$form['diaporama']['diaporama_speed'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Speed transition'),
+		'#default_value' => variable_get('diaporama_speed', 20),
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Speed transition in ms"),
+		'#required' => TRUE,
+	);
+	
+	$form['diaporama']['diaporama_timer'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Time display'),
+		'#default_value' => variable_get('diaporama_timer', 5),
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#description' => t("Time display in seconds, 0 = infinity"),
+		'#required' => TRUE,
+	);
+	
+	$form['diaporama']['diaporama_showbuttons'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Show buttons'),
+		'#default_value' => variable_get('diaporama_showbuttons', 1),
+	);
+	
+	$form['diaporama']['diaporama_alignbuttons'] = array(
+		'#type' => 'radios',
+		'#title' => t('Buttons position'),
+		'#default_value' => variable_get('diaporama_alignbuttons', 'bottom'),
+		'#options' => array(
+			'top' => t('top'),
+			'bottom' => t('bottom'),
+		),
+	);
+	
+	$form['diaporama']['diaporama_showtitles'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Show titles'),
+		'#default_value' => variable_get('diaporama_showtitles', 1),
+	);
+	
+	$form['diaporama']['diaporama_aligntitles'] = array(
+		'#type' => 'radios',
+		'#title' => t('Titles position'),
+		'#default_value' => variable_get('diaporama_aligntitles', 'bottom'),
+		'#options' => array(
+			'top' => t('top'),
+			'bottom' => t('bottom'),
+		),
+	);
+	
+	$form['diaporama']['diaporama_randomstart'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Random start'),
+		'#default_value' => variable_get('diaporama_randomstart', 1),
+	);
+
+	$form['diaporama']['diaporama_imageNode'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Open image node'),
+		'#default_value' => variable_get('diaporama_imageNode', 1),
+	);
+	
+	return system_settings_form($form);
+}
+
+/**
+ * Verify the diaporama module settings.
+ */
+function _diaporama_check_settings() {
+  // File paths
+  $diaporama_path = file_create_path(variable_get('diaporama_default_path',file_directory_path() . '/diaporamas'));
+
+  if (!file_check_directory($diaporama_path, FILE_CREATE_DIRECTORY, 'diaporama_default_path')) {
+    return false;
+  }
+  
+  if(!file_exists(variable_get('diaporama_default_path',file_directory_path() . '/diaporamas')."/dewslider.swf")){
+    drupal_set_message(t('Dewslider not found at %dewslider.',array('%dewslider'=>variable_get('diaporama_default_path',file_directory_path() . '/diaporamas')."/dewslider.swf")),"error");
+  	drupal_set_message(t('You have to download dewslider on <a href="http://www.alsacreations.fr/dewslider" target="_blank">http://www.alsacreations.fr/dewslider</a> to use diaporama.'),"error");
+  }
+  
+  return true;
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function diaporama_help($section) {
+
+  $output = '';
+
+  switch ($section) {
+    case "admin/help#diaporama":
+      $output .= '<p>'.  t("Management diaporama"). '</p>';
+      break;
+    case "node/add/diaporama":
+      $output .= '<p><i>' . t("Select images that make up your slideshow.") . '</i></p>';
+  }
+
+  return $output;
+} // function diaporama_help
+
+/**
+ * Returns (and possibly creates) a new vocabulary for Diaporama.
+ */
+function _diaporama_get_vid() {
+  $vid = variable_get('diaporama_nav_vocabulary', '');
+  if (empty($vid) || !taxonomy_get_vocabulary($vid)) {
+    // Check to see if an diaporama vocabulary exists
+    $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module='diaporama'"));
+    if (!$vid) {
+      $vocabulary = array('name' => t('Diaporama'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'diaporama', 'nodes' => array());
+      taxonomy_save_vocabulary($vocabulary);
+      $vid = $vocabulary['vid'];
+    }
+    variable_set('diaporama_nav_vocabulary', $vid);
+  }
+
+  return $vid;
+}
+
+/**
+ * Récupération des données d'un diaporama existant
+ */
+function _diaporama_get_datas($node){
+	$datas = array();
+	$result = db_query('SELECT d.* FROM {diaporama} d WHERE d.nid = %d ORDER BY vid DESC LIMIT 1', $node->nid);
+	while ($data = db_fetch_object($result)){
+		foreach($data as $key=>$val)
+			$datas[$key] = $val;
+	}
+	
+	if(isset($datas['tid']) && !empty($datas['tid'])){
+		$result = db_query('SELECT t.nid FROM {term_node} t WHERE t.tid = %d', $datas['tid']);
+		while ($data = db_fetch_object($result))
+			$datas['galleries'][$data->nid] = 1;
+	}
+	return $datas;
+}
+
+/**
+ * Affichage des images du formulaire dans un tableau
+ */
+function theme_diaporama_form_gallery(&$form) {
+	//$header = array(t('Label'), t('Operation'), t('Width'), t('Height'), t('Link'));
+	$i = 0;
+	$text = '<a href="#0" name="0" onClick="javascript: diaporama_checkAll(this);">' . t('Check all images of the gallery') . '</a>';
+	$rows[] = array(array('data'=>$text,'colspan'=>'5'));
+	foreach (element_children($form) as $key) { // parcours des elements du formulaire
+		if($i%5 == 0){ // Si le nombre d'enregistrement atteint est de 5 c'est qu'il faut faire une nouvelle ligne
+			if(isset($row)) // Vérification que l'on ne se trouve pas dans la premiere itération
+				$rows[] = $row; // Enregistrement de la ligne
+			$row = array(); // instanciation d'une nouvelle ligne
+		}
+		$row[] = drupal_render($form[$key]); // nouvelle cellule
+		$i++;
+	}
+	$rows[] = $row; // Enregistrement de la ligne
+	$output .= theme('table', $header, $rows);
+	
+	$output .= theme_pager();
+	
+	$output .= drupal_render($form);
+
+	return $output;
+}
+
+function _diaporama_boolean($value){
+	if ($value)
+		return 'yes';
+	else
+		return 'no';
+}
+
+function _diaporama_xml_save($node){
+	global $base_url;
+	
+	// convert boolean to yes and no
+	$showbuttons = _diaporama_boolean($node->showbuttons);
+	$showtitles = _diaporama_boolean($node->showtitles);
+	$randomstart = _diaporama_boolean($node->randomstart);
+	
+	$file= fopen(variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . "/diaporama_" . $node->nid . ".xml", "w");
+	$_xml ="<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+	$_xml .= "<album\n";
+	$_xml .= "\tshowbuttons=\"" . $showbuttons . "\"\n";
+	$_xml .= "\tshowtitles=\"" . $showtitles . "\"\n";
+	$_xml .= "\trandomstart=\"" . $randomstart . "\"\n";
+	$_xml .= "\ttimer=\"" . $node->timer . "\"\n";
+	$_xml .= "\taligntitles=\"" . $node->aligntitles . "\"\n";
+	$_xml .= "\talignbuttons=\"" . $node->alignbuttons . "\"\n";
+	$_xml .= "\ttransition=\"" . $node->transition . "\"\n";
+	$_xml .= "\tspeed=\"" . $node->speed . "\">\n";
+	
+	$result = db_query("SELECT f.filepath, n.title, n.nid FROM {term_node} t INNER JOIN {files} f ON f.nid = t.nid INNER JOIN {node} n ON t.nid = n.nid WHERE t.tid = %d AND filename='_original'", $node->tid);
+	while ($image = db_fetch_object($result)){
+		$check_file = _diaporama_image_save($node, $image->nid, $image->filepath);
+		if($check_file){
+			$_xml .= "\t<img src=\"" . $base_url . "/" . variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . "/" . $node->width . "x" . $node->height . "_" . $node->ratio . "/" . $image->nid . ".jpg" . "\" title=\"" . replaceDoubleQuote($image->title) . "\"";
+			if($node->image_node)
+				$_xml .= " url=\"?q=node/" . $image->nid . "\"";
+			$_xml .= " />\n";
+		 }
+	}
+	if(!isset($check_file))
+		drupal_set_message(t('xml file diaporama_%xml.xml has no images.',array('%xml'=>$node->nid)),"error");
+	
+	$_xml .= "</album>\n";
+
+	if(!fwrite($file, $_xml))
+		drupal_set_message(t("Write in xml file diaporama_%node_nid.xml failed !"),array('%node_nid'=>$node->nid),"error");
+	fclose($file);
+}
+
+function _diaporama_xml_delete($node){
+	$isSuppr = unlink(variable_get('diaporama_default_path',file_directory_path() . '/diaporamas') . "/diaporama_" . $node->nid . ".xml");
+	if($isSuppr){
+		drupal_set_message(t("The xml file diaporama_%node_nid.xml has been deleted.", array('%node_nid'=>$node->nid)));
+	}else{
+		drupal_set_message(t("XML file diaporama_%node_nid.xml failed deleting.", array('%node_nid'=>$node->nid)),"error");
+	}
+}
+
+?>

@@ -1,0 +1,670 @@
+diff -ur /tmp/imagefield_gallery/imagefield_gallery.info imagefield_gallery/imagefield_gallery.info
+--- /tmp/imagefield_gallery/imagefield_gallery.info	2008-09-17 18:35:32.000000000 +0200
++++ imagefield_gallery/imagefield_gallery.info	2009-06-11 16:08:51.000000000 +0200
+@@ -1,11 +1,13 @@
+ ; $Id: imagefield_gallery.info,v 1.4 2008/02/04 23:27:14 eclipsegc Exp $
+ name = ImageField Gallery
+-description = Creates a Gallery out of an Imagefield.
++description = Creates a Gallery out of an Imagefield. 
+ package = ImageField Gallery
+-dependencies = imagefield imagecache
++dependencies[] = imagefield
++dependencies[] = imagecache 
++core = 6.x 
+ 
+-; Information added by drupal.org packaging script on 2008-09-17
+-version = "5.x-2.0-alpha4"
++; Information added by drupal.org packaging script on 2008-09-17 
++version = "6.x-2.0-alpha4" 
+ project = "imagefield_gallery"
+ datestamp = "1221669332"
+ 
+diff -ur /tmp/imagefield_gallery/imagefield_gallery.module imagefield_gallery/imagefield_gallery.module
+--- /tmp/imagefield_gallery/imagefield_gallery.module	2008-09-17 18:10:30.000000000 +0200
++++ imagefield_gallery/imagefield_gallery.module	2009-06-11 15:47:53.000000000 +0200
+@@ -6,8 +6,8 @@
+  * implementation of hook_help()
+  */
+ 
+-function imagefield_gallery_help($section) {
+-  switch ($section) {
++function imagefield_gallery_help($path, $arg) {
++  switch ($path) {
+     case 'admin/help#imagefield_gallery':
+     $output = '<p>'. t('Imagefield Gallery is specifically designed to make theming and displaying imagefield images easy.  The following administrative links will help you manage your imagefield galleries.') .'</p>';
+     $output .= '<p>'. t('Imagefield Gallery is currently made up of two separate modules.  The first is the imagefield_gallery module which does nothing on its own.  The second is the imagefield_gallery_lightbox2 module.  This module allows you to create galleries of images on a node that has an imagefield on it.  Imagefield_gallery is designed to work with nodes that have only one imagefield, it does not currently work with nodes that have more than one imagefield.  Results cannot be garunteed in these situations.  For best results set your imagefield to be a multi-value imagefield and then use the links below to administrate the look of your gallery.  Imagefield_gallery works on a node by node basis, so you can set completely different css settings on nodes, even if they share the same gallery type, and same imagefield!') .'</p>';
+@@ -28,57 +28,49 @@
+  * implementation of hook_menu()
+  */
+ 
+-function imagefield_gallery_menu($may_cache) {
++function imagefield_gallery_menu() {
+   $items = array();
+ 
+-  if ($may_cache) {
+-    $items[] = array(
+-      'path' => 'admin/settings/imagefield_gallery_types',
+-      'title' => t('Imagefield Gallery Administration'),
+-      'description' => t('Configure the types of content on which you would like an Imagefield Gallery to appear, and modify the css settings for those galleries.'),
+-      'callback' => 'imagefield_gallery_content_types',
+-      'access' => user_access('administer imagefield gallery'),
+-      'type' => MENU_NORMAL_ITEM,
+-    );
+-  }
+-  else {
+-    $type = arg(3);
+-    $field = arg(4);
+-    $items[] = array(
+-    	'path' => 'admin/settings/imagefield_gallery_types_edit/'. $type .'/'. $field,
+-    	'title' => $type .' '. t('Imagefield Gallery Settings'),
+-    	'callback' => 'drupal_get_form',
+-    	'callback arguments' => array('imagefield_gallery_content_types_edit', $type, $field),
+-    	'access' => user_access('administer imagefield gallery'),
+-    	'type' => MENU_CALLBACK,
+-    );
+-    $items[] = array(
+-    	'path' => 'admin/settings/imagefield_gallery_types_reset/'. $type .'/'. $field,
+-    	'callback' => 'imagefield_gallery_content_types_reset',
+-        'callback arguments' => array($type, $field),
+-    	'access' => user_access('administer imagefield gallery'),
+-    	'type' => MENU_CALLBACK,
+-    );
+-    $items[] = array(
+-    	'path' => 'admin/settings/imagefield_gallery_style_edit/'. $type .'/'. $field,
+-    	'title' => $type .' '. t('Style Settings'),
+-    	'callback' => 'drupal_get_form',
+-    	'callback arguments' => array('imagefield_gallery_style_edit', $type, $field),
+-    	'access' => user_access('administer imagefield gallery'),
+-    	'type' => MENU_CALLBACK,
+-    );
+-    $items[] = array(
+-    	'path' => 'admin/settings/imagefield_gallery_style_reset/'. $type .'/'. $field,
+-    	'callback' => 'imagefield_gallery_style_reset',
+-        'callback arguments' => array($type, $field),
+-    	'access' => user_access('administer imagefield gallery'),
+-    	'type' => MENU_CALLBACK,
+-    );
+-  }
++  $items['admin/settings/imagefield_gallery_types'] = array(
++    'title' => 'Imagefield Gallery Administration',
++    'description' => 'Configure the types of content on which you would like an Imagefield Gallery to appear, and modify the css settings for those galleries.',
++    'page callback' => 'imagefield_gallery_content_types',
++    'access arguments' => array('administer imagefield gallery'),
++    'type' => MENU_NORMAL_ITEM,
++  );
++  $type = arg(3);
++  $field = arg(4);
++  $items['admin/settings/imagefield_gallery_types_edit/%/%'] = array(
++    'title' => $type .' '.'Imagefield Gallery Settings',
++    'page callback' => 'drupal_get_form',
++    'page arguments' => array('imagefield_gallery_content_types_edit', 3, 4),
++    'access arguments' => array('administer imagefield gallery'),
++    'type' => MENU_CALLBACK,
++  );
++  $items['admin/settings/imagefield_gallery_types_reset/%/%'] = array(
++    'page callback' => 'imagefield_gallery_content_types_reset',
++    'page arguments' => array(3, 4),
++    'access arguments' => array('administer imagefield gallery'),
++    'type' => MENU_CALLBACK,
++  );
++  $items['admin/settings/imagefield_gallery_style_edit/%/%'] = array(
++    'title' => 3 .' '.'Style Settings',
++    'page callback' => 'drupal_get_form',
++    'page arguments' => array('imagefield_gallery_style_edit', 3, 4),
++    'access arguments' => array('administer imagefield gallery'),
++    'type' => MENU_CALLBACK,
++  );
++  $items['admin/settings/imagefield_gallery_style_reset/%/%'] = array(
++    'callback' => 'imagefield_gallery_style_reset',
++    'callback arguments' => array(3, 4),
++    'access arguments' => array('administer imagefield gallery'),
++    'type' => MENU_CALLBACK,
++  );
++
+   return $items;
+ }
+ 
+-function imagefield_gallery_style_reset($type, $field){
++function imagefield_gallery_style_reset($type, $field) {
+   $gallery_type = imagefield_gallery_gallery_type($type, $field);
+   $var_name = $gallery_type .'_imagefield_gallery_css';
+   $var = variable_get($var_name, array());
+@@ -89,7 +81,7 @@
+   drupal_goto('admin/settings/imagefield_gallery_types');
+ }
+ 
+-function imagefield_gallery_style_edit($type, $field){
++function imagefield_gallery_style_edit($form_state, $type, $field) {
+   $cache = imagefield_gallery_get_imagecache_presets();
+   $var = variable_get('imagefield_gallery', array());
+   $form_func = $var[$type][$field]['gallery'] .'_imagefield_gallery_admin';
+@@ -106,17 +98,15 @@
+   return system_settings_form($form);
+ }
+ 
+-function imagefield_gallery_style_edit_validate($form_id, $form_values) { //!! this is probalby going to break, I forget what's in $form_values['variable'] but I think it makes this check
+-  $validate_func = $form_values['variable'] .'_imagefield_gallery_admin_validate';
++function imagefield_gallery_style_edit_validate($form, &$form_state) { //!! this is probalby going to break, I forget what's in $form_values['variable'] but I think it makes this check
++  $validate_func = $form_state['values']['variable'] .'_imagefield_gallery_admin_validate';
+   if (function_exists($validate_func)) {
+-    $validate_func($form_id, $form_values);
++    $validate_func($form, $form_state);
+   }
+-}
+ 
+-function imagefield_gallery_style_edit_submit($form_id, $form_values) { //!! this is probalby going to break, I forget what's in $form_values['variable'] but I think it makes this check
+-  $submit_func = $form_values['variable'] .'_imagefield_gallery_admin_submit';
++  $submit_func = $form_state['values']['variable'] .'_imagefield_gallery_admin_submit';
+   if (function_exists($submit_func)) {
+-    $submit_func($form_id, $form_values);
++    $submit_func($form, $form_state);
+     imagefield_gallery_build_css();
+   }
+   else {
+@@ -164,8 +154,8 @@
+             }
+           }
+           # end new stuff
+-          
+-          $current_theme = variable_get('theme_default','none');
++
++          $current_theme = variable_get('theme_default', 'none');
+           /*if (function_exists('garland_lightbox2_story_field_lead_image_imagefield_gallery')) {
+             $gallery_func = 'garland_lightbox2_story_field_lead_image_imagefield_gallery';
+           }*/
+@@ -181,7 +171,7 @@
+           else {
+             $gallery_func = imagefield_gallery_gallery_type($type['type'], $type['name']) .'_imagefield_gallery';
+           }
+-          
++
+           $node->content[$type['name']]['#value'] = theme($gallery_func, $images, $node, $type['name']);
+           //$node->content[$type['name']]['#value'] = imagefield_gallery_gallery_type($type['type'], $type['name']) .'_'. $type['type'] .'_'. $type['name'];
+         }
+@@ -222,10 +212,15 @@
+         $nt[$i]['type'] = $type['type'];
+         $nt[$i]['name'] = $field['field_name'];
+       }
++      if (($field['type'] == 'filefield') && ($field['widget']['type'] == 'imagefield_widget')) {
++        $nt[$i]['type'] = $type['type'];
++        $nt[$i]['name'] = $field['field_name'];
++      }
++
+       # new stuff
+       if ($field['type'] == 'nodereference') {
+         foreach ($field['referenceable_types'] as $name => $active) {
+-          if($active && $types[$active]['fields']){
++          if ($active && $types[$active]['fields']) {
+             // check active content types for an imagefield.  If one doesn't exist, this node reference is ineligible for an imagefield gallery
+             foreach ($types[$active]['fields'] as $name2 => $field2) {
+               if ($field2['type'] == 'image') {
+@@ -315,11 +310,12 @@
+ 
+   foreach ($types as $type) {
+     $rows = array();
++//    drupal_set_message('type: '.$type['type'].' name: '.$type['name']);
+     if (empty($var[$type['type']][$type['name']]['gallery']) || !isset($var[$type['type']][$type['name']]['gallery'])) {
+-    	$gallery = 'none';
++      $gallery = 'none';
+     }
+     else {
+-    	$gallery = $var[$type['type']][$type['name']]['gallery'];
++      $gallery = $var[$type['type']][$type['name']]['gallery'];
+     }
+     $rows[] = array('<strong>'. $type['type'] .'</strong>', $type['name'], $gallery, l(t('edit'), 'admin/settings/imagefield_gallery_types_edit/'. $type['type'] .'/'. $type['name']), l(t('reset'), 'admin/settings/imagefield_gallery_types_reset/'. $type['type'] .'/'. $type['name']));
+     $output .= '<div class="gallery_type">';
+@@ -329,7 +325,7 @@
+   return $output;
+ }
+ 
+-function imagefield_gallery_content_types_edit($type, $field){
++function imagefield_gallery_content_types_edit($form_state, $type, $field) {
+   $cache = imagefield_gallery_get_imagecache_presets();
+   $var = variable_get('imagefield_gallery', array());
+   $form_func = $var[$type][$field]['gallery'] .'_imagefield_gallery_content_types';
+@@ -363,23 +359,33 @@
+ }
+ 
+ /**
+- * implementation of imagefield_gallery_content_types_edit_submit()
+- * $form_values should already be checked and scrubbed at this point
+- * so we're just saving each type within the imagefield_gallery
+- * variable.  Doing it this way should eliminate anything that is
+- * not tied to a node type.
++ * implementation of imagefield_gallery_hook_content_types_validate()
++ * custom validate functions are all checked for existance and then
++ * called via the typical naming convention.  This allows for gallery
++ * type modules to have independent validation for whatever forms
++ * they may implement in the content types admin.
+  */
+ 
+-function imagefield_gallery_content_types_edit_submit($form_id, $form_values) {
++function imagefield_gallery_content_types_edit_validate($form, &$form_state) {
++  $types = imagefield_gallery_nodetypes();
++  foreach ($types as $type) {
++    $validate_func = imagefield_gallery_gallery_type($type['type'], $type['name']) .'_imagefield_gallery_content_types_validate';
++    if (function_exists($validate_func)) {
++      $validate_func($form, $form_state);
++    }
++  }
++
+   $types = imagefield_gallery_nodetypes();
+-  $var = variable_get(imagefield_gallery, array());
++  $var = variable_get('imagefield_gallery', array());
+   foreach ($types as $type) {
+-    if (is_array($form_values[$type['type']][$type['name']])) {
+-      $var[$type['type']][$type['name']] = $form_values[$type['type']][$type['name']];
++  	
++    if (is_array($form_state['values'][$type['type']][$type['name']])) {
++      $var[$type['type']][$type['name']] = $form_state['values'][$type['type']][$type['name']];
+     }
+     else {
+-      if ($form_values[$type['type']][$type['name']]) {
+-        $var[$type['type']][$type['name']]['gallery'] = $form_values[$type['type']][$type['name']];
++      
++      if ($form_state['values'][$type['type']][$type['name']]) {
++        $var[$type['type']][$type['name']]['gallery'] = $form_state['values'][$type['type']][$type['name']];
+       }
+     }
+   }
+@@ -387,7 +393,8 @@
+   imagefield_gallery_build_css();
+ }
+ 
+-function imagefield_gallery_content_types_reset($type, $field){
++function imagefield_gallery_content_types_reset($type, $field) {
++  drupal_set_message('type: '.$type.' field: '.$field);
+   $var = variable_get('imagefield_gallery', array());
+   $var[$type][$field] = array();
+   $var[$type][$field]['gallery'] = 'none';
+@@ -410,24 +417,6 @@
+ }
+ 
+ /**
+- * implementation of imagefield_gallery_hook_content_types_validate()
+- * custom validate functions are all checked for existance and then
+- * called via the typical naming convention.  This allows for gallery
+- * type modules to have independent validation for whatever forms
+- * they may implement in the content types admin.
+- */
+-
+-function imagefield_gallery_content_types_edit_validate($form_id, $form_values, $form) {
+-  $types = imagefield_gallery_nodetypes();
+-  foreach ($types as $type) {
+-    $validate_func = imagefield_gallery_gallery_type($type['type'], $type['name']) .'_imagefield_gallery_content_types_validate';
+-    if (function_exists($validate_func)) {
+-      $validate_func($form_id, $form_values, $form);
+-    }
+-  }
+-}
+-
+-/**
+  * implementation of imagefield_gallery_build_css()
+  * creates a css file
+  * calls theme_imagefield_gallery_css_render
+@@ -441,6 +430,15 @@
+   }
+ }
+ 
++function imagefield_gallery_theme() {
++  return array(
++    'imagefield_gallery_css_render' => array(
++      'arguments' => array(),
++    ),
++  );
++}
++
++
+ /**
+  * implementation of imagefield_gallery_hook_css_render()
+  * calls gallery type css_render theme functions and passes
+@@ -452,9 +450,9 @@
+ 
+ function theme_imagefield_gallery_css_render() {
+   $output = "
+-/* This CSS File is automatically generated by the imagefield_gallery.module, any 
+-edits made to this file will be overwritten the next time any configuration changes 
+-are made via the admin.  If you'd like to alter the contents of this file, check 
++/* This CSS File is automatically generated by the imagefield_gallery.module, any
++edits made to this file will be overwritten the next time any configuration changes
++are made via the admin.  If you'd like to alter the contents of this file, check
+ theme_imagefield_gallery_css_render() in the imagefield_gallery.module file. */
+ ";
+   $types = imagefield_gallery_nodetypes();
+
+diff -ur /tmp/imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.info imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.info
+--- /tmp/imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.info	2008-09-17 18:35:32.000000000 +0200
++++ imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.info	2009-06-11 16:09:03.000000000 +0200
+@@ -1,11 +1,12 @@
+-; $Id: lightbox2_imagefield_gallery.info,v 1.1 2008/09/17 16:10:30 eclipsegc Exp $
+-name = Lightbox2 ImageField Gallery
++; $Id: lightbox2_imagefield_gallery.info,v 1.1 2008/09/17 16:10:30 eclipsegc Exp $ 
++name = Lightbox2 ImageField Gallery 
+ description = Creates a Lightbox Style Gallery out of an Imagefield.
+ package = ImageField Gallery
+-dependencies = imagefield_gallery jquery_update
++dependencies[] = jquery_update
++dependencies[] = imagefield_gallery
++core = 6.x 
+ 
+ ; Information added by drupal.org packaging script on 2008-09-17
+-version = "5.x-2.0-alpha4"
++version = "6.x-2.0-alpha4" 
+ project = "imagefield_gallery"
+ datestamp = "1221669332"
+-
+diff -ur /tmp/imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.module imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.module
+--- /tmp/imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.module	2008-09-17 18:10:30.000000000 +0200
++++ imagefield_gallery/lightbox2_imagefield_gallery/lightbox2_imagefield_gallery.module	2009-04-15 11:05:58.000000000 +0200
+@@ -95,11 +95,11 @@
+  * implementation of hook_imagefield_gallery_content_types_validate()
+  */
+ 
+-function lightbox2_imagefield_gallery_content_types_validate($form_id, $form_values, $form) {
++function lightbox2_imagefield_gallery_content_types_validate($form, &$form_state) {
+   $types = imagefield_gallery_nodetypes();
+   foreach ($types as $type) {
+-    if (is_array($form_values[$type['type']][$type['name']]) && $form_values[$type['type']][$type['name']]['gallery'] != 'none') {
+-      if ($form_values[$type['type']][$type['name']]['images']['thumbnail'] == 'none' || $form_values[$type['type']][$type['name']]['images']['preview'] == 'none') {
++    if (is_array($form_state['values'][$type['type']][$type['name']]) && $form_state['values'][$type['type']][$type['name']]['gallery'] != 'none') {
++      if ($form_state['values'][$type['type']][$type['name']]['images']['thumbnail'] == 'none' || $form_state['values'][$type['type']][$type['name']]['images']['preview'] == 'none') {
+         form_set_error('', t('You must select an imagecache setting for the @type content type $field field!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+@@ -110,41 +110,41 @@
+  * implementation of hook_imagefield_gallery_admin_validate()
+  */
+ 
+-function lightbox2_imagefield_gallery_admin_validate($form_id, $form_values) {
++function lightbox2_imagefield_gallery_admin_validate($form, &$form_state) {
+   $types = imagefield_gallery_nodetypes();
+   foreach ($types as $type) {
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['width'])) {
+-      if (!is_numeric($form_values['lightbox2'][$type['type']][$type['name']]['width'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['width'])) {
++      if (!is_numeric($form_state['values']['lightbox2'][$type['type']][$type['name']]['width'])) {
+         form_set_error('', t('The @type @field width value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['height'])) {
+-      if (!is_numeric($form_values['lightbox2'][$type['type']][$type['name']]['height'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['height'])) {
++      if (!is_numeric($form_state['values']['lightbox2'][$type['type']][$type['name']]['height'])) {
+         form_set_error('', t('The @type @field height value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['margins']['top'])) {
+-      if (!is_numeric($form_values['lightbox2'][$type['type']][$type['name']]['margins']['top'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['top'])) {
++      if (!is_numeric($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['top'])) {
+         form_set_error('', t('The @type @field top margin value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['margins']['right'])) {
+-      if (!is_numeric($form_values['lightbox2'][$type['type']][$type['name']]['margins']['right'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['right'])) {
++      if (!is_numeric($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['right'])) {
+         form_set_error('', t('The @type @field right margin value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['margins']['bottom'])) {
+-      if (!is_numeric($form_values['lightbox2'][$type['type']][$type['name']]['margins']['bottom'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['bottom'])) {
++      if (!is_numeric($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['bottom'])) {
+         form_set_error('', t('The @type @field bottom margin value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['margins']['left'])) {
+-      if (!is_numeric($form_values['lightbox2'][$type['type']][$type['name']]['margins']['left'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['left'])) {
++      if (!is_numeric($form_state['values']['lightbox2'][$type['type']][$type['name']]['margins']['left'])) {
+         form_set_error('', t('The @type @field left margin value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['lightbox2'][$type['type']][$type['name']]['border']['color_style_textfield'])) {
+-      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_values['lightbox2'][$type['type']][$type['name']]['border']['color_style_textfield'])) {
++    if (!empty($form_state['values']['lightbox2'][$type['type']][$type['name']]['border']['color_style_textfield'])) {
++      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_state['values']['lightbox2'][$type['type']][$type['name']]['border']['color_style_textfield'])) {
+         form_set_error('', t('The @type @field border color value must be a hexidecimal number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+@@ -331,12 +331,12 @@
+ /**
+  * implementation of imagefield_gallery_hook_admin_submit()
+  * because we keyed the form by node type, we can just set the
+- * variable equal to $form_values['lightbox2']
++ * variable equal to $form_state['values']['lightbox2']
+  */
+ 
+-function lightbox2_imagefield_gallery_admin_submit($form_id, $form_values) {
++function lightbox2_imagefield_gallery_admin_submit($form, &$form_state) {
+   $var = variable_get('lightbox2_imagefield_gallery_css', array());
+-  foreach($form_values['lightbox2'] as $name => $type) {
++  foreach ($form_state['values']['lightbox2'] as $name => $type) {
+     foreach ($type as $fname => $field) {
+       $var[$name][$fname] = $field;
+     }
+@@ -344,6 +344,18 @@
+   variable_set('lightbox2_imagefield_gallery_css', $var);
+ }
+ 
++function lightbox2_imagefield_gallery_theme() {
++  return array(
++    'lightbox2_imagefield_gallery' => array(
++      'arguments' => array(
++        'images' => NULL,
++        'node' => NULL,
++        'field' => NULL,
++      ),
++    ),
++  );
++}
++
+ /* ---------- Theme Functions ----------- */
+ 
+ /**
+@@ -374,9 +386,9 @@
+       if (!$js_added) {
+         $js_added = TRUE;
+         $js_settings = array(
+-          'use_alt_layout' =>  false,
+-          'disable_zoom' => false,
+-          'force_show_nav' => false,
++          'use_alt_layout' =>  FALSE,
++          'disable_zoom' => FALSE,
++          'force_show_nav' => FALSE,
+           'group_images' => TRUE,
+           'disable_for_gallery_lists' => TRUE,
+           'node_link_text' => check_plain(t('View Image Details')),
+diff -ur /tmp/imagefield_gallery/.project imagefield_gallery/.project
+--- /tmp/imagefield_gallery/.project	2008-02-03 22:08:04.000000000 +0100
++++ imagefield_gallery/.project	2009-04-15 11:05:58.000000000 +0200
+@@ -2,13 +2,11 @@
+ <projectDescription>
+ 	<name>imagefield_gallery</name>
+ 	<comment></comment>
+-	<projects>
+-	</projects>
++	<projects></projects>
+ 	<buildSpec>
+ 		<buildCommand>
+ 			<name>net.sourceforge.phpeclipse.parserbuilder</name>
+-			<arguments>
+-			</arguments>
++			<arguments></arguments>
+ 		</buildCommand>
+ 	</buildSpec>
+ 	<natures>
+diff -ur /tmp/imagefield_gallery/scrollbox_imagefield_gallery/css/admin.css imagefield_gallery/scrollbox_imagefield_gallery/css/admin.css
+--- /tmp/imagefield_gallery/scrollbox_imagefield_gallery/css/admin.css	2008-09-17 18:31:18.000000000 +0200
++++ imagefield_gallery/scrollbox_imagefield_gallery/css/admin.css	2009-04-15 11:05:58.000000000 +0200
+@@ -1,13 +1,14 @@
+ fieldset.lightbox2_thumbnail_fieldset div.form-item {
+-  float:left;
+-  margin-right:20px;
++	float: left;
++	margin-right: 20px;
+ }
+ 
+-fieldset.lightbox2_thumbnail_fieldset fieldset.lightbox2_margin_fieldset div.form-item {
+-  float:left;
+-  margin-right:20px;
++fieldset.lightbox2_thumbnail_fieldset fieldset.lightbox2_margin_fieldset div.form-item
++	{
++	float: left;
++	margin-right: 20px;
+ }
+ 
+ fieldset.lightbox2_thumbnail_fieldset fieldset div.form-item {
+-  float:none;
++	float: none;
+ }
+\ No newline at end of file
+diff -ur /tmp/imagefield_gallery/scrollbox_imagefield_gallery/css/content_types.css imagefield_gallery/scrollbox_imagefield_gallery/css/content_types.css
+--- /tmp/imagefield_gallery/scrollbox_imagefield_gallery/css/content_types.css	2008-09-17 18:31:18.000000000 +0200
++++ imagefield_gallery/scrollbox_imagefield_gallery/css/content_types.css	2009-04-15 11:05:58.000000000 +0200
+@@ -1,5 +1,5 @@
+ fieldset.lightbox2_fieldset fieldset div.form-item {
+-  display:block;
+-  float:left;
+-  margin-right:20px;
++	display: block;
++	float: left;
++	margin-right: 20px;
+ }
+\ No newline at end of file
+diff -ur /tmp/imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.info imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.info
+--- /tmp/imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.info	2008-09-17 18:35:32.000000000 +0200
++++ imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.info	2009-06-11 16:09:16.000000000 +0200
+@@ -1,11 +1,13 @@
+ ; $Id: scrollbox_imagefield_gallery.info,v 1.1 2008/09/17 16:10:30 eclipsegc Exp $
+ name = Scrollbox ImageField Gallery
+-description = Creates a Scrollbox Style Gallery out of an Imagefield.  Requires 1.2.6 of jquery.
+-package = ImageField Gallery
+-dependencies = imagefield_gallery jquery_update
++description = Creates a Scrollbox Style Gallery out of an Imagefield. Requires 1.2.6 of jquery. 
++package = ImageField Gallery 
++dependencies[] = imagefield_gallery
++dependencies[] = jquery_update 
++core = 6.x
+ 
+-; Information added by drupal.org packaging script on 2008-09-17
+-version = "5.x-2.0-alpha4"
++;Information added by drupal.org packaging script on 2008-09-17
++version = "6.x-2.0-alpha4"
+ project = "imagefield_gallery"
+ datestamp = "1221669332"
+ 
+diff -ur /tmp/imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.module imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.module
+--- /tmp/imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.module	2008-09-17 18:10:30.000000000 +0200
++++ imagefield_gallery/scrollbox_imagefield_gallery/scrollbox_imagefield_gallery.module	2009-04-15 11:05:58.000000000 +0200
+@@ -97,11 +97,11 @@
+  * implementation of hook_imagefield_gallery_content_types_validate()
+  */
+ 
+-function scrollbox_imagefield_gallery_content_types_validate($form_id, $form_values, $form) {
++function scrollbox_imagefield_gallery_content_types_validate($form, &$form_state) {
+   $types = imagefield_gallery_nodetypes();
+   foreach ($types as $type) {
+-    if (is_array($form_values[$type['type']][$type['name']]) && $form_values[$type['type']][$type['name']]['gallery'] != 'none') {
+-      if ($form_values[$type['type']][$type['name']]['images']['thumbnail'] == 'none' || $form_values[$type['type']][$type['name']]['images']['preview'] == 'none') {
++    if (is_array($form_state['values'][$type['type']][$type['name']]) && $form_state['values'][$type['type']][$type['name']]['gallery'] != 'none') {
++      if ($form_state['values'][$type['type']][$type['name']]['images']['thumbnail'] == 'none' || $form_state['values'][$type['type']][$type['name']]['images']['preview'] == 'none') {
+         form_set_error('', t('You must select an imagecache setting for the @type content type $field field!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+@@ -112,46 +112,46 @@
+  * implementation of hook_imagefield_gallery_admin_validate()
+  */
+ 
+-function scrollbox_imagefield_gallery_admin_validate($form_id, $form_values) {
++function scrollbox_imagefield_gallery_admin_validate($form, &$form_state) {
+   $types = imagefield_gallery_nodetypes();
+   foreach ($types as $type) {
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['preview']['width'])) {
+-      if (!is_numeric($form_values['scrollbox'][$type['type']][$type['name']]['preview']['width'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['width'])) {
++      if (!is_numeric($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['width'])) {
+         form_set_error('', t('The @type @field width value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['preview']['height'])) {
+-      if (!is_numeric($form_values['scrollbox'][$type['type']][$type['name']]['preview']['height'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['height'])) {
++      if (!is_numeric($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['height'])) {
+         form_set_error('', t('The @type @field height value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['thumb']['width'])) {
+-      if (!is_numeric($form_values['scrollbox'][$type['type']][$type['name']]['thumb']['width'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['thumb']['width'])) {
++      if (!is_numeric($form_state['values']['scrollbox'][$type['type']][$type['name']]['thumb']['width'])) {
+         form_set_error('', t('The @type @field width value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['thumb']['height'])) {
+-      if (!is_numeric($form_values['scrollbox'][$type['type']][$type['name']]['thumb']['height'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['thumb']['height'])) {
++      if (!is_numeric($form_state['values']['scrollbox'][$type['type']][$type['name']]['thumb']['height'])) {
+         form_set_error('', t('The @type @field height value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['preview']['margins'])) {
+-      if (!is_numeric($form_values['scrollbox'][$type['type']][$type['name']]['preview']['margins'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['margins'])) {
++      if (!is_numeric($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['margins'])) {
+         form_set_error('', t('The @type @field left margin value must be a number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['parent']['border_color'])) {
+-      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_values['scrollbox'][$type['type']][$type['name']]['parent']['border_color'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['parent']['border_color'])) {
++      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_state['values']['scrollbox'][$type['type']][$type['name']]['parent']['border_color'])) {
+         form_set_error('', t('The @type @field border color value must be a hexidecimal number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['preview']['border_color'])) {
+-      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_values['scrollbox'][$type['type']][$type['name']]['preview']['border_color'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['border_color'])) {
++      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_state['values']['scrollbox'][$type['type']][$type['name']]['preview']['border_color'])) {
+         form_set_error('', t('The @type @field border color value must be a hexidecimal number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+-    if (!empty($form_values['scrollbox'][$type['type']][$type['name']]['thumb']['border_color'])) {
+-      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_values['scrollbox'][$type['type']][$type['name']]['thumb']['border_color'])) {
++    if (!empty($form_state['values']['scrollbox'][$type['type']][$type['name']]['thumb']['border_color'])) {
++      if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $form_state['values']['scrollbox'][$type['type']][$type['name']]['thumb']['border_color'])) {
+         form_set_error('', t('The @type @field border color value must be a hexidecimal number!', array('@type' => $type['type'], '@field' => $type['name'])));
+       }
+     }
+@@ -461,9 +461,9 @@
+  * implementation of hook_imagefield_gallery_admin_submit().
+  */
+ 
+-function scrollbox_imagefield_gallery_admin_submit($form_id, $form_values) {
++function scrollbox_imagefield_gallery_admin_submit($form, &$form_state) {
+   $var = variable_get('scrollbox_imagefield_gallery_css', array());
+-  foreach($form_values['scrollbox'] as $name => $type) {
++  foreach ($form_state['values']['scrollbox'] as $name => $type) {
+     foreach ($type as $fname => $field) {
+       $var[$name][$fname] = $field;
+     }
+@@ -473,6 +473,18 @@
+ 
+ /* ---------- Theme Functions ----------- */
+ 
++function scrollbox_imagefield_gallery_theme() {
++  return array(
++    'scrollbox_imagefield_gallery' => array(
++      'arguments' => array(
++        'images' => NULL,
++        'node' => NULL,
++        'field' => NULL,
++      ),
++    ),
++  );
++}
++
+ /**
+  * implementation of    hook_imagefield_gallery().
+  */

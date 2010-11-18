@@ -1,0 +1,62 @@
+[client]
+#default-character-set=tis620
+[mysql]
+no-auto-rehash
+###safe-updates
+#default-character-set=tis620
+[mysqld]
+#init-connect='SET collation_connection = tis620_thai_ci'
+#init-connect='SET NAMES tis620'
+#default-character-set=tis620
+character-set-server=utf8
+collation-server=utf8_general_ci
+###old-passwords
+#datadir=/home/mysql
+skip-locking
+skip-innodb
+#skip-networking
+safe-show-database
+query_cache_limit=1M
+query_cache_size=128M ## 32MB for every 1GB of RAM
+query_cache_type=1
+max_user_connections=200
+max_connections=500
+interactive_timeout=10
+wait_timeout=10
+connect_timeout=20
+thread_cache_size=128
+key_buffer=512M ## 128MB for every 1GB of RAM
+join_buffer=1M
+max_connect_errors=20
+max_allowed_packet=64M
+table_cache=1024
+record_buffer=1M
+sort_buffer_size=4M ## 1MB for every 1GB of RAM
+read_buffer_size=4M ## 1MB for every 1GB of RAM
+read_rnd_buffer_size=4M  ## 1MB for every 1GB of RAM
+thread_concurrency=2 ## Number of CPUs x 2
+myisam_sort_buffer_size=64M
+server-id=1
+log_slow_queries=/var/log/mysql-slow-queries.log
+long_query_time=2
+[mysql.server]
+user=mysql
+#basedir=/usr/local/mysql
+[safe_mysqld]
+err-log=/var/log/mysqld.log
+open_files_limit=8192
+[mysqldump]
+quick
+max_allowed_packet=16M
+[isamchk]
+key_buffer=64M
+sort_buffer=64M
+read_buffer=16M
+write_buffer=16M
+[myisamchk]
+key_buffer=64M
+sort_buffer=64M
+read_buffer=16M
+write_buffer=16M
+[mysqlhotcopy]
+interactive-timeout

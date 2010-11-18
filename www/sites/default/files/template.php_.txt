@@ -1,0 +1,66 @@
+<?php
+/*
+ * Initialize theme settings
+ */
+$pixture_width = theme_get_setting('pixture_width');
+pixture_validate_page_width($pixture_width);
+/*
+ * Check the page width theme settings and reset to default 
+ * if the value is null, or invalid value is specified
+ */
+function pixture_validate_page_width($width) {
+  global $theme_key;
+  /*
+  * The default values for the theme variables. Make sure $defaults exactly
+  * matches the $defaults in the theme-settings.php file.
+  */
+  $defaults = array(             // <-- change this array
+    'pixture_width' => '85%',
+  );
+  // check if it is liquid (%) or fixed width (px)
+  if(preg_match("/(\d+)\s*%/", $width, $match)) {
+    $liquid = 1;
+    $num = intval($match[0]);
+    if(50 <= $num && $num <= 100) {
+      return $num . "%";  // OK!
+    }
+  }
+  else if(preg_match("/(\d+)\s*px/", $width, $match)) {
+    $fixed = 1;
+    $num = intval($match[0]);
+    if(800 <= $num && $num < 1600) {
+      return $num . "px"; // OK
+    }
+  }
+  // reset to default value
+  variable_set(
+    str_replace('/', '_', 'theme_'. $theme_key .'_settings'),
+    array_merge($defaults, theme_get_settings($theme_key))
+  );
+  // Force refresh of Drupal internals
+  theme_get_setting('', TRUE);
+  return $defaults['pixture_width'];
+}
+
+/**
+ * Override or insert PHPTemplate variables into the templates.
+ */
+function phptemplate_preprocess_page(&$vars) {
+  // Hook into color.module
+  if (module_exists('color')) {
+    _color_page_alter($vars);
+  }
+}
+/* AJOUT DE ALF - Permet de faire apparaitre l'icone d'IMCE dans TinyMCE */
+function phptemplate_tinymce_theme($init, $textarea_name, $theme_name, $is_running) {
+static $access, $integrated;if (!isset($access)) {
+    $access = function_exists('imce_access') && imce_access();
+}$init = theme_tinymce_theme($init, $textarea_name, $theme_name, $is_running);if ($init && $access) {
+	$init['file_browser_callback'] = 'imceImageBrowser';
+    if (!isset($integrated)) {
+		$integrated = TRUE;
+      	drupal_add_js("function imceImageBrowser(fid, url, type, win) {win.open(Drupal.settings.basePath +'?q=imce&app=TinyMCE|url@'+ fid, '', 'width=760,height=560,resizable=1');}", 'inline');
+    }
+  }
+  return $init;
+}/* Ajout ALF: pour affichage de la date dans l'entete du calendrier */function theme_date_nav_title($granularity, $view, $link = FALSE, $format = NULL) {  switch ($granularity) {    case 'year':      $title = $view->date_info->year;      $url = $view->date_info->url .'/'. $view->date_info->year;      break;    case 'month':      $format = !empty($format) ? $format : (empty($view->date_info->mini) ? 'F Y' : 'F');      $title = date_format_date($view->date_info->min_date, 'custom', $format);      $url = $view->date_info->url .'/'. $view->date_info->year .'-'. date_pad($view->date_info->month);      break;    case 'day':      $format = !empty($format) ? $format : (empty($view->date_info->mini) ? 'l j F Y' : 'l j F ');      $title = date_format_date($view->date_info->min_date, 'custom', $format);      $url = $view->date_info->url .'/'. $view->date_info->year .'-'. date_pad($view->date_info->month) .'-'. date_pad($view->date_info->day);      break;    case 'week':    $format = !empty($format) ? $format : (empty($view->date_info->mini) ? 'j F Y' : 'j F');      $title = t('Week of @date', array('@date' => date_format_date($view->date_info->min_date, 'custom', $format)));    $url = $view->date_info->url .'/'. $view->date_info->year .'-W'. date_pad($view->date_info->week);    break;  }  // TODO Update this.  if (!empty($view->date_info->mini) || $link) {    // Month navigation titles are used as links in the mini view.	$attributes = array('title' => t('View full page month'));    return l($title, $view->date_info->url, array('attributes' => $attributes));  }  else {    return $title;  }}

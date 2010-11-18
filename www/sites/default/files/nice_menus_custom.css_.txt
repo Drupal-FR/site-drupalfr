@@ -1,0 +1,315 @@
+/* $Id: nice_menus_default.css,v 1.7 2009/02/09 00:19:36 add1sun Exp $ */
+/*
+
+  This is the default layout template for nice menus, and will provide
+  a starting point for the look of your menus. To customize, it's
+  recommended to create a custom CSS file using this file as a template,
+
+
+
+  then configure the module to use your custom CSS file
+  (this is done in the global settings tab of the theme administration.)
+
+  To help understand the CSS, the HTML looks like this, where
+    x is a number;
+    TYPE is down/left/right;
+    PATH is the menu path such as node/343;
+    MID is the menu id such as 33):
+  <ul id='nice-menu-x' class='nice-menu nice-menu-TYPE'>
+    <li id='menu-MID' class='menu-path-PATH'><a href='#'>This is a menu item</a></li>
+    <li class='menuparent menu-path-PATH'><a href='#'>A submenu</a>
+      <ul...><li...>...</li>
+      </ul>
+    </li>
+    ...
+  </ul>
+
+  If you have more than one nice-menu and want to target a particular one,
+  use its id (e.g. ul#nice-menu-2).
+
+  See README.txt and the handbook page (http://drupal.org/node/185543)
+  for some CSS customization examples.
+*/
+
+
+/******************************
+ Global CSS for ALL menu types
+******************************/
+
+ul.nice-menu,
+ul.nice-menu ul {
+  padding: 0;
+  margin: 0;
+  border-top: 0;
+  
+}
+
+ul.nice-menu li {
+
+  /*border: 1px solid #156597;*/
+  border-top: 0;
+  float: left; /* LTR */
+  background-color: none; /*changer couleur BG*/
+  /* Additional overrides to deal with Garland theme. */
+  margin: 0;
+  padding-left: 0; /* LTR */
+  background-image: none;
+}
+
+
+
+
+/* Overrides for Garland header. */
+#header-region ul.nice-menu li {
+  margin: 0;
+  /* Padding rules are needed to deal with Garland's header line-height. */
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  background: #eee;
+}
+
+ul.nice-menu a {
+ padding: 1.3em 5px;
+
+}
+
+ul.nice-menu ul,
+/* Repeat for Garland header. */
+#header-region ul.nice-menu ul {
+  top: 1.8em;
+  left: -1px; /* LTR */
+  border: 0;
+  border-top: 0;
+  margin-right: 0; /* LTR */
+}
+
+/* Override for Garland header. */
+#header-region ul.nice-menu ul {
+
+  top: 1.7em;
+}
+
+ul.nice-menu ul li {
+
+  width: 12.5em;
+}
+
+/******************************
+ VERTICAL (left/right) menus
+******************************/
+
+/* This is the default width of all vertical menus. */
+ul.nice-menu-right, ul.nice-menu-left,
+ul.nice-menu-right li, ul.nice-menu-left li {
+  width: 12.5em;
+}
+
+/* VERTICAL menus where submenus pop RIGHT (default). */
+ul.nice-menu-right ul {
+  width: 12.5em;
+  left: 12.5em;
+  top: -1px;
+}
+
+ul.nice-menu-right ul ul {
+  width: 12.5em;
+  left: 12.5em;
+  top: -1px;
+}
+
+ul.nice-menu-right li.menuparent,
+ul.nice-menu-right li li.menuparent {
+  background: #eee url(arrow-right.png) right center no-repeat;
+}
+
+ul.nice-menu-right li.menuparent:hover,
+ul.nice-menu-right li.over,
+ul.nice-menu-right li li.menuparent:hover,
+ul.nice-menu-right li li.over {
+  background: #ccc url(arrow-right.png) right center no-repeat;
+}
+
+/* VERTICAL menus where submenus pop LEFT. */
+ul.nice-menu-left li ul {
+  width: 12.5em;
+  left: -12.65em;
+  top: -1px;
+}
+
+ul.nice-menu-left li ul li ul {
+  width: 12.5em;
+  left: -12.65em;
+  top: -1px;
+}
+
+ul.nice-menu-left li.menuparent,
+ul.nice-menu-left li li.menuparent {
+  background: #eee url(arrow-left.png) left center no-repeat;
+}
+
+ul.nice-menu-left li.menuparent:hover,
+ul.nice-menu-left li.over,
+ul.nice-menu-left li li.menuparent:hover,
+ul.nice-menu-left li li.over {
+  background: #ccc url(arrow-left.png) left center no-repeat;
+}
+
+ul.nice-menu-left a, ul.nice-menu-left ul a {
+  padding-left: 14px;
+}
+
+/******************************
+ HORIZONTAL (down) menus
+******************************/
+
+ul.nice-menu-down {
+  float: left; /* LTR */
+  border: 0;
+}
+
+ul.nice-menu-down li {
+	text-align:center;
+	margin:0 2px 0 0;
+	font-family: Arial;
+	font-size: 10px;
+	list-style:none;
+	
+}
+ul.nice-menu-down li a,ul.nice-menu-down .menuparent a {  /*Pour les rubriques avec sous rubriques*/
+ 	text-decoration: none;
+	background: #ebebeb;
+	color:#156597;
+	border: 0;
+	width:100px;  
+	height: 30px;
+	display: block;	
+	padding:13px 3px ;
+	
+}
+ul.nice-menu-down li a:hover {
+	text-decoration: none;
+	background: #156597;
+	color:#ebebeb;
+	border: 0;
+}
+/*Style sous rubriques*/
+ul.nice-menu-down li.menuparent ul {
+margin: 40px 0 0 0;
+background: none;
+
+}
+ 
+ul.nice-menu-down li.menuparent ul li {
+  border: 0;
+  background: none;
+ list-style:square;
+ height: 20px;
+}
+
+ul.nice-menu-down li.menuparent ul li a{
+  background: transparent url(../images/puce.png) no-repeat 15px;
+  border: 0;
+  width: auto;
+  height: auto;
+  color:#156597;
+  
+}
+ul.nice-menu-down li.menuparent ul li a:hover{
+ color:#ebebeb;
+}
+/**************************/
+/*Style sous sous rubriques*/
+ul.nice-menu-down li.menuparent ul li.menuparent ul{
+margin:0;
+background: none;
+list-style-type:square;
+}
+ 
+ul.nice-menu-down li.menuparent ul li.menuparent ul li {
+  border: 0;
+  background: none;
+  list-style-type:square;
+  height: 20px;
+}
+
+ul.nice-menu-down li.menuparent ul li.menuparent li a{
+  background: none;
+  border: 0;
+  width: auto;
+  height: auto;
+  color:#156597;
+  list-style-type:square;
+  text-decoration:none;
+}
+ul.nice-menu-down li.menuparent ul li.menuparent li a:hover{
+ color:#ebebeb;
+ text-decoration: underline;
+}
+/*fin Style sous sous rubriques*/
+ul.nice-menu-down ul {
+  left: 0; /* LTR */
+}
+
+ul.nice-menu-down ul li {
+  clear: both;
+
+}
+
+ul.nice-menu-down li ul li ul,
+
+/* Repeat for Garland header. */
+
+#header-region ul.nice-menu-down li ul li ul {
+
+  left: 12.5em; /* LTR */
+  top: -1px;
+}
+
+ul.nice-menu-down li.menuparent,
+/* Repeat for Garland header. */
+#header-region ul.nice-menu-down li.menuparent {
+  background: none; /* LTR - changer couleur BG */
+}
+
+
+ul.nice-menu-down li.menuparent:hover,
+ul.nice-menu-down li.over,
+/* Repeat for Garland header. */
+#header-region ul.nice-menu-down li.menuparent:hover,
+
+
+#header-region ul.nice-menu-down li.over {
+  background: none; /* LTR */
+}
+
+ul.nice-menu-down li li.menuparent,
+/* Repeat for Garland header. */
+#header-region ul.nice-menu-down li li.menuparent {
+  background: none; /* LTR */
+}
+
+ul.nice-menu-down li li.menuparent:hover,
+ul.nice-menu-down li li.over,
+/* Repeat for Garland header. */
+#header-region ul.nice-menu-down li li.menuparent:hover,
+#header-region ul.nice-menu-down li li.over {
+  background: none; /* LTR */
+}
+/**-------cacher les titres des menus--------*/
+.nice-menu-hide-title, .nice-menu-show-title{
+display:none;
+}
+/*********************************************************************************************/
+/***************************Differencier les menus: ajouter l'active trail ***********************************/
+/*, ul#nice-menu-2 li.active-trail >a  pour le second menu*/
+ul#nice-menu-1 li.active-trail a{
+	color:#ebebeb;
+	background: #156597;
+}
+/*active trail pour les sous rubriques*/
+ul#nice-menu-1  li.active-trail ul li.active-trail a{
+	background: none;
+	text-decoration: underline;
+}
+/*********************************************************************************************/
+/*********************************************************************************************/

@@ -1,0 +1,2025 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Drupal 6\n"
+"POT-Creation-Date: 2008-01-11 00:39+0100\n"
+"PO-Revision-Date: 2007-12-31 12:56+0100\n"
+"Last-Translator: Damien Tournoud <damz@prealable.org>\n"
+"Language-Team: drupalfr.org <traduction@drupalfr.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: France\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: includes/actions.inc:301
+msgid "Remove orphaned actions"
+msgstr "Supprime les actions orphelines"
+
+#: includes/actions.inc:46
+msgid ""
+"Stack overflow: too many calls to actions_do(). Aborting to prevent infinite "
+"recursion."
+msgstr ""
+"Dépassement de tas : trop d'appels à actions_do(). Traitement abandonné pour "
+"éviter une récursion infinie."
+
+#: includes/actions.inc:275
+msgid "Action '%action' added."
+msgstr "Action '%action' ajoutée."
+
+#: includes/actions.inc:297
+msgid "Removed orphaned action '%action' from database."
+msgstr "L'action orpheline '%action' a été supprimée de la base de données."
+
+#: includes/actions.inc:329
+msgid "Action %action saved."
+msgstr "Action '%action' enregistrée."
+
+#: includes/actions.inc:337
+msgid "Action %action created."
+msgstr "Action '%action' créée."
+
+#: includes/actions.inc:303
+msgid "One orphaned action (%orphans) exists in the actions table. !link"
+msgid_plural ""
+"@count orphaned actions (%orphans) exist in the actions table. !link"
+msgstr[0] ""
+"Une action orpheline (%orphans) existe dans la table des actions. !link"
+msgstr[1] ""
+"@count actions orphelines (%orphans) existent dans la table des actions. !"
+"link"
+
+#: includes/batch.inc:100
+msgid "HTTP POST is required."
+msgstr "La méthode HTTP POST est indispensable."
+
+#: includes/batch.inc:101 includes/unicode.inc:86
+msgid "Error"
+msgstr "Erreur"
+
+#: includes/common.inc:333
+msgid "Site off-line"
+msgstr "Site hors ligne"
+
+#: includes/common.inc:360
+msgid "Page not found"
+msgstr "Page non trouvée"
+
+#: includes/common.inc:361
+msgid "The requested page could not be found."
+msgstr "La page demandée n'a pu être trouvée."
+
+#: includes/common.inc:389
+msgid "Access denied"
+msgstr "Accès refusé"
+
+#: includes/common.inc:390
+msgid "You are not authorized to access this page."
+msgstr "Vous n'êtes pas autorisé(e) à accéder à cette page."
+
+#: includes/common.inc:430
+msgid "The server can't issue HTTP requests"
+msgstr "Le serveur ne peut exécuter de requêtes HTTP."
+
+#: includes/common.inc:1083
+msgid "KB"
+msgstr "Ko"
+
+#: includes/common.inc:1088
+msgid "@size @suffix"
+msgstr "@size @suffix"
+
+#: includes/common.inc:1120
+msgid "0 sec"
+msgstr "0s"
+
+#: includes/common.inc:3461
+msgid "emergency"
+msgstr "urgence"
+
+#: includes/common.inc:3462
+msgid "alert"
+msgstr "alerte"
+
+#: includes/common.inc:3463
+msgid "critical"
+msgstr "critique"
+
+#: includes/common.inc:3466
+msgid "notice"
+msgstr "remarque"
+
+#: includes/common.inc:3467
+msgid "info"
+msgstr "info"
+
+#: includes/common.inc:3468
+msgid "debug"
+msgstr "debug"
+
+#: includes/common.inc:609
+msgid "%message in %file on line %line."
+msgstr "%message dans %file à la ligne %line."
+
+#: includes/common.inc:2517;2524;2539;2555
+msgid "cron"
+msgstr "cron"
+
+#: includes/common.inc:2517
+msgid "Cron has been running for more than an hour and is most likely stuck."
+msgstr "Cron fonctionne depuis plus d'une heure. Il est probablement bloqué."
+
+#: includes/common.inc:2524
+msgid "Attempting to re-run cron while it is already running."
+msgstr "Tentative de relancer cron alors qu'il fonctionne déjà."
+
+#: includes/common.inc:2539
+msgid "Cron run completed."
+msgstr "Exécution de cron réussie."
+
+#: includes/common.inc:2555
+msgid "Cron run exceeded the time limit and was aborted."
+msgstr "L'exécution de cron a dépassé la limite de temps et a été annulée."
+
+#: includes/common.inc:1079
+msgid "1 byte"
+msgid_plural "@count bytes"
+msgstr[0] "1 octet"
+msgstr[1] "@count octets"
+
+#: includes/common.inc:0
+msgid "1 year"
+msgid_plural "@count years"
+msgstr[0] "1 an"
+msgstr[1] "@count an"
+
+#: includes/common.inc:0
+msgid "1 week"
+msgid_plural "@count weeks"
+msgstr[0] "1 semaine"
+msgstr[1] "@count semaines"
+
+#: includes/common.inc:0
+msgid "1 day"
+msgid_plural "@count days"
+msgstr[0] "1 jour"
+msgstr[1] "@count jours"
+
+#: includes/common.inc:0
+msgid "1 hour"
+msgid_plural "@count hours"
+msgstr[0] "1h"
+msgstr[1] "@counth"
+
+#: includes/common.inc:0
+msgid "1 min"
+msgid_plural "@count min"
+msgstr[0] "1 min"
+msgstr[1] "@count min"
+
+#: includes/common.inc:0
+msgid "1 sec"
+msgid_plural "@count sec"
+msgstr[0] "1 sec"
+msgstr[1] "@count sec"
+
+#: includes/database.mysql.inc:26 includes/database.mysqli.inc:29
+msgid "MySQL database"
+msgstr "Base de données MySQL"
+
+#: includes/database.mysql.inc:32 includes/database.mysqli.inc:35
+msgid "Your MySQL Server is too old. Drupal requires at least MySQL %version."
+msgstr ""
+"Votre serveur MySQL est d'une version trop ancienne. Drupal nécessite au "
+"minimum la version %version de MySQL."
+
+#: includes/database.pgsql.inc:23
+msgid "PostgreSQL database"
+msgstr "Base de données PostgreSQL"
+
+#: includes/database.pgsql.inc:29
+msgid ""
+"Your PostgreSQL Server is too old. Drupal requires at least PostgreSQL %"
+"version."
+msgstr ""
+"Votre serveur PostgreSQL est d'une version trop ancienne. Drupal nécessite "
+"au minimum la version %version de PostgreSQL."
+
+#: includes/database.pgsql.inc:405
+msgid ""
+"Your PostgreSQL database is set up with the wrong character encoding (%"
+"encoding). It is possible it will not work as expected. It is advised to "
+"recreate it with UTF-8/Unicode encoding. More information can be found in "
+"the <a href=\"@url\">PostgreSQL documentation</a>."
+msgstr ""
+"Votre base de données PostgreSQL est configurée avec un mauvais encodage de "
+"caractères (%encoding). Il est possible qu'elle ne fonctionne pas comme "
+"prévu. Il est conseillé de la recréer avec l'encodage UTF-8/Unicode. Vous "
+"trouverez plus d'information dans la <a href=\"%url\">documentation "
+"PostgreSQL</a>."
+
+#: includes/file.inc:104
+msgid "The directory %directory has been created."
+msgstr "Le répertoire '%directory' a été créé."
+
+#: includes/file.inc:118
+msgid ""
+"The permissions of directory %directory have been changed to make it "
+"writable."
+msgstr ""
+"Les droits du répertoire '%directory' ont été modifiés pour qu'il soit "
+"accessible en écriture."
+
+#: includes/file.inc:121
+msgid "The directory %directory is not writable"
+msgstr "Le répertoire '%directory' n'est pas accessible en écriture"
+
+#: includes/file.inc:135;136
+msgid ""
+"Security warning: Couldn't write .htaccess file. Please create a .htaccess "
+"file in your %directory directory which contains the following lines: <code>!"
+"htaccess</code>"
+msgstr ""
+"Avertissement de sécurité : impossible de créer le fichier .htaccess. "
+"Veuillez créer un fichier .htaccess dans le répertoire %directory contenant "
+"les lignes suivantes : <code>!htaccess</code>"
+
+#: includes/file.inc:225
+msgid ""
+"The selected file %file could not be uploaded, because the destination %"
+"directory is not properly configured."
+msgstr ""
+"Le fichier choisi %file n'a pas pu être transféré, car le répertoire de "
+"destination %directory n'est pas correctement configuré."
+
+#: includes/file.inc:241
+msgid ""
+"The selected file %file could not be copied, because no file by that name "
+"exists. Please check that you supplied the correct filename."
+msgstr ""
+"Le fichier choisi %file n'a pas pu être copié car aucun fichier de ce nom "
+"n'existe. Veuillez vérifier que le nom de fichier que vous avez saisi est "
+"correct."
+
+#: includes/file.inc:254;305
+msgid ""
+"The selected file %file could not be copied, because a file by that name "
+"already exists in the destination."
+msgstr ""
+"Le fichier choisi %file n'a pas pu être copié car un fichier de ce nom "
+"existe déjà dans le répertoire de destination."
+
+#: includes/file.inc:259
+msgid "The selected file %file could not be copied."
+msgstr "Le fichier choisi %file n'a pas pu être copié."
+
+#: includes/file.inc:339
+msgid "The removal of the original file %file has failed."
+msgstr "La suppression du fichier d'origine %file a échoué."
+
+#: includes/file.inc:380
+msgid "For security reasons, your upload has been renamed to %filename."
+msgstr ""
+"Pour des raisons de sécurité, votre fichier a été renommé en %filename."
+
+#: includes/file.inc:504
+msgid ""
+"The file %file could not be saved, because it exceeds %maxsize, the maximum "
+"allowed size for uploads."
+msgstr ""
+"Le fichier %file n'a pu être enregistré, parce qu'il dépasse la taille "
+"maximale autorisée (%maxsize)."
+
+#: includes/file.inc:509
+msgid "The file %file could not be saved, because the upload did not complete."
+msgstr ""
+"Le fichier %file n'a pas pu être enregistré car le transfert ne s'est pas "
+"terminé."
+
+#: includes/file.inc:514
+msgid "The file %file could not be saved. An unknown error has occurred."
+msgstr ""
+"Le fichier %file n'a pas pu être enregistré. Une erreur inconnue s'est "
+"produite."
+
+#: includes/file.inc:558
+msgid "The selected file %name could not be uploaded."
+msgstr "Le fichier sélectionné %name n'a pas pu être transféré."
+
+#: includes/file.inc:573
+msgid "File upload error. Could not move uploaded file."
+msgstr ""
+"Erreur dans le transfert de fichiers. Impossible de déplacer le fichier "
+"transféré."
+
+#: includes/file.inc:603
+msgid ""
+"Its name exceeds the 255 characters limit. Please rename the file and try "
+"again."
+msgstr ""
+"Son nom dépasse la limite des 255 caractères. Veuillez renommer le fichier."
+
+#: includes/file.inc:628
+msgid "Only files with the following extensions are allowed: %files-allowed."
+msgstr ""
+"Seuls les fichiers se terminant par les extensions suivantes sont "
+"autorisés : %files-allowed."
+
+#: includes/file.inc:657
+msgid "The file is %filesize exceeding the maximum file size of %maxsize."
+msgstr ""
+"Le fichier fait %filesize, ce qui dépasse la taille maximale autorisée (%"
+"maxsize)."
+
+#: includes/file.inc:662
+msgid "The file is %filesize which would exceed your disk quota of %quota."
+msgstr ""
+"Le fichier fait %filesize, ce qui dépasserait votre quota de disque (%quota)."
+
+#: includes/file.inc:681
+msgid "Only JPEG, PNG and GIF images are allowed."
+msgstr "Seules les images JPEG, PNG et GIF sont autorisées."
+
+#: includes/file.inc:716
+msgid ""
+"The image was resized to fit within the maximum allowed dimensions of %"
+"dimensions pixels."
+msgstr ""
+"Votre image a été retaillée aux dimensions maximales autorisées (%"
+"resolution)."
+
+#: includes/file.inc:724
+msgid "The image is too large; the maximum dimensions are %dimensions pixels."
+msgstr ""
+"L'image transférée est trop grande ; les dimensions maximales sont de %"
+"dimensions."
+
+#: includes/file.inc:733
+msgid "The image is too small; the minimum dimensions are %dimensions pixels."
+msgstr ""
+"L'image transférée est trop grande ; les dimensions maximales sont de %"
+"dimensions."
+
+#: includes/file.inc:758
+msgid "The file could not be created."
+msgstr "Le fichier n'a pas pu être créé."
+
+#: includes/file.inc:122;226
+msgid "file system"
+msgstr "système de fichiers"
+
+#: includes/file.inc:122
+msgid ""
+"The directory %directory is not writable, because it does not have the "
+"correct permissions set."
+msgstr ""
+"Le répertoire %directory n'est pas accessible en écriture car les "
+"permissions ne sont pas définies correctement."
+
+#: includes/file.inc:226
+msgid ""
+"The selected file %file could not be uploaded, because the destination %"
+"directory could not be found, or because its permissions do not allow the "
+"file to be written."
+msgstr ""
+"Le fichier choisi %file n'a pas pu être transféré car le répertoire de "
+"destination %directory n'a pas pu être trouvé, ou n'est pas accessible en "
+"écriture."
+
+#: includes/file.inc:574
+msgid "file"
+msgstr "fichier"
+
+#: includes/file.inc:574
+msgid ""
+"Upload error. Could not move uploaded file %file to destination %destination."
+msgstr ""
+"Erreur de transfert. Impossible de déplacer le fichier transféré (%file) "
+"vers la destination (%destination)."
+
+#: includes/form.inc:547
+msgid ""
+"Validation error, please try again. If this error persists, please contact "
+"the site administrator."
+msgstr ""
+"Erreur de validation, veuillez réessayer. Si l'erreur persiste, veuillez "
+"contacter l'administrateur du site."
+
+#: includes/form.inc:1541
+msgid "Confirm password"
+msgstr "Confirmer le mot de passe"
+
+#: includes/form.inc:1564
+msgid "The specified passwords do not match."
+msgstr "Les mots de passe ne correspondent pas."
+
+#: includes/form.inc:1568
+msgid "Password field is required."
+msgstr "Le champ mot de passe est obligatoire."
+
+#: includes/form.inc:1649
+msgid "The specified date is invalid."
+msgstr "La date spécifiée est invalide."
+
+#: includes/form.inc:649
+msgid "!name field is required."
+msgstr "Le champ !name est obligatoire."
+
+#: includes/form.inc:654
+msgid ""
+"!name cannot be longer than %max characters but is currently %length "
+"characters long."
+msgstr ""
+"Le champ '!name' ne peut pas être plus long que %max caractères mais "
+"comporte actuellement %length caractères."
+
+#: includes/form.inc:2120
+msgid "This field is required."
+msgstr "Ce champ est obligatoire."
+
+#: includes/form.inc:2125;2128
+msgid "!title: !required"
+msgstr "!title : !required"
+
+#: includes/form.inc:2366
+msgid "Initializing."
+msgstr "Initialisation."
+
+#: includes/form.inc:2367
+msgid "Remaining @remaining of @total."
+msgstr "Reste @remaining sur un total de @total."
+
+#: includes/form.inc:2368
+msgid "An error has occurred."
+msgstr "Une erreur s'est produite."
+
+#: includes/form.inc:2441
+msgid "Please continue to <a href=\"@error_url\">the error page</a>"
+msgstr "Merci de continuer sur la <a href=\"@error_url\">page d'erreur</a>"
+
+#: includes/form.inc:669
+msgid "Illegal choice %choice in !name element."
+msgstr "Choix interdit %choice dans l'élément !name."
+
+#: includes/image.gd.inc:18
+msgid "GD2 image manipulation toolkit"
+msgstr "Boîte à outils de traitement d'image GD2"
+
+#: includes/image.gd.inc:28
+msgid "The GD toolkit is installed and working properly."
+msgstr "La boîte à outils GD2 est installée et fonctionne correctement."
+
+#: includes/image.gd.inc:33
+msgid "JPEG quality"
+msgstr "Qualité JPEG"
+
+#: includes/image.gd.inc:34
+msgid ""
+"Define the image quality for JPEG manipulations. Ranges from 0 to 100. "
+"Higher values mean better image quality but bigger files."
+msgstr ""
+"Définir la qualité d'image pour les conversions en JPEG, sur une échelle de "
+"0 à 100. Une valeur élevée signifie une image de meilleure qualité mais un "
+"fichier de taille plus importante."
+
+#: includes/image.gd.inc:38
+msgid "%"
+msgstr "%"
+
+#: includes/image.gd.inc:44
+msgid ""
+"The GD image toolkit requires that the GD module for PHP be installed and "
+"configured properly. For more information see <a href=\"@url\">PHP's image "
+"documentation</a>."
+msgstr ""
+"La boîte à outils GD2 nécessite que le module GD pour PHP soit installé et "
+"configuré. Pour plus d'information voir <a href=\"@url\">la documentation de "
+"PHP à propos des images</a>."
+
+#: includes/image.inc:120
+msgid ""
+"The selected image handling toolkit %toolkit can not correctly process %"
+"function."
+msgstr ""
+"La boîte à outils de gestion d'images sélectionnée, %toolkit, ne peut pas "
+"traiter correctement : '%fonction'."
+
+#: includes/install.inc:724
+msgid "Currently using !item !version"
+msgstr "En cours d'utilisation : !item !version"
+
+#: includes/locale.inc:48;279
+msgid "Right to left"
+msgstr "De droite à gauche"
+
+#: includes/locale.inc:48;279
+msgid "Left to right"
+msgstr "De gauche à droite"
+
+#: includes/locale.inc:90
+msgid "Code"
+msgstr "Code"
+
+#: includes/locale.inc:90
+msgid "English name"
+msgstr "Nom anglais"
+
+#: includes/locale.inc:90
+msgid "Native name"
+msgstr "Nom natif"
+
+#: includes/locale.inc:90;275
+msgid "Direction"
+msgstr "Direction"
+
+#: includes/locale.inc:122
+msgid "Configuration saved."
+msgstr "Configuration enregistrée."
+
+#: includes/locale.inc:157
+msgid "Predefined language"
+msgstr "Langue prédéfinie"
+
+#: includes/locale.inc:161;710
+msgid "Language name"
+msgstr "Nom de la langue"
+
+#: includes/locale.inc:164
+msgid ""
+"Select the desired language and click the <em>Add language</em> button. (Use "
+"the <em>Custom language</em> options if your desired language does not "
+"appear in this list.)"
+msgstr ""
+"Sélectionner la langue désirée et cliquez sur le bouton <em>Ajouter la "
+"langue</em> (utilisez l'option <em>Langue personnalisée</em> si la langue "
+"que vous souhaitez créer n'est pas dans la liste)."
+
+#: includes/locale.inc:176
+msgid "Custom language"
+msgstr "Langue personnalisée"
+
+#: includes/locale.inc:183
+msgid "Add custom language"
+msgstr "Ajouter une langue personnalisée"
+
+#: includes/locale.inc:203
+msgid "Save language"
+msgstr "Enregistrer la langue"
+
+#: includes/locale.inc:229;239
+msgid "Language code"
+msgstr "Code de la langue"
+
+#: includes/locale.inc:245
+msgid ""
+"<a href=\"@rfc4646\">RFC 4646</a> compliant language identifier. Language "
+"codes typically use a country code, and optionally, a script or regional "
+"variant name. <em>Examples: \"en\", \"en-US\" and \"zh-Hant\".</em>"
+msgstr ""
+"Un code identifiant la langue, conforme à <a href=\"@rfc4646\">RFC 4646</a>. "
+"Les codes de langue sont généralement le code du pays, parfois suivi d'un "
+"code identifiant une variante régionale. <em>Exemples : \"fr\", \"fr-FR\" et "
+"\"fr-BE\".</em>"
+
+#: includes/locale.inc:249
+msgid "Language name in English"
+msgstr "Nom de la langue en anglais"
+
+#: includes/locale.inc:253
+msgid ""
+"Name of the language in English. Will be available for translation in all "
+"languages."
+msgstr ""
+"Nom de la langue en anglais. Sera disponible à la traduction dans les autres "
+"langues."
+
+#: includes/locale.inc:256
+msgid "Native language name"
+msgstr "Nom natif de la langue"
+
+#: includes/locale.inc:260
+msgid "Name of the language in the language being added."
+msgstr "Nom de la langue en question dans cette même langue."
+
+#: includes/locale.inc:263
+msgid "Path prefix"
+msgstr "Prefixe de chemin"
+
+#: includes/locale.inc:266
+msgid ""
+"Language code or other custom string for pattern matching within the path. "
+"With language negotiation set to <em>Path prefix only</em> or <em>Path "
+"prefix with language fallback</em>, this site is presented in this language "
+"when the Path prefix value matches an element in the path. For the default "
+"language, this value may be left blank. <strong>Modifying this value will "
+"break existing URLs and should be used with caution in a production "
+"environment.</strong> <em>Example: Specifying \"deutsch\" as the path prefix "
+"for German results in URLs in the form \"www.example.com/deutsch/node\".</em>"
+msgstr ""
+"Code de la langue ou n'importe quel autre chaîne de caractère à identifier "
+"dans le chemin d'accès à une page. Lorsque le paramètre de négociation de la "
+"langue est <em>Préfixe de chemin seulement</em> ou <em>Préfixe de chemin "
+"avec fallback</em>, le site sera présenté dans cette langue lorsque le "
+"chemin d'accès commence par ce préfixe. Pour la langue par défaut, ce "
+"paramètre peut rester vide. <strong>Toute modification de cette valeur peut "
+"casser les URLs existantes, et doit donc être utilisé avec précaution en "
+"production.</strong> <em>Exemple : Spécifier \"french\" comme préfixe de "
+"chemin pour le français se traduira par des URLs de la forme \"www.example."
+"com/french/node\".</em>"
+
+#: includes/locale.inc:269
+msgid "Language domain"
+msgstr "Domaine de la langue"
+
+#: includes/locale.inc:272
+msgid ""
+"Language-specific URL, with protocol. With language negotiation set to "
+"<em>Domain name only</em>, the site is presented in this language when the "
+"URL accessing the site references this domain. For the default language, "
+"this value may be left blank. <strong>This value must include a protocol as "
+"part of the string.</strong> <em>Example: Specifying \"http://example.de\" "
+"or \"http://de.example.com\" as language domains for German results in URLs "
+"in the forms \"http://example.de/node\" and \"http://de.example.com/node\", "
+"respectively.</em>"
+msgstr ""
+"URL spécifique à la langue, incluant le protocole. Si le paramètre de "
+"négociation de la langue est <em>Nom de domaine uniquement</em>, le site "
+"sera présenté dans cette langue lorsque l'URL contiendra ce domaine. Pour la "
+"langue par défaut, ce paramètre peut rester vide. <strong>Cette valeur doit "
+"inclure le protocole de l'URL.</strong> <em>Exemple : Spécifier \"http://"
+"example.fr\" ou \"http://fr.example.com\" comme domaine pour la langue "
+"française se traduira par des URLs de la forme \"http://example.fr/node\" et "
+"\"http://fr.example.com/node\", respectivement</em>"
+
+#: includes/locale.inc:277
+msgid "Direction that text in this language is presented."
+msgstr "Direction d'écriture du texte."
+
+#: includes/locale.inc:291
+msgid "The language %language (%code) already exists."
+msgstr "La langue %language (%code) existe déjà."
+
+#: includes/locale.inc:298
+msgid "Invalid language code."
+msgstr "Code de langue invalide."
+
+#: includes/locale.inc:315;321
+msgid ""
+"The language %language has been created and can now be used. More "
+"information is available on the <a href=\"@locale-help\">help screen</a>."
+msgstr ""
+"La langue %language a été crée et peut maintenant être utilisée. Pour plus "
+"d'informations, consulter <a href=\"@locale-help\">l'écran d'aide</a>."
+
+#: includes/locale.inc:339
+msgid "Domain and path prefix values should not be set at the same time."
+msgstr ""
+"Le domaine et le préfixe de chemin ne peuvent pas être renseignés tous les "
+"deux."
+
+#: includes/locale.inc:342
+msgid "The domain (%domain) is already tied to a language (%language)."
+msgstr "Le domaine '%domaine' est déjà associé à la langue '%language'."
+
+#: includes/locale.inc:345
+msgid "Only the default language can have both the domain and prefix empty."
+msgstr "Seule la langue par défaut peut avoir ni domaine ni préfixe de chemin."
+
+#: includes/locale.inc:348
+msgid "The prefix (%prefix) is already tied to a language (%language)."
+msgstr "Le préfixe '%prefix' est déjà associé à la langue '%language'."
+
+#: includes/locale.inc:386
+msgid "The English language cannot be deleted."
+msgstr "La langue anglaise, par défaut, ne peut être supprimée."
+
+#: includes/locale.inc:391
+msgid "The default language cannot be deleted."
+msgstr "La langue par défaut ne peut être supprimée."
+
+#: includes/locale.inc:403
+msgid "Are you sure you want to delete the language %name?"
+msgstr "Êtes vous sûr(e) de vouloir supprimer la langue %name ?"
+
+#: includes/locale.inc:403
+msgid ""
+"Deleting a language will remove all interface translations associated with "
+"it, and posts in this language will be set to be language neutral. This "
+"action cannot be undone."
+msgstr ""
+"Supprimer une langue supprimera également la traduction de l'interface qui "
+"lui est associée. Les contenus dans cette langue seront dorénavant indiqués "
+"en \"indépendant de la langue\". Cette action ne peut pas être annulée."
+
+#: includes/locale.inc:422;423
+msgid "The language %locale has been removed."
+msgstr "La langue %locale a été supprimée."
+
+#: includes/locale.inc:446
+msgid "Language negotiation"
+msgstr "Négociation de la langue"
+
+#: includes/locale.inc:449
+msgid "None."
+msgstr "Aucun."
+
+#: includes/locale.inc:450
+msgid "Path prefix only."
+msgstr "Seulement le préfixe de chemin."
+
+#: includes/locale.inc:451
+msgid "Path prefix with language fallback."
+msgstr "Préfixe de chemin avec solution dégradée."
+
+#: includes/locale.inc:452
+msgid "Domain name only."
+msgstr "Seulement le nom de domaine."
+
+#: includes/locale.inc:454
+msgid ""
+"Select the mechanism used to determine your site's presentation language. "
+"<strong>Modifying this setting may break all incoming URLs and should be "
+"used with caution in a production environment.</strong>"
+msgstr ""
+"Choisissez le mécanisme utilisé pour déterminer la langue dans lequel votre "
+"site sera présenté. <strong>Modifier ce paramètres peut casser les URLs "
+"entrantes et doit donc être utilisé avec précaution dans un environnement de "
+"production.</strong>"
+
+#: includes/locale.inc:468
+msgid "Language negotiation configuration saved."
+msgstr "Les options de négociation de la langue ont été enregistrées."
+
+#: includes/locale.inc:501
+msgid "English (built-in)"
+msgstr "Anglais (interne)"
+
+#: includes/locale.inc:549
+msgid "String contains"
+msgstr "La chaîne contient"
+
+#: includes/locale.inc:551
+msgid "Leave blank to show all strings. The search is case sensitive."
+msgstr ""
+"Laisser vide pour afficher tous les termes. La recherche est sensible à la "
+"casse."
+
+#: includes/locale.inc:559
+msgid "English (provided by Drupal)"
+msgstr "Anglais (fourni par Drupal)"
+
+#: includes/locale.inc:562
+msgid "Search in"
+msgstr "Rechercher dans"
+
+#: includes/locale.inc:564
+msgid "Both translated and untranslated strings"
+msgstr "A la fois les chaînes traduites et celles qui ne le sont pas"
+
+#: includes/locale.inc:564
+msgid "Only translated strings"
+msgstr "Seulement les termes traduits"
+
+#: includes/locale.inc:564
+msgid "Only untranslated strings"
+msgstr "Seulement les termes non traduits"
+
+#: includes/locale.inc:568
+msgid "Limit search to"
+msgstr "Limiter la recherche à"
+
+#: includes/locale.inc:570
+msgid "All text groups"
+msgstr "Tous les groupes de texte"
+
+#: includes/locale.inc:601
+msgid "Already added languages"
+msgstr "Langues déjà installées"
+
+#: includes/locale.inc:602
+msgid "Languages not yet added"
+msgstr "Langues non encore installées"
+
+#: includes/locale.inc:609
+msgid "Import translation"
+msgstr "Importer une traduction"
+
+#: includes/locale.inc:612
+msgid "Language file"
+msgstr "Fichier de langue"
+
+#: includes/locale.inc:614
+msgid "A Gettext Portable Object (<em>.po</em>) file."
+msgstr "Un fichier gettext portable (<em>.po</em>)."
+
+#: includes/locale.inc:617
+msgid "Import into"
+msgstr "Importer dans"
+
+#: includes/locale.inc:620
+msgid ""
+"Choose the language you want to add strings into. If you choose a language "
+"which is not yet set up, it will be added."
+msgstr ""
+"Choisissez la langue pour laquelle vous voulez ajouter des termes. Si vous "
+"choisissez une langue qui n'est pas encore présente, elle sera ajoutée."
+
+#: includes/locale.inc:623;715;734;1970
+msgid "Text group"
+msgstr "Groupes de texte"
+
+#: includes/locale.inc:626
+msgid "Imported translations will be added to this text group."
+msgstr "Les traductions importées seront ajoutées dans ce groupe de texte."
+
+#: includes/locale.inc:629
+msgid "Mode"
+msgstr "Mode"
+
+#: includes/locale.inc:632
+msgid "Strings in the uploaded file replace existing ones, new ones are added"
+msgstr ""
+"Les termes du fichier remplacent les termes existants, les nouveaux sont "
+"ajoutés"
+
+#: includes/locale.inc:633
+msgid "Existing strings are kept, only new strings are added"
+msgstr ""
+"Les termes existants sont conservés, seuls les nouveaux termes sont ajoutés"
+
+#: includes/locale.inc:655
+msgid "The language %language has been created."
+msgstr "La langue %language a été créée."
+
+#: includes/locale.inc:661;662
+msgid "The translation import of %filename failed."
+msgstr "L'import de la traduction %filename a échoué."
+
+#: includes/locale.inc:666
+msgid "File to import not found."
+msgstr "Le fichier à importer n'a pas été trouvé."
+
+#: includes/locale.inc:706
+msgid "Export translation"
+msgstr "Exporter une traduction"
+
+#: includes/locale.inc:712
+msgid ""
+"Select the language to export in Gettext Portable Object (<em>.po</em>) "
+"format."
+msgstr ""
+"Sélectionnez la langue que vous voulez exporter au format gettext portable "
+"(<em>.po</em>)."
+
+#: includes/locale.inc:729
+msgid "Export template"
+msgstr "Exporter le modèle"
+
+#: includes/locale.inc:731
+msgid ""
+"Generate a Gettext Portable Object Template (<em>.pot</em>) file with all "
+"strings from the Drupal locale database."
+msgstr ""
+"Créer un fichier modèle gettext portable (<em>.pot</em>) contenant "
+"l'ensemble des termes de la base de données de traduction de Drupal."
+
+#: includes/locale.inc:773
+msgid "String not found."
+msgstr "Terme non trouvé."
+
+#: includes/locale.inc:781
+msgid "Original text"
+msgstr "Texte original"
+
+#: includes/locale.inc:823
+msgid "Save translations"
+msgstr "Enregistrer les traductions"
+
+#: includes/locale.inc:853
+msgid "The string has been saved."
+msgstr "Le terme a été enregistré."
+
+#: includes/locale.inc:879
+msgid "The string has been removed."
+msgstr "Le terme a été supprimé."
+
+#: includes/locale.inc:973
+msgid "The language selected for import is not supported."
+msgstr "La langue choisie pour l'import n'est pas supportée."
+
+#: includes/locale.inc:988
+msgid ""
+"The translation file %filename appears to have a missing or malformed header."
+msgstr ""
+"Le fichier de traduction %filename semble avoir un en-tête manquant ou "
+"malformé."
+
+#: includes/locale.inc:998
+msgid ""
+"The translation was successfully imported. There are %number newly created "
+"translated strings, %update strings were updated and %delete strings were "
+"removed."
+msgstr ""
+"La traduction a été importée avec succès. Il y a %number chaîne(s) "
+"nouvellement traduite(s), %update chaîne(s) mise(s) à jour et %delete chaîne"
+"(s) supprimée(s)."
+
+#: includes/locale.inc:1374
+msgid ""
+"The translation file %filename contains an error: the plural formula could "
+"not be parsed."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : la formule de "
+"valeurs plurielles n'a pu être analysée."
+
+#: includes/locale.inc:1970
+msgid "String"
+msgstr "Chaîne"
+
+#: includes/locale.inc:1996
+msgid "No strings found for your search."
+msgstr "Aucune chaîne trouvée."
+
+#: includes/locale.inc:1021
+msgid ""
+"The translation import failed, because the file %filename could not be read."
+msgstr ""
+"L'import de la traduction a échoué car le fichier %filename n'a pas pu être "
+"lu."
+
+#: includes/locale.inc:1050
+msgid ""
+"The translation file %filename contains an error: \"msgstr\" was expected "
+"but not found on line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : \"msgstr\" attendu "
+"mais non trouvé à la ligne %line."
+
+#: includes/locale.inc:1056
+msgid ""
+"The translation file %filename contains an error: \"msgid_plural\" was "
+"expected but not found on line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : \"msgid_plural\" "
+"attendu mais non trouvé à la ligne %line."
+
+#: includes/locale.inc:1062;1080;1092;1100;1114;1123
+msgid "The translation file %filename contains a syntax error on line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur de syntaxe à la ligne "
+"%line."
+
+#: includes/locale.inc:1074
+msgid ""
+"The translation file %filename contains an error: \"msgid\" is unexpected on "
+"line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : \"msgid\" inattendu "
+"à la ligne %line."
+
+#: includes/locale.inc:1088
+msgid ""
+"The translation file %filename contains an error: \"msgstr[]\" is unexpected "
+"on line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : \"msgstr[]\" "
+"inattendu à la ligne %line."
+
+#: includes/locale.inc:1108
+msgid ""
+"The translation file %filename contains an error: \"msgstr\" is unexpected "
+"on line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : \"msgstr\" "
+"inattendu à la ligne %line."
+
+#: includes/locale.inc:1136
+msgid ""
+"The translation file %filename contains an error: there is an unexpected "
+"string on line %line."
+msgstr ""
+"Le fichier de traduction %filename contient une erreur : expression "
+"inattendue à la ligne %line."
+
+#: includes/locale.inc:1147
+msgid "The translation file %filename ended unexpectedly at line %line."
+msgstr ""
+"Le fichier de traduction %filename se termine de façon inattendue à la ligne "
+"%line."
+
+#: includes/locale.inc:2514
+msgid "Importing interface translations"
+msgstr "Importation de traductions de l'interface utilisateur"
+
+#: includes/locale.inc:2515
+msgid "Starting import"
+msgstr "Début de l'importation"
+
+#: includes/locale.inc:2516
+msgid "Error importing interface translations"
+msgstr "Erreur à l'importation de la traduction"
+
+#: includes/locale.inc:942
+msgid "The %language language (%code) has been created."
+msgstr "La langue %language (%code) a été créée."
+
+#: includes/locale.inc:999
+msgid ""
+"Imported %file into %locale: %number new strings added, %update updated and %"
+"delete removed."
+msgstr ""
+"Importation du fichier %file dans %locale : %number chaîne(s) nouvellement "
+"traduite(s), %update chaîne(s) mise(s) à jour et %delete chaîne(s) supprimée"
+"(s)."
+
+#: includes/locale.inc:1816
+msgid "Exported %locale translation file: %filename."
+msgstr "Fichier de traduction %locale exporté : %filename."
+
+#: includes/locale.inc:1820
+msgid "Exported translation file: %filename."
+msgstr "Fichier de traduction exporté : %filename."
+
+#: includes/locale.inc:2161
+msgid "Updated JavaScript translation file for the language %language."
+msgstr ""
+"Mise à jour du fichier de traduction Javascript de la langue %language."
+
+#: includes/locale.inc:2164
+msgid "Created JavaScript translation file for the language %language."
+msgstr "Création du fichier de traduction Javascript de la langue %language."
+
+#: includes/locale.inc:2167
+msgid ""
+"Removed JavaScript translation file for the language %language, because no "
+"translations currently exist for that language."
+msgstr ""
+"Le fichier de traduction Javascript pour la langue %language a été supprimé, "
+"parce qu'aucune traduction n'existe pour cette langue."
+
+#: includes/locale.inc:2170
+msgid ""
+"An error occurred during creation of the JavaScript translation file for the "
+"language %language."
+msgstr ""
+"Une erreur s'est produite durant la création du fichier de traduction "
+"Javascript de la langue %language."
+
+#: includes/locale.inc:2554
+msgid "One translation file imported for the newly installed modules."
+msgid_plural ""
+"@count translation files imported for the newly installed modules."
+msgstr[0] ""
+"Un fichier de traduction a été importé pour les modules nouvellement "
+"installés."
+msgstr[1] ""
+"@count fichiers de traduction ont été importés pour les modules nouvellement "
+"installés."
+
+#: includes/locale.inc:2564
+msgid "One translation file imported for the enabled modules."
+msgid_plural "@count translation files imported for the enabled modules."
+msgstr[0] "Un fichier de traduction a été importé pour les modules activés."
+msgstr[1] ""
+"@count fichiers de traduction ont été importés pour les modules activés."
+
+#: includes/locale.inc:2236
+msgid "Afar"
+msgstr "Afar"
+
+#: includes/locale.inc:2237
+msgid "Abkhazian"
+msgstr "Abkhaze"
+
+#: includes/locale.inc:2238
+msgid "Avestan"
+msgstr "Avestan"
+
+#: includes/locale.inc:2239
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+#: includes/locale.inc:2240
+msgid "Akan"
+msgstr "Akan"
+
+#: includes/locale.inc:2241
+msgid "Amharic"
+msgstr "Amharique"
+
+#: includes/locale.inc:2242
+msgid "Arabic"
+msgstr "Arabe"
+
+#: includes/locale.inc:2243
+msgid "Assamese"
+msgstr "Assamese"
+
+#: includes/locale.inc:2244
+msgid "Avar"
+msgstr "Avar"
+
+#: includes/locale.inc:2245
+msgid "Aymara"
+msgstr "Aymara"
+
+#: includes/locale.inc:2246
+msgid "Azerbaijani"
+msgstr "Azerbaïdjanais"
+
+#: includes/locale.inc:2247
+msgid "Bashkir"
+msgstr "Bashkir"
+
+#: includes/locale.inc:2248
+msgid "Belarusian"
+msgstr "Belorussien"
+
+#: includes/locale.inc:2249
+msgid "Bulgarian"
+msgstr "Bulgare"
+
+#: includes/locale.inc:2250
+msgid "Bihari"
+msgstr "Bihari"
+
+#: includes/locale.inc:2251
+msgid "Bislama"
+msgstr "Bislama"
+
+#: includes/locale.inc:2252
+msgid "Bambara"
+msgstr "Bambara"
+
+#: includes/locale.inc:2253
+msgid "Bengali"
+msgstr "Bengali"
+
+#: includes/locale.inc:2254
+msgid "Tibetan"
+msgstr "Tibétain"
+
+#: includes/locale.inc:2255
+msgid "Breton"
+msgstr "Breton"
+
+#: includes/locale.inc:2256
+msgid "Bosnian"
+msgstr "Bosniaque"
+
+#: includes/locale.inc:2257
+msgid "Catalan"
+msgstr "Catalan"
+
+#: includes/locale.inc:2258
+msgid "Chechen"
+msgstr "Tchétchène"
+
+#: includes/locale.inc:2259
+msgid "Chamorro"
+msgstr "Chamorro"
+
+#: includes/locale.inc:2260
+msgid "Corsican"
+msgstr "Corse"
+
+#: includes/locale.inc:2261
+msgid "Cree"
+msgstr "Cree"
+
+#: includes/locale.inc:2262
+msgid "Czech"
+msgstr "Tchèque"
+
+#: includes/locale.inc:2263
+msgid "Old Slavonic"
+msgstr "Vieux Slave"
+
+#: includes/locale.inc:2264
+msgid "Chuvash"
+msgstr "Chuvash"
+
+#: includes/locale.inc:2265
+msgid "Welsh"
+msgstr "Gallois"
+
+#: includes/locale.inc:2266
+msgid "Danish"
+msgstr "Danois"
+
+#: includes/locale.inc:2267
+msgid "German"
+msgstr "Allemand"
+
+#: includes/locale.inc:2268
+msgid "Maldivian"
+msgstr "Maldivian"
+
+#: includes/locale.inc:2269
+msgid "Bhutani"
+msgstr "Bhutani"
+
+#: includes/locale.inc:2270
+msgid "Ewe"
+msgstr "Ewé"
+
+#: includes/locale.inc:2271
+msgid "Greek"
+msgstr "Grec"
+
+#: includes/locale.inc:2272
+msgid "English"
+msgstr "Anglais"
+
+#: includes/locale.inc:2273
+msgid "Esperanto"
+msgstr "Espéranto"
+
+#: includes/locale.inc:2274
+msgid "Spanish"
+msgstr "Espagnol"
+
+#: includes/locale.inc:2275
+msgid "Estonian"
+msgstr "Estonien"
+
+#: includes/locale.inc:2276
+msgid "Basque"
+msgstr "Basque"
+
+#: includes/locale.inc:2277
+msgid "Persian"
+msgstr "Perse"
+
+#: includes/locale.inc:2278
+msgid "Fulah"
+msgstr "Fulah"
+
+#: includes/locale.inc:2279
+msgid "Finnish"
+msgstr "Finlandais"
+
+#: includes/locale.inc:2280
+msgid "Fiji"
+msgstr "Fiji"
+
+#: includes/locale.inc:2281
+msgid "Faeroese"
+msgstr "Féroïen"
+
+#: includes/locale.inc:2282
+msgid "French"
+msgstr "Français"
+
+#: includes/locale.inc:2283
+msgid "Frisian"
+msgstr "Frisian"
+
+#: includes/locale.inc:2284
+msgid "Irish"
+msgstr "Irlandais"
+
+#: includes/locale.inc:2285
+msgid "Scots Gaelic"
+msgstr "Gaéliques écossais"
+
+#: includes/locale.inc:2286
+msgid "Galician"
+msgstr "Galicien"
+
+#: includes/locale.inc:2287
+msgid "Guarani"
+msgstr "Guarani"
+
+#: includes/locale.inc:2288
+msgid "Gujarati"
+msgstr "Gujarati"
+
+#: includes/locale.inc:2289
+msgid "Manx"
+msgstr "Mannois"
+
+#: includes/locale.inc:2290
+msgid "Hausa"
+msgstr "Hausa"
+
+#: includes/locale.inc:2291
+msgid "Hebrew"
+msgstr "Hébreux"
+
+#: includes/locale.inc:2292
+msgid "Hindi"
+msgstr "Hindou"
+
+#: includes/locale.inc:2293
+msgid "Hiri Motu"
+msgstr "Hiri Motu"
+
+#: includes/locale.inc:2294
+msgid "Croatian"
+msgstr "Croate"
+
+#: includes/locale.inc:2295
+msgid "Hungarian"
+msgstr "Hongrois"
+
+#: includes/locale.inc:2296
+msgid "Armenian"
+msgstr "Arménien"
+
+#: includes/locale.inc:2297
+msgid "Herero"
+msgstr "Herero"
+
+#: includes/locale.inc:2298
+msgid "Interlingua"
+msgstr "Interlingua"
+
+#: includes/locale.inc:2299
+msgid "Indonesian"
+msgstr "Indonésien"
+
+#: includes/locale.inc:2300
+msgid "Interlingue"
+msgstr "Interlingue"
+
+#: includes/locale.inc:2301
+msgid "Igbo"
+msgstr "Igbo"
+
+#: includes/locale.inc:2302
+msgid "Inupiak"
+msgstr "Inupiak"
+
+#: includes/locale.inc:2303
+msgid "Icelandic"
+msgstr "Islandais"
+
+#: includes/locale.inc:2304
+msgid "Italian"
+msgstr "Italien"
+
+#: includes/locale.inc:2305
+msgid "Inuktitut"
+msgstr "Inuktitut"
+
+#: includes/locale.inc:2306
+msgid "Japanese"
+msgstr "Japonais"
+
+#: includes/locale.inc:2307
+msgid "Javanese"
+msgstr "Javanais"
+
+#: includes/locale.inc:2308
+msgid "Georgian"
+msgstr "Géorgien"
+
+#: includes/locale.inc:2309
+msgid "Kongo"
+msgstr "Congolais"
+
+#: includes/locale.inc:2310
+msgid "Kikuyu"
+msgstr "Kikuyu"
+
+#: includes/locale.inc:2311
+msgid "Kwanyama"
+msgstr "Kwanyama"
+
+#: includes/locale.inc:2312
+msgid "Kazakh"
+msgstr "Kazakh"
+
+#: includes/locale.inc:2313
+msgid "Greenlandic"
+msgstr "Groenlandais"
+
+#: includes/locale.inc:2314
+msgid "Cambodian"
+msgstr "Cambodgien"
+
+#: includes/locale.inc:2315
+msgid "Kannada"
+msgstr "Kannada"
+
+#: includes/locale.inc:2316
+msgid "Korean"
+msgstr "Coréen"
+
+#: includes/locale.inc:2317
+msgid "Kanuri"
+msgstr "Kanuri"
+
+#: includes/locale.inc:2318
+msgid "Kashmiri"
+msgstr "Kashmiri"
+
+#: includes/locale.inc:2319
+msgid "Kurdish"
+msgstr "Kurde"
+
+#: includes/locale.inc:2320
+msgid "Komi"
+msgstr "Komi"
+
+#: includes/locale.inc:2321
+msgid "Cornish"
+msgstr "Cornique"
+
+#: includes/locale.inc:2322
+msgid "Kirghiz"
+msgstr "Kirghiz"
+
+#: includes/locale.inc:2323
+msgid "Latin"
+msgstr "Latin"
+
+#: includes/locale.inc:2324
+msgid "Luxembourgish"
+msgstr "Luxembourgeois"
+
+#: includes/locale.inc:2325
+msgid "Luganda"
+msgstr "Luganda"
+
+#: includes/locale.inc:2326
+msgid "Lingala"
+msgstr "Lingala"
+
+#: includes/locale.inc:2327
+msgid "Laothian"
+msgstr "Laotien"
+
+#: includes/locale.inc:2328
+msgid "Lithuanian"
+msgstr "Lithuanien"
+
+#: includes/locale.inc:2329
+msgid "Latvian"
+msgstr "Latvian"
+
+#: includes/locale.inc:2330
+msgid "Malagasy"
+msgstr "Malgache"
+
+#: includes/locale.inc:2331
+msgid "Marshallese"
+msgstr "Marshallese"
+
+#: includes/locale.inc:2332
+msgid "Maori"
+msgstr "Maori"
+
+#: includes/locale.inc:2333
+msgid "Macedonian"
+msgstr "Macédonien"
+
+#: includes/locale.inc:2334
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: includes/locale.inc:2335
+msgid "Mongolian"
+msgstr "Mongolien"
+
+#: includes/locale.inc:2336
+msgid "Moldavian"
+msgstr "Moldave"
+
+#: includes/locale.inc:2337
+msgid "Marathi"
+msgstr "Marathi"
+
+#: includes/locale.inc:2338
+msgid "Malay"
+msgstr "Malais"
+
+#: includes/locale.inc:2339
+msgid "Maltese"
+msgstr "Maltais"
+
+#: includes/locale.inc:2340
+msgid "Burmese"
+msgstr "Birman"
+
+#: includes/locale.inc:2341
+msgid "Nauru"
+msgstr "Le Nauru"
+
+#: includes/locale.inc:2342
+msgid "North Ndebele"
+msgstr "Ndebele du nord"
+
+#: includes/locale.inc:2343
+msgid "Nepali"
+msgstr "Népalien"
+
+#: includes/locale.inc:2344
+msgid "Ndonga"
+msgstr "Ndonga"
+
+#: includes/locale.inc:2345
+msgid "Dutch"
+msgstr "Hollandais"
+
+#: includes/locale.inc:2346
+msgid "Norwegian Bokmål"
+msgstr "Norvégien classique"
+
+#: includes/locale.inc:2347
+msgid "Norwegian Nynorsk"
+msgstr "Néo-norvégien"
+
+#: includes/locale.inc:2348
+msgid "South Ndebele"
+msgstr "Ndebele du sud"
+
+#: includes/locale.inc:2349
+msgid "Navajo"
+msgstr "Navajo"
+
+#: includes/locale.inc:2350
+msgid "Chichewa"
+msgstr "Chichewa"
+
+#: includes/locale.inc:2351
+msgid "Occitan"
+msgstr "Occitan"
+
+#: includes/locale.inc:2352
+msgid "Oromo"
+msgstr "Oromo"
+
+#: includes/locale.inc:2353
+msgid "Oriya"
+msgstr "Oriya"
+
+#: includes/locale.inc:2354
+msgid "Ossetian"
+msgstr "Ossète"
+
+#: includes/locale.inc:2355
+msgid "Punjabi"
+msgstr "Pendjabi"
+
+#: includes/locale.inc:2356
+msgid "Pali"
+msgstr "Pali"
+
+#: includes/locale.inc:2357
+msgid "Polish"
+msgstr "Polonais"
+
+#: includes/locale.inc:2358
+msgid "Pashto"
+msgstr "Pashto"
+
+#: includes/locale.inc:2359
+msgid "Portuguese, Portugal"
+msgstr "Portugais, Portugal"
+
+#: includes/locale.inc:2360
+msgid "Portuguese, Brazil"
+msgstr "Portugais, Brésil"
+
+#: includes/locale.inc:2361
+msgid "Quechua"
+msgstr "Quechua"
+
+#: includes/locale.inc:2362
+msgid "Rhaeto-Romance"
+msgstr "Rhaeto-Roman"
+
+#: includes/locale.inc:2363
+msgid "Kirundi"
+msgstr "Kirundi"
+
+#: includes/locale.inc:2364
+msgid "Romanian"
+msgstr "Roumain"
+
+#: includes/locale.inc:2365
+msgid "Russian"
+msgstr "Russe"
+
+#: includes/locale.inc:2366
+msgid "Kinyarwanda"
+msgstr "Kinyarwanda"
+
+#: includes/locale.inc:2367
+msgid "Sanskrit"
+msgstr "Sanskrit"
+
+#: includes/locale.inc:2368
+msgid "Sardinian"
+msgstr "Sarde"
+
+#: includes/locale.inc:2369
+msgid "Sindhi"
+msgstr "Shindi"
+
+#: includes/locale.inc:2370
+msgid "Northern Sami"
+msgstr "Sami Nordique"
+
+#: includes/locale.inc:2371
+msgid "Sango"
+msgstr "Sango"
+
+#: includes/locale.inc:2372
+msgid "Serbo-Croatian"
+msgstr "Serbo-Croate"
+
+#: includes/locale.inc:2373
+msgid "Singhalese"
+msgstr "Singhalese"
+
+#: includes/locale.inc:2374
+msgid "Slovak"
+msgstr "Slovaque"
+
+#: includes/locale.inc:2375
+msgid "Slovenian"
+msgstr "Slovène"
+
+#: includes/locale.inc:2376
+msgid "Samoan"
+msgstr "Samoan"
+
+#: includes/locale.inc:2377
+msgid "Shona"
+msgstr "Shona"
+
+#: includes/locale.inc:2378
+msgid "Somali"
+msgstr "Somalien"
+
+#: includes/locale.inc:2379
+msgid "Albanian"
+msgstr "Albanais"
+
+#: includes/locale.inc:2380
+msgid "Serbian"
+msgstr "Serbe"
+
+#: includes/locale.inc:2381
+msgid "Siswati"
+msgstr "Siswati"
+
+#: includes/locale.inc:2382
+msgid "Sesotho"
+msgstr "Sesotho"
+
+#: includes/locale.inc:2383
+msgid "Sudanese"
+msgstr "Soudanais"
+
+#: includes/locale.inc:2384
+msgid "Swedish"
+msgstr "Suèdois"
+
+#: includes/locale.inc:2385
+msgid "Swahili"
+msgstr "Swahili"
+
+#: includes/locale.inc:2386
+msgid "Tamil"
+msgstr "Tamil"
+
+#: includes/locale.inc:2387
+msgid "Telugu"
+msgstr "Telugu"
+
+#: includes/locale.inc:2388
+msgid "Tajik"
+msgstr "Tadjik"
+
+#: includes/locale.inc:2389
+msgid "Thai"
+msgstr "Thaïlandais"
+
+#: includes/locale.inc:2390
+msgid "Tigrinya"
+msgstr "Tigrinya"
+
+#: includes/locale.inc:2391
+msgid "Turkmen"
+msgstr "Turkmène"
+
+#: includes/locale.inc:2392
+msgid "Tagalog"
+msgstr "Tagalog"
+
+#: includes/locale.inc:2393
+msgid "Setswana"
+msgstr "Setswana"
+
+#: includes/locale.inc:2394
+msgid "Tonga"
+msgstr "Tongien"
+
+#: includes/locale.inc:2395
+msgid "Turkish"
+msgstr "Turque"
+
+#: includes/locale.inc:2396
+msgid "Tsonga"
+msgstr "Tsonga"
+
+#: includes/locale.inc:2397
+msgid "Tatar"
+msgstr "Tatare"
+
+#: includes/locale.inc:2398
+msgid "Twi"
+msgstr "Twi"
+
+#: includes/locale.inc:2399
+msgid "Tahitian"
+msgstr "Tahitien"
+
+#: includes/locale.inc:2400
+msgid "Uighur"
+msgstr "Uighur"
+
+#: includes/locale.inc:2401
+msgid "Ukrainian"
+msgstr "Ukrainien"
+
+#: includes/locale.inc:2402
+msgid "Urdu"
+msgstr "Urdu"
+
+#: includes/locale.inc:2403
+msgid "Uzbek"
+msgstr "Ouzbek"
+
+#: includes/locale.inc:2404
+msgid "Venda"
+msgstr "Venda"
+
+#: includes/locale.inc:2405
+msgid "Vietnamese"
+msgstr "Vietnamien"
+
+#: includes/locale.inc:2406
+msgid "Wolof"
+msgstr "Wolof"
+
+#: includes/locale.inc:2407
+msgid "Xhosa"
+msgstr "Xhosa"
+
+#: includes/locale.inc:2408
+msgid "Yiddish"
+msgstr "Yiddish"
+
+#: includes/locale.inc:2409
+msgid "Yoruba"
+msgstr "Yoruba"
+
+#: includes/locale.inc:2410
+msgid "Zhuang"
+msgstr "Zhuang"
+
+#: includes/locale.inc:2411
+msgid "Chinese, Simplified"
+msgstr "Chinois, Simplifié"
+
+#: includes/locale.inc:2412
+msgid "Chinese, Traditional"
+msgstr "Chinois, Traditionnel"
+
+#: includes/locale.inc:2413
+msgid "Zulu"
+msgstr "Zoulou"
+
+#: includes/mail.inc:135
+msgid ""
+"Unable to send e-mail. Please contact the site admin, if the problem "
+"persists."
+msgstr ""
+"Impossible d'envoyer l'email. Merci de contacter l'administrateur du site si "
+"le problème persiste."
+
+#: includes/mail.inc:134
+msgid "Error sending e-mail (from %from to %to)."
+msgstr "Erreur à l'envoi du mail (de %from à %to)."
+
+#: includes/menu.inc:2284
+msgid "Operating in off-line mode."
+msgstr "Fonctionne en mode hors-ligne."
+
+#: includes/module.inc:200
+msgid ""
+"%module is part of a circular dependency. This is not supported and you will "
+"not be able to switch it on."
+msgstr ""
+"%module fait partie d'une dépendance circulaire. Cette situation n'est pas "
+"gérée, et l'activation de ce module sera donc impossible."
+
+#: includes/pager.inc:145;395
+msgid "« first"
+msgstr "« premier"
+
+#: includes/pager.inc:146;396
+msgid "‹ previous"
+msgstr "‹ précédent"
+
+#: includes/pager.inc:147;397
+msgid "next ›"
+msgstr "suivant ›"
+
+#: includes/pager.inc:148;398
+msgid "last »"
+msgstr "dernier »"
+
+#: includes/pager.inc:395
+msgid "Go to first page"
+msgstr "Aller à la première page"
+
+#: includes/pager.inc:398
+msgid "Go to last page"
+msgstr "Aller à la dernière page"
+
+#: includes/pager.inc:405
+msgid "Go to page @number"
+msgstr "Aller à la page @number"
+
+#: includes/tablesort.inc:71
+msgid "sort by @s"
+msgstr "trier par @s"
+
+#: includes/theme.inc:1325;1328
+msgid "sort icon"
+msgstr "icone de tri"
+
+#: includes/theme.inc:1325
+msgid "sort ascending"
+msgstr "trier par ordre croissant"
+
+#: includes/theme.inc:1328
+msgid "sort descending"
+msgstr "trier par ordre décroissant"
+
+#: includes/theme.inc:1366
+msgid "updated"
+msgstr "mis à jour"
+
+#: includes/theme.inc:1438
+msgid "[<a href=\"@link\">more help...</a>]"
+msgstr "[<a href=\"@link\">plus d'aide...</a>]"
+
+#: includes/theme.inc:1445;1445
+msgid "XML feed"
+msgstr "flux XML"
+
+#: includes/theme.inc:1459
+msgid "Syndicate content"
+msgstr "Syndiquer le contenu"
+
+#: includes/theme.inc:1473
+msgid "<a href=\"@link\" title=\"@title\">more</a>"
+msgstr "[<a href=\"@link\">plus</a>]"
+
+#: includes/theme.inc:1553
+msgid "not verified"
+msgstr "non vérifié"
+
+#: includes/unicode.inc:48
+msgid ""
+"The PCRE library in your PHP installation is outdated. This will cause "
+"problems when handling Unicode text. If you are running PHP 4.3.3 or higher, "
+"make sure you are using the PCRE library supplied by PHP. Please refer to "
+"the <a href=\"@url\">PHP PCRE documentation</a> for more information."
+msgstr ""
+"La librairie PCRE de votre installation de PHP est obsolète. Cela entraînera "
+"des problèmes lors de la manipulation de texte Unicode. Si vous utilisez PHP "
+"4.3.3 ou plus, assurez-vous que vous utilisez la librairie PCRE fournie par "
+"PHP. Merci de vous référer à la <a href=\"@url\">documentation PCRE de PHP</"
+"a> pour plus d'information."
+
+#: includes/unicode.inc:53
+msgid ""
+"Operations on Unicode strings are emulated on a best-effort basis. Install "
+"the <a href=\"@url\">PHP mbstring extension</a> for improved Unicode support."
+msgstr ""
+"Les opérations sur les chaînes de caractères Unicode sont émulées le mieux "
+"possible. Installez <a href=\"@url\">l'extension PHP mbstring</a> pour un "
+"meilleur support de l'Unicode."
+
+#: includes/unicode.inc:58
+msgid ""
+"Multibyte string function overloading in PHP is active and must be disabled. "
+"Check the php.ini <em>mbstring.func_overload</em> setting. Please refer to "
+"the <a href=\"@url\">PHP mbstring documentation</a> for more information."
+msgstr ""
+"La surcharge des fonctions normales par l'extension \"PHP Multibyte\" est "
+"active et doit être désactivée. Vérifiez le paramètre <em>mbstring."
+"func_overload</em> dans le fichier php.ini. Veuillez vous reporter à la <a "
+"href=\"@url\">documentation PHP mbstring</a> pour plus d'information."
+
+#: includes/unicode.inc:61
+msgid ""
+"Multibyte string input conversion in PHP is active and must be disabled. "
+"Check the php.ini <em>mbstring.encoding_translation</em> setting. Please "
+"refer to the <a href=\"@url\">PHP mbstring documentation</a> for more "
+"information."
+msgstr ""
+"La conversion des chaînes de caractères multibyte en entrée dans PHP est "
+"active et doit être désactivée. Vérifiez le paramètre <em>mbstring."
+"encoding_translation</em> dans le fichier php.ini. Veuillez vous reporter à "
+"la <a href=\"@url\">documentation PHP mbstring</a> pour plus d'information."
+
+#: includes/unicode.inc:64
+msgid ""
+"Multibyte string input conversion in PHP is active and must be disabled. "
+"Check the php.ini <em>mbstring.http_input</em> setting. Please refer to the "
+"<a href=\"@url\">PHP mbstring documentation</a> for more information."
+msgstr ""
+"La conversion des chaînes de caractères multibyte en entrée dans PHP est "
+"active et doit être désactivée. Vérifiez le paramètre <em>mbstring."
+"http_input</em> dans le fichier php.ini. Veuillez vous reporter à la <a href="
+"\"@url\">documentation PHP mbstring</a> pour plus d'information."
+
+#: includes/unicode.inc:67
+msgid ""
+"Multibyte string output conversion in PHP is active and must be disabled. "
+"Check the php.ini <em>mbstring.http_output</em> setting. Please refer to the "
+"<a href=\"@url\">PHP mbstring documentation</a> for more information."
+msgstr ""
+"La conversion des chaînes de caractères multibyte en sortie dans PHP est "
+"active et doit être désactivée. Vérifiez le paramètre <em>mbstring."
+"http_output</em> dans le fichier php.ini. Veuillez vous reporter à la <a "
+"href=\"@url\">documentation PHP mbstring</a> pour plus d'information."
+
+#: includes/unicode.inc:84
+msgid "Standard PHP"
+msgstr "PHP standard"
+
+#: includes/unicode.inc:85
+msgid "PHP Mbstring Extension"
+msgstr "Extension PHP mbstring"
+
+#: includes/unicode.inc:96
+msgid "Unicode library"
+msgstr "Librairie Unicode"
+
+#: includes/unicode.inc:151
+msgid "Could not convert XML encoding %s to UTF-8."
+msgstr "Impossible de convertir l'encodage XML %s en UTF-8."
+
+#: includes/unicode.inc:184
+msgid ""
+"Unsupported encoding %s. Please install iconv, GNU recode or mbstring for "
+"PHP."
+msgstr ""
+"Encodage %s non supporté. Veuillez installer iconv, GNU recode ou mbstring "
+"pour PHP."
+
+#: includes/xmlrpc.inc:451
+msgid "Parse error. Not well formed"
+msgstr "Erreur d'analyse. Non conforme"
+
+#: includes/xmlrpcs.inc:62
+msgid "Parse error. Request not well formed."
+msgstr "Erreur d'analyse. Requête non conforme."
+
+#: includes/xmlrpcs.inc:65
+msgid "Server error. Invalid XML-RPC. Request must be a methodCall."
+msgstr ""
+"Erreur serveur. XML-RPC non conforme aux spécifications. La requête doit "
+"être un methodCall."
+
+#: includes/xmlrpcs.inc:152;291
+msgid "Server error. Requested method %methodname not specified."
+msgstr "Erreur serveur. La méthode demandée (%methodname) n'est pas spécifiée."
+
+#: includes/xmlrpcs.inc:163
+msgid "Server error. Wrong number of method parameters."
+msgstr "Erreur serveur. Nombre de paramètres erroné."
+
+#: includes/xmlrpcs.inc:200
+msgid "Server error. Invalid method parameters."
+msgstr "Erreur serveur. Paramètres invalides."
+
+#: includes/xmlrpcs.inc:206
+msgid "Server error. Requested function %method does not exist."
+msgstr "Erreur serveur. La méthode demandée (%method) n'existe pas."
+
+#: includes/xmlrpcs.inc:219
+msgid "Invalid syntax for system.multicall."
+msgstr "Syntaxe invalide pour system.multicall."
+
+#: includes/xmlrpcs.inc:225
+msgid "Recursive calls to system.multicall are forbidden."
+msgstr "Les appels récursifs de system.multicall sont interdits."
+
+#: includes/xmlrpcs.inc:294
+msgid "Server error. Requested method %methodname signature not specified."
+msgstr ""
+"Erreur serveur. La signature de la méthode demandée (%methodname) n'est pas "
+"spécifiée."

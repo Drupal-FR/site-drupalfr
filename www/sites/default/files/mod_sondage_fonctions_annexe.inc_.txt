@@ -1,0 +1,226 @@
+<?php 
+
+/**
+ *	module de gestion des sondages
+ *  
+ *  FICHIER DES FONCTIONS ANNEXES 
+ *  
+ * @name mod_sondage
+ *
+ * @version 1.0
+ * 
+ * @copyright EDIPRESSE SA juin 2008
+ * @author Da Costa Alcindo
+ */
+
+	function _mod_sondage_increase_vote($rid){
+	
+			$result = db_query("SELECT nbvote FROM {reponse} WHERE rid=%d",$rid);
+					
+				while ($row = mysql_fetch_row($result)){
+					$nbdeVote=$row['0'];
+				}
+			$nbdeVote++;
+			$sql_upd_reponse ="UPDATE {reponse} SET nbvote ='%d' WHERE rid='%d'";
+			return db_query($sql_upd_reponse, $nbdeVote, $rid);
+	}
+
+	function _mod_sondage_form_export()
+	{
+	$option=array();
+	$sql_lst_sondage="SELECT nid from {sondage}";
+	$rows=db_query($sql_lst_sondage);
+	
+	$form['fieldset'] = array(
+				'#type' => 'fieldset',
+				'#title' => t('Choisissez le concour a exporter'),
+				'#collapsible' => FALSE,
+				'#collapsed' => FALSE);
+	while( $result = db_fetch_object($rows) )
+	{	$node=node_load($result->nid);
+		$option[$result->nid]=$node->title;
+	}
+	
+		$form['fieldset']['sondage_nid'] = array(
+		    '#type' => 'select',
+			'#options'=> $option
+		  );
+		
+	 $form['Envoyer'] = array(
+		  	'#submit' => TRUE,
+		    '#type' => 'submit',
+		    '#value' => t('Exporter'),
+		    '#required' => TRUE
+		  ); 
+  	return $form;
+}
+
+	function _mod_sondage_form_attibution(){
+			
+		
+	  	$mod_sondage_attribution = unserialize(variable_get('mod_sondage_attribution',''));
+	  	$option=array();
+	  	$sql_lst_sondage="SELECT nid from {sondage}";
+		$rows=db_query($sql_lst_sondage);
+		$option['0'] = "<aucun>";
+		while( $result = db_fetch_object($rows) )
+			{	$node=node_load($result->nid);
+				$option[$result->nid]=$node->title;
+			}
+	
+		
+		$form['home'] = array(
+			'#type' => 'fieldset',
+			'#title' => 'Choix sondage Home',
+			'#weight' => -9
+		  );
+	  	$form['home']['blockhome'] = array(
+			   '#type' => 'select',
+			    '#title' => t("Sondage en Home"),
+	  			'#weight' => -9,
+			    '#default_value' => $mod_sondage_attribution['blockhome'],
+			    '#options'=> $option,
+			    '#description' => t("Selectionner un Sondage pour la home")
+			    );
+			
+		$arrayVocabularies = taxonomy_get_vocabularies();
+		$i = '0';
+		
+		
+		foreach ($arrayVocabularies as $key => $values){
+			if ($values->nodes['0'] == "tags"){
+				unset($arrayVocabularies[$key]);
+			}
+		}
+		
+		foreach ($arrayVocabularies as $key){
+		
+			
+			$vocab=taxonomy_get_vocabulary($key->vid);	
+		  	$term_tree=taxonomy_get_tree($vocab->vid);
+
+			$form[$key->name] = array(
+						'#type' => 'fieldset',
+						'#title' => 'Choix sondage '.$key->name,
+						'#collapsible' => TRUE,
+						'#collapsed' => TRUE,
+						'#weight' => $i
+					  );
+			foreach($term_tree as $term)    
+		  	{	$form[$key->name]['blocksondage_'.$term->tid] = array(
+				   '#type' => 'select',
+				    '#title' => t($term->name),
+				    '#default_value' => $mod_sondage_attribution['blocksondage_'.$term->tid],
+				    '#options'=> $option,
+				    '#description' => t("Selectionner un Sondage pour '".$term->name."'")
+				    );
+		  	}
+		$i++;
+		}
+		
+	 
+		 $form['Last sondage'] = array(
+			  	'#submit' => TRUE,
+			    '#type' => 'submit',
+			    '#value' => t('Last sondage'),
+			    '#required' => TRUE,
+		 		'#weight' => 10
+			  ); 
+			  
+		 $form['Envoyer'] = array(
+			  	'#submit' => TRUE,
+			    '#type' => 'submit',
+			    '#value' => t('Enregistrer'),
+			    '#required' => TRUE,
+		 		'#weight' => 10
+			  ); 
+	  	return $form;
+	}	
+
+	function _mod_sondage_form_attibution_submit($form_id, $form_values){
+		
+		if ($form_values['op'] == "Last sondage"){
+			
+			$sql_lst_sondage="SELECT nid from {sondage} ORDER BY nid DESC";
+			$rows=db_query($sql_lst_sondage);
+			$node = mysql_fetch_object($rows);
+			$array = array();
+			
+			foreach ($form_values as $key => $values){
+				$array[$key] .= $node->nid;
+			}
+		
+		$mod_sondage_attribution = serialize($array);
+		variable_set("mod_sondage_attribution", $mod_sondage_attribution );
+		return  system_settings_form_submit($form_id, $form_values);
+		
+		}else{
+		$mod_sondage_attribution = serialize($form_values);
+		variable_set("mod_sondage_attribution", $mod_sondage_attribution );
+		return  system_settings_form_submit($form_id, $form_values);
+		}
+	}
+	
+	function _mod_sondage_form_export_submit($form_id, $form_values)
+	{
+
+		$node = node_load($form_values['sondage_nid']);
+		
+		//creation des donne
+		$sql_data="SELECT * FROM {reponse} WHERE nid=%d";
+		$rows = db_query($sql_data, $form_values['sondage_nid']);
+		
+		while( $result = db_fetch_array($rows))
+		{	
+			$data[]=$result;					
+		}
+		
+		$csv_data = _mod_sondage_format_csv($form_values['sondage_nid'], $data);
+
+		foreach ($data as $key){$nbvote += $key['nbvote'];}
+		
+		$csv_data .= "Nombre total de vote;$nbvote \n";
+	  	init_theme();
+	  	header("Content-Type: application/csv-tab-delimited-table");	
+	  	header('Content-type: text/csv');  	
+	   	include_once(drupal_get_path('module', 'mod_sondage')."/export.tpl.php");
+		die();
+	}
+
+	function _mod_sondage_format_csv($nid, $data)
+	{
+		
+		$node = node_load($nid);
+		$output_title = $node->sondage['question']."\n\n";
+		$output_title .= "reponse;nbvote";
+
+		$field_keys = array ('0' => "reponse", '1' => "nbvote" ); 
+		
+		foreach($data as $row)	
+		{	
+			$output_data .= _mod_sondage_format_csv_line($node, $field_keys, $row );
+		}
+
+		return utf8_decode($output_title."\n".$output_data."\n\n");
+	}
+	
+	function _mod_sondage_format_csv_line($node, $field_keys, $data )
+	{
+		
+		foreach($field_keys as $key)
+		{	
+				$output_data .=  ($value == end ($field_keys))? "'".$data[$key]."'" : "'".$data[$key]."';" ;	
+		}
+
+		
+		return $output_data."\n";
+	}
+
+	function _mod_sondage_cacul_pourcentage($nbvote,$nbvoteTotal)
+	{ 
+		  if ($nbvoteTotal != "0"){
+			  $resultat = ($nbvote/$nbvoteTotal) * '100';
+			  return round($resultat); // Arrondi la valeur
+		  }
+		return "0";
+	}  

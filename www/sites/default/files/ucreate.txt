@@ -1,0 +1,338 @@
+<?php
+// $Id: ucreate.module,v 1.3.4.8 2010/02/17 11:25:40 yhahn Exp $
+/**
+ * @file
+ * U create - allows non site admins create and block users.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function ucreate_help($path, $arg) {
+  switch ($path) {
+    case 'user/add':
+      return '<p>'. t('Create a new user. A notification e-mail will be sent to the e-mail address specified.') .'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function ucreate_menu() {
+  $items = array();
+  $items['user/add'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ucreate_user_form'),
+    'title' => 'Add user',
+    'description' => 'Add a user to this web site.',
+    'access arguments' => array('create users'),
+    );
+  $items['admin/user/ucreate'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ucreate_settings_form'),
+    'title' => 'U create settings',
+    'description' => 'Configure default roles for users created by U create module.',
+    'access arguments' => array('administer site configuration'),
+    );
+    
+  $items['user/%user/block'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ucreate_block_form', 1, 'block'),
+    'title' => 'Suspend',
+    'description' => 'Suspend this user\'s account.',
+    'access callback' => 'ucreate_access_suspend',
+    'access arguments' => array('block users', 1, 'block'),
+    'type' => MENU_LOCAL_TASK,
+    );
+
+
+  $items['user/%user/activate'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ucreate_block_form', 1, 'activate'),
+    'title' => 'Activate',
+    'description' => 'Activate this user\'s account.',
+    'access callback' => 'ucreate_access_suspend',
+    'access arguments' => array('block users', 1, 'activate'),
+    'type' => MENU_LOCAL_TASK,
+    );
+    
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function ucreate_perm() {
+  return array('create users', 'block users', 'assign user roles');
+}
+
+/**
+ * Access menu callback for block/activate user tabs
+ */
+function ucreate_access_suspend($access_rule, $account, $op) {
+  global $user;
+
+  if (user_access($access_rule)) {
+    
+    if ($account->uid >= 1) {
+    // Don't provide links if userid is 1 or 0
+    
+      if ($account->uid != $user->uid) {
+      // User can not block themselves 
+        
+        if (($op == 'activate' && $account->status == 0) || ($op == 'block' && $account->status == 1)) {
+        // Only show if action is possible
+          return true; 
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+/**
+ * Menu callback for settings form.
+ */
+function ucreate_settings_form() {
+  $options = user_roles();
+  unset($options[1]);
+  unset($options[2]);
+  $form['ucreate_default_roles'] = array(
+    '#title' => t('Default roles'),
+    '#description' => t('Roles a new user should be assigned.'),
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => variable_get('ucreate_default_roles', array()),
+    );
+  // @todo: personalize e-mail message.
+  return system_settings_form($form);
+}
+
+/**
+ * Break out form for creating users.
+ */
+function ucreate_user_form() {
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User name'),
+    '#required' => TRUE,
+    '#element_validate' => array('ucreate_validate_name'),
+    );
+  $form['mail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#required' => TRUE,
+    '#element_validate' => array('ucreate_validate_mail'),
+    );
+  $form['mail_confirm'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail (confirm)'),
+    '#required' => TRUE,
+    );
+  if (user_access('assign user roles') || user_access('administer users')) {
+    $form['roles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('User roles'),
+    );
+    $default_roles = variable_get('ucreate_default_roles', array());
+    foreach (user_roles() as $rid => $role) {
+      // Exclude 'anonymous user'
+      if ($rid !== 1) {
+        $form['roles'][$rid] = array(
+          '#title' => $role,
+          '#type' => 'checkbox',
+          '#default_value' => in_array($rid, $default_roles, TRUE) || $rid === 2,
+          '#disabled' => $rid === 2 ? TRUE : FALSE,
+        );
+      }
+    }
+  }
+  else {
+    $form['roles'] = array(
+      '#type' => 'value',
+      '#value' => drupal_map_assoc(variable_get('ucreate_default_roles', array())),
+      );
+  }
+  // The personal welcome message will be added to the top of the mail.
+  // @todo: Ideal would be offering the full notification message for edit
+  //        * updated by ajax call back (we shouldn't show tokens to users)
+  //        * or in a second step of the form
+  //        Both approaches have ramifications for the use of the form in ajaxy popups.
+  $form['welcome_message_body'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Personal welcome message'),
+    '#default_value' => '',
+    '#description' => t('This welcome message will appear at the top of the e-mail notification sent to the new user.')
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add'),
+    '#weight' => 20,
+    );
+  $form['#redirect'] = $_GET['q'];
+  return $form;
+}
+
+/**
+ * Element validator for usernames.
+ */
+function ucreate_validate_name($element, &$form_state) {
+  if ($account = user_load(array('name' => $element['#value']))) {
+    $name = user_access('access user profiles') ? l($account->name, 'user/'. $account->uid) : $account->name;
+    form_set_error('name', t('User !name already exists.', array('!name' => $name)));
+  }
+  else if ($error = user_validate_name($element['#value'])) {
+    form_set_error('name', $error);
+  }
+}
+
+/**
+ * Element validator for mail.
+ */
+function ucreate_validate_mail($element, &$form_state) {
+  if ($form_state['values']['mail_confirm'] !== $element['#value']) {
+    form_set_error('mail_confirm', t('E-mail addresses don\'t match'));
+  }
+  else if (user_load(array('mail' => $element['#value']))) {
+    form_set_error('mail', t('User with this e-mail address already exists.'));
+  }
+  else if ($error = user_validate_mail($element['#value'])) {
+    form_set_error('mail', $error);
+  }
+}
+
+/**
+ * Submit handler for ucreate_user_form().
+ */
+function ucreate_user_form_submit($form, &$form_state) {
+  // If user roles were handled through a UI element, process accordingly.
+  // This sucks. See user_save() for why this is necessary.
+  if ($form['roles']['#type'] != 'value') {
+    $rids = array();
+    foreach ($form_state['values']['roles'] as $rid => $enabled) {
+      if (!empty($enabled)) {
+        $rids[$rid] = $rid;
+      }
+    }
+    $form_state['values']['roles'] = $rids;
+  }
+
+  ucreate_user_create($form_state['values']);
+}
+
+/**
+ * Block user confirm dialog.
+ */
+function ucreate_block_form($form, $user, $op) {
+  if ($account = $user) {
+    $path = $_GET['destination'] ?  $_GET['destination'] : '<front>';
+    $form = array(
+      'uid' => array(
+        '#type' => 'value',
+        '#value' => $user->uid,
+      ),
+      'operation' => array(
+        '#type' => 'value',
+        '#value' => $op,
+      ),
+    );
+    if ($op == 'block') {
+      $message = t('Are you sure you would like to suspend !user\'s account?', array('!user' => theme('username', $account)));
+    }
+    else if ($op == 'activate') {
+      $message = t('Are you sure you would like to activate !user\'s account?', array('!user' => theme('username', $account)));
+    }
+    $form = confirm_form($form, $message, $path, '');
+    return $form;
+  }
+}
+
+/**
+ * Submit handler for ucreate_block_form().
+ * @todo: send email if user is blocked/activated.
+ */
+function ucreate_block_form_submit($form, &$form_state) {
+  if ($account = user_load(array('uid' => $form_state['values']['uid']))) {
+    if ($form_state['values']['operation'] == 'block') {
+      $account = user_save($account, array('status' => 0));
+      if ($account->status == 0) {
+        drupal_set_message(t('The account !user was suspended.', array('!user' => theme('username', $account))));
+        drupal_goto('user/'. $account->uid);
+        return;
+      }
+    }
+    else if ($form_state['values']['operation'] == 'activate') {
+      $account = user_save($account, array('status' => 1));
+      if ($account->status == 1) {
+        drupal_set_message(t('The account !user was activated.', array('!user' => theme('username', $account))));
+        drupal_goto('user/'. $account->uid);
+        return;
+      }
+    }
+  }
+  // Unlikely.
+  drupal_set_message(t('There was an error in changing the account status.'), 'error');
+}
+
+/**
+ * Create user
+ *
+ * @param array $edit
+ *   Values in format accepted by user_save().
+ *   Required values:
+ *   $edit['name']
+ *   $edit['mail']
+ */
+function ucreate_user_create($edit) {
+  // Send in the language in which the user is viewing the site.
+  global $language;
+  // Sanitize the $params array which will get sent to drupal_mail.
+  $params = array();
+  // Define who the mail will be sent from.
+  $from = variable_get('site_mail', ini_get('sendmail_from'));
+  // Create account.
+  $account = new stdClass();
+  $password = user_password();
+  $edit['pass'] = $password;
+  $edit['status'] = 1;
+  $account = user_save($account, $edit);
+
+  // Notify user if successful.
+  if ($account->uid) {
+    drupal_set_message(t('You have created an account for !name, password and login instructions have been sent to the e-mail address !email.', array('!name' => $edit['name'], '!email' => l($edit['mail'], 'mailto:'. $edit['mail']))));
+
+    $params['subject'] = t('[!site_name] We have created an account for you', array('!site_name' => variable_get('site_name', 'Drupal')));
+    $variables = array(
+      '!name' => $edit['name'],
+      '!site' => variable_get('site_name', 'Drupal'),
+      '!login_url' => user_pass_reset_url($account) .'/login',
+      '!url' => trim(url('<front>', array('absolute' => TRUE)), '/'),
+      '!password' => $password,
+      );
+    if (trim($edit['welcome_message_body'])) {
+      $body .= $edit['welcome_message_body'];
+      $body .= "\n\n================================================\n";
+    }
+    else {
+      $body .= t("\nHello !name,\n", $variables);
+    }
+    // @todo: Would love to use one time login link here - alas it is only valid for 24 hrs and needs to be renewed then.
+    $body .= t("\nWe have created an account for you on !site\n!url.\n\nYou can log in to the site with the following username and password\n\n!name\n!password\n\nPlease change your password after the first time you log in.\n\nWelcome to !site", $variables);
+    // Put the completed $body in the $params array for hook_mail
+    $params['body'] = $body;
+    if (!drupal_mail('ucreate', 'ucreate-create', $edit['mail'], $language, $params, $from)) {
+      drupal_set_message(t('Error sending notification mail to user.'), 'error');
+    }
+  }
+  else {
+    drupal_set_message(t('Error creating user.'), 'error');
+  }
+  return $account;
+}
+
+
+function ucreate_mail($key, &$message, $params) {
+  $message['subject'] = $params['subject'];
+  $message['body'] = $params['body'];
+}

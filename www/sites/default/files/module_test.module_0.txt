@@ -1,0 +1,148 @@
+<?php
+// $Id: node_quick_find.module,v 1.3.2.1 2008/12/16 22:32:30 njt1982 Exp $
+
+/*
+ * @file
+ * The Node Quick Find module provides a block which contains an autocompleting textfield which matches user input
+ * against the beginning of node titles. This means if a user enters 'test', NQF will match 'test node' but NOT 'node test'.
+ *
+ * Once a user selects the node title and submits, they are taken to the node.
+ *
+ * This is a handy module if the user knows exactly what they're looking for.
+ */
+
+
+/**
+ * Implementation of hook_block().
+ */
+function module_test_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list' :
+      return array(
+        array('info' => t('Module Test'))
+      );
+
+    case 'configure' :
+      return _module_test_block_configuration($delta);
+
+
+    case 'save' :
+      $edit['settings']['node_types'] = array_filter($edit['settings']['node_types']);
+      variable_set('module_test_'. $delta, $edit['settings']);
+      break;
+
+    case 'view' :
+      return array(
+        'subject' => t('Module Test'),
+        'content' => drupal_get_form('module_test_block_contents_form', $delta),
+      );
+  }
+}
+
+ 
+ 
+
+/**
+ * Wrapper function to build the settings form
+ *
+ * @param mixed $delta
+ *   The $delta represents the unique ID of the block from this module
+ *
+ * @return array
+ *   Array for use with the Drupal FAPI
+ */
+function _module_test_block_configuration($delta) {
+  $form = array();
+  $settings = variable_get('module_test_'. $delta, array());
+
+  $form['settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('NQF Settings'),
+    '#tree' => TRUE,
+  );
+
+  $form['settings']['field_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text Field Title'),
+    '#size' => 16,
+    '#default_value' => isset($settings['field_title']) ? $settings['field_title'] : 'Title',
+  );
+
+  $form['settings']['field_size'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text Field Size'),
+    '#size' => 3,
+    '#default_value' => isset($settings['field_size']) ? $settings['field_size'] : 16,
+  );
+
+  $form['settings']['field_error'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Error Message'),
+    '#size' => 25,
+    '#default_value' => isset($settings['field_error']) ? $settings['field_error'] : 'Page Not Found',
+  );
+
+
+   return $form;
+}
+
+
+/**
+ * Block Contents Form. 
+ */
+function module_test_block_contents_form(&$form_state, $delta) {
+  $form = array();
+  $settings = variable_get('module_test_'. $delta, array());
+
+  $form['title'] = array(
+    '#title' => t(isset($settings['field_title']) ? check_plain($settings['field_title']) : 'Title'),
+    '#type' => 'textfield',
+    '#size' => isset($settings['field_size']) ? $settings['field_size'] : 16,
+    '#required' => TRUE,
+  );
+
+  $form['delta'] = array('#type' => 'value', '#value' => $delta);
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+
+/**
+ * Submit handler for module_test_block form above
+ */
+ 
+function module_test_block_contents_form_submit($form, &$form_state) {
+
+ $header = array('Node ID', 'Title', 'Type', 'Terms', 'Created', 'Published', 'Sticky', 'Promoted');
+  $rows = array();
+  $noyes = array('No', 'Yes');
+
+  $results = db_query('SELECT * FROM {node} WHERE title LIKE "%s%%"', $form_state['values']['title']);
+
+  while ($node = db_fetch_object($results)) {
+    $termlist = taxonomy_node_get_terms($node->nid);
+    $terms = array();
+    foreach ($termlist as $key => $value) { $terms[] = $value->name; }
+    $rows[] = array($node->nid,
+                    l($node->title, 'node/'. $node->nid .'/edit'),
+                    $node->type,
+                    implode(' | ', $terms),
+                    format_date($node->created),
+                    $noyes[$node->status],
+                    $noyes[$node->sticky],
+                    $noyes[$node->promote],
+                );
+   }
+  return theme('table', $header, $rows);
+
+
+ 
+}
+
+
+

@@ -1,0 +1,45 @@
+<?php
+
+// $Id:$
+
+/**
+ * Implementation of hook_perm().
+ */
+function timeline_content_perm() {
+  return array(
+  // Administrative permissions
+  'administer timeline icons'
+  );
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function timeline_content_form_alter($form_id, &$form) {
+  if ('node_type_form' == $form_id) {
+    if (user_access('administer timeline icons')) {
+      $form['timeline'] = array('#type' => 'fieldset', '#title' => t('Timeline settings'), '#collapsible' => TRUE, '#collapsed' => FALSE);
+      $form['timeline']['timeline_icon'] = array(
+        '#type' => 'textfield', 
+        '#title' => t('Path to icon'), 
+        '#default_value' => variable_get('timeline_icon_'. $form['#node_type']->type, ''),
+        '#description' => t('Path to timeline icon for this node type.'),
+
+      );
+      $form['timeline']['timeline_color'] = array(
+        '#type' => 'textfield', 
+        '#title' => t('Color'), 
+        '#default_value' => variable_get('timeline_color_'. $form['#node_type']->type, ''),
+        '#description' => t('Color to timeline for this node type.'),
+      );
+    }
+  }
+}
+
+function phptemplate_timeline_icon($node) {
+  return variable_get('timeline_icon_'. $node->type, '');
+}
+
+function phptemplate_timeline_color($node) {
+  return variable_get('timeline_color_'. $node->type, '');
+}

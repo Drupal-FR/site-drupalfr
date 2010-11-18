@@ -1,0 +1,87 @@
+<?php
+
+if ($_SERVER[argc] < 2)
+{
+	echo "Usage : php trans.php nom_module\n";
+	exit;	
+}
+$module = $_SERVER[argv][1];
+
+echo "START recherche du Module\n";
+$auth_url = "http://drupal.org/user/login";
+$export_url = "http://localize.drupal.org/translate/languages/fr/export?project=$module";
+
+$login_email = 'COMPTE DRUPAL';
+$login_pass = 'PASSWORD DRUPAL';
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $auth_url);
+curl_setopt($ch, CURLOPT_POSTFIELDS,'name='.urlencode($login_email).'&pass='.urlencode($login_pass).'&form_id=user_login&op=Log In');
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_COOKIEJAR, "my_cookies.txt");
+curl_setopt($ch, CURLOPT_COOKIEFILE, "my_cookies.txt");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3");
+curl_exec($ch);
+
+curl_setopt($ch, CURLOPT_POST, 0);
+curl_setopt($ch, CURLOPT_URL, $export_url);
+$page = curl_exec($ch);
+$html = explode("\n", $page);
+$post = "name=translation&version=drupal-6&compact=0&op=export&form_id=l10n_community_export_form";
+foreach($html as $key => $value)
+{
+	get_input($value);
+}
+
+echo "Module OK\n";
+echo "Telechargement du Module\n";
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+curl_setopt($ch, CURLOPT_URL, $export_url);
+$file = curl_exec($ch);
+file_put_contents("$module.tar", $file);
+echo "Fichier $module.tar creee\n";
+exec("tar xf $module.tar");
+echo "Desarchive le Module\n";
+exec("rm $module.tar");
+echo "Fichier $module.tar supprimer\n";
+
+function get_input($line)
+{
+  global $post;
+  if (preg_match('<input*>', $line))
+  {
+  	$value = "";
+  	if (strlen(($value = get_value("project", $line))) > 0)
+  		$post .= "&project=$value";
+  	else if (strlen(($value = get_value("form_build_id", $line))) > 0)
+  		$post .= "&form_build_id=$value";
+  	else if (strlen(($value = get_value("form_token", $line))) > 0)
+  		$post .= "&form_token=$value";
+  	return true;
+  }
+  return false;
+}
+
+function get_value($champs, $line)
+{
+	if (strstr($line, 'name="' .$champs .'"') != FALSE)
+	{
+		$line = strstr($line, "value=\"");
+		$line = substr($line, 7);
+		$j = strpos($line, '"');
+		$value = substr($line, 0, $j);
+		if ($value == "")
+		{
+			echo "Mauvais nom de Module, Exit\n";
+			exit;
+		}
+		return $value;
+	}
+	return "";
+}
+
+?>
