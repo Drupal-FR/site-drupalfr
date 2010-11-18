@@ -1,37 +1,14 @@
-sites/default/files
-sites/default/private
-sites/default/settings.php
-cache/
-files/
-/README.txt
-/CHANGELOG.txt
-/COPYRIGHT.txt
-/INSTALL*.txt
-/LICENSE.txt
-/MAINTAINERS.txt
-/UPGRADE.txt
-robots.txt
-sites/all/README.txt
-sites/all/modules/README.txt
-sites/all/themes/README.txt
-.htaccess
+# First level directories.
+/.*
+/conf
+/database
+/logs
+/tmp
 
-#for non core developer
-#only include "sites" folder without exclusions before
-cron.php
-index.php
-install.php
-update.php
-xmlrpc.php
-/includes
-/misc
-/modules     
-/profiles
-/scripts
-/themes
-conf
-database
-logs
-tmp
-settings.local.php
-
+# Site-specific data.
+/www/sites/default/settings.local.php
+/www/sites/default/files/imagecache/*
+/www/sites/default/files/imagefield_thumbs/*
+/www/sites/default/files/js/*
+/www/sites/default/files/css/*
+/www/sites/default/files/languages/*
