@@ -1,7 +1,7 @@
 
 -- Munge emails for security.
 UPDATE users SET mail = CONCAT(name, '@localhost'), init = CONCAT('http://drupalfr.org/user/', uid, '/edit'), pass = MD5(CONCAT('drupalfr', name)), login = 280299600, access = 280299600;
-UPDATE comments SET mail = CONCAT(name, '@localhost');
+UPDATE comments SET mail = CONCAT(name, '@localhost'), hostname = '';
 UPDATE authmap SET authname = CONCAT(aid, '@localhost');
 UPDATE client SET mail = CONCAT(cid, '@localhost');
 UPDATE simplenews_subscriptions SET mail = CONCAT(snid, '@localhost');
