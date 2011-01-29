@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -xe
 
 # Needs to be called from www7.
 
