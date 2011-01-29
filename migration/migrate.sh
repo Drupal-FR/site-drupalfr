@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Needs to be called from www7.
 
@@ -13,5 +14,3 @@ drush sqlc < ../migration/sql/pre-migration.sql
 
 # Try a migration.
 drush update-db -y
-
-
