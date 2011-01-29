@@ -1,3 +1,4 @@
-DROP DATABASE drupalfr;
-CREATE DATABASE drupalfr;
-USE drupalfr;
+DROP DATABASE dfr_port7;
+CREATE DATABASE dfr_port7;
+USE dfr_port7;
+
