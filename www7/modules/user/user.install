@@ -414,6 +414,10 @@ function user_update_7000(&$sandbox) {
     $sandbox['user_count'] = db_query("SELECT COUNT(uid) FROM {users}")->fetchField();
   }
   else {
+    // #migration: For now, do not hash passwords as it is a very expensive
+    // operation.
+    return;
+
     require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
     //  Hash again all current hashed passwords.
     $has_rows = FALSE;
