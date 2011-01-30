@@ -1,0 +1,23 @@
+<?php
+
+// $Id: email.install,v 1.1.2.3.2.3 2011/01/20 12:50:06 mh86 Exp $
+
+/**
+ * @file
+ * Defines schema for email fields
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function email_field_schema($field) {
+  return array(
+    'columns' => array(
+      'email' => array(
+        'type' => 'varchar',
+         'length' => 255,
+         'not null' => FALSE,
+      ),
+    ),
+  );
+}
