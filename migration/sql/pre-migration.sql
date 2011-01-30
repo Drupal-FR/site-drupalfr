@@ -6,3 +6,6 @@ ALTER TABLE system CHANGE COLUMN weight weight INT NOT NULL DEFAULT 0;
 
 -- Disable all non core modules.
 UPDATE system SET status = 0 WHERE type = 'module' AND filename NOT LIKE 'modules/%';
+
+-- Recreate a UID=1 users.
+INSERT INTO users (uid, name, pass, status) VALUES(1, 'admin', MD5('admin'), 1);
