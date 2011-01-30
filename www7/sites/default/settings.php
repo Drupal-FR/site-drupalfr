@@ -26,6 +26,10 @@ ini_set('session.cookie_lifetime', 2000000);
 # ini_set('pcre.backtrack_limit', 200000);
 # ini_set('pcre.recursion_limit', 200000);
 
+// Necessary at least during the migration, to prevent Drush update-db from
+// failing.
+$conf['blocked_ips'] = array();
+
 /**
  * Local settings (databases password, domain configuration, ...).
  */

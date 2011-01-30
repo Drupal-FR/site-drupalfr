@@ -416,6 +416,7 @@ function user_update_7000(&$sandbox) {
   else {
     // #migration: For now, do not hash passwords as it is a very expensive
     // operation.
+    $sandbox['#finished'] = 1;
     return;
 
     require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
