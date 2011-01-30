@@ -13,4 +13,4 @@ cat ../export/drupalfr-live-sanitized.sql | sed -e 's/^) ENGINE=InnoDB/) ENGINE=
 drush sqlc < ../migration/sql/pre-migration.sql
 
 # Try a migration.
-drush updatedb -y
+drush updatedb -y --verbose
