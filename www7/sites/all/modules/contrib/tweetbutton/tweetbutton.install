@@ -1,0 +1,16 @@
+<?php
+// $Id: tweetbutton.install,v 1.1.2.2 2010/08/13 11:53:09 jasonleon Exp $
+
+function tweetbutton_uninstall() {
+	variable_del('tweetbutton_button');
+  variable_del('tweetbutton_tweet_text');
+  variable_del('tweetbutton_tweet_url');
+  variable_del('tweetbutton_language');
+  variable_del('tweetbutton_account');
+  variable_del('tweetbutton_rel_account_name');
+  variable_del('tweetbutton_rel_account_description');
+  variable_del('tweetbutton_node_weight');
+  variable_del('tweetbutton_node_types');
+  variable_del('tweetbutton_node_location');  
+    
+}
