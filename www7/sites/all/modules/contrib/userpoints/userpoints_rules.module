@@ -1,0 +1,59 @@
+<?php
+// $Id: userpoints_rules.module,v 1.1.4.2 2010/10/30 08:27:57 berdir Exp $
+
+/**
+ * @file
+ * Rules integration for the user points module.
+ */
+
+/**
+ * Rules events -Trigger event when user points awarded.
+ */
+function userpoints_rules_userpoints($op, &$params = array()) {
+  // Transactions without points are not passed to rules for now.
+  if (!is_array($params) || !isset($params['points'])) {
+   return;
+  }
+
+  $event = '';
+  switch ($op) {
+    case 'points after':
+        $event = 'userpoints_event_points_awarded_after';
+        break;
+
+    case 'points before':
+        $event = 'userpoints_event_points_awarded_before';
+        break;
+  }
+
+  if (!empty($event)) {
+    // Convert to an object.
+    $userpoints_transaction = (object) $params;
+
+    // Provide uid as wrapped user entity.
+    $userpoints_transaction->user = entity_metadata_wrapper('user', $userpoints_transaction->uid);
+
+    $userpoints_transaction->entity = NULL;
+    if (!empty($userpoints_transaction->entity_type) && !empty($userpoints_transaction->entity_id)) {
+      // Make entity available as lazy loading wrapper.
+      $userpoints_transaction->entity = entity_metadata_wrapper($userpoints_transaction->entity_type, $userpoints_transaction->entity_id);
+    }
+    // Invoke rules event.
+    rules_invoke_event($event, $userpoints_transaction);
+    // Convert back to keep any changes to the properties.
+    $params = (array)$userpoints_transaction;
+
+    $params['uid'] = $userpoints_transaction->user->getIdentifier();
+    unset($params['user']);
+
+    if ($userpoints_transaction->entity) {
+      $params['entity_type'] = $userpoints_transaction->entity->type();
+      try {
+        $params['entity_id'] = $userpoints_transaction->entity->getIdentifier();
+      } catch (Exception $e) {
+        throw $e;
+      }
+    }
+    unset($params['entity']);
+  }
+}
