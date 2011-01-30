@@ -1,0 +1,249 @@
+<?php
+// $Id: typogrify.module,v 1.12 2010/09/06 16:23:02 mikl Exp $
+
+/**
+ * @file
+ * Typogrify: Brings typographical refinemnts to drupal
+ *
+ * Hook together all the typogrify components.
+ */
+
+/**
+ * Implementation of hook_filter_info().
+ */
+function typogrify_filter_info() {
+  return array('typogrify' => array(
+    'title' => t('Typogrify'),
+    'description' => t('Adds typographic refinements.'),
+    'process callback' => '_typogrify_process',
+    'settings callback' => '_typogrify_settings',
+    'default settings' => array(
+      'smartypants_enabled' => 1,
+      'smartypants_hyphens' => 3,
+      'wrap_ampersand' => 1,
+      'widont_enabled' => 1,
+      'wrap_caps' => 1,
+      'wrap_initial_quotes' => 1,
+      'long_s' => 0,
+      'ligatures' => array(),
+      'arrows' => array(),
+    ),
+    'tips callback' => '_typogrify_filter_tips',
+  ));
+}
+
+/**
+ * Filter tips callback for Typogrify filter.
+ */
+function _typogrify_filter_tips($filter, $format, $long) {
+  if ($long) {
+    $output = t('Typogrify.module brings the typographic refinements of Typogrify to Drupal.<ul>
+<li>Wraps ampersands (the $ldquo;&amp;&rdquo; character) with &lt;span class=\"amp\"&gt;&amp;&lt;/span&gt;.</li>
+<li>Prevents single words from wrapping onto their own line using Shaun Inman\'s Widont technique.</li>
+<li>Converts straight quotation marks to typographer\'s quotation marks, using SmartyPants.</li>
+<li>Converts multiple hyphens to en dashes and em dashes (according to your preferences), using SmartyPants.</li>
+<li>Wraps multiple capital letters with &lt;span class=\"caps\"&gt;CAPS&lt;/span&gt;.</li>
+<li>Wraps initial quotation marks with &lt;span class=\"quo\"&gt;&lt;/span&gt; or &lt;span class=\"dquo\"&gt;&lt;/span&gt;.</li>
+<li>Adds a css style sheet that uses the &lt;span&gt; tags to substitute a showy ampersand in headlines, switch caps to small caps, and hang initial quotation marks.</li></ul>');
+  }
+  else {
+    $output = t('Typographic refinements will be added.');
+  }
+
+  return $output;
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function typogrify_init() {
+  drupal_add_css(drupal_get_path('module', 'typogrify') . '/typogrify.css');
+}
+
+/**
+ * Processing function to apply the Typogrify filters
+ *
+ * @param string $text
+ *    The text to apply the filter on.
+ * @param integer $format
+ *    ID if the input format whose settings to use when applying the filters.
+ * @return string
+ *    The filtered text.
+ */
+function _typogrify_process($text, $filter, $format, $langcode, $cache, $cache_id) {
+  $characters_to_convert = array();
+  // Load Helpers.
+  module_load_include('class.php', 'typogrify');
+  module_load_include('php', 'typogrify', 'unicode-conversion');
+  module_load_include('php', 'typogrify', 'smartypants');
+
+  // Wrap ampersands.
+  if ($filter->settings['wrap_ampersand']) {
+    $text = Typogrify::amp($text);
+  }
+
+  // Remove widows.
+  if ($filter->settings['widont_enabled']) {
+    $text = Typogrify::widont($text);
+  }
+
+  // Smartypants formatting.
+  if ($filter->settings['smartypants_enabled']) {
+    global $_typogrify_smartypants_attr;
+    $_typogrify_smartypants_attr = $filter->settings['smartypants_hyphens'];
+    $text = SmartyPants($text);
+  }
+
+  // Wrap caps.
+  if ($filter->settings['wrap_caps']) {
+    $text = Typogrify::caps($text);
+  }
+
+  // Wrap initial quotes.
+  if ($filter->settings['wrap_initial_quotes']) {
+    $text = Typogrify::initial_quotes($text);
+  }
+
+  // Build a list of ligatures to convert.
+  foreach (unicode_conversion_map('ligature') as $ascii => $unicode) {
+    if ($filter->settings['ligatures'][$ascii]) {
+      $characters_to_convert[] = $ascii;
+    }
+  }
+
+  // Build a list of arrows to convert.
+  foreach (unicode_conversion_map('arrow') as $ascii => $unicode) {
+    if ($filter->settings['arrows'][$ascii]) {
+      $characters_to_convert[] = $ascii;
+    }
+  }
+
+  // Convert ligatures and arrows
+  if (count($characters_to_convert) > 0) {
+    $text = convert_characters($text, $characters_to_convert);
+  }
+
+  return $text;
+}
+
+
+/**
+ * Typogrify filter settings form.
+ *
+ * @param integer $format
+ *    ID if the input format to generate a settings form for.
+ * @return array
+ *    Form API array containing our settings form.
+ */
+function _typogrify_settings(&$form_state, $filter, $defaults, $format, $filters) {
+  module_load_include('class.php', 'typogrify');
+  module_load_include('php', 'typogrify', 'unicode-conversion');
+  module_load_include('php', 'typogrify', 'smartypants');
+
+  // Add our default settings to the array if they are not present.
+  $defaults->settings += array(
+    'smartypants_enabled' => 1,
+    'smartypants_hyphens' => 2,
+    'wrap_ampersand' => 1,
+    'widont_enabled' => 1,
+    'wrap_caps' => 1,
+    'wrap_initial_quotes' => 1,
+    'ligatures' => array(),
+    'arrows' => array(),
+  );
+
+  $form = array();
+
+  $form['help'] = array(
+    '#type' => 'markup',
+    '#value' => '<p>Enable the following typographic refinements:</p>',
+  );
+
+  // Smartypants settings.
+  $form['smartypants_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use typographers quotation marks and dashes (!smartylink)', array('!smartylink' => l('SmartyPants', 'http://daringfireball.net/projects/smartypants/'))),
+    '#default_value' => $defaults->settings['smartypants_enabled'],
+  );
+
+  // Smartypants hyphenation settings.
+  // Uses the same values as the parse attributes in the SmartyPants 
+  // function (@see SmartyPants in smartypants.php)
+  $form['smartypants_hyphens'] = array(
+    '#type' => 'select',
+    '#title' => t('Hyphenation settings for SmartyPants'),
+    '#default_value' => $defaults->settings['smartypants_hyphens'],
+    '#options' => array(
+      1 => t('“--” for em-dashes; no en-dash support'),
+      3 => t('“--” for em-dashes; “---” for en-dashes'),
+      2 => t('“---” for em-dashes; “--” for en-dashes'),
+    ),
+  );
+
+  // Wrap ampersand settings.
+  $form['wrap_ampersand'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wrap ampersands'),
+    '#default_value' => $defaults->settings['wrap_ampersand'],
+  );
+
+  // Remove widows settings.
+  $form['widont_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Remove widows'),
+    '#default_value' => $defaults->settings['widont_enabled'],
+  );
+
+  // Wrap caps settings.
+  $form['wrap_caps'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wrap caps'),
+    '#default_value' => $defaults->settings['wrap_caps'],
+  );
+
+  // Wrap initial quotes settings.
+  $form['wrap_initial_quotes'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wrap quotation marks'),
+    '#default_value' => $defaults->settings['wrap_initial_quotes'],
+  );
+  
+  // Ligature conversion settings.
+  $ligature_options = array();
+  foreach (unicode_conversion_map('ligature') as $ascii => $unicode) {
+    $ligature_options[$ascii] =  t('Convert !ascii to !unicode', array('!ascii' => $ascii, '!unicode' => $unicode));
+  }
+
+  $form['ligatures'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Ligatures'),
+    '#options' => $ligature_options,
+    '#default_value' => $defaults->settings['ligatures'],
+  );
+
+  // Arrow conversion settings.
+  $arrow_options = array();
+  foreach (unicode_conversion_map('arrow') as $ascii => $unicode) {
+    $arrow_options[$ascii] =  t('Convert @ascii to !unicode', array('@ascii' => $ascii, '!unicode' => $unicode));
+  }
+
+  $form['arrows'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Arrows'),
+    '#options' => $arrow_options,
+    '#default_value' => $defaults->settings['arrows'],
+  );
+
+  // Version Information Settings
+  $version_strings = array();
+  $version_strings[] = t('SmartyPants PHP version: !version', array('!version' => l(SMARTYPANTS_PHP_VERSION, 'http://www.michelf.com/projects/php-smartypants/')));
+  $version_strings[] = t('PHP Typogrify Version: !version', array('!version' => l('1.0', 'http://blog.hamstu.com/')));
+
+  $form['info']['typogrify_status'] = array(
+    '#type' => 'markup',
+    '#value' => theme('item_list', $version_strings, t('Version Information'))
+  );
+
+  return $form;
+}
+

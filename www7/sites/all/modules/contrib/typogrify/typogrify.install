@@ -1,0 +1,96 @@
+<?php
+// $Id: typogrify.install,v 1.2 2009/05/30 12:55:19 mikl Exp $
+
+/**
+ * @file typogrify.install
+ * Upgrade hooks for the Typogrify module.
+ */
+
+/**
+ * Upgrade Typogrify settings to the new format.
+ */
+function typogrify_update_7000() {
+  $ret = array();
+  $current_settings = array();
+  
+  // Iterate over the current settings, and try to match them to the old 
+  // ones.
+  $search_query = db_query("SELECT name FROM {variable} WHERE name LIKE 'typogrify_%';");
+  while ($row = db_fetch_array($search_query)) {
+    $match = array();
+
+    if (preg_match('/^typogrify_settings_(\d+)$/', $row['name'], $match)) {
+      $current_settings[$match[1]]['has_new_settings'] = TRUE;
+    }
+    elseif (preg_match('/^typogrify_is_([_\w]+)_on_(\d+)$/', $row['name'], $match)) {
+      $current_settings[$match[2]][$match[1]] = variable_get($row['name'], NULL);
+    }
+    elseif (preg_match('/^typogrify_use_([\w]+)_ligature_(\d+)$/', $row['name'], $match)) {
+      $current_settings[$match[2]]['ligatures'][$match[1]] = variable_get($row['name'], NULL);
+    }
+    elseif (preg_match('/^typogrify_use_unicode_for_([|<>=-]+)_(\d+)$/', $row['name'], $match)) {
+      $current_settings[$match[2]]['arrows'][$match[1]] = variable_get($row['name'], NULL);
+    }
+
+    // Unless it's the new settings, delete the setting.
+    if (strpos($row['name'], 'typogrify_settings_') !== 0) {
+      variable_del($row['name']);
+    }
+  }
+
+  // Iterate over all the filter formats, snap up the old settings and 
+  // save new ones based on the old and the default settings.
+  $filter_query = db_query("SELECT format FROM {filter_format} WHERE 1");
+  while ($format = db_result($filter_query)) {
+    if (isset($current_settings[$format])) {
+      $settings = $current_settings[$format];
+    }
+    else {
+      $settings = array();
+    }
+
+    // The matching stuff above doesn't pick up the old Marksmarty 
+    // settings, so we'll grab those here.
+    $marksmarty_on = variable_get('marksmarty_is_smarty_on_' . $format, NULL);
+    if (!is_null($marksmarty_on)) {
+      $settings['smartypants_enabled'] = $marksmarty_on;
+      variable_del('marksmarty_is_smarty_on_' . $format);
+    }
+    $marksmarty_hyphens = variable_get('marksmarty_smarty_hyphens_' . $format, NULL);
+    if (!is_null($marksmarty_hyphens)) {
+      $settings['smartypants_hyphens'] = $marksmarty_hyphens;
+      variable_del('marksmarty_smarty_hyphens_' . $format);
+    }
+
+    // Format already has settings and not the new settings format.
+    if (!empty($settings) && !$settings['has_new_settings']) {
+      // Transform the words we extracted from the variable names in to 
+      // the real setting names.
+      if (isset($settings['amp'])) {
+        $settings['wrap_ampersand'] = $settings['amp'];
+        unset($settings['amp']);
+      }
+      if (isset($settings['caps'])) {
+        $settings['wrap_caps'] = $settings['caps'];
+        unset($settings['caps']);
+      }
+      if (isset($settings['initial_quotes'])) {
+        $settings['wrap_initial_quotes'] = $settings['initial_quotes'];
+        unset($settings['initial_quotes']);
+      }
+      if (isset($settings['widont'])) {
+        $settings['widont_enabled'] = $settings['widont'];
+        unset($settings['widont']);
+      }
+
+      // Then merge in our default settings.
+      module_load_include('php', 'typogrify', 'unicode-conversion');
+      $settings += _typogrify_default_settings();
+
+      // Save the upgraded settings to the database.
+      variable_set('typogrify_settings_' . $format, $settings);
+    }
+  }
+  return $ret;
+}
+
