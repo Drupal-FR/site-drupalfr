@@ -1,0 +1,25 @@
+; $Id: rules.info,v 1.1.2.3 2011/01/04 13:08:35 fago Exp $
+name = Rules
+description = React on events and conditionally evaluate actions.
+package = Rules
+core = 7.x
+files[] = tests/rules.test
+files[] = includes/rules.core.inc
+files[] = includes/rules.processor.inc
+files[] = includes/rules.plugins.inc
+files[] = includes/rules.state.inc
+files[] = modules/php.eval.inc
+files[] = modules/rules_core.eval.inc
+files[] = modules/system.eval.inc
+files[] = ui/ui.core.inc
+files[] = ui/ui.data.inc
+files[] = ui/ui.plugins.inc
+dependencies[] = entity_token
+dependencies[] = entity
+
+; Information added by drupal.org packaging script on 2011-01-05
+version = "7.x-2.0-alpha4"
+core = "7.x"
+project = "rules"
+datestamp = "1294228279"
+
