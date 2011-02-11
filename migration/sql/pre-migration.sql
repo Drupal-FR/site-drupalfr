@@ -13,3 +13,9 @@ INSERT INTO users (uid, name, pass, status) VALUES(1, 'admin', MD5('admin'), 1);
 -- Change the theme to Garland.
 UPDATE system SET status = 1 WHERE name = 'garland';
 UPDATE variable SET value = 's:7:"garland";' WHERE name = 'theme_default';
+
+-- Remove all files that have the same case insensitive name
+-- NEED TO FIND A REAL SOLUTION
+CREATE TABLE tfiles select filepath as filepath from files group by lower(`filepath`) HAVING count(fid) > 1;
+DELETE FROM files WHERE filepath in (select filepath from tfiles);
+DROP TABLE tfiles;
