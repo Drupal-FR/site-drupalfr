@@ -419,9 +419,10 @@ function user_update_7000(&$sandbox) {
     $has_rows = FALSE;
     // Update this many per page load.
     $count = 1000;
+    //$result = db_query_range("SELECT uid, pass FROM {users} WHERE uid > 0 ORDER BY uid", $sandbox['user_from'], $count);
     // #migration: For now, do not hash passwords all passwords as it is a
     // very expensive operation.
-    $result = db_query_range("SELECT uid, pass FROM {users} WHERE uid == 1 ORDER BY uid", $sandbox['user_from'], $count);
+    $result = db_query_range("SELECT uid, pass FROM {users} WHERE uid = 1 ORDER BY uid", $sandbox['user_from'], $count);
     foreach ($result as $account) {
       $has_rows = TRUE;
       $new_hash = user_hash_password($account->pass, $hash_count_log2);
