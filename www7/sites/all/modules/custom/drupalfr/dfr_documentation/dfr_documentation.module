@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function dfr_documentation_menu() {
+  $items = array();
+  $items['documentation'] = array(
+    'title' => 'Documentation',
+    'page callback' => 'dfr_documentation_page',
+    'access arguments' => array('access content'),
+    'menu_name' => 'primary-links',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+function dfr_documentation_page() {
+  $output = "";
+  $books = array(4395, 5037, 56, 9619, 4);
+  foreach ($books as $nid) {
+    $book = node_load($nid);
+    $output .= '<h2 style="clear: left;">'. l($book->title, 'node/'. $nid) .'</h2>';
+    $output .= '<p>'. $book->teaser .'</p>';
+    $output .= '<div class="column-left">'. book_children($book->book) .'</div>';
+  }
+  $output .= '<div style="clear: both"></div>';
+  return $output;
+}
+
