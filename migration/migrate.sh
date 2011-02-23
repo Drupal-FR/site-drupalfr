@@ -14,3 +14,7 @@ drush sqlc < ../migration/sql/pre-migration.sql
 
 # Try a migration.
 drush updatedb -y --verbose
+
+# enable modules
+drush en -y markdown
+drush cc all
