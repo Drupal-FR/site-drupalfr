@@ -357,6 +357,12 @@ function _update_7000_field_create_instance($field, &$instance) {
     'field_id' => $field['id'],
     'field_name' => $field['field_name'],
     'deleted' => 0,
+    'settings' => array(),
+    'display' => array(),
+    'widget' => array(),
+    'required' => FALSE,
+    'label' => $field['field_name'],
+    'description' => '',
   );
 
   // The serialized 'data' column contains everything from $instance that does
