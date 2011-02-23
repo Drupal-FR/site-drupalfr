@@ -19,3 +19,10 @@ UPDATE variable SET value = 's:7:"garland";' WHERE name = 'theme_default';
 CREATE TABLE tfiles select filepath as filepath from files group by lower(`filepath`) HAVING count(fid) > 1;
 DELETE FROM files WHERE filepath in (select filepath from tfiles);
 DROP TABLE tfiles;
+
+-- Drop profiles tables (no more needed since we using content profile)
+DROP TABLE profile_fields;
+DROP TABLE profile_values;
+-- fake uninstall of profile module
+UPDATE system SET schema_version = -1 WHERE name = 'profile';
+
