@@ -1,5 +1,5 @@
 <?php
-// $Id: data.rules.inc,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
+// $Id: data.rules.inc,v 1.1.2.9 2011/02/21 09:00:39 fago Exp $
 
 /**
  * @file General data related rules integration
@@ -29,6 +29,8 @@ function rules_data_action_info() {
         'label' => t('Data'),
         'description' => t('Specifies the data to be modified using a data selector, e.g. "node:author:name".'),
         'restriction' => 'selector',
+        'wrapped' => TRUE,
+        'allow null' => TRUE,
        ),
       'value' => array(
         'type' => '*',
@@ -147,6 +149,7 @@ function rules_data_action_info() {
           'label' => t('Entity'),
           'description' => t('Specifies the entity, which should be saved permanently.'),
           'restriction' => 'selector',
+          'wrapped' => TRUE,
          ),
          'immediate' => array(
            'type' => 'boolean',
@@ -176,7 +179,8 @@ function rules_data_action_info() {
           'label' => t('Entity'),
           'description' => t('Specifies the entity, which should be deleted permanently.'),
           'restriction' => 'selector',
-         ),
+          'wrapped' => TRUE,
+        ),
       ),
       'group' => t('Entities'),
       'access callback' => 'rules_data_action_access',
@@ -310,7 +314,6 @@ function rules_action_data_set_validate(RulesAbstractPlugin $element) {
   $element->settings += array('data:select' => NULL);
   $info = $element->applyDataSelector($element->settings['data:select'])->info();
   if (strpos($element->settings['data:select'], ':') !== FALSE && empty($info['setter callback'])) {
-    // Modifying rules variables itself doesn't make any sense.
     throw new RulesException("The selected data property doesn't support writing.", array(), array($element, 'parameter', 'data'));
   }
 }
@@ -582,6 +585,19 @@ function rules_data_condition_info() {
       'group' => t('Data'),
       'base' => 'rules_condition_data_is',
     ),
+    'data_is_empty' => array(
+      'label' => t('Data value is empty'),
+      'parameter' => array(
+        'data' => array(
+          'type' => '*',
+          'label' => t('Data to check'),
+          'description' => t('The data to be checked to be empty, specified by using a data selector, e.g. "node:author:name".'),
+          'allow null' => TRUE,
+         ),
+      ),
+      'group' => t('Data'),
+      'base' => 'rules_condition_data_is_empty',
+    ),
     'entity_is_new' => array(
       'label' => t('Entity is new'),
       'parameter' => array(
@@ -614,6 +630,25 @@ function rules_data_condition_info() {
       ),
       'group' => t('Entities'),
       'base' => 'rules_condition_entity_has_field',
+    ),
+    'entity_is_of_type' => array(
+      'label' => t('Entity is of type'),
+      'parameter' => array(
+        'entity' => array(
+          'type' => 'entity',
+          'label' => t('Entity'),
+          'description' => t('Specifies the entity for which to evaluate the condition.'),
+        ),
+        'type' => array(
+          'type' => 'token',
+          'label' => t('Entity type'),
+          'description' => t('The entity type to check for.'),
+          'options list' => 'rules_data_action_type_options',
+          'restriction' => 'input',
+        ),
+      ),
+      'group' => t('Entities'),
+      'base' => 'rules_condition_entity_is_of_type',
     ),
   );
 }
@@ -736,12 +771,50 @@ function rules_condition_entity_has_field_assertions($element) {
 }
 
 /**
+ * Assert the selected entity type.
+ */
+function rules_condition_entity_is_of_type_assertions($element) {
+  if ($type = $element->settings['type']) {
+    return array('entity' => array('type' => $type));
+  }
+}
+
+/**
  * Returns the options list specified by the selected data property.
+ *
+ * @see rules_action_data_set_info_alter()
+ * @see rules_condition_data_is_info_alter()
  */
 function rules_data_selector_options_list(RulesAbstractPlugin $element) {
   // The possible values of the "value" parameter are those of the data param.
   if (isset($element->settings['data:select']) && $wrapper = $element->applyDataSelector($element->settings['data:select'])) {
-    return $wrapper->optionsList();
+    return $wrapper->optionsList($element instanceof RulesActionInterface ? 'edit' : 'view');
+  }
+}
+
+/**
+ * Returns the options list for choosing a property of an entity type.
+ */
+function rules_action_entity_query_property_options_list(RulesAbstractPlugin $element) {
+  $element->settings += array('type' => NULL);
+  if ($element->settings['type']) {
+    $properties = entity_get_all_property_info($element->settings['type']);
+    return rules_extract_property($properties, 'label');
+  }
+}
+
+/**
+ * Returns the options list specified for the choosen property.
+ */
+function rules_action_entity_query_value_options_list(RulesAbstractPlugin $element) {
+  // Get the possible values for the selected property.
+  $element->settings += array('type' => NULL, 'property' => NULL);
+  if ($element->settings['type'] && $element->settings['property']) {
+    $wrapper = entity_metadata_wrapper($element->settings['type']);
+
+    if (isset($wrapper->{$element->settings['property']}) && $property = $wrapper->{$element->settings['property']}) {
+      return $property->optionsList('view');
+    }
   }
 }
 

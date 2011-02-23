@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_core.rules.inc,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
+// $Id: rules_core.rules.inc,v 1.1.2.6 2011/02/16 17:21:47 fago Exp $
 
 /**
  * @file Rules core integration providing data types and conditions and
@@ -75,33 +75,60 @@ function rules_rules_core_data_info() {
    'list' => array(
       'label' => t('list'),
       'wrap' => TRUE,
+      'group' => t('List'),
     ),
    'list<text>' => array(
       'label' => t('list of text'),
       'ui class' => 'RulesDataUIListText',
       'wrap' => TRUE,
+      'group' => t('List'),
     ),
    'list<integer>' => array(
       'label' => t('list of integer'),
       'ui class' => 'RulesDataUIListInteger',
       'wrap' => TRUE,
+      'group' => t('List'),
     ),
    'entity' => array(
       'label' => t('any entity'),
       'group' => t('Entity'),
+      'is wrapped' => TRUE,
     ),
   );
   foreach (entity_get_info() as $type => $info) {
     if (!empty($info['label'])) {
       $return[$type] = array(
-        'label' => $info['label'],
+        'label' => strtolower($info['label'][0]) . substr($info['label'], 1),
         'parent' => 'entity',
         'wrap' => TRUE,
         'group' => t('Entity'),
       );
     }
   }
+  $return['taxonomy_vocabulary']['wrapper class'] = 'RulesTaxonomyVocabularyWrapper';
   return $return;
+}
+
+/**
+ * Implements hook_rules_data_info_alter() on behalf of the pseudo rules_core module.
+ *
+ * Makes sure there is a list<type> data type for each type registered.
+ *
+ * @see rules_rules_data_info_alter()
+ */
+function rules_rules_core_data_info_alter(&$data_info) {
+  foreach ($data_info as $type => $info) {
+    if (!entity_property_list_extract_type($type)) {
+      $list_type = "list<$type>";
+      if (!isset($data_info[$list_type])) {
+        $data_info[$list_type] = array(
+          'label' => t('list of @type_label items', array('@type_label' => $info['label'])),
+          'wrap' => TRUE,
+          'group' => t('List'),
+        );
+      }
+    }
+  }
 }
 
 /**
@@ -203,6 +230,15 @@ function rules_element_invoke_component_operations(RulesPlugin $element) {
     'href' => RulesPluginUI::path($info['#config_name']),
   );
   return $defaults;
+}
+
+/**
+ * Implements the features export callback of the RulesPluginFeaturesIntegrationInterace.
+ */
+function rules_element_invoke_component_features_export(&$export, &$pipe, $module_name = '', $element) {
+  // Add the used component to the pipe.
+  $info = $element->info();
+  $pipe['rules_config'][] = $info['#config_name'];
 }
 
 /**

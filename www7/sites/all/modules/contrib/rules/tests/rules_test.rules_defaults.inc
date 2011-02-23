@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_test.rules_defaults.inc,v 1.1.2.1 2010/12/16 09:30:44 fago Exp $
+// $Id: rules_test.rules_defaults.inc,v 1.1.2.4 2011/01/13 18:06:48 fago Exp $
 
 /**
  * @file Includes any rules integration provided by the module.
@@ -19,5 +19,57 @@ function rules_test_default_rules_configuration() {
        ->action('drupal_message', array('message' => 'A node has been updated.'));
 
   $configs['rules_test_default_1'] = $rule;
+
+  $action_set = rules_action_set(array('node' => array('type' => 'node', 'label' => 'Content')));
+  $action_set->action('node_publish');
+  $configs['rules_test_action_set'] = $action_set;
+
+  // Test providing a rule using an export.
+  $configs['rules_export_test'] = rules_import(_rules_export_get_test_export());
+
   return $configs;
+}
+
+/**
+ * Defines the export of rule for testing import/export.
+ */
+function _rules_export_get_test_export() {
+  return '{ "rules_export_test" : {
+    "LABEL" : "Test import rule2",
+    "PLUGIN" : "reaction rule",
+    "WEIGHT" : "-1",
+    "ACTIVE" : false,
+    "REQUIRES" : [ "rules", "comment" ],
+    "ON" : [ "comment_insert" ],
+    "IF" : [
+      { "OR" : [
+          { "NOT node_is_sticky" : { "node" : [ "comment:node" ] } },
+          { "node_is_of_type" : {
+              "node" : [ "comment:node" ],
+              "type" : { "value" : { "page" : "page" } }
+            }
+          }
+        ]
+      }
+    ],
+    "DO" : [
+      { "data_set" : {
+          "data" : [ "comment:node:created" ],
+          "value" : { "select" : "site:current-date", "date_offset" : { "value" : -604800 } }
+        }
+      },
+      { "node_make_sticky" : { "node" : [ "comment:node" ] } },
+      { "variable_add" : {
+          "USING" : { "type" : "token", "value" : "error" },
+          "PROVIDE" : { "variable_added" : { "level" : "Error level" } }
+        }
+      },
+      { "drupal_message" : {
+          "message" : "fein, [comment:node:title] has been made sticky!",
+          "type" : [ "level" ]
+        }
+      }
+    ]
+  }
+}';
 }

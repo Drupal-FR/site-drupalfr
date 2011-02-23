@@ -1,5 +1,5 @@
 <?php
-// $Id: data.eval.inc,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
+// $Id: data.eval.inc,v 1.1.2.8 2011/02/21 09:00:39 fago Exp $
 
 /**
  * @file
@@ -12,21 +12,29 @@
 /**
  * Action: Modify data.
  */
-function rules_action_data_set($data, $value, $settings, $state, $element) {
-  $wrapper = $state->currentArguments['data'];
-  try {
-    // Update the value first then save changes, if possible.
-    $wrapper->set($value);
+function rules_action_data_set($wrapper, $value, $settings, $state, $element) {
+  if ($wrapper instanceof EntityMetadataWrapper) {
+    try {
+      // Update the value first then save changes, if possible.
+      $wrapper->set($value);
+    }
+    catch (EntityMetadataWrapperException $e) {
+      throw new RulesException('Unable to modify data "@selector": ' . $e->getMessage(), array('@selector' => $settings['data:select']));
+    }
+    // Save changes if a property of a variable has been changed.
+    if (strpos($element->settings['data:select'], ':') !== FALSE) {
+      $info = $wrapper->info();
+      // We always have to save the changes in the parent entity. E.g. when the
+      // node author is changed, we don't want to save the author but the node.
+      $state->saveChanges(implode(':', explode(':', $settings['data:select'], -1)), $info['parent']);
+    }
   }
-  catch (EntityMetadataWrapperException $e) {
-    throw new RulesException('Unable to modify data "@selector": ' . $e->getMessage(), array('@selector' => $settings['data:select']));
-  }
-  // Save changes if a property of a variable has been changed.
-  if (strpos($element->settings['data:select'], ':') !== FALSE) {
-    $info = $wrapper->info();
-    // We always have to save the changes in the parent entity. E.g. when the
-    // node author is changed, we don't want to save the author but the node.
-    $state->saveChanges(implode(':', explode(':', $settings['data:select'], -1)), $info['parent']);
+  else {
+    // A not wrapped variable (e.g. a number) is being set. As we don't have
+    // a reference on the variable, we need to directly update the variable in
+    // the state.
+    $var_name = $element->settings['data:select'];
+    $state->variables[$var_name] = $value;
   }
 }
 
@@ -95,8 +103,18 @@ function rules_action_entity_query($type, $property, $value, $limit) {
  * Info alteration callback for the entity query action.
  */
 function rules_action_entity_query_info_alter(&$element_info, RulesAbstractPlugin $element) {
-  $element->settings += array('type' => NULL);
-  $element_info['parameter']['value']['type'] = $element->settings['type'];
+  $element->settings += array('type' => NULL, 'property' => NULL);
+  if ($element->settings['type']) {
+    $element_info['parameter']['property']['options list'] = 'rules_action_entity_query_property_options_list';
+
+    if ($element->settings['property']) {
+      $wrapper = entity_metadata_wrapper($element->settings['type']);
+      if (isset($wrapper->{$element->settings['property']}) && $property = $wrapper->{$element->settings['property']}) {
+        $element_info['parameter']['value']['type'] = $property->type();
+        $element_info['parameter']['value']['options list']  = $property->optionsList() ? 'rules_action_entity_query_value_options_list' : FALSE;
+      }
+    }
+  }
   $element_info['provides']['entity_fetched']['type'] = 'list<' . $element->settings['type'] . '>';
 }
 
@@ -146,21 +164,19 @@ function rules_action_entity_create_info_alter(&$element_info, RulesAbstractPlug
 /**
  * Action: Save entities.
  */
-function rules_action_entity_save($data, $immediate = FALSE, $settings, $state, $element) {
-  $wrapper = $state->currentArguments['data'];
+function rules_action_entity_save($wrapper, $immediate = FALSE, $settings, $state, $element) {
   $state->saveChanges($settings['data:select'], $wrapper, $immediate);
 }
 
 /**
  * Action: Delete entities.
  */
-function rules_action_entity_delete($data, $settings, $state, $element) {
-  $wrapper = $state->currentArguments['data'];
+function rules_action_entity_delete($wrapper, $settings, $state, $element) {
   $wrapper->delete();
 }
 
 /**
- * Action: Add a list item
+ * Action: Add a list item.
  */
 function rules_action_data_list_add($list, $item, $pos = 'end', $settings) {
   switch ($pos) {
@@ -176,7 +192,7 @@ function rules_action_data_list_add($list, $item, $pos = 'end', $settings) {
 }
 
 /**
- * Action: Remove a list item
+ * Action: Remove a list item.
  */
 function rules_action_data_list_remove($list, $item) {
   foreach (array_keys($list, $item) as $key) {
@@ -264,7 +280,7 @@ function rules_action_data_create_array($values = array(), $type) {
 }
 
 /**
- * Condition: Compare data
+ * Condition: Compare data.
  */
 function rules_condition_data_is($data, $op, $value) {
   switch ($op) {
@@ -295,17 +311,29 @@ function rules_condition_data_is_info_alter(&$element_info, RulesAbstractPlugin 
 }
 
 /**
- * Condition: Entity is new
+ * Condition: Data value is empty.
  */
-function rules_condition_entity_is_new($entity, $settings, $state, $element) {
-  $wrapper = $state->currentArguments['entity'];
+function rules_condition_data_is_empty($data) {
+  return empty($data);
+}
+
+/**
+ * Condition: Entity is new.
+ */
+function rules_condition_entity_is_new($wrapper, $settings, $state, $element) {
   return !$wrapper->getIdentifier() || !empty($entity->is_new);
 }
 
 /**
  * Condition: Entity has field.
  */
-function rules_condition_entity_has_field($entity, $field_name, $settings, $state) {
-  $wrapper = $state->currentArguments['entity'];
+function rules_condition_entity_has_field($wrapper, $field_name, $settings, $state) {
   return isset($wrapper->$field_name) || isset($entity->$field_name);
+}
+
+/**
+ * Condition: Entity is of type.
+ */
+function rules_condition_entity_is_of_type($wrapper, $type) {
+  return $wrapper->type() == $type;
 }

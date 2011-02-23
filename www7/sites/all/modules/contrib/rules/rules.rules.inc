@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.rules.inc,v 1.1.2.1 2010/12/16 09:30:43 fago Exp $
+// $Id: rules.rules.inc,v 1.1.2.2 2011/02/11 14:52:30 fago Exp $
 
 /**
  * @file Includes any rules integration provided by the module.
@@ -84,6 +84,14 @@ function rules_rules_event_info() {
  */
 function rules_rules_data_info() {
   return _rules_rules_collect_items('data_info');
+}
+
+/**
+ * Implements hook_rules_data_info_alter().
+ */
+function rules_rules_data_info_alter(&$items) {
+  // For now just invoke the rules core implementation manually.
+  rules_rules_core_data_info_alter($items);
 }
 
 /**

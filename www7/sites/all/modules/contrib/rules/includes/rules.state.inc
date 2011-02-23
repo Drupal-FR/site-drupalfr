@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.state.inc,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
+// $Id: rules.state.inc,v 1.1.2.11 2011/02/16 17:22:33 fago Exp $
 
 /**
  * @file Contains the state and data related stuff.
@@ -61,7 +61,7 @@ class RulesState {
       'type' => 'unknown',
       'handler' => FALSE,
     );
-    if (isset($data)) {
+    if (empty($this->info[$name]['handler'])) {
       $this->variables[$name] = rules_wrap_data($data, $this->info[$name]);
     }
   }
@@ -116,7 +116,7 @@ class RulesState {
    * Returns whether the given wrapper is savable.
    */
   public function isSavable($wrapper) {
-    return entity_type_supports($wrapper->type(), 'save');
+    return ($wrapper instanceof EntityDrupalWrapper && entity_type_supports($wrapper->type(), 'save')) || $wrapper instanceof RulesDataWrapperSavableInterface;
   }
 
   /**
@@ -141,9 +141,9 @@ class RulesState {
    *   The variable or a EntityMetadataWrapper containing the variable.
    */
   public function &get($name) {
-    if (!isset($this->variables[$name])) {
+    if (!array_key_exists($name, $this->variables)) {
       // If there is handler to load the variable, do it now.
-      if (!array_key_exists($name, $this->variables) && !empty($this->info[$name]['handler'])) {
+      if (!empty($this->info[$name]['handler'])) {
         $data = call_user_func($this->info[$name]['handler'], rules_unwrap_data($this->variables), $name, $this->info[$name]);
         $this->variables[$name] = rules_wrap_data($data, $this->info[$name]);
         $this->info[$name]['handler'] = FALSE;
@@ -260,8 +260,7 @@ class RulesState {
    * @throws RulesException
    *   Throws a RulesException in case the selector cannot be applied.
    * @return EntityMetadataWrapper
-   *   The wrapper for the given selector or FALSE if the selector couldn't be
-   *   applied.
+   *   The wrapper for the given selector.
    */
   public function applyDataSelector($selector) {
     $parts = explode(':', str_replace('-', '_', $selector), 2);
@@ -274,7 +273,12 @@ class RulesState {
     }
     try {
       foreach (explode(':', $parts[1]) as $name) {
-        $wrapper = $wrapper->get($name);
+        if ($wrapper instanceof EntityListWrapper || $wrapper instanceof EntityStructureWrapper) {
+          $wrapper = $wrapper->get($name);
+        }
+        else {
+          throw new RulesException('Unable to apply data selector %selector. The specified variable is not a list or a structure: %wrapper.', array('%selector' => $selector, '%wrapper' => $wrapper));
+        }
       }
     }
     catch (EntityMetadataWrapperException $e) {
@@ -427,22 +431,29 @@ class RulesData  {
 
       if (self::typesMatch($info, $param_info)) {
         $matches[$prefix . $name] = $info;
+        if (!is_array($source) && $source instanceof EntityListWrapper) {
+          // Add some more possible list items.
+          for ($i = 1; $i < 4; $i++) {
+            $matches[$prefix . $i] = $info;
+          }
+        }
       }
       // Recurse later on to get an improved ordering of the results.
-      if ($wrapper instanceof EntityStructureWrapper) {
+      if ($wrapper instanceof EntityStructureWrapper || $wrapper instanceof EntityListWrapper) {
         $recurse[$prefix . $name] = $wrapper;
-      }
-    }
-    if ($recursions > 0 && !empty($recurse)) {
-      $recursions--;
-      foreach ($recurse as $name => $wrapper) {
-        $matches += self::matchingDataSelector($wrapper, $param_info, $name . ':', $recursions, $suggestions);
-      }
-    }
-    elseif (!empty($recurse) && $suggestions) {
-      // We may not recurse any more, but indicate the possibility to recurse.
-      foreach ($recurse as $name => $wrapper) {
-        $matches[$name . ':'] = $wrapper->info();
+        if ($recursions > 0) {
+          $matches += self::matchingDataSelector($wrapper, $param_info, $prefix . $name . ':', $recursions - 1, $suggestions);
+        }
+        elseif ($suggestions) {
+          // We may not recurse any more, but indicate the possibility to recurse.
+          $matches[$prefix . $name . ':'] = $wrapper->info();
+          if (!is_array($source) && $source instanceof EntityListWrapper) {
+            // Add some more possible list items.
+            for ($i = 1; $i < 4; $i++) {
+              $matches[$prefix . $i . ':'] = $wrapper->info();
+            }
+          }
+        }
       }
     }
     return $matches;
@@ -460,6 +471,15 @@ class RulesData  {
       $selector = str_replace('-', '_', $selector);
       // For now only support assertions for variables
       if (strpos($selector, ':') === FALSE && isset($var_info[$selector])) {
+        // Allow conditions to specialize data types via assertions.
+        if (isset($data['type'])) {
+          // Make sure the data type is more special than the current one.
+          if (RulesData::typesMatch($data, $var_info[$selector])) {
+            $var_info[$selector]['type'] = $data['type'];
+          }
+          unset($data['type']);
+        }
+
         $var_info[$selector]['rules assertion']['#info'] = isset($var_info[$selector]['rules assertion']['#info']) ? rules_update_array($var_info[$selector]['rules assertion']['#info'], $data) : $data;
         // Add in a callback that the entity metadata wrapper pick up for
         // altering the property info, such that we can add in the assertions.
@@ -536,3 +556,147 @@ class RulesData  {
   }
 }
 
+/**
+ * A wrapper class similar to the EntityDrupalWrapper, but for non-entities.
+ *
+ * This class is intended to serve as base for a custom wrapper classes of
+ * identifiable data types, which are non-entities. By extending this class only
+ * the extractIdentifier() and load() methods have to be defined.
+ * In order to make the data type savable implement the
+ * RulesDataWrapperSavableInterface.
+ *
+ * That way it is possible for non-entity data types to be work with Rules, i.e.
+ * one can implement a 'ui class' with a direct input form returning the
+ * identifier of the data. However, instead of that it is suggested to implement
+ * an entity type, such that the same is achieved via general API functions like
+ * entity_load().
+ */
+abstract class RulesIdentifiableDataWrapper extends EntityStructureWrapper {
+
+  /**
+   * Contains the id.
+   */
+  protected $id = FALSE;
+
+  /**
+   * Construct a new wrapper object.
+   *
+   * @param $type
+   *   The type of the passed data.
+   * @param $data
+   *   Optional. The data to wrap or its identifier.
+   * @param $info
+   *   Optional. Used internally to pass info about properties down the tree.
+   */
+  public function __construct($type, $data = NULL, $info = array()) {
+    parent::__construct($type, $data, $info);
+    $this->setData($data);
+  }
+
+  /**
+   * Sets the data internally accepting both the data id and object.
+   */
+  protected function setData($data) {
+    if (isset($data) && $data !== FALSE && !is_object($data)) {
+      $this->id = $data;
+      $this->data = FALSE;
+    }
+    elseif (is_object($data)) {
+      // We got the data object passed.
+      $this->data = $data;
+      $id = $this->extractIdentifier($data);
+      $this->id = isset($id) ? $id : FALSE;
+    }
+  }
+
+  /**
+   * Returns the identifier of the wrapped data.
+   */
+  public function getIdentifier() {
+    return $this->dataAvailable() && $this->value() ? $this->id : NULL;
+  }
+
+  /**
+   * Overridden.
+   */
+  public function value(array $options = array()) {
+    $this->setData(parent::value());
+    if (!$this->data && !empty($this->id)) {
+      // Lazy load the data if necessary.
+      $this->data = $this->load($this->id);
+      if (!$this->data) {
+        throw new EntityMetadataWrapperException('Unable to load the ' . check_plain($this->type) . ' with the id ' . check_plain($this->id) . '.');
+      }
+    }
+    return $this->data;
+  }
+
+  /**
+   * Overridden to support setting the data by either the object or the id.
+   */
+  public function set($value) {
+    if (!$this->validate($value)) {
+      throw new EntityMetadataWrapperException('Invalid data value given. Be sure it matches the required data type and format.');
+    }
+    // As custom wrapper classes can only appear for Rules variables, but not
+    // as properties we don't have to care about updating the parent.
+    $this->clear();
+    $this->setData($value);
+    return $this;
+  }
+
+  /**
+   * Overridden.
+   */
+  public function clear() {
+    $this->id = NULL;
+    parent::clear();
+  }
+
+  /**
+   * Prepare for serializiation.
+   */
+  public function __sleep() {
+    $vars = parent::__sleep();
+    // Don't serialize the loaded data, except for the case the data is not
+    // saved yet.
+    if (!empty($this->id)) {
+      unset($vars['data']);
+    }
+    return $vars;
+  }
+
+  public function __wakeup() {
+    if ($this->id !== FALSE) {
+      // Make sure data is set, so the data will be loaded when needed.
+      $this->data = FALSE;
+    }
+  }
+
+  /**
+   * Extract the identifier of the given data object.
+   *
+   * @return
+   *   The extracted identifier.
+   */
+  abstract protected function extractIdentifier($data);
+
+  /**
+   * Load a data object given an identifier.
+   *
+   * @return
+   *   The loaded data object, or FALSE if loading failed.
+   */
+  abstract protected function load($id);
+}
+
+/**
+ * Interface that allows custom wrapper classes to declare that they are savable.
+ */
+interface RulesDataWrapperSavableInterface {
+
+  /**
+   * Save the currently wrapped data.
+   */
+  public function save();
+}

@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.module,v 1.1.2.6 2011/01/05 11:38:13 fago Exp $
+// $Id: rules.module,v 1.1.2.20 2011/02/21 09:00:16 fago Exp $
 
 /**
  * @file Rules engine module
@@ -25,6 +25,19 @@ function rules_autoload($class) {
 function rules_init() {
   module_load_include('inc', 'rules', 'modules/events');
   rules_invoke_event('init');
+}
+
+/**
+ * Returns an instance of the rules UI controller, which eases re-using the Rules UI.
+ *
+ * @return RulesUIController
+ */
+function rules_ui() {
+  $static = drupal_static(__FUNCTION__);
+  if (!isset($static)) {
+    $static = new RulesUIController();
+  }
+  return $static;
 }
 
 /**
@@ -59,8 +72,19 @@ function rules_condition($name, $settings = array()) {
  * @param $variables
  *   The array of variables to setup in the evaluation state, making them
  *   available for the configuraion elements. Values for the variables need to
- *   be passed as argument when the rule is executed.
- *   Only instances with no variables can be embedded in configurations.
+ *   be passed as argument when the rule is executed. Only Rule instances with
+ *   no variables can be embedded in other configurations, e.g. rule sets.
+ *   The array has to be keyed by variable name and contain a sub-array for each
+ *   variable that has the same structure as the arrays used for describing
+ *   parameters of an action, see hook_rules_action_info(). However, in addition
+ *   to that the following keys are supported:
+ *    - parameter: (optional) If set to FALSE, no parameter for the variable
+ *      is created - thus no argument needs to be passed to the rule for the
+ *      variable upon execution. As a consequence no value will be set
+ *      initially, but the "Set data value" action may be used to do so. This is
+ *      in particular useful for defining variables which can be provided to the
+ *      caller (see e.g. rules_action_set()) but need not be passed in as
+ *      parameter.
  * @return Rule
  */
 function rule($variables = NULL) {
@@ -262,6 +286,18 @@ function rules_clear_cache($immediate = FALSE) {
   }
 }
 
+/**
+ * Imports the given export and returns the imported configuration.
+ *
+ * @param $export
+ *   A serialized string in JSON format as produced by the RulesPlugin::export()
+ *   method, or the PHP export as usual PHP array.
+ * @return RulesPlugin
+ */
+function rules_import($export, &$error_msg = '') {
+  return entity_get_controller('rules_config')->import($export, $error_msg);
+}
+
 
 /**
  * Wraps the given data.
@@ -297,7 +333,14 @@ function &rules_wrap_data($data = NULL, $info, $force = FALSE) {
   // By default we do not wrap the data, except for completely unknown types.
   if (!empty($cache['data_info'][$info['type']]['wrap']) || $list_item_type || $force || empty($cache['data_info'][$info['type']])) {
     unset($info['handler']);
-    $wrapper = entity_metadata_wrapper($info['type'], $data, $info);
+    // Allow data types to define custom wrapper classes.
+    if (!empty($cache['data_info'][$info['type']]['wrapper class'])) {
+      $class = $cache['data_info'][$info['type']]['wrapper class'];
+      $wrapper = new $class($info['type'], $data, $info);
+    }
+    else {
+      $wrapper = entity_metadata_wrapper($info['type'], $data, $info);
+    }
     return $wrapper;
   }
   return $data;
@@ -314,11 +357,24 @@ function &rules_wrap_data($data = NULL, $info, $force = FALSE) {
  *   An array containing unwrapped or passed through data.
  */
 function rules_unwrap_data(array $data, $info = array()) {
+  $cache = rules_get_cache();
   foreach ($data as $key => $entry) {
-    // If it's a wrapper, unwrap.
+    // If it's a wrapper, unwrap unless specified otherwise.
     if ($entry instanceof EntityMetadataWrapper) {
+      if (isset($info[$key]) && (!empty($info[$key]['wrapped']) || (is_string($info[$key]['type']) && !empty($cache['data_info'][$info[$key]['type']]['is wrapped'])))) {
+        continue;
+      }
       $options = (isset($info[$key]) ? $info[$key] : array()) + array('decode' => empty($info[$key]['sanitize']));
-      $data[$key] = $entry->value($options);
+      try {
+        $data[$key] = $entry->value($options);
+      }
+      catch (Exception $e) {
+        // Getting the data value failed.
+        throw new RulesException($e->getMessage());
+      }
+      if (!isset($data[$key]) && empty($info[$key]['allow null'])) {
+        throw new RulesException('The variable or parameter %name is empty.', array('%name' => $key));
+      }
     }
   }
   return $data;
@@ -353,6 +409,11 @@ function rules_rules_plugin_info() {
         'RulesPluginImplInterface' => array(
           'class' => 'RulesAbstractPluginDefaults',
         ),
+        'RulesPluginFeaturesIntegrationInterace' => array(
+          'methods' => array(
+            'features_export' => 'rules_features_abstract_default_features_export',
+          ),
+        ),
         'RulesPluginUIInterface' => array(
           'class' => 'RulesAbstractPluginUI',
         ),
@@ -364,6 +425,11 @@ function rules_rules_plugin_info() {
       'extenders' => array (
         'RulesPluginImplInterface' => array(
           'class' => 'RulesAbstractPluginDefaults',
+        ),
+        'RulesPluginFeaturesIntegrationInterace' => array(
+          'methods' => array(
+            'features_export' => 'rules_features_abstract_default_features_export',
+          ),
         ),
         'RulesPluginUIInterface' => array(
           'class' => 'RulesAbstractPluginUI',
@@ -413,6 +479,7 @@ function rules_rules_plugin_info() {
           'class' => 'RulesRuleUI',
         ),
       ),
+      'import keys' => array('IF', 'DO'),
     ),
     'loop' => array(
       'class' => 'RulesLoop',
@@ -422,6 +489,7 @@ function rules_rules_plugin_info() {
           'class' => 'RulesLoopUI',
         ),
       ),
+      'import keys' => array('LOOP OVER'),
     ),
     'reaction rule' => array(
       'class' => 'RulesReactionRule',
@@ -473,6 +541,7 @@ function rules_entity_info() {
         'default hook' => 'default_rules_configuration',
       ),
       'access callback' => 'rules_config_access',
+      'features controller class' => 'RulesFeaturesController',
     ),
   );
 }
@@ -854,7 +923,8 @@ function rules_permission() {
 }
 
 /**
- * Callback for loading rules configuration elements.
+ * Menu callback for loading rules configuration elements.
+ * @see RulesUIController::config_menu()
  */
 function rules_element_load($element_id, $config_name) {
   $config = rules_config_load($config_name);
@@ -862,7 +932,8 @@ function rules_element_load($element_id, $config_name) {
 }
 
 /**
- * Callback for getting the title as configured.
+ * Menu callback for getting the title as configured.
+ * @see RulesUIController::config_menu()
  */
 function rules_get_title($text, $element) {
   if ($element instanceof RulesPlugin) {
@@ -877,13 +948,30 @@ function rules_get_title($text, $element) {
 }
 
 /**
+ * Menu callback for getting the title for the add element page.
+ *
+ * Uses a work-a-round for accessing the plugin name.
+ * @see RulesUIController::config_menu()
+ */
+function rules_menu_add_element_title($array) {
+  $plugin_name = arg($array[0]);
+  $cache = rules_get_cache();
+  if (isset($cache['plugin_info'][$plugin_name]['class'])) {
+    $info = $cache['plugin_info'][$plugin_name] + array('label' => $plugin_name);
+    $label = drupal_strtolower(drupal_substr($info['label'], 0, 1)) . drupal_substr($info['label'], 1);
+    return t('Add a new !plugin', array('!plugin' => $label));
+  }
+}
+
+/**
  * Implements hook_page_build() to add the rules debug log to the page bottom.
  */
 function rules_page_build(&$page) {
   // Invoke a the page redirect, in case the action has been executed.
+  // @see rules_action_drupal_goto()
   if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
-    // $_REQUEST['destination'] has been set, drupal_goto() will use that.
-    drupal_goto($GLOBALS['_rules_action_drupal_goto_do']);
+    list($url, $force) = $GLOBALS['_rules_action_drupal_goto_do'];
+    drupal_goto($url);
   }
 
   if (isset($_SESSION['rules_debug'])) {
@@ -892,28 +980,56 @@ function rules_page_build(&$page) {
       $page[$region]['rules_debug'][] = array(
         '#markup' => $log,
       );
-      $page[$region]['rules_debug']['#theme_wrappers'][] = 'rules_log';
+      $page[$region]['rules_debug']['#theme_wrappers'] = array('rules_log');
     }
     unset($_SESSION['rules_debug']);
   }
-  if (variable_get('rules_debug', FALSE) || (user_access('administer rules') && RulesLog::logger()->hasErrors())) {
+  if (rules_show_debug_output()) {
     $logger = RulesLog::logger();
     $region = variable_get('rules_debug_region', 'help');
     if ($log = $logger->render()) {
       $page[$region]['rules_debug'][] = array(
         '#markup' => $log,
       );
-      $page[$region]['rules_debug']['#theme_wrappers'][] = 'rules_log';
+      $page[$region]['rules_debug']['#theme_wrappers'] = array('rules_log');
       $logger->clear();
     }
   }
 }
 
 /**
+ * Implements hook_drupal_goto_alter().
+ *
+ * @see rules_action_drupal_goto()
+ */
+function rules_drupal_goto_alter(&$path, &$options, &$http_response_code) {
+  // Invoke a the page redirect, in case the action has been executed.
+  if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
+    list($url, $force) = $GLOBALS['_rules_action_drupal_goto_do'];
+
+    if ($force || !isset($_GET['destination'])) {
+      $url = drupal_parse_url($url);
+      $path = $url['path'];
+      $options['query'] = $url['query'];
+      $options['fragment'] = $url['fragment'];
+      $http_response_code = 302;
+    }
+  }
+}
+
+/**
+ * Returns whether the debug log should be shown.
+ */
+function rules_show_debug_output() {
+  // For performance avoid unnecessary auto-loading of the RulesLog class.
+  return variable_get('rules_debug', FALSE) || (class_exists('RulesLog', FALSE) && RulesLog::logger()->hasErrors() && user_access('administer rules'));
+}
+
+/**
  * Implements hook_exit().
  */
 function rules_exit() {
-  if (variable_get('rules_debug', FALSE) || (user_access('administer rules') && RulesLog::logger()->hasErrors())) {
+  if (rules_show_debug_output()) {
     if ($log = RulesLog::logger()->render()) {
       // Keep the log in the session so we can show it on the next page.
       $_SESSION['rules_debug'][] = $log;

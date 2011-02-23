@@ -1,4 +1,4 @@
-// $Id: rules.autocomplete.js,v 1.1.2.1 2010/12/16 09:30:44 fago Exp $
+// $Id: rules.autocomplete.js,v 1.1.2.2 2011/02/11 14:52:36 fago Exp $
 
 // Registers the rules namespace.
 Drupal.rules = Drupal.rules || {};
@@ -171,8 +171,9 @@ Drupal.rules = Drupal.rules || {};
    * Toogle the autcomplete window.
    */
   Drupal.rules.autocomplete.prototype.toggle = function(open) {
-    if (this.jqObject.autocomplete("widget").is(":visible") && open !== undefined) {
+    if (this.jqObject.autocomplete("widget").is(":visible")) {
       this.close();
+      this.focusOpens = true;
     }
     else {
       var groups = this.jqObject.val().split(":");

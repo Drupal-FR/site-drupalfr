@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_test.rules.inc,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
+// $Id: rules_test.rules.inc,v 1.1.2.5 2011/02/16 17:22:34 fago Exp $
 
 /**
  * @file Includes any rules integration provided by the module.
@@ -113,28 +113,6 @@ function rules_test_rules_action_info() {
       'group' => t('Node'),
       'access callback' => 'rules_node_integration_access',
     ),
-    'node_create' => array(
-      'label' => t('Create new content'),
-      'parameter' => array(
-        'author' => array('type' => 'user', 'label' => t('User, who is set as author')),
-        'title' => array(
-          'type' => 'text',
-          'label' => t('Title'),
-          'description' => t('The title of the newly created content.'),
-        ),
-      ),
-      'provides' => array(
-        'node_added' => array(
-          'type' => 'node',
-          'label' => t('New content'),
-          'save' => TRUE,
-          'label callback' => 'rules_action_add_node_variable_label',
-        ),
-      ),
-      'group' => t('Node'),
-      'callbacks' => array('execute' => 'rules_action_node_create'),
-      'access callback' => 'rules_node_integration_access',
-    ),
     // An action for testing named parameters.
     'rules_action_node_set_title' => array(
       'label' => t('Content'),
@@ -146,6 +124,28 @@ function rules_test_rules_action_info() {
       'group' => t('Node'),
       'access callback' => 'rules_node_integration_access',
     ),
+    // Tests automatic saving with a non-entity data type.
+    'test_type_save' => array(
+      'base' => 'rules_test_type_save',
+      'label' => t('Save test type'),
+      'parameter' => array(
+        'node' => array('type' => 'rules_test_type', 'label' => t('Test content'), 'save' => TRUE),
+      ),
+      'group' => t('Node'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_rules_data_info().
+ */
+function rules_test_rules_data_info() {
+  return array(
+    'rules_test_type' => array(
+      'label' => t('test type'),
+      'wrap' => TRUE,
+      'wrapper class' => 'RulesTestTypeWrapper',
+    ),
   );
 }
 
@@ -154,4 +154,24 @@ function rules_test_rules_action_info() {
  */
 function rules_test_rules_data_info_alter(&$data_info) {
   $data_info['log_entry']['creation callback'] = 'rules_action_data_create_array';
+}
+
+/**
+ * The custom wrapper class for the rules test type.
+ *
+ * For testing we internally just make use of nodes.
+ */
+class RulesTestTypeWrapper extends RulesIdentifiableDataWrapper implements RulesDataWrapperSavableInterface {
+
+  protected function extractIdentifier($data) {
+    return $data->nid;
+  }
+
+  protected function load($id) {
+    return node_load($id);
+  }
+
+  public function save() {
+    node_save($this->value());
+  }
 }

@@ -1,5 +1,5 @@
 <?php
-// $Id: ui.core.inc,v 1.1.2.5 2011/01/05 11:21:40 fago Exp $
+// $Id: ui.core.inc,v 1.1.2.17 2011/02/15 10:43:49 fago Exp $
 
 /**
  * @file Contains core ui functions.
@@ -382,21 +382,23 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
     );
     $form['settings']['label'] = array(
       '#type' => 'textfield',
-      '#title' => 'Label',
+      '#title' => t('Name'),
       '#default_value' => $this->element->label(),
       '#required' => TRUE,
       '#weight' => -5,
-      '#description' => t('The human-readable name.'),
     );
-    if (!empty($this->element->module) && !empty($this->element->name) && strpos($this->element->name, $this->element->module . '_') === 0) {
-      // Remove the module prefix from the machine name.
+    if (!empty($this->element->module) && !empty($this->element->name) && $this->element->module == 'rules' && strpos($this->element->name, 'rules_') === 0) {
+      // Remove the Rules module prefix from the machine name.
       $machine_name = substr($this->element->name, strlen($this->element->module) + 1);
+    }
+    else {
+      $machine_name = $this->element->name;
     }
     $form['settings']['name'] = array(
       '#type' => 'machine_name',
       '#default_value' => isset($machine_name) ? $machine_name : '',
       '#maxlength' => 32,
-      '#disabled' => entity_has_status('rules_config', $this->element, ENTITY_IN_CODE),
+      '#disabled' => entity_has_status('rules_config', $this->element, ENTITY_IN_CODE) && !(isset($form_state['op']) && $form_state['op'] == 'clone'),
       '#machine_name' => array(
         'exists' => 'rules_config_load',
         'source' => array('settings', 'label'),
@@ -407,6 +409,7 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
 
     // Show a form for editing variables for components.
     if (($plugin_info = $this->element->pluginInfo()) && !empty($plugin_info['component'])) {
+      $description = $this->element->hasStatus(ENTITY_IN_CODE) ? t('Variables that are passed to the component when it is invoked. They can not be edited for configurations that are provided in code.') : t('Specify the variables to be passed to the component when it is invoked. For each variable you have to specify a certain data type, a label and a unique machine readable name containing only lowercase alphanumeric characters and underscores.');
       $form['settings']['vars'] = array(
         '#prefix' => '<div id="rules-component-variables">',
         '#suffix' => '</div>',
@@ -414,12 +417,16 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
         '#element_validate' => array('rules_ui_element_variable_form_validate'),
         '#theme' => 'rules_ui_variable_form',
         '#title' => t('Variables'),
-        '#description' => t('Specify the variables to be passed to the component when it is invoked. For each variable you have to specify a certain data type, a label and a unique machine readable name containing only lowercase alphanumeric characters and underscores.'),
+        '#description' => $description,
+        // Variables can not be edited on configurations in code.
+        '#disabled' => $this->element->hasStatus(ENTITY_IN_CODE),
       );
       $weight = 0;
       foreach ($this->element->componentVariables() as $name => $var_info) {
-        $form['settings']['vars']['items'][$name] = RulesPluginUI::getVariableForm($name, $var_info);
-        $form['settings']['vars']['items'][$name]['weight']['#default_value'] = $weight++;
+        if (!(isset($var_info['parameter']) && $var_info['parameter'] == FALSE)) {
+          $form['settings']['vars']['items'][$name] = RulesPluginUI::getVariableForm($name, $var_info);
+          $form['settings']['vars']['items'][$name]['weight']['#default_value'] = $weight++;
+        }
       }
       // Always add three empty forms.
       for ($i = 0; $i < 3; $i++) {
@@ -521,15 +528,19 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
     // Make sure the element has been processed.
     $this->element->processSettings();
 
+    $config_name = $this->element->root()->name;
     $content['label'] = array(
       '#type' => 'link',
       '#title' => $this->element->label(),
-      '#href' => RulesPluginUI::path($this->element->root()->name, 'edit', $this->element),
+      '#href' => $this->element->isRoot() ? RulesPluginUI::path($config_name) : RulesPluginUI::path($config_name, 'edit', $this->element),
       '#prefix' => '<div class="rules-element-label">',
-      // Put the elements below in a "description" div.
-      '#suffix' => '</div><div class="description">'
+      '#suffix' => '</div>'
     );
-    $content['parameter'] = array(
+    // Put the elements below in a "description" div.
+    $content['description'] = array(
+      '#prefix' => '<div class="description">',
+    );
+    $content['description']['parameter'] = array(
       '#caption' => t('Parameter'),
       '#theme' => 'rules_content_group',
     );
@@ -541,25 +552,26 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
         );
       }
       elseif (isset($this->element->settings[$name]) && (!isset($parameter['default value']) || $parameter['default value'] != $this->element->settings[$name])) {
-        $element = call_user_func(array($this->getDataTypeClass($parameter['type']), 'render'), $this->element->settings[$name]);
+        $method = empty($parameter['options list']) ? 'render' : 'renderOptionsLabel';
+        $element = call_user_func(array($this->getDataTypeClass($parameter['type']), $method), $this->element->settings[$name], $name, $parameter, $this->element);
       }
       // Only add parameters that are really configured / not default.
       if ($element) {
-        $content['parameter'][$name] = array(
+        $content['description']['parameter'][$name] = array(
           '#theme' => 'rules_parameter_configuration',
           '#info' => $parameter,
         ) + $element;
       }
     }
     foreach ($this->element->providesVariables() as $name => $var_info) {
-      $content['provides'][$name] = array(
+      $content['description']['provides'][$name] = array(
         '#theme' => 'rules_provides_variable_view',
         '#info' => $var_info,
         '#name' => $name,
       );
     }
-    if (!empty($content['provides'])) {
-      $content['provides'] += array(
+    if (!empty($content['description']['provides'])) {
+      $content['description']['provides'] += array(
         '#caption' => t('Provides variables'),
         '#theme' => 'rules_content_group',
       );
@@ -597,118 +609,12 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
    */
   public function help() {}
 
+
   /**
-   * Generates the render array for a overview configuration table for arbitrary
-   * rule configs that match the given conditions.
-   *
-   * Note: Make sure that you set RulesPluginUI::$basePath before using this
-   * method, otherwise paths, links, redirects etc. won't be correct.
-   *
-   * @param $conditions
-   *   An array of conditions as needed by rules_config_load_multiple().
-   * @param $options
-   *   An array with optional options. Known keys are:
-   *   - 'hide status op': If set to TRUE, enable/disable links are not added.
-   *   - 'show plugin: If set to FALSE, the plugin is not shown.
-   * @return Array
-   *   A renderable array.
+   * Deprecated by the controllers overviewTable() method.
    */
   public static function overviewTable($conditions = array(), $options = array()) {
-    $options += array(
-      'hide status op' => FALSE,
-      'show plugin' => TRUE,
-    );
-
-    $cache = rules_get_cache();
-    $configs = rules_config_load_multiple(FALSE, $conditions);
-    $rows = array();
-    $event_info = rules_fetch_data('event_info');
-
-    $num_cols = 1;
-    $scheduler_exists = module_exists('rules_scheduler');
-    foreach ($configs as $name => $config) {
-      $row = array();
-      $row[] = l($config->label(), RulesPluginUI::path($name));
-      // Add events if the configs are assigned to events.
-      if ($config instanceof RulesTriggerableInterface) {
-        $events = array();
-        foreach ($config->events() as $event_name) {
-          $events[] = $event_info[$event_name]['label'];
-        }
-        $row[] = implode(", ", $events);
-      }
-      if ($options['show plugin']) {
-        $plugin = $config->plugin();
-        $row[] = isset($cache['plugin_info'][$plugin]['label']) ? $cache['plugin_info'][$plugin]['label'] : $plugin;
-      }
-      // Add exportable status.
-      $row[] = array('data' => array(
-        '#theme' => 'entity_status',
-        '#status' => $config->status,
-      ));
-
-      $row[] = l(t('edit'), RulesPluginUI::path($name));
-
-      if (!$options['hide status op']) {
-        // Add either an enable or disable link.
-        $text = $config->active ? t('disable') : t('enable');
-        $link_path = RulesPluginUI::path($name, $config->active ? 'disable' : 'enable');
-        $row[] = l($text, $link_path, array('query' => drupal_get_destination()));
-      }
-      $row[] = l(t('clone'), RulesPluginUI::path($name, 'clone'), array('query' => drupal_get_destination()));
-
-      // Add execute link for components only.
-      if (!($config instanceof RulesTriggerableInterface)) {
-        $row[] = l(t('execute'), RulesPluginUI::path($name, 'execute'), array('query' => drupal_get_destination()));
-        if ($scheduler_exists) {
-          if ($config instanceof RulesActionInterface) {
-            // Add schedule link for action components only.
-            $row[] = l(t('schedule'), RulesPluginUI::path($name, 'schedule'), array('query' => drupal_get_destination()));
-          }
-          else {
-            $row[] = '';
-          }
-        }
-      }
-
-      // Add either an delete or revert link.
-      if ($config->status != ENTITY_IN_CODE) {
-        $text = $config->status & ENTITY_IN_CODE ? t('revert') : t('delete');
-        $link_path = RulesPluginUI::path($name, $config->status & ENTITY_IN_CODE ? 'revert' : 'delete');
-        $row[] = l($text, $link_path, array('query' => drupal_get_destination()));
-      }
-      else {
-        $row[] = '';
-      }
-
-      // TODO: hide configs where access() is FALSE and make sure access is
-      // FALSE for fixed configurations,
-
-      $num_cols = max($num_cols, count($row));
-      $rows[] = $row;
-    }
-    $header = array(t('Label'), t('Event'), t('Plugin'), t('Status'), array('data' => t('Operations')));
-    if (!isset($events)) {
-      // Remove the event heading as there is no such column.
-      unset($header[1]);
-    }
-    if (!$options['show plugin']) {
-      unset($header[2]);
-    }
-    // Fix the header operation column colspan.
-    if (($addition = $num_cols - count($header)) > 0) {
-      $header[4]['colspan'] = $addition + 1;
-    }
-
-    $table = array(
-      '#theme' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-      '#empty' => t('None'),
-    );
-    $table['#attributes']['class'][] = 'rules-overview-table';
-    $table['#attached']['css'][] = drupal_get_path('module', 'rules') . '/ui/rules.ui.css';
-    return $table;
+    return rules_ui()->overviewTable($conditions, $options);
   }
 
   /**
@@ -781,7 +687,7 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
     // Preserve the base path in the form state. The after build handler will
     // set self::$basePath again for cached forms.
     if (isset(self::$basePath)) {
-      $form_state['_rules_base_path'] = self::$basePath;
+      $form_state['_rules_base_path'] = RulesPluginUI::$basePath;
       $form['#after_build'][] = 'rules_form_after_build_restore_base_path';
     }
   }
@@ -855,10 +761,13 @@ class RulesContainerPluginUI extends RulesPluginUI {
       $form['elements'][$id]['weight'] = array(
         '#type' => 'weight',
         '#default_value' => $child->weight,
+        '#delta' => 20,
       );
       $form['elements'][$id]['parent_id'] = array(
         '#type' => 'hidden',
-        '#default_value' => $this->element->elementId(),
+        // If another iterator is passed in, the childs parent may not equal
+        // the current element. Thus ask the child for its parent.
+        '#default_value' => $child->parentElement()->elementId(),
       );
       $form['elements'][$id]['element_id'] = array(
         '#type' => 'hidden',
@@ -929,10 +838,38 @@ class RulesContainerPluginUI extends RulesPluginUI {
 
   public function buildContent() {
     $content = parent::buildContent();
-    // Don't link the title for container plugins.
-    $content['label']['#type'] = 'markup';
-    $content['label']['#markup'] = check_plain($content['label']['#title']);
-    unset($content['label']['#title']);
+    // Don't link the title for embedded container plugins, except for rules.
+    if (!$this->element->isRoot() && !($this->element instanceof Rule)) {
+      $content['label']['#type'] = 'markup';
+      $content['label']['#markup'] = check_plain($content['label']['#title']);
+      unset($content['label']['#title']);
+    }
+    elseif ($this->element->isRoot()) {
+      $content['description']['settings'] = array(
+        '#theme' => 'rules_content_group',
+        '#weight' => -4,
+        'machine_name' => array(
+          '#markup' => t('Machine name: ') . $this->element->name,
+        ),
+        'weight' => array(
+          '#access' => $this->element instanceof RulesTriggerableInterface,
+          '#markup' => t('Weight: ') . $this->element->weight,
+        ),
+      );
+      if ($vars = $this->element->componentVariables()) {
+        $content['description']['variables'] = array(
+          '#caption' => t('Variables'),
+          '#theme' => 'rules_content_group',
+        );
+        foreach ($vars as $name => $info) {
+          $content['description']['variables'][$name] = array(
+            '#theme' => 'rules_provides_variable_view',
+            '#info' => $info,
+            '#name' => $name,
+          );
+        }
+      }
+    }
     return $content;
   }
 }
@@ -1000,8 +937,10 @@ class RulesActionContainerUI extends RulesContainerPluginUI {
       '#type' => 'checkboxes',
       '#options' => rules_extract_property($vars, 'label'),
       '#default_value' => $this->element->componentProvidesVariables(),
-      '#title' => t('Provide variables'),
-      '#description' => t('Select the variables that should be provided to the caller.'),
+      '#title' => t('Provided variables'),
+      '#description' => $this->element->hasStatus(ENTITY_IN_CODE) ? t('Variables that are provided to the caller. They can not be edited for configurations that are provided in code.') : t('Select the variables that should be provided to the caller.'),
+      // Variables can not be edited on configurations in code.
+      '#disabled' => $this->element->hasStatus(ENTITY_IN_CODE),
     );
   }
 
@@ -1014,4 +953,3 @@ class RulesActionContainerUI extends RulesContainerPluginUI {
     }
   }
 }
-

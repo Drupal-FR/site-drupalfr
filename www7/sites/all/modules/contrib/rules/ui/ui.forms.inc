@@ -1,5 +1,5 @@
 <?php
-// $Id: ui.forms.inc,v 1.1.2.6 2011/01/05 11:38:13 fago Exp $
+// $Id: ui.forms.inc,v 1.1.2.12 2011/02/11 16:51:24 fago Exp $
 
 /**
  * @file Rules UI forms
@@ -35,14 +35,12 @@ function rules_ui_parameter_replace_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
-
 /**
  * General form submit handler, that rebuilds the form
  */
 function rules_form_submit_rebuild($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
-
 
 /**
  * Edit a rules configuration.
@@ -81,18 +79,34 @@ function rules_ui_form_clone_rules_config($form, &$form_state, $rules_config, $b
   RulesPluginUI::$basePath = $base_path;
   $rules_config = clone $rules_config;
   $rules_config->module = 'rules';
-  $rules_config->id = FALSE;
+  $rules_config->id = NULL;
   $rules_config->name = '';
   $rules_config->label .= ' (' . t('cloned') . ')';
+  $rules_config->status = ENTITY_CUSTOM;
 
   $form['#validate'][] = 'rules_ui_form_rules_config_validate';
   $form['#submit'][] = 'rules_ui_form_edit_rules_config_submit';
-  $form_state += array('rules_element' => $rules_config);
+  $form_state += array('rules_element' => $rules_config, 'op' => 'clone');
+
   // Add the rule configuration's form.
   $rules_config->form($form, $form_state, array('show settings' => TRUE, 'button' => TRUE, 'init' => TRUE));
 
   // Open the settings fieldset so altering the name is easier.
   $form['settings']['#collapsed'] = FALSE;
+  return $form;
+}
+
+/**
+ * A simple form just showing a textarea with the export.
+ */
+function rules_ui_form_export_rules_config($form, &$form_state, $rules_config, $base_path) {
+  $form['export'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Export'),
+    '#description' => t('For importing copy the content of the text area and paste it into the import page.'),
+    '#rows' => 25,
+    '#default_value' => $rules_config->export(),
+  );
   return $form;
 }
 
@@ -467,6 +481,81 @@ function rules_ui_remove_event_submit($form, &$form_state) {
 }
 
 /**
+ * Import form for rule configurations.
+ */
+function rules_ui_import_form($form, &$form_state, $base_path) {
+  RulesPluginUI::$basePath = $base_path;
+  RulesPluginUI::formDefaults($form, $form_state);
+  $form['import'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Import'),
+    '#description' => t('Paste an exported Rules configuration here.'),
+    '#rows' => 20,
+  );
+  $form['overwrite'] = array(
+    '#title' => t('Overwrite'),
+    '#type' => 'checkbox',
+    '#description' => t('If checked, any existing configuration with the same identifier will be replaced by the import.'),
+    '#default_value' => FALSE,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  );
+  return $form;
+}
+
+/**
+ * Validation callback for the import form.
+ */
+function rules_ui_import_form_validate($form, &$form_state) {
+  if ($rules_config = rules_import($form_state['values']['import'], $error_msg)) {
+    // Store the successfully imported entity in $form_state.
+    $form_state['rules_config'] = $rules_config;
+    if (!$form_state['values']['overwrite']) {
+      // Check for existing entities with the same identifier.
+      if (rules_config_load($rules_config->name)) {
+        $vars = array('@entity' => t('Rules configuration'), '%label' => $rules_config->label());
+        form_set_error('import', t('Import of @entity %label failed, a @entity with the same machine name already exists. Check the overwrite option to replace it.', $vars));
+      }
+    }
+    try {
+      $rules_config->integrityCheck();
+    }
+    catch (RulesException $e) {
+      form_set_error('import', t('Integrity check for the imported configuratoin failed. Error message: %message.', array('%message' => $e->getMessage())));
+    }
+    if (!$rules_config->access()) {
+      form_set_error('import', t('You have insufficient access permissions for importing this Rules configuration.'));
+    }
+  }
+  else {
+    form_set_error('import', t('Import failed.'));
+    if ($error_msg) {
+      drupal_set_message($error_msg, 'error');
+    }
+  }
+}
+
+/**
+ * Submit callback for the import form.
+ */
+function rules_ui_import_form_submit($form, &$form_state) {
+  $rules_config = $form_state['rules_config'];
+
+  if ($existing_config = rules_config_load($rules_config->name)) {
+    // Copy DB id and remove the new indicator to overwrite the existing record.
+    $rules_config->id = $existing_config->id;
+    unset($rules_config->is_new);
+  }
+  $rules_config->save();
+  $vars = array('@entity' => t('Rules configuration'), '%label' => $rules_config->label());
+  watchdog('rules_config', 'Imported @entity %label.', $vars);
+  drupal_set_message(t('Imported @entity %label.', $vars));
+  $form_state['redirect'] = RulesPluginUI::$basePath;
+}
+
+/**
  * FAPI process callback for the data selection widget.
  * This finalises the auto completion callback path by appending the form build
  * id.
@@ -508,7 +597,7 @@ function rules_ui_form_data_selection_auto_completion($parameter, $form_build_id
       $result = RulesData::matchingDataSelector($wrapper, $params[$parameter], $selector . ':', 0);
     }
     elseif (!$selector) {
-      $result = RulesData::matchingDataSelector($element->availableVariables(), $params[$parameter], '', 1);
+      $result = RulesData::matchingDataSelector($element->availableVariables(), $params[$parameter], '', 0);
     }
 
     foreach ($result as $selector => $info) {
@@ -519,7 +608,7 @@ function rules_ui_form_data_selection_auto_completion($parameter, $form_build_id
         $attributes['title'] = isset($info['description']) ? check_plain($info['description']) : '';
         if ($selector[strlen($selector) - 1] == ':') {
           $attributes['class'][] = 'rules-dsac-group';
-          $text = '> ' . check_plain($selector) . '... (' . check_plain($info['label']) . ')';
+          $text = check_plain($selector) . '... (' . check_plain($info['label']) . ')';
         }
         else {
           $text = check_plain($selector) . ' (' . check_plain($info['label']) . ')';

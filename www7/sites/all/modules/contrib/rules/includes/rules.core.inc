@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.core.inc,v 1.1.2.4 2011/01/04 12:09:35 fago Exp $
+// $Id: rules.core.inc,v 1.1.2.22 2011/02/16 17:21:47 fago Exp $
 
 /**
  * @file
@@ -53,6 +53,45 @@ class RulesEntityController extends EntityAPIController {
     }
     return parent::applyConditions($entities, $conditions);
   }
+
+  /**
+   * Overridden to work with Rules' custom export format.
+   *
+   * @param $export
+   *   A serialized string in JSON format as produced by the
+   *   RulesPlugin::export() method, or the PHP export as usual PHP array.
+   */
+  public function import($export, &$error_msg = '') {
+    $export = is_array($export) ? $export : drupal_json_decode($export);
+    if (!is_array($export)) {
+      $error_msg = t('Unable to parse the pasted export.');
+      return FALSE;
+    }
+    // The key ist the configuration name and the value the actual export.
+    list($name, $export) = each($export);
+    if (!isset($export['PLUGIN'])) {
+      $error_msg = t('Export misses plugin information.');
+      return FALSE;
+    }
+    // Create an empty configuration, re-set basic keys and import.
+    $config = rules_plugin_factory($export['PLUGIN']);
+    $config->name = $name;
+    foreach (array('label', 'active', 'weight') as $key) {
+      if (isset($export[strtoupper($key)])) {
+        $config->$key = $export[strtoupper($key)];
+      }
+    }
+    if (!empty($export['REQUIRES'])) {
+      foreach ($export['REQUIRES'] as $module) {
+        if (!module_exists($module)) {
+          $error_msg = t('Missing the required module %module.', array('%module' => $module));
+          return FALSE;
+        }
+      }
+    }
+    $config->import($export);
+    return $config;
+  }
 }
 
 /**
@@ -82,7 +121,9 @@ abstract class RulesExtendable extends FacesExtendable {
   }
 
   protected function setUp() {
-    $this->cache = rules_get_cache();
+    // Keep a reference on the cache, so elements created during cache
+    // rebuilding end up with a complete cache in the end too.
+    $this->cache = &rules_get_cache();
     if (isset($this->cache[$this->hook][$this->itemName])) {
       $this->itemInfo = &$this->cache[$this->hook][$this->itemName];
     }
@@ -402,25 +443,28 @@ abstract class RulesPlugin extends RulesExtendable {
   /**
    * Sets up the execution state for the given arguments.
    */
-  protected function setUpState(array $args) {
+  public function setUpState(array $args) {
     $state = new RulesState();
     $vars = $this->setUpVariables();
     // Fix numerically indexed args to start with 0.
     if (!isset($args[key($vars)])) {
       $args = array_values($args);
     }
-
+    $offset = 0;
     foreach (array_keys($vars) as $i => $name) {
       $info = $vars[$name];
+      if (!empty($info['handler']) || (isset($info['parameter']) && $info['parameter'] === FALSE)) {
+        $state->addVariable($name, NULL, $info);
+        // Count the variables that are not passed as parameters.
+        $offset++;
+      }
       // Support numerically indexed arrays as well as named parameter style.
-      if (isset($args[$i])) {
-        $state->addVariable($name, $args[$i], $info);
+      // The index is reduced to exclude non-parameter variables.
+      elseif (isset($args[$i - $offset])) {
+        $state->addVariable($name, $args[$i - $offset], $info);
       }
       elseif (isset($args[$name])) {
         $state->addVariable($name, $args[$name], $info);
-      }
-      elseif (!empty($info['handler'])) {
-        $state->addVariable($name, NULL, $info);
       }
       elseif (empty($info['optional']) && $info['type'] != 'hidden') {
         throw new RulesException('Argument %name is missing.', array('%name' => $name), $this);
@@ -599,7 +643,7 @@ abstract class RulesPlugin extends RulesExtendable {
       $arg = $state->applyDataSelector($this->settings[$name . ':select']);
     }
     elseif (isset($this->settings[$name])) {
-      $arg = $this->settings[$name];
+      $arg = rules_wrap_data($this->settings[$name], $info);
       // We don't sanitize directly specified values.
       $skip_sanitize = TRUE;
     }
@@ -612,16 +656,22 @@ abstract class RulesPlugin extends RulesExtendable {
     else {
       $arg = !empty($info['default value']) ? $info['default value'] : NULL;
       $skip_sanitize = TRUE;
+      $info['allow null'] = TRUE;
     }
+    // Make sure the given value is set if required (default).
+    if (!isset($arg) && empty($info['allow null'])) {
+      throw new RulesException('The provided argument for parameter %name is empty.', array('%name' => $name), $this);
+    }
+
     // Apply any configured data processors.
     if (!empty($this->settings[$name . ':process'])) {
       // For processing, make sure the data is unwrapped now.
       $return = rules_unwrap_data(array($arg), array($info));
-      return $this->settings[$name . ':process']->process($return[0], $info, $state, $this);
+      return isset($return[0]) ? $this->settings[$name . ':process']->process($return[0], $info, $state, $this) : NULL;
     }
     // Support passing already sanitized values.
     if ($info['type'] == 'text' && !isset($skip_sanitize) && !empty($info['sanitize']) && !($arg instanceof EntityMetadataWrapper)) {
-      return check_plain((string)$arg);
+      return check_plain((string) $arg);
     }
     return $arg;
   }
@@ -639,12 +689,16 @@ abstract class RulesPlugin extends RulesExtendable {
   public function applyDataSelector($selector) {
     $parts = explode(':', str_replace('-', '_', $selector), 2);
     if (($vars = $this->availableVariables()) && isset($vars[$parts[0]]['type'])) {
-      $data = NULL;
-      $wrapper = rules_wrap_data($data, $vars[$parts[0]], TRUE);
+      $wrapper = rules_wrap_data(NULL, $vars[$parts[0]], TRUE);
       if (count($parts) > 1 && $wrapper instanceof EntityMetadataWrapper) {
         try {
           foreach (explode(':', $parts[1]) as $name) {
-            $wrapper = $wrapper->get($name);
+            if ($wrapper instanceof EntityListWrapper || $wrapper instanceof EntityStructureWrapper) {
+              $wrapper = $wrapper->get($name);
+            }
+            else {
+              return FALSE;
+            }
           }
         }
         // In case of an exception or we were unable to get a wrapper, return FALSE.
@@ -714,7 +768,7 @@ abstract class RulesPlugin extends RulesExtendable {
       // Find a unique name for this configuration.
       $this->name = $this->module . '_';
       for ($i = 0; $i < 8; $i++) {
-        //Alphanumeric name generation
+        // Alphanumeric name generation.
         $rnd = mt_rand(97, 122);
         $this->name .= chr($rnd);
       }
@@ -725,7 +779,7 @@ abstract class RulesPlugin extends RulesExtendable {
     // Keep the id always as we need it for the recursion prevention.
     $array = drupal_map_assoc(array('parent', 'id', 'elementId', 'weight', 'settings'));
     // Keep properties related to configurations if they are there.
-    foreach (array('name', 'module', 'label', 'recursion') as $key) {
+    foreach (array('name', 'module', 'status', 'label', 'recursion') as $key) {
       if (isset($this->$key)) {
         $array[$key] = $key;
       }
@@ -794,6 +848,22 @@ abstract class RulesPlugin extends RulesExtendable {
   }
 
   /**
+   * Checks if the configuration has a certain exportable status.
+   *
+   * @param $status
+   *   A status constant, i.e. one of ENTITY_CUSTOM, ENTITY_IN_CODE,
+   *   ENTITY_OVERRIDDEN or ENTITY_FIXED.
+   *
+   * @return
+   *   TRUE if the configuration has the status, else FALSE.
+   *
+   * @see entity_has_status()
+   */
+  public function hasStatus($status) {
+    return $this->isRoot() && isset($this->status) && ($this->status & $status) == $status;
+  }
+
+  /**
    * Remove circular object references so the PHP garbage collector does its
    * work.
    */
@@ -825,7 +895,8 @@ abstract class RulesPlugin extends RulesExtendable {
     if (!empty($this->label) && $this->label != t('unlabeled')) {
       return $this->label;
     }
-    return isset($this->info['label']) ? $this->info['label'] : (!empty($this->name) ? $this->name : t('unlabeled'));
+    $info = $this->info();
+    return isset($info['label']) ? $info['label'] : (!empty($this->name) ? $this->name : t('unlabeled'));
   }
 
   /**
@@ -844,17 +915,62 @@ abstract class RulesPlugin extends RulesExtendable {
   }
 
   /**
+   * Applies the given export.
+   */
+  public function import(array $export) {
+    $this->importSettings($export[strtoupper($this->plugin())]);
+  }
+
+  protected function importSettings($export) {
+    // Import parameter settings.
+    $export += array('USING' => array(), 'PROVIDE' => array());
+    foreach ($export['USING'] as $name => $param_export) {
+      $this->importParameterSetting($name, $param_export);
+    }
+    foreach ($export['PROVIDE'] as $name => $var_export) {
+      // The key of $var_export is the variable name, the value the label.
+      $this->settings[$name . ':var'] = key($var_export);
+      $this->settings[$name . ':label'] = reset($var_export);
+    }
+  }
+
+  protected function importParameterSetting($name, $export) {
+    if (is_array($export) && isset($export['select'])) {
+      $this->settings[$name . ':select'] = $export['select'];
+      if (count($export) > 1) {
+        // Add in processor settings.
+        unset($export['select']);
+        $this->settings[$name . ':process'] = $export;
+      }
+    }
+    // Convert back the [selector] strings being an array with one entry.
+    elseif (is_array($export) && count($export) == 1 && isset($export[0])) {
+      $this->settings[$name . ':select'] = $export[0];
+    }
+    elseif (is_array($export) && isset($export['value'])) {
+      $this->settings[$name] = $export['value'];
+    }
+    else {
+      $this->settings[$name] = $export;
+    }
+  }
+
+  /**
    * Exports a rule configuration.
    *
+   * @param $prefix
+   *   An optional prefix for each line.
    * @param $php
    *   Optional. Set to TRUE to format the export using PHP arrays. By default
    *   JSON is used.
    * @return
    *   The exported confiugration.
+   *
+   * @see rules_import()
    */
-  public function export($php = FALSE) {
+  public function export($prefix = '',$php = FALSE) {
     $export[strtoupper($this->plugin())] = $this->exportSettings();
-    return $this->isRoot() ? $this->returnExport($export, $php) : $export;
+    return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
   }
 
   protected function exportSettings() {
@@ -874,7 +990,9 @@ abstract class RulesPlugin extends RulesExtendable {
 
   protected function exportParameterSetting($name, $info) {
     if (isset($this->settings[$name]) && (!isset($info['default value']) || $this->settings[$name] != $info['default value'])) {
-      return $this->settings[$name];
+      // In case of an array-value wrap the value into another array, such that
+      // the value cannot be confused with an exported data selector.
+      return is_array($this->settings[$name]) ? array('value' => $this->settings[$name]) : $this->settings[$name];
     }
     elseif (isset($this->settings[$name . ':select'])) {
       if (isset($this->settings[$name . ':process']) && $processor = $this->settings[$name . ':process']) {
@@ -892,20 +1010,23 @@ abstract class RulesPlugin extends RulesExtendable {
    * Finalizies the configuration export by adding general attributes regarding
    * the configuration and returns it in the right format.
    */
-  protected function returnExport($export, $php = FALSE) {
+  protected function returnExport($export, $prefix = '', $php = FALSE) {
     $this->ensureNameExists();
     if (!empty($this->label) && $this->label != t('unlabeled')) {
       $export_cfg[$this->name]['LABEL'] = $this->label;
     }
-    if (!empty($this->module) && $this->module != 'rules') {
-      $export_cfg[$this->name]['MODULE'] = $this->module;
-    }
     $export_cfg[$this->name]['PLUGIN'] = $this->plugin();
+    if (!empty($this->weight)) {
+      $export_cfg[$this->name]['WEIGHT'] = $this->weight;
+    }
+    if (isset($this->active) && !$this->active) {
+      $export_cfg[$this->name]['ACTIVE'] = FALSE;
+    }
     if ($modules = $this->dependencies()) {
       $export_cfg[$this->name]['REQUIRES'] = $modules;
     }
     $export_cfg[$this->name] += $export;
-    return $php ? entity_var_export($export_cfg) : entity_var_json_export($export_cfg);
+    return $php ? entity_var_export($export_cfg, $prefix) : entity_var_json_export($export_cfg, $prefix);
   }
 
   /**
@@ -942,6 +1063,7 @@ abstract class RulesAbstractPlugin extends RulesPlugin {
 
   protected $elementName;
   protected $info = array('parameter' => array(), 'provides' => array());
+  protected $infoLoaded = FALSE;
 
   /**
    * @param $name
@@ -961,6 +1083,10 @@ abstract class RulesAbstractPlugin extends RulesPlugin {
     parent::setUp();
     if (isset($this->cache[$this->itemName . '_info'][$this->elementName])) {
       $this->info = $this->cache[$this->itemName . '_info'][$this->elementName];
+      // Remember that the info has been correctly setup.
+      // @see self::forceSetup().
+      $this->infoLoaded = TRUE;
+
       // Add in per-plugin implementation callbacks if any.
       if (!empty($this->info['faces_cache'])) {
         foreach ($this->info['faces_cache'] as $face => $data) {
@@ -981,6 +1107,18 @@ abstract class RulesAbstractPlugin extends RulesPlugin {
     elseif (!empty($this->itemInfo['faces_cache']) && function_exists($this->elementName)) {
       // We don't have any info, so just add the name as execution callback.
       $this->override(array('execute' => $this->elementName));
+    }
+  }
+
+  public function forceSetUp() {
+    if (!isset($this->cache) || (!empty($this->itemInfo['faces_cache']) && !$this->faces)) {
+      $this->setUp();
+    }
+    // In case we have element specific information, which is not loaded yet,
+    // do so now. This might happen if the element has been initially loaded
+    // with an incomplete cache, i.e. during cache rebuilding.
+    elseif (!$this->infoLoaded && isset($this->cache[$this->itemName . '_info'][$this->elementName])) {
+      $this->setUp();
     }
   }
 
@@ -1045,14 +1183,30 @@ abstract class RulesAbstractPlugin extends RulesPlugin {
     }
   }
 
-  public function export($php = FALSE) {
+  public function import(array $export) {
+    // The key is the element name and the value the actual export.
+    $this->elementName = key($export);
+    $export = reset($export);
+
+    // After setting the element name, setup the element again so the right
+    // element info is loaded.
+    $this->setUp();
+
+    if (!isset($export['USING']) && !isset($export['PROVIDES']) && !empty($export)) {
+      // The export has been abbreviated to skip "USING".
+      $export = array('USING' => $export);
+    }
+    $this->importSettings($export);
+  }
+
+  public function export($prefix = '',$php = FALSE) {
     $export = $this->exportSettings();
     if (!$this->providesVariables()) {
       // Abbreviate the export making "USING" implicit.
-      $export = $export['USING'];
+      $export = isset($export['USING']) ? $export['USING'] : array();
     }
     $export = array($this->elementName => $export);
-    return $this->isRoot() ? $this->returnExport($export, $php) : $export;
+    return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
   }
 
   public function dependencies() {
@@ -1433,6 +1587,9 @@ abstract class RulesContainerPlugin extends RulesPlugin implements IteratorAggre
       $this->info += array('variables' => array());
       return $this->info['variables'];
     }
+    // We have to return a reference in any case.
+    $return = NULL;
+    return $return;
   }
 
   /**
@@ -1467,10 +1624,15 @@ abstract class RulesContainerPlugin extends RulesPlugin implements IteratorAggre
   }
 
   public function parameterInfo($optional = FALSE) {
+    $params = parent::parameterInfo($optional);
     if (isset($this->info['variables'])) {
-      return parent::parameterInfo($optional) + rules_filter_array($this->info['variables'], 'handler', FALSE);
+      foreach ($this->info['variables'] as $name => $var_info) {
+        if (empty($var_info['handler']) && (!isset($var_info['parameter']) || $var_info['parameter'])) {
+          $params[$name] = $var_info;
+        }
+      }
     }
-    return parent::parameterInfo($optional);
+    return $params;
   }
 
   public function availableVariables() {
@@ -1579,8 +1741,8 @@ abstract class RulesContainerPlugin extends RulesPlugin implements IteratorAggre
   /**
    * Override delete to keep the children alive, if possible.
    */
-  public function delete() {
-    if (isset($this->parent)) {
+  public function delete($keep_children = TRUE) {
+    if (isset($this->parent) && $keep_children) {
       foreach ($this->children as $child) {
         $child->setParent($this->parent);
       }
@@ -1600,7 +1762,18 @@ abstract class RulesContainerPlugin extends RulesPlugin implements IteratorAggre
    *   this element is sorted.
    */
   public function sortChildren($deep = FALSE) {
+    // Make sure the array order is kept in case two children have the same
+    // weight by ensuring later childrens would have higher weights.
+    foreach (array_values($this->children) as $i => $child) {
+      $child->weight += $i / 1000;
+    }
     usort($this->children, array('RulesPlugin', 'compare'));
+
+    // Fix up the weights afterwards to be unique integers.
+    foreach (array_values($this->children) as $i => $child) {
+      $child->weight = $i * 2;
+    }
+
     if ($deep) {
       foreach (new ParentIterator($this->getIterator()) as $child) {
         $child->sortChildren(TRUE);
@@ -1617,13 +1790,30 @@ abstract class RulesContainerPlugin extends RulesPlugin implements IteratorAggre
     return $export;
   }
 
-  public function export($php = FALSE) {
+  public function export($prefix = '',$php = FALSE) {
     $export = array();
     if (isset($this->info['variables'])) {
       $export['USES VARIABLES'] = $this->info['variables'];
     }
     $export += $this->exportChildren();
-    return $this->isRoot() ? $this->returnExport($export, $php) : $export;
+    return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
+  }
+
+  public function import(array $export) {
+    if (isset($export['USES VARIABLES'])) {
+      $this->info['variables'] = $export['USES VARIABLES'];
+    }
+    $this->importChildren($export);
+  }
+
+  protected function importChildren($export, $key = NULL) {
+    $key = isset($key) ? $key : strtoupper($this->plugin());
+    foreach ($export[$key] as $child_export) {
+      $plugin = _rules_import_get_plugin(key($child_export), 'action');
+      $child = rules_plugin_factory($plugin);
+      $child->setParent($this);
+      $child->import($child_export);
+    }
   }
 }
 
@@ -1739,6 +1929,22 @@ abstract class RulesConditionContainer extends RulesContainerPlugin implements R
       $export[$key][] = $child->export(TRUE);
     }
     return $export;
+  }
+
+
+  protected function importChildren($export, $key = NULL) {
+    $key = isset($key) ? $key : strtoupper($this->plugin());
+    // Care for negated elements.
+    if (!isset($export[$key]) && isset($export['NOT ' . $key])) {
+      $this->negate = TRUE;
+      $key = 'NOT ' . $key;
+    }
+    foreach ($export[$key] as $child_export) {
+      $plugin = _rules_import_get_plugin(key($child_export), 'condition');
+      $child = rules_plugin_factory($plugin);
+      $child->setParent($this);
+      $child->import($child_export);
+    }
   }
 
   /**
@@ -1921,4 +2127,31 @@ class RulesException extends Exception {
     $this->severity = $severity;
     $this->message = t($this->msg, $this->args);
   }
+}
+
+/**
+ * Determines the plugin to be used for importing a child element.
+ *
+ * @param $key
+ *   The key to look for, e.g. 'OR' or 'DO'.
+ * @param $default
+ *   The default to return if no special plugin can be found.
+ */
+function _rules_import_get_plugin($key, $default = 'action') {
+  $map = &drupal_static(__FUNCTION__);
+  if (!isset($map)) {
+    $cache = rules_get_cache();
+    foreach ($cache['plugin_info'] as $name => $info) {
+      if (!empty($info['embeddable'])) {
+        $info += array('import keys' => array(strtoupper($name)));
+        foreach ($info['import keys'] as $k) {
+          $map[$k] = $name;
+        }
+      }
+    }
+  }
+  if (isset($map[$key])) {
+    return $map[$key];
+  }
+  return $default;
 }

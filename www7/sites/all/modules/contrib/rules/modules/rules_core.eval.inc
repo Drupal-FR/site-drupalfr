@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_core.eval.inc,v 1.1.2.2 2010/12/21 13:40:36 fago Exp $
+// $Id: rules_core.eval.inc,v 1.1.2.5 2011/02/16 17:22:00 fago Exp $
 
 /**
  * @file
@@ -30,16 +30,10 @@ function rules_element_invoke_component($arguments, RulesPlugin $element) {
     rules_log('Evaluating @plugin %label.', $replacements, RulesLog::INFO, TRUE);
     module_invoke_all('rules_config_execute', $component);
 
-    // Manually create a new evaluation state.
-    $new_state = new RulesState();
-
-    // Register all parameters as variables.
-    $args = array_intersect_key($wrapped_args, $info['parameter']);
-    foreach ($args as $name => $data) {
-      $new_state->addVariable($name, $data, $info['parameter'][$name]);
-    }
-
+    // Manually create a new evaluation state and evaluate the component.
+    $new_state = $component->setUpState($wrapped_args);
     $return = $component->evaluate($new_state);
+
     // Care for the right return value in case we have to provide vars.
     if ($component instanceof RulesActionInterface && !empty($info['provides'])) {
       $return = array();
@@ -154,5 +148,24 @@ class RulesDateOffsetProcessor extends RulesDataProcessor {
   public function process($value, $info, RulesState $state, RulesPlugin $element) {
     $value = isset($this->processor) ? $this->processor->process($value, $info, $state, $element) : $value;
     return $value + $this->setting['value'];
+  }
+}
+
+/**
+ * A custom wrapper class for vocabularies that is capable of loading vocabularies by machine name.
+ */
+class RulesTaxonomyVocabularyWrapper extends EntityDrupalWrapper {
+
+  /**
+   * Overridden to support identifying vocabularies by machine names.
+   */
+  protected function setEntity($data) {
+    if (isset($data) && $data !== FALSE && !is_object($data) && !is_numeric($data)) {
+      // The vocabulary name has been passed.
+      parent::setEntity(taxonomy_vocabulary_machine_name_load($data));
+    }
+    else {
+      parent::setEntity($data);
+    }
   }
 }

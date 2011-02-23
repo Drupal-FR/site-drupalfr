@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.test,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
+// $Id: rules.test,v 1.1.2.14 2011/02/21 09:00:39 fago Exp $
 
 /**
  * @file
@@ -180,9 +180,10 @@ class RulesTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Test saving a parameter.
+   * Test automatic saving of variables.
    */
   function testActionSaving() {
+    // Test saving a parameter.
     $action = rules_action('rules_node_publish_action_save');
     $node = $this->drupalCreateNode(array('status' => 0, 'type' => 'page'));
     $action->executeByArgs(array('node' => $node));
@@ -193,6 +194,27 @@ class RulesTestCase extends DrupalWebTestCase {
 
     $node = node_load($node->nid);
     $this->assertEqual($node->status, 1, 'Node has been saved.');
+
+    // Now test saving a provided variable, which is renamed and modified before
+    // it is saved.
+    $title = $this->randomName();
+    $rule = rule();
+    $rule->action('entity_create', array(
+      'type' => 'node',
+      'param_type' => 'article',
+      'param_author:select' => 'site:current-user',
+      'param_title' => $title,
+      'entity_created:var' => 'node',
+    ));
+    $rule->action('data_set', array(
+      'data:select' => 'node:body',
+      'value' => array('value' => 'body'),
+    ));
+    $rule->integrityCheck();
+    $rule->execute();
+
+    $node = $this->drupalGetNodeByTitle($title);
+    $this->assertTrue(!empty($node) && $node->body[LANGUAGE_NONE][0]['value'] == 'body', 'Saved a provided variable');
     RulesLog::logger()->checkLog();
   }
 
@@ -247,13 +269,16 @@ class RulesTestCase extends DrupalWebTestCase {
     $rule = $this->createTestRule();
     $conditions = $rule->conditions();
     $conditions[0]->weight = 10;
-    $conditions[2]->weight = -1;
+    $conditions[2]->weight = 10;
+    $id[0] = $conditions[0]->elementId();
+    $id[1] = $conditions[1]->elementId();
+    $id[2] = $conditions[2]->elementId();
     // For testing use a deep sort, even if not necessary here.
     $rule->sortChildren(TRUE);
     $conditions = $rule->conditions();
-    $this->assertEqual($conditions[0]->weight, -1, 'Condition sorted correctly.');
-    $this->assertEqual($conditions[1]->weight, 0, 'Condition sorted correctly.');
-    $this->assertEqual($conditions[2]->weight, 10, 'Condition sorted correctly.');
+    $this->assertEqual($conditions[0]->elementId(), $id[1], 'Condition sorted correctly.');
+    $this->assertEqual($conditions[1]->elementId(), $id[0], 'Condition sorted correctly.');
+    $this->assertEqual($conditions[2]->elementId(), $id[2], 'Condition sorted correctly.');
   }
 
   /**
@@ -383,6 +408,13 @@ class RulesTestCase extends DrupalWebTestCase {
     $text1 = RulesLog::logger()->render();
     $text2 = RulesTestCase::t('Not evaluating rule set %rules_test_set_2 to prevent recursion.', array('rules_test_set_2'));
     $this->assertTrue((strpos($text1, $text2) !== FALSE), "Recursion of component invocation prevented.");
+
+    // Test executing the component provided in code via the action. This makes
+    // sure the component in code has been properly picked up.
+    $node->status = 0;
+    node_save($node);
+    rules_action('component_rules_test_action_set')->execute($node);
+    $this->assertTrue($node->status == 1, 'Component provided in code has been executed.');
   }
 
 
@@ -492,6 +524,29 @@ class RulesTestCase extends DrupalWebTestCase {
 
     list($node2) = $set->execute($node);
     $this->assertTrue($node2->nid == $node->nid, 'Rule set returned a variable.');
+
+    // Create an action set returning a variable that is no parameter.
+    $set = rules_action_set(array(
+      'node' => array(
+        'type' => 'node',
+        'parameter' => FALSE,
+      )), array('node'));
+    $set->action('entity_fetch', array('type' => 'node', 'id' => $node->nid))
+        ->action('data_set', array('data:select' => 'node', 'value:select' => 'entity_fetched'));
+    $set->integrityCheck();
+    list($node3) = $set->execute();
+    $this->assertTrue($node3->nid == $node->nid, 'Action set returned a variable that has not been passed as parameter.');
+
+    // Test the same again with a variable holding a not wrapped data type.
+    $set = rules_action_set(array(
+      'number' => array(
+        'type' => 'integer',
+        'parameter' => FALSE,
+      )), array('number'));
+    $set->action('data_set', array('data:select' => 'number', 'value' => 3));
+    $set->integrityCheck();
+    list($number) = $set->execute();
+    $this->assertTrue($number == 3, 'Actions set returned a number.');
   }
 
   /**
@@ -511,9 +566,9 @@ class RulesTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Test exporting a rule.
+   * Test importing and exporting a rule.
    */
-  function testRuleExport() {
+  function testRuleImportExport() {
     $rule = rule(array('nid' => array('type' => 'integer')));
     $rule->name = "rules_export_test";
     $rule->action('rules_action_load_node')
@@ -531,6 +586,49 @@ class RulesTestCase extends DrupalWebTestCase {
   }
 }';
     $this->assertEqual($export, $rule->export(), 'Rule has been exported correctly.');
+
+    // Test importing a rule which makes use of almost all features.
+    $export = _rules_export_get_test_export();
+    $rule = rules_import($export);
+    $this->assertTrue(!empty($rule) && $rule->integrityCheck(), 'Rule has been imported.');
+
+    // Test loading the same export provided as default rule.
+    $rule = rules_config_load('rules_export_test');
+    $this->assertTrue(!empty($rule) && $rule->integrityCheck(), 'Export has been provided in code.');
+
+    // Export it and make sure the same export is generated again.
+    $this->assertEqual($export, $rule->export(), 'Export of imported rule equals original export.');
+
+    // Now try importing a rule set.
+    $export =
+'{ "rules_test_set" : {
+    "LABEL" : "Test set",
+    "PLUGIN" : "rule set",
+    "REQUIRES" : [ "rules" ],
+    "USES VARIABLES" : { "node" : { "label" : "Test node", "type" : "node" } },
+    "RULES" : [
+      {
+        "IF" : [ { "NOT data_is" : { "data" : [ "node:title" ], "value" : "test" } } ],
+        "DO" : [ { "data_set" : { "data" : [ "node:title" ], "value" : "test" } } ],
+        "LABEL" : "Test Rule"
+      },
+      {
+        "DO" : [ { "drupal_message" : { "message" : "hi" } } ],
+        "LABEL" : "Test Rule 2"
+      }
+    ]
+  }
+}';
+    $set = rules_import($export);
+    $this->assertTrue(!empty($set) && $set->integrityCheck(), 'Rule set has been imported.');
+    // Export it and make sure the same export is generated again.
+    $this->assertEqual($export, $set->export(), 'Export of imported rule set equals original export.');
+
+    // Try executing the imported rule set.
+    $node = $this->drupalCreateNode();
+    $set->execute($node);
+    $this->assertEqual($node->title, 'test', 'Imported rule set has been executed.');
+    RulesLog::logger()->checkLog();
   }
 
   /**
@@ -548,23 +646,22 @@ class RulesTestCase extends DrupalWebTestCase {
     RulesLog::logger()->checkLog();
   }
 
-  function testRuleBuilding() {
-    //TODO: implement.
-    return;
-    $configs = rules_config_build(
-      '{ "rules_tzhxvirp" : {
-          "LABEL" : "example default rule",
-          "PLUGIN" : "reaction rule",
-          "REQUIRES" : [ "rules" ],
-          "ON" : [ "node_update" ],
-          "IF" : [
-            { "data_is" : { "data" : [ "node:status" ], "value" : true } },
-            { "data_is" : { "data" : [ "node:type" ], "value" : "page" } }
-          ],
-          "DO" : [ { "drupal_message" : { "message" : "A node has been updated." } } ]
-        }
-      }'
-    )->execute();
+  /**
+   * Make sure Rules aborts when NULL values are used.
+   */
+  function testAbortOnNULLValues() {
+    $rule = rule(array('node' => array('type' => 'node')));
+    $rule->action('drupal_message', array('message:select' => 'node:type'));
+    $rule->integrityCheck();
+
+    // Test the rule.
+    $node = $this->drupalCreateNode();
+    $node->type = NULL;
+    $rule->execute($node);
+
+    $text = RulesLog::logger()->render();
+    $msg = RulesTestCase::t('The variable or parameter %message is empty.', array('message'));
+    $this->assertTrue(strpos($text, $msg) !== FALSE, 'Evaluation aborted due to an empty argument value.');
   }
 }
 
@@ -657,6 +754,75 @@ class RulesTestDataCase extends DrupalWebTestCase {
     // Test that a type matches its grand-parent type (text > decimal > integer)
     $this->assertTrue(RulesData::typesMatch(array('type' => 'integer'), array('type' => 'text')), 'Types match.');
     $this->assertFalse(RulesData::typesMatch(array('type' => 'text'), array('type' => 'integer')), 'Types don\'t match.');
+  }
+
+  /**
+   * Tests making use of custom wrapper classes.
+   */
+  function testCustomWrapperClasses() {
+    // Test loading a vocabulary by name, which is done by a custom wrapper.
+    $set = rules_action_set(array('vocab' => array('type' => 'taxonomy_vocabulary')), array('vocab'));
+    $set->action('drupal_message', array('message:select' => 'vocab:name'));
+    $set->integrityCheck();
+    list($vocab) = $set->execute('tags');
+    $this->assertTrue($vocab->machine_name == 'tags', 'Loaded vocabulary by name.');
+
+    // Now test wrapper creation for a direct input argument value.
+    $set = rules_action_set(array('term' => array('type' => 'taxonomy_term')));
+    $set->action('data_set', array('data:select' => 'term:vocabulary', 'value' => 'tags'));
+    $set->integrityCheck();
+
+    $vocab = entity_create('taxonomy_vocabulary', array(
+      'name' => 'foo',
+      'machine_name' => 'foo',
+    ));
+    entity_save('taxonomy_vocabulary', $vocab);
+    $term_wrapped = entity_property_values_create_entity('taxonomy_term', array(
+      'name' => $this->randomName(),
+      'vocabulary' => $vocab,
+    ))->save();
+    $set->execute($term_wrapped);
+    $this->assertEqual($term_wrapped->vocabulary->machine_name->value(), 'tags', 'Vocabulary name used as direct input value.');
+    RulesLog::logger()->checkLog();
+  }
+
+  /**
+   * Makes sure the RulesIdentifiableDataWrapper is working correctly.
+   */
+  function testRulesIdentifiableDataWrapper() {
+    $node = $this->drupalCreateNode();
+    $wrapper = new RulesTestTypeWrapper('rules_test_type', $node);
+    $this->assertTrue($wrapper->value() == $node, 'Data correctly wrapped.');
+
+    // Test serializing and make sure only the id is stored.
+    $this->assertTrue(strpos(serialize($wrapper), $node->title) === FALSE, 'Data has been correctly serialized.');
+    $this->assertEqual(unserialize(serialize($wrapper))->value()->title, $node->title, 'Serializing works right.');
+
+    $wrapper2 = unserialize(serialize($wrapper));
+    // Test serializing the unloaded wrapper.
+    $this->assertEqual(unserialize(serialize($wrapper2))->value()->title, $node->title, 'Serializing works right.');
+
+    // Test loading a not more existing node.
+    $s = serialize($wrapper2);
+    node_delete($node->nid);
+    $this->assertFalse(node_load($node->nid), 'Node deleted.');
+    try {
+      unserialize($s)->value();
+      $this->fail("Loading hasn't created an exception.");
+    }
+    catch (EntityMetadataWrapperException $e) {
+      $this->pass("Exception was thrown: ". $e->getMessage());
+    }
+
+    // Test saving a savable custom, identifiable wrapper.
+    $action = rules_action('test_type_save');
+    $node = $this->drupalCreateNode(array('status' => 0, 'type' => 'page'));
+    $node->status = 1;
+    $action->execute($node);
+
+    // Load the node fresh from the db.
+    $node = node_load($node->nid, NULL, TRUE);
+    $this->assertEqual($node->status, 1, 'Savable non-entity has been saved.');
   }
 }
 
@@ -1019,9 +1185,9 @@ class RulesIntegrationTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Test the provided list actions.
+   * Test data integration.
    */
-  function testListActions() {
+  function testDataIntegration() {
     $rule = rule(array(
       'list' => array(
         'type' => 'list<text>',
@@ -1036,6 +1202,24 @@ class RulesIntegrationTestCase extends DrupalWebTestCase {
     RulesLog::logger()->checkLog();
     $this->assertEqual($list->value(), array('bar', 'foo', 'foo2'), 'List items removed and added.');
     //debug(RulesLog::logger()->render());
+
+    // Test Condition: Data is empty.
+    $rule = rule(array('node' => array('type' => 'node')));
+    $rule->condition('data_is_empty', array('data:select' => 'node:title'));
+    $rule->action('data_set', array('data:select' => 'node:title', 'value' => 'bar'));
+    $rule->integrityCheck();
+
+    // Data is empty condition evaluates to TRUE
+    // for node with empty title, action sets title to 'bar'.
+    $node = $this->drupalCreateNode(array('title' => '', 'type' => 'article'));
+    $rule->execute($node);
+    $this->assertEqual($node->title, 'bar', "Data is empty condition evaluates to TRUE for node with empty title, action sets title to 'bar'.");
+
+    // Data is empty condition evaluates to FALSE
+    // for node with title 'foo', action is not executed.
+    $node = $this->drupalCreateNode(array('title' => 'foo', 'type' => 'article'));
+    $rule->execute($node);
+    $this->assertEqual($node->title, 'foo', "Data is empty condition evaluates to FALSE for node with title 'foo', action is not executed.");
   }
 
   /**
@@ -1063,13 +1247,22 @@ class RulesIntegrationTestCase extends DrupalWebTestCase {
     $rule->execute($node);
 
     $tid = $term_wrapped->getIdentifier();
-    RulesLog::logger()->checkLog();
     $this->assertEqual(array_values($node->field_tags[LANGUAGE_NONE]), array(0 => array('tid' => $tid)), 'Entity has field conditions evaluted.');
 
     // Test loading a non-node entity.
     $action = rules_action('entity_fetch', array('type' => 'taxonomy_term', 'id' => $tid));
     list($term) = $action->execute();
     $this->assertEqual($term->tid, $tid, 'Fetched a taxonomy term using "entity_fetch".');
+
+    // Test the entity is of type condition.
+    $rule = rule(array('entity' => array('type' => 'entity', 'label' => 'entity')));
+    $rule->condition('entity_is_of_type', array('type' => 'node'));
+    $rule->action('data_set', array('data:select' => 'entity:title', 'value' => 'bar'));
+    $rule->integrityCheck();
+    $rule->execute(entity_metadata_wrapper('node', $node));
+
+    $this->assertEqual(entity_metadata_wrapper('node', $node->nid)->title->value(), 'bar', 'Entity is of type condition correctly asserts the entity type.');
+    RulesLog::logger()->checkLog();
   }
 
   /**

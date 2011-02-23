@@ -1,5 +1,5 @@
 <?php
-// $Id: comment.rules.inc,v 1.1.2.3 2011/01/05 10:49:15 fago Exp $
+// $Id: comment.rules.inc,v 1.1.2.4 2011/02/14 18:11:30 fago Exp $
 
 /**
  * @file rules integration for the comment module
@@ -49,18 +49,6 @@ function rules_comment_event_info() {
       'label' => t('After deleting a comment'),
       'variables' => array(
         'comment' => array('type' => 'comment', 'label' => t('deleted comment')),
-      ),
-    ),
-    'comment_publish' => $defaults + array(
-      'label' => t('A comment has been published'),
-      'variables' => array(
-        'comment' => array('type' => 'comment', 'label' => t('published comment')),
-      ),
-    ),
-    'comment_unpublish' => $defaults + array(
-      'label' => t('A comment has been unpublished'),
-      'variables' => array(
-        'comment' => array('type' => 'comment', 'label' => t('unpublished comment')),
       ),
     ),
   );

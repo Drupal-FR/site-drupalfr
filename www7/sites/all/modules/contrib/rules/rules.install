@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.install,v 1.1.2.2 2011/01/04 12:09:35 fago Exp $
+// $Id: rules.install,v 1.1.2.3 2011/02/16 17:22:09 fago Exp $
 
 
 /**
@@ -117,4 +117,11 @@ function rules_update_7200() {
     'description' => 'The exportable status of the entity.',
   ));
   // The module column did already exist before.
+}
+
+/**
+ * Ensure caches are cleared.
+ */
+function rules_update_7201() {
+  // Just do nothing as caches are cleared nevertheless afterwards.
 }

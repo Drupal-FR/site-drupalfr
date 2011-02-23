@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.plugins.inc,v 1.1.2.3 2011/01/04 13:08:35 fago Exp $
+// $Id: rules.plugins.inc,v 1.1.2.12 2011/02/21 09:26:24 fago Exp $
 
 /**
  * @file Contains plugin info and implementations not needed for rule evaluation.
@@ -41,8 +41,8 @@ class RulesAction extends RulesAbstractPlugin implements RulesActionInterface {
           $var_name = isset($this->settings[$name . ':var']) ? $this->settings[$name . ':var'] : $name;
           $state->addVariable($var_name, $data, $this->info['provides'][$name]);
           rules_log('Added the provided variable %name of type %type', array('%name' => $var_name, '%type' => $this->info['provides'][$name]['type']));
-          if (!empty($this->info['provides'][$name]['save']) && $state->variables[$name] instanceof EntityDrupalWrapper) {
-            $state->saveChanges($var_name, $state->variables[$name]);
+          if (!empty($this->info['provides'][$name]['save']) && $state->variables[$var_name] instanceof EntityMetadataWrapper) {
+            $state->saveChanges($var_name, $state->variables[$var_name]);
           }
         }
       }
@@ -103,12 +103,26 @@ class RulesCondition extends RulesAbstractPlugin implements RulesConditionInterf
     return $result;
   }
 
-  public function export($php = FALSE) {
+  public function export($prefix = '',$php = FALSE) {
     $not = $this->negate ? 'NOT ' : '';
     $export = $this->exportSettings();
     // Abbreviate the export making "USING" implicit.
-    $export = array($not . $this->elementName => $export['USING']);
-    return $this->isRoot() ? $this->returnExport($export, $php) : $export;
+    $export = array($not . $this->elementName => isset($export['USING']) ? $export['USING'] : array());
+    return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
+  }
+
+  public function import(array $export) {
+    $this->elementName = key($export);
+    if (strpos($this->elementName, 'NOT ') === 0) {
+      $this->elementName = substr($this->elementName, 4);
+      $this->negate = TRUE;
+    }
+    // After setting the element name, setup the element again so the right
+    // element info is loaded.
+    $this->setUp();
+
+    // Re-add 'USING' which has been removed for abbreviation.
+    $this->importSettings(array('USING' => reset($export)));
   }
 
   public function label() {
@@ -246,12 +260,34 @@ class Rule extends RulesActionContainer {
     return $vars;
   }
 
+  public function export($prefix = '',$php = FALSE) {
+    $export = parent::export($prefix, $php);
+    if (!$this->isRoot()) {
+      $export['LABEL'] = $this->label;
+    }
+    return $export;
+  }
+
   protected function exportChildren($key = NULL) {
     $export = array();
     if ($this->conditions->children) {
       $export = $this->conditions->exportChildren('IF');
     }
     return $export + parent::exportChildren('DO');
+  }
+
+  public function import(array $export) {
+    if (!$this->isRoot() && isset($export['LABEL'])) {
+      $this->label = $export['LABEL'];
+    }
+    parent::import($export);
+  }
+
+  protected function importChildren($export, $key = NULL) {
+    if (!empty($export['IF'])) {
+      $this->conditions->importChildren($export, 'IF');
+    }
+    parent::importChildren($export, 'DO');
   }
 
   public function __clone() {
@@ -266,6 +302,24 @@ class Rule extends RulesActionContainer {
    */
   protected function variableInfoAssertions() {
     return array();
+  }
+
+  /**
+   * Overridden to ensure the whole Rule is deleted at once.
+   */
+  public function delete($keep_children = FALSE) {
+    parent::delete($keep_children);
+  }
+
+  /**
+   * Overriden to expose the variables of all actions.
+   */
+  public function providesVariables() {
+    $provides = parent::providesVariables();
+    foreach ($this->actions() as $action) {
+      $provides += $action->providesVariables();
+    }
+    return $provides;
   }
 }
 
@@ -379,6 +433,11 @@ class RulesReactionRule extends Rule implements RulesTriggerableInterface {
     $export[$key] = array_values($this->events);
     return $export + parent::exportChildren();
   }
+
+  protected function importChildren($export, $key = 'ON') {
+    $this->events = $export[$key];
+    parent::importChildren($export);
+  }
 }
 
 /**
@@ -451,11 +510,12 @@ class RulesOr extends RulesConditionContainer {
 class RulesLoop extends RulesActionContainer {
 
   protected $itemName = 'loop';
+  protected $listItemInfo;
 
   public function __construct($settings = array(), $variables = NULL) {
     $this->setUp();
     $this->settings = (array) $settings + array(
-      'item:var' => 'list-item',
+      'item:var' => 'list_item',
       'item:label' => t('Current list item'),
     );
     if (!empty($variables)) {
@@ -478,19 +538,19 @@ class RulesLoop extends RulesActionContainer {
     $this->checkVarName($this->settings['item:var']);
   }
 
-  protected function listItemType() {
-    if (!isset($this->settings['item:type'])) {
-      $info = $this->getArgumentInfo('list');
-      $this->settings['item:type'] = isset($info['type']) ? entity_property_list_extract_type($info['type']) : 'unknown';
-    }
-    return $this->settings['item:type'];
-  }
-
   protected function listItemInfo() {
-    return array(
-      'type' => $this->listItemType(),
-      'label' => $this->settings['item:label'],
-    );
+    if (!isset($this->listItemInfo)) {
+      if ($info = $this->getArgumentInfo('list')) {
+        // Pass through the variable info keys like property info.
+        $this->listItemInfo = array_intersect_key($info, array_flip(array('type', 'property info', 'bundle')));
+        $this->listItemInfo['type'] = isset($info['type']) ? entity_property_list_extract_type($info['type']) : 'unknown';
+      }
+      else {
+        $this->listItemInfo = array('type' => 'unknown');
+      }
+      $this->listItemInfo['label'] = $this->settings['item:label'];
+    }
+    return $this->listItemInfo;
   }
 
   public function evaluate(RulesState $state) {
@@ -509,6 +569,13 @@ class RulesLoop extends RulesActionContainer {
       $state2 = clone $state;
       $state2->addVariable($item_var_name, $list[$key], $item_var_info);
       parent::evaluate($state2);
+
+      // Update variables from parent scope.
+      foreach ($state->variables as $var_key => &$var_value) {
+        if (array_key_exists($var_key, $state2->variables)) {
+          $var_value = $state2->variables[$var_key];
+        }
+      }
     }
   }
 
@@ -522,6 +589,10 @@ class RulesLoop extends RulesActionContainer {
 
   protected function exportChildren($key = 'LOOP OVER') {
     return parent::exportChildren($key);
+  }
+
+  protected function importChildren($export, $key = 'LOOP OVER') {
+    parent::importChildren($export, $key);
   }
 }
 
@@ -550,6 +621,10 @@ class RulesRuleSet extends RulesActionContainer {
 
   protected function exportChildren($key = 'RULES') {
     return parent::exportChildren($key);
+  }
+
+  protected function importChildren($export, $key = 'RULES') {
+    parent::importChildren($export, $key);
   }
 }
 

@@ -1,5 +1,5 @@
 <?php
-// $Id: ui.plugins.inc,v 1.1.2.2 2010/12/22 11:45:04 fago Exp $
+// $Id: ui.plugins.inc,v 1.1.2.9 2011/02/15 10:43:49 fago Exp $
 
 /**
  * @file Contains UI for diverse plugins provided by Rules.
@@ -19,6 +19,7 @@ class RulesRuleUI extends RulesActionContainerUI {
   }
 
   public function form(&$form, &$form_state, $options = array()) {
+    $form_state['rules_element'] = $this->rule;
     $label = $this->element->label();
     // Automatically add a counter to unlabelled rules.
     if ($label == t('unlabeled') && !$this->element->isRoot() && !empty($options['init'])) {
@@ -26,12 +27,12 @@ class RulesRuleUI extends RulesActionContainerUI {
       $label .= ' ' . count($parent->getIterator());
     }
     // Components have already a label. If used inside a rule-set add a label
-    // though.
+    // though. It's called 'Name' in the UI though.
     if (!$this->element->isRoot()) {
       $form['label'] = array(
         '#type' => 'textfield',
-        '#title' => 'Label',
-        '#default_value' => $label,
+        '#title' => t('Name'),
+        '#default_value' => empty($options['init']) ? $label : '',
         '#required' => TRUE,
         '#weight' => 5,
         '#description' => t('A human-readable name shortly describing the rule.'),
@@ -129,7 +130,6 @@ class RulesReactionRuleUI extends RulesRuleUI {
     $form['settings']['active'] = array(
       '#type' => 'checkbox',
       '#title' => t('Active'),
-      '#description' => t('If checked the reaction rule will be triggered when the configured events occur.'),
       '#default_value' => !isset($this->rule->active) || $this->rule->active,
     );
     $form['settings']['weight'] = array(
@@ -138,8 +138,9 @@ class RulesReactionRuleUI extends RulesRuleUI {
       '#default_value' => $this->element->weight,
       '#weight' => 5,
       '#delta' => 10,
-      '#description' => t('Adjust the weight to influence the evaluation order of rules reacting on the same event.'),
+      '#description' => t('Order rules that react on the same event. Rules with a higher weight are evaluated after rules with less weight.'),
     );
+    unset($form['settings']['component_provides']);
   }
 
   public function settingsFormExtractValues($form, &$form_state) {

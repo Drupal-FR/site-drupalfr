@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_test.test.inc,v 1.1.2.1 2010/12/16 09:30:44 fago Exp $
+// $Id: rules_test.test.inc,v 1.1.2.3 2011/02/16 17:22:34 fago Exp $
 
 /**
  * @file Include file for testing file inclusion.
@@ -57,24 +57,6 @@ function rules_action_delete_node($node) {
 }
 
 /**
- * Action "Create a node"
- */
-function rules_action_node_create($author, $title, $settings) {
-  if (!$settings['node_access'] || node_access('create', $settings['type'], $author)) {
-    module_load_include('inc', 'node', 'node.pages');
-
-    $node = (object)array('type' => $settings['type']);
-    node_object_prepare($node);
-
-    $node->name  = $author->name;
-    $node->uid   = $author->uid;
-    $node->type  = $settings['type'];
-    $node->title = $title;
-    return array('node_added' => $node);
-  }
-}
-
-/**
  * An action making use of named parameters.
  */
 function rules_action_node_set_title($arguments) {
@@ -84,4 +66,11 @@ function rules_action_node_set_title($arguments) {
   }
   $arguments['node']->title = $arguments['title'];
   return $arguments;
+}
+
+/**
+ * Action: Test saving - nothing to do here.
+ */
+function rules_test_type_save($node) {
+
 }

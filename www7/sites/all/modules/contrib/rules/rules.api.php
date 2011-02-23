@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.api.php,v 1.1.2.2 2010/12/28 17:24:21 fago Exp $
+// $Id: rules.api.php,v 1.1.2.8 2011/02/16 17:22:34 fago Exp $
 
 /**
  * @file
@@ -34,32 +34,33 @@
  * @return
  *   An array of information about the module's provided rules actions.
  *   The array contains a sub-array for each action, with the action name as
- *   the key.
+ *   the key. Actions names may only contain lowercase alpha-numeric characters
+ *   and underscores and should be prefixed with the providing module name.
  *   Possible attributes for each sub-array are:
  *   - label: The label of the action. Start capitalized. Required.
  *   - group: A group for this element, used for grouping the actions in the
  *     interface. Should start with a capital letter and be translated.
  *     Required.
- *   - parameter: An array describing all parameter of the action with
- *     the parameter's name as key.  Optional. Each parameter has to be
+ *   - parameter: (optional) An array describing all parameter of the action
+ *     with the parameter's name as key. Each parameter has to be
  *     described by a sub-array with possible attributes as described
  *     afterwards, whereas the name of a parameter needs to be a lowercase,
  *     valid PHP variable name.
- *   - provides: An array describing the variables the action provides to the
- *     evaluation state with the variable name as key. Optional. Each variable
- *     has to be described by a sub-array with possible attributes as described
- *     afterwards, whereas the name of a parameter needs to be a lowercase,
- *     valid PHP variable name.
- *   - 'named parameter': If set to TRUE, the arguments will be passed as a
- *     single array with the parameter names as keys. This emulates named
- *     parameters in PHP and is in particular useful if the number of parameters
- *     can vary. Optionally, defaults to FALSE.
- *   - base: The base for action implementation callbacks to use instead of the
- *     action's name. Optional (defaults to the name).
- *   - callbacks: An array which allows to set specific function callbacks for
- *     the action. The default for each callback is the actions base appended
- *     by '_' and the callback name.
- *   - 'access callback': An optional callback, which has to return whether the
+ *   - provides: (optional) An array describing the variables the action
+ *     provides to the evaluation state with the variable name as key. Each
+ *     variable has to be described by a sub-array with possible attributes as
+ *     described afterwards, whereas the name of a parameter needs to be a
+ *     lowercase, valid PHP variable name.
+ *   - 'named parameter': (optional) If set to TRUE, the arguments will be
+ *     passed as a single array with the parameter names as keys. This emulates
+ *     named parameters in PHP and is in particular useful if the number of
+ *     parameters can vary. Defaults to FALSE.
+ *   - base: (optional) The base for action implementation callbacks to use
+ *     instead of the action's name. Defaults to the action name.
+ *   - callbacks: (optional) An array which allows to set specific function
+ *     callbacks for the action. The default for each callback is the actions
+ *     base appended by '_' and the callback name.
+ *   - 'access callback': (optional) A callback which has to return whether the
  *     currently logged in user is allowed to configure this action. See
  *     rules_node_integration_access() for an example callback.
  *  Each 'parameter' array may contain the following properties:
@@ -70,36 +71,42 @@
  *     can be specified by using the notating list<integer> as introduced by
  *     the entity metadata module. The special keyword '*' can be used when all
  *     types should be allowed. Required.
- *   - bundles: Optionally, an array of bundle names. When the specified type is
+ *   - bundles: (optional) An array of bundle names. When the specified type is
  *     set to a single entity type, this may be used to restrict the allowed
  *     bundles.
- *   - description: If necessary, a further description of the parameter.
- *     Optional.
- *   - options list: Optionally, a callback that returns an array of possible
+ *   - description: (optional) If necessary, a further description of the
+ *     parameter.
+ *   - options list: (optional) A callback that returns an array of possible
  *     values for this parameter. The callback has to return an array as used
  *     by hook_options_list(). For an example implementation see
  *     rules_data_action_type_options().
- *   - save: If this is set to TRUE, the parameter will be saved by rules when
- *     the rules evaluation ends. This is only supported for savable data
- *     types. If the action returns FALSE, saving is skipped.
- *   - optional: May be set to TRUE, when the parameter isn't required.
- *   - 'default value': The value to pass to the action, in case the parameter
- *     is optional and there is no specified value. Optional.
- *   - restriction: Restrict how the argument for this parameter may be
- *     provided. Supported values are 'selector' and 'input'. Optional.
- *   - sanitize: Optionally. Allows parameters of type 'text' to demand an
+ *   - save: (optional) If this is set to TRUE, the parameter will be saved by
+ *     rules when the rules evaluation ends. This is only supported for savable
+ *     data types. If the action returns FALSE, saving is skipped.
+ *   - optional: (optional) May be set to TRUE, when the parameter isn't
+ *     required.
+ *   - 'default value': (optional) The value to pass to the action, in case the
+ *     parameter is optional and there is no specified value.
+ *   - 'allow null': (optional) Usually Rules will not pass any NULL values as
+ *     argument, but abort the evaluation if a NULL value is present. If set to
+ *     TRUE, Rules will not abort and pass the NULL value through. Defaults to
+ *     FALSE.
+ *   - restriction: (optional) Restrict how the argument for this parameter may
+ *     be provided. Supported values are 'selector' and 'input'.
+ *   - sanitize: (optional) Allows parameters of type 'text' to demand an
  *     already sanitized argument. If enabled, any user specified value won't be
- *     sanitized itself, but replacements applied by input evaluators are.
+ *     sanitized itself, but replacements applied by input evaluators are as
+ *     well as values retrieved from selected data sources.
+ *   - wrapped: (optional) Set this to TRUE in case the data should be passed
+ *     wrapped. This only applies to wrapped data types, e.g. entities.
  *  Each 'provides' array may contain the following properties:
  *   - label: The label of the variable. Start capitalized. Required.
  *   - type: The rules data type of the variable. All types declared in
  *     hook_rules_data_info() may be specified. Types may be parametrized e.g.
  *     the types node<page> or list<integer> are valid.
- *   - save: If this is set to TRUE, the provided variable is saved by rules
- *     when the rules evaluation ends. Only possible for savable data types.
- *     Optional (defaults to FALSE).
- *   - 'label callback': A callback to improve the variables label using the
- *     action's configuration settings. Optional.
+ *   - save: (optional) If this is set to TRUE, the provided variable is saved
+ *     by rules when the rules evaluation ends. Only possible for savable data
+ *     types. Defaults to FALSE.
  *
  *  The module has to provide an implementation for each action, being a
  *  function named as specified in the 'base' key or for the execution callback.
@@ -218,8 +225,10 @@ function hook_rules_condition_info() {
  *
  * @return
  *   An array of information about the module's provided rules events. The array
- *   contains a sub-array for each event, with the event name as the key.
- *   Possible attributes for each sub-array are:
+ *   contains a sub-array for each event, with the event name as the key. The
+ *   name may only contain lower case alpha-numeric characters and underscores
+ *   and should be prefixed with the providing module name. Possible attributes
+ *   for each sub-array are:
  *   - label: The label of the event. Start capitalized. Required.
  *   - group: A group for this element, used for grouping the events in the
  *     interface. Should start with a capital letter and be translated.
@@ -296,42 +305,56 @@ function hook_rules_event_info() {
  *
  * @return
  *   An array of information about the module's provided data types. The array
- *   contains a sub-array for each data type, with the data type name as the key.
- *   Possible attributes for each sub-array are:
+ *   contains a sub-array for each data type, with the data type name as the
+ *   key. The name may only contain lower case alpha-numeric characters and
+ *   underscores and should be prefixed with the providing module name. Possible
+ *   attributes for each sub-array are:
  *   - label: The label of the data type. Start uncapitalized. Required.
- *   - wrap: If set to TRUE, the data is wrapped internally using wrappers
- *     provided by the entity metadata module. This is required for entities and
- *     data structures to support the application of data selectors or
- *     intelligent saving.
- *   - parent: Optionally a parent type may be set to specify a sub-type
+ *   - parent: (optional) A parent type may be set to specify a sub-type
  *     relationship, which will be only used for checking compatible types. E.g.
  *     the 'entity' data type is parent of the 'node' data type, thus a node may
  *     be also used for any action needing an 'entity' parameter. Can be set to
  *     any known rules data type.
- *   - 'ui class': Specify a class that is used to generate the configuration UI
- *     to configure parameters of this type. The given class must extend
- *     RulesDataUI and may implement the RulesDataDirectInputFormInterface in
- *     order to allow the direct data input configuration mode. Optionally,
- *     defaults to RulesDataUI.
- *   - 'property info': May be used for non-entity data structures to provide
- *     info about the data properties, such that data selectors via an entity
- *     metadata wrapper are supported. Specify an array as expected by
- *     entity_metadata_wrapper(). Optionally.
- *   - 'creation callback': If 'property info' is given, an optional callback
- *     that makes use of the property info to create a new instance of this
- *     data type. Entities should use hook_entity_info() to specify
- *     'creation callback' instead, as introduced by the entity module. See
- *     rules_action_data_create_array() for an example.
- *   - 'property defaults': May be used for non-entity data structures to
- *     to provide property info defaults for the data properties. Specify an
- *     array as expected by entity_metadata_wrapper(). Optionally.
- *   - group: A group for this element, used for grouping the data types in the
- *     interface. Should start with a capital letter and be translated.
- *     Optional.
- *   - 'token type': The type name as used by the token module. Defaults to the
- *     type name as used by rules. Use FALSE to let token ignore this type.
- *     Optional.
- *   - 'cleaning callback': An optional callback that input evaluators may use
+ *   - ui class: (optional) Specify a class that is used to generate the
+ *     configuration UI to configure parameters of this type. The given class
+ *     must extend RulesDataUI and may implement the
+ *     RulesDataDirectInputFormInterface in order to allow the direct data input
+ *     configuration mode. Defaults to RulesDataUI.
+ *   - wrap: (optional) If set to TRUE, the data is wrapped internally using
+ *     wrappers provided by the entity API module. This is required for entities
+ *     and data structures to support selecting a property via the data selector
+ *     and for intelligent saving.
+ *   - is wrapped: (optional) In case the data wrapper is already wrapped when
+ *     passed to Rules and Rules should not unwrap it when passing the data as
+ *     argument, e.g. to an action, set this to TRUE. The default FALSE is fine
+ *     in most cases.
+ *   - wrapper class: (optional) Allows the specification of a custom wrapper
+ *     class, which has to inherit from 'EntityMetadataWrapper'. If given Rules
+ *     makes use of the class for wrapping the data of the given type. However
+ *     note that if data is already wrapped when it is passed to Rules, the
+ *     existing wrappers will be kept.
+ *     For modules implementing identifiable data types being non-entites the
+ *     class RulesIdentifiableDataWrapper is provided, which can be used as base
+ *     for a custom wrapper class. See RulesIdentifiableDataWrapper for details.
+ *   - property info: (optional) May be used for non-entity data structures to
+ *     provide info about the data properties, such that data selectors via an
+ *     entity metadata wrapper are supported. Specify an array as expected by
+ *     the $info parameter of entity_metadata_wrapper().
+ *   - creation callback: (optional) If 'property info' is given, an optional
+ *     callback that makes use of the property info to create a new instance of
+ *     this data type. Entities should use hook_entity_info() to specify the
+ *     'creation callback' instead, as utilized by the entity API module. See
+ *     rules_action_data_create_array() for an example callback.
+ *   - property defaults: (optional) May be used for non-entity data structures
+ *     to to provide property info defaults for the data properties. Specify an
+ *     array as expected by entity_metadata_wrapper().
+ *   - group: (optional) A group for this element, used for grouping the data
+ *     types in the interface. Should start with a capital letter and be
+ *     translated.
+ *   - token type: (optional) The type name as used by the token module.
+ *     Defaults to the type name as used by rules. Use FALSE to let token ignore
+ *     this type.
+ *   - cleaning callback: (optional) A callback that input evaluators may use
  *     to clean inserted replacements; e.g. this is used by the token evaluator.
  *
  *  @see entity_metadata_wrapper()
@@ -345,6 +368,13 @@ function hook_rules_data_info() {
       'parent' => 'entity',
       'group' => t('Node'),
     ),
+    // Formatted text as used by in hook_entity_property_info() for text fields.
+    'text_formatted' => array(
+      'label' => t('formatted text'),
+      'ui class' => 'RulesDataUITextFormatted',
+      'wrap' => TRUE,
+      'property info' => entity_property_text_formatted_info(),
+    ),
   );
 }
 
@@ -357,7 +387,10 @@ function hook_rules_data_info() {
  * @return
  *   An array of information about the module's provided rules plugins. The
  *   array contains a sub-array for each plugin, with the plugin name as the
- *   key. Possible attributes for each sub-array are:
+ *   key. The name may only contain lower case alpha-numeric characters,
+ *   underscores and spaces and should be prefixed with the providing module
+ *   name. Possible attributes for
+ *   each sub-array are:
  *   - label: A label for the plugin. Start capitalized. Required only for
  *     components (see below).
  *   - class: The implementation class. Has to extend the RulesPlugin class.
@@ -390,6 +423,11 @@ function hook_rules_data_info() {
  *       For each method appearing in methods a file may be specified by using
  *       the method name as key and another array as value, which describes the
  *       file to include - looking like the file array supported by 'extenders'.
+ *   - import keys: (optional) Embeddable plugins may specify an array of import
+ *     keys, which the plugin make use for exporting. Defaults to the upper
+ *     case plugin name, thus the key 'OR' in an export triggers the creation
+ *     of the 'or' plugin. Note that only uppercase values are allowed, as
+ *     lower case values are treated as action or condition exports.
  *
  *  @see class RulesPlugin
  *  @see hook_rules_plugin_info_alter()
@@ -415,6 +453,7 @@ function hook_rules_plugin_info() {
           'class' => 'RulesRuleUI',
         ),
       ),
+      'import keys' => array('DO', 'IF'),
     ),
   );
 }
@@ -433,7 +472,9 @@ function hook_rules_plugin_info() {
  * @return
  *   An array of information about the module's provided input evaluators. The
  *   array contains a sub-array for each evaluator, with the evaluator name as
- *   the key. Possible attributes for each sub-array are:
+ *   the key. The name may only contain lower case alpha-numeric characters and
+ *   underscores and should be prefixed with the providing module name. Possible
+ *   attributes for each sub-array are:
  *   - class: The implementation class, which has to extend the
  *     RulesDataInputEvaluator class. Required.
  *   - weight: A weight for controlling the evaluation order of multiple
@@ -469,7 +510,10 @@ function hook_rules_evaluator_info() {
  * @return
  *   An array of information about the module's provided data processors. The
  *   array contains a sub-array for each processor, with the processor name as
- *   the key. Possible attributes for each sub-array are:
+ *   the key. The name may only contain lower case alpha-numeric characters and
+ *   underscores and should be prefixed with the providing module name, whereas
+ *   'select' is reserved as well.
+ *   Possible attributes for each sub-array are:
  *   - class: The implementation class, which has to extend the
  *     RulesDataProcessor class. Required.
  *   - weight: A weight for controlling the processing order of multiple data
