@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function drupalfr_user_install() {
+  /* Need to move data from `content_type_profile` to all user field
+   * Here is the mapping
+   * =======================================================================
+   * | Fields of content_type_profile         | user's fields table        |
+   * ======================================== ==============================
+   * | field_icq_value                        | field_data_field_icq       |
+   * | field_jabber_value                     | field_data_field_jabber    |
+   * | field_link_url                         | field_data_field_website   |
+   * | field_link_title                       | field_data_field_website   |
+   * | field_link_attributes                  | field_data_field_website   |
+   * | field_msn_email                        | field_data_field_msn       |
+   * | field_nickname_value                   | field_data_field_nickname  |
+   * | field_picture_fid                      | field_data_field_picture   |
+   * | field_picture_list                     | field_data_field_picture   |
+   * | field_picture_data                     | field_data_field_picture   |
+   * | field_realname_value                   | field_data_field_realname  |
+   * | field_company_nid                      | field_data_field_company   |
+   * |----------------------------------------|----------------------------|
+   * | content_field_events table             | field_data_field_events    |
+   * |----------------------------------------|----------------------------|
+   * | field_data_body where bundle = profile | field_data_field_biography |
+   * |----------------------------------------|----------------------------|
+   *
+   * Let's do the logic now
+   * ----------------------
+   * Find the content profile nid of an user
+   * SELECT nid, vid, uid FROM node WHERE type = 'profile' (AND uid = 1084)
+   * nid = 11060
+   * vid = 22022
+   * uid = 1084
+   * SELECT * FROM content_type_profile WHERE nid = 11060 AND vid = 22022
+   * field_icq_value 
+   * field_jabber_value   
+   * field_link_url       
+   * field_link_title     
+   * field_link_attributes
+   * field_msn_email      
+   * field_nickname_value 
+   * field_picture_fid    
+   * field_picture_list   
+   * field_picture_data   
+   * field_realname_value 
+   * field_company_nid 
+   * --------------------
+   * filling of one user field #1
+   *
+   * entity_type : user
+   * bundle      : user
+   * deleted     : 0
+   * entity_id   : 1084 (uid)
+   * revision_id : 1084 (uid)
+   * language    : und
+   * delta       : 0
+   * Then the last field are the values
+   *
+   * --------------------
+   * field_biography case
+   * SELECT body_value FROM field_data_body WHERE bundle LIKE 'profile' AND entity_id = 11060 AND revision_id = 22022
+   * body_value = 'Drupal Lover'
+   * 
+   * --------------------
+   * field_events case
+   * SELECT * FROM content_field_events WHERE vid = 22022 AND nid = 11060
+   * delta | field_events_value
+   * 0     | drupalcamp-paris-2
+   * 1     | drupalcamp-paris-3
+   * 2     | drupalcamp-paris-4
+   * >>> direct to field_data_field_events as seens in #1 
+   */
+
+}
+
+function drupalfr_user_migration() {
+  $mapping = array(
+    'field_icq_value' => array ( // origin field
+      'table' => 'field_data_field_icq', // destination table
+      'field' => 'field_icq_value', // destination field
+    ),
+    'field_jabber_value' => array ( // origin field
+      'table' => 'field_data_field_jabber', // destination table
+      'field' => 'field_jabber_value', // destination field
+    ),
+  );
+
+  $result = db_query("SELECT p.*, b.body_value FROM node n
+                      INNER JOIN content_type_profile p ON n.nid = p.nid AND n.vid = p.vid
+                      INNER JOIN field_data_body b ON b.entity_id = n.nid AND b.revision_id = n.vid
+                      WHERE n.type = 'profile'");
+  //while($item = db_fetch_array($result)) {
+
+  //}
+
+}
