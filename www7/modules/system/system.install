@@ -2412,7 +2412,7 @@ function system_update_7053() {
       ->execute();
   }
 
-  block_flush_caches();
+  // block_flush_caches();
 
   // Show the new menu blocks along the navigation block.
   $blocks = db_query("SELECT theme, status, region, weight, visibility, pages FROM {block} WHERE module = 'system' AND delta = 'navigation'");
