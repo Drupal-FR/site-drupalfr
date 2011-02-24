@@ -17,4 +17,5 @@ drush updatedb -y --verbose
 
 # enable modules
 drush en -y markdown
+drush en -y dfr_documentation
 drush cc all
