@@ -109,6 +109,7 @@ function rules_schema() {
  * Upgrade from Rules 6.x-1.x to 7.x.
  */
 function rules_update_7200() {
+  module_load_include('module', 'entity');
   // Create the new db tables first.
   $schema['rules_config'] = array(
     'fields' => array(
