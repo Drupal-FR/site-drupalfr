@@ -1,5 +1,5 @@
 <?php
-// $Id: ui.core.inc,v 1.1.2.17 2011/02/15 10:43:49 fago Exp $
+// $Id: ui.core.inc,v 1.1.2.18 2011/02/22 15:50:05 fago Exp $
 
 /**
  * @file Contains core ui functions.
@@ -459,7 +459,13 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
 
     if (isset($form_state['values']['vars']['items'])) {
       $vars = &$this->element->componentVariables();
-      $vars = array();
+      // Clear the variables and re-add all variables based on the form values.
+      // However keep non-parameter variables as they don't appear in the form.
+      foreach ($vars as $name => $info) {
+        if (!isset($info['parameter']) || $info['parameter']) {
+          unset($vars[$name]);
+        }
+      }
       usort($form_state['values']['vars']['items'], 'rules_element_sort_helper');
       foreach ($form_state['values']['vars']['items'] as $item) {
         if ($item['type'] && $item['name'] && $item['label']) {

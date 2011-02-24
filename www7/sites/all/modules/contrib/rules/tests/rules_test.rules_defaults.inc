@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_test.rules_defaults.inc,v 1.1.2.4 2011/01/13 18:06:48 fago Exp $
+// $Id: rules_test.rules_defaults.inc,v 1.1.2.5 2011/02/22 14:28:38 fago Exp $
 
 /**
  * @file Includes any rules integration provided by the module.
@@ -48,7 +48,8 @@ function _rules_export_get_test_export() {
               "node" : [ "comment:node" ],
               "type" : { "value" : { "page" : "page" } }
             }
-          }
+          },
+          { "NOT AND" : [ { "OR" : [] } ] }
         ]
       }
     ],
@@ -67,6 +68,11 @@ function _rules_export_get_test_export() {
       { "drupal_message" : {
           "message" : "fein, [comment:node:title] has been made sticky!",
           "type" : [ "level" ]
+        }
+      },
+      { "LOOP" : {
+          "USING" : { "list" : [ "site:current-user:roles" ] },
+          "DO" : [ { "drupal_message" : { "message" : [ "list-item" ] } } ]
         }
       }
     ]

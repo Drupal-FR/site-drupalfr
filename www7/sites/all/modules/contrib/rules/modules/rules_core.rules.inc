@@ -1,5 +1,5 @@
 <?php
-// $Id: rules_core.rules.inc,v 1.1.2.6 2011/02/16 17:21:47 fago Exp $
+// $Id: rules_core.rules.inc,v 1.1.2.8 2011/02/23 18:15:00 fago Exp $
 
 /**
  * @file Rules core integration providing data types and conditions and
@@ -102,10 +102,15 @@ function rules_rules_core_data_info() {
         'parent' => 'entity',
         'wrap' => TRUE,
         'group' => t('Entity'),
+        'ui class' => empty($info['exportable']) ? 'RulesDataUIEntity' : 'RulesDataUIEntityExportable',
       );
     }
   }
-  $return['taxonomy_vocabulary']['wrapper class'] = 'RulesTaxonomyVocabularyWrapper';
+
+  if (module_exists('taxonomy')) {
+    $return['taxonomy_vocabulary']['wrapper class'] = 'RulesTaxonomyVocabularyWrapper';
+  }
+
   return $return;
 }
 

@@ -1,5 +1,5 @@
 <?php
-// $Id: rules.core.inc,v 1.1.2.22 2011/02/16 17:21:47 fago Exp $
+// $Id: rules.core.inc,v 1.1.2.24 2011/02/23 12:40:10 fago Exp $
 
 /**
  * @file
@@ -969,20 +969,27 @@ abstract class RulesPlugin extends RulesExtendable {
    * @see rules_import()
    */
   public function export($prefix = '',$php = FALSE) {
-    $export[strtoupper($this->plugin())] = $this->exportSettings();
+    $export = $this->exportToArray();
     return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
+  }
+
+  protected function exportToArray() {
+    $export[strtoupper($this->plugin())] = $this->exportSettings();
+    return $export;
   }
 
   protected function exportSettings() {
     $export = array();
-    foreach ($this->pluginParameterInfo() as $name => $info) {
-      if (($return = $this->exportParameterSetting($name, $info)) !== NULL) {
-        $export['USING'][$name] = $return;
+    if (!$this->isRoot()) {
+      foreach ($this->pluginParameterInfo() as $name => $info) {
+        if (($return = $this->exportParameterSetting($name, $info)) !== NULL) {
+          $export['USING'][$name] = $return;
+        }
       }
-    }
-    foreach ($this->providesVariables() as $name => $info) {
-      if (!empty($info['source name'])) {
-        $export['PROVIDE'][$info['source name']][$name] = $info['label'];
+      foreach ($this->providesVariables() as $name => $info) {
+        if (!empty($info['source name'])) {
+          $export['PROVIDE'][$info['source name']][$name] = $info['label'];
+        }
       }
     }
     return $export;
@@ -1199,14 +1206,13 @@ abstract class RulesAbstractPlugin extends RulesPlugin {
     $this->importSettings($export);
   }
 
-  public function export($prefix = '',$php = FALSE) {
+  protected function exportToArray() {
     $export = $this->exportSettings();
     if (!$this->providesVariables()) {
       // Abbreviate the export making "USING" implicit.
       $export = isset($export['USING']) ? $export['USING'] : array();
     }
-    $export = array($this->elementName => $export);
-    return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
+    return array($this->elementName => $export);
   }
 
   public function dependencies() {
@@ -1790,26 +1796,48 @@ abstract class RulesContainerPlugin extends RulesPlugin implements IteratorAggre
     return $export;
   }
 
-  public function export($prefix = '',$php = FALSE) {
+  /**
+   * Determines whether the element should be exported in flat style. Flat style
+   * means that the export keys are written directly into the export array,
+   * whereas else the export is written into a sub-array.
+   */
+  protected function exportFlat() {
+    // By default we always use flat style for plugins without any parameters
+    // or provided variables, as then only children have to be exported. E.g.
+    // this applies to the OR and AND plugins.
+    return $this->isRoot() || (!$this->pluginParameterInfo() && !$this->providesVariables());
+  }
+
+  protected function exportToArray() {
     $export = array();
-    if (isset($this->info['variables'])) {
+    if (!empty($this->info['variables'])) {
       $export['USES VARIABLES'] = $this->info['variables'];
     }
-    $export += $this->exportChildren();
-    return $this->isRoot() ? $this->returnExport($export, $prefix, $php) : $export;
+    if ($this->exportFlat()) {
+      $export += $this->exportSettings() + $this->exportChildren();
+    }
+    else {
+      $export[strtoupper($this->plugin())] = $this->exportSettings() + $this->exportChildren();
+    }
+    return $export;
   }
 
   public function import(array $export) {
-    if (isset($export['USES VARIABLES'])) {
+    if (!empty($export['USES VARIABLES'])) {
       $this->info['variables'] = $export['USES VARIABLES'];
     }
+    // Care for exports having the export array nested in a sub-array.
+    if (!$this->exportFlat()) {
+      $export = reset($export);
+    }
+    $this->importSettings($export);
     $this->importChildren($export);
   }
 
   protected function importChildren($export, $key = NULL) {
     $key = isset($key) ? $key : strtoupper($this->plugin());
     foreach ($export[$key] as $child_export) {
-      $plugin = _rules_import_get_plugin(key($child_export), 'action');
+      $plugin = _rules_import_get_plugin(key($child_export), $this instanceof RulesActionInterface ? 'action' : 'condition');
       $child = rules_plugin_factory($plugin);
       $child->setParent($this);
       $child->import($child_export);
@@ -1874,6 +1902,21 @@ abstract class RulesActionContainer extends RulesContainerPlugin implements Rule
     $this->info += array('provides' => array());
     return $this->info['provides'];
   }
+
+  protected function exportToArray() {
+    $export = parent::exportToArray();
+    if (!empty($this->info['provides'])) {
+      $export['PROVIDES VARIABLES'] = $this->info['provides'];
+    }
+    return $export;
+  }
+
+  public function import(array $export) {
+    parent::import($export);
+    if (!empty($export['PROVIDES VARIABLES'])) {
+      $this->info['provides'] = $export['PROVIDES VARIABLES'];
+    }
+  }
 }
 
 /**
@@ -1922,15 +1965,9 @@ abstract class RulesConditionContainer extends RulesContainerPlugin implements R
   }
 
   protected function exportChildren($key = NULL) {
-    $not = $this->negate ? 'NOT ' : '';
-    $key = isset($key) ? $key : $not . strtoupper($this->plugin());
-    $export[$key] = array();
-    foreach ($this->children as $child) {
-      $export[$key][] = $child->export(TRUE);
-    }
-    return $export;
+    $key = isset($key) ? $key : strtoupper($this->plugin());
+    return parent::exportChildren($this->negate ? 'NOT ' . $key : $key);
   }
-
 
   protected function importChildren($export, $key = NULL) {
     $key = isset($key) ? $key : strtoupper($this->plugin());
@@ -1939,12 +1976,7 @@ abstract class RulesConditionContainer extends RulesContainerPlugin implements R
       $this->negate = TRUE;
       $key = 'NOT ' . $key;
     }
-    foreach ($export[$key] as $child_export) {
-      $plugin = _rules_import_get_plugin(key($child_export), 'condition');
-      $child = rules_plugin_factory($plugin);
-      $child->setParent($this);
-      $child->import($child_export);
-    }
+    parent::importChildren($export, $key);
   }
 
   /**
@@ -2149,6 +2181,10 @@ function _rules_import_get_plugin($key, $default = 'action') {
         }
       }
     }
+  }
+  // Cut of any leading NOT from the key.
+  if (strpos($key, 'NOT ') === 0) {
+    $key = substr($key, 4);
   }
   if (isset($map[$key])) {
     return $map[$key];
