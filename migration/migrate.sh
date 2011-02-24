@@ -18,4 +18,23 @@ drush updatedb -y --verbose
 # enable modules
 drush en -y markdown
 drush en -y dfr_documentation
+drush en -y toolbar
+drush en -y token
+drush en -y contextual
+drush en -y image
+drush en -y rdf
+drush en -y shortcut
+drush en -y codefilter
+drush en -y entity
+drush en -y diff
+drush en -y mollom
+drush en -y pathauto
+drush en -y redirect
+drush en -y strongarm
+drush en -y views views_ui
+drush en -y features
+drush en -y email link node_reference user_reference
+drush en -y flag 
+drush en -y rules rules_admin
+
 drush cc all
