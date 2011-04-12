@@ -1,5 +1,5 @@
 <?php
-// $Id: flag.module,v 1.33 2011/01/24 05:21:32 mooffie Exp $
+// $Id: flag.module,v 1.31 2011/01/11 13:44:47 mooffie Exp $
 
 /**
  * @file
@@ -22,7 +22,7 @@ function flag_menu() {
     'page callback' => 'flag_admin_page',
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
-    'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
+    'description' => 'Configure flags for marking content with arbitary information (such as <em>offensive</em> or <em>bookmarked</em>).',
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
@@ -698,6 +698,32 @@ function flag_session_api_cleanup($arg = 'run') {
 function flag_node_type_delete($info) {
   // Remove entry from flaggable content types.
   db_delete('flag_types')->condition('type', $info->type)->execute();
+}
+
+/**
+ * Implements hook_activity_info().
+ */
+function flag_activity_info() {
+  $info = new stdClass();
+  $info->api = 2;
+  $info->name = 'flag';
+  // The order of objects here matters. If a user is both the author and the
+  // flagging user, the flagging user message takes precedence.
+  $info->objects = array('node author' => 'node', 'flagging user' => 'account', 'comment author' => 'comment');
+  $info->hooks = array('flag' => array('flag', 'unflag'));
+
+  // Figure out the activity access control realms and the types.
+  $flags = flag_get_flags();
+  foreach ($flags as $fid => $flag) {
+    $info->realms["flag_" . $flag->fid] = $flag->title;
+    // Currently, flagging a user cannot be recorded.
+    if ($flag->content_type != 'user') {
+      $info->type_options[$flag->fid] = $flag->title;
+    }
+  }
+  $info->object_type = 'flag';
+  $info->path = drupal_get_path('module', 'flag') . '/includes';
+  return $info;
 }
 
 /**
