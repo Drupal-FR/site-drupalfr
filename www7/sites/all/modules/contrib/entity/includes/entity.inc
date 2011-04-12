@@ -1,5 +1,4 @@
 <?php
-// $Id: entity.inc,v 1.1.2.3 2011/01/04 12:05:31 fago Exp $
 
 /**
  * @file
@@ -23,7 +22,7 @@ class Entity {
 
   protected $entityType;
   protected $entityInfo;
-  protected $idKey, $nameKey;
+  protected $idKey, $nameKey, $statusKey;
 
   /**
    * Creates a new entity.
@@ -38,6 +37,7 @@ class Entity {
     $this->entityInfo = entity_get_info($entityType);
     $this->idKey = $this->entityInfo['entity keys']['id'];
     $this->nameKey = isset($this->entityInfo['entity keys']['name']) ? $this->entityInfo['entity keys']['name'] : $this->idKey;
+    $this->statusKey = empty($info['entity keys']['status']) ? 'status' : $info['entity keys']['status'];
 
     // Set initial values.
     foreach ($values as $key => $value) {
@@ -122,7 +122,7 @@ class Entity {
     if (isset($this->entityInfo['uri callback']) && $this->entityInfo['uri callback'] == 'entity_class_uri') {
       return $this->defaultUri();
     }
-    return entity_uri($entity_type, $entity);
+    return entity_uri($this->entityType, $this);
   }
 
   /**
@@ -130,7 +130,26 @@ class Entity {
    * 'entity_class_uri' as 'uri callback' hook_entity_info().
    */
   protected function defaultUri() {
-    return array('path' => 'default/' . $entity->identifier());
+    return array('path' => 'default/' . $this->identifier());
+  }
+
+  /**
+   * Checks if the entity has a certain exportable status.
+   *
+   * @param $status
+   *   A status constant, i.e. one of ENTITY_CUSTOM, ENTITY_IN_CODE,
+   *   ENTITY_OVERRIDDEN or ENTITY_FIXED.
+   *
+   * @return
+   *   For exportable entities TRUE if the entity has the status, else FALSE.
+   *   In case the entity is not exportable, NULL is returned.
+   *
+   * @see entity_has_status()
+   */
+  public function hasStatus($status) {
+    if (!empty($this->entityInfo['exportable'])) {
+      return isset($this->{$this->statusKey}) && ($this->{$this->statusKey} & $status) == $status;
+    }
   }
 
   /**

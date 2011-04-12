@@ -1,5 +1,4 @@
 <?php
-// $Id: field.info.inc,v 1.1.2.3 2010/12/29 12:03:11 fago Exp $
 
 /**
  * @file
@@ -17,17 +16,19 @@ function entity_metadata_field_entity_property_info() {
   // Loop over all field instances and add them as property.
   foreach (field_info_fields() as $field_name => $field) {
     $field += array('bundles' => array());
-    $field_type = field_info_field_types($field['type']) + array('property_callbacks' => array());
-    // Add in our default callback as the first one.
-    array_unshift($field_type['property_callbacks'], 'entity_metadata_field_default_property_callback');
+    if ($field_type = field_info_field_types($field['type'])) {
+      // Add in our default callback as the first one.
+      $field_type += array('property_callbacks' => array());
+      array_unshift($field_type['property_callbacks'], 'entity_metadata_field_default_property_callback');
 
-    foreach ($field['bundles'] as $entity_type => $bundles) {
-      foreach ($bundles as $bundle) {
-        $instance = field_info_instance($entity_type, $field_name, $bundle);
+      foreach ($field['bundles'] as $entity_type => $bundles) {
+        foreach ($bundles as $bundle) {
+          $instance = field_info_instance($entity_type, $field_name, $bundle);
 
-        if ($instance && empty($instance['deleted'])) {
-          foreach ($field_type['property_callbacks'] as $callback) {
-            $callback($info, $entity_type, $field, $instance, $field_type);
+          if ($instance && empty($instance['deleted'])) {
+            foreach ($field_type['property_callbacks'] as $callback) {
+              $callback($info, $entity_type, $field, $instance, $field_type);
+            }
           }
         }
       }
@@ -57,6 +58,7 @@ function entity_metadata_field_default_property_callback(&$info, $entity_type, $
       'setter callback' => 'entity_metadata_field_property_set',
       'access callback' => 'entity_metadata_field_access_callback',
       'query callback' => 'entity_metadata_field_query',
+      'translatable' => !empty($field['translatable']),
       // Specify that this property stems from a field.
       'field' => TRUE,
     );

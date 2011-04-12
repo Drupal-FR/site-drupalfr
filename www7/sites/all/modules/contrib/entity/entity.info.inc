@@ -1,5 +1,4 @@
 <?php
-// $Id: entity.info.inc,v 1.1.2.1 2010/12/16 11:13:26 fago Exp $
 
 /**
  * @file
@@ -74,6 +73,8 @@ class EntityDefaultMetadataController {
 
     // Set better metadata for known entity keys.
     $id_key = $this->info['entity keys']['id'];
+    $info['properties'][$id_key]['validation callback'] = 'entity_metadata_validate_integer_positive';
+
     if (!empty($this->info['entity keys']['name']) && $key = $this->info['entity keys']['name']) {
       $info['properties'][$key]['type'] = 'token';
       $info['properties'][$key]['label'] = t('Machine-readable name');
@@ -129,7 +130,7 @@ function entity_metadata_convert_schema($table) {
       $properties[$name] = array(
         'type' => $type,
         'label' => drupal_ucfirst($name),
-        'query callback' => 'entity_metadata_table_query',
+        'schema field' => $name,
         // As we cannot know about any setter access, leave out the setter
         // callback. For getting usually no further access callback is needed.
       );

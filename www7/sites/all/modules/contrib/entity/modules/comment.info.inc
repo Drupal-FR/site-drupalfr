@@ -1,5 +1,4 @@
 <?php
-// $Id: comment.info.inc,v 1.1.2.2 2010/12/29 12:03:11 fago Exp $
 
 /**
  * @file
@@ -19,10 +18,12 @@ function entity_metadata_comment_entity_property_info() {
     'label' => t("Comment ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the comment."),
+    'schema field' => 'cid',
   );
   $properties['hostname'] = array(
     'label' => t("IP Address"),
     'description' => t("The IP address of the computer the comment was posted from."),
+    'schema field' => 'hostname',
   );
   $properties['name'] = array(
     'label' => t("Name"),
@@ -31,6 +32,7 @@ function entity_metadata_comment_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer comments',
     'sanitize' => 'filter_xss',
+    'schema field' => 'name',
   );
   $properties['mail'] = array(
     'label' => t("Email address"),
@@ -39,6 +41,7 @@ function entity_metadata_comment_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer comments',
     'validation callback' => 'valid_email_address',
+    'schema field' => 'mail',
   );
   $properties['homepage'] = array(
     'label' => t("Home page"),
@@ -46,6 +49,7 @@ function entity_metadata_comment_entity_property_info() {
     'sanitize' => 'filter_xss_bad_protocol',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer comments',
+    'schema field' => 'homepage',
   );
   $properties['subject'] = array(
     'label' => t("Subject"),
@@ -54,6 +58,7 @@ function entity_metadata_comment_entity_property_info() {
     'setter permission' => 'administer comments',
     'sanitize' => 'filter_xss',
     'required' => TRUE,
+    'schema field' => 'subject',
   );
   $properties['url'] = array(
     'label' => t("URL"),
@@ -73,12 +78,14 @@ function entity_metadata_comment_entity_property_info() {
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer comments',
+    'schema field' => 'created',
   );
   $properties['parent'] = array(
     'label' => t("Parent"),
     'description' => t("The comment's parent, if comment threading is active."),
     'type' => 'comment',
     'getter callback' => 'entity_metadata_comment_get_properties',
+    'schema field' => 'pid',
   );
   $properties['node'] = array(
     'label' => t("Node"),
@@ -88,6 +95,7 @@ function entity_metadata_comment_entity_property_info() {
     'setter callback' => 'entity_metadata_comment_setter',
     'setter permission' => 'administer comments',
     'required' => TRUE,
+    'schema field' => 'nid',
   );
   $properties['author'] = array(
     'label' => t("Author"),
@@ -97,6 +105,7 @@ function entity_metadata_comment_entity_property_info() {
     'setter callback' => 'entity_metadata_comment_setter',
     'setter permission' => 'administer comments',
     'required' => TRUE,
+    'schema field' => 'uid',
   );
   return $info;
 }

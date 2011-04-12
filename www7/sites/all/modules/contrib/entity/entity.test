@@ -1,5 +1,4 @@
 <?php
-// $Id: entity.test,v 1.1.2.7 2011/01/04 12:05:31 fago Exp $
 
 /**
  * @file
@@ -204,7 +203,7 @@ class EntityAPITestCase extends DrupalWebTestCase {
 
     // Now make sure 'test' is not overridden any more, but custom.
     $result = entity_load('entity_test_type', array('test'));
-    $this->assertTrue(!entity_has_status('entity_test_type', $result['test'], ENTITY_OVERRIDDEN), 'Entity is not marked as overridden any more.');
+    $this->assertTrue(!$result['test']->hasStatus(ENTITY_OVERRIDDEN), 'Entity is not marked as overridden any more.');
     $this->assertTrue(entity_has_status('entity_test_type', $result['test'], ENTITY_CUSTOM), 'Entity is marked as custom.');
 
     // Test deleting the remaining entities from DB.
@@ -272,8 +271,6 @@ class EntityAPIRulesIntegrationTestCase extends DrupalWebTestCase {
       'name' => 'Entity CRUD Rules integration',
       'description' => 'Tests the Rules integration provided by the Entity CRUD API.',
       'group' => 'Entity API',
-      // Unfortunately the drupal.org testing bot doesn't pick that up yet, so
-      // this test is excluded from the automated tests. See #924090.
       'dependencies' => array('rules'),
     );
   }
@@ -327,7 +324,7 @@ class EntityMetadataTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('entity', 'entity_test');
+    parent::setUp('entity', 'entity_test', 'locale');
     // Create a field having 4 values for testing multiple value support.
     $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
     $this->field = array('field_name' => $this->field_name, 'type' => 'text', 'cardinality' => 4);
@@ -433,6 +430,21 @@ class EntityMetadataTestCase extends DrupalWebTestCase {
     $this->assertEqual($node->body[LANGUAGE_NONE][0]['value'], "<b>The second body.</b>", 'Update appears in the wrapped entity.');
     $this->assert(isset($node->body[LANGUAGE_NONE][0]['safe_value']), 'Formatted text has been processed.');
 
+    // Test translating the body.
+    locale_add_language('de');
+    $wrapper->language('de');
+
+    $languages = language_list();
+    $this->assertEqual($wrapper->getPropertyLanguage(), $languages['de'], 'Wrapper language has been set to German');
+    $this->assertEqual($wrapper->body->value->value(), "<p>The second body.</p>\n", 'Language fallback on neutral language.');
+
+    // Set a German text using the wrapper.
+    $wrapper->body->set(array('value' => "<b>Der zweite Text.</b>"));
+
+    $this->assertEqual($wrapper->body->value->value(), "<p>Der zweite Text.</p>\n", 'German body set and retrieved.');
+    $wrapper->language(NULL);
+    $this->assertEqual($wrapper->body->value->value(), "<p>The second body.</p>\n", 'Language neutral text is still there.');
+
     // Test iterator.
     $type_info = entity_get_property_info('node');
     $this->assertFalse(array_diff_key($type_info['properties'], iterator_to_array($wrapper->getIterator())), 'Iterator is working.');
@@ -448,11 +460,26 @@ class EntityMetadataTestCase extends DrupalWebTestCase {
     // Test getting options lists.
     $this->assertEqual($wrapper->type->optionsList(), node_type_get_names(), 'Options list returned.');
 
+    // Test making use of a generic 'entity' reference property the
+    // 'entity_test' module provides. The property defaults to the node author.
+    $this->assertEqual($wrapper->reference->uid->value(), $wrapper->author->getIdentifier(), 'Used generic entity reference property.');
+    // For testing, just point the reference to the node itself now.
+    $wrapper->reference->set($wrapper);
+    $this->assertEqual($wrapper->reference->nid->value(), $wrapper->getIdentifier(), 'Correctly updated the generic entity referenced property.');
+
     // Test saving and deleting.
     $wrapper->save();
     $wrapper->delete();
     $return = node_load($wrapper->getIdentifier());
     $this->assertFalse($return, "Node has been successfully deleted.");
+
+    // Test labels.
+    $user = $this->drupalCreateUser();
+    user_save($user, array('roles' => array()));
+    $wrapper->author = $user->uid;
+    $this->assertEqual($wrapper->label(), $node->title, 'Entity label returned.');
+    $this->assertEqual($wrapper->author->roles[0]->label(), t('authenticated user'), 'Label from options list returned');
+    $this->assertEqual($wrapper->author->roles->label(), t('authenticated user'), 'Label for a list from options list returned');
   }
 
   /**
@@ -569,13 +596,16 @@ class EntityMetadataTestCase extends DrupalWebTestCase {
   function testEntityQuery() {
     $title = '<b>Is it bold?<b>';
     $values[LANGUAGE_NONE][0] = array('value' => 'foo');
-    $node = $this->drupalCreateNode(array($this->field_name => $values, 'title' => $title));
+    $node = $this->drupalCreateNode(array($this->field_name => $values, 'title' => $title, 'uid' => $GLOBALS['user']->uid));
 
-    $results = entity_property_query('node', 'title', array($title, 'another title'));
+    $results = entity_property_query('node', 'title', $title);
     $this->assertEqual($results, array($node->nid), 'Queried nodes with a given title.');
 
     $results = entity_property_query('node', $this->field_name, 'foo');
     $this->assertEqual($results, array($node->nid), 'Queried nodes with a given field value.');
+
+    $results = entity_property_query('node', 'author', $GLOBALS['user']);
+    $this->assertEqual($results, array($node->nid), 'Queried nodes with a given auhtor.');
   }
 
   /**
@@ -825,6 +855,11 @@ class EntityMetadataIntegrationTestCase extends DrupalWebTestCase {
     foreach ($wrapper as $key => $value) {
       $this->assertValue($wrapper, $key);
     }
+    // Test page request related properties.
+    foreach ($wrapper->current_page as $key => $value) {
+      $this->assertValue($wrapper->current_page, $key);
+    }
+
     // Test files.
     $file = $this->createFile();
 
@@ -857,8 +892,7 @@ class EntityMetadataIntegrationTestCase extends DrupalWebTestCase {
       foreach (entity_metadata_wrapper($entity_type) as $name => $wrapper) {
         $info = $wrapper->info();
         if (!empty($info['setter callback'])) {
-          $info += array('type' => 'text');
-          $values[$name] = $this->createValue($info['type'], $info);
+          $values[$name] = $this->createValue($wrapper);
         }
       }
       $entity = entity_property_values_create_entity($entity_type, $values)->value();
@@ -1073,26 +1107,27 @@ class EntityMetadataIntegrationTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Creates a value for the given type.
+   * Creates a value for the given property.
    */
-  protected function createValue($type, $info) {
+  protected function createValue($wrapper) {
     if (!isset($this->node)) {
       $this->node = $this->drupalCreateNode(array('type' => 'page'));
       $this->user = $this->drupalCreateUser();
       $this->taxonomy_vocabulary = $this->createVocab();
     }
 
-    if (isset($info['options list'])) {
-      $options = array_keys($info['options list']());
-      return entity_property_list_extract_type($type) ? array(reset($options)) : reset($options);
+    if ($options = $wrapper->optionsList()) {
+      $options = entity_property_options_flatten($options);
+      return $wrapper instanceof EntityListWrapper ? array(key($options)) : key($options);
     }
 
     // For mail addresses properly pass an mail address.
+    $info = $wrapper->info();
     if ($info['name'] == 'mail') {
       return 'webmaster@example.com';
     }
 
-    switch ($type) {
+    switch ($wrapper->type()) {
       case 'decimal':
       case 'integer':
       case 'duration':
@@ -1111,7 +1146,7 @@ class EntityMetadataIntegrationTestCase extends DrupalWebTestCase {
         return array();
 
       default:
-        return $this->$type;
+        return $this->{$wrapper->type()};
     }
   }
 

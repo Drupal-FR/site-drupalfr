@@ -1,5 +1,4 @@
 <?php
-// $Id: entity_test.module,v 1.1.2.2 2011/01/04 12:05:31 fago Exp $
 
 /**
  * @file
@@ -29,18 +28,18 @@ function entity_test_entity_info() {
         'bundle' => 'name',
       ),
     ),
-  );
-  $return['entity_test_type'] = array(
-    'label' => t('Test entity type'),
-    'entity class' => 'Entity',
-    'controller class' => 'EntityAPIController',
-    'base table' => 'entity_test_type',
-    'fieldable' => FALSE,
-    'bundle of' => 'entity_test',
-    'exportable' => TRUE,
-    'entity keys' => array(
-      'id' => 'id',
-      'name' => 'name',
+    'entity_test_type' => array(
+      'label' => t('Test entity type'),
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'entity_test_type',
+      'fieldable' => FALSE,
+      'bundle of' => 'entity_test',
+      'exportable' => TRUE,
+      'entity keys' => array(
+        'id' => 'id',
+        'name' => 'name',
+      ),
     ),
   );
   return $return;
@@ -205,4 +204,37 @@ function entity_test_entity_test_type_presave($entity) {
       $entity->label .= '_presave';
     }
   }
+}
+
+/**
+ * Implements hook_entity_property_info_alter() for testing an property of type
+ * 'entity'.
+ */
+function entity_test_entity_property_info_alter(&$info) {
+  $info['node']['properties']['reference'] = array(
+    'label' => t('Test reference'),
+    'description' => t('A generic entity reference.'),
+    'getter callback' => 'entity_test_entity_getter',
+    'setter callback' => 'entity_test_entity_setter',
+    'type' => 'entity',
+  );
+}
+
+/**
+ * Getter callback for the 'reference' property.
+ */
+function entity_test_entity_getter($node) {
+  if (empty($node->entity)) {
+    $node->entity = array('type' => 'user', 'id' => $node->uid);
+  }
+  // We have to return the entity wrapped.
+  return entity_metadata_wrapper($node->entity['type'], $node->entity['id']);
+}
+
+/**
+ * Setter callback for the 'reference' property.
+ */
+function entity_test_entity_setter($node, $property_name, $wrapper) {
+  // The entity has to be passed wrapped.
+  $node->entity = array('type' => $wrapper->type(), 'id' => $wrapper->getIdentifier());
 }

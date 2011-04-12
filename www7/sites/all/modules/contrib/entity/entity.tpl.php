@@ -1,5 +1,4 @@
 <?php
-// $Id: entity.tpl.php,v 1.1.2.1 2010/12/16 11:13:26 fago Exp $
 
 /**
  * @file

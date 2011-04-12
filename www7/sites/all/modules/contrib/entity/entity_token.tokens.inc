@@ -1,5 +1,4 @@
 <?php
-// $Id: entity_token.tokens.inc,v 1.1.2.1 2010/12/16 11:13:26 fago Exp $
 
 /**
  * @file
@@ -86,7 +85,12 @@ function entity_token_tokens($type, $tokens, array $data = array(), array $optio
       if (!empty($info['tokens'][$type][$name]['entity-token'])) {
         $wrapper = !isset($wrapper) ? _entity_token_wrap_data($type, $token_types[$type], $data[$type], $options) : $wrapper;
         $property_name = str_replace('-', '_', $name);
-        $replacements[$original] = _entity_token_get_token($wrapper->$property_name, $options);
+        try {
+          $replacements[$original] = _entity_token_get_token($wrapper->$property_name, $options);
+        }
+        catch (EntityMetadataWrapperException $e) {
+          // In case tokens for not existing values are requested, just do nothing.
+        }
       }
     }
     // Properly chain everything of a type marked as needs chaining.
@@ -95,7 +99,12 @@ function entity_token_tokens($type, $tokens, array $data = array(), array $optio
         if ($chained_tokens = token_find_with_prefix($tokens, $name)) {
           $wrapper = !isset($wrapper) ? _entity_token_wrap_data($type, $token_types[$type], $data[$type], $options) : $wrapper;
           $property_name = str_replace('-', '_', $name);
-          $replacements += token_generate($token_info['type'], $chained_tokens, array($token_info['type'] => $wrapper->$property_name->value()), $options);
+          try {
+            $replacements += token_generate($token_info['type'], $chained_tokens, array($token_info['type'] => $wrapper->$property_name->value()), $options);
+          }
+          catch (EntityMetadataWrapperException $e) {
+            // In case tokens for not existing values are requested, just do nothing.
+          }
         }
       }
     }

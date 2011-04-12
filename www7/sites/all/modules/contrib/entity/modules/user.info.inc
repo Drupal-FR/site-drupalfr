@@ -1,5 +1,4 @@
 <?php
-// $Id: user.info.inc,v 1.1.2.3 2011/01/02 17:24:13 fago Exp $
 
 /**
  * @file
@@ -19,6 +18,7 @@ function entity_metadata_user_entity_property_info() {
     'label' => t("User ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the user account."),
+    'schema field' => 'uid',
   );
   $properties['name'] = array(
     'label' => t("Name"),
@@ -27,6 +27,8 @@ function entity_metadata_user_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'sanitize' => 'filter_xss',
     'required' => TRUE,
+    'access callback' => 'entity_metadata_user_properties_access',
+    'schema field' => 'name',
   );
   $properties['mail'] = array(
     'label' => t("Email"),
@@ -34,6 +36,8 @@ function entity_metadata_user_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'validation callback' => 'valid_email_address',
     'required' => TRUE,
+    'access callback' => 'entity_metadata_user_properties_access',
+    'schema field' => 'mail',
   );
   $properties['url'] = array(
     'label' => t("URL"),
@@ -52,11 +56,13 @@ function entity_metadata_user_entity_property_info() {
     'description' => t("The date the user last logged in to the site."),
     'getter callback' => 'entity_metadata_user_get_properties',
     'type' => 'date',
+    'schema field' => 'login',
   );
   $properties['created'] = array(
     'label' => t("Created"),
     'description' => t("The date the user account was created."),
     'type' => 'date',
+    'schema field' => 'created',
   );
   $properties['roles'] = array(
     'label' => t("User roles"),
@@ -66,6 +72,7 @@ function entity_metadata_user_entity_property_info() {
     'setter callback' => 'entity_metadata_user_set_properties',
     'setter permission' => 'administer users',
     'options list' => 'entity_metadata_user_roles',
+    'access callback' => 'entity_metadata_user_properties_access',
   );
   return $info;
 }

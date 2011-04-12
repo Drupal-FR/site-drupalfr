@@ -1,5 +1,4 @@
 <?php
-// $Id: entity.features.inc,v 1.1.2.1 2010/12/16 11:13:26 fago Exp $
 
 /**
  * @file
@@ -20,7 +19,7 @@ function entity_features_get_controller($type) {
 }
 
 /**
- * Default controller for generating some basic metadata.
+ * Default controller handling features integration.
  */
 class EntityDefaultFeaturesController {
 
@@ -92,6 +91,10 @@ class EntityDefaultFeaturesController {
     // Add the module providing the entity type as dependency.
     if ($data && !empty($this->info['module'])) {
       $export['dependencies'][$this->info['module']] = $this->info['module'];
+      // In case entity is not already an indirect dependency, add it.
+      // We can do so without causing redundant dependencies because,
+      // if entity is an indirect dependency, Features will filter it out.
+      $export['dependencies']['entity'] = 'entity';
     }
     return $pipe;
   }
@@ -104,6 +107,7 @@ class EntityDefaultFeaturesController {
     $output[] = '  $items = array();';
     foreach (entity_load($this->type, $data) as $name => $entity) {
       $export  = "  \$items['$name'] = entity_import('{$this->type}', '";
+      // Make sure to escape the characters \ and '.
       $export .= addcslashes(entity_export($this->type, $entity, '  '), '\\\'');
       $export .= "');";
       $output[] = $export;

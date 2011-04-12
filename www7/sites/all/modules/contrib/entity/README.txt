@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1.2.10 2010/12/16 11:13:26 fago Exp $
 
 Entity API module
 -----------------

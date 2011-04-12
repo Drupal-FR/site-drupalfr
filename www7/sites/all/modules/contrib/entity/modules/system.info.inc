@@ -1,5 +1,4 @@
 <?php
-// $Id: system.info.inc,v 1.1.2.1 2010/12/16 11:13:26 fago Exp $
 
 /**
  * @file
@@ -61,6 +60,26 @@ function entity_metadata_system_entity_property_info() {
     'getter callback' => 'entity_metadata_system_get_properties',
     'type' => 'date',
   );
+  $properties['current_page'] = array(
+    'label' => t("Current page"),
+    'description' => t("Information related to the current page request."),
+    'getter callback' => 'entity_metadata_system_get_properties',
+    'type' => 'struct',
+    'property info' => array(
+      'path' => array(
+        'label' => t("Path"),
+        'description' => t("The internal Drupal path of the current page request."),
+        'getter callback' => 'current_path',
+        'type' => 'text',
+      ),
+      'url' => array(
+        'label' => t("URL"),
+        'description' => t("The full URL of the current page request."),
+        'getter callback' => 'entity_metadata_system_get_page_properties',
+        'type' => 'uri',
+      ),
+    ),
+  );
 
   // Files.
   $properties = &$info['file']['properties'];
@@ -69,23 +88,27 @@ function entity_metadata_system_entity_property_info() {
     'description' => t("The unique ID of the uploaded file."),
     'type' => 'integer',
     'validation callback' => 'entity_metadata_validate_integer_positive',
+    'schema field' => 'fid',
   );
   $properties['name'] = array(
     'label' => t("File name"),
     'description' => t("The name of the file on disk."),
     'getter callback' => 'entity_metadata_system_get_file_properties',
+    'schema field' => 'filename',
   );
   $properties['mime'] = array(
     'label' => t("MIME type"),
     'description' => t("The MIME type of the file."),
     'getter callback' => 'entity_metadata_system_get_file_properties',
     'sanitize' => 'filter_xss',
+    'schema field' => 'filemime',
   );
   $properties['size'] = array(
     'label' => t("File size"),
     'description' => t("The size of the file, in kilobytes."),
     'getter callback' => 'entity_metadata_system_get_file_properties',
     'type' => 'integer',
+    'schema field' => 'filesize',
   );
   $properties['url'] = array(
     'label' => t("URL"),
@@ -96,12 +119,14 @@ function entity_metadata_system_entity_property_info() {
     'label' => t("Timestamp"),
     'description' => t("The date the file was most recently changed."),
     'type' => 'date',
+    'schema field' => 'timestamp',
   );
   $properties['owner'] = array(
     'label' => t("Owner"),
     'description' => t("The user who originally uploaded the file."),
     'type' => 'user',
     'getter callback' => 'entity_metadata_system_get_file_properties',
+    'schema field' => 'uid',
   );
   return $info;
 }

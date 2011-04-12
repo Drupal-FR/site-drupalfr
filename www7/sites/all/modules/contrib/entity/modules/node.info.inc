@@ -1,5 +1,4 @@
 <?php
-// $Id: node.info.inc,v 1.1.2.3 2010/12/29 12:03:11 fago Exp $
 
 /**
  * @file
@@ -19,13 +18,13 @@ function entity_metadata_node_entity_property_info() {
     'label' => t("Node ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the node."),
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'nid',
   );
   $properties['vid'] = array(
     'label' => t("Revision ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the node's revision."),
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'vid',
   );
   $properties['is_new'] = array(
     'label' => t("Is new"),
@@ -41,13 +40,13 @@ function entity_metadata_node_entity_property_info() {
     'setter permission' => 'administer nodes',
     'options list' => 'node_type_get_names',
     'required' => TRUE,
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'type',
   );
   $properties['title'] = array(
     'label' => t("Title"),
     'description' => t("The title of the node."),
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'title',
     'required' => TRUE,
   );
   $properties['language'] = array(
@@ -55,7 +54,7 @@ function entity_metadata_node_entity_property_info() {
     'description' => t("The language the node is written in."),
     'setter callback' => 'entity_property_verbatim_set',
     'options list' => 'entity_metadata_language_list',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'language',
     'setter permission' => 'administer nodes',
   );
   $properties['url'] = array(
@@ -75,7 +74,7 @@ function entity_metadata_node_entity_property_info() {
     'description' => t("Whether the node is published."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer nodes',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'status',
     'type' => 'boolean',
   );
   $properties['promote'] = array(
@@ -83,7 +82,7 @@ function entity_metadata_node_entity_property_info() {
     'description' => t("Whether the node is promoted to the frontpage."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer nodes',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'promote',
     'type' => 'boolean',
   );
   $properties['sticky'] = array(
@@ -91,7 +90,7 @@ function entity_metadata_node_entity_property_info() {
     'description' => t("Whether the node is displayed at the top of lists in which it appears."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer nodes',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'sticky',
     'type' => 'boolean',
   );
   $properties['created'] = array(
@@ -100,12 +99,12 @@ function entity_metadata_node_entity_property_info() {
     'description' => t("The date the node was posted."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer nodes',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'created',
   );
   $properties['changed'] = array(
     'label' => t("Date changed"),
     'type' => 'date',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'changed',
     'description' => t("The date the node was most recently updated."),
   );
   $properties['author'] = array(
@@ -116,6 +115,7 @@ function entity_metadata_node_entity_property_info() {
     'setter callback' => 'entity_metadata_node_set_properties',
     'setter permission' => 'administer nodes',
     'required' => TRUE,
+    'schema field' => 'uid',
   );
   $properties['source'] = array(
     'label' => t("Translation source node"),
