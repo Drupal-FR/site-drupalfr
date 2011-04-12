@@ -1,5 +1,4 @@
 <?php
-// $Id: user.rules.inc,v 1.1.2.4 2011/02/14 15:08:49 fago Exp $
 
 /**
  * @file rules integration for the user module

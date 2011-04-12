@@ -1,5 +1,4 @@
 <?php
-// $Id: ui.data.inc,v 1.1.2.3 2011/02/23 18:15:00 fago Exp $
 
 /**
  * @file Contains data type related forms.
@@ -99,7 +98,7 @@ class RulesDataUI {
       if (!is_array($value) && isset($options[$value])) {
         $value = $options[$value];
       }
-      else {
+      elseif (is_array($value)) {
         foreach ($value as $key => $single_value) {
           if (isset($options[$single_value])) {
             $value[$key] = $options[$single_value];

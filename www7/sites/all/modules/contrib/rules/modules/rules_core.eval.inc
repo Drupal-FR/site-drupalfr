@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_core.eval.inc,v 1.1.2.5 2011/02/16 17:22:00 fago Exp $
 
 /**
  * @file
@@ -52,7 +51,7 @@ function rules_element_invoke_component($arguments, RulesPlugin $element) {
     return $return;
   }
   else {
-    throw new RulesException('Unable to get the component %name'. array('%name' => $info['#config_name']), $element);
+    throw new RulesException('Unable to get the component %name', array('%name' => $info['#config_name']), $element);
   }
 }
 

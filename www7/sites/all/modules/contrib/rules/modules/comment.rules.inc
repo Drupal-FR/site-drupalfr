@@ -1,5 +1,4 @@
 <?php
-// $Id: comment.rules.inc,v 1.1.2.4 2011/02/14 18:11:30 fago Exp $
 
 /**
  * @file rules integration for the comment module

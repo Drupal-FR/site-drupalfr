@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_scheduler_views_filter.inc,v 1.1.2.1 2010/12/21 15:28:13 fago Exp $
 
 /**
  * @file

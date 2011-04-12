@@ -1,5 +1,4 @@
 <?php
-// $Id: php.rules.inc,v 1.1.2.2 2011/02/22 15:50:12 fago Exp $
 
 /**
  * @file rules integration for the php module

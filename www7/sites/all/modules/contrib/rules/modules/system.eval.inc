@@ -1,5 +1,4 @@
 <?php
-// $Id: system.eval.inc,v 1.1.2.2 2011/02/09 17:38:18 fago Exp $
 
 /**
  * @file

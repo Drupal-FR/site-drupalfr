@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_test.test.inc,v 1.1.2.3 2011/02/16 17:22:34 fago Exp $
 
 /**
  * @file Include file for testing file inclusion.

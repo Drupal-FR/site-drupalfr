@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.features.inc,v 1.1.2.2 2011/02/15 14:21:03 fago Exp $
 
 /**
  * @file

@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.core.inc,v 1.1.2.24 2011/02/23 12:40:10 fago Exp $
 
 /**
  * @file

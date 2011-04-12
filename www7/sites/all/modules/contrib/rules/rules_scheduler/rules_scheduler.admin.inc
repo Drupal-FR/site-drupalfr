@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_scheduler.admin.inc,v 1.1.4.3 2010/12/21 16:40:29 fago Exp $
 
 /**
  * @file

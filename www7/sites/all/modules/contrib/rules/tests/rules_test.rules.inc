@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_test.rules.inc,v 1.1.2.5 2011/02/16 17:22:34 fago Exp $
 
 /**
  * @file Includes any rules integration provided by the module.

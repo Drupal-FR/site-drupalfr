@@ -1,5 +1,4 @@
 <?php
-// $Id: taxonomy.rules.inc,v 1.1.2.2 2011/01/04 13:08:35 fago Exp $
 
 /**
  * @file rules integration for the taxonomy_term module

@@ -1,5 +1,4 @@
 <?php
-// $Id: ui.plugins.inc,v 1.1.2.9 2011/02/15 10:43:49 fago Exp $
 
 /**
  * @file Contains UI for diverse plugins provided by Rules.

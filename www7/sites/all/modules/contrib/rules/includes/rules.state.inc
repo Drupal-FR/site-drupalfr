@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.state.inc,v 1.1.2.12 2011/02/23 18:25:39 fago Exp $
 
 /**
  * @file Contains the state and data related stuff.

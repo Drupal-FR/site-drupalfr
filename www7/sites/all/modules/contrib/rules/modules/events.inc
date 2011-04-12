@@ -1,5 +1,4 @@
 <?php
-// $Id: events.inc,v 1.1.2.3 2011/01/05 10:49:15 fago Exp $
 
 /**
  * @file Invokes events on behalf core modules. Usually this should be
@@ -44,6 +43,7 @@ function rules_node_update($node) {
 }
 
 function rules_node_insert($node) {
+  unset($node->is_new);
   rules_invoke_event('node_insert', $node);
 }
 
@@ -175,8 +175,7 @@ function rules_data_action_access($type, $name) {
     $op = $name == 'entity_create' ? 'create' : 'view';
   }
   elseif ($name == 'entity_save' || $name == 'entity_delete') {
-    $cache = rules_get_cache();
-    $types = $cache['action_info'][$name]['parameter']['data']['type'];
+    $types = array_keys(entity_get_info());
     $op = $name == 'entity_save' ? 'save' : 'delete';
   }
   foreach ($types as $key => $type) {

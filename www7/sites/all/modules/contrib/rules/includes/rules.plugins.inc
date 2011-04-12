@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.plugins.inc,v 1.1.2.14 2011/02/23 12:40:11 fago Exp $
 
 /**
  * @file Contains plugin info and implementations not needed for rule evaluation.
@@ -675,6 +674,7 @@ class RulesEventSet extends RulesRuleSet {
           // the static cache.
           $event->rule(clone $rule);
         }
+        $event->sortChildren();
         $event->optimize();
         // Allow modules to alter the cached event set.
         drupal_alter('rules_event_set', $name, $event);

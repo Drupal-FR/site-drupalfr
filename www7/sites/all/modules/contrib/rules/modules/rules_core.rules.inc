@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_core.rules.inc,v 1.1.2.8 2011/02/23 18:15:00 fago Exp $
 
 /**
  * @file Rules core integration providing data types and conditions and

@@ -1,5 +1,4 @@
 <?php
-// $Id: ui.core.inc,v 1.1.2.18 2011/02/22 15:50:05 fago Exp $
 
 /**
  * @file Contains core ui functions.

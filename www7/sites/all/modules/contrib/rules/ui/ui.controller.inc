@@ -1,5 +1,4 @@
 <?php
-// $Id: ui.controller.inc,v 1.1.2.4 2011/02/17 13:00:38 fago Exp $
 
 /**
  * @file Contains the UI controller for Rules.
