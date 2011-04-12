@@ -21,8 +21,7 @@ DELETE FROM files WHERE filepath in (select filepath from tfiles);
 DROP TABLE tfiles;
 
 -- Drop profiles tables (no more needed since we using content profile)
-DROP TABLE profile_fields;
-DROP TABLE profile_values;
+--DROP TABLE profile_fields;
+--DROP TABLE profile_values;
 -- fake uninstall of profile module
-UPDATE system SET schema_version = -1 WHERE name = 'profile';
-
+--UPDATE system SET schema_version = -1 WHERE name = 'profile';
