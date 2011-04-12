@@ -1,5 +1,4 @@
 <?php
-// $Id: user_reference.module,v 1.1.2.1 2011/01/24 14:41:44 yched Exp $
 
 /**
  * @file
@@ -31,6 +30,8 @@ function user_reference_field_info() {
       'settings' => array('referenceable_roles' => array(), 'referenceable_status' => array()),
       'default_widget' => 'user_reference_autocomplete',
       'default_formatter' => 'user_reference_default',
+      // Support hook_entity_property_info() from contrib "Entity API".
+      'property_type' => 'user',
     ),
   );
 }
@@ -71,8 +72,7 @@ function user_reference_field_settings_form($field, $instance, $has_data) {
     '#default_value' => is_array($settings['referenceable_roles'])
        ? array_filter($settings['referenceable_roles'])
        : array(),
-    '#options' => user_roles(1),
-    '#disabled' => $has_data,
+    '#options' => user_roles(TRUE),
   );
   $form['referenceable_status'] = array(
     '#type' => 'checkboxes',
@@ -81,7 +81,6 @@ function user_reference_field_settings_form($field, $instance, $has_data) {
       ? array_filter($settings['referenceable_status'])
       : array(1),
     '#options' => array(1 => t('Active'), 0 => t('Blocked')),
-    '#disabled' => $has_data,
   );
   return $form;
 }
@@ -381,6 +380,30 @@ function user_reference_field_widget_error($element, $error, $form, &$form_state
 }
 
 /**
+ * Builds a list of referenceable users suitable for the '#option' FAPI property.
+ *
+ * Warning: the function does NOT take care of encoding or escaping the user
+ * names. Proper massaging needs to be performed by the caller, according to
+ * the destination FAPI '#type' (radios / checkboxes / select).
+ *
+ * @param $field
+ *   The field definition.
+ *
+ * @return
+ *   An array of referenceable user names, keyed by user id.
+ */
+function _user_reference_options($field) {
+  $references = _user_reference_potential_references($field);
+
+  $options = array();
+  foreach ($references as $key => $value) {
+    $options[$key] = $value['title'];
+  }
+
+  return $options;
+}
+
+/**
  * Fetch an array of all candidate referenced users.
  *
  * This info is used in various places (aloowed values, autocomplete results,
@@ -435,65 +458,65 @@ function _user_reference_potential_references($field, $string = '', $match = 'co
  * List of referenceable users defined by user role and status.
  */
 function _user_reference_potential_references_standard($field, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
-  // Avoid useless work
-  if (!count($field['settings']['referenceable_status']) || !count($field['settings']['referenceable_roles'])) {
+  // Avoid useless work.
+  $filter_roles = array_filter($field['settings']['referenceable_roles']);
+  $filter_status = array_filter($field['settings']['referenceable_status']);
+  if (!count($filter_status) && !count($filter_roles)) {
     return array();
   }
 
-  $query = db_select('users', 'u');
-  $user_uid_alias    = $query->addField('u', 'uid');
-  $user_name_alias   = $query->addField('u', 'name');
-  $user_status_alias = $query->addField('u', 'status');
-  $query->addMetaData('id', ' _user_reference_potential_references_standard');
+  $query = db_select('users', 'u')
+    ->addMetaData('id', ' _user_reference_potential_references_standard')
+    // Select the whole record, so that format_username() has enough
+    // information.
+    ->fields('u');
 
-  if (is_array($field['settings']['referenceable_status'])) {
-    $query->condition('u.status', $field['settings']['referenceable_status']);
+  // Enable this filter only if any statuses checked (and not both).
+  if (count($filter_status) == 1) {
+    $query->condition('u.status', array_keys($filter_status), 'IN');
   }
 
-  if (is_array($field['settings']['referenceable_roles']) && (!in_array(DRUPAL_AUTHENTICATED_RID, $field['settings']['referenceable_roles']))) {
+  // Skip filter when "authenticated user" choosen.
+  if ($filter_roles && !isset($filter_roles[DRUPAL_AUTHENTICATED_RID])) {
     $query->join('users_roles', 'r', 'u.uid = r.uid');
-    $query->addField('r', 'rid');
-    $query->condition('r.rid', $field['settings']['referenceable_roles']);
+    $query->condition('r.rid', array_keys($filter_roles), 'IN');
   }
 
   if ($string !== '') {
     $args = array();
     switch ($match) {
       case 'contains':
-        $name_clause = 'u.name LIKE :match';
-        $args['match'] = '%' . $string . '%';
+        $query->condition('u.name', '%' . $string . '%', 'LIKE');
         break;
 
       case 'starts_with':
-        $name_clause = 'u.name LIKE :match';
-        $args['match'] = $string . '%';
+        $query->condition('u.name', $string . '%', 'LIKE');
         break;
 
       case 'equals':
       default: // no match type or incorrect match type: use "="
-        $name_clause = 'u.name = :match';
-        $args['match'] = $string;
+        $query->condition('u.name', $string, '=');
         break;
     }
-    $query->where($name_clause, $args);
   }
   elseif ($ids) {
-    $query->condition($user_uid_alias, $ids, 'IN', $ids);
+    $query->condition('u.uid', $ids, 'IN');
   }
 
-  $query
-    ->orderBy($user_name_alias);
+  // Explicitly exclude the anonymous user.
+  $query->condition('u.uid', 0, '<>');
 
   if ($limit) {
     $query->range(0, $limit);
   }
+  $query->orderBy('u.name');
 
-  $result = $query->execute();
+  $result = $query->execute()->fetchAll();
   $references = array();
-  foreach ($result->fetchAll() as $user) {
-    $references[$user->uid] = array(
-      'title'    => $user->name,
-      'rendered' => check_plain($user->name),
+  foreach ($result as $account) {
+    $references[$account->uid] = array(
+      'title'    => $account->name,
+      'rendered' => check_plain(format_username($account)),
     );
   }
   return $references;
@@ -520,21 +543,13 @@ function user_reference_autocomplete($field_name, $string = '') {
  * Implements hook_options_list().
  */
 function user_reference_options_list($field) {
-  $references = _user_reference_potential_references($field);
-
-  // @todo Support optgroups ? I think this was added in late CCK D6.
-  $options = array();
-  foreach ($references as $key => $value) {
-    $options[$key] = $value['title'];
-  }
-
-  return $options;
+  return _user_reference_options($field);
 }
 
 /**
  * Implementation of hook_user_load().
  */
-/*function user_reference_user_load(&$accounts) {
+/*function user_reference_user_load($accounts) {
 
   // Only add links if we are on the user 'view' page.
   if (arg(0) != 'user' || arg(2)) {
@@ -579,7 +594,7 @@ function user_reference_options_list($field) {
 /**
  * Implementation of hook_user_view().
  */
-/*function user_reference_user_view(&$account) {
+/*function user_reference_user_view($account, $view_mode, $langcode) {
   if (!empty($account->user_reference)) {
     $node_types = content_types();
     $additions = array();
@@ -620,7 +635,7 @@ function user_reference_options_list($field) {
  * $field_value['widget_type'] is available to
  * see what widget type was originally used.
  */
-function user_reference_content_migrate_field_alter(&$field_value) {
+function user_reference_content_migrate_field_alter(&$field_value, $instance_value) {
   switch ($field_value['module']) {
     case 'userreference':
       $field_value['module'] = 'user_reference';
@@ -637,16 +652,17 @@ function user_reference_content_migrate_field_alter(&$field_value) {
  * situations not handled by basic conversion, as when
  * formatter or widget names or settings are changed.
  */
-function user_reference_content_migrate_instance_alter(&$instance_value) {
+function user_reference_content_migrate_instance_alter(&$instance_value, $field_value) {
   // The module name for the instance was corrected
   // by the change in user_reference_content_migrate_field_alter().
-  switch ($instance_value['module']) {
-    case 'user_reference':
+  switch ($field_value['type']) {
+    case 'userreference':
       // The formatter names changed, all are prefixed
       // with 'user_reference_'.
       foreach ($instance_value['display'] as $context => $settings) {
-        $instance_value['display'][$context]['type'] = 'user_reference_'. $settings['type'];
+        $instance_value['display'][$context]['type'] = 'user_reference_' . $settings['type'];
       }
+      // Massage the widget.
       switch ($instance_value['widget']['type']) {
         case 'userreference_autocomplete':
           $instance_value['widget']['type'] = 'user_reference_autocomplete';
@@ -662,15 +678,6 @@ function user_reference_content_migrate_instance_alter(&$instance_value) {
       }
       break;
   }
-}
-
-/**
- * Implements hook_views_api().
- */
-function user_reference_views_api() {
-  return array(
-    'api' => '3.0',
-  );
 }
 
 /**
@@ -691,14 +698,55 @@ function user_reference_field_views_data($field) {
     $columns = current($table_data);
     $id_column = $columns['uid'];
     if (isset($data[$table])) {
+      // Filter: swap the handler to the 'in' operator. The callback receives
+      // the field name instead of the whole $field structure to keep views
+      // data to a reasonable size.
+      $data[$table][$id_column]['filter']['handler'] = 'views_handler_filter_in_operator';
+      $data[$table][$id_column]['filter']['options callback'] = 'user_reference_views_filter_options';
+      $data[$table][$id_column]['filter']['options arguments'] = array($field['field_name']);
+
+      // Argument: display users.name in argument titles (handled in our custom
+      // handler) and summary lists (handled by the base views_handler_argument
+      // handler).
+      // Both mechanisms rely on the 'name table' and 'name field' information
+      // below, by joining to a separate copy of the base table from the field
+      // data table.
+      $data[$table][$id_column]['argument']['handler'] = 'references_handler_argument';
+      $data[$table][$id_column]['argument']['name table'] = $table . '_reference';
+      $data[$table][$id_column]['argument']['name field'] = 'name';
+      $data[$table . '_reference']['table']['join'][$table] = array(
+        'left_field' => $id_column,
+        'table' => 'users',
+        'field' => 'uid',
+      );
+
+      // Relationship.
       $data[$table][$id_column]['relationship'] = array(
+        'handler' => 'references_handler_relationship',
         'base' => 'users',
         'field' => 'uid',
         'base field' => 'uid',
         'label' => $field['field_name'],
+        'field_name' => $field['field_name'],
       );
     }
   }
 
   return $data;
+}
+
+/**
+ * Helper callback for the views_handler_filter_in_operator filter.
+ *
+ * @param $field_name
+ *   The field name.
+ *
+ * @return
+ *   The array of allowed options for the filter.
+ */
+function user_reference_views_filter_options($field_name) {
+  if ($field = field_info_field($field_name)) {
+    return _user_reference_options($field);
+  }
+  return array();
 }

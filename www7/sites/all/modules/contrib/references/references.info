@@ -1,10 +1,11 @@
-name = User Reference
-description = Defines a field type for referencing a user from a node.
+name = References
+description = Defines common base features for the various reference field types.
 package = Fields
 core = 7.x
 dependencies[] = field
-dependencies[] = references
 dependencies[] = options
+files[] = views/references_handler_relationship.inc
+files[] = views/references_handler_argument.inc
 
 ; Information added by drupal.org packaging script on 2011-04-07
 version = "7.x-2.x-dev"

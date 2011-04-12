@@ -1,5 +1,4 @@
 <?php
-// $Id: node_reference.module,v 1.1.2.2 2011/01/24 14:41:44 yched Exp $
 
 /**
  * @file
@@ -35,6 +34,8 @@ function node_reference_field_info() {
       // 'instance settings' => array('referenceable_types' => array()),
       'default_widget'    => 'options_select', //  node_reference_autocomplete',
       'default_formatter' => 'node_reference_default',
+      // Support hook_entity_property_info() from contrib "Entity API".
+      'property_type' => 'node',
     ),
   );
 }
@@ -77,7 +78,6 @@ function node_reference_field_settings_form($field, $instance, $has_data) {
       ? $settings['referenceable_types']
       : array(),
     '#options'       => array_map('check_plain', node_type_get_names()),
-    '#disabled'      => $has_data,
   );
   return $form;
 }
@@ -157,7 +157,7 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
       if (!user_access('administer nodes')) {
         $query->condition('status', 1);
       }
-      $fetched_nodes = $query->execute()->fetchAllAssoc('nid');
+      $fetched_nodes += $query->execute()->fetchAllAssoc('nid');
     }
 
     foreach ($items as $id => $entity_items) {
@@ -544,6 +544,30 @@ function node_reference_field_widget_error($element, $error, $form, &$form_state
 }
 
 /**
+ * Builds a list of referenceable nodes suitable for the '#option' FAPI property.
+ *
+ * Warning: the function does NOT take care of encoding or escaping the node
+ * titles. Proper massaging needs to be performed by the caller, according to
+ * the destination FAPI '#type' (radios / checkboxes / select).
+ *
+ * @param $field
+ *   The field definition.
+ *
+ * @return
+ *   An array of referenceable node titles, keyed by node id.
+ */
+function _node_reference_options($field) {
+  $references = _node_reference_potential_references($field);
+
+  $options = array();
+  foreach ($references as $key => $value) {
+    $options[$key] = $value['title'];
+  }
+
+  return $options;
+}
+
+/**
  * Fetch an array of all candidate referenced nodes.
  *
  * This info is used in various places (allowed values, autocomplete
@@ -764,15 +788,7 @@ function node_reference_field_prepare_translation($entity_type, $entity, $field,
  * Implements hook_options_list().
  */
 function node_reference_options_list($field) {
-  $references = _node_reference_potential_references($field);
-
-  // @todo Support optgroups ? I think this was added in late CCK D6.
-  $options = array();
-  foreach ($references as $key => $value) {
-    $options[$key] = $value['title'];
-  }
-
-  return $options;
+  return _node_reference_options($field);
 }
 
 /**
@@ -785,7 +801,7 @@ function node_reference_options_list($field) {
  * $field_value['widget_type'] is available to
  * see what widget type was originally used.
  */
-function node_reference_content_migrate_field_alter(&$field_value) {
+function node_reference_content_migrate_field_alter(&$field_value, $instance_value) {
   switch ($field_value['module']) {
     case 'nodereference':
       $field_value['module'] = 'node_reference';
@@ -801,16 +817,28 @@ function node_reference_content_migrate_field_alter(&$field_value) {
  * style to the D7 style for specific situations not handled by basic
  * conversion, as when formatter or widget names or settings are changed.
  */
-function node_reference_content_migrate_instance_alter(&$instance_value) {
-  // The module name for the instance was corrected
-  // by the change in node_reference_content_migrate_field_alter().
-  switch ($instance_value['module']) {
-    case 'node_reference':
-      // The formatter names changed, all are prefixed
-      // with 'node_reference_'.
-      foreach ($instance_value['display'] as $context => $settings) {
-        $instance_value['display'][$context]['type'] = 'node_reference_' . $settings['type'];
+function node_reference_content_migrate_instance_alter(&$instance_value, $field_value) {
+  switch ($field_value['type']) {
+    case 'nodereference':
+      // Massage formatters.
+      foreach ($instance_value['display'] as $context => &$display) {
+        switch ($display['type']) {
+          case 'full':
+          case 'teaser':
+            // Those two formatters have been merged into
+            // 'node_reference_view_mode', with a formatter setting.
+            $display['type'] = 'node_reference_node';
+            $display['settings']['node_reference_view_mode'] = $display['type'];
+            break;
+
+          default:
+            // The formatter names changed, all are prefixed with
+            // 'node_reference_'.
+            $display['type'] = 'node_reference_' . $display['type'];
+            break;
+        }
       }
+      // Massage the widget.
       switch ($instance_value['widget']['type']) {
         case 'nodereference_autocomplete':
           $instance_value['widget']['type'] = 'node_reference_autocomplete';
@@ -826,15 +854,6 @@ function node_reference_content_migrate_instance_alter(&$instance_value) {
       }
       break;
   }
-}
-
-/**
- * Implements hook_views_api().
- */
-function node_reference_views_api() {
-  return array(
-    'api' => '3.0',
-  );
 }
 
 /**
@@ -855,14 +874,52 @@ function node_reference_field_views_data($field) {
     $columns = current($table_data);
     $id_column = $columns['nid'];
     if (isset($data[$table])) {
+      // Filter: swap the handler to the 'in' operator. The callback receives
+      // the field name instead of the whole $field structure to keep views
+      // data to a reasonable size.
+      $data[$table][$id_column]['filter']['handler'] = 'views_handler_filter_in_operator';
+      $data[$table][$id_column]['filter']['options callback'] = 'node_reference_views_options';
+      $data[$table][$id_column]['filter']['options arguments'] = array($field['field_name']);
+
+      // Argument: display node.title in argument titles (handled in our custom
+      // handler) and summary lists (handled by the base views_handler_argument
+      // handler).
+      // Both mechanisms rely on the 'name table' and 'name field' information
+      // below, by joining to a separate copy of the base table from the field
+      // data table.
+      $data[$table][$id_column]['argument']['handler'] = 'references_handler_argument';
+      $data[$table][$id_column]['argument']['name table'] = $table . '_reference';
+      $data[$table][$id_column]['argument']['name field'] = 'title';
+      $data[$table . '_reference']['table']['join'][$table] = array(
+        'left_field' => $id_column,
+        'table' => 'node',
+        'field' => 'nid',
+      );
+
+      // Relationship.
       $data[$table][$id_column]['relationship'] = array(
+        'handler' => 'references_handler_relationship',
         'base' => 'node',
         'field' => 'nid',
         'base field' => 'nid',
         'label' => $field['field_name'],
+        'field_name' => $field['field_name'],
       );
     }
   }
 
   return $data;
+}
+
+/**
+ * Helper callback for the views_handler_filter_in_operator filter.
+ *
+ * @param $field_name
+ *   The field name.
+ */
+function node_reference_views_options($field_name) {
+  if ($field = field_info_field($field_name)) {
+    return _node_reference_options($field);
+  }
+  return array();
 }
