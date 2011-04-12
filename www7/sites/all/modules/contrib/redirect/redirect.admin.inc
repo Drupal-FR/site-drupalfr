@@ -56,11 +56,11 @@ function redirect_list_form($form, &$form_state) {
   //);
 
   // Building the SQL query and load the redirects.
-  $query = db_select('redirect', 'r');
+  $query = db_select('redirect', 'r')->extend('TableSort')->extend('PagerDefault');
   $query->addField('r', 'rid');
   $query->condition('r.type', 'redirect');
-  $query->extend('TableSort')->orderByHeader($header);
-  $query->extend('PagerDefault')->limit(50);
+  $query->orderByHeader($header);
+  $query->limit(50);
   $query->addTag('redirect_list');
   $query->addTag('redirect_access');
   redirect_build_filter_query($query, array('source', 'redirect'), $keys);
@@ -236,7 +236,7 @@ function redirect_edit_form($form, &$form_state, $redirect = NULL) {
     '#title' => t('From'),
     '#description' => t("Enter an interal Drupal path or path alias to redirect (e.g. %example1 or %example2). Fragment anchors (e.g. %anchor) are <strong>not</strong> allowed.", array('%example1' => 'node/123', '%example2' => 'taxonomy/term/123', '%anchor' => '#anchor')),
     '#maxlength' => 560,
-    '#default_value' => $redirect->rid ? redirect_url($redirect->source, $redirect->source_options) : '',
+    '#default_value' => $redirect->rid || $redirect->source ? redirect_url($redirect->source, $redirect->source_options) : '',
     '#required' => TRUE,
     '#field_prefix' => url('', array('absolute' => TRUE)) . (variable_get('clean_url', 0) ? '' : '?q='),
     '#element_validate' => array('redirect_element_validate_source'),
@@ -249,7 +249,7 @@ function redirect_edit_form($form, &$form_state, $redirect = NULL) {
     '#type' => 'textfield',
     '#title' => t('To'),
     '#maxlength' => 560,
-    '#default_value' => $redirect->rid ? redirect_url($redirect->redirect, array('absolute' => TRUE) + $redirect->redirect_options, TRUE) : '',
+    '#default_value' => $redirect->rid || $redirect->redirect ? redirect_url($redirect->redirect, array('absolute' => TRUE) + $redirect->redirect_options, TRUE) : '',
     '#required' => TRUE,
     '#description' => t('Enter an internal Drupal path, path alias, or complete external URL (like http://example.com/) to redirect to. Use %front to redirect to the front page.', array('%front' => '<front>')),
     '#element_validate' => array('redirect_element_validate_redirect'),
@@ -493,7 +493,7 @@ function redirect_settings_form($form, &$form_state) {
   $form['redirect_passthrough_querystring'] = array(
     '#type' => 'checkbox',
     '#title' => t('Retain query string through redirect.'),
-    '#default_value' => variable_get('redirect_querystring', 0),
+    '#default_value' => variable_get('redirect_passthrough_querystring', 1),
     '#description' => t('For example, given a redirect from %source to %redirect, if a user visits %sourcequery they would be redirected to %redirectquery. The query strings in the redirection will always take precedence over the current query string.', array('%source' => 'source-path', '%redirect' => 'node?a=apples', '%sourcequery' => 'source-path?a=alligators&b=bananas', '%redirectquery' => 'node?a=apples&b=bananas')),
   );
   $form['redirect_warning'] = array(
@@ -597,7 +597,7 @@ function redirect_404_list($form = NULL) {
   $count_query->isNull('r.rid');
   redirect_build_filter_query($count_query, array('w.message'), $keys);
 
-  $query = db_select('watchdog', 'w');
+  $query = db_select('watchdog', 'w')->extend('PagerDefault')->extend('TableSort');
   $query->fields('w', array('message'));
   $query->addExpression('COUNT(wid)', 'count');
   $query->addExpression('MAX(timestamp)', 'timestamp');
@@ -605,8 +605,8 @@ function redirect_404_list($form = NULL) {
   $query->isNull('r.rid');
   $query->condition('w.type', 'page not found');
   $query->groupBy('w.message');
-  $query = $query->extend('PagerDefault')->limit(25);
-  $query = $query->extend('TableSort')->orderByHeader($header);
+  $query->orderByHeader($header);
+  $query->limit(25);
   redirect_build_filter_query($query, array('w.message'), $keys);
   $query->setCountQuery($count_query);
   $results = $query->execute();
