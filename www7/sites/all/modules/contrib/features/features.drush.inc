@@ -1,5 +1,4 @@
 <?php
-// $Id: features.drush.inc,v 1.1.2.21.2.2 2010/09/09 18:13:05 yhahn Exp $
 
 /**
  * @file
@@ -370,7 +369,7 @@ function drush_features_diff() {
     drush_log(dt('Feature is in its default state. No diff needed.'), 'ok');
     return;
   }
-  module_load_include('php', 'diff', 'DiffEngine');
+  module_load_include('inc', 'diff', 'diff.engine');
 
   if (!class_exists('DiffFormatter')) {
     if (drush_confirm(dt('It seems that the Diff module is not available. Would you like to download and enable it?'))) {
@@ -387,8 +386,8 @@ function drush_features_diff() {
     else {
       return drush_set_error(dt('Diff module is not enabled.'));
     }
-    // If we're still here, now we can include the DiffEngine again.
-    module_load_include('php', 'diff', 'DiffEngine');
+    // If we're still here, now we can include the diff.engine again.
+    module_load_include('inc', 'diff', 'diff.engine');
   }
 
   $formatter = new DiffFormatter();

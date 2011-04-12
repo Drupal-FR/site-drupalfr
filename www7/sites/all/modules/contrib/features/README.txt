@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1.2.3.2.3 2010/09/10 20:20:57 yhahn Exp $
 
 Current state of Features for Drupal 7
 --------------------------------------

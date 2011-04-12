@@ -1,5 +1,4 @@
 <?php
-// $Id: theme.inc,v 1.1.2.16.2.2 2010/09/09 18:13:05 yhahn Exp $
 
 /**
  * Display feature component info
@@ -131,7 +130,8 @@ function theme_features_storage_link($vars) {
   );
   $text = isset($text) ? $text : $default_text[$vars['storage']];
   if ($vars['path']) {
-    $vars['options']['attributes']['class'] = $classes[$vars['storage']] . ' features-storage';
+    $vars['options']['attributes']['class'][] = $classes[$vars['storage']];
+    $vars['options']['attributes']['class'][] = 'features-storage';
     return l($text, $vars['path'], $vars['options']);
   }
   else {

@@ -1,5 +1,4 @@
 <?php
-// $Id: features.taxonomy.inc,v 1.1.4.3 2010/09/10 16:59:14 yhahn Exp $
 
 /**
  * Implementation of hook_features_api().
@@ -65,6 +64,9 @@ function taxonomy_features_export_render($module, $data) {
   foreach ($data as $machine_name) {
     foreach ($vocabularies as $vocabulary) {
       if ($vocabulary->machine_name == $machine_name) {
+        // We don't want to break the entity cache, so we need to clone the
+        // vocabulary before unsetting the id.
+        $vocabulary = clone $vocabulary;
         unset($vocabulary->vid);
         $code[$machine_name] = $vocabulary;
       }

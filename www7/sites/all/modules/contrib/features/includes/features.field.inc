@@ -1,5 +1,4 @@
 <?php
-// $Id: features.field.inc,v 1.1.2.6 2010/09/29 18:01:52 yhahn Exp $
 
 /**
  * Implements hook_features_api().
@@ -93,9 +92,12 @@ function field_features_export_render($module, $data, $export = NULL) {
       $code[] = "  \$fields[{$field_identifier}] = {$field_export};";
       $code[] = "";
 
-      // Add any labels to translatables array.
-      if (!empty($field_info['widget']['label'])) {
-        $translatables[] = $field_info['widget']['label'];
+      // Add label and description to translatables array.
+      if (!empty($field['field_instance']['label'])) {
+        $translatables[] = $field['field_instance']['label'];
+      }
+      if (!empty($field['field_instance']['description'])) {
+        $translatables[] = $field['field_instance']['description'];
       }
     }
   }
