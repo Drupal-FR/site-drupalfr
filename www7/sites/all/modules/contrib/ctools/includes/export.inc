@@ -1,5 +1,4 @@
 <?php
-// $Id: export.inc,v 1.31 2010/12/31 23:50:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -386,7 +385,10 @@ function ctools_export_load_object($table, $type = 'all', $args = array()) {
     }
   }
 
-  // @todo Load subrecords.
+  // Load subrecords.
+  if (isset($export['subrecords callback']) && function_exists($export['subrecords callback'])) {
+    $export['subrecords callback']($cache[$table]);
+  }
 
   if ($defaults = _ctools_export_get_defaults($table, $export)) {
 
@@ -550,8 +552,8 @@ function _ctools_export_get_defaults($table, $export) {
             else {
               // If version checking is enabled, ensure that the object can be used.
               if (isset($object->api_version) &&
-                $object->api_version >= $export['api']['minimum_version'] &&
-                $object->api_version <= $export['api']['current_version']) {
+                version_compare($object->api_version, $export['api']['minimum_version']) >= 0 &&
+                version_compare($object->api_version, $export['api']['current_version']) <= 0) {
                 $cache[$table][$name] = $object;
               }
             }
@@ -708,7 +710,7 @@ function ctools_export_object($table, $object, $indent = '', $identifier = NULL,
 
     // Note: This is the *field* export callback, not the table one!
     if (!empty($info['export callback']) && function_exists($info['export callback'])) {
-      $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . $info['export callback']($object, $field, $value, $indent) . ";\n";
+      $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . $info['export callback']($object, $field, $object->$field, $indent) . ";\n";
     }
     else {
       $value = $object->$field;
@@ -995,16 +997,22 @@ function ctools_export_default_list($table, $schema) {
 
   $items = ctools_export_crud_load_all($table);
   $export_key = $schema['export']['key'];
-
   foreach ($items as $item) {
     // Try a couple of possible obvious title keys:
-    if (!empty($item->admin_title)) {
-      $string = "$item->admin_title (" . $item->$export_key . ")";
+    $keys = array('admin_title', 'title');
+    if (isset($schema['export']['admin_title'])) {
+      array_unshift($keys, $schema['export']['admin_title']);
     }
-    elseif (!empty($item->title)) {
-      $string = "$item->title (" . $item->$export_key . ")";
+
+    $string = '';
+    foreach ($keys as $key) {
+      if (!empty($item->$key)) {
+        $string = $item->$key . " (" . $item->$export_key . ")";
+        break;
+      }
     }
-    else {
+
+    if (empty($string)) {
       $string = $item->$export_key;
     }
     $list[$item->$export_key] = check_plain($string);

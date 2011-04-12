@@ -1,5 +1,4 @@
 <?php
-// $Id: stylizer_ui.class.php,v 1.3 2011/01/05 22:35:46 merlinofchaos Exp $
 
 /**
  * UI class for Stylizer.
@@ -139,6 +138,8 @@ class stylizer_ui extends ctools_export_ui {
       $type = t('Unknown');
     }
 
+    $ops = theme('links__ctools_dropbutton', array('links' => $operations, 'attributes' => array('class' => array('links', 'inline'))));
+
     $this->rows[$item->name] = array(
       'data' => array(
         array('data' => $type, 'class' => array('ctools-export-ui-type')),
@@ -146,7 +147,7 @@ class stylizer_ui extends ctools_export_ui {
         array('data' => check_plain($item->admin_title), 'class' => array('ctools-export-ui-title')),
         array('data' => check_plain($this->style_plugin['title']), 'class' => array('ctools-export-ui-base')),
         array('data' => check_plain($item->type), 'class' => array('ctools-export-ui-storage')),
-        array('data' => theme('links', array('links' => $operations)), 'class' => array('ctools-export-ui-operations')),
+        array('data' => $ops, 'class' => array('ctools-export-ui-operations')),
       ),
       'title' => check_plain($item->admin_description),
       'class' => array(!empty($item->disabled) ? 'ctools-export-ui-disabled' : 'ctools-export-ui-enabled'),

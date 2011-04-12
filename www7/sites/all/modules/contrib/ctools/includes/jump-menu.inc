@@ -1,5 +1,4 @@
 <?php
-// $Id: jump-menu.inc,v 1.3 2010/10/11 22:18:22 sdboyer Exp $
 
 /**
  * @file
@@ -44,7 +43,7 @@
  *     set to this.
  *   - 'inline': If set to TRUE (default) the display will be forced inline.
  */
-function ctools_jump_menu($form_state, $select, $options = array()) {
+function ctools_jump_menu($form, &$form_state, $select, $options = array()) {
   $options += array(
     'button' => t('Go'),
     'choose' => t('- Choose -'),
@@ -117,5 +116,18 @@ function ctools_jump_menu($form_state, $select, $options = array()) {
  * This is normally only invoked upon submit without javascript enabled.
  */
 function ctools_jump_menu_submit($form, &$form_state) {
-  $form_state['redirect'] = $form_state['values']['jump'];
+  $redirect = $form_state['values']['jump'];
+
+  // If the path we are redirecting to starts with the base path (for example,
+  // "/somepath/node/1"), we need to strip the base path off before passing it
+  // to $form_state['redirect'].
+  $base_path = base_path();
+  if (strpos($redirect, $base_path) === 0) {
+    $redirect = substr($redirect, strlen($base_path));
+  }
+
+  // Parse the URL so that query strings and fragments are preserved in the
+  // redirect.
+  $redirect = drupal_parse_url($redirect);
+  $form_state['redirect'] = array($redirect['path'], $redirect);
 }
