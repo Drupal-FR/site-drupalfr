@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_field_contact_link.inc,v 1.2.4.5 2010/12/23 05:44:54 dereine Exp $
 /**
  * A field that links to the user contact page, if access is permitted.
  */
@@ -12,7 +11,6 @@ class views_handler_field_contact_link extends views_handler_field_user_link {
   }
 
   function options_form(&$form, &$form_state) {
-    parent::options_form($form, $form_state);
     $form['link_display'] = array(
       '#title' => t('Type of link'),
       '#default_value' => $this->options['link_display'],
@@ -25,6 +23,7 @@ class views_handler_field_contact_link extends views_handler_field_user_link {
     $form['text']['#title'] = t('Link label');
     $form['text']['#required'] = TRUE;
     $form['text']['#default_value'] = empty($this->options['text']) ? t('contact') : $this->options['text'];
+    parent::options_form($form, $form_state);
   }
 
   // An example of field level access control.
@@ -43,7 +42,7 @@ class views_handler_field_contact_link extends views_handler_field_user_link {
 
   function render_link($data, $values) {
     global $user;
-    $uid = $values->{$this->aliases['uid']};
+    $uid = $this->get_value($values, 'uid');
 
     if (empty($uid)) {
       return;
@@ -56,7 +55,8 @@ class views_handler_field_contact_link extends views_handler_field_user_link {
 
     // Check access when we pull up the user account so we know
     // if the user has made the contact page available.
-    if (!_contact_personal_tab_access($account) || empty($account->contact)) {
+    $menu_item = menu_get_item("user/$uid/contact");
+    if (!$menu_item['access'] || empty($account->contact)) {
       return;
     }
 

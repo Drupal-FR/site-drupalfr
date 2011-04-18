@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_filter_history_user_timestamp.inc,v 1.3.4.4 2010/12/25 22:03:47 dereine Exp $
 /**
  * Filter for new content
  *
@@ -9,8 +8,12 @@ class views_handler_filter_history_user_timestamp extends views_handler_filter {
   // Don't display empty space where the operator would be.
   var $no_operator = TRUE;
 
-  function expose_form_right() {
-    // We don't want any of the usual options for exposed filters.
+  function expose_form(&$form, &$form_state) {
+    parent::expose_form($form, $form_state);
+    // @todo There are better ways of excluding required and multiple (object flags)
+    unset($form['expose']['required']);
+    unset($form['expose']['multiple']);
+    unset($form['expose']['remember']);
   }
 
   function value_form(&$form, &$form_state) {
@@ -53,6 +56,8 @@ class views_handler_filter_history_user_timestamp extends views_handler_filter {
     $field = "$this->table_alias.$this->real_field";
     $node = $this->query->ensure_table('node', $this->relationship);
 
+    $clause = '';
+    $clause2 = '';
     if (module_exists('comment')) {
       $ncs = $this->query->ensure_table('node_comment_statistics', $this->relationship);
       $clause = ("OR $ncs.last_comment_timestamp > (***CURRENT_TIME*** - $limit)");
@@ -62,7 +67,7 @@ class views_handler_filter_history_user_timestamp extends views_handler_filter {
     // NULL means a history record doesn't exist. That's clearly new content.
     // Unless it's very very old content. Everything in the query is already
     // type safe cause none of it is coming from outside here.
-    $this->query->add_where($this->options['group'], "($field IS NULL AND ($node.changed > (***CURRENT_TIME*** - $limit) $clause)) OR $field < $node.changed $clause2", array(), 'formula');
+    $this->query->add_where_expression($this->options['group'], "($field IS NULL AND ($node.changed > (***CURRENT_TIME*** - $limit) $clause)) OR $field < $node.changed $clause2");
   }
 
   function admin_summary() {

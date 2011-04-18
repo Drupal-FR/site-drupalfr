@@ -1,5 +1,4 @@
 <?php
-// $Id: views_test.module,v 1.1.2.9 2011/01/04 21:26:47 dereine Exp $
 
 /**
  * Implements hook_permission().
@@ -27,7 +26,7 @@ function views_test_views_api() {
  * Implements hook_views_data()
  */
 function views_test_views_data() {
-  return variable_get('views_test_views_data', array());
+  return  variable_get('views_test_views_data', array());
 }
 
 /**

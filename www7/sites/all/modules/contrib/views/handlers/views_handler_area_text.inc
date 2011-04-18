@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_area_text.inc,v 1.1.4.7 2010/12/06 17:13:49 dereine Exp $
 
 class views_handler_area_text extends views_handler_area {
 
@@ -18,6 +17,7 @@ class views_handler_area_text extends views_handler_area {
       '#default_value' => $this->options['content'],
       '#rows' => 6,
       '#format' => $this->options['format'],
+      '#wysiwyg' => FALSE,
     );
   }
 

@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_row_node_rss.inc,v 1.7.4.7 2010/11/11 19:41:11 dereine Exp $
 /**
  * @file
  * Contains the node RSS row style plugin.
@@ -31,15 +30,28 @@ class views_plugin_row_node_rss extends views_plugin_row {
     $form['item_length'] = array(
       '#type' => 'select',
       '#title' => t('Display type'),
-      '#options' => array(
-        'fulltext' => t('Full text'),
-        'teaser' => t('Title plus teaser'),
-        'title' => t('Title only'),
-        'default' => t('Use default RSS settings'),
-      ),
+      '#options' => $this->options_form_summary_options(),
       '#default_value' => $this->options['item_length'],
     );
   }
+
+  /**
+   * Return the main options, which are shown in the summary title.
+   */
+  function options_form_summary_options() {
+    return array(
+      'fulltext' => t('Full text'),
+      'teaser' => t('Title plus teaser'),
+      'title' => t('Title only'),
+      'default' => t('Use default RSS settings'),
+    );
+  }
+
+  function summary_title() {
+    $options = $this->options_form_summary_options();
+    return check_plain($options[$this->options['item_length']]);
+  }
+
 
   function pre_render($values) {
     foreach ($values as $row) {
@@ -70,10 +82,10 @@ class views_plugin_row_node_rss extends views_plugin_row {
 
     $item_text = '';
 
-    $node->rss_namespaces = array();
+    $node->rss_namespaces = array('xmlns:dc' => 'http://purl.org/dc/elements/1.1/');
     $node->rss_elements = array(
       array('key' => 'pubDate', 'value' => gmdate('r', $node->created)),
-      array('key' => 'dc:creator', 'value' => $node->name, 'namespace' => array('xmlns:dc' => 'http://purl.org/dc/elements/1.1/')),
+      array('key' => 'dc:creator', 'value' => $node->name),
       array('key' => 'guid', 'value' => $node->nid . ' at ' . $base_url, 'attributes' => array('isPermaLink' => 'false'))
     );
 
@@ -81,11 +93,7 @@ class views_plugin_row_node_rss extends views_plugin_row {
     // and $node->rss_namespaces.
     node_build_content($node, 'rss');
 
-    foreach ($node->rss_elements as $element) {
-      if (isset($element['namespace'])) {
-        $this->view->style_plugin->namespaces = array_merge($this->view->style_plugin->namespaces, $element['namespace']);
-      }
-    }
+    $this->view->style_plugin->namespaces = array_merge($this->view->style_plugin->namespaces, $node->rss_namespaces);
 
     if ($item_length != 'title' && !empty($node->content)) {
       // We render node contents and force links to be last.
@@ -93,6 +101,7 @@ class views_plugin_row_node_rss extends views_plugin_row {
       $item_text .= drupal_render($node->content) . $links;
     }
 
+    $item = new stdClass;
     $item->description = $item_text;
     $item->title = $node->title;
     $item->link = url("node/$node->nid", array('absolute' => TRUE));

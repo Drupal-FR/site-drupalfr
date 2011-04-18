@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_query_default.inc,v 1.1.4.39 2011/01/06 00:37:05 dereine Exp $
 /**
  * @file views_plugin_query_default.inc
  * Defines the default query object which builds SQL to execute using the
@@ -72,6 +71,13 @@ class views_plugin_query_default extends views_plugin_query {
    * Should this query be optimized for counts, for example no sorts.
    */
   var $get_count_optimized = NULL;
+
+  /**
+   * The current used pager plugin.
+   *
+   * @var views_plugin_pager
+   */
+   var $pager = NULL;
 
   /**
    * Constructor; Create the basic query object and fill with default values.
@@ -173,6 +179,9 @@ class views_plugin_query_default extends views_plugin_query {
     $options['field_language'] = array(
       'default' => '***CURRENT_LANGUAGE***',
     );
+    $options['field_language_add_to_query'] = array(
+      'default' => 1,
+    );
 
     return $options;
   }
@@ -183,7 +192,7 @@ class views_plugin_query_default extends views_plugin_query {
   function options_form(&$form, &$form_state) {
     $form['disable_sql_rewrite'] = array(
       '#title' => t('Disable SQL rewriting'),
-      '#description' => t('Disabling SQL rewriting will disable node_access checks as well as other modules that implement hook_db_rewrite_sql().'),
+      '#description' => t('Disabling SQL rewriting will disable node_access checks as well as other modules that implement hook_query_alter().'),
       '#type' => 'checkbox',
       '#default_value' => !empty($this->options['disable_sql_rewrite']),
       '#prefix' =>  '<div class="messages warning">' . t('WARNING: Disabling SQL rewriting means that node access security is disabled. This may allow users to see data they should not be able to see if your view is misconfigured. Please use this option only if you understand and accept this security risk.') . '</div>',
@@ -219,7 +228,7 @@ class views_plugin_query_default extends views_plugin_query {
       $languages = array(
         '***CURRENT_LANGUAGE***' => t("Current user's language"),
         '***DEFAULT_LANGUAGE***' => t("Default site language"),
-        LANGUAGE_NONE => t('No language')
+        LANGUAGE_NONE => t('Language neutral'),
       );
       $languages = array_merge($languages, locale_language_list());
 
@@ -229,6 +238,11 @@ class views_plugin_query_default extends views_plugin_query {
         '#description' => t('All fields which support translations will be displayed in the selected language.'),
         '#options' => $languages,
         '#default_value' => $this->options['field_language'],
+      );
+      $form['field_language_add_to_query'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('When needed, add the field language condition to the query.'),
+        '#default_value' => $this->options['field_language_add_to_query'],
       );
     }
   }
@@ -347,11 +361,11 @@ class views_plugin_query_default extends views_plugin_query {
   }
 
   /**
-   * Add a table to the query, without ensuring the path.
+   * Add a table to the query without ensuring the path.
    *
-   * This function will test to ensure that the path back to the primary
-   * table is valid and exists; if you do not wish for this testing to
-   * occur, use $query->queue_table() instead.
+   * This is a pretty internal function to Views and add_table() or
+   * ensure_table() should be used instead of this one, unless you are
+   * absolutely sure this is what you want.
    *
    * @param $table
    *   The name of the table to add. It needs to exist in the global table
@@ -933,6 +947,7 @@ class views_plugin_query_default extends views_plugin_query {
    *
    * @param $table
    *   The table this field is part of. If a formula, enter NULL.
+   *   If you want to orderby random use "rand" as table and
    * @param $field
    *   The field or formula to sort on. If already a field, enter NULL
    *   and put in the alias.
@@ -946,7 +961,7 @@ class views_plugin_query_default extends views_plugin_query {
    * @param $params
    *   Any params that should be passed through to the add_field.
    */
-  function add_orderby($table, $field, $order, $alias = '', $params = array()) {
+  function add_orderby($table, $field = NULL, $order = 'ASC', $alias = '', $params = array()) {
     if ($table) {
       $this->ensure_table($table);
     }
@@ -1115,6 +1130,7 @@ class views_plugin_query_default extends views_plugin_query {
     if (empty($this->no_distinct) && $this->distinct && !empty($this->fields)) {
       $base_field_alias = $this->add_field($this->base_table, $this->base_field);
       $this->add_groupby($base_field_alias);
+      $distinct = TRUE;
     }
 
     /**
@@ -1138,18 +1154,25 @@ class views_plugin_query_default extends views_plugin_query {
     }
 
     $options = array();
-    // Detect an external database.
+    $target = 'default';
+    $key = 'default';
+    // Detect an external database and set the
     if (isset($this->view->base_database)) {
-      $options['target'] = $this->view->base_database;
+      $key = $this->view->base_database;
     }
 
     // Set the slave target if the slave option is set
     if (!empty($this->options['slave'])) {
-      $options['target'] = 'slave';
+      $target = 'slave';
     }
 
     // Go ahead and build the query.
-    $query = db_select($this->base_table, $this->base_table, $options)->addTag('views');
+    // db_select doesn't support to specify the key, so use getConnection directly.
+    $query = Database::getConnection($target, $key)->select($this->base_table, $this->base_table, $options)->addTag('views');
+
+    if (!empty($distinct)) {
+      $query->distinct();
+    }
 
     $joins = $where = $having = $orderby = $groupby = '';
     $fields = $distinct = array();
@@ -1169,7 +1192,7 @@ class views_plugin_query_default extends views_plugin_query {
     if (count($this->having)) {
       $this->has_aggregate = TRUE;
     }
-    if ($this->has_aggregate || $this->groupby) {
+    if ($this->has_aggregate && (!empty($this->groupby) || !empty($non_aggregates))) {
       $groupby = array_unique(array_merge($this->groupby, $non_aggregates));
       foreach ($groupby as $field) {
         $query->groupBy($field);
@@ -1183,7 +1206,12 @@ class views_plugin_query_default extends views_plugin_query {
       // we only add the orderby if we're not counting.
       if ($this->orderby) {
         foreach ($this->orderby as $order) {
-          $query->orderBy($order['field'], $order['direction']);
+          if ($order['field'] == 'rand_') {
+            $query->orderRandom();
+          }
+          else {
+            $query->orderBy($order['field'], $order['direction']);
+          }
         }
       }
     }
@@ -1231,6 +1259,9 @@ class views_plugin_query_default extends views_plugin_query {
       $this->set_distinct();
     }
 
+    // Store the view in the object to be able to use it later.
+    $this->view = $view;
+
     $view->init_pager();
 
     // Let the pager modify the query to add limits.
@@ -1267,9 +1298,18 @@ class views_plugin_query_default extends views_plugin_query {
     $items = array();
     if ($query) {
       $additional_arguments = module_invoke_all('views_query_substitutions', $view);
+
+      // Count queries must be run through the preExecute() method.
+      // If not, then hook_query_node_access_alter() may munge the count by
+      // adding a distinct against an empty query string
+      // (e.g. COUNT DISTINCT(1) ...) and no pager will return.
+      // See pager.inc > PagerDefault::execute()
+      // http://api.drupal.org/api/drupal/includes--pager.inc/function/PagerDefault::execute/7
+      // See http://drupal.org/node/1046170.
+      $count_query->preExecute();
+
       // Build the count query.
       $count_query = $count_query->countQuery();
-      //  $count_query->distinct = FALSE;
 
       // Add additional arguments as a fake condition.
       // XXX: this doesn't work... because PDO mandates that all bound arguments

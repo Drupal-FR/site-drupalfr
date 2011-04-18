@@ -1,5 +1,4 @@
 <?php
-// $Id: views-view.tpl.php,v 1.13.4.4 2010/07/04 10:04:51 dereine Exp $
 /**
  * @file views-view.tpl.php
  * Main view template
@@ -33,6 +32,11 @@
   <?php if ($admin_links): ?>
     <?php print $admin_links; ?>
   <?php endif; ?>
+  <?php print render($title_prefix); ?>
+  <?php if ($title): ?>
+    <?php print $title; ?>
+  <?php endif; ?>
+  <?php print render($title_suffix); ?>
   <?php if ($header): ?>
     <div class="view-header">
       <?php print $header; ?>

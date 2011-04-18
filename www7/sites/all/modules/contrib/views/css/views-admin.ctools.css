@@ -1,0 +1,222 @@
+/* @group Buttons */
+
+.ctools-button {
+  background-color: #ffffff;
+  border-color: #cccccc;
+  font-size: 11px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+.ctools-button,
+.ctools-button input {
+  text-transform: lowercase;
+}
+
+.ctools-button:hover {
+  border-color: #b8b8b8;
+}
+
+.ctools-button:active {
+  border-color: #a0a0a0;
+}
+
+.ctools-button .ctools-content {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+.ctools-dropbutton .ctools-content {
+  border-right: 1px solid #e8e8e8;
+}
+
+.ctools-dropbutton .ctools-content ul {
+  margin: 0;
+  padding: 0;
+}
+
+.ctools-content ul.actions {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.ctools-button .ctools-content a {
+  background-image: none;
+  border: medium none;
+}
+
+.ctools-dropbutton.open:hover {
+  border-color: #D0D0D0;
+}
+
+.ctools-dropbutton.open {
+  z-index: 100;
+}
+
+.ctools-dropbutton .ctools-link {
+  border-left: 1px solid #ffffff;
+}
+
+.ctools-dropbutton.open .ctools-content {
+    padding-bottom: 4px;
+}
+
+.ctools-dropbutton li {
+  padding-right: 9px;
+}
+
+.ctools-dropbutton.open li + li {
+  border-top: 1px solid #efefef;
+  margin-top: 4px;
+  padding-bottom: 0;
+  padding-top: 4px;
+}
+
+.ctools-twisty:focus {
+  outline: medium none;
+}
+
+.views-display-top .ctools-button {
+  font-size: 12px;
+  position: absolute;
+  right: 12px;
+  top: 7px;
+}
+
+.views-ui-display-tab-bucket .ctools-button {
+  position: absolute;
+}
+
+.views-ui-display-tab-bucket .ctools-button {
+  right: 5px;
+  top: 4px;
+}
+
+.views-ui-display-tab-actions .ctools-button input {
+  background: none;
+  border: medium;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.views-ui-display-tab-actions .ctools-button input:hover {
+  background: none;
+}
+
+/* @end */
+
+/* @group Collapsible */
+
+.ctools-toggle {
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-style: solid;
+  border-width: 5px 5px 0;
+  display: inline-block;
+  float: left;
+  height: 0;
+  margin-right: 2px;
+  margin-top: 0.4545em;
+  width: 0;
+}
+
+.ctools-toggle.ctools-toggle-collapsed {
+  border-bottom-color: transparent;
+  border-left:  4px solid;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  border-width: 5px 0 5px 5px;
+  margin-left: 2px;
+  margin-right: 5px;
+  margin-top: 0.3333em;
+}
+
+.ctools-toggle:hover,
+.ctools-collapsible-handle:hover {
+  cursor: pointer;
+}
+
+.ctools-export-ui-row {
+  margin-bottom: 0;
+  padding-top: 0;
+}
+
+.ctools-export-ui-row label {
+  display: block;
+  float: left;
+  width: 55px;
+}
+
+.views-display-settings .ctools-toggle {
+  color: #000000;
+}
+
+.views-display-column > .ctools-toggle {
+  margin-left: 6px;
+  margin-right: 3px;
+  margin-top: 10px;
+}
+.views-display-column > .ctools-toggle.ctools-toggle-collapsed {
+  margin-left: 9px;
+  margin-right: 5px;
+  margin-top: 8px;
+}
+
+.views-display-column > .ctools-collapsible-handle {
+  border-color: #F3F3F3;
+  border-style: solid;
+  border-width: 1px 1px 0;
+  font-size: 13px;
+  font-weight: normal;
+  margin: 0;
+  padding: 6px 3px;
+}
+
+.views-display-column > .ctools-toggle.ctools-toggle-collapsed + .ctools-collapsible-handle {
+  border-width: 1px;
+}
+
+.views-display-column > .ctools-collapsible-content > .views-ui-display-tab-bucket:first-child {
+  border-top: medium none;
+}
+
+/* @end */
+
+/* @group Dependent */
+
+.dependent-options {
+  margin-left: 18px; /* LTR */
+}
+
+/* @end */
+
+/* @group Export */
+
+/* Override for filter button on the views list screen */
+#ctools-export-ui-list-form .form-submit {
+  margin-top: 0em !important;
+  margin-right: 0em;
+}
+
+.ctools-export-ui-row + .ctools-export-ui-row {
+  margin-top: 1em;
+}
+
+.ctools-export-ui-fourth-row input {
+  margin-top: 5px !important;
+}
+
+/* @end */
+
+/* @group Jump list */
+
+#views-live-preview .ctools-jump-menu-select{
+  max-width: 450px;
+}
+
+/* @end */
+

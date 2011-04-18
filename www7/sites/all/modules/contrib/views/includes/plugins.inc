@@ -1,10 +1,12 @@
 <?php
-// $Id: plugins.inc,v 1.156.4.14 2010/12/04 07:39:35 dereine Exp $
 /**
  * @file plugins.inc
  * Built in plugins for Views output handling.
  *
  */
+
+// @todo: Remove this once update.php can use the registry
+views_include('base');
 
 /**
  * Implements hook_views_plugins
@@ -16,7 +18,7 @@ function views_views_plugins() {
     'display' => array(
       // Default settings for all display plugins.
       'default' => array(
-        'title' => t('Defaults'),
+        'title' => t('Master'),
         'help' => t('Default settings for this view.'),
         'handler' => 'views_plugin_display_default',
         'theme' => 'views_view',
@@ -35,6 +37,7 @@ function views_views_plugins() {
         'handler' => 'views_plugin_display_page',
         'theme' => 'views_view',
         'uses hook menu' => TRUE,
+        'contextual links locations' => array('page'),
         'use ajax' => TRUE,
         'use pager' => TRUE,
         'accept attachments' => TRUE,
@@ -47,6 +50,7 @@ function views_views_plugins() {
         'handler' => 'views_plugin_display_block',
         'theme' => 'views_view',
         'uses hook block' => TRUE,
+        'contextual links locations' => array('block'),
         'use ajax' => TRUE,
         'use pager' => TRUE,
         'use more' => TRUE,
@@ -61,6 +65,7 @@ function views_views_plugins() {
         'theme' => 'views_view',
         'use ajax' => TRUE,
         'use pager' => FALSE,
+        'use more' => TRUE,
         'accept attachments' => FALSE,
         'help topic' => 'display-attachment',
       ),
@@ -79,7 +84,7 @@ function views_views_plugins() {
     'style' => array(
       // Default settings for all style plugins.
       'default' => array(
-        'title' => t('Unformatted'),
+        'title' => t('Unformatted list'),
         'help' => t('Displays rows one after another.'),
         'handler' => 'views_plugin_style_default',
         'theme' => 'views_view_unformatted',
@@ -91,7 +96,7 @@ function views_views_plugins() {
         'help topic' => 'style-unformatted',
       ),
       'list' => array(
-        'title' => t('HTML List'),
+        'title' => t('HTML list'),
         'help' => t('Displays rows as an HTML list.'),
         'handler' => 'views_plugin_style_list',
         'theme' => 'views_view_list',
@@ -172,7 +177,7 @@ function views_views_plugins() {
         'parent' => '',
       ),
       'fixed' => array(
-        'title' => t('Fixed entry'),
+        'title' => t('Fixed value'),
         'handler' => 'views_plugin_argument_default_fixed',
       ),
       'php' => array(
@@ -289,6 +294,7 @@ function views_views_plugins() {
       ),
       'full' => array(
         'title' => t('Paged output, full pager'),
+        'short title' => t('Full'),
         'help' => t('Paged output, full Drupal style'),
         'handler' => 'views_plugin_pager_full',
         'help topic' => 'pager-full',
@@ -296,6 +302,7 @@ function views_views_plugins() {
       ),
       'mini' => array(
         'title' => t('Paged output, mini pager'),
+        'short title' => t('Mini'),
         'help' => t('Use the mini pager output.'),
         'handler' => 'views_plugin_pager_mini',
         'help topic' => 'pager-mini',
@@ -418,6 +425,20 @@ function views_discover_plugins() {
  */
 class views_plugin extends views_object {
   /**
+   * The top object of a view.
+   *
+   * @var view
+   */
+  var $view = NULL;
+
+  /**
+   * The current used display plugin.
+   *
+   * @var views_plugin_display
+   */
+  var $display = NULL;
+
+  /**
    * Init will be called after construct, when the plugin is attached to a
    * view and a display.
    */
@@ -470,5 +491,22 @@ class views_plugin extends views_object {
    *   plugin.
    */
   function validate() { return array(); }
-}
 
+  /**
+   * Returns the summary of the settings in the display.
+   */
+  function summary_title() {
+    return t('Settings');
+  }
+  /**
+   * Return the human readable name of the display.
+   *
+   * This appears on the ui beside each plugin and beside the settings link.
+   */
+  function plugin_title() {
+    if (isset($this->definition['short title'])) {
+      return check_plain($this->definition['short title']);
+    }
+    return check_plain($this->definition['title']);
+  }
+}

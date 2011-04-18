@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_row_comment_view.inc,v 1.1.6.2 2010/01/28 00:00:56 dereine Exp $
 /**
  * @file
  * Contains the node RSS row style plugin.
@@ -11,6 +10,13 @@
 class views_plugin_row_comment_view extends views_plugin_row {
   var $base_table = 'comment';
   var $base_field = 'cid';
+
+  function summary_title() {
+    if (empty($this->options['links'])) {
+      return t('Hide links');
+    }
+    return t('Display links');
+  }
 
   function option_definition() {
     $options = parent::option_definition();
@@ -36,8 +42,6 @@ class views_plugin_row_comment_view extends views_plugin_row {
 
     $cresult = comment_load_multiple($cids);
     foreach ($cresult as $comment) {
-      $comment = drupal_unpack($comment);
-      $comment->name = $comment->uid ? $comment->registered_name : $comment->name;
       $comment->depth = count(explode('.', $comment->thread)) - 1;
       $this->comments[$comment->cid] = $comment;
     }

@@ -1,5 +1,3 @@
-// $Id: ajax_view.js,v 1.19.4.4 2011/01/03 22:56:39 merlinofchaos Exp $
-
 /**
  * @file ajaxView.js
  *
@@ -37,7 +35,7 @@ Drupal.behaviors.ViewsAjaxView.attach = function() {
       .filter(':not(.views-processed)')
       .each(function () {
         var button = $('input[type=submit]', this);
-        button.form = this;
+        button = button[0];
 
         var ajax = new Drupal.ajax($(button).attr('id'), button, element_settings);
       })

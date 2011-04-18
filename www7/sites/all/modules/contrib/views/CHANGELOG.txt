@@ -1,5 +1,134 @@
 CHANGELOG for Views 3 for Drupal 7
 
+Views 3.x-7.x-dev
+=================
+#1017128 by bojanz, dereine: Add support to render a single delta.
+follow up by bojanz: Better description for the delta.
+#1017254 by dereine: Fix undefined property error in argument_string handler.
+#1007886 by dereine: Relationship-fields in field_field handler should use the table alias.
+#1018766 by bojanz: Fix click_sort for fieldapi fields.
+#1017128 by bojanz: Follow up: Hide field_field if field value is empty.
+#1018802 by dereine: Convert 'formula' add_where to add_where_expression.
+#1018766 by solotandem: Fix click_sort for fieldapi fields.
+#960648 by dereine: Addjust comment link to d7 changes.
+#997662 by das-peter: Saving a machine name of a display throws Notice "Undefined property new_id".
+#955464 by davereid: Fix notice in views_many_to_one_helper when $operator = 'and'.
+#1019438 by dereine: Fix "illegal choice" for unlimited fields.
+#1019506 by dereine: Fix the remove items element on the rearrange filter_group form.
+#1011004 by dereine: Add validation for query plugin option forms.
+#991202 by helmo: Add option to turn linebreaks into br tags in field rewriting.
+#1001302 by dagmar: Enable attachment displays to have more links.
+#1021784 by tim.plunkett: Extra space added in some classes erroneously.
+#862072 by jhedstrom: Allow argument validator to test if user has edit or delete access to a node.
+Fix fieldsets in field handler.
+#962564 by joshuajabbour: Allow link attributes to be rewritten (internally).
+#672864 by dboulet: cols- class incorrect on table, grid.
+#981872 by infojunkie: Option to hide attachments in summary views.
+#839810 by marcp: Get UID from URL argument default plugin should accept uids from Views pages.
+#1012584 by dereine: Allow filtering on term descriptions.
+#895046 by bojanz, dereine, merlinofchaos: Implement proper multiple field api handling and improve field api rendering in general.
+#1035168 by Ao: Fix strict warning in unread node filter.
+#1044916 by dagmar: Fix improper use of set_current_page member variable.
+#1016814 by eaton: string argument should support name_field.
+#1007376 by dereine: Jump menu was not correctly supporting offsets.
+#1018160 by zhangtaihao: unpack_translatable could infinitely recurse when options are arrays but not declared as such.
+#776830: Attachments and other displays lost "Items to display" controls.
+#747782 by dereine: Improve jump menu grouping.
+#1026014 by dereine and alex_b: Use more always should not ask for the count query to see if we need to show the more link.
+#1012596 by dereine: More inline documentation of class variables.
+#988680 by mikeytown2: Fix Views memory leak with attachments.
+#1023062 by mikejoconnor: Replace views_process_dependency with ctools_dependent_process again.
+#1023558 by mariusz.slonina: Add a user cancel account link.
+#1015960 by duellj: View js should use DOM element not jquery object.
+#1027552 by david_Rothstein: Fix Node: Has new content fatal error.
+#955464 by dereine: Fix many_to_one helper in the case of have no condition and operator = 'and'.
+#696550: Taxonomy validator should always set title when it successfully validates.
+#869172 by bendiy: Add an "external" parameter to field link rewriting so that external URLs can be formed properly even without a scheme.
+#935176 by benoit.borrel: Add "system" table to Views data.
+#839236: Fields named "buttons" would disappear from the rearrange UI due to conflict with the buttons on the form.
+#783514 by dereine: Allow breaking of strings with + and ,
+#1000760 by dereine: Prevent htmlspecialchars() error with string arguments.
+#1033494 by dereine: Fix filter by user picture: change used handler.
+#895046 by bojanz: Follow up of the multiple field handler. Fixes an issue with group-by and rename entity_api_classes.
+#1044250 by dereine: Fix notice in views_handler_filter_history_user_timestamp for disabled comment module.
+#1018872 by dereine: field_field handler shouldn't force to set base field in relationship.
+#1049586 by fgm: Fix strict error in field_field::init.
+#1049276 by david_Rothstein: Commit the 6.11 patch to d7.
+#1011226 by Chris Gillis, Sutharsan: Fix display of error messages in the views inteface.
+#1050962 by Sutharsan: Convert #value to #markup in validate methods.
+#1051034 by Manuel Garcia: Allow field wrapper class to take multiple classes.
+#957284 by dereine: Fix search filter to work with d7 version of search.module's api.
+#534452 by dereine: Remove non-functional "optional" setting on string filters.
+#1019826 by penguin25: Respect contact page access overrides when displaying contact link.
+#652684 by dereine: Search and replace error resulted in invalid function name in nid argument validator.
+#1008358: Updated for translation plugin to work properly with i18nviews.
+#1055378 by mfb: Fix rss_namespaces.
+#957284: by dereine: Followup for filter_search fix.
+#1063208 by dereine: Fix joins between some tables and file_usage.
+#1024586 by merlinofchaos, dereine: Provide a way to move old fields in views data. Additional move field-api data to it.
+#990554 by bojanz: Allow to show default values of fields.
+#1039460 by robertgarrigos: Rename drupal_set_content to drupal_add_region_content
+#1045908 by bfroehle: Fix type in api-upgrading.html
+#646456 by xslim: Add a workaround to run update.php
+#1055602 by dereine: Convert argument search to dbtng.
+#1039584 by dereine: Fix path of taxonomy path, function from d6
+#1019746 by Ralf: Check_plain role names.
+#1006482 by dereine: Fix filter: user posted or commented handler.
+#870960 by bojanz, dereine: Field label should derive from field Label, not field name.
+#1056824 by greggles: Rename the displayed permission from "access all views" to "bypass views access control".
+#1022052 bojanz, dereine: Don't add the field_info into the views data array
+#970162 by longwave: Add "time hence" options to date field format
+#1069100 by paranojik: remove legacy code from views_plugin_row_comment_view:pre_render().
+#741234 by voxpelli: Arguments should check for NULL along with empty string to find empty values.
+#1046170 by agentrickard, blackice2999, dereine: Execute preExecute before generate the countQuery to fix pagers with node_access.
+#1046170 (follow up) by agentrickard: Provide a better documentation for the problem.
+#1070112 by drunken_monkey: Fix notice in field_views_field_label.
+#978824 by dereine: Don't execute validation on config_item remove button.
+by dereine: Convert op_shorter/longer in filter_string to add_where_expression.
+#1046650 by dereine, damz: Don't delete views in the simpletest.
+#1022052 follow up by bojanz: Fix filter_list handler, by loading the field_info again.
+#1023794 by turek: Fix notice in many_to_one_helper.
+#1057810 by mariusz.slonina: Remove views_handler_field_user_link_delete and the views_data entry.
+#1075598 by paranojik: small fix for the single argument case.
+#1053164 by dereine: Support random sort for sqlite by using dbtng functionality.
+#1073862 by solotandem: Title of columns from field revision tables shouldn't have the name delta.
+#1042072 by das-peter: Fix notice in views_handler_field_field.
+#1078570 by duellj: Search filter doesn't work for attachments.
+#1068108 by boombatower: Allow row_class to contain multiple classes.
+#1078738 by dereine: Add a serialized data field handler and set users.data to it.
+#1051308 by dereine: Backport a test fix for views_handler_filter_date from d7v3ui.
+#1079496 by dereine: Fix renamed field names for list fields. This caused an additional filter, which didn't worked.
+#1080690 by dereine: Store the view object in the query object, so it can be used.
+#1080690 by dereine: Fix target/key for querying against sql databases. Therefore don't use db_select anymore.
+#1029534 by bojanz: Fix like for pgsql by using db_like correct.
+#1051308 by bojanz: Fix date filter handler behaviour with offsets.
+#1062506 by dereine: Misnamed parameter for creation of broken handlers.
+#1049998 by dereine: Fix jump_menu summary and some possible notices.
+#975400 by bojanz, dereine: Refactor field render() functions to accept $value.
+#975400 follow up by bojanz: Give field::sanitize_value more power and fix some issues with get_value.
+#1052896 by dereine: Fix summary css classes output.
+#1046674 by dereine: Rename build_mode to view_mode in row_node_view. This fixes some bugs with code using $node->view_mode.
+#1090682 by febbraro: view:load does not clear the cache correctly when reset.
+#1090682 by dereine: Write a simpletest for the reset parameter of view::load.
+#1054272 by dagmar: String filters are non optional anymore.
+#1086158 by dereine: Fix filter handler of list fields.
+#1079178 by Manuel Garcia: Provide a views revert drush command.
+#1097602 by bojanz: Don't run validation for Cancel button on views wizard.
+#1096292 by bojanz: Provide better default for exposed_sorts_label.
+#1097964 by dereine: Don't show contextual links when the contextual module is disabled.
+#1098006 by bojanz: Fix notice in summary style conversion code.
+by dereine: Move get_value and sanitize_value into views_handler to support it for area handlers.
+#1098334 by kannary, dereine: Remove merge leftover in views.help.ini.
+by dereine: Allow to expose sorts again.
+#1098168 by fubhy: HTML Wrapper checkboxes in style settings in default field handler showing weird behavior
+#1096366 by jamsilver: Role access plugin: Replacing array_unshift() with reset()
+#1096834 by dww: Allow importing views code that starts with '<?php'.
+#557160 by joachim: Move docs/docs.php to views.api.php to match the drupal standard of hook documentation.
+#1100052 by michielnugter: Fix strict warning of views_handler_argument::get_value.
+#1023456 by dereine: Fix many_to_one_helper condition buidling.
+#1100738 by bojanz: Extend upgrading docs to include info about argument changes and get_value/sanitize_value.
+#1100776 by bojanz: Fix call for get_value in field_user_language handler.
+
 Views 3.x-7.x-alpha1 (05-Jan-2011)
 ==================================
 
