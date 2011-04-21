@@ -25,3 +25,8 @@ DROP TABLE tfiles;
 --DROP TABLE profile_values;
 -- fake uninstall of profile module
 --UPDATE system SET schema_version = -1 WHERE name = 'profile';
+
+-- remove internal:links
+UPDATE node_revisions SET body = REPLACE(body, "internal:", "/");
+UPDATE node_revisions SET teaser = REPLACE(teaser, "internal:", "/");
+
