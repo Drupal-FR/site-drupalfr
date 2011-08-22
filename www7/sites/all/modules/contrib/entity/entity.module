@@ -71,6 +71,84 @@ function entity_type_supports($entity_type, $op) {
 }
 
 /**
+ * Menu loader function: load an entity from its path.
+ *
+ * This can be used to load entities of all types in menu paths:
+ *
+ * @code
+ * $items['myentity/%entity_object'] = array(
+ *   'load arguments' => array('myentity'),
+ *   'title' => ...,
+ *   'page callback' => ...,
+ *   'page arguments' => array(...),
+ *   'access arguments' => array(...),
+ * );
+ * @endcode
+ *
+ * @param $entity_id
+ *   The ID of the entity to load, passed by the menu URL.
+ * @param $entity_type
+ *   The type of the entity to load.
+ * @return
+ *   A fully loaded entity object, or FALSE in case of error.
+ */
+function entity_object_load($entity_id, $entity_type) {
+  $entities = entity_load($entity_type, array($entity_id));
+  return reset($entities);
+}
+
+/**
+ * A wrapper around entity_load() to load a single entity by name or numeric id.
+ *
+ * @todo: Re-name entity_load() to entity_load_multiple() in d8 core and this
+ * to entity_load().
+ *
+ * @param $entity_type
+ *   The entity type to load, e.g. node or user.
+ * @param $id
+ *   The entity id, either the numeric id or the entity name. In case the entity
+ *   type has specified a name key, both the numeric id and the name may be
+ *   passed.
+ *
+ * @return
+ *   The entity object, or FALSE.
+ *
+ * @see entity_load()
+ */
+function entity_load_single($entity_type, $id) {
+  $entities = entity_load($entity_type, array($id));
+  return reset($entities);
+}
+
+/**
+ * A wrapper around entity_load() to return entities keyed by name key if existing.
+ *
+ * @param $entity_type
+ *   The entity type to load, e.g. node or user.
+ * @param $names
+ *   An array of entity names or ids, or FALSE to load all entities.
+ * @param $conditions
+ *   (deprecated) An associative array of conditions on the base table, where
+ *   the keys are the database fields and the values are the values those
+ *   fields must have. Instead, it is preferable to use EntityFieldQuery to
+ *   retrieve a list of entity IDs loadable by this function.
+ *
+ * @return
+ *   An array of entity objects indexed by their names (or ids if the entity
+ *   type has no name key).
+ *
+ * @see entity_load()
+ */
+function entity_load_multiple_by_name($entity_type, $names = FALSE, $conditions = array()) {
+  $entities = entity_load($entity_type, $names, $conditions);
+  $info = entity_get_info($entity_type);
+  if (!isset($info['entity keys']['name'])) {
+    return $entities;
+  }
+  return entity_key_array_by_property($entities, $info['entity keys']['name']);
+}
+
+/**
  * Permanently save an entity.
  *
  * In case of failures, an exception is thrown.
@@ -79,6 +157,7 @@ function entity_type_supports($entity_type, $op) {
  *   The type of the entity.
  * @param $entity
  *   The entity to save.
+ *
  * @return
  *   For entity types provided by the CRUD API, SAVED_NEW or SAVED_UPDATED is
  *   returned depending on the operation performed. If there is no information
@@ -86,7 +165,7 @@ function entity_type_supports($entity_type, $op) {
  *
  * @see entity_type_supports()
  */
-function entity_save($entity_type, &$entity) {
+function entity_save($entity_type, $entity) {
   $info = entity_get_info($entity_type);
   if (method_exists($entity, 'save')) {
     return $entity->save();
@@ -118,32 +197,28 @@ function entity_save($entity_type, &$entity) {
  * @see entity_type_supports()
  */
 function entity_delete($entity_type, $id) {
-  $info = entity_get_info($entity_type);
-  if (isset($info['deletion callback'])) {
-    $info['deletion callback']($id);
-  }
-  elseif (in_array('EntityAPIControllerInterface', class_implements($info['controller class']))) {
-    entity_get_controller($entity_type)->delete(array($id));
-  }
-  else {
-    return FALSE;
-  }
+  return entity_delete_multiple($entity_type, array($id));
 }
 
 /**
  * Permanently delete multiple entities.
- * @todo: Add support for entity types not provided via the CRUD API.
  *
  * @param $entity_type
  *   The type of the entity.
  * @param $ids
- *   An array of uniform identifiers of the entities to delete.
+ *   An array of entity ids of the entities to delete. In case the entity makes
+ *   use of a name key, both the names or numeric ids may be passed.
  * @return
  *   FALSE if the given entity type isn't compatible to the CRUD API.
  */
 function entity_delete_multiple($entity_type, $ids) {
   $info = entity_get_info($entity_type);
-  if (in_array('EntityAPIControllerInterface', class_implements($info['controller class']))) {
+  if (isset($info['deletion callback'])) {
+    foreach ($ids as $id) {
+      $info['deletion callback']($id);
+    }
+  }
+  elseif (in_array('EntityAPIControllerInterface', class_implements($info['controller class']))) {
     entity_get_controller($entity_type)->delete($ids);
   }
   else {
@@ -256,11 +331,10 @@ function entity_build_content($entity_type, $entity, $view_mode = 'full', $langc
 }
 
 /**
- * Returns the entity identifier.
+ * Returns the entity identifier, i.e. the entities name or numeric id.
  *
- * Unlike entity_extract_ids() this function returns the uniform identifier,
- * thus if an exportable entity makes use of a name key, the name of the entity
- * is returned. Otherwise the usual numeric id is returned.
+ * Unlike entity_extract_ids() this function returns the name of the entity
+ * instead of the numeric id, in case the entity type has specified a name key.
  *
  * @param $entity_type
  *   The type of the entity.
@@ -281,28 +355,42 @@ function entity_id($entity_type, $entity) {
 /**
  * Generate an array for rendering the given entities.
  *
+ * Entities being viewed, are generally expected to be fully-loaded entity
+ * objects, thus have their name or id key set. However, it is possible to
+ * view a single entity without any id, e.g. for generating a preview during
+ * creation.
+ *
  * @param $entity_type
  *   The type of the entity.
  * @param $entities
- *   An array of entities to render, keyed by their ids. E.g. as returned from
- *   entity_load().
+ *   An array of entities to render.
  * @param $view_mode
  *   A view mode as used by this entity type, e.g. 'full', 'teaser'...
  * @param $langcode
  *   (optional) A language code to use for rendering. Defaults to the global
  *   content language of the current request.
+ * @param $page
+ *   (optional) If set will control if the entity is rendered: if TRUE
+ *   the entity will be rendered without its title, so that it can be embeded
+ *   in another context. If FALSE the entity will be displayed with its title
+ *   in a mode suitable for lists.
+ *   If unset, the page mode will be enabled if the current path is the URI
+ *   of the entity, as returned by entity_uri().
+ *   This parameter is only supported for entities which controller is a
+ *   EntityAPIControllerInterface.
  * @return
- *   The renderable array, or FALSE if there is no information how to view an
- *   entity.
+ *   The renderable array, keyed by name key if existing or by numeric id else.
+ *   If there is no information on how to view an entity, FALSE is returned.
  */
-function entity_view($entity_type, $entities, $view_mode = 'full', $langcode = NULL) {
+function entity_view($entity_type, $entities, $view_mode = 'full', $langcode = NULL, $page = NULL) {
   $info = entity_get_info($entity_type);
   if (isset($info['view callback'])) {
     return $info['view callback']($entities, $view_mode, $langcode, $entity_type);
   }
   elseif (in_array('EntityAPIControllerInterface', class_implements($info['controller class']))) {
-    return entity_get_controller($entity_type)->view($entities, $view_mode, $langcode);
+    return entity_get_controller($entity_type)->view($entities, $view_mode, $langcode, $page);
   }
+  return FALSE;
 }
 
 /**
@@ -329,6 +417,27 @@ function entity_access($op, $entity_type, $entity = NULL, $account = NULL) {
   if (($info = entity_get_info()) && isset($info[$entity_type]['access callback'])) {
     return $info[$entity_type]['access callback']($op, $entity, $account, $entity_type);
   }
+}
+
+/**
+ * Converts an array of entities to be keyed by the values of a given property.
+ *
+ * @param array $entities
+ *   The array of entities to convert.
+ * @param $property
+ *   The name of entity property, by which the array should be keyed. To get
+ *   reasonable results, the property has to have unique values.
+ *
+ * @return array
+ *   The same entities in the same order, but keyed by their $property values.
+ */
+function entity_key_array_by_property(array $entities, $property) {
+  $ret = array();
+  foreach ($entities as $entity) {
+    $key = isset($entity->$property) ? $entity->$property : NULL;
+    $ret[$key] = $entity;
+  }
+  return $ret;
 }
 
 /**
@@ -497,11 +606,11 @@ function _entity_defaults_rebuild($entity_type) {
     drupal_alter($hook, $entities);
 
     // Remove defaults which are already overridden.
-    $overridden_entities = entity_load($entity_type, array_keys($entities), array($keys['status'] => ENTITY_OVERRIDDEN));
+    $overridden_entities = entity_load_multiple_by_name($entity_type, array_keys($entities), array($keys['status'] => ENTITY_OVERRIDDEN));
     $entities = array_diff_key($entities, $overridden_entities);
 
     // Determine already existing, custom entities and mark them as overridden.
-    $existing_entities = entity_load($entity_type, array_keys($entities), array($keys['status'] => ENTITY_CUSTOM));
+    $existing_entities = entity_load_multiple_by_name($entity_type, array_keys($entities), array($keys['status'] => ENTITY_CUSTOM));
     foreach ($existing_entities as $name => $entity) {
       $entity->{$keys['status']} |= ENTITY_OVERRIDDEN;
       $entity->{$keys['module']} = $entities[$name]->{$keys['module']};
@@ -529,8 +638,20 @@ function _entity_defaults_rebuild($entity_type) {
  * Implements hook_modules_enabled().
  */
 function entity_modules_enabled($modules) {
+  $built_types = variable_get('entity_defaults_built', array());
   if ($entity_types = _entity_modules_get_default_types($modules)) {
-    entity_defaults_rebuild($entity_types);
+    // Determining the entity types might have triggered rebuilding already, in
+    // which case we do not need to rebuild again. So we make sure to only
+    // add entity-types for rebuilding that were not marked for rebuilding
+    // *before our check* anyway.
+    foreach ($entity_types as $key => $type) {
+      if (!isset($built_types[$type])) {
+        unset($entity_types[$key]);
+      }
+    }
+    if ($entity_types) {
+      entity_defaults_rebuild($entity_types);
+    }
   }
 }
 
@@ -595,14 +716,21 @@ function _entity_modules_get_default_types($modules) {
 
 /**
  * Defines schema fields required for exportable entities.
- * To be utilized by modules defining exportable entities.
+ *
+ * Warning: Do not call this function in your module's hook_schema()
+ * implementation or update functions. It is not safe to call functions of
+ * dependencies at this point. Instead of calling the function, just copy over
+ * the content.
+ * For more details see the issue http://drupal.org/node/1122812.
  */
 function entity_exportable_schema_fields($module_col = 'module', $status_col = 'status') {
   return array(
     $status_col => array(
       'type' => 'int',
       'not null' => TRUE,
-      'default' => ENTITY_CUSTOM,
+      // Set the default to ENTITY_CUSTOM without using the constant as it is
+      // not safe to use it at this point.
+      'default' => 0x01,
       'size' => 'tiny',
       'description' => 'The exportable status of the entity.',
     ),
@@ -682,9 +810,16 @@ function template_preprocess_entity(&$variables) {
   $info = entity_get_info($entity_type);
 
   $variables['title'] = check_plain(entity_label($entity_type, $entity));
-  $uri = entity_uri($entity_type, $entity);
-  $variables['url'] = $uri ? url($uri['path'], $uri['options']) : FALSE;
-  $variables['page'] = $uri && $uri['path'] == $_GET['q'];
+  if (isset($variables['elements']['#page'])) {
+    // If set by the caller, respect the page property.
+    $variables['page'] = $variables['elements']['#page'];
+  }
+  else {
+    // Else, try to automatically detect it.
+    $uri = entity_uri($entity_type, $entity);
+    $variables['url'] = $uri ? url($uri['path'], $uri['options']) : FALSE;
+    $variables['page'] = $uri && $uri['path'] == $_GET['q'];
+  }
 
   // Helpful $content variable for templates.
   $variables['content'] = array();
@@ -934,9 +1069,44 @@ function entity_metadata_site_wrapper() {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ *
+ * Moves the hook_entity_info_alter() implementation to the bottom so it is
+ * invoked after all modules relying on the entity API.
+ * That way we ensure to run last and clear the field-info cache after the
+ * others added in their bundle information.
+ *
+ * @see entity_entity_info_alter()
+ */
+function entity_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'entity_info_alter') {
+    // Move our hook implementation to the bottom.
+    $group = $implementations['entity'];
+    unset($implementations['entity']);
+    $implementations['entity'] = $group;
+  }
+}
+
+/**
  * Implements hook_entity_info_alter().
+ *
+ * @see entity_module_implements_alter()
  */
 function entity_entity_info_alter(&$entity_info) {
+  _entity_info_add_metadata_callbacks($entity_info);
+
+  // Modules are using entity_load() in hook_entity_info_alter() to add
+  // their bundle-info. This might trigger the field API cache to be built,
+  // which makes use of the bundle-info. In that case the field-info cache would
+  // have been built with in-complete bundle-info, thus we clear it so it is
+  // rebuilt with complete bundle-info the next time field-info is requested.
+  _field_info_collate_fields(TRUE);
+}
+
+/**
+ * Adds metadata callbacks for core entities to the entity info.
+ */
+function _entity_info_add_metadata_callbacks(&$entity_info) {
   // Set access callbacks.
   $entity_info['node']['access callback'] = 'entity_metadata_no_hook_node_access';
   $entity_info['user']['access callback'] = 'entity_metadata_user_access';
@@ -978,4 +1148,3 @@ function entity_entity_info_alter(&$entity_info) {
     $entity_info['taxonomy_vocabulary']['token type'] = 'vocabulary';
   }
 }
-

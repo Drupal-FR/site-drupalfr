@@ -1,5 +1,4 @@
 <?php
-// $Id: diff.pages.inc,v 1.1.2.11.2.1 2010/09/09 23:12:09 yhahn Exp $
 
 /**
  * @file
@@ -75,7 +74,7 @@ function diff_node_revisions($form, $form_state, $node) {
       $form['info'][$revision->vid] = array(
         '#markup' => t('!date by !username', array(
           '!date' => l(format_date($revision->timestamp, 'small'), "node/$node->nid"),
-          '!username' => theme('username', array('name' => $revision))))
+          '!username' => theme('username', array('account' => $revision))))
         . (($revision->log != '') ? '<p class="revision-log">'. filter_xss($revision->log) .'</p>' : ''),
       );
     }
@@ -83,7 +82,7 @@ function diff_node_revisions($form, $form_state, $node) {
       $form['info'][$revision->vid] = array(
         '#markup' => t('!date by !username', array(
           '!date' => l(format_date($revision->timestamp, 'small'), "node/$node->nid/revisions/$revision->vid/view"),
-          '!username' => theme('username', array('name' => $revision))))
+          '!username' => theme('username', array('account' => $revision))))
         . (($revision->log != '') ? '<p class="revision-log">'. filter_xss($revision->log) .'</p>' : '')
       );
       if ($revert_permission) {
@@ -116,7 +115,7 @@ function diff_node_revisions($form, $form_state, $node) {
   $form['submit'] = array('#type' => 'submit', '#value' => t('Show diff'));
 
   if (count($revision_list) > REVISION_LIST_SIZE) {
-    $form['#suffix'] = theme('pager', NULL, REVISION_LIST_SIZE, 0);
+    $form['#suffix'] = theme('pager');
   }
 
   return $form;
@@ -167,11 +166,11 @@ function diff_diffs_show($node, $old_vid, $new_vid) {
   // Generate table header (date, username, logmessage).
   $old_header = t('!date by !username', array(
     '!date' => l(format_date($old_node->revision_timestamp), "node/$node->nid/revisions/$old_node->vid/view"),
-    '!username' => theme('username', array('name' => $node_revisions[$old_vid])),
+    '!username' => theme('username', array('account' => $node_revisions[$old_vid])),
   ));
   $new_header = t('!date by !username', array(
     '!date' => l(format_date($new_node->revision_timestamp), "node/$node->nid/revisions/$new_node->vid/view"),
-    '!username' => theme('username', array('name' => $node_revisions[$new_vid])),
+    '!username' => theme('username', array('account' => $node_revisions[$new_vid])),
   ));
 
   $old_log = $old_node->log != '' ? '<p class="revision-log">'. filter_xss($old_node->log) .'</p>' : '';
@@ -230,7 +229,8 @@ function diff_diffs_show($node, $old_vid, $new_vid) {
     $output .= '<div class="diff-section-title">'. t('Revision of !new_date:', array('!new_date' => format_date($new_node->revision_timestamp))) .'</div>';
   }
   // Don't include node links (final argument) when viewing the diff.
-  $output .= drupal_render(node_view($new_node, 'full'));
+  $view = node_view($new_node, 'full');
+  $output .= drupal_render($view);
   return $output;
 }
 
@@ -244,7 +244,8 @@ function diff_diffs_show($node, $old_vid, $new_vid) {
  *   Node for comparison which will be displayed on the right side.
  */
 function _diff_body_rows($old_node, $new_node) {
-  drupal_add_css(drupal_get_path('module', 'diff') .'/diff.css', 'module', 'all', FALSE);
+  drupal_add_css(drupal_get_path('module', 'diff') .'/diff.css');
+
   module_load_include('inc', 'diff', 'includes/node');
 
   $rows = array();
@@ -302,6 +303,7 @@ function _diff_body_rows($old_node, $new_node) {
       array('data' => ''),
     );
   }
+
   return $rows;
 }
 

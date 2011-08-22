@@ -61,6 +61,7 @@ function entity_metadata_field_default_property_callback(&$info, $entity_type, $
       'translatable' => !empty($field['translatable']),
       // Specify that this property stems from a field.
       'field' => TRUE,
+      'required' => $instance['required'],
     );
     // For field types of the list module add in the options list callback.
     if (strpos($field['type'], 'list') === 0) {
@@ -116,7 +117,11 @@ function entity_metadata_field_term_reference_callback(&$info, $entity_type, $fi
     $settings = reset($field['settings']['allowed_values']);
     $property['bundle'] = $settings['vocabulary'];
   }
-  $property['options list'] = 'entity_metadata_field_options_list';
+  // Only add the options list callback for controlled vocabularies, thus
+  // vocabularies not using the autocomplete widget.
+  if ($instance['widget']['type'] != 'taxonomy_autocomplete') {
+    $property['options list'] = 'entity_metadata_field_options_list';
+  }
   unset($property['query callback']);
 }
 

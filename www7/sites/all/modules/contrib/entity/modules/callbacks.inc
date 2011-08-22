@@ -52,7 +52,8 @@ function entity_metadata_comment_get_properties($comment, array $options, $name)
       if (!empty($comment->pid)) {
         return $comment->pid;
       }
-      throw new EntityMetadataWrapperException('This comment has no parent comment.');
+      // There is no parent comment.
+      return NULL;
 
     case 'author':
       return $comment->uid;
@@ -152,7 +153,8 @@ function entity_metadata_poll_node_get_properties($node, array $options, $name) 
     return $total_votes;
   }
   elseif (!isset($winner)) {
-    throw new EntityMetadataWrapperException('There is no poll winner yet.');
+    // There is no poll winner yet.
+    return NULL;
   }
   switch ($name) {
     case 'poll_winner_votes':
@@ -171,14 +173,15 @@ function entity_metadata_poll_node_get_properties($node, array $options, $name) 
  * @see entity_metadata_statistics_entity_info_alter()
  */
 function entity_metadata_statistics_node_get_properties($node, array $options, $name) {
-  $statistics = statistics_get($node->nid);
+  $statistics = (array) statistics_get($node->nid);
+  $statistics += array('totalcount' => 0, 'daycount' => 0, 'timestamp' => NULL);
 
   switch ($name) {
     case 'views':
-      return $statistics['totalviews'];
+      return $statistics['totalcount'];
 
     case 'day_views':
-      return $statistics['dayviews'];
+      return $statistics['daycount'];
 
     case 'last_view':
       return $statistics['timestamp'];
@@ -387,7 +390,7 @@ function entity_metadata_field_property_set($entity, $name, $value, $langcode, $
   $field = field_info_field($name);
   $columns = array_keys($field['columns']);
   $langcode = isset($langcode) ? $langcode : LANGUAGE_NONE;
-  $values = $field['cardinality'] == 1 ? array($value) : $value;
+  $values = $field['cardinality'] == 1 ? array($value) : (array) $value;
 
   $items = array();
   foreach ($values as $delta => $value) {
@@ -438,7 +441,7 @@ function entity_metadata_field_verbatim_get($entity, array $options, $name, $ent
 function entity_metadata_field_verbatim_set($entity, $name, $items, $langcode) {
   $field = field_info_field($name);
   $langcode = isset($langcode) ? $langcode : LANGUAGE_NONE;
-  $value = $field['cardinality'] == 1 ? array($items) : $items;
+  $value = $field['cardinality'] == 1 ? array($items) : (array) $items;
   // Filter out any items set to NULL.
   $entity->{$name}[$langcode] = array_filter($value);
 
@@ -499,13 +502,18 @@ function entity_metadata_field_file_create_item($property_name, $context) {
 /**
  * Callback for validating file field $items.
  */
-function entity_metadata_field_file_validate_item($item, $context) {
-  // File-field items require a valid file.
-  if (!isset($item['fid']) || !file_load($item['fid'])) {
-    return FALSE;
-  }
-  if (isset($context['property info']['display']) && !isset($item['display'])) {
-    return FALSE;
+function entity_metadata_field_file_validate_item($items, $context) {
+  // Stream-line $items for multiple vs non-multiple fields.
+  $items = !entity_property_list_extract_type($context['type']) ? array($items) : (array) $items;
+
+  foreach ($items as $item) {
+    // File-field items require a valid file.
+    if (!isset($item['fid']) || !file_load($item['fid'])) {
+      return FALSE;
+    }
+    if (isset($context['property info']['display']) && !isset($item['display'])) {
+      return FALSE;
+    }
   }
   return TRUE;
 }
@@ -658,6 +666,10 @@ function entity_metadata_create_node($values = array()) {
   foreach (array('status', 'promote', 'sticky') as $key) {
     $node->$key = (int) in_array($key, $node_options);
   }
+  if (module_exists('comment') && !isset($node->comment)) {
+    $node->comment = variable_get("comment_$node->type", COMMENT_NODE_OPEN);
+  }
+  // Apply the given values.
   foreach ($values as $key => $value) {
     $node->$key = $value;
   }
@@ -667,11 +679,11 @@ function entity_metadata_create_node($values = array()) {
 /**
  * Callback to save a user account.
  */
-function entity_metadata_user_save(&$account) {
+function entity_metadata_user_save($account) {
   $edit = (array) $account;
   // Don't save the hashed password as password.
   unset($edit['pass']);
-  $account = user_save($account, $edit);
+  user_save($account, $edit);
 }
 
 /**
@@ -732,7 +744,7 @@ function entity_metadata_table_query($entity_type, $property, $value, $limit) {
 
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', $entity_type, '=')
-        ->propertyCondition($info['schema field'], $value, '=')
+        ->propertyCondition($info['schema field'], $value, is_array($value) ? 'IN' : '=')
         ->range(0, $limit);
 
   $result = $query->execute();
@@ -750,7 +762,7 @@ function entity_metadata_field_query($entity_type, $property, $value, $limit) {
   $columns = array_keys($field['columns']);
 
   $query->entityCondition('entity_type', $entity_type, '=')
-        ->fieldCondition($field, $columns[0], $value, '=')
+        ->fieldCondition($field, $columns[0], $value, is_array($value) ? 'IN' : '=')
         ->range(0, $limit);
 
   $result = $query->execute();

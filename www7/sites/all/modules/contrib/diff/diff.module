@@ -1,5 +1,4 @@
 <?php
-// $Id: diff.module,v 1.23.2.3.2.22.2.3 2010/09/23 19:37:59 yhahn Exp $
 
 /**
  * @file
@@ -201,10 +200,11 @@ function diff_form_node_type_form_alter(&$form, $form_state) {
  */
 function diff_node_form_build_preview_changes($form, &$form_state) {
   module_load_include('inc', 'diff', 'diff.pages');
-  $node = $form['#builder_function']($form, $form_state);
+  $old_node = clone node_load($form_state['values']['nid']);
+  $node = node_form_submit_build_node($form, $form_state);
 
   // Create diff of old node and edited node
-  $rows = _diff_body_rows(node_load($form_state['values']['nid']), $node);
+  $rows = _diff_body_rows($old_node, $node);
   $cols = _diff_default_cols();
   $header = _diff_default_header();
   $changes = theme('diff_table', array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => 'diff'), 'cols' => $cols));

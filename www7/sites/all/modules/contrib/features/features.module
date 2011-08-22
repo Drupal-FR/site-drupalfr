@@ -329,7 +329,8 @@ function features_include_defaults($components = NULL, $reset = FALSE) {
       // Inclusion of defaults for Views.
       if ($component === 'views') {
         views_include('view');
-        views_include_default_views();
+        views_include_handlers();
+        views_module_include('views_default.inc');
       }
       // Inclusion of defaults for CTools.
       else if (isset($info['api'], $info['module'], $info['current_version'])) {

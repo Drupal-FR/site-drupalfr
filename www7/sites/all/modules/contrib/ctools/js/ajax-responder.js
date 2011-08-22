@@ -26,7 +26,7 @@
     // Grab all the links that match this url and add the fetching class.
     // This allows the caching system to grab each url once and only once
     // instead of grabbing the url once per <a>.
-    var $objects = $('a[href=' + old_url + ']')
+    var $objects = $('a[href="' + old_url + '"]')
     $objects.addClass('ctools-fetching');
     try {
       url = old_url.replace(/\/nojs(\/|$)/g, '/ajax$1');
@@ -104,7 +104,6 @@
 
 
     Drupal.ajax.prototype.commands.redirect = function(ajax, data, status) {
-      console.log(redirect);
       if (data.delay > 0) {
         setTimeout(function () {
           location.href = data.url;

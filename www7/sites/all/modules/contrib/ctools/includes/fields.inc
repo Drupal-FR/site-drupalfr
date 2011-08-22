@@ -71,6 +71,9 @@ function ctools_fields_fake_field_instance($field_name, $view_mode = 'ctools', $
 function ctools_fields_get_field_formatter_settings_form($field, $formatter_type, &$form, $form_state, $view_mode = 'ctools') {
   $conf = $form_state['conf'];
   $formatter = field_info_formatter_types($formatter_type);
+  if (isset($formatter['settings'])) {
+    $conf['formatter_settings'] += $formatter['settings'];
+  }
   $function = $formatter['module'] . '_field_formatter_settings_form';
   if (function_exists($function)) {
     $instance = ctools_fields_fake_field_instance($field['field_name'], $view_mode, $formatter_type, $conf['formatter_settings']);
@@ -103,4 +106,29 @@ function ctools_fields_get_field_formatter_info($fields) {
   }
   drupal_alter('field_formatter_info', $info);
   return $info;
+}
+
+/**
+ * Returns the label of a certain field.
+ *
+ * Cribbed from Views.
+ */
+function ctools_field_label($field_name) {
+  $label_counter = array();
+  // Count the amount of instances per label per field.
+  $instances = field_info_instances();
+  foreach ($instances as $entity_type) {
+    foreach ($entity_type as $bundle) {
+      if (isset($bundle[$field_name])) {
+        $label_counter[$bundle[$field_name]['label']] = isset($label_counter[$bundle[$field_name]['label']]) ? ++$label_counter[$bundle[$field_name]['label']] : 1;
+      }
+    }
+  }
+  if (empty($label_counter)) {
+    return $field_name;
+  }
+  // Sort the field lables by it most used label and return the most used one.
+  arsort($label_counter);
+  $label_counter = array_keys($label_counter);
+  return $label_counter[0];
 }

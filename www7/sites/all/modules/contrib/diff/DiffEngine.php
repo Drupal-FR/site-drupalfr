@@ -1,5 +1,4 @@
 <?php
-// $Id: DiffEngine.php,v 1.4.2.1.2.4.2.1 2010/09/09 23:12:09 yhahn Exp $
 
 /**
  * @file
@@ -240,7 +239,7 @@ class _DiffEngine {
    */
   function _line_hash($line) {
     if (strlen($line) > $this->MAX_XREF_LENGTH()) {
-      return md5( line);
+      return md5($line);
     }
     else {
       return $line;

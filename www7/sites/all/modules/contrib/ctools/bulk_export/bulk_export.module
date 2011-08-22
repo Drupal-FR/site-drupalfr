@@ -99,7 +99,7 @@ function bulk_export_export() {
       if ($api_code) {
         foreach ($api_code as $api_hook => $text) {
           $api =  "\n/**\n";
-          $api .= " * Implements hook_$api_hook().\n";
+          $api .= " * Implement hook_$api_hook().\n";
           $api .= " */\n";
           $api .= "function $form_state[module]_$api_hook(\$module, \$api) {\n";
           $api .= $text;

@@ -1,5 +1,4 @@
 <?php
-// $Id: node.inc,v 1.1.2.2.2.2 2010/09/23 19:27:36 yhahn Exp $
 
 /**
  * @file
@@ -14,7 +13,7 @@ function node_diff($old_node, $new_node) {
   $result = array();
   $type = node_type_get_type($new_node);
   $result['title'] = array(
-    '#name' => t($type->title_label),
+    '#name' => $type->title_label,
     '#old' => array($old_node->title),
     '#new' => array($new_node->title),
     '#weight' => -5,
@@ -31,13 +30,45 @@ function node_diff($old_node, $new_node) {
     $langcode = field_language('node', $new_node, $field_name);
     if (isset($new_node->{$field_name}[$langcode])) {
       foreach (array_keys($new_node->{$field_name}[$langcode]) as $delta) {
-        if (isset($new_node->{$field_name}[$langcode][$delta]['value'])) {
+        if (isset($new_node->{$field_name}[$langcode][$delta]['value']) && isset($old_node->{$field_name}[$langcode][$delta]['value'])) {
           $view_old = $old_node->{$field_name}[$langcode][$delta]['value'];
           $view_new = $new_node->{$field_name}[$langcode][$delta]['value'];
           $result["{$field_name}_{$delta}"] = array(
-            '#name' => t($instance['label']),
+            '#name' => $instance['label'],
             '#old' => explode("\n", $view_old),
             '#new' => explode("\n", $view_new),
+          );
+        }
+        elseif (isset($new_node->{$field_name}[$langcode][$delta]['value'])) {
+          // We have a newly input value where there was none in the previous
+          // version of the node.
+          $view_new = $new_node->{$field_name}[$langcode][$delta]['value'];
+          $result["{$field_name}_{$delta}"] = array(
+            '#name' => $instance['label'],
+            '#old' => '',
+            '#new' => explode("\n", $view_new),
+          );
+        }
+        elseif (isset($old_node->{$field_name}[$langcode][$delta]['value'])) {
+          // We have a value that has been removed from the field.
+          $view_old = $old_node->{$field_name}[$langcode][$delta]['value'];
+          $result["{$field_name}_{$delta}"] = array(
+            '#name' => $instance['label'],
+            '#old' => explode("\n", $view_old),
+            '#new' => '',
+          );
+        }
+      }
+    }
+    elseif (isset($old_node->{$field_name}[$langcode])) {
+      // We have a value that has been removed from the field.
+      foreach (array_keys($old_node->{$field_name}[$langcode]) as $delta) {
+        if (isset($old_node->{$field_name}[$langcode][$delta]['value'])) {
+          $view_old = $old_node->{$field_name}[$langcode][$delta]['value'];
+          $result["{$field_name}_{$delta}"] = array(
+            '#name' => $instance['label'],
+            '#old' => explode("\n", $view_old),
+            '#new' => '',
           );
         }
       }

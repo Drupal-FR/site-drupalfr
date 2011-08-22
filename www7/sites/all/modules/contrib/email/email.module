@@ -1,6 +1,5 @@
 <?php
 
-// $Id: email.module,v 1.9.2.8.4.12.2.9 2011/01/20 12:50:06 mh86 Exp $
 
 /**
  * Implements hook_field_info().
@@ -9,9 +8,9 @@ function email_field_info() {
   return array(
     'email' => array(
       'label' => 'Email',
-      'description' => t('This field stores and renderes email addresses.'),
-      'default_widget' => 'text_textfield',
-      'default_formatter' => 'default',
+      'description' => t('This field stores and renders email addresses.'),
+      'default_widget' => 'email_textfield',
+      'default_formatter' => 'email_default',
       'property_type' => 'text',
     ),
   );
@@ -35,6 +34,12 @@ function email_field_validate($obj_type, $object, $field, $instance, $langcode, 
   }
 }
 
+/**
+ * Implements hook_field_widget_error().
+ */
+function email_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element, $error['message']);
+}
 
 /**
  * Implements hook_content_is_empty().

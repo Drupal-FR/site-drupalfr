@@ -83,7 +83,7 @@ function entity_get_all_property_info($entity_type = NULL) {
  * @param $property
  *   The name of the property to query for.
  * @param $value
- *   A property value or an array of possible values to query for.
+ *   A single property value or an array of possible values to query for.
  * @param $limit
  *   Limit the numer of results. Defaults to 30.
  *
@@ -95,8 +95,18 @@ function entity_property_query($entity_type, $property, $value, $limit = 30) {
   $properties = entity_get_all_property_info($entity_type);
   $info = $properties[$property] + array('type' => 'text', 'query callback' => isset($properties[$property]['schema field']) ? 'entity_metadata_table_query' : FALSE);
 
-  // Make sure an entity or a list of entities are passed on as identifiers.
-  $wrapper = entity_metadata_wrapper($info['type'], $value);
+  $type = $info['type'];
+  // Make sure an entity or a list of entities are passed on as identifiers
+  // with the help of the wrappers. For that ensure the data type matches the
+  // passed on value(s).
+  if (is_array($value) && !entity_property_list_extract_type($type)) {
+    $type = 'list<' . $type . '>';
+  }
+  elseif (!is_array($value) && entity_property_list_extract_type($type)) {
+    $type = entity_property_list_extract_type($type);
+  }
+
+  $wrapper = entity_metadata_wrapper($type, $value);
   $value = $wrapper->value(array('identifier' => TRUE));
 
   if (!empty($info['query callback'])) {
@@ -207,6 +217,7 @@ function entity_property_verify_data_type($data, $type) {
   }
 
   switch ($type) {
+    case 'site':
     case 'unknown':
       return TRUE;
     case 'date':
@@ -389,6 +400,8 @@ function entity_property_text_formatted_info() {
       'label' => t('Text'),
       'sanitized' => TRUE,
       'getter callback' => 'entity_metadata_field_text_get',
+      'setter callback' => 'entity_property_verbatim_set',
+      'setter permission' => 'administer nodes',
       'raw getter callback' => 'entity_property_verbatim_get',
     ),
     'summary' => array(
@@ -396,6 +409,8 @@ function entity_property_text_formatted_info() {
       'label' => t('Summary'),
       'sanitized' => TRUE,
       'getter callback' => 'entity_metadata_field_text_get',
+      'setter callback' => 'entity_property_verbatim_set',
+      'setter permission' => 'administer nodes',
       'raw getter callback' => 'entity_property_verbatim_get',
     ),
     'format' => array(

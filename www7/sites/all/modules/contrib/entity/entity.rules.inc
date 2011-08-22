@@ -34,33 +34,44 @@ class EntityDefaultRulesController {
 
     $items[$type . '_insert'] = $defaults + array(
       'label' => t('After saving a new @entity', array('@entity' => drupal_strtolower($label))),
-      'variables' => array(
-        $type => array('type' => $type, 'label' => t('created @entity', array('@entity' => drupal_strtolower($label)))),
-      ),
+      'variables' => entity_rules_events_variables($type, t('created @entity', array('@entity' => drupal_strtolower($label)))),
     );
     $items[$type . '_update'] = $defaults + array(
       'label' => t('After updating an existing @entity', array('@entity' => drupal_strtolower($label))),
-      'variables' => array(
-        $type => array('type' => $type, 'label' => t('updated @entity', array('@entity' => drupal_strtolower($label)))),
-      ),
+      'variables' => entity_rules_events_variables($type, t('updated @entity', array('@entity' => drupal_strtolower($label))), TRUE),
     );
     $items[$type . '_presave'] = $defaults + array(
       'label' => t('Before saving a @entity', array('@entity' => drupal_strtolower($label))),
-      'variables' => array(
-        $type => array('type' => $type, 'label' => t('saved @entity', array('@entity' => drupal_strtolower($label)))),
-      ),
+      'variables' => entity_rules_events_variables($type, t('saved @entity', array('@entity' => drupal_strtolower($label))), TRUE),
     );
     $items[$type . '_delete'] = $defaults + array(
       'label' => t('After deleting a @entity', array('@entity' => drupal_strtolower($label))),
-      'variables' => array(
-        $type => array('type' => $type, 'label' => t('deleted @entity', array('@entity' => drupal_strtolower($label)))),
-      ),
+      'variables' => entity_rules_events_variables($type, t('deleted @entity', array('@entity' => drupal_strtolower($label)))),
     );
     // Specify that on presave the entity is saved anyway.
     $items[$type . '_presave']['variables'][$type]['skip save'] = TRUE;
     return $items;
   }
 
+}
+
+/**
+ * Returns some parameter info suiting for the specified entity type.
+ */
+function entity_rules_events_variables($type, $label, $update = FALSE) {
+  $args = array(
+    $type => array('type' => $type, 'label' => $label),
+  );
+  if ($update) {
+    $args += array(
+      $type . '_unchanged' => array(
+        'type' => $type,
+        'label' => t('unchanged entity'),
+        'handler' => 'rules_events_entity_unchanged',
+      ),
+    );
+  }
+  return $args;
 }
 
 /**
