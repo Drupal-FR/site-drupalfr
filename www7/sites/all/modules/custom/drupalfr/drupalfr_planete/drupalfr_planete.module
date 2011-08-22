@@ -1,0 +1,23 @@
+<?php
+/**
+ * @file
+ * Code for the Drupal FR planete feature.
+ */
+
+include_once('drupalfr_planete.features.inc');
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function drupalfr_planete_preprocess_node(&$vars) {
+  // Unify the author of the blog post label. We are doing it there instead of
+  // in the fields UI because we want to fake a single field to the user
+  // and keep the two labels in the admin interface.
+  $vars['content']['field_blog_author']['#title'] = t('Auteur du blog');
+  $vars['content']['field_internal_author']['#title'] = t('Auteur du blog');
+
+  // If the user profile is linked in the node, hide the default name.
+  if ($vars['field_internal_author'][0]['uid'] != NULL) {
+    $vars['content']['field_blog_author']['#access'] = FALSE;
+  }
+}

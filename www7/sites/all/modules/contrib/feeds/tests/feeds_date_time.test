@@ -1,0 +1,48 @@
+<?php
+// $Id: feeds_date_time.test,v 1.1.4.2 2010/09/29 23:56:10 alexb Exp $
+
+/**
+ * @file
+ * Tests for FeedsDateTime class.
+ */
+
+/**
+ * Test FeedsDateTime class.
+ *
+ * Using DrupalWebTestCase as DrupalUnitTestCase is broken in SimpleTest 2.8.
+ * Not inheriting from Feeds base class as ParserCSV should be moved out of
+ * Feeds at some time.
+ */
+class FeedsDateTimeTest extends DrupalWebTestCase  {
+  protected $profile = 'testing';
+
+  /**
+   * Describe this test.
+   */
+  public function getInfo() {
+    return array(
+      'name' => t('FeedsDateTime unit tests'),
+      'description' => t('Unit tests for Feeds date handling.'),
+      'group' => t('Feeds'),
+    );
+  }
+
+  /**
+   * Set up.
+   */
+  public function setUp() {
+    parent::setUp('feeds', 'feeds_ui', 'ctools', 'job_scheduler');
+  }
+
+  /**
+   * Dispatch tests, only use one entry point method testX to save time.
+   */
+  public function test() {
+    $date = new FeedsDateTime('2010-20-12');
+    $this->assertTrue(is_numeric($date->format('U')));
+    $date = new FeedsDateTime('created');
+    $this->assertTrue(is_numeric($date->format('U')));
+    $date = new FeedsDateTime('12/3/2009 20:00:10');
+    $this->assertTrue(is_numeric($date->format('U')));
+  }
+}
