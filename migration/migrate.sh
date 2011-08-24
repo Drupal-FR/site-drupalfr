@@ -1,7 +1,12 @@
 #!/bin/bash
 set -xe
 
-# Needs to be called from www7.
+
+# Synchronize files.
+#rm -Rf ../www7/sites/default/files
+#cp -r ../files ../www7/sites/default
+#find ../www7/sites/default/files -type d -print0 | xargs -0 chmod g+rwxs
+#find ../www7/sites/default/files -type f -print0 | xargs -0 chmod g+rw
 
 # Clean-up the database.
 drush sqlc < ../migration/sql/pre-import.sql
@@ -16,6 +21,7 @@ drush sqlc < ../migration/sql/pre-migration.sql
 drush updatedb -y --verbose
 
 # enable modules
+drush en -y content_migrate
 drush en -y markdown
 drush en -y dfr_documentation
 drush en -y toolbar
