@@ -22,6 +22,7 @@ drush updatedb -y --verbose
 
 # enable modules
 drush en -y content_migrate
+drush en -y dfr_migration
 drush en -y markdown
 drush en -y dfr_documentation
 drush en -y toolbar
