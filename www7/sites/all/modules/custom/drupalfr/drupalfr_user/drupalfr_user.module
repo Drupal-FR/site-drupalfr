@@ -1,3 +1,94 @@
 <?php
 
 // Drupal needs this blank file.
+
+function drupalfr_user_menu() {
+  $items['port'] = array(
+    'title' => 'test function for port', 
+    'page callback' => 'drupalfr_user_migration', 
+    'access arguments' => array('access content'), 
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function drupalfr_user_migration() {
+  $mapping = array(
+    'field_icq_value' => array ( // origin field
+      'table' => 'field_data_field_icq', // destination table
+      'field' => 'field_icq_value', // destination field
+    ),
+    'field_jabber_value' => array ( // origin field
+      'table' => 'field_data_field_jabber', // destination table
+      'field' => 'field_jabber_value', // destination field
+    ),
+    'field_link_url' => array ( // origin field
+      'table' => 'field_data_field_website', // destination table
+      'field' => 'field_website_url', // destination field
+    ),
+    'field_link_title' => array ( // origin field
+      'table' => 'field_data_field_website', // destination table
+      'field' => 'field_website_title', // destination field
+    ),
+    'field_link_attributes' => array ( // origin field
+      'table' => 'field_data_field_website', // destination table
+      'field' => 'field_website_attributes', // destination field
+    ),
+    'field_msn_email' => array ( // origin field
+      'table' => 'field_data_field_msn', // destination table
+      'field' => 'field_msn_email', // destination field
+    ),
+    'field_nickname_value' => array ( // origin field
+      'table' => 'field_data_field_nickname', // destination table
+      'field' => 'field_nickname_value', // destination field
+    ),
+    /*
+    'field_picture_fid' => array ( // origin field
+      'table' => 'field_data_field_picture', // destination table
+      'field' => 'field_picture_fid', // destination field
+    ),
+    */
+    /*
+    'field_picture_list' => array ( // origin field
+      'table' => 'field_data_field_picture', // destination table
+      'field' => '', // destination field
+    ),*/
+    'field_realname_value' => array ( // origin field
+      'table' => 'field_data_field_realname', // destination table
+      'field' => 'field_realname_value', // destination field
+    ),
+    'field_company_nid' => array ( // origin field
+      'table' => 'field_data_field_company', // destination table
+      'field' => 'field_company_nid', // destination field
+    ),
+  );
+
+
+  $result = db_query_range("SELECT p.*, b.body_value, n.uid FROM {node} n
+                      INNER JOIN {content_type_profile} p ON n.nid = p.nid AND n.vid = p.vid
+                      INNER JOIN {field_data_body} b ON b.entity_id = n.nid AND b.revision_id = n.vid
+                      WHERE n.type = 'profile' AND n.uid = 1084", 0, 1);
+
+  global $language;
+  foreach ($result as $record) {
+    $user = user_load($record->uid, TRUE);
+    $edit = (array)$user;
+    foreach ($mapping as $source => $destinfo) {
+      $dest = substr($destinfo['table'], 11);
+      if ($dest) {
+        $edit[$dest]['und'][0]['value'] = $record->$source;
+      }
+    }
+    $edit['field_biography']['und'][0]['value'] = $record->body_value;
+dpm($edit);
+    user_save($user, $edit);
+/*
+    if($saved_user = user_save($user, $edit)) {
+      dpm($saved_user);
+    }
+  */  
+  }
+
+  return 'done';
+
+}

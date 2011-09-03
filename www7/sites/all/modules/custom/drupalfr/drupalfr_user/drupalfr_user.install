@@ -76,24 +76,3 @@ function drupalfr_user_install() {
 
 }
 
-function drupalfr_user_migration() {
-  $mapping = array(
-    'field_icq_value' => array ( // origin field
-      'table' => 'field_data_field_icq', // destination table
-      'field' => 'field_icq_value', // destination field
-    ),
-    'field_jabber_value' => array ( // origin field
-      'table' => 'field_data_field_jabber', // destination table
-      'field' => 'field_jabber_value', // destination field
-    ),
-  );
-
-  $result = db_query("SELECT p.*, b.body_value FROM node n
-                      INNER JOIN content_type_profile p ON n.nid = p.nid AND n.vid = p.vid
-                      INNER JOIN field_data_body b ON b.entity_id = n.nid AND b.revision_id = n.vid
-                      WHERE n.type = 'profile'");
-  //while($item = db_fetch_array($result)) {
-
-  //}
-
-}
