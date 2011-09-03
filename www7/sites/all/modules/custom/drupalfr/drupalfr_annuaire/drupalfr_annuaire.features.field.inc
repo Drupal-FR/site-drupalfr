@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * drupalfr_annuaire.features.field.inc
+ */
 
 /**
  * Implementation of hook_field_default_fields().
@@ -24,7 +28,7 @@ function drupalfr_annuaire_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
       'module' => 'text',
@@ -83,14 +87,14 @@ function drupalfr_annuaire_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
-          '0' => 'Non, pas encore',
-          '1' => 'Oui',
+          0 => 'Non, pas encore',
+          1 => 'Oui',
         ),
         'allowed_values_function' => '',
       ),
@@ -152,7 +156,7 @@ function drupalfr_annuaire_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
       'module' => 'text',
@@ -211,7 +215,7 @@ function drupalfr_annuaire_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
       'module' => 'list',
@@ -284,7 +288,7 @@ function drupalfr_annuaire_field_default_fields() {
       ),
       'indexes' => array(
         'fid' => array(
-          '0' => 'fid',
+          0 => 'fid',
         ),
       ),
       'module' => 'image',
@@ -409,14 +413,14 @@ function drupalfr_annuaire_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
-          '0' => 'Non, pas encore',
-          '1' => 'Oui',
+          0 => 'Non, pas encore',
+          1 => 'Oui',
         ),
         'allowed_values_function' => '',
       ),
@@ -471,7 +475,7 @@ function drupalfr_annuaire_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
       'module' => 'list',
@@ -584,6 +588,18 @@ function drupalfr_annuaire_field_default_fields() {
       'label' => 'Showcase',
       'required' => 0,
       'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'rel' => '',
+          'target' => 'default',
+        ),
+        'display' => array(
+          'url_cutoff' => 80,
+        ),
+        'enable_tokens' => 1,
+        'title' => 'optional',
+        'title_value' => '',
+        'url' => 0,
         'user_register_form' => FALSE,
       ),
       'widget' => array(
@@ -668,7 +684,7 @@ function drupalfr_annuaire_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
       'module' => 'list',
@@ -741,7 +757,7 @@ function drupalfr_annuaire_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
       'module' => 'text',
@@ -802,7 +818,7 @@ function drupalfr_annuaire_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
       'module' => 'list',
@@ -914,6 +930,18 @@ function drupalfr_annuaire_field_default_fields() {
       'label' => 'Site Internet',
       'required' => 0,
       'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'rel' => '',
+          'target' => 'default',
+        ),
+        'display' => array(
+          'url_cutoff' => 80,
+        ),
+        'enable_tokens' => 1,
+        'title' => 'optional',
+        'title_value' => '',
+        'url' => 0,
         'user_register_form' => FALSE,
       ),
       'widget' => array(
@@ -925,6 +953,34 @@ function drupalfr_annuaire_field_default_fields() {
       ),
     ),
   );
+
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('<a href="http://association.drupal.org/" title="Site de l\'association Drupal">L\'association Drupal</a> est une organisation dédiée au développement du  <a href="http://drupal.org/" title="Site du CMS Drupal">CMS Drupal</a>. Elle aide la communauté à organiser des événements autour de Drupal partout dans le monde.');
+  t('Adresse');
+  t('Adresse e-mail');
+  t('Effectif');
+  t('Forme juridique');
+  t('Implantation géographique');
+  t('L\'adresse e-mail à laquelle il est possible de contacter la/les personne(s) responsables des projets Drupal.');
+  t('La forme juridique de votre structure.');
+  t('Logo');
+  t('Merci de préciser le numéro de téléphone de votre structure. Si une personne en particulier s\'occupe des projets Drupal, merci d\'indiquer son numéro.');
+  t('Merci de renseigner votre adresse complète.');
+  t('Où sont situés vos bureaux ?');
+  t('Précisez l\'adresse de votre site Internet.');
+  t('Présentation');
+  t('Présenter votre structure en quelques lignes.');
+  t('Showcase');
+  t('Siren');
+  t('Site Internet');
+  t('Sélectionnez les prestations que votre société propose. Merci de garder à l\'esprit que les services que présentez ici doivent être en rapport direct avec Drupal.');
+  t('Type de service');
+  t('Téléphone');
+  t('Votre numéro d\'identification SIREN tel qu\'il apparaît sur votre K-bis.');
+  t('Vous avez la possibilité d\'insérer le logo de votre société.');
+  t('Êtes-vous membre de l\'association Drupal ?');
+  t('Êtes-vous membre de l\'association Drupal France et francophonie ?');
 
   return $fields;
 }
