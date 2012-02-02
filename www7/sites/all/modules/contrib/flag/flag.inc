@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.inc,v 1.22 2011/01/11 13:44:47 mooffie Exp $
 
 /**
  * @file
@@ -122,10 +121,8 @@ class flag_flag {
    * is because the class to instantiate changes according to the 'content_type'
    * database column. This design pattern is known as the "Single Table
    * Inheritance".
-   *
-   * @static
    */
-  function factory_by_row($row) {
+  static function factory_by_row($row) {
     $flag = flag_create_handler($row->content_type);
 
     // Lump all data unto the object...
@@ -155,7 +152,7 @@ class flag_flag {
   /**
    * Create a complete flag (except an FID) from an array definition.
    */
-  function factory_by_array($config) {
+  static function factory_by_array($config) {
     $flag = flag_create_handler($config['content_type']);
 
     foreach ($config as $option => $value) {
@@ -172,10 +169,8 @@ class flag_flag {
   /**
    * Another factory method. Returns a new, "empty" flag; e.g., one suitable for
    * the "Add new flag" page.
-   *
-   * @static
    */
-  function factory_by_content_type($content_type) {
+  static function factory_by_content_type($content_type) {
     return flag_create_handler($content_type);
   }
 
@@ -918,31 +913,6 @@ class flag_flag {
    */
 
   /**
-   * Methods that can be overridden to support the Rules module.
-   *
-   * @addtogroup rules
-   * @{
-   */
-
-  /**
-   * Defines the Rules arguments involved in a flag event.
-   */
-  function rules_get_event_arguments_definition() {
-    return array();
-  }
-
-  /**
-   * Defines the Rules argument for flag actions or conditions
-   */
-  function rules_get_element_argument_definition() {
-    return array();
-  }
-
-  /**
-   * @} End of "addtogroup rules".
-   */
-
-  /**
    * @addtogroup views
    * @{
    * Methods that can be overridden to support the Views module.
@@ -1278,7 +1248,7 @@ class flag_node extends flag_flag {
     // Ensure that only flaggable node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_content_id().
     $result = db_select('node', 'n')->fields('n', array('nid'))
-      ->condition('nid', $content_ids, 'IN')
+      ->condition('nid', array_keys($content_ids), 'IN')
       ->condition('type', $this->types, 'NOT IN')
       ->execute();
     foreach ($result as $row) {
@@ -1372,20 +1342,6 @@ class flag_node extends flag_flag {
     return array(
       'node' => $this->fetch_content($content_id),
     );
-  }
-
-  function rules_get_event_arguments_definition() {
-    return array(
-      'node' => array(
-        'type' => 'node',
-        'label' => t('flagged content'),
-        'handler' => 'flag_rules_get_event_argument',
-      ),
-    );
-  }
-
-  function rules_get_element_argument_definition() {
-    return array('type' => 'node', 'label' => t('Flagged content'));
   }
 
   function get_views_info() {
@@ -1509,25 +1465,6 @@ class flag_comment extends flag_flag {
       'comment' => $comment,
       'node' => node_load($comment->nid),
     );
-  }
-
-  function rules_get_event_arguments_definition() {
-    return array(
-      'comment' => array(
-        'type' => 'comment',
-        'label' => t('flagged comment'),
-        'handler' => 'flag_rules_get_event_argument',
-      ),
-      'node' => array(
-        'type' => 'node',
-        'label' => t("the flagged comment's content"),
-        'handler' => 'flag_rules_get_comment_content',
-      ),
-    );
-  }
-
-  function rules_get_element_argument_definition() {
-    return array('type' => 'comment', 'label' => t('Flagged comment'));
   }
 
   function get_views_info() {
@@ -1661,20 +1598,6 @@ class flag_user extends flag_flag {
     return array(
       'user' => $this->fetch_content($content_id),
     );
-  }
-
-  function rules_get_event_arguments_definition() {
-    return array(
-      'account' => array(
-        'type' => 'user',
-        'label' => t('flagged user'),
-        'handler' => 'flag_rules_get_event_argument',
-      ),
-    );
-  }
-
-  function rules_get_element_argument_definition() {
-    return array('type' => 'user', 'label' => t('Flagged user'));
   }
 
   function get_views_info() {

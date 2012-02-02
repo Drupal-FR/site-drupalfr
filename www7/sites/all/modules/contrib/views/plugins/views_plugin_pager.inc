@@ -77,6 +77,9 @@ class views_plugin_pager extends views_plugin {
    *   the page number will be set from the global page array.
    */
   function set_current_page($number = NULL) {
+    if (!is_numeric($number) || $number < 0) {
+      $number = 0;
+    }
     $this->current_page = $number;
   }
 
@@ -170,6 +173,11 @@ class views_plugin_pager extends views_plugin {
    * Perform any needed actions just after the query executing.
    */
   function post_execute(&$result) { }
+
+  /**
+   * Perform any needed actions just before rendering.
+   */
+  function pre_render(&$result) { }
 
   /**
    * Render the pager.

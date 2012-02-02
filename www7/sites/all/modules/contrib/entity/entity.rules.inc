@@ -48,6 +48,20 @@ class EntityDefaultRulesController {
       'label' => t('After deleting a @entity', array('@entity' => drupal_strtolower($label))),
       'variables' => entity_rules_events_variables($type, t('deleted @entity', array('@entity' => drupal_strtolower($label)))),
     );
+    if (count($info['view modes'])) {
+      $items[$type . '_view'] = $defaults + array(
+        'label' => t('@entity is viewed', array('@entity' => $label)),
+        'variables' => entity_rules_events_variables($type, t('viewed @entity', array('@entity' => drupal_strtolower($label)))) + array(
+          'view_mode' => array(
+            'type' => 'text',
+            'label' => t('view mode'),
+            'options list' => 'rules_get_entity_view_modes',
+             // Add the entity-type for the options list callback.
+            'options list entity type' => $type,
+          ),
+        ),
+      );
+    }
     // Specify that on presave the entity is saved anyway.
     $items[$type . '_presave']['variables'][$type]['skip save'] = TRUE;
     return $items;
@@ -80,7 +94,9 @@ function entity_rules_events_variables($type, $label, $update = FALSE) {
 function entity_rules_event_info() {
   $items = array();
   foreach (entity_crud_get_info() as $type => $info) {
-    $info += array('rules controller class' => 'EntityDefaultRulesController');
+    // By default we enable the controller only for non-configuration.
+    $configuration = !empty($info['configuration']) || !empty($info['exportable']);
+    $info += array('rules controller class' => $configuration ? FALSE : 'EntityDefaultRulesController');
     if ($info['rules controller class']) {
       $controller = new $info['rules controller class']($type);
       $items += $controller->eventInfo();

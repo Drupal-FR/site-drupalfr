@@ -200,8 +200,8 @@ class Entity {
    *
    * @see entity_view()
    */
-  public function view($view_mode = 'full', $langcode = NULL) {
-    return entity_get_controller($this->entityType)->view(array($this), $view_mode, $langcode);
+  public function view($view_mode = 'full', $langcode = NULL, $page = NULL) {
+    return entity_get_controller($this->entityType)->view(array($this), $view_mode, $langcode, $page);
   }
 
   /**

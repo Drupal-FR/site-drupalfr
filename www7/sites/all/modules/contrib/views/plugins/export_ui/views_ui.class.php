@@ -48,6 +48,9 @@ class views_ui extends ctools_export_ui {
     // We are using our own 'edit' still, rather than having edit on this
     // object (maybe in the future) so unset the edit callbacks:
 
+    // Store this so we can put them back as sometimes they're needed
+    // again laster:
+    $stored_items = $this->plugin['menu']['items'];
     // We leave these to make sure the operations still exist in the plugin so
     // that the path finder.
     unset($this->plugin['menu']['items']['edit']);
@@ -56,6 +59,12 @@ class views_ui extends ctools_export_ui {
     unset($this->plugin['menu']['items']['edit callback']);
 
     parent::hook_menu($items);
+
+    $this->plugin['menu']['items'] = $stored_items;
+  }
+
+  function load_item($item_name) {
+    return views_ui_cache_load($item_name);
   }
 
   function list_form(&$form, &$form_state) {
@@ -119,10 +128,13 @@ class views_ui extends ctools_export_ui {
     );
 
     $tags = array();
-    if (isset($form_state['views'])) {
-      foreach ($form_state['views'] as $name => $view) {
+    if (isset($form_state['object']->items)) {
+      foreach ($form_state['object']->items as $name => $view) {
         if (!empty($view->tag)) {
-          $tags[$view->tag] = $view->tag;
+          $view_tags = drupal_explode_tags($view->tag);
+          foreach ($view_tags as $tag) {
+            $tags[$tag] = $tag;
+          }
         }
       }
     }
@@ -153,6 +165,17 @@ class views_ui extends ctools_export_ui {
   }
 
   function list_filter($form_state, $view) {
+    // Don't filter by tags if all is set up.
+    if ($form_state['values']['tag'] != 'all') {
+      // If none is selected check whether the view has a tag.
+      if ($form_state['values']['tag'] == 'none') {
+        return !empty($view->tag);
+      }
+      else {
+        // Check whether the tag can be found in the views tag.
+        return strpos($view->tag, $form_state['values']['tag']) === FALSE;
+      }
+    }
     if ($form_state['values']['base'] != 'all' && $form_state['values']['base'] != $view->base_table) {
       return TRUE;
     }
@@ -339,6 +362,27 @@ class views_ui extends ctools_export_ui {
     drupal_set_title(t('Create view from template @template', array('@template' => $template->get_human_name())));
     return $output;
   }
+
+  function set_item_state($state, $js, $input, $item) {
+    ctools_export_set_object_status($item, $state);
+    menu_rebuild();
+
+    if (!$js) {
+      drupal_goto(ctools_export_ui_plugin_base_path($this->plugin));
+    }
+    else {
+      return $this->list_page($js, $input);
+    }
+  }
+
+  function list_page($js, $input) {
+    // wrap output in a div for CSS
+    $output = parent::list_page($js, $input);
+    if (is_string($output)) {
+      $output = '<div id="views-ui-list-page">' . $output . '</div>';
+      return $output;
+    }
+  }
 }
 
 /**
@@ -348,12 +392,19 @@ class views_ui extends ctools_export_ui {
  */
 function views_ui_clone_form($form, &$form_state) {
   $counter = 1;
+
+  if (!isset($form_state['item'])) {
+    $view = views_get_view($form_state['original name']);
+  }
+  else {
+    $view = $form_state['item'];
+  }
   do {
     if (empty($form_state['item']->is_template)) {
-      $name = format_plural($counter, 'Clone of', 'Clone @count of') . ' ' . $form_state['original name'];
+      $name = format_plural($counter, 'Clone of', 'Clone @count of') . ' ' . $view->get_human_name();
     }
     else {
-      $name = $form_state['original name'];
+      $name = $view->get_human_name();
       if ($counter > 1) {
         $name .= ' ' . $counter;
       }
@@ -366,13 +417,16 @@ function views_ui_clone_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('View name'),
     '#default_value' => $name,
+    '#size' => 32,
+    '#maxlength' => 255,
   );
 
   $form['name'] = array(
     '#title' => t('View name'),
     '#type' => 'machine_name',
     '#required' => TRUE,
-    '#maxlength' => 255,
+    '#maxlength' => 32,
+    '#size' => 32,
     '#machine_name' => array(
       'exists' => 'ctools_export_ui_edit_name_exists',
       'source' => array('human_name'),
@@ -386,5 +440,3 @@ function views_ui_clone_form($form, &$form_state) {
 
   return $form;
 }
-
-

@@ -1,13 +1,16 @@
 <?php
 
 /**
- * Field handler for terms.
+ * Field handler to display all taxonomy terms of a node.
+ *
+ * @ingroup views_field_handlers
  */
 class views_handler_field_term_node_tid extends views_handler_field_prerender_list {
   function init(&$view, &$options) {
     parent::init($view, $options);
-    if ($view->base_table == 'node_revisions') {
-      $this->additional_fields['nid'] = array('table' => 'node_revisions', 'field' => 'nid');
+    // @todo: Wouldn't it be possible to use $this->base_table and no if here?
+    if ($view->base_table == 'node_revision') {
+      $this->additional_fields['nid'] = array('table' => 'node_revision', 'field' => 'nid');
     }
     else {
       $this->additional_fields['nid'] = array('table' => 'node', 'field' => 'nid');
@@ -64,7 +67,6 @@ class views_handler_field_term_node_tid extends views_handler_field_prerender_li
       '#title' => t('Vocabularies'),
       '#options' => $options,
       '#default_value' => $this->options['vocabularies'],
-      '#process' => array('form_process_checkboxes', 'ctools_dependent_process'),
       '#dependency' => array('edit-options-limit' => array(TRUE)),
       '#fieldset' => 'more',
     );
@@ -132,10 +134,9 @@ class views_handler_field_term_node_tid extends views_handler_field_prerender_li
   }
 
   function add_self_tokens(&$tokens, $item) {
-    $tokens['[' . $this->options['id'] . '-tid' . ']'] = $item['tid'];
-    $tokens['[' . $this->options['id'] . '-name' . ']'] = $item['name'];
-    $tokens['[' . $this->options['id'] . '-vocabulary-machine-name' . ']'] = $item['vocabulary_machine_name'];
-    $tokens['[' . $this->options['id'] . '-vocabulary' . ']'] = $item['vocabulary'];
+    foreach(array('tid', 'name', 'vocabulary_machine_name', 'vocabulary') as $token) {
+      // Replace _ with - for the vocabulary machine name.
+      $tokens['[' . $this->options['id'] . '-' . str_replace('_', '-', $token). ']'] = isset($item[$token]) ? $item[$token] : '';
+    }
   }
 }
-

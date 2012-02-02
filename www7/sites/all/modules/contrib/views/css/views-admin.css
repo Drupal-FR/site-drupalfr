@@ -90,6 +90,11 @@
   width: 70%;
 }
 
+.views-group-box .form-item {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
 /* @end */
 
 /* @group Attachment details
@@ -98,13 +103,12 @@
  * to add a new section
  */
 
-.form-actions {
+.form-edit .form-actions {
   float: right; /* LTR */
 }
 
 .views-displays {
   clear: both;
-  float:left; /* LTR */
 }
 
 /* @end */
@@ -113,7 +117,6 @@
  *
  * The tabs that switch between sections
  */
-
  .views-displays .secondary {
    border-bottom: 0 none;
    margin: 0;
@@ -141,6 +144,12 @@
 .views-display-deleted .fieldset-wrapper > .views-ui-display-tab-bucket > *,
 .views-display-deleted .views-display-columns {
   opacity: 0.25;
+}
+
+.views-display-disabled > fieldset > legend,
+.views-display-disabled .fieldset-wrapper > .views-ui-display-tab-bucket > *,
+.views-display-disabled .views-display-columns {
+  opacity: 0.5;
 }
 
 .views-display-tab .fieldset-wrapper > .views-ui-display-tab-bucket .actions {
@@ -303,31 +312,7 @@ div.form-item-options-value-all {
 
 /* @end */
 
-/* @group Clearfix
- *
- * @see http://perishablepress.com/press/2009/12/06/new-clearfix-hack
- */
 
- /* Reset the formatting context for all modern browsers */
-.views-display-tab .fieldset-wrapper:after,
-ul.secondary:after {
-  clear: both;
-  content: " x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";
-  display: block;
-  font-size: xx-large;
-  height: 0 !important;
-  line-height: 0;
-  overflow: hidden;
-  visibility: hidden;
-}
-
-/* Reset the formatting context for IE */
-.views-display-tab .fieldset-wrapper,
-ul.secondary {
-  zoom: 1;
-}
-
-/* @end */
 
 /* @group Javascript dependent styling */
 
@@ -348,6 +333,7 @@ html.js span.js-only {
 /* @group AJAX throbber */
 
 /* Base Page */
+#views-ui-list-page .ajax-progress-throbber,
 .views-admin .ajax-progress-throbber {
   /* Can't do center:50% middle: 50%, so approximate it for a typical window size. */
   left: 49%;
@@ -355,6 +341,7 @@ html.js span.js-only {
   top: 48.5%;
   z-index: 1000;
 }
+#views-ui-list-page .ajax-progress-throbber .message,
 .views-admin .ajax-progress-throbber .message {
   display: none;
 }

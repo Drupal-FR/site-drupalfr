@@ -1,5 +1,4 @@
 <?php
-// $Id: link.crud.test,v 1.2.2.3 2011/01/16 04:12:21 jcfiala Exp $
 
 /**
  * @file
@@ -7,20 +6,20 @@
  */
 
 class LinkContentCrudTest extends DrupalWebTestCase {
-  
-  function getInfo() {
+
+  public static function getInfo() {
     return array(
-      'name' => t('Link CRUD - Basic API tests'),
-      'description' => t('Tests the field CRUD (create, read, update, delete) API.'),
-      'group' => t('Link'),
+      'name' => 'Link CRUD - Basic API tests',
+      'description' => 'Tests the field CRUD (create, read, update, delete) API.',
+      'group' => 'Link',
     );
   }
-  
+
   function setUp() {
     parent::setUp('field_ui', 'link'); // was views?
     //$this->loginWithPermissions();
   }
-  
+
   /**
    * All we're doing here is creating a content type, creating a simple link field
    * on that content type.
@@ -39,14 +38,14 @@ class LinkContentCrudTest extends DrupalWebTestCase {
     // Create the content type.
     $this->clickLink(t('Add content type'));
 
-    
+
     $edit = array (
       'name' => $content_type_friendly,
       'type' => $content_type_machine,
     );
     $this->drupalPost(NULL, $edit, t('Save and add fields'));
     $this->assertText(t('The content type @name has been added.', array('@name' => $content_type_friendly)));
-    
+
     //$field = $this->createField(array('type' => 'link', 'widget_type' => 'link'), 0);
     // Now add a singleton field.
     $single_field_name_friendly = $this->randomName(20);
@@ -59,21 +58,21 @@ class LinkContentCrudTest extends DrupalWebTestCase {
 
     );
     $this->drupalPost(NULL, $edit, t('Save'));
-    
+
     // We'll go with the default settings for this run-through.
     $this->drupalPost(NULL, array(), t('Save field settings'));
-    
+
     // Using all the default settings, so press the button.
     $this->drupalPost(NULL, array(), t('Save settings'));
     $this->assertText(t('Saved @name configuration.', array('@name' => $single_field_name_friendly)));
-    
+
     // Somehow clicking "save" isn't enough, and we have to do a
     // node_types_rebuild().
     node_types_rebuild();
     menu_rebuild();
     $type_exists = db_query('SELECT 1 FROM {node_type} WHERE type = :type', array(':type' => $content_type_machine))->fetchField();
     $this->assertTrue($type_exists, 'The new content type has been created in the database.');
-    
+
     /*$table_schema = drupal_get_schema();
     $this->assertEqual(1, 1, print_r(array_keys($table_schema), TRUE));
     // Check the schema - the values should be in the per-type table.

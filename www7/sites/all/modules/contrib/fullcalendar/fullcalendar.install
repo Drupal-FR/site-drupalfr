@@ -1,0 +1,45 @@
+<?php
+// $Id: fullcalendar.install,v 1.3.2.1 2011/01/26 21:53:27 timplunkett Exp $
+
+/**
+ * @file
+ * Install, update and uninstall functions for the fullcalendar module.
+ */
+
+/**
+ * Implements of hook_requirements().
+ */
+function fullcalendar_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    $t = get_t();
+    $status = _fullcalendar_status();
+
+    if (!$status['fullcalendar_plugin']) {
+      $requirements['fullcalendar_plugin'] = array(
+        'title' => $t('FullCalendar plugin'),
+        'value' => $t('At least @a', array('@a' => FULLCALENDAR_MIN_PLUGIN_VERSION)),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('You need to download the !fullcalendar and extract the entire contents of the archive into the %path folder of your server.', array('!fullcalendar' => l(t('FullCalendar plugin'), 'http://arshaw.com/fullcalendar/download'), '%path' => 'sites/all/libraries')),
+      );
+    }
+    else {
+      $requirements['fullcalendar_plugin'] = array(
+        'title' => $t('FullCalendar plugin'),
+        'severity' => REQUIREMENT_OK,
+        'value' => fullcalendar_get_version(),
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fullcalendar_uninstall() {
+  variable_del('fullcalendar_path');
+  variable_del('fullcalendar_compression_type');
+}

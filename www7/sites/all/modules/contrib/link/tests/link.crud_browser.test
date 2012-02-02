@@ -1,5 +1,4 @@
 <?php
-// $Id: link.crud_browser.test,v 1.1.4.2 2011/01/16 04:12:21 jcfiala Exp $
 
 /**
  * @file
@@ -13,33 +12,27 @@ class LinkUITest extends DrupalWebTestcase {
 
   /**
    * Link supposed to be good
-   */ 
+   */
   const LINK_INPUT_TYPE_GOOD = 0;
 
   /**
    * Link supposed to have a bad title
-   */ 
+   */
   const LINK_INPUT_TYPE_BAD_TITLE = 1;
 
   /**
    * Link supposed to have a bad URL
-   */ 
+   */
   const LINK_INPUT_TYPE_BAD_URL = 2;
 
-  /**
-   * Implementation of getInfo().
-   */
-  function getInfo() {
+  public static function getInfo() {
     return array(
-      'name' => t('Link CRUD - browser test'),
-      'description' => t('Tests the field CRUD (create, read, update, delete) API 2.'),
-      'group' => t('Link'),
+      'name' => 'Link CRUD - browser test',
+      'description' => 'Tests the field CRUD (create, read, update, delete) API 2.',
+      'group' => 'Link',
     );
   }
 
-  /**
-   * Implementation of setUp().
-   */
   function setUp() {
     parent::setUp('field_ui', 'link');
   }
@@ -73,7 +66,7 @@ class LinkUITest extends DrupalWebTestcase {
     $this->assertRaw(t('Saved %label configuration', array('%label' => $name)), 'Field added');
     node_types_rebuild();
     menu_rebuild();
-    
+
     $permission = 'create page content';
     $this->checkPermissions(array($permission), TRUE);
 
@@ -122,6 +115,15 @@ class LinkUITest extends DrupalWebTestcase {
         'type' => self::LINK_INPUT_TYPE_BAD_URL
       ),
     );
+    $test_case = array(
+      'href' => 'www.example.com/'. $this->randomName(),
+      'label' => $this->randomName(),
+      'msg' => 'Link found',
+      'type' => self::LINK_INPUT_TYPE_GOOD,
+    );
+    $test_case['expected_href'] = 'http://'. $test_case['href'];
+    $input_test_cases[] = $test_case;
+
     foreach ($input_test_cases as $input) {
       $this->drupalLogin($account);
       $this->drupalGet('node/add/page');
@@ -145,13 +147,18 @@ class LinkUITest extends DrupalWebTestcase {
 
       // change to anonym user
       $this->drupalLogout();
-    
+
       $this->drupalGet($url);
       //debug($this);
       // If simpletest starts using something to override the error system, this will flag
       // us and let us know it's broken.
       $this->assertFalse(libxml_use_internal_errors(TRUE));
-      $path = '//a[@href="'. $input['href'] .'" and text()="'. $input['label'] .'"]';
+      if (isset($input['expected_href'])) {
+        $path = '//a[@href="'. $input['expected_href'] .'" and text()="'. $input['label'] .'"]';
+      }
+      else {
+        $path = '//a[@href="'. $input['href'] .'" and text()="'. $input['label'] .'"]';
+      }
       //$this->pass(htmlentities($path));
       $elements = $this->xpath($path);
       libxml_use_internal_errors(FALSE);
@@ -159,7 +166,7 @@ class LinkUITest extends DrupalWebTestcase {
     }
     //libxml_use_internal_errors(FALSE);
   }
-  
+
   /**
    * Creates a link field for the "page" type and creates a page with a link.
    * Just like the above test, only here we're turning off the validation on the field.
@@ -186,7 +193,7 @@ class LinkUITest extends DrupalWebTestcase {
     _content_type_info(TRUE);
     $fields = content_fields();
     $this->assertTRUE(0 === $fields['field_'. $name]['validate_url'], 'Make sure validation is off.');
-    
+
     // create page form
     $this->drupalGet('node/add/page');
     $field_name = 'field_' . $name;
@@ -254,7 +261,7 @@ class LinkUITest extends DrupalWebTestcase {
 
       // change to anonym user
       $this->drupalLogout();
-    
+
       $this->drupalGet($url);
       //debug($this);
       // If simpletest starts using something to override the error system, this will flag
@@ -268,7 +275,7 @@ class LinkUITest extends DrupalWebTestcase {
     }
     //libxml_use_internal_errors(FALSE);
   }*/
-  
+
   /**
    * Testing that if you use <strong> in a static title for your link, that the
    * title actually displays <strong>.
@@ -298,26 +305,26 @@ class LinkUITest extends DrupalWebTestcase {
     // create page form
     $this->drupalGet('node/add/page');
     $this->assertField($field_name . '[und][0][url]', 'URL found');
-    
+
     $input = array(
       'href' => 'http://example.com/' . $this->randomName()
     );
-    
+
     $edit = array(
       'title' => $name,
       $field_name . '[und][0][url]' => $input['href'],
     );
-    $this->drupalPost(NULL, $edit, t('Save'));    
-    
+    $this->drupalPost(NULL, $edit, t('Save'));
+
     $url = $this->getUrl();
 
     // change to anonymous user
-    $this->drupalLogout();    
+    $this->drupalLogout();
     $this->drupalGet($url);
 
-    $this->assertRaw(l('<strong>'. $name .'</strong>', $input['href'], array('html' => FALSE)));
+    $this->assertRaw(l('<strong>'. $name .'</strong>', $input['href'], array('html' => TRUE)));
   }
-  
+
   /**
    * If we're creating a new field and just hit 'save' on the default options, we want to make
    * sure they are set to the expected results.
@@ -360,7 +367,7 @@ class LinkUITest extends DrupalWebTestcase {
     $this->assertFalse($instance['settings']['attributes']['rel'], 'Rel should be blank by default.');
     $this->assertFalse($instance['settings']['attributes']['class'], 'By default, no class should be set.');
     $this->assertFalse($instance['settings']['title_value'], 'By default, no title should be set.');
-    
+
     //$this->fail('<pre>'. print_r($fields['field_'. $name], TRUE) .'</pre>');
   }
 }

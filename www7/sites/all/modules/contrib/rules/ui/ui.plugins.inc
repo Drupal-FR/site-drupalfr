@@ -59,12 +59,13 @@ class RulesRuleUI extends RulesActionContainerUI {
    * Applies the values of the form to the rule configuration.
    */
   function form_extract_values($form, &$form_state) {
+    $form_values = RulesPluginUI::getFormStateValues($form, $form_state);
     // Run condition and action container value extraction.
     if (isset($form['conditions'])) {
       $this->conditions->extender('RulesConditionContainerUI')->form_extract_values($form['conditions'], $form_state);
     }
-    if (!empty($form_state['values']['label'])) {
-      $this->element->label = $form_state['values']['label'];
+    if (!empty($form_values['label'])) {
+      $this->element->label = $form_values['label'];
     }
     parent::form_extract_values($form, $form_state);
   }
@@ -99,6 +100,7 @@ class RulesReactionRuleUI extends RulesRuleUI {
     );
     $form['events']['table']['#attributes']['class'][] = 'rules-elements-table';
     foreach ($this->rule->events() as $event_name) {
+      $event_info += array($event_name => array('label' => t('Unknown event "!event_name"', array('!event_name' => $event_name))));
       $form['events']['table']['#rows'][$event_name] = array(
         check_plain($event_info[$event_name]['label']),
         '<span class="rules_rule_event">' . l(t('delete'), RulesPluginUI::path($this->rule->name, 'delete/event/' . $event_name)) . '</span>',
@@ -143,9 +145,10 @@ class RulesReactionRuleUI extends RulesRuleUI {
   }
 
   public function settingsFormExtractValues($form, &$form_state) {
+    $form_values = RulesPluginUI::getFormStateValues($form['settings'], $form_state);
     parent::settingsFormExtractValues($form, $form_state);
-    $this->rule->active = $form_state['values']['active'];
-    $this->rule->weight = $form_state['values']['weight'];
+    $this->rule->active = $form_values['active'];
+    $this->rule->weight = $form_values['weight'];
   }
 }
 
@@ -167,18 +170,65 @@ class RulesRuleSetUI extends RulesActionContainerUI {
 
 /**
  * UI for Rules loops.
- *
- * @todo Make the current list item variable name and label configurable.
  */
 class RulesLoopUI extends RulesActionContainerUI {
 
+  public function form(&$form, &$form_state, $options = array()) {
+    parent::form($form, $form_state, $options);
+    $settings = $this->element->settings;
+
+    $form['item'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Current list item'),
+      '#description' => t('The variable used for holding each list item in the loop. This variable will be available inside the loop only.'),
+      '#tree' => TRUE,
+    );
+    $form['item']['label'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Variable label'),
+      '#default_value' => $settings['item:label'],
+      '#required' => TRUE,
+    );
+    $form['item']['var'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Variable name'),
+      '#default_value' => $settings['item:var'],
+      '#description' => t('The variable name must contain only lowercase letters, numbers, and underscores and must be unique in the current scope.'),
+      '#element_validate' => array('rules_ui_element_machine_name_validate'),
+      '#required' => TRUE,
+    );
+  }
+
   function form_extract_values($form, &$form_state) {
     parent::form_extract_values($form, $form_state);
+    $form_values = RulesPluginUI::getFormStateValues($form, $form_state);
 
-    // Make sure the current list item settings are set.
-    $this->element->settings += array(
-      'item:var' => 'list_item',
-      'item:label' => t('Current list item'),
+    $this->element->settings['item:var'] = $form_values['item']['var'];
+    $this->element->settings['item:label'] = $form_values['item']['label'];
+  }
+
+  public function form_validate($form, &$form_state) {
+    parent::form_validate($form, $form_state);
+
+    $vars = $this->element->availableVariables();
+    $name = $this->element->settings['item:var'];
+    if (isset($vars[$name])) {
+      form_error($form['item']['var'], t('The variable name %name is already taken.', array('%name' => $name)));
+    }
+  }
+
+  public function buildContent() {
+    $content = parent::buildContent();
+
+    $content['description']['item'] = array(
+      '#caption' => t('List item'),
+      '#theme' => 'rules_content_group',
     );
+    $content['description']['item']['var'] = array(
+      '#theme' => 'rules_variable_view',
+      '#info' => $this->element->listItemInfo(),
+      '#name' => $this->element->settings['item:var'],
+    );
+    return $content;
   }
 }

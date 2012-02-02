@@ -6,6 +6,11 @@
  */
 
 function redirect_list_form($form, &$form_state) {
+  $form['#operations'] = redirect_get_redirect_operations();
+  if (isset($form_state['values']['operation']) && empty($form_state['values']['confirm'])) {
+    return redirect_list_form_operations_confirm_form($form, $form_state, $form_state['values']['operation'], array_filter($form_state['values']['rids']));
+  }
+
   $destination = drupal_get_destination();
   $default_status_code = variable_get('redirect_default_status_code', 301);
 
@@ -31,29 +36,28 @@ function redirect_list_form($form, &$form_state) {
   $keys = implode('/', $keys);
   $form['redirect_list_filter_form'] = redirect_list_filter_form($keys);
 
-  //// Build the 'Update options' form.
-  //$form['operations'] = array(
-  //  '#type' => 'fieldset',
-  //  '#title' => t('Update options'),
-  //  '#prefix' => '<div class="container-inline">',
-  //  '#suffix' => '</div>',
-  //);
-  //$form['#operations'] = module_invoke_all('redirect_operations');
-  //$operations = array();
-  //foreach ($form['#operations'] as $key => $operation) {
-  //  $operations[$key] = $operation['action'];
-  //}
-  //$form['operations']['operation'] = array(
-  //  '#type' => 'select',
-  //  '#options' => $operations,
-  //  '#default_value' => 'delete',
-  //);
-  //$form['operations']['submit'] = array(
-  //  '#type' => 'submit',
-  //  '#value' => t('Update'),
-  //  '#validate' => array('redirect_list_form_operations_validate'),
-  //  '#submit' => array('redirect_list_form_operations_submit'),
-  //);
+  // Build the 'Update options' form.
+  $form['operations'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Update options'),
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
+  $operations = array();
+  foreach ($form['#operations'] as $key => $operation) {
+    $operations[$key] = $operation['action'];
+  }
+  $form['operations']['operation'] = array(
+    '#type' => 'select',
+    '#options' => $operations,
+    '#default_value' => 'delete',
+  );
+  $form['operations']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#validate' => array('redirect_list_form_operations_validate'),
+    '#submit' => array('redirect_list_form_operations_submit'),
+  );
 
   // Building the SQL query and load the redirects.
   $query = db_select('redirect', 'r')->extend('TableSort')->extend('PagerDefault');
@@ -73,6 +77,8 @@ function redirect_list_form($form, &$form_state) {
     $redirect->source_options = array_merge($redirect->source_options, array('alias' => TRUE, 'language' => redirect_language_load($redirect->language)));
     $source_url = redirect_url($redirect->source, $redirect->source_options);
     $redirect_url = redirect_url($redirect->redirect, array_merge($redirect->redirect_options, array('alias' => TRUE)));
+    drupal_alter('redirect_url', $redirect->source, $redirect->source_options);
+    drupal_alter('redirect_url', $redirect->redirect, $redirect->redirect_options);
     $row['source'] = l($source_url, $redirect->source, $redirect->source_options);
     $row['redirect'] = l($redirect_url, $redirect->redirect, $redirect->redirect_options);
     $row['status_code'] = $redirect->status_code ? $redirect->status_code : t('Default (@default)', array('@default' => $default_status_code));
@@ -86,6 +92,12 @@ function redirect_list_form($form, &$form_state) {
     }
     else {
       $row['access'] = t('Never');
+    }
+
+    // Mark redirects that override existing paths with a warning in the table.
+    if (drupal_valid_path($redirect->source)) {
+      $row['#attributes']['class'][] = 'warning';
+      $row['#attributes']['title'] = t('This redirect overrides an existing internal path.');
     }
 
     $operations = array();
@@ -118,8 +130,11 @@ function redirect_list_form($form, &$form_state) {
     '#type' => 'tableselect',
     '#header' => $header,
     '#options' => $rows,
-    '#empty' => t('No URL redirects available.') . ' ' . l(t('Add URL redirect.'), 'admin/config/search/redirect/add', array('query' => $destination)),
+    '#empty' => t('No URL redirects available.'),
   );
+  if (redirect_access('create', 'redirect')) {
+    $form['rids']['#empty'] .= ' ' . l(t('Add URL redirect.'), 'admin/config/search/redirect/add', array('query' => $destination));
+  }
   $form['pager'] = array('#theme' => 'pager');
   return $form;
 }
@@ -195,6 +210,86 @@ function redirect_build_filter_query(QueryAlterableInterface $query, array $fiel
 }
 
 /**
+ * Validate redirect_list_form form submissions.
+ *
+ * Check if any redirects have been selected to perform the chosen
+ * 'Update option' on.
+ */
+function redirect_list_form_operations_validate($form, &$form_state) {
+  // Error if there are no redirects selected.
+  if (!is_array($form_state['values']['rids']) || !count(array_filter($form_state['values']['rids']))) {
+    form_set_error('', t('No redirects selected.'));
+  }
+}
+
+/**
+ * Process redirect_list_form form submissions.
+ *
+ * Execute the chosen 'Update option' on the selected redirects.
+ */
+function redirect_list_form_operations_submit($form, &$form_state) {
+  $operations = $form['#operations'];
+  $operation = $operations[$form_state['values']['operation']];
+
+  // Filter out unchecked redirects
+  $rids = array_filter($form_state['values']['rids']);
+
+  if (!empty($operation['confirm']) && empty($form_state['values']['confirm'])) {
+    // We need to rebuild the form to go to a second step. For example, to
+    // show the confirmation form for the deletion of redirects.
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+    $function = $operation['callback'];
+
+    // Add in callback arguments if present.
+    if (isset($operation['callback arguments'])) {
+      $args = array_merge(array($rids), $operation['callback arguments']);
+    }
+    else {
+      $args = array($rids);
+    }
+    call_user_func_array($function, $args);
+
+    $count = count($form_state['values']['rids']);
+    watchdog('redirect', '@action @count redirects.', array('@action' => $operation['action_past'], '@count' => $count));
+    drupal_set_message(format_plural(count($rids), '@action @count redirect.', '@action @count redirects.', array('@action' => $operation['action_past'], '@count' => $count)));
+  }
+}
+
+function redirect_list_form_operations_confirm_form($form, &$form_state, $operation, $rids) {
+  $operations = $form['#operations'];
+  $operation = $operations[$form_state['values']['operation']];
+
+  $form['rids_list'] = array(
+    '#theme' => 'item_list',
+    '#items' => array(),
+  );
+  $form['rids'] = array(
+    '#type' => 'value',
+    '#value' => $rids,
+  );
+
+  $redirects = redirect_load_multiple($rids);
+  foreach ($redirects as $rid => $redirect) {
+    $form['rids_list']['#items'][$rid] = check_plain(redirect_url($redirect->source, $redirect->source_options));
+  }
+
+  $form['operation'] = array('#type' => 'hidden', '#value' => $form_state['values']['operation']);
+  $form['#submit'][] = 'redirect_list_form_operations_submit';
+  $confirm_question = format_plural(count($rids), 'Are you sure you want to @action this redirect?', 'Are you sure you want to @action these redirects?', array('@action' => drupal_strtolower($operation['action'])));
+
+  return confirm_form(
+    $form,
+    $confirm_question,
+    'admin/config/search/redirect', // @todo This does not redirect back to filtered page.
+    t('This action cannot be undone.'),
+    $operation['action'],
+    t('Cancel')
+  );
+}
+
+/**
  * Form builder to add or edit an URL redirect.
  *
  * @see redirect_element_validate_source()
@@ -236,20 +331,21 @@ function redirect_edit_form($form, &$form_state, $redirect = NULL) {
     '#title' => t('From'),
     '#description' => t("Enter an interal Drupal path or path alias to redirect (e.g. %example1 or %example2). Fragment anchors (e.g. %anchor) are <strong>not</strong> allowed.", array('%example1' => 'node/123', '%example2' => 'taxonomy/term/123', '%anchor' => '#anchor')),
     '#maxlength' => 560,
-    '#default_value' => $redirect->rid || $redirect->source ? redirect_url($redirect->source, $redirect->source_options) : '',
+    '#default_value' => $redirect->rid || $redirect->source ? redirect_url($redirect->source, $redirect->source_options + array('alter' => FALSE)) : '',
     '#required' => TRUE,
-    '#field_prefix' => url('', array('absolute' => TRUE)) . (variable_get('clean_url', 0) ? '' : '?q='),
+    '#field_prefix' => $GLOBALS['base_url'] . '/' . (variable_get('clean_url', 0) ? '' : '?q='),
     '#element_validate' => array('redirect_element_validate_source'),
   );
   $form['source_options'] = array(
     '#type' => 'value',
     '#value' => $redirect->source_options,
+    '#tree' => TRUE,
   );
   $form['redirect'] = array(
     '#type' => 'textfield',
     '#title' => t('To'),
     '#maxlength' => 560,
-    '#default_value' => $redirect->rid || $redirect->redirect ? redirect_url($redirect->redirect, array('absolute' => TRUE) + $redirect->redirect_options, TRUE) : '',
+    '#default_value' => $redirect->rid || $redirect->redirect ? redirect_url($redirect->redirect, $redirect->redirect_options, TRUE) : '',
     '#required' => TRUE,
     '#description' => t('Enter an internal Drupal path, path alias, or complete external URL (like http://example.com/) to redirect to. Use %front to redirect to the front page.', array('%front' => '<front>')),
     '#element_validate' => array('redirect_element_validate_redirect'),
@@ -257,6 +353,7 @@ function redirect_edit_form($form, &$form_state, $redirect = NULL) {
   $form['redirect_options'] = array(
     '#type' => 'value',
     '#value' => $redirect->redirect_options,
+    '#tree' => TRUE,
   );
 
   // This will be a hidden value unless locale module is enabled.
@@ -695,4 +792,90 @@ function redirect_list_404_filter_form_submit($form, &$form_state) {
  */
 function redirect_list_404_filter_form_reset($form, &$form_state) {
   $form_state['redirect'] = 'admin/config/search/redirect/404';
+}
+
+function redirect_list_table($redirects, $header) {
+  $destination = drupal_get_destination();
+  $default_status_code = variable_get('redirect_default_status_code', 301);
+
+  // Set up the header.
+  $header = array_combine($header, $header);
+  $header = array_intersect_key(array(
+    'source' => array('data' => t('From'), 'field' => 'source', 'sort' => 'asc'),
+    'redirect' => array('data' => t('To'), 'field' => 'redirect'),
+    'status_code' => array('data' => t('Type'), 'field' => 'status_code'),
+    'language' => array('data' => t('Language'), 'field' => 'language'),
+    'count' => array('data' => t('Count'), 'field' => 'count'),
+    'access' => array('data' => t('Last accessed'), 'field' => 'access'),
+    'operations' => array('data' => t('Operations')),
+  ), $header);
+
+  // Do not include the language column if locale is disabled.
+  if (!module_exists('locale')) {
+    unset($header['language']);
+  }
+
+  $rows = array();
+  foreach ($redirects as $rid => $redirect) {
+    $row = array();
+    $redirect->source_options = array_merge($redirect->source_options, array('alias' => TRUE, 'language' => redirect_language_load($redirect->language)));
+    $source_url = redirect_url($redirect->source, $redirect->source_options);
+    $redirect_url = redirect_url($redirect->redirect, array_merge($redirect->redirect_options, array('alias' => TRUE)));
+    $row['data']['source'] = l($source_url, $redirect->source, $redirect->source_options);
+    $row['data']['redirect'] = l($redirect_url, $redirect->redirect, $redirect->redirect_options);
+    $row['data']['status_code'] = $redirect->status_code ? $redirect->status_code : t('Default (@default)', array('@default' => $default_status_code));
+    $row['data']['language'] = module_invoke('locale', 'language_name', $redirect->language);
+    $row['data']['count'] = $redirect->count;
+    if ($redirect->access) {
+      $row['data']['access'] = array(
+        'data' => t('!interval ago', array('!interval' => format_interval(REQUEST_TIME - $redirect->access))),
+        'title' => t('Last accessed on @date', array('@date' => format_date($redirect->access))),
+      );
+    }
+    else {
+      $row['data']['access'] = t('Never');
+    }
+
+    // Mark redirects that override existing paths with a warning in the table.
+    if (drupal_valid_path($redirect->source)) {
+      $row['class'][] = 'warning';
+      $row['title'] = t('This redirect overrides an existing internal path.');
+    }
+
+    $operations = array();
+    if (redirect_access('update', $redirect)) {
+      $operations['edit'] = array(
+        'title' => t('Edit'),
+        'href' => 'admin/config/search/redirect/edit/' . $rid,
+        'query' => $destination,
+      );
+    }
+    if (redirect_access('delete', $redirect)) {
+      $operations['delete'] = array(
+        'title' => t('Delete'),
+        'href' => 'admin/config/search/redirect/delete/' . $rid,
+        'query' => $destination,
+      );
+    }
+    $row['data']['operations'] = array(
+      'data' => array(
+        '#theme' => 'links',
+        '#links' => $operations,
+        '#attributes' => array('class' => array('links', 'inline', 'nowrap')),
+      ),
+    );
+
+    $row['data'] = array_intersect_key($row['data'], $header);
+    $rows[$rid] = $row;
+  }
+
+  $build['list'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('No URL redirects available.'),
+    '#attributes' => array('class' => array('redirect-list')),
+  );
+
+  return $build;
 }

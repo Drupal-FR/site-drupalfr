@@ -1,21 +1,16 @@
 <?php
 /**
  * Field handler to present a link to delete a node.
+ *
+ * @ingroup views_field_handlers
  */
 class views_handler_field_node_link_delete extends views_handler_field_node_link {
-  function construct() {
-    parent::construct();
-    $this->additional_fields['type'] = 'type';
-    $this->additional_fields['uid'] = 'uid';
-  }
 
-  function render_link($data, $values) {
-    // ensure user has access to edit this node.
-    $node = new stdClass();
-    $node->nid = $this->get_value($values, 'nid');
-    $node->uid = $this->get_value($values, 'uid');
-    $node->type = $this->get_value($values, 'type');
-    $node->status = 1; // unpublished nodes ignore access control
+  /**
+   * Renders the link.
+   */
+  function render_link($node, $values) {
+    // Ensure user has access to delete this node.
     if (!node_access('delete', $node)) {
       return;
     }

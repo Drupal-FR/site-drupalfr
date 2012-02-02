@@ -67,7 +67,7 @@
 
   Drupal.ajax.prototype.commands.viewsTriggerPreview = function (ajax, response, status) {
     if ($('input#edit-displays-live-preview').is(':checked')) {
-      $('#preview-submit').trigger('mousedown');
+      $('#preview-submit').trigger('click');
     }
   };
 
@@ -102,10 +102,7 @@
     attach: function (context) {
       $('input#edit-displays-live-preview', context).once('views-ajax-processed').click(function() {
         if ($(this).is(':checked')) {
-          $('#preview-submit').trigger('mousedown');
-        }
-        else {
-          $('#views-live-preview').empty();
+          $('#preview-submit').click();
         }
       });
     }
@@ -148,7 +145,7 @@
         'progress': { 'type': 'throbber' }
       };
       // Bind AJAX behaviors to all items showing the class.
-      $('.views-ajax-link', context).once('views-ajax-processed').each(function () {
+      $('a.views-ajax-link', context).once('views-ajax-processed').each(function () {
         var element_settings = base_element_settings;
         // Set the URL to go to the anchor.
         if ($(this).attr('href')) {
@@ -160,13 +157,16 @@
 
       $('div#views-live-preview a')
         .once('views-ajax-processed').each(function () {
+        // We don't bind to links without a URL.
+        if (!$(this).attr('href')) {
+          return true;
+        }
+
         var element_settings = base_element_settings;
         // Set the URL to go to the anchor.
-        if ($(this).attr('href')) {
-          element_settings.url = $(this).attr('href');
-          if (element_settings.url.substring(0, 22) != '/admin/structure/views') {
-            return true;
-          }
+        element_settings.url = $(this).attr('href');
+        if (Drupal.Views.getPath(element_settings.url).substring(0, 21) != 'admin/structure/views') {
+          return true;
         }
 
         element_settings.wrapper = 'views-live-preview';
@@ -180,11 +180,24 @@
       // @todo Revisit this after fixing Views UI to display a Preview outside
       //   of the main Edit form.
       $('div#views-live-preview input[type=submit]')
-        .once('views-ajax-processed').each(function () {
-        $(this).click(function(event) {
-          event.preventDefault();
-          $('#preview-submit').mousedown();
+        .once('views-ajax-processed').each(function(event) {
+        $(this).click(function () {
+          this.form.clk = this;
+          return true;
         });
+        var element_settings = base_element_settings;
+        // Set the URL to go to the anchor.
+        element_settings.url = $(this.form).attr('action');
+        if (Drupal.Views.getPath(element_settings.url).substring(0, 21) != 'admin/structure/views') {
+          return true;
+        }
+
+        element_settings.wrapper = 'views-live-preview';
+        element_settings.method = 'html';
+        element_settings.event = 'click';
+
+        var base = $(this).attr('id');
+        Drupal.ajax[base] = new Drupal.ajax(base, this, element_settings);
       });
 
       if (!this.collapseReplaced && Drupal.collapseScrollIntoView) {

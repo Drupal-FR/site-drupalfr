@@ -70,10 +70,12 @@ function search_views_data() {
       'handler' => 'views_handler_field_search_score',
       'click sortable' => TRUE,
       'float' => TRUE,
+      'no group by' => TRUE,
     ),
     // Information for sorting on a search score.
     'sort' => array(
       'handler' => 'views_handler_sort_search_score',
+      'no group by' => TRUE,
     ),
   );
 
@@ -120,9 +122,11 @@ function search_views_data() {
     // Information for searching terms using the full search syntax
     'filter' => array(
       'handler' => 'views_handler_filter_search',
+      'no group by' => TRUE,
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_search',
+      'no group by' => TRUE,
     ),
   );
 
@@ -164,6 +168,7 @@ function template_preprocess_views_view_row_search(&$vars) {
     return;
   }
 
+  // @todo: Once the search row is fixed this node_load should be replace by a node_load_multiple
   $node = node_load($nid);
 
   if (empty($node)) {

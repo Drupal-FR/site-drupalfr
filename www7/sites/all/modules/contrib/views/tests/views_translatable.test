@@ -1,8 +1,6 @@
 <?php
 
-module_load_include('test', 'views', 'tests/views_query');
-
-class viewsTranslatableTest extends ViewsSqlTest {
+class ViewsTranslatableTest extends ViewsSqlTest {
   var $strings;
 
   public static function getInfo() {
@@ -48,17 +46,17 @@ class viewsTranslatableTest extends ViewsSqlTest {
     $view = $this->view_unpack_translatable();
     $view->init_localization();
 
-    $this->assertEqual('views_plugin_localization_test', get_class($view->localization_plugin), 'Take sure that init_localization initiales the right translation plugin');
+    $this->assertEqual('views_plugin_localization_test', get_class($view->localization_plugin), 'Make sure that init_localization initializes the right translation plugin');
 
     $view->export_locale_strings();
 
     $expected_strings = $this->strings;
     $result_strings = $view->localization_plugin->get_export_strings();
-    $this->assertEqual(sort($expected_strings), sort($result_strings), 'Take sure that the localisation plugin got every translatable string.');
+    $this->assertEqual(sort($expected_strings), sort($result_strings), 'Make sure that the localization plugin got every translatable string.');
   }
 
   public function testUi() {
-    // Take sure that the string is not translated on the ui.
+    // Make sure that the string is not translated in the UI.
     $view = $this->view_unpack_translatable();
     $view->save();
     views_invalidate_cache();
@@ -67,11 +65,11 @@ class viewsTranslatableTest extends ViewsSqlTest {
     $this->drupalLogin($admin_user);
 
     $this->drupalGet("admin/structure/views/view/$view->name/edit");
-    $this->assertNoText('-translated', 'Take sure that no strings get\'s translated in the ui.');
+    $this->assertNoText('-translated', 'Make sure that no strings get translated in the UI.');
   }
 
   /**
-   * Take sure that the translations get's into the loaded view.
+   * Make sure that the translations get into the loaded view.
    */
   public function testTranslation() {
     $view = $this->view_unpack_translatable();
@@ -83,7 +81,44 @@ class viewsTranslatableTest extends ViewsSqlTest {
     foreach ($this->strings as $string) {
       $expected_strings[] = $string .= '-translated';
     }
-    $this->assertEqual(sort($expected_strings), sort($view->localization_plugin->translated_strings), 'Take sure that every string got loaded translated');
+    $this->assertEqual(sort($expected_strings), sort($view->localization_plugin->translated_strings), 'Make sure that every string got loaded translated');
+  }
+
+  /**
+   * Make sure that the different things have the right translation keys.
+   */
+  public function testTranslationKey() {
+    $view = $this->view_unpack_translatable();
+    $view->editing = TRUE;
+    $view->init_display();
+
+    // Don't run translation. We just want to get the right keys.
+
+    foreach ($view->display as $display_id => $display) {
+      $translatables = array();
+      $display->handler->unpack_translatables($translatables);
+
+      $this->string_keys = array(
+        'Master1' => array('title'),
+        'Apply1' => array('exposed_form', 'submit_button'),
+        'Sort By1' => array('exposed_form', 'exposed_sorts_label'),
+        'Asc1' => array('exposed_form', 'sort_asc_label'),
+        'Desc1' => array('exposed_form', 'sort_desc_label'),
+        'more1' => array('use_more_text'),
+        'Reset1' => array('exposed_form', 'reset_button_label'),
+        'Offset1' => array('pager', 'expose', 'offset_label'),
+        'Master1' => array('title'),
+        'title1' => array('title'),
+        'Items per page1' => array('pager', 'expose', 'items_per_page_label'),
+        'fieldlabel1' => array('field', 'node', 'nid', 'label'),
+        'filterlabel1' => array('filter', 'node', 'nid', 'expose', 'label'),
+        '- All -' => array('pager', 'expose', 'items_per_page_options_all_label'),
+      );
+
+      foreach ($translatables as $translatable) {
+        $this->assertEqual($translatable['keys'], $this->string_keys[$translatable['value']]);
+      }
+    }
   }
 
   public function view_unpack_translatable() {

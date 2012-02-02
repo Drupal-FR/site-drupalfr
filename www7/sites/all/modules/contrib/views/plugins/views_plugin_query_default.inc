@@ -79,6 +79,16 @@ class views_plugin_query_default extends views_plugin_query {
    */
    var $pager = NULL;
 
+   /**
+    * An array mapping table aliases and field names to field aliases.
+    */
+   var $field_aliases = array();
+
+   /**
+    * Query tags which will be passed over to the dbtng query object.
+    */
+   var $tags = array();
+
   /**
    * Constructor; Create the basic query object and fill with default values.
    */
@@ -176,11 +186,9 @@ class views_plugin_query_default extends views_plugin_query {
       'default' => FALSE,
       'bool' => TRUE,
     );
-    $options['field_language'] = array(
-      'default' => '***CURRENT_LANGUAGE***',
-    );
-    $options['field_language_add_to_query'] = array(
-      'default' => 1,
+    $options['query_comment'] = array(
+      'default' => '',
+      'bool' => FALSE,
     );
 
     return $options;
@@ -190,6 +198,8 @@ class views_plugin_query_default extends views_plugin_query {
    * Add settings for the ui.
    */
   function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+
     $form['disable_sql_rewrite'] = array(
       '#title' => t('Disable SQL rewriting'),
       '#description' => t('Disabling SQL rewriting will disable node_access checks as well as other modules that implement hook_query_alter().'),
@@ -209,42 +219,12 @@ class views_plugin_query_default extends views_plugin_query {
       '#description' => t('This will make the query attempt to connect to a slave server if available.  If no slave server is defined or available, it will fall back to the default server.'),
       '#default_value' => !empty($this->options['slave']),
     );
-
-    $entities = entity_get_info();
-    $entity_tables = array();
-    $has_translation_handlers = FALSE;
-    foreach ($entities as $type => $entity_info) {
-      $entity_tables[] = $entity_info['base table'];
-
-      if (!empty($entity_info['translation'])) {
-        $has_translation_handlers = TRUE;
-      }
-    }
-
-    // Doesn't make sense to show a field setting here if we aren't querying
-    // an entity base table. Also, we make sure that there's at least one
-    // entity type with a translation handler attached.
-    if (in_array($this->base_table, $entity_tables) && $has_translation_handlers) {
-      $languages = array(
-        '***CURRENT_LANGUAGE***' => t("Current user's language"),
-        '***DEFAULT_LANGUAGE***' => t("Default site language"),
-        LANGUAGE_NONE => t('Language neutral'),
-      );
-      $languages = array_merge($languages, locale_language_list());
-
-      $form['field_language'] = array(
-        '#type' => 'select',
-        '#title' => t('Field Language'),
-        '#description' => t('All fields which support translations will be displayed in the selected language.'),
-        '#options' => $languages,
-        '#default_value' => $this->options['field_language'],
-      );
-      $form['field_language_add_to_query'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('When needed, add the field language condition to the query.'),
-        '#default_value' => $this->options['field_language_add_to_query'],
-      );
-    }
+    $form['query_comment'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Query Comment'),
+      '#description' => t('If set, this comment will be embedded in the query and passed to the SQL server. This can be helpful for logging or debugging.'),
+      '#default_value' => $this->options['query_comment'],
+    );
   }
 
   // ----------------------------------------------------------------
@@ -266,7 +246,7 @@ class views_plugin_query_default extends views_plugin_query {
    * @param $alias
    *   What this relationship will be called, and is also the alias
    *   for the table.
-   * @param $join
+   * @param views_join $join
    *   A views_join object (or derived object) to join the alias in.
    * @param $base
    *   The name of the 'base' table this relationship represents; this
@@ -338,7 +318,7 @@ class views_plugin_query_default extends views_plugin_query {
    *   tables exist and are properly aliased. If set to NULL the path to
    *   the primary table will be ensured. If the path cannot be made, the
    *   table will NOT be added.
-   * @param $join
+   * @param views_join $join
    *   In some join configurations this table may actually join back through
    *   a different method; this is most likely to be used when tracing
    *   a hierarchy path. (node->parent->parent2->parent3). This parameter
@@ -357,7 +337,11 @@ class views_plugin_query_default extends views_plugin_query {
       return FALSE;
     }
 
-    return $this->queue_table($table, $relationship, $this->adjust_join($join, $relationship), $alias);
+    if ($join && $relationship) {
+      $join = $this->adjust_join($join, $relationship);
+    }
+
+    return $this->queue_table($table, $relationship, $join, $alias);
   }
 
   /**
@@ -373,7 +357,7 @@ class views_plugin_query_default extends views_plugin_query {
    * @param $relationship
    *   The primary table alias this table is related to. If not set, the
    *   primary table will be used.
-   * @param $join
+   * @param views_join $join
    *   In some join configurations this table may actually join back through
    *   a different method; this is most likely to be used when tracing
    *   a hierarchy path. (node->parent->parent2->parent3). This parameter
@@ -485,7 +469,7 @@ class views_plugin_query_default extends views_plugin_query {
    *   The relationship to ensure the table links to. Each relationship will
    *   get a unique instance of the table being added. If not specified,
    *   will be the primary table.
-   * @param $join
+   * @param views_join $join
    *   A views_join object (or derived object) to join the alias in.
    *
    * @return
@@ -673,7 +657,7 @@ class views_plugin_query_default extends views_plugin_query {
    * @param $base_table
    *   The path we're following to get this join.
    *
-   * @return
+   * @return views_join
    *   A views_join object or child object, if one exists.
    */
   function get_join_data($table, $base_table) {
@@ -748,7 +732,7 @@ class views_plugin_query_default extends views_plugin_query {
 
     // We limit the length of the original alias up to 60 characters
     // to get a unique alias later if its have duplicates
-    $alias = substr($alias, 0, 60);
+    $alias = strtolower(substr($alias, 0, 60));
 
     // Create a field info array.
     $field_info = array(
@@ -769,6 +753,9 @@ class views_plugin_query_default extends views_plugin_query {
     if (empty($this->fields[$alias])) {
       $this->fields[$alias] = $field_info;
     }
+
+    // Keep track of all aliases used.
+    $this->field_aliases[$table][$field] = $alias;
 
     return $alias;
   }
@@ -1009,6 +996,24 @@ class views_plugin_query_default extends views_plugin_query {
   }
 
   /**
+   * Returns the alias for the given field added to $table.
+   *
+   * @see views_plugin_query_default::add_field()
+   */
+  function get_field_alias($table_alias, $field) {
+    return isset($this->field_aliases[$table_alias][$field]) ? $this->field_aliases[$table_alias][$field] : FALSE;
+  }
+
+  /**
+   * Adds a query tag to the sql object.
+   *
+   * @see SelectQuery::addTag
+   */
+  function add_tag($tag) {
+    $this->tags[] = $tag;
+  }
+
+  /**
    * Generates a unique placeholder used in the db query.
    */
   function placeholder($base = 'views') {
@@ -1025,27 +1030,63 @@ class views_plugin_query_default extends views_plugin_query {
   /**
    * Construct the "WHERE" or "HAVING" part of the query.
    *
+   * As views has to wrap the conditions from arguments with AND, a special
+   * group is wrapped around all conditions. This special group has the ID 0.
+   * There is other code in filters which makes sure that the group IDs are
+   * higher than zero.
+   *
    * @param $where
    *   'where' or 'having'.
    */
   function build_condition($where = 'where') {
     $has_condition = FALSE;
-    $main_group = $this->group_operator == 'OR' ? db_or() : db_and();
+    $has_arguments = FALSE;
+    $has_filter = FALSE;
+
+    $main_group = db_and();
+    $filter_group = $this->group_operator == 'OR' ? db_or() : db_and();
+
     foreach ($this->$where as $group => $info) {
-      $sub_group = $info['type'] == 'OR' ? db_or() : db_and();
-      foreach ($info['conditions'] as $key => $clause) {
-        if ($clause['operator'] == 'formula') {
-          $has_condition = TRUE;
-          $sub_group->where($clause['field'], $clause['value']);
+
+      if (!empty($info['conditions'])) {
+        $sub_group = $info['type'] == 'OR' ? db_or() : db_and();
+        foreach ($info['conditions'] as $key => $clause) {
+          // DBTNG doesn't support to add the same subquery twice to the main
+          // query and the count query, so clone the subquery to have two instances
+          // of the same object. - http://drupal.org/node/1112854
+          if (is_object($clause['value']) && $clause['value'] instanceof SelectQuery) {
+            $clause['value'] = clone $clause['value'];
+          }
+          if ($clause['operator'] == 'formula') {
+            $has_condition = TRUE;
+            $sub_group->where($clause['field'], $clause['value']);
+          }
+          else {
+            $has_condition = TRUE;
+            $sub_group->condition($clause['field'], $clause['value'], $clause['operator']);
+          }
+        }
+
+        // Add the item to the filter group.
+        if ($group != 0) {
+          $has_filter = TRUE;
+          $filter_group->condition($sub_group);
         }
         else {
-          $has_condition = TRUE;
-          $sub_group->condition($clause['field'], $clause['value'], $clause['operator']);
+          $has_arguments = TRUE;
+          $main_group->condition($sub_group);
         }
       }
-      $main_group->condition($sub_group);
     }
-    if ($has_condition) {
+
+    if ($has_filter) {
+      $main_group->condition($filter_group);
+    }
+
+    if (!$has_arguments && $has_condition) {
+      return $filter_group;
+    }
+    if ($has_arguments && $has_condition) {
       return $main_group;
     }
   }
@@ -1168,7 +1209,15 @@ class views_plugin_query_default extends views_plugin_query {
 
     // Go ahead and build the query.
     // db_select doesn't support to specify the key, so use getConnection directly.
-    $query = Database::getConnection($target, $key)->select($this->base_table, $this->base_table, $options)->addTag('views');
+    $query = Database::getConnection($target, $key)
+      ->select($this->base_table, $this->base_table, $options)
+      ->addTag('views')
+      ->addTag('views_' . $this->view->name);
+
+    // Add the tags added to the view itself.
+    foreach ($this->tags as $tag) {
+      $query->addTag($tag);
+    }
 
     if (!empty($distinct)) {
       $query->distinct();
@@ -1218,6 +1267,11 @@ class views_plugin_query_default extends views_plugin_query {
 
     if (!empty($this->where) && $condition = $this->build_condition('where')) {
       $query->condition($condition);
+    }
+
+    // Add a query comment.
+    if (!empty($this->options['query_comment'])) {
+      $query->comment($this->options['query_comment']);
     }
 
     // Add all query substitutions as metadata.
@@ -1321,21 +1375,22 @@ class views_plugin_query_default extends views_plugin_query {
 
       $start = microtime(TRUE);
 
-      if ($this->pager->use_count_query() || !empty($view->get_total_rows)) {
-        $this->pager->execute_count_query($count_query);
-      }
-
-      // Let the pager modify the query to add limits.
-      $this->pager->pre_execute($query);
-
-      if (!empty($this->limit) || !empty($this->offset)) {
-        // We can't have an offset without a limit, so provide a very large limit instead.
-        $limit  = intval(!empty($this->limit) ? $this->limit : 999999);
-        $offset = intval(!empty($this->offset) ? $this->offset : 0);
-        $query->range($offset, $limit);
-      }
 
       try {
+        if ($this->pager->use_count_query() || !empty($view->get_total_rows)) {
+          $this->pager->execute_count_query($count_query);
+        }
+
+        // Let the pager modify the query to add limits.
+        $this->pager->pre_execute($query);
+
+        if (!empty($this->limit) || !empty($this->offset)) {
+          // We can't have an offset without a limit, so provide a very large limit instead.
+          $limit  = intval(!empty($this->limit) ? $this->limit : 999999);
+          $offset = intval(!empty($this->offset) ? $this->offset : 0);
+          $query->range($offset, $limit);
+        }
+
         $result = $query->execute();
 
         $view->result = array();
@@ -1351,7 +1406,13 @@ class views_plugin_query_default extends views_plugin_query {
       }
       catch (Exception $e) {
         $view->result = array();
-        debug('Exception: ' . $e->getMessage());
+        if (!empty($view->live_preview)) {
+          drupal_set_message(time());
+          drupal_set_message($e->getMessage(), 'error');
+        }
+        else {
+          vpr('Exception in @human_name[@view_name]: @message', array('@human_name' => $view->human_name, '@view_name' => $view->name, '@message' => $e->getMessage()));
+        }
       }
 
     }
@@ -1375,7 +1436,17 @@ class views_plugin_query_default extends views_plugin_query {
         'method' => 'views_query_default_aggregation_method_simple',
         'handler' => array(
           'argument' => 'views_handler_argument_group_by_numeric',
-          'field' => 'views_handler_field_group_by_numeric',
+          'field' => 'views_handler_field_numeric',
+          'filter' => 'views_handler_filter_group_by_numeric',
+          'sort' => 'views_handler_sort_group_by_numeric',
+        ),
+      ),
+      'count_distinct' => array(
+        'title' => t('Count DISTINCT'),
+        'method' => 'views_query_default_aggregation_method_distinct',
+        'handler' => array(
+          'argument' => 'views_handler_argument_group_by_numeric',
+          'field' => 'views_handler_field_numeric',
           'filter' => 'views_handler_filter_group_by_numeric',
           'sort' => 'views_handler_sort_group_by_numeric',
         ),
@@ -1385,7 +1456,6 @@ class views_plugin_query_default extends views_plugin_query {
         'method' => 'views_query_default_aggregation_method_simple',
         'handler' => array(
           'argument' => 'views_handler_argument_group_by_numeric',
-          'field' => 'views_handler_field_group_by_numeric',
           'filter' => 'views_handler_filter_group_by_numeric',
           'sort' => 'views_handler_sort_group_by_numeric',
         ),
@@ -1395,7 +1465,6 @@ class views_plugin_query_default extends views_plugin_query {
         'method' => 'views_query_default_aggregation_method_simple',
         'handler' => array(
           'argument' => 'views_handler_argument_group_by_numeric',
-          'field' => 'views_handler_field_group_by_numeric',
           'filter' => 'views_handler_filter_group_by_numeric',
           'sort' => 'views_handler_sort_group_by_numeric',
         ),
@@ -1405,7 +1474,6 @@ class views_plugin_query_default extends views_plugin_query {
         'method' => 'views_query_default_aggregation_method_simple',
         'handler' => array(
           'argument' => 'views_handler_argument_group_by_numeric',
-          'field' => 'views_handler_field_group_by_numeric',
           'filter' => 'views_handler_filter_group_by_numeric',
           'sort' => 'views_handler_sort_group_by_numeric',
         ),
@@ -1415,15 +1483,63 @@ class views_plugin_query_default extends views_plugin_query {
         'method' => 'views_query_default_aggregation_method_simple',
         'handler' => array(
           'argument' => 'views_handler_argument_group_by_numeric',
-          'field' => 'views_handler_field_group_by_numeric',
           'filter' => 'views_handler_filter_group_by_numeric',
           'sort' => 'views_handler_sort_group_by_numeric',
         ),
       ),
     );
   }
+
+  /**
+   * Returns the according entity objects for the given query results.
+   *
+   */
+  function get_result_entities($results, $relationship = NULL) {
+    $base_table = $this->base_table;
+    $base_table_alias = $base_table;
+
+    if (!empty($relationship)) {
+      foreach ($this->view->relationship as $current) {
+        if ($current->alias == $relationship) {
+          $base_table = $current->definition['base'];
+          $base_table_alias = $relationship;
+          break;
+        }
+      }
+    }
+    $table_data = views_fetch_data($base_table);
+
+    // Bail out if the table has not specified the according entity-type.
+    if (!isset($table_data['table']['entity type'])) {
+      return FALSE;
+    }
+    $entity_type = $table_data['table']['entity type'];
+    $info = entity_get_info($entity_type);
+    $id_alias = $this->get_field_alias($base_table_alias, $info['entity keys']['id']);
+
+    // Assemble the ids of the entities to load.
+    $ids = array();
+    foreach ($results as $key => $result) {
+      if (isset($result->$id_alias)) {
+        $ids[$key] = $result->$id_alias;
+      }
+    }
+
+    $entities = entity_load($entity_type, $ids);
+    // Re-key the array by row-index.
+    $result = array();
+    foreach ($ids as $key => $id) {
+      $result[$key] = isset($entities[$id]) ? $entities[$id] : FALSE;
+    }
+    return array($entity_type, $result);
+  }
 }
 
 function views_query_default_aggregation_method_simple($group_type, $field) {
   return strtoupper($group_type) . '(' . $field . ')';
+}
+
+function views_query_default_aggregation_method_distinct($group_type, $field) {
+  $group_type = str_replace('_distinct', '', $group_type);
+  return strtoupper($group_type) . '(DISTINCT ' . $field . ')';
 }

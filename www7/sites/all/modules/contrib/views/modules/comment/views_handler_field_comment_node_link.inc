@@ -1,6 +1,8 @@
 <?php
 /**
-* Handler for showing comment module's node link.
+ * Handler for showing comment module's node link.
+ *
+ * @ingroup views_field_handlers
  */
 class views_handler_field_comment_node_link extends views_handler_field {
   function construct() {
@@ -58,4 +60,3 @@ class views_handler_field_comment_node_link extends views_handler_field {
     return !empty($node->content['links']['comment']) ? drupal_render($node->content['links']['comment']) : '';
   }
 }
-

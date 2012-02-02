@@ -1,35 +1,29 @@
 <?php
-// $Id: link.token.test,v 1.1.4.2 2011/02/07 06:39:47 jcfiala Exp $
 
 /**
  * @file
  * Contains simpletests making sure token integration works.
  */
 
-// Let's include the parent class.
-module_load_include('inc', 'link', 'tests/link.base-test');
-
 /**
  * Testing that tokens can be used in link titles
  */
 class LinkTokenTest extends LinkBaseTestClass {
-  
-  /**
-   * Implementation of getInfo().
-   */
-  function getInfo() {
+
+  public static function getInfo() {
     return array(
-      'name' => t('Link tokens - browser test'),
-      'description' => t('Tests including tokens in link titles, making sure they appear in node views. <strong>Requires <a href="@token_link">Token module</a>.</strong>'),
-      'group' => t('Link'),
+      'name' => 'Link tokens - browser test',
+      'description' => 'Tests including tokens in link titles, making sure they appear in node views.',
+      'group' => 'Link',
+      'dependencies' => array('token'),
     );
   }
 
-  /**
-   * Implementation of setUp().
-   */
-  function setUp() {
-    parent::setUp(array('field_ui', 'link', 'token'));
+  function setUp($modules = array()) {
+    $modules[] = 'field_ui';
+    $modules[] = 'link';
+    $modules[] = 'token';
+    parent::setUp($modules);
   }
 
   /**
@@ -57,7 +51,7 @@ class LinkTokenTest extends LinkBaseTestClass {
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName(),
     );
-    
+
     //$this->drupalLogin($account);
     $this->drupalGet('node/add/page');
 
@@ -66,17 +60,17 @@ class LinkTokenTest extends LinkBaseTestClass {
       $field_name . '[und][0][title]' => $input['label'] . " [node:content-type:machine-name]",
       $field_name . '[und][0][url]' => $input['href'],
     );
-    $this->drupalPost(NULL, $edit, t('Save'));    
+    $this->drupalPost(NULL, $edit, t('Save'));
     $url = $this->getUrl();
 
     // change to anonymous user
-    $this->drupalLogout();    
+    $this->drupalLogout();
     $this->drupalGet($url);
 
     $this->assertRaw(l($input['label'] . ' page', $input['href']));
   }
-  
-  
+
+
   /**
    * Creates a link field with a static title and an admin-entered token.
    * Creates a node with a link and checks the title value.
@@ -105,17 +99,17 @@ class LinkTokenTest extends LinkBaseTestClass {
       'title' => $name,
       $field_name . '[und][0][url]' => $input['href'],
     );
-    $this->drupalPost(NULL, $edit, t('Save'));    
-    
+    $this->drupalPost(NULL, $edit, t('Save'));
+
     $url = $this->getUrl();
 
     // change to anonymous user
-    $this->drupalLogout();    
+    $this->drupalLogout();
     $this->drupalGet($url);
 
     $this->assertRaw(l($name . ' page', $input['href']));
   }
-  
+
   /**
    * Creates a link field with a static title and an admin-entered token.
    * Creates a node with a link and checks the title value.
@@ -148,17 +142,17 @@ class LinkTokenTest extends LinkBaseTestClass {
       'title' => $name,
       $field_name . '[und][0][url]' => $input['href'],
     );
-    $this->drupalPost(NULL, $edit, t('Save'));    
-    
+    $this->drupalPost(NULL, $edit, t('Save'));
+
     $url = $this->getUrl();
 
     // change to anonymous user
-    $this->drupalLogout();    
+    $this->drupalLogout();
     $this->drupalGet($url);
 
     $this->assertRaw(l($name .' '. $name, $input['href']));
   }
-  
+
   // This test doesn't seem to actually work, due to lack of 'title' in url.
   function _test_Link_With_Title_Attribute_token_url_form() {
    /* $this->loginWithPermissions($this->permissions);
@@ -174,13 +168,13 @@ class LinkTokenTest extends LinkBaseTestClass {
         'title' => '',
       ),
     );
-    
+
     $field = $this->createField($field_settings, 0);
     //$this->fail('<pre>'. print_r($field, TRUE) .'</pre>');
     $field_name = $field['field_name'];
     $field_db_info = content_database_info($field);
     $url_type = str_replace('_', '-', $this->content_types[0]->type);
-  
+
     $edit = array('attributes[title]' => '['. $field_name .'-url]',
                   'enable_tokens' => TRUE);
 
@@ -191,31 +185,31 @@ class LinkTokenTest extends LinkBaseTestClass {
     $settings = array(
       'instance[settings][attributes][rel]' => 'nofollow',
     );
-    
+
     $field_name = $this->createLinkField('page', $settings);
-    
+
     // So, having saved this field_name, let's see if it works...
     //$this->acquireNodes(1);
-    
+
     //$node = node_load($this->nodes[0]->nid);
-    
+
     //$this->drupalGet('node/'. $this->nodes[0]->nid);
-    
+
     $edit = array();
     $test_link_url = 'http://www.example.com/test';
     $edit[$field_name .'[und][0][url]'] = $test_link_url;
     $title = 'title_'. $this->randomName(20);
     $edit[$field_name .'[und][0][title]'] = $title;
     $edit['title'] = $name;
-    
+
     $this->drupalGet('node/add/page');
     $this->drupalPost(NULL, $edit, t('Save'));
-    
+
     // Make sure we get a new version!
     //$node = node_load($this->nodes[0]->nid, NULL, TRUE);
     $this->assertText(t('Basic page @title has been updated.',
                         array('@title' => $name)));
-    
+
     //$this->drupalGet('node/'. $node->nid);
     $this->assertText($title, 'Make sure the link title/text shows');
     $this->assertRaw(' title="'. $test_link_url .'"', "Do we show the link url as the title attribute?");
@@ -223,7 +217,7 @@ class LinkTokenTest extends LinkBaseTestClass {
     $this->assertTrue(module_exists('token'), t('Assure that Token Module is enabled.'));
     //$this->fail($this->content);
   }
-  
+
   /**
    * If the title of the link is set to the title attribute, then the title
    * attribute isn't supposed to show.
@@ -242,39 +236,39 @@ class LinkTokenTest extends LinkBaseTestClass {
         'title' => '',
       ),
     );
-    
+
     $field = $this->createField($field_settings, 0);
     $field_name = $field['field_name'];
     $field_db_info = content_database_info($field);
     $url_type = str_replace('_', '-', $this->content_types[0]->type);
-  
+
     $edit = array('attributes[title]' => '['. $field_name .'-title]',
                   'enable_tokens' => TRUE);
 
     $this->drupalPost('admin/content/node-type/'. $url_type .'/fields/'. $field['field_name'],
                       $edit, t('Save field settings'));
     $this->assertText(t('Saved field @field_name', array('@field_name' => $field['field_name'])));
-    
+
     // So, having saved this field_name, let's see if it works...
     $this->acquireNodes(1);
-    
+
     $node = node_load($this->nodes[0]->nid);
-    
+
     $this->drupalGet('node/'. $this->nodes[0]->nid);
-    
+
     $edit = array();
     $edit[$field['field_name'] .'[0][url]'] = 'http://www.example.com/test';
     $title = 'title_'. $this->randomName(20);
     $edit[$field['field_name'] .'[0][title]'] = $title;
-    
+
     $this->drupalPost('node/'. $this->nodes[0]->nid .'/edit', $edit, t('Save'));
-    
+
     // Make sure we get a new version!
     $node = node_load($this->nodes[0]->nid, NULL, TRUE);
     $this->assertText(t('@type @title has been updated.',
                         array('@title' => $node->title,
                               '@type' => $this->content_types[0]->name)));
-    
+
     $this->drupalGet('node/'. $node->nid);
     $this->assertText($title, 'Make sure the link title/text shows');
     $this->assertNoRaw(' title="'. $title .'"', "We should not show the link title as the title attribute?");
@@ -315,7 +309,7 @@ class LinkTokenTest extends LinkBaseTestClass {
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName(),
     );
-    
+
     $this->drupalLogin($account);
     $this->drupalGet('node/add/page');
 
@@ -324,17 +318,17 @@ class LinkTokenTest extends LinkBaseTestClass {
       $field_name . '[0][title]' => $input['label'],
       $field_name . '[0][url]' => $input['href'] . "/[type]",
     );
-    $this->drupalPost(NULL, $edit, t('Save'));    
+    $this->drupalPost(NULL, $edit, t('Save'));
     $url = $this->getUrl();
 
     // change to anonymous user
-    $this->drupalLogout();    
+    $this->drupalLogout();
     $this->drupalGet($url);
 
     $this->assertRaw(l($input['label'], $input['href'] .'/page'));
     //$this->fail($this->content);
   }
-  
+
   /**
    *  Trying to set the url to contain a token.
    */
@@ -368,7 +362,7 @@ class LinkTokenTest extends LinkBaseTestClass {
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName(),
     );
-    
+
     $this->drupalLogin($account);
     $this->drupalGet('node/add/page');
 
@@ -377,11 +371,11 @@ class LinkTokenTest extends LinkBaseTestClass {
       $field_name . '[0][title]' => $input['label'],
       $field_name . '[0][url]' => $input['href'] . "/[author-uid]",
     );
-    $this->drupalPost(NULL, $edit, t('Save'));    
+    $this->drupalPost(NULL, $edit, t('Save'));
     $url = $this->getUrl();
 
     // change to anonymous user
-    $this->drupalLogout();    
+    $this->drupalLogout();
     $this->drupalGet($url);
 
     $this->assertRaw(l($input['label'], $input['href'] .'/'. $account->uid));

@@ -18,7 +18,7 @@ function rules_action_data_set($wrapper, $value, $settings, $state, $element) {
       $wrapper->set($value);
     }
     catch (EntityMetadataWrapperException $e) {
-      throw new RulesException('Unable to modify data "@selector": ' . $e->getMessage(), array('@selector' => $settings['data:select']));
+      throw new RulesEvaluationException('Unable to modify data "@selector": ' . $e->getMessage(), array('@selector' => $settings['data:select']));
     }
     // Save changes if a property of a variable has been changed.
     if (strpos($element->settings['data:select'], ':') !== FALSE) {
@@ -29,11 +29,9 @@ function rules_action_data_set($wrapper, $value, $settings, $state, $element) {
     }
   }
   else {
-    // A not wrapped variable (e.g. a number) is being set. As we don't have
-    // a reference on the variable, we need to directly update the variable in
-    // the state.
-    $var_name = $element->settings['data:select'];
-    $state->variables[$var_name] = $value;
+    // A not wrapped variable (e.g. a number) is being updated. Just overwrite
+    // the variable with the new value.
+    return array('data' => $value);
   }
 }
 
@@ -43,146 +41,71 @@ function rules_action_data_set($wrapper, $value, $settings, $state, $element) {
 function rules_action_data_set_info_alter(&$element_info, $element) {
   $element->settings += array('data:select' => NULL);
   if ($wrapper = $element->applyDataSelector($element->settings['data:select'])) {
+    $info = $wrapper->info();
     $element_info['parameter']['value']['type'] = $wrapper->type();
-    $element_info['parameter']['value']['options list']  = $wrapper->optionsList() ? 'rules_data_selector_options_list' : FALSE;
+    $element_info['parameter']['value']['options list']  = !empty($info['options list']) ? 'rules_data_selector_options_list' : FALSE;
   }
 }
 
 /**
- * Action: Fetch data.
+ * Action: Calculate a value.
  */
-function rules_action_entity_fetch($type, $id, $revision) {
-  $info = entity_get_info($type);
-
-  // Support the revision parameter, if applicable.
-  if (!empty($info['entity keys']['revision']) && isset($revision)) {
-    $conditions = array($info['entity keys']['revision'] => $revision);
+function rules_action_data_calc($input1, $op, $input2, $settings, $state, $element) {
+  switch ($op) {
+    case '+':
+      $result = $input1 + $input2;
+      break;
+    case '-':
+      $result = $input1 - $input2;
+      break;
+    case '*':
+      $result = $input1 * $input2;
+      break;
+    case '/':
+      $result = $input1 / $input2;
+      break;
   }
-
-  $return = entity_load($type, array($id), isset($conditions) ? $conditions : array());
-  $entity = reset($return);
-  if (!$entity) {
-    throw new RulesException('Unable to load @entity with id "@id"', array('@id' => $id, '@entity' => $type));
-  }
-  return array('entity_fetched' => $entity);
-}
-
-
-/**
- * Info alteration callback for the entity fetch action.
- */
-function rules_action_entity_fetch_info_alter(&$element_info, RulesAbstractPlugin $element) {
-  $element->settings += array('type' => NULL);
-  $info = entity_get_info($element->settings['type']);
-
-  // Fix the type of the identifier.
-  $element_info['parameter']['id']['type'] = isset($info['entity keys']['name']) ? 'text' : 'integer';
-
-  // Add an optional revision parameter, if supported.
-  if (!empty($info['entity keys']['revision'])) {
-    $element_info['parameter']['revision_id'] = array(
-      'type' => 'integer',
-      'label' => t('Revision identifier'),
-      'optional' => TRUE,
-    );
-  }
-  $element_info['provides']['entity_fetched']['type'] = $element->settings['type'];
-}
-
-/**
- * Action: Query entities.
- */
-function rules_action_entity_query($type, $property, $value, $limit) {
-  $return = entity_property_query($type, $property, $value, $limit);
-  return array('entity_fetched' => array_values($return));
-}
-
-
-/**
- * Info alteration callback for the entity query action.
- */
-function rules_action_entity_query_info_alter(&$element_info, RulesAbstractPlugin $element) {
-  $element->settings += array('type' => NULL, 'property' => NULL);
-  if ($element->settings['type']) {
-    $element_info['parameter']['property']['options list'] = 'rules_action_entity_query_property_options_list';
-
-    if ($element->settings['property']) {
-      $wrapper = entity_metadata_wrapper($element->settings['type']);
-      if (isset($wrapper->{$element->settings['property']}) && $property = $wrapper->{$element->settings['property']}) {
-        $element_info['parameter']['value']['type'] = $property->type();
-        $element_info['parameter']['value']['options list']  = $property->optionsList() ? 'rules_action_entity_query_value_options_list' : FALSE;
-      }
+  if (isset($result)) {
+    // Ensure results are valid integer values if necessary.
+    $var_info = rules_array_key($element->providesVariables());
+    if (in_array($var_info['type'], array('integer', 'date', 'duration'))) {
+      $result = (int) $result;
     }
+    return array('result' => $result);
   }
-  $element_info['provides']['entity_fetched']['type'] = 'list<' . $element->settings['type'] . '>';
 }
 
 /**
- * Action: Create entities.
+ * Info alter callback for the data_calc action.
  */
-function rules_action_entity_create($args, $element) {
-  $values = array();
-  foreach ($element->pluginParameterInfo() as $name => $info) {
-    if ($name != 'type') {
-      // Remove the parameter name prefix 'param_'.
-      $values[substr($name, 6)] = $args[$name];
+function rules_action_data_calc_info_alter(&$element_info, RulesPlugin $element) {
+  if ($info = $element->getArgumentInfo('input_1')) {
+    // Only allow durations as offset for date values.
+    if ($info['type'] == 'date') {
+      $element_info['parameter']['input_2']['type'] = 'duration';
     }
-  }
-  try {
-    $data = entity_property_values_create_entity($args['type'], $values);
-    return array('entity_created' => $data);
-  }
-  catch (EntityMetadataWrapperException $e) {
-    throw new RulesException('Unable to create entity @type": ' . $e->getMessage(), array('@type' => $args['type']), $element);
-  }
-}
+    // Specify the data type of the result.
+    $element_info['provides']['result']['type'] = $info['type'];
 
-/**
- * Info alteration callback for the entity create action.
- */
-function rules_action_entity_create_info_alter(&$element_info, RulesAbstractPlugin $element) {
-  if (!empty($element->settings['type'])) {
-    $wrapper = entity_metadata_wrapper($element->settings['type']);
-    // Add the data type's needed parameter for loading to the parameter info.
-    foreach ($wrapper as $name => $child) {
-      $info = $child->info();
-      if (!empty($info['required'])) {
-        $info += array('type' => 'text');
-        // Prefix parameter names to avoid name clashes with existing parameters.
-        $element_info['parameter']['param_' . $name] = array_intersect_key($info, array_flip(array('type', 'label', 'description')));
-        $element_info['parameter']['param_' . $name]['options list']  = $child->optionsList() ? 'rules_action_entity_parameter_options_list' : FALSE;
-      }
+    if ($info['type'] == 'integer' && ($info2 = $element->getArgumentInfo('input_2')) && $info2['type'] == 'decimal') {
+      $element_info['provides']['result']['type'] = 'decimal';
     }
-    $element_info['provides']['entity_created']['type'] = $element->settings['type'];
-    if (($bundleKey = $wrapper->entityKey('bundle')) && isset($element->settings['param_' . $bundleKey])) {
-      $element_info['provides']['entity_created']['bundle'] = $element->settings['param_' . $bundleKey];
+    // A division with two integers results in a decimal.
+    elseif (isset($element->settings['op']) && $element->settings['op'] == '/') {
+      $element_info['provides']['result']['type'] = 'decimal';
     }
-  }
-}
-
-/**
- * Action: Save entities.
- */
-function rules_action_entity_save($wrapper, $immediate = FALSE, $settings, $state, $element) {
-  $state->saveChanges($settings['data:select'], $wrapper, $immediate);
-}
-
-/**
- * Action: Delete entities.
- */
-function rules_action_entity_delete($wrapper, $settings, $state, $element) {
-  try {
-    $wrapper->delete();
-  }
-  catch (EntityMetadataWrapperException $e) {
-    throw new RulesException($e->getMessage(), array(), $element);
   }
 }
 
 /**
  * Action: Add a list item.
  */
-function rules_action_data_list_add($list, $item, $pos = 'end', $settings) {
+function rules_action_data_list_add($list, $item, $unique = FALSE, $pos = 'end', $settings, $state) {
+  // Optionally, only add the list item if it is not yet contained.
+  if ($unique && rules_condition_data_list_contains($list, $item, $settings, $state)) {
+    return;
+  }
+
   switch ($pos) {
     case 'start':
       array_unshift($list, $item);
@@ -193,6 +116,21 @@ function rules_action_data_list_add($list, $item, $pos = 'end', $settings) {
       break;
   }
   return array('list' => $list);
+}
+
+/**
+ * Info alteration callback for the "Add and Remove a list item" actions.
+ */
+function rules_data_list_info_alter(&$element_info, RulesAbstractPlugin $element) {
+  // Update the required type for the list item if it is known.
+  $element->settings += array('list:select' => NULL);
+  if ($wrapper = $element->applyDataSelector($element->settings['list:select'])) {
+    if ($type = entity_property_list_extract_type($wrapper->type())) {
+      $info = $wrapper->info();
+      $element_info['parameter']['item']['type'] = $type;
+      $element_info['parameter']['item']['options list']  = !empty($info['options list']) ? 'rules_data_selector_options_list' : FALSE;
+    }
+  }
 }
 
 /**
@@ -220,8 +158,13 @@ function rules_action_variable_add_info_alter(&$element_info, RulesAbstractPlugi
     $cache = rules_get_cache();
     $type_info = $cache['data_info'][$type];
     $element_info['parameter']['value']['type'] = $type;
-    $element_info['parameter']['value']['label'] = $type_info['label'];
     $element_info['provides']['variable_added']['type'] = $type;
+
+    // For lists, we default to an empty list so subsequent actions can add
+    // items.
+    if (entity_property_list_extract_type($type)) {
+      $element_info['parameter']['value']['default value'] = array();
+    }
   }
 }
 
@@ -245,11 +188,11 @@ function rules_action_data_create($args, $element) {
       return array('data_created' => $data);
     }
     catch (EntityMetadataWrapperException $e) {
-      throw new RulesException('Unable to create @data": ' . $e->getMessage(), array('@data' => $type), $element);
+      throw new RulesEvaluationException('Unable to create @data": ' . $e->getMessage(), array('@data' => $type), $element);
     }
   }
   else {
-    throw new RulesException('Unable to create @data, no creation callback found.', array('@data' => $type), $element);
+    throw new RulesEvaluationException('Unable to create @data, no creation callback found.', array('@data' => $type), $element, RulesLog::ERROR);
   }
 }
 
@@ -290,7 +233,8 @@ function rules_condition_data_is($data, $op, $value) {
   switch ($op) {
     default:
     case '==':
-      return $data == $value || is_array($value) && in_array($data, $value);
+      // In case both values evaluate to FALSE, do a type-safe comparison.
+      return (!$data && !$value) ? $data === $value : $data == $value;
     case '<':
       return $data < $value;
     case '>':
@@ -309,9 +253,27 @@ function rules_condition_data_is($data, $op, $value) {
 function rules_condition_data_is_info_alter(&$element_info, RulesAbstractPlugin $element) {
   $element->settings += array('data:select' => NULL);
   if ($wrapper = $element->applyDataSelector($element->settings['data:select'])) {
+    $info = $wrapper->info();
     $element_info['parameter']['value']['type'] = $wrapper->type();
-    $element_info['parameter']['value']['options list']  = $wrapper->optionsList() ? 'rules_data_selector_options_list' : FALSE;
+    $element_info['parameter']['value']['options list']  = !empty($info['options list']) ? 'rules_data_selector_options_list' : FALSE;
   }
+}
+
+/**
+ * Condition: List contains.
+ */
+function rules_condition_data_list_contains($list, $item, $settings, $state) {
+  $wrapper = $state->currentArguments['item'];
+  if ($wrapper instanceof EntityStructureWrapper && $id = $wrapper->getIdentifier()) {
+    // Check for equal items using the identifier if there is one.
+    foreach ($state->currentArguments['list'] as $i) {
+      if ($i->getIdentifier() == $id) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+  return in_array($item, $list);
 }
 
 /**
@@ -322,22 +284,17 @@ function rules_condition_data_is_empty($data) {
 }
 
 /**
- * Condition: Entity is new.
+ * Condition: Textual comparison.
  */
-function rules_condition_entity_is_new($wrapper, $settings, $state, $element) {
-  return !$wrapper->getIdentifier() || !empty($entity->is_new);
-}
-
-/**
- * Condition: Entity has field.
- */
-function rules_condition_entity_has_field($wrapper, $field_name, $settings, $state) {
-  return isset($wrapper->$field_name) || isset($entity->$field_name);
-}
-
-/**
- * Condition: Entity is of type.
- */
-function rules_condition_entity_is_of_type($wrapper, $type) {
-  return $wrapper->type() == $type;
+function rules_data_text_comparison($text, $text2, $op = 'contains') {
+  switch ($op) {
+    case 'contains':
+      return strpos($text, $text2) !== FALSE;
+    case 'starts':
+      return strpos($text, $text2) === 0;
+    case 'ends':
+     return strrpos($text, $text2) === (strlen($text) - strlen($text2));
+    case 'regex':
+     return (bool) preg_match('/'. str_replace('/', '\\/', $text2) .'/', $text);
+  }
 }

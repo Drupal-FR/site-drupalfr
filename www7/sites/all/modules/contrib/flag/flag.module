@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.module,v 1.31 2011/01/11 13:44:47 mooffie Exp $
 
 /**
  * @file
@@ -22,7 +21,7 @@ function flag_menu() {
     'page callback' => 'flag_admin_page',
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
-    'description' => 'Configure flags for marking content with arbitary information (such as <em>offensive</em> or <em>bookmarked</em>).',
+    'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
@@ -179,9 +178,8 @@ function flag_help($path, $arg) {
 function flag_init() {
   $path = drupal_get_path('module', 'flag');
   include_once $path .'/includes/flag.token.inc';
-  if (module_exists('trigger')) {
-    include_once $path .'/includes/flag.actions.inc';
-  }
+  include_once $path .'/includes/flag.actions.inc';
+
   if (module_exists('session_api')) {
     // Set the anonymous user SID immediately, in case the user logs in.
     flag_set_sid();
@@ -222,34 +220,6 @@ function flag_permission() {
       'description' => t('Create and edit site-wide flags.'),
     ),
   );
-}
-
-/**
- * Access checking to check an account for flagging ability.
- *
- * See documentation for $flag->user_access().
- */
-function flag_access($flag, $account = NULL) {
-  return $flag->user_access('flag', $account);
-}
-
-/**
- * Content type checking to see if a flag applies to a certain type of data.
- *
- * @param $flag
- *   The flag object whose available types are being checked.
- * @param $content_type
- *   The type of content being checked, usually "node".
- * @param $content_subtype
- *   The subtype (node type) being checked.
- *
- * @return
- *   Boolean TRUE if the flag is enabled for this type and subtype.
- *   FALSE otherwise.
- */
-function flag_content_enabled($flag, $content_type, $content_subtype = NULL) {
-  $return = $flag->content_type == $content_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
-  return $return;
 }
 
 /**
@@ -327,10 +297,14 @@ function flag_flag_link_types() {
     'toggle' => array(
       'title' => t('JavaScript toggle'),
       'description' => t('An AJAX request will be made and degrades to type "Normal link" if JavaScript is not available.'),
+      'uses standard js' => TRUE,
+      'uses standard css' => TRUE,
     ),
     'normal' => array(
       'title' => t('Normal link'),
       'description' => t('A normal non-JavaScript request will be made and the current page will be reloaded.'),
+      'uses standard js' => FALSE,
+      'uses standard css' => FALSE,
     ),
     'confirm' => array(
       'title' => t('Confirmation form'),
@@ -339,6 +313,8 @@ function flag_flag_link_types() {
         'flag_confirmation' => '',
         'unflag_confirmation' => '',
       ),
+      'uses standard js' => FALSE,
+      'uses standard css' => FALSE,
     ),
   );
 }
@@ -348,24 +324,27 @@ function flag_flag_link_types() {
  */
 function flag_field_extra_fields() {
   $extra = array();
-  $flags = flag_get_flags('node');
 
-  // Filter out flags which need to be included on the node form.
-  foreach ($flags as $name => $flag) {
-    if (!$flag->show_on_form) {
-      unset($flags[$name]);
+  foreach (node_type_get_types() as $type) {
+    $flags = flag_get_flags('node', $type->type);
+
+    // Filter out flags which need to be included on the node form.
+    $flag_names = array();
+    foreach ($flags as $name => $flag) {
+      if ($flag->show_on_form) {
+        $flag_names[] = $flag->get_label('title');
+      }
     }
-  }
 
-  if (!empty($flags)) {
-    foreach (node_type_get_types() as $type) {
-      $extra['node'][$type->type]['flag'] = array(
+    if ($flag_names) {
+      $extra['node'][$type->type]['form']['flag'] = array(
         'label' => t('Flags'),
-        'description' => t('Flags fieldset.'),
-        'weight' => 0
+        'description' => t('Checkboxes for toggling flags (i.e. @flag_names)', array('@flag_names' => implode(', ', $flag_names))),
+        'weight' => 1
       );
     }
   }
+
   return $extra;
 }
 
@@ -450,7 +429,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
     }
     if ($flags_in_form) {
       $form['flag'] += array(
-        '#weight' => module_exists('content') ? content_extra_field_weight($form['#node']->type, 'flags') : 1,
+        '#weight' => 1,
         '#tree' => TRUE,
       );
     }
@@ -608,6 +587,20 @@ function flag_user_login(&$edit, &$account) {
  * Implements hook_user_cancel().
  */
 function flag_user_cancel($edit, $account, $method) {
+  flag_user_account_removal($account);
+}
+
+/**
+ * Implements hook_user_delete().
+ */
+function flag_user_delete($account) {
+  flag_user_account_removal($account);
+}
+
+/**
+ * Callback function for user account cancellation or deletion.
+ */
+function flag_user_account_removal($account) {
   // Remove flags by this user.
   $query = db_select('flag_content', 'fc');
   $query->leftJoin('flag_counts', 'c', 'fc.content_id = c.content_id AND fc.content_type = c.content_type');
@@ -698,32 +691,6 @@ function flag_session_api_cleanup($arg = 'run') {
 function flag_node_type_delete($info) {
   // Remove entry from flaggable content types.
   db_delete('flag_types')->condition('type', $info->type)->execute();
-}
-
-/**
- * Implements hook_activity_info().
- */
-function flag_activity_info() {
-  $info = new stdClass();
-  $info->api = 2;
-  $info->name = 'flag';
-  // The order of objects here matters. If a user is both the author and the
-  // flagging user, the flagging user message takes precedence.
-  $info->objects = array('node author' => 'node', 'flagging user' => 'account', 'comment author' => 'comment');
-  $info->hooks = array('flag' => array('flag', 'unflag'));
-
-  // Figure out the activity access control realms and the types.
-  $flags = flag_get_flags();
-  foreach ($flags as $fid => $flag) {
-    $info->realms["flag_" . $flag->fid] = $flag->title;
-    // Currently, flagging a user cannot be recorded.
-    if ($flag->content_type != 'user') {
-      $info->type_options[$flag->fid] = $flag->title;
-    }
-  }
-  $info->object_type = 'flag';
-  $info->path = drupal_get_path('module', 'flag') . '/includes';
-  return $info;
 }
 
 /**
@@ -886,8 +853,11 @@ function flag_flag($action, $flag, $content_id, $account) {
 
   if (module_exists('rules')) {
     $event_name = ($action == 'flag' ? 'flag_flagged_' : 'flag_unflagged_') . $flag->name;
-    $arguments = array('flag' => $flag, 'flag_content_id' => $content_id, 'flagging_user' => $account);
-    rules_invoke_event($event_name, $arguments);
+    // We only support flags on entities.
+    if (entity_get_info($flag->content_type)) {
+      $variables = array('flag' => $flag, 'flagged_' . $flag->content_type => $content_id, 'flagging_user' => $account);
+      rules_invoke_event_by_args($event_name, $variables);
+    }
   }
 }
 
@@ -949,7 +919,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     // want to deny access, or use the current access value provided by Flag.
     $result = db_select('node', 'n')
       ->fields('n', array('nid', 'uid'))
-      ->condition('nid', $content_ids, 'IN')
+      ->condition('nid', array_keys($content_ids), 'IN')
       ->condition('type', $flag->types, 'IN')
       ->execute();
     foreach ($result as $row) {
@@ -1242,10 +1212,6 @@ function flag_theme() {
       'render element' => 'element',
       'file' => 'includes/flag.admin.inc',
     ),
-    'flag_rules_radios' => array(
-      'render element' => 'element',
-      'file' => 'includes/flag.rules_forms.inc',
-    ),
   );
 }
 
@@ -1263,7 +1229,7 @@ function flag_theme() {
  */
 function template_preprocess_flag(&$variables) {
   global $user;
-  static $first_time = TRUE;
+  static $initialized = array();
 
   // Some typing shotcuts:
   $flag =& $variables['flag'];
@@ -1284,20 +1250,26 @@ function template_preprocess_flag(&$variables) {
     unset($link['href']);
   }
 
-  // Tell the template file to add JavaScript/CSS if using the toggle link type.
   // Anonymous users always need the JavaScript to maintain their flag state.
-  if (($flag->link_type == 'toggle' || $user->uid == 0) && $first_time) {
-    $variables['setup'] = $first_time;
-    $first_time = FALSE;
+  if ($user->uid == 0) {
+    $link_type['uses standard js'] = TRUE;
   }
-  else {
-    $variables['setup'] = FALSE;
+
+  // Load the JavaScript/CSS, if the link type requires it.
+  if (!isset($initialized[$link_type['name']])) {
+    if ($link_type['uses standard css']) {
+      drupal_add_css(drupal_get_path('module', 'flag') . '/theme/flag.css');
+    }
+    if ($link_type['uses standard js']) {
+      drupal_add_js(drupal_get_path('module', 'flag') . '/theme/flag.js');
+    }
+    $initialized[$link_type['name']] = TRUE;
   }
 
   $variables['link_href'] = isset($link['href']) ? check_url(url($link['href'], $link)) : FALSE;
   $variables['link_text'] = isset($link['title']) ? $link['title'] : $flag->get_label($action . '_short', $content_id);
   $variables['link_title'] = isset($link['attributes']['title']) ? check_plain($link['attributes']['title']) : check_plain(strip_tags($flag->get_label($action . '_long', $content_id)));
-  $variables['last_action'] = ($action == 'flag' ? 'unflagged' : 'flagged');
+  $variables['status'] = ($action == 'flag' ? 'unflagged' : 'flagged');
 
   $variables['flag_wrapper_classes_array'] = array();
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
@@ -1315,64 +1287,15 @@ function template_preprocess_flag(&$variables) {
   if ($variables['after_flagging']) {
     $inverse_action = ($action == 'flag' ? 'unflag' : 'flag');
     $variables['message_text'] = $flag->get_label($inverse_action . '_message', $content_id);
-    $variables['flag_classes_array'][] = $variables['last_action'];
+    $variables['flag_classes_array'][] = $variables['status'];
   }
   $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
-}
 
-/**
- * Format a string containing a count of items.
- *
- * _flag_format_plural() is a version of format_plural() which
- * accepts the format string as a single argument, where the singular and
- * plural forms are separated by pipe. A 'zero' form is allowed as well.
- *
- * _flag_format_plural() is used where we want the admin, not the
- * programmer, to be able to nicely and easily format a number.
- *
- * If three forms are provided, separated by pipes, then the first is
- * considered the zero form and is used if $count is 0. The zero form may
- * well be an empty string.
- *
- * @param $count
- *   The item count to display.
- * @param $format
- *   The singular, plural, and optionally the zero, forms separated
- *   by pipe characters.
- * @return
- *   A formatted, translated string.
- *
- * Examples for $format:
- *
- * @code
- *   "@count"
- *   "1 vote|@count votes"
- *   "needs voting|1 vote|@count votes"
- *   "|1 vote|@count votes"
- *   "|@count|@count"
- * @endcode
- */
-function _flag_format_plural($count, $format) {
-  $elements = explode('|', $format ? $format : '@count', 3);
-
-  if (count($elements) == 3) {
-    list($zero, $singular, $plural) = $elements;
-  }
-  elseif (count($elements) == 2) {
-    list($singular, $plural) = $elements;
-    $zero = NULL;
-  }
-  else { // count($elements) == 1
-    $singular = $plural = $elements[0];
-    $zero = NULL;
-  }
-
-  if (isset($zero) && intval($count) == 0) {
-    return $zero;
-  }
-  else {
-    return format_plural(intval($count), $singular, $plural);
-  }
+  // Backward compatibility: The following section preserves some deprecated
+  // variables either to make old flag.tpl.php files continue to work, or to
+  // prevent PHP from generating E_NOTICEs there. @todo: Remove these sometime.
+  $variables['setup'] = FALSE;
+  $variables['last_action'] = $variables['status'];
 }
 
 /**
@@ -1592,7 +1515,7 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   // Filter out flags based on type and subtype.
   if (isset($content_type) || isset($content_subtype)) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!flag_content_enabled($flag, $content_type, $content_subtype)) {
+      if (!_flag_content_enabled($flag, $content_type, $content_subtype)) {
         unset($filtered_flags[$name]);
       }
     }
@@ -1601,13 +1524,32 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   // Filter out flags based on account permissions.
   if (isset($account) && $account->uid != 1) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!flag_access($flag, $account)) {
+      // We test against the 'flag' action, which is the minimum permission to
+      // use a flag.
+      if (!$flag->user_access('flag', $account)) {
         unset($filtered_flags[$name]);
       }
     }
   }
 
   return $filtered_flags;
+}
+
+/**
+ * Utility function: Checks whether a flag applies to a certain type, and
+ * possibly subtype, of content.
+ *
+ * @param $content_type
+ *   The type of content being checked, usually "node".
+ * @param $content_subtype
+ *   The subtype (node type) being checked.
+ *
+ * @return
+ *   TRUE if the flag is enabled for this type and subtype.
+ */
+function _flag_content_enabled($flag, $content_type, $content_subtype = NULL) {
+  $return = $flag->content_type == $content_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
+  return $return;
 }
 
 /**
@@ -1849,12 +1791,14 @@ function flag_get_link_types($reset = FALSE) {
     foreach (module_implements('flag_link_types') as $module) {
       $module_types = module_invoke($module, 'flag_link_types');
       foreach ($module_types as $type_name => $info) {
-        $link_types[$type_name] = $info;
-        $link_types[$type_name]['module'] = $module;
-        $link_types[$type_name] += array(
+        $link_types[$type_name] = $info + array(
+          'module' => $module,
+          'name' => $type_name,
           'title' => '',
           'description' => '',
           'options' => array(),
+          'uses standard js' => TRUE,
+          'uses standard css' => TRUE,
         );
       }
     }

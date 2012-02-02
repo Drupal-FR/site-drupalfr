@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.actions.inc,v 1.4 2010/11/24 04:31:55 mooffie Exp $
 
 /**
  * @file

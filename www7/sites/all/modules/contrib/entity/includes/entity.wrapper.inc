@@ -67,6 +67,16 @@ abstract class EntityMetadataWrapper {
    *     sanitized for display to a web browser. Defaults to FALSE.
    *   - decode: If set to TRUE and some textual data is already sanitized, it
    *     strips HTML tags and decodes HTML entities. Defaults to FALSE.
+   *
+   *  @return
+   *    The value of the wrapped data. If the data property is not set, NULL
+   *    is returned.
+   *
+   *  @throws EntityMetadataWrapperException
+   *    In case there are no data values available to the wrapper, an exception
+   *    is thrown. E.g. if the value for an entity property is to be retrieved
+   *    and there is no entity available, the exception is thrown. However, if
+   *    an entity is available but the property is not set, NULL is returned.
    */
   public function value(array $options = array()) {
     if (!$this->dataAvailable() && isset($this->info['parent'])) {
@@ -177,8 +187,9 @@ abstract class EntityMetadataWrapper {
    *   An array as used by hook_options_list() or FALSE.
    */
   public function optionsList($op = 'edit') {
-    if (isset($this->info['options list']) && is_callable($this->info['options list']) && isset($this->info['name'])) {
-      return call_user_func($this->info['options list'], $this->info['name'], $this->info, $op);
+    if (isset($this->info['options list']) && is_callable($this->info['options list'])) {
+      $name = isset($this->info['name']) ? $this->info['name'] : NULL;
+      return call_user_func($this->info['options list'], $name, $this->info, $op);
     }
     return FALSE;
   }
@@ -245,7 +256,7 @@ class EntityValueWrapper extends EntityMetadataWrapper {
    */
   public function value(array $options = array()) {
     $data = parent::value();
-    if ($this->type == 'text') {
+    if ($this->type == 'text' && isset($data)) {
       $info = $this->info + array('sanitized' => FALSE, 'sanitize' => 'check_plain');
       $options += array('sanitize' => FALSE, 'decode' => FALSE);
       if ($options['sanitize'] && !$info['sanitized']) {
@@ -383,7 +394,8 @@ class EntityStructureWrapper extends EntityMetadataWrapper implements IteratorAg
     // Look it up in the cache if possible.
     if (!array_key_exists($name, $this->cache)) {
       if ($info = $this->getPropertyInfo($name)) {
-        $info += array('parent' => $this, 'name' => $name, 'langcode' => $this->langcode);
+        $info += array('parent' => $this, 'name' => $name, 'langcode' => $this->langcode, 'property defaults' => array());
+        $info['property defaults'] += $this->info['property defaults'];
         $this->cache[$name] = entity_metadata_wrapper($info['type'], NULL, $info);
       }
       else {
@@ -594,6 +606,8 @@ class EntityDrupalWrapper extends EntityStructureWrapper {
    * Sets the entity internally accepting both the entity id and object.
    */
   protected function setEntity($data) {
+    // For entities we allow getter callbacks to return FALSE, which we
+    // interpret like NULL values as unset properties.
     if (isset($data) && $data !== FALSE && !is_object($data)) {
       $this->id = $data;
       $this->data = FALSE;
@@ -613,7 +627,7 @@ class EntityDrupalWrapper extends EntityStructureWrapper {
       $id = entity_id($this->type, $data);
       $this->id = isset($id) ? $id : FALSE;
     }
-    elseif (!isset($data)){
+    else {
       $this->id = FALSE;
       $this->data = NULL;
     }
@@ -642,15 +656,23 @@ class EntityDrupalWrapper extends EntityStructureWrapper {
    *   Whether the entity should be loaded to spot the info if necessary.
    */
   protected function spotBundleInfo($load = TRUE) {
-    // Detect the bundle if not set yet and add in properties from the bundle.
-    if (!$this->bundle && !empty($this->entityInfo['fieldable']) && $load && $this->dataAvailable() && $entity = $this->value()) {
-      list($id, $vid, $bundle) = entity_extract_ids($this->type, $entity);
-      $this->bundle = $bundle;
-    }
     // Like entity_extract_ids() assume the entity type if no key is given.
-    elseif (empty($this->entityInfo['entity keys']['bundle']) && $this->type != 'entity') {
+    if (empty($this->entityInfo['entity keys']['bundle']) && $this->type != 'entity') {
       $this->bundle = $this->type;
     }
+    // Detect the bundle if not set yet and add in properties from the bundle.
+    elseif (!$this->bundle && !empty($this->entityInfo['fieldable']) && $load && $this->dataAvailable()) {
+      try {
+        if ($entity = $this->value()) {
+          list($id, $vid, $bundle) = entity_extract_ids($this->type, $entity);
+          $this->bundle = $bundle;
+        }
+      }
+      catch (EntityMetadataWrapperException $e) {
+        // Loading data failed, so we cannot derive the used bundle.
+      }
+    }
+
     if ($this->bundle && isset($this->propertyInfo['bundles'][$this->bundle])) {
       $bundle_info = (array) $this->propertyInfo['bundles'][$this->bundle] + array('properties' => array());
       $this->propertyInfo['properties'] += $bundle_info['properties'];
@@ -684,17 +706,19 @@ class EntityDrupalWrapper extends EntityStructureWrapper {
    *   - identifier: If set to TRUE, the entity identifier is returned.
    */
   public function value(array $options = array()) {
-    $this->setEntity(parent::value());
+    // Try loading the data via the getter callback if there is none yet.
+    if (!isset($this->data)) {
+      $this->setEntity(parent::value());
+    }
     if (!empty($options['identifier'])) {
       return $this->id;
     }
     elseif (!$this->data && !empty($this->id)) {
       // Lazy load the entity if necessary.
       $return = entity_load($this->type, array($this->id));
-      $this->data = reset($return);
-      if (!$this->data) {
-        throw new EntityMetadataWrapperException('Unable to load the ' . check_plain($this->type) . ' with the id ' . check_plain($this->id) . '.');
-      }
+      // In case the entity cannot be loaded, we return NULL just as for empty
+      // properties.
+      $this->data = $return ? reset($return) : NULL;
     }
     return $this->data;
   }
@@ -722,7 +746,7 @@ class EntityDrupalWrapper extends EntityStructureWrapper {
     // In case the entity has been unset, we cannot properly detect changes as
     // the previous id defaults to FALSE for unloaded entities too. So in that
     // case we just always update the parent.
-    elseif ($this->id === FALSE) {
+    elseif ($this->id === FALSE && !$this->data) {
       $this->updateParent(NULL);
     }
     elseif ($previous_id != $this->id) {
@@ -749,8 +773,13 @@ class EntityDrupalWrapper extends EntityStructureWrapper {
   public function type() {
     // In case of a generic entity wrapper, load the data first to determine
     // the type of the concrete entity.
-    if ($this->info['type'] == 'entity') {
-      $this->value(array('identifier' => TRUE));
+    if ($this->dataAvailable() && $this->info['type'] == 'entity') {
+      try {
+        $this->value(array('identifier' => TRUE));
+      }
+      catch (EntityMetadataWrapper $e) {
+        // If loading data fails, we cannot determine the concrete entity type.
+      }
     }
     return $this->type;
   }
@@ -917,10 +946,19 @@ class EntityListWrapper extends EntityMetadataWrapper implements IteratorAggrega
   }
 
   /**
+   * Returns the list as numerically indexed array.
+   *
+   * Note that a list of entities might contain stale entity references. In
+   * that case the wrapper and the identifier of a stale reference would be
+   * still accessible, however the entity object value would be NULL. That way,
+   * there may be NULL values in lists of entity objects due to stale entity
+   * references.
+   *
    * @param $options
    *   An array of options. Known keys:
    *   - identifier: If set to TRUE for a list of entities, it won't be returned
    *     as list of fully loaded entity objects, but as a list of entity ids.
+   *     Note that this list may contain ids of stale entity references.
    */
   public function value(array $options = array()) {
     // For lists of entities fetch full entity objects before returning.
@@ -930,10 +968,9 @@ class EntityListWrapper extends EntityMetadataWrapper implements IteratorAggrega
       $entities = $list ? entity_load($this->get(0)->type, $list) : array();
       // Make sure to keep the array keys as present in the list.
       foreach ($list as $key => $id) {
-        if (!isset($entities[$id])) {
-          throw new EntityMetadataWrapperException('Unable to load the ' . check_plain($this->itemType()) . ' with the id ' . check_plain($id) . '.');
-        }
-        $list[$key] = $entities[$id];
+        // In case the entity cannot be loaded, we return NULL just as for empty
+        // properties.
+        $list[$key] = isset($entities[$id]) ? $entities[$id] : NULL;
       }
       return $list;
     }

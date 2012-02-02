@@ -28,6 +28,7 @@ class views_plugin_display_page extends views_plugin_display {
         'description' => array('default' => '', 'translatable' => FALSE),
         'weight' => array('default' => 0),
         'name' => array('default' => variable_get('menu_default_node_menu', 'navigation')),
+        'context' => array('default' => ''),
        ),
     );
     $options['tab_options'] = array(
@@ -54,14 +55,15 @@ class views_plugin_display_page extends views_plugin_display {
 
     $bits = explode('/', $this->get_option('path'));
     $page_arguments = array($this->view->name, $this->display->id);
-    $view_arguments = $this->get_option('arguments');
+    $this->view->init_handlers();
+    $view_arguments = $this->view->argument;
 
     // Replace % with %views_arg for menu autoloading and add to the
     // page arguments so the argument actually comes through.
-    foreach($bits as $pos => $bit) {
+    foreach ($bits as $pos => $bit) {
       if ($bit == '%') {
         $argument = array_shift($view_arguments);
-        if (isset($argument['validate_type']) && $argument['validate_type'] != 'none') {
+        if (!empty($argument->options['specify_validation']) && $argument->options['validate']['type'] != 'none') {
           $bits[$pos] = '%views_arg';
         }
         $page_arguments[] = $pos;
@@ -147,6 +149,12 @@ class views_plugin_display_page extends views_plugin_display {
           break;
       }
 
+      // Add context for contextual links.
+      // @see menu_contextual_links()
+      if (!empty($menu['context'])) {
+        $items[$path]['context'] = MENU_CONTEXT_INLINE;
+      }
+
       // If this is a 'default' tab, check to see if we have to create teh
       // parent menu item.
       if ($menu['type'] == 'default tab') {
@@ -166,7 +174,7 @@ class views_plugin_display_page extends views_plugin_display {
               'page arguments' => $page_arguments,
               // Default access check (per display)
               'access callback' => 'views_access',
-              'access arguments' => array($access_plugin->get_access_callback()),
+              'access arguments' => $access_arguments,
               // Identify URL embedded arguments and correlate them to a handler
               'load arguments'  => array($this->view->name, $this->display->id, '%index'),
               'title' => $tab_options['title'],
@@ -211,11 +219,14 @@ class views_plugin_display_page extends views_plugin_display {
 
     $this->view->get_breadcrumb(TRUE);
 
-    // And the title, which is much easier.
-    drupal_set_title(filter_xss_admin($this->view->get_title()), PASS_THROUGH);
 
     // And now render the view.
-    return $this->view->render();
+    $render = $this->view->render();
+
+    // First execute the view so it's possible to get tokens for the title.
+    // And the title, which is much easier.
+    drupal_set_title(filter_xss_admin($this->view->get_title()), PASS_THROUGH);
+    return $render;
   }
 
   /**
@@ -235,19 +246,15 @@ class views_plugin_display_page extends views_plugin_display {
       ),
     );
 
-    $path = strip_tags($this->get_option('path'));
+    $path = strip_tags('/' . $this->get_option('path'));
     if (empty($path)) {
       $path = t('None');
-    }
-
-    if (strlen($path) > 16) {
-      $path = substr($path, 0, 16) . '...';
     }
 
     $options['path'] = array(
       'category' => 'page',
       'title' => t('Path'),
-      'value' => $path,
+      'value' => views_ui_truncate($path, 24),
     );
 
     $menu = $this->get_option('menu');
@@ -268,14 +275,10 @@ class views_plugin_display_page extends views_plugin_display {
         break;
     }
 
-    if (strlen($menu_str) > 16) {
-      $menu_str = substr($menu_str, 0, 16) . '...';
-    }
-
     $options['menu'] = array(
       'category' => 'page',
       'title' => t('Menu'),
-      'value' => $menu_str,
+      'value' => views_ui_truncate($menu_str, 24),
     );
 
     // This adds a 'Settings' link to the style_options setting if the style has options.
@@ -289,6 +292,7 @@ class views_plugin_display_page extends views_plugin_display {
    * Provide the default form for setting options.
    */
   function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
     // It is very important to call the parent function here:
     parent::options_form($form, $form_state);
 
@@ -353,8 +357,8 @@ class views_plugin_display_page extends views_plugin_display {
             '#type' => 'select',
             '#options' => menu_get_menus(),
             '#default_value' => $menu['name'],
-            '#description' => t('Insert item into an available menu.'), //
-            '#dependency' => array('radio:menu[type]' => array('normal')),
+            '#description' => t('Insert item into an available menu.'),
+            '#dependency' => array('radio:menu[type]' => array('normal', 'tab')),
           );
         }
         else {
@@ -373,6 +377,13 @@ class views_plugin_display_page extends views_plugin_display {
           '#default_value' => isset($menu['weight']) ? $menu['weight'] : 0,
           '#description' => t('The lower the weight the higher/further left it will appear.'),
           '#dependency' => array('radio:menu[type]' => array('normal', 'tab', 'default tab')),
+        );
+        $form['menu']['context'] = array(
+          '#title' => t('Context'),
+          '#type' => 'checkbox',
+          '#default_value' => !empty($menu['context']),
+          '#description' => t('Displays the link in contextual links'),
+          '#dependency' => array('radio:menu[type]' => array('tab')),
         );
         break;
       case 'tab_options':
@@ -521,5 +532,20 @@ class views_plugin_display_page extends views_plugin_display {
     }
 
     return $errors;
+  }
+
+  function get_argument_text() {
+    return array(
+      'filter value not present' => t('When the filter value is <em>NOT</em> in the URL'),
+      'filter value present' => t('When the filter value <em>IS</em> in the URL or a default is provided'),
+      'description' => t('The contextual filter values is provided by the URL.'),
+    );
+  }
+
+  function get_pager_text() {
+    return array(
+      'items per page title' => t('Items per page'),
+      'items per page description' => t('The number of items to display per page. Enter 0 for no limit.')
+    );
   }
 }

@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.tpl.php,v 1.2 2010/05/09 00:07:47 quicksketch Exp $
 
 /**
  * @file
@@ -15,8 +14,7 @@
  * - $flag_classes: A space-separated list of CSS classes that should be applied to the link.
  *
  * - $action: The action the link is about to carry out, either "flag" or "unflag".
- * - $last_action: The action, as a passive English verb, either "flagged" or
- *   "unflagged", that led to the current status of the flag.
+ * - $status: The status of the item; either "flagged" or "unflagged".
  *
  * - $link_href: The URL for the flag link.
  * - $link_text: The text to show for the link.
@@ -27,18 +25,10 @@
  *   flagged. If displaying to the user immediately after flagging, this value
  *   will be boolean TRUE. This is usually used in conjunction with immedate
  *   JavaScript-based toggling of flags.
- * - $setup: TRUE when this template is parsed for the first time; Use this
- *   flag to carry out procedures that are needed only once; e.g., linking to CSS
- *   and JS files.
  *
  * NOTE: This template spaces out the <span> tags for clarity only. When doing some
  * advanced theming you may have to remove all the whitespace.
  */
-
-  if ($setup) {
-    drupal_add_css(drupal_get_path('module', 'flag') .'/theme/flag.css');
-    drupal_add_js(drupal_get_path('module', 'flag') .'/theme/flag.js');
-  }
 ?>
 <span class="<?php print $flag_wrapper_classes; ?>">
   <?php if ($link_href): ?>
@@ -47,7 +37,7 @@
     <span class="<?php print $flag_classes ?>"><?php print $link_text; ?></span>
   <?php endif; ?>
   <?php if ($after_flagging): ?>
-    <span class="flag-message flag-<?php print $last_action; ?>-message">
+    <span class="flag-message flag-<?php print $status; ?>-message">
       <?php print $message_text; ?>
     </span>
   <?php endif; ?>

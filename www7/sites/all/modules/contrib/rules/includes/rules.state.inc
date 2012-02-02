@@ -133,11 +133,13 @@ class RulesState {
    *
    * @param $name
    *   The name of the variable to return.
-   * @throws RulesException
-   *   Throws a RulesException in case we have info about the requested
-   *   variable, but it is not defined.
+   *
    * @return
    *   The variable or a EntityMetadataWrapper containing the variable.
+   *
+   * @throws RulesEvaluationException
+   *   Throws a RulesEvaluationException in case we have info about the
+   *   requested variable, but it is not defined.
    */
   public function &get($name) {
     if (!array_key_exists($name, $this->variables)) {
@@ -147,11 +149,11 @@ class RulesState {
         $this->variables[$name] = rules_wrap_data($data, $this->info[$name]);
         $this->info[$name]['handler'] = FALSE;
         if (!isset($data)) {
-          throw new RulesException('Unable to load variable %name, aborting.', array('%name' => $name), NULL, RulesLog::INFO);
+          throw new RulesEvaluationException('Unable to load variable %name, aborting.', array('%name' => $name), NULL, RulesLog::INFO);
         }
       }
       else {
-        throw new RulesException('Unable to get variable %name, it is not defined.', array('%name' => $name));
+        throw new RulesEvaluationException('Unable to get variable %name, it is not defined.', array('%name' => $name), NULL, RulesLog::ERROR);
       }
     }
     return $this->variables[$name];
@@ -216,6 +218,13 @@ class RulesState {
 
     // Actually save!
     $wrapper = $this->save[$selector][0];
+    $entity = $wrapper->value();
+    // When operating in hook_entity_insert() $entity->is_new might be still
+    // set. In that case remove the flag to avoid causing another insert instead
+    // of an update.
+    if (!empty($entity->is_new) && $wrapper->getIdentifier()) {
+      $entity->is_new = FALSE;
+    }
     rules_log('Saved %selector of type %type.', array('%selector' => $selector, '%type' => $wrapper->type()));
     $wrapper->save();
 
@@ -260,10 +269,12 @@ class RulesState {
    *
    * @param $selector
    *   The selector string, e.g. "node:author:mail".
-   * @throws RulesException
-   *   Throws a RulesException in case the selector cannot be applied.
+   *
    * @return EntityMetadataWrapper
    *   The wrapper for the given selector.
+   *
+   * @throws RulesEvaluationException
+   *   Throws a RulesEvaluationException in case the selector cannot be applied.
    */
   public function applyDataSelector($selector) {
     $parts = explode(':', str_replace('-', '_', $selector), 2);
@@ -272,7 +283,7 @@ class RulesState {
       return $wrapper;
     }
     elseif (!$wrapper instanceof EntityMetadataWrapper) {
-      throw new RulesException('Unable to apply data selector %selector. The specified variable is not wrapped correctly.', array('%selector' => $selector));
+      throw new RulesEvaluationException('Unable to apply data selector %selector. The specified variable is not wrapped correctly.', array('%selector' => $selector));
     }
     try {
       foreach (explode(':', $parts[1]) as $name) {
@@ -280,13 +291,13 @@ class RulesState {
           $wrapper = $wrapper->get($name);
         }
         else {
-          throw new RulesException('Unable to apply data selector %selector. The specified variable is not a list or a structure: %wrapper.', array('%selector' => $selector, '%wrapper' => $wrapper));
+          throw new RulesEvaluationException('Unable to apply data selector %selector. The specified variable is not a list or a structure: %wrapper.', array('%selector' => $selector, '%wrapper' => $wrapper));
         }
       }
     }
     catch (EntityMetadataWrapperException $e) {
       // In case of an exception, re-throw it.
-      throw new RulesException('Unable to apply data selector %selector: %error', array('%selector' => $selector, '%error' => $e->getMessage()));
+      throw new RulesEvaluationException('Unable to apply data selector %selector: %error', array('%selector' => $selector, '%error' => $e->getMessage()));
     }
     return $wrapper;
   }
@@ -469,40 +480,57 @@ class RulesData  {
    * @see RulesData::applyMetadataAssertions()
    */
   public static function addMetadataAssertions($var_info, $assertions) {
-    foreach ($assertions as $selector => $data) {
-      // Convert the selector back to underscores, such it maches the varname.
+    foreach ($assertions as $selector => $assertion) {
+      // Convert the selector back to underscores, such it matches the varname.
       $selector = str_replace('-', '_', $selector);
-      // For now only support assertions for variables
-      if (strpos($selector, ':') === FALSE && isset($var_info[$selector])) {
-        // Allow conditions to specialize data types via assertions.
-        if (isset($data['type'])) {
-          // Make sure the data type is more special than the current one.
-          if (RulesData::typesMatch($data, $var_info[$selector])) {
-            $var_info[$selector]['type'] = $data['type'];
-          }
-          unset($data['type']);
+
+      $parts = explode(':', $selector);
+      if (isset($var_info[$parts[0]])) {
+        // Apply the selector to determine the right target array. We build an
+        // array like
+        // $var_info['rules assertion']['property1']['property2']['#info'] = ..
+        $target = &$var_info[$parts[0]]['rules assertion'];
+        foreach (array_slice($parts, 1) as $part) {
+          $target = &$target[$part];
         }
 
-        $var_info[$selector]['rules assertion']['#info'] = isset($var_info[$selector]['rules assertion']['#info']) ? rules_update_array($var_info[$selector]['rules assertion']['#info'], $data) : $data;
+        // In case the assertion is directly for a variable, we have to modify
+        // the variable info directly. In case the asserted property is nested
+        // the info-has to be altered by RulesData::applyMetadataAssertions()
+        // before the child-wrapper is created.
+        if (count($parts) == 1) {
+          // Support asserting a type in case of generic entity references only.
+          if (isset($assertion['type']) && $var_info[$parts[0]]['type'] == 'entity') {
+            if (entity_get_info($assertion['type'])) {
+              $var_info[$parts[0]]['type'] = $assertion['type'];
+            }
+            unset($assertion['type']);
+          }
+          // Add any single bundle directly to the variable info, so the
+          // variable fits as argument for parameters requiring the bundle.
+          if (isset($assertion['bundle']) && count($bundles = (array) $assertion['bundle']) == 1) {
+            $var_info[$parts[0]]['bundle'] = reset($bundles);
+          }
+        }
+
+        // Add the assertions, but merge them with any previously added
+        // assertions if necessary.
+        $target['#info'] = isset($target['#info']) ? rules_update_array($target['#info'], $assertion) : $assertion;
+
         // Add in a callback that the entity metadata wrapper pick up for
         // altering the property info, such that we can add in the assertions.
-        $var_info[$selector] += array('property info alter' => array('RulesData', 'applyMetadataAssertions'));
-
-        // Add any single bundle directly to the variable info, so it can be
-        // used for type checking.
-        if (isset($data['bundle']) && count($bundles = (array) $data['bundle']) == 1) {
-          $var_info[$selector]['bundle'] = reset($bundles);
-        }
+        $var_info[$parts[0]] += array('property info alter' => array('RulesData', 'applyMetadataAssertions'));
 
         // In case there is a VARNAME_unchanged variable as it is used in update
         // hooks, assume the assertions are valid for the unchanged variable
         // too.
-        if (isset($var_info[$selector . '_unchanged'])) {
-          $var_info[$selector . '_unchanged']['rules assertion'] = $var_info[$selector]['rules assertion'];
-          $var_info[$selector . '_unchanged']['property info alter'] = array('RulesData', 'applyMetadataAssertions');
+        if (isset($var_info[$parts[0] . '_unchanged'])) {
+          $name = $parts[0] . '_unchanged';
+          $var_info[$name]['rules assertion'] = $var_info[$parts[0]]['rules assertion'];
+          $var_info[$name]['property info alter'] = array('RulesData', 'applyMetadataAssertions');
 
-          if (isset($var_info[$selector]['bundle']) && !isset($var_info[$selector . '_unchanged']['bundle'])) {
-            $var_info[$selector . '_unchanged']['bundle'] = $var_info[$selector]['bundle'];
+          if (isset($var_info[$parts[0]]['bundle']) && !isset($var_info[$name]['bundle'])) {
+            $var_info[$name]['bundle'] = $var_info[$parts[0]]['bundle'];
           }
         }
       }
@@ -520,10 +548,19 @@ class RulesData  {
     $info = $wrapper->info();
 
     if (!empty($info['rules assertion'])) {
+      $assertion = $info['rules assertion'];
+
+      // In case there are list-wrappers pass through the assertions of the item
+      // but make sure we only apply the assertions for the list items for
+      // which the conditions are executed.
+      if (isset($info['parent']) && $info['parent'] instanceof EntityListWrapper) {
+        $assertion = isset($assertion[$info['name']]) ? $assertion[$info['name']] : array();
+      }
+
       // Support specifying multiple bundles, whereas the added properties are
       // the intersection of the bundle properties.
-      if (isset($info['rules assertion']['#info']['bundle'])) {
-        $bundles = (array) $info['rules assertion']['#info']['bundle'];
+      if (isset($assertion['#info']['bundle'])) {
+        $bundles = (array) $assertion['#info']['bundle'];
         foreach ($bundles as $bundle) {
           $properties[] = isset($property_info['bundles'][$bundle]['properties']) ? $property_info['bundles'][$bundle]['properties'] : array();
         }
@@ -531,12 +568,32 @@ class RulesData  {
         $property_info['properties'] += count($properties) > 1 ? call_user_func_array('array_intersect_key', $properties) : reset($properties);
       }
       // Support adding directly asserted property info.
-      if (isset($info['rules assertion']['#info']['property info'])) {
-        $property_info['properties'] += $info['rules assertion']['#info']['property info'];
+      if (isset($assertion['#info']['property info'])) {
+        $property_info['properties'] += $assertion['#info']['property info'];
       }
-      // Pass through any rules assertion of properties to their info.
-      foreach (element_children($info['rules assertion']) as $key) {
-        $property_info['properties'][$key]['rules assertion'] = $info['rules assertion'][$key];
+
+      // Pass through any rules assertion of properties to their info, so any
+      // derived wrappers apply it.
+      foreach (element_children($assertion) as $key) {
+        $property_info['properties'][$key]['rules assertion'] = $assertion[$key];
+        $property_info['properties'][$key]['property info alter'] = array('RulesData', 'applyMetadataAssertions');
+
+        // Apply any 'type' and 'bundle' assertion directly to the propertyinfo.
+        if (isset($assertion[$key]['#info']['type'])) {
+          $type = $assertion[$key]['#info']['type'];
+          // Support asserting a type in case of generic entity references only.
+          if ($property_info['properties'][$key]['type'] == 'entity' && entity_get_info($type)) {
+            $property_info['properties'][$key]['type'] = $type;
+          }
+        }
+        if (isset($assertion[$key]['#info']['bundle'])) {
+          $bundle = (array) $assertion[$key]['#info']['bundle'];
+          // Add any single bundle directly to the variable info, so the
+          // property fits as argument for parameters requiring the bundle.
+          if (count($bundle) == 1) {
+            $property_info['properties'][$key]['bundle'] = reset($bundle);
+          }
+        }
       }
     }
     return $property_info;

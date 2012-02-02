@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Tests views UI Wizard.
@@ -48,7 +49,7 @@ class ViewsUIWizardBasicTestCase extends ViewsUIWizardHelper {
 
     // This view should not have a block.
     $this->drupalGet('admin/structure/block');
-    $this->assertNoText($view1['name'] . ': Block');
+    $this->assertNoText('View: ' . $view1['human_name']);
 
     // Create two nodes.
     $node1 = $this->drupalCreateNode(array('type' => 'page'));
@@ -92,7 +93,7 @@ class ViewsUIWizardBasicTestCase extends ViewsUIWizardHelper {
 
     // This view should not have a block.
     $this->drupalGet('admin/structure/block');
-    $this->assertNoText($view2['name'] . ': Block');
+    $this->assertNoText('View: ' . $view2['human_name']);
 
     // Create a view with a page and a block, and filter the listing.
     $view3 = array();
@@ -122,7 +123,7 @@ class ViewsUIWizardBasicTestCase extends ViewsUIWizardHelper {
 
     // Put the block into the first sidebar region.
     $this->drupalGet('admin/structure/block');
-    $this->assertText($view3['name'] . ': Block');
+    $this->assertText('View: ' . $view3['human_name']);
     $edit = array();
     $edit["blocks[views_{$view3['name']}-block][region]"] = 'sidebar_first';
     $this->drupalPost('admin/structure/block', $edit, t('Save blocks'));
@@ -544,7 +545,7 @@ class ViewsUIWizardItemsPerPageTestCase extends ViewsUIWizardHelper {
     // the block, and check that the nodes we expect appear in the correct
     // order.
     $this->drupalGet('admin/structure/block');
-    $this->assertText($view['name'] . ': Block');
+    $this->assertText('View: ' . $view['human_name']);
     $edit = array();
     $edit["blocks[views_{$view['name']}-block][region]"] = 'sidebar_first';
     $this->drupalPost('admin/structure/block', $edit, t('Save blocks'));
@@ -903,5 +904,32 @@ class ViewsUIWizardOverrideDisplaysTestCase extends ViewsUIWizardHelper {
     $this->drupalGet('');
     $this->assertText($new_block_title);
     $this->assertNoText($view['block[title]']);
+  }
+
+  /**
+   * Tests that the revert to all displays select-option works as expected.
+   */
+  function testRevertAllDisplays() {
+    // Create a basic view with a page, block.
+    // Because there is both a title on page and block we expect the title on
+    // the block be overriden.
+    $view['human_name'] = $this->randomName(16);
+    $view['name'] = strtolower($this->randomName(16));
+    $view['page[create]'] = 1;
+    $view['page[title]'] = $this->randomName(16);
+    $view['page[path]'] = $this->randomName(16);
+    $view['block[create]'] = 1;
+    $view['block[title]'] = $this->randomName(16);
+    $this->drupalPost('admin/structure/views/add', $view, t('Continue & edit'));
+
+    // Revert the title of the block back to the default ones, but submit some
+    // new values to be sure that the new value is not stored.
+    $edit = array();
+    $edit['title'] = $new_block_title = $this->randomName();
+    $edit['override[dropdown]'] = 'default_revert';
+
+    $this->drupalPost("admin/structure/views/nojs/display/{$view['name']}/block/title", $edit, t('Apply'));
+    $this->drupalPost("admin/structure/views/view/{$view['name']}/edit/block", array(), t('Save'));
+    $this->assertText($view['page[title]']);
   }
 }

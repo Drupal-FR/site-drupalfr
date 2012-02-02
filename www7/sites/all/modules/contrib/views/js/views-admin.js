@@ -208,7 +208,8 @@ Drupal.behaviors.viewsUiRenderAddViewButton = {};
 Drupal.behaviors.viewsUiRenderAddViewButton.attach = function (context, settings) {
   var $ = jQuery;
   // Build the add display menu and pull the display input buttons into it.
-  var $menu = $('#views-ui-edit-form .secondary', context).once('views-ui-render-add-view-button-processed');
+  var $menu = $('#views-display-menu-tabs', context).once('views-ui-render-add-view-button-processed');
+
   if (!$menu.length) {
     return;
   }
@@ -307,15 +308,16 @@ Drupal.viewsUi.OptionsSearch = function ($form) {
  */
 Drupal.viewsUi.OptionsSearch.prototype.getOptions = function ($allOptions) {
   var $ = jQuery;
-  var i, $label, $option;
+  var i, $label, $description, $option;
   var options = [];
   var length = $allOptions.length;
   for (i = 0; i < length; i++) {
     $option = $($allOptions[i]);
     $label = $option.find('label');
+    $description = $option.find('div.description');
     options[i] = {
-      // Search on the lowercase version of the label text.
-      'labelText': $label.text().toLowerCase(),
+      // Search on the lowercase version of the label text + description.
+      'searchText': $label.text().toLowerCase() + " " + $description.text().toLowerCase(),
       // Maintain a reference to the jQuery object for each row, so we don't
       // have to create a new object inside the performance-sensitive keyup
       // handler.
@@ -331,7 +333,7 @@ Drupal.viewsUi.OptionsSearch.prototype.getOptions = function ($allOptions) {
 Drupal.viewsUi.OptionsSearch.prototype.handleKeyup = function (event) {
   var found, i, j, option, search, words, wordsLength, zebraClass, zebraCounter;
 
-  // Determine the user's search query. The label text has been converted to
+  // Determine the user's search query. The search text has been converted to
   // lowercase.
   search = this.$searchBox.val().toLowerCase();
   words = search.split(' ');
@@ -340,16 +342,16 @@ Drupal.viewsUi.OptionsSearch.prototype.handleKeyup = function (event) {
   // Start the counter for restriping rows.
   zebraCounter = 0;
 
-  // Search through the labels in the form for matching text.
+  // Search through the search texts in the form for matching text.
   var length = this.options.length;
   for (i = 0; i < length; i++) {
     // Use a local variable for the option being searched, for performance.
     option = this.options[i];
     found = true;
-    // Each word in the search string has to match the label in order for the
-    // label to be shown.
+    // Each word in the search string has to match the item in order for the
+    // item to be shown.
     for (j = 0; j < wordsLength; j++) {
-      if (option.labelText.indexOf(words[j]) === -1) {
+      if (option.searchText.indexOf(words[j]) === -1) {
         found = false;
       }
     }
@@ -384,10 +386,15 @@ Drupal.behaviors.viewsUiPreview.attach = function (context, settings) {
   // show the form.
   var contextualFilters = $('.views-display-setting a', contextualFiltersBucket);
   if (contextualFilters.length) {
-    $('.form-item-displays-settings-settings-content-preview-controls-view-args').show();
+    $('#preview-args').parent().show();
   }
   else {
-    $('.form-item-displays-settings-settings-content-preview-controls-view-args').hide();
+    $('#preview-args').parent().hide();
+  }
+
+  // Executes an initial preview.
+  if ($('#edit-displays-live-preview').once('edit-displays-live-preview').is(':checked')) {
+    $('#preview-submit').once('edit-displays-live-preview').click();
   }
 };
 
@@ -540,7 +547,7 @@ Drupal.viewsUi.rearrangeFilterHandler.prototype.duplicateGroupsOperator = functi
   dropdowns = this.operator;
 
   // Move the operator to a new row just above the second group.
-  titleRow = $('tr#views-group-title-1');
+  titleRow = $('tr#views-group-title-2');
   newRow = $('<tr class="filter-group-operator-row"><td colspan="5"></td></tr>');
   newRow.find('td').append(this.operator);
   newRow.insertBefore(titleRow);
@@ -839,22 +846,36 @@ Drupal.viewsUi.Checkboxifier.prototype.clickHandler = function (e) {
 };
 
 /**
- * Add extra dependency behavior, in addition to CTools visibility management.
- *
- * @todo Abstract this and perhaps add to CTools.
+ * Change the Apply button text based upon the override select state.
  */
-Drupal.behaviors.viewsUiDependent = {};
-Drupal.behaviors.viewsUiDependent.attach = function (context, settings) {
+Drupal.behaviors.viewsUiOverrideSelect = {};
+Drupal.behaviors.viewsUiOverrideSelect.attach = function (context, settings) {
   var $ = jQuery;
-  $('#views-ui-config-item-form #edit-options-custom-label').once('views-ui-dependent', function () {
-    var $checkbox = $(this);
-    $checkbox.click(function (event) {
-      if (!$checkbox.is(':checked')) {
-        $('#views-ui-config-item-form #edit-options-label').val('');
-        $('#views-ui-config-item-form #edit-options-element-label-colon').attr('checked', false);
+  $('#edit-override-dropdown', context).once('views-ui-override-button-text', function() {
+    // Closures! :(
+    var $submit = $('#edit-submit', context);
+    var old_value = $submit.val();
+
+    $submit.once('views-ui-override-button-text')
+      .bind('mouseup', function() {
+        $(this).val(old_value);
+        return true;
+      });
+
+    $(this).bind('change', function() {
+      if ($(this).val() == 'default') {
+        $submit.val(Drupal.t('Apply (all displays)'));
       }
-    });
+      else if ($(this).val() == 'default_revert') {
+        $submit.val(Drupal.t('Revert to default'));
+      }
+      else {
+        $submit.val(Drupal.t('Apply (this display)'));
+      }
+    })
+    .trigger('change');
   });
+
 };
 
 Drupal.viewsUi.resizeModal = function (e, no_shrink) {

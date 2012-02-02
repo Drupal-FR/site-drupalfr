@@ -1,5 +1,4 @@
 <?php
-// $Id: token.pages.inc,v 1.13 2010/12/18 01:53:33 davereid Exp $
 
 /**
  * @file
@@ -15,12 +14,12 @@ function theme_tree_table($variables) {
   foreach ($variables['rows'] as &$row) {
     $row += array('class' => array());
     if (!empty($row['parent'])) {
-      $row['class'][] = 'child-of-' . drupal_clean_css_identifier($row['parent']);
+      $row['class'][] = 'child-of-' . $row['parent'];
       unset($row['parent']);
     }
   }
 
-  if (count($variables['rows'])) {
+  if (!empty($variables['rows'])) {
     drupal_add_library('token', 'treeTable');
   }
 
@@ -43,11 +42,22 @@ function theme_token_tree($variables) {
     $token_types = array_merge($token_types, token_get_global_token_types());
   }
 
-  $header = array(
-    t('Name'),
-    t('Token'),
-    t('Description'),
+  $element = array(
+    '#cache' => array(
+      'cid' => 'tree-rendered:' . hash('sha256', serialize(array('token_types' => $token_types, 'global_types' => NULL) + $variables)),
+      'bin' => 'cache_token',
+    ),
   );
+  if ($cached_output = token_render_cache_get($element)) {
+    return $cached_output;
+  }
+
+  $options = array(
+    'flat' => TRUE,
+    'restricted' => $variables['show_restricted'],
+    'depth' => $variables['recursion_limit'],
+  );
+  $multiple_token_types = (count($token_types) > 1);
   $rows = array();
 
   foreach ($info['types'] as $type => $type_info) {
@@ -55,23 +65,18 @@ function theme_token_tree($variables) {
       continue;
     }
 
-    if (count($token_types) > 1) {
+    if ($multiple_token_types) {
       $row = _token_token_tree_format_row($type, $type_info, TRUE);
       unset($row['data']['value']);
       $rows[] = $row;
     }
 
-    $options = array(
-      'flat' => TRUE,
-      'restricted' => $variables['show_restricted'],
-      'depth' => $variables['recursion_limit'],
-    );
     $tree = token_build_tree($type, $options);
     foreach ($tree as $token => $token_info) {
       if (!empty($token_info['restricted']) && empty($variables['show_restricted'])) {
         continue;
       }
-      if (count($token_types) > 1 && !isset($token_info['parent'])) {
+      if ($multiple_token_types && !isset($token_info['parent'])) {
         $token_info['parent'] = $type;
       }
       $row = _token_token_tree_format_row($token, $token_info);
@@ -80,37 +85,55 @@ function theme_token_tree($variables) {
     }
   }
 
-  drupal_add_js(drupal_get_path('module', 'token') . '/token.js');
-  drupal_add_css(drupal_get_path('module', 'token') . '/token.css');
-
-  $table_options = array(
-    'header' => $header,
-    'rows' => $rows,
-    'attributes' => array('class' => array('token-tree')),
-    'empty' => t('No tokens available.'),
+  $element += array(
+    '#theme' => 'tree_table',
+    '#header' => array(
+      t('Name'),
+      t('Token'),
+      t('Description'),
+    ),
+    '#rows' => $rows,
+    '#attributes' => array('class' => array('token-tree')),
+    '#empty' => t('No tokens available'),
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'token') . '/token.js'),
+      'css' => array(drupal_get_path('module', 'token') . '/token.css'),
+      'library' => array(array('token', 'treeTable')),
+    ),
   );
+
   if ($variables['click_insert']) {
-    $table_options['caption'] = t('Click a token to insert it into the field you\'ve last clicked.');
-    $table_options['attributes']['class'][] = 'token-click-insert';
+    $element['#caption'] = t('Click a token to insert it into the field you\'ve last clicked.');
+    $element['#attributes']['class'][] = 'token-click-insert';
   }
 
-  return theme('tree_table', $table_options);
+  $output = drupal_render($element);
+  token_render_cache_set($output, $element);
+  return $output;
 }
 
 /**
  * Build a row in the token tree.
  */
 function _token_token_tree_format_row($token, array $token_info, $is_group = FALSE) {
-  $row = array(
-    'id' => _token_clean_css_identifier($token),
+  // Build a statically cached array of default values. This is around four
+  // times as efficient as building the base array from scratch each time this
+  // function is called.
+  static $defaults = array(
+    'id' => '',
     'class' => array(),
     'data' => array(
-      'name' => $token_info['name'],
+      'name' => '',
       'token' => '',
       'value' => '',
-      'description' => $token_info['description'],
+      'description' => '',
     ),
   );
+
+  $row = $defaults;
+  $row['id'] = _token_clean_css_identifier($token);
+  $row['data']['name'] = $token_info['name'];
+  $row['data']['description'] = $token_info['description'];
 
   if ($is_group) {
     // This is a token type/group.
@@ -118,10 +141,8 @@ function _token_token_tree_format_row($token, array $token_info, $is_group = FAL
   }
   else {
     // This is a token.
-    $row['data']['token'] = array(
-      'data' => $token,
-      'class' => array('token-key'),
-    );
+    $row['data']['token']['data'] = $token;
+    $row['data']['token']['class'][] = 'token-key';
     if (isset($token_info['value'])) {
       $row['data']['value'] = $token_info['value'];
     }
@@ -139,10 +160,11 @@ function _token_token_tree_format_row($token, array $token_info, $is_group = FAL
  * This trims any brackets from the token and also cleans the colon character
  * to a hyphen.
  *
- * @see drupal_clean_css_identifier().
+ * @see drupal_clean_css_identifier()
  */
 function _token_clean_css_identifier($id) {
-  return drupal_clean_css_identifier('token-' . trim($id, '[]'), array(' ' => '-', '_' => '-', '/' => '-', '[' => '-', ']' => '', ':' => '-'));
+  static $replacements = array(' ' => '-', '_' => '-', '/' => '-', '[' => '-', ']' => '', ':' => '--', '?' => '');
+  return 'token-' . rtrim(strtr(trim($id, '[]'), $replacements), '-');
 }
 
 /**
@@ -174,16 +196,32 @@ function token_devel_token_object($entity_type, $entity) {
     $rows[] = $row;
   }
 
-  drupal_add_js(drupal_get_path('module', 'token') . '/token.js');
-  drupal_add_css(drupal_get_path('module', 'token') . '/token.css');
-
-  $table_options = array(
-    'header' => $header,
-    'rows' => $rows,
-    'attributes' => array('class' => array('token-tree')),
-    'empty' => t('No tokens available.'),
+  $build['tokens'] = array(
+    '#theme' => 'tree_table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#attributes' => array('class' => array('token-tree')),
+    '#empty' => t('No tokens available.'),
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'token') . '/token.js'),
+      'css' => array(drupal_get_path('module', 'token') . '/token.css'),
+    ),
   );
-  return theme('tree_table', $table_options);
+
+  return $build;
+}
+
+/**
+ * Page callback to clear the token registry caches.
+ */
+function token_flush_cache_callback() {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], current_path())) {
+    return MENU_NOT_FOUND;
+  }
+
+  token_clear_cache();
+  drupal_set_message(t('Token registry caches cleared.'));
+  drupal_goto();
 }
 
 function token_autocomplete() {
@@ -215,7 +253,7 @@ function token_autocomplete_type($string = '') {
   foreach ($types as $type => $info) {
     if (!$string || strpos($type, $string) === 0) {
       $type_key = "[{$type}:";
-       $matches[$type_key] = levenshtein($type, $string);
+      $matches[$type_key] = levenshtein($type, $string);
     }
   }
 

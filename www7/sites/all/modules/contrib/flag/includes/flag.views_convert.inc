@@ -1,5 +1,4 @@
 <?php
-//$Id: flag.views_convert.inc,v 1.2 2010/05/09 00:07:47 quicksketch Exp $
 /**
  * @file
  * Update Views 1 views provided by both views_bookmark and flag modules.

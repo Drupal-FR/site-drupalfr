@@ -22,6 +22,17 @@ function rules_action_drupal_message($message, $status, $repeat) {
  * @see rules_drupal_goto_alter()
  */
 function rules_action_drupal_goto($url, $force = FALSE, $destination = FALSE) {
+  // Don't let administrators lock them out from Rules administration pages.
+  if (isset($_GET['q']) && strpos($_GET['q'], 'admin/config/workflow/rules') === 0) {
+    rules_log('Skipped page redirect on Rules administration page.', array(), RulesLog::WARN);
+    return;
+  }
+  // Do not redirect during batch processing.
+  if (($batch = batch_get()) && isset($batch['current_set'])) {
+    rules_log('Skipped page redirect during batch processing.');
+    return;
+  }
+
   // Keep the current destination parameter if there is one set.
   if ($destination) {
     $url .= strpos($url, '?') === FALSE ? '?' : '&';
@@ -70,8 +81,6 @@ function rules_action_mail($to, $subject, $message, $from = NULL, $settings, Rul
   $params = array(
     'subject' => $subject,
     'message' => $message,
-    'action' => $element,
-    'state' => $state,
   );
   // Set a unique key for this mail.
   $name = isset($element->root()->name) ? $element->root()->name : 'unnamed';
@@ -140,6 +149,7 @@ function rules_mail($key, &$message, $params) {
 class RulesTokenEvaluator extends RulesDataInputEvaluator {
 
   public function prepare($text, $var_info) {
+    $text = is_array($text) ? implode('', $text) : $text;
     // Skip this evaluator if there are no tokens.
     $this->setting = token_scan($text) ? TRUE : NULL;
   }
@@ -157,7 +167,10 @@ class RulesTokenEvaluator extends RulesDataInputEvaluator {
 
     $replacements = array();
     $data = array();
-    foreach (token_scan($text) as $var_name => $tokens) {
+    // We also support replacing tokens in a list of textual values.
+    $whole_text = is_array($text) ? implode('', $text) : $text;
+    foreach (token_scan($whole_text) as $var_name => $tokens) {
+      $var_name = str_replace('-', '_', $var_name);
       if (isset($var_info[$var_name]) && ($token_type = _rules_system_token_map_type($var_info[$var_name]['type']))) {
         // We have to key $data with the type token uses for the variable.
         $data = rules_unwrap_data(array($token_type => $state->get($var_name)), array($token_type => $var_info[$var_name]));
@@ -174,8 +187,15 @@ class RulesTokenEvaluator extends RulesDataInputEvaluator {
       $function($replacements, $data, $options);
     }
 
+    // Actually apply the replacements.
     $tokens = array_keys($replacements);
     $values = array_values($replacements);
+    if (is_array($text)) {
+      foreach ($text as $i => $text_item) {
+        $text[$i] = str_replace($tokens, $values, $text_item);
+      }
+      return $text;
+    }
     return str_replace($tokens, $values, $text);
   }
 
@@ -185,6 +205,8 @@ class RulesTokenEvaluator extends RulesDataInputEvaluator {
       '#title' => t('Replacement patterns'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
+      '#description' => t('Note that token replacements containing chained objects – such as [node:author:uid] – are not listed here, but are still available. The <em>data selection</em> input mode may help you find more complex replacement patterns. See <a href="@url">the online documentation</a> for more information about complex replacement patterns.',
+        array('@url' => rules_external_help('chained-tokens'))),
     );
     $token_info = token_info();
     foreach ($var_info as $name => $info) {
@@ -199,7 +221,7 @@ class RulesTokenEvaluator extends RulesDataInputEvaluator {
           '#prefix' => '<h3>' . t('Replacement patterns for %label', array('%label' => $var_info[$name]['label'])) . '</h3>',
         );
         foreach ($token_info['tokens'][$token_type] as $token => $info) {
-          $token = '[' . $name . ':' . $token . ']';
+          $token = '[' . str_replace('_', '-', $name) . ':' . $token . ']';
           $render[$name]['#rows'][$token] = array(check_plain($token), check_plain($info['name']), check_plain($info['description']));
         }
       }

@@ -11,6 +11,31 @@
 function rules_admin_reaction_overview($form, &$form_state, $base_path) {
   RulesPluginUI::formDefaults($form, $form_state);
 
+  $conditions = array('plugin' => 'reaction rule', 'active' => TRUE);
+  $collapsed = TRUE;
+  if (empty($_GET['tag'])) {
+    $tag = 0;
+  }
+  else {
+    $tag = $_GET['tag'];
+    $conditions['tags'] = array($tag);
+    $collapsed = FALSE;
+  }
+  if (empty($_GET['event'])) {
+    $event = 0;
+  }
+  else {
+    $event = $_GET['event'];
+    $conditions['event'] = $event;
+    $collapsed = FALSE;
+  }
+  $form['help'] = array(
+    '#type' => 'markup',
+    '#markup' => t('Reaction rules, listed below, react on selected events on the site. Each reaction rule may fire any number of <em>actions</em>, and may have any number of <em>conditions</em> that must be met for the actions to be executed. You can also set up <a href="@url1">components</a> – stand-alone sets of Rules configuration that can be used in Rules and other parts of your site. See <a href="@url2">the online documentation</a> for an introduction on how to use Rules.',
+      array('@url1' => url('admin/config/workflow/rules/components'),
+            '@url2' => rules_external_help('rules'))),
+  );
+
   $form['filter'] = array(
     '#type' => 'fieldset',
     '#title' => t('Filter'),
@@ -21,33 +46,34 @@ function rules_admin_reaction_overview($form, &$form_state, $base_path) {
   $form['filter']['event'] = array(
     '#type' => 'select',
     '#title' => t('Filter by event'),
-    '#options' => array(0 => '<All>') + RulesPluginUI::getOptions('event_info'),
-    '#default_value' => isset($form_state['values']['event']) ? $form_state['values']['event'] : 0,
+    '#options' => array(0 => t('<All>')) + RulesPluginUI::getOptions('event'),
+    '#default_value' => $event,
   );
-  $form['filter']['category'] = array(
+  $form['filter']['tag'] = array(
     '#type' => 'select',
-    '#title' => t('Filter by category'),
-    '#options' => array(0 => '<All>'),
-    '#default_value' => isset($form_state['values']['category']) ? $form_state['values']['category'] : 0,
+    '#title' => t('Filter by tag'),
+    '#options' => array(0 => t('<All>')) + RulesPluginUI::getTags(),
+    '#default_value' => $tag,
   );
-  $form['filter']['submit'] = array('#type' => 'submit', '#value' => t('Filter'));
+  $form['filter']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Filter'),
+    '#name' => '', // prevent from showing up in $_GET.
+  );
 
-  $event = !empty($form_state['values']['event']) ? $form_state['values']['event'] : FALSE;
-  $category = !empty($form_state['values']['category']) ? $form_state['values']['category'] : FALSE;
-
-  $conditions = array('event' => $event, 'plugin' => 'reaction rule', 'active' => TRUE);
   $options = array('show plugin' => FALSE, 'base path' => $base_path);
-  $form['active'] = rules_ui()->overviewTable(array_filter($conditions), $options);
+  $form['active'] = rules_ui()->overviewTable($conditions, $options);
   $form['active']['#caption'] = t('Active rules');
   $form['active']['#empty'] = t('There are no active rules. <a href="!url">Add new rule</a>.', array('!url' => url('admin/config/workflow/rules/reaction/add')));
 
-  $conditions = array_filter(array('event' => $event, 'plugin' => 'reaction rule')) + array('active' => FALSE);
+  $conditions['active'] = FALSE;
   $form['inactive'] = rules_ui()->overviewTable($conditions, $options);
   $form['inactive']['#caption'] = t('Inactive rules');
   $form['inactive']['#empty'] = t('There are no inactive rules.');
 
-  $form['filter']['#collapsed'] = isset($form_state['values']) || (count($form['active']['#rows']) + count($form['inactive']['#rows'])) < 20;
+  $form['filter']['#collapsed'] = $collapsed;
   $form['#submit'][] = 'rules_form_submit_rebuild';
+  $form['#method'] = 'get';
   return $form;
 }
 
@@ -57,6 +83,30 @@ function rules_admin_reaction_overview($form, &$form_state, $base_path) {
 function rules_admin_components_overview($form, &$form_state, $base_path) {
   RulesPluginUI::formDefaults($form, $form_state);
 
+  $collapsed = TRUE;
+  if (empty($_GET['tag'])) {
+    $tag = 0;
+  }
+  else {
+    $tag = $_GET['tag'];
+    $conditions['tags'] = array($tag);
+    $collapsed = FALSE;
+  }
+  if (empty($_GET['plugin'])) {
+    // Get the plugin name usable as component.
+    $conditions['plugin'] = array_keys(rules_filter_array(rules_fetch_data('plugin_info'), 'component', TRUE));
+    $plugin = 0;
+  }
+  else {
+    $plugin = $_GET['plugin'];
+    $conditions['plugin'] = $plugin;
+    $collapsed = FALSE;
+  }
+  $form['help'] = array(
+    '#type' => 'markup',
+    '#markup' => t('Components are stand-alone sets of Rules configuration that can be used by Rules and other modules on your site. Components are for example useful if you want to use the same conditions, actions or rules in multiple places, or call them from your custom module. You may also export each component separately. See <a href="@url2">the online documentation</a> for more information about how to use components.',
+      array('@url' => rules_external_help('components'))),
+  );
   $form['filter'] = array(
     '#type' => 'fieldset',
     '#title' => t('Filter'),
@@ -67,27 +117,27 @@ function rules_admin_components_overview($form, &$form_state, $base_path) {
   $form['filter']['plugin'] = array(
     '#type' => 'select',
     '#title' => t('Filter by plugin'),
-    '#options' => array(0 => '<All>') + rules_admin_component_options(),
-    '#default_value' => isset($form_state['values']['plugin']) ? $form_state['values']['plugin'] : 0,
+    '#options' => array(0 => t('<All>')) + rules_admin_component_options(),
+    '#default_value' => $plugin,
   );
-  $form['filter']['category'] = array(
+  $form['filter']['tag'] = array(
     '#type' => 'select',
-    '#title' => t('Filter by category'),
-    '#options' => array(0 => '<All>'),
-    '#default_value' => isset($form_state['values']['category']) ? $form_state['values']['category'] : 0,
+    '#title' => t('Filter by tag'),
+    '#options' => array(0 => '<All>') + RulesPluginUI::getTags(),
+    '#default_value' => $tag,
   );
-  $form['filter']['submit'] = array('#type' => 'submit', '#value' => t('Filter'));
+  $form['filter']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Filter'),
+    '#name' => '', // prevent from showing up in $_GET.
+  );
 
-  $category = !empty($form_state['values']['category']) ? $form_state['values']['category'] : FALSE;
-
-  // Get the plugin name usable as component.
-  $plugins = array_keys(rules_filter_array(rules_fetch_data('plugin_info'), 'component', TRUE));
-  $conditions = array('plugin' => !empty($form_state['values']['plugin']) ? array($form_state['values']['plugin']) : $plugins);
   $form['table'] = RulesPluginUI::overviewTable($conditions, array('hide status op' => TRUE));
   $form['table']['#empty'] = t('There are no rule components.');
 
-  $form['filter']['#collapsed'] = isset($form_state['values']) || count($form['table']['#rows']) < 20;
+  $form['filter']['#collapsed'] = $collapsed;
   $form['#submit'][] = 'rules_form_submit_rebuild';
+  $form['#method'] = 'get';
   return $form;
 }
 
@@ -95,11 +145,65 @@ function rules_admin_components_overview($form, &$form_state, $base_path) {
  * Rules settings form.
  */
 function rules_admin_settings($form, &$form_state) {
-  $form['rules_debug'] = array(
+  $form['rules_log_errors'] = array(
+    '#type' => 'radios',
+    '#title' => t('Logging of Rules evaluation errors'),
+    '#options' => array(
+      RulesLog::WARN => t('Log all warnings and errors'),
+      RulesLog::ERROR => t('Log errors only'),
+    ),
+    '#default_value' => variable_get('rules_log_errors', RulesLog::WARN),
+    '#description' => t('Evaluations errors are logged to the system log.'),
+  );
+
+  $form['debug'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Debugging'),
+  );
+  $form['debug']['rules_debug_log'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Debug rules evaluation'),
-    '#default_value' => variable_get('rules_debug', FALSE),
-    '#description' => t('If activated debugging information is shown when rules are evaluated.'),
+    '#title' => t('Log debug information to the system log'),
+    '#default_value' => variable_get('rules_debug_log', 0),
+  );
+  $form['debug']['rules_debug'] = array(
+    '#type' => 'radios',
+    '#title' => t('Show debug information'),
+    '#default_value' => variable_get('rules_debug', 0),
+    '#options' => array(
+      0 => t('Never'),
+      RulesLog::WARN => t('In case of errors'),
+      RulesLog::INFO => t('Always'),
+    ),
+    '#description' => t('Debug information is only shown when rules are evaluated and is visible for users having the permission <a href="!url">%link</a>.', array('%link' => t('Access the Rules debug log'), '!url' => url('admin/people/permissions', array('fragment' => 'module-rules')))),
+  );
+
+  $form['debug']['regions'] = array(
+    '#type' => 'container',
+    '#states' => array(
+      // Hide the regions settings when the debug log is disabled.
+      'invisible' => array(
+        'input[name="rules_debug"]' => array('value' => '0'),
+      ),
+    ),
+  );
+
+  $theme_default = variable_get('theme_default', 'bartik');
+  $admin_theme = variable_get('admin_theme', 'seven');
+
+  $form['debug']['regions']['rules_debug_region_' . $theme_default] = array(
+    '#type' => 'select',
+    '#title' => t('Default theme region'),
+    '#description' => t("The region, where the debug log should be displayed on the default theme %theme. For other themes, Rules will try to display the log on the same region, or hide it in case it doesn't exist.", array('%theme' => $theme_default)),
+    '#options' => system_region_list($theme_default, REGIONS_VISIBLE),
+    '#default_value' => variable_get('rules_debug_region_' . $theme_default, 'help'),
+  );
+
+  $form['debug']['regions']['rules_debug_region_' . $admin_theme] = array(
+    '#type' => 'select',
+    '#title' => t('Admin theme region'),
+    '#description' => t('The region, where the debug log should be displayed on the admin theme %theme.', array('%theme' => $admin_theme)),
+    '#options' => system_region_list($admin_theme, REGIONS_VISIBLE),
+    '#default_value' => variable_get('rules_debug_region_' . $admin_theme, 'help'),
   );
   if (db_table_exists('rules_rules')) {
     drupal_set_message(t('There are left over rule configurations from a previous Rules 1.x installation. Proceed to the <a href="!url">upgrade page</a> to convert them and consult the README.txt for more details.', array('!url' => url('admin/config/workflow/rules/upgrade'))), 'warning');
@@ -129,6 +233,7 @@ function rules_admin_add_reaction_rule($form, &$form_state, $base_path) {
   }
   // Incorporate the form to add the first event.
   $form['settings'] += rules_ui_add_event(array(), $form_state, $rules_config, $base_path);
+  $form['settings']['event']['#tree'] = FALSE;
   unset($form['settings']['help']);
 
   unset($form['settings']['submit']);
@@ -136,7 +241,7 @@ function rules_admin_add_reaction_rule($form, &$form_state, $base_path) {
 
   $form_state += array('rules_config' => $rules_config);
   $form['#validate'][] = 'rules_ui_edit_element_validate';
-  $form['#validate'][] = 'rules_ui_add_event_validate';
+  $form['#submit'][] = 'rules_ui_add_event_apply';
   $form['#submit'][] = 'rules_ui_edit_element_submit';
   return $form;
 }
@@ -152,7 +257,8 @@ function rules_admin_add_component($form, &$form_state, $base_path) {
     '#type' => 'select',
     '#title' => t('Component plugin'),
     '#options' => rules_admin_component_options(),
-    '#description' => t('Choose which kind of component to create.'),
+    '#description' => t('Choose which kind of component to create. Each component type is described in <a href="@url">the online documentation</a>.',
+      array('@url' => rules_external_help('component-types'))),
     '#weight' => -2,
     '#default_value' => isset($form_state['values']['plugin_name']) ? $form_state['values']['plugin_name'] : '',
   );
@@ -212,5 +318,6 @@ function rules_admin_add_component_validate($form, &$form_state) {
 function rules_admin_add_component_submit($form, &$form_state) {
   $rules_config = $form_state['rules_config'];
   $rules_config->form_submit($form, $form_state);
+  drupal_set_message(t('Your changes have been saved.'));
   $form_state['redirect'] = RulesPluginUI::path($rules_config->name);
 }

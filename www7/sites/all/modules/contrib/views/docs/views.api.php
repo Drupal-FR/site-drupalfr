@@ -64,8 +64,9 @@
  * Describe table structure to Views.
  *
  * This hook should be placed in MODULENAME.views.inc and it will be auto-loaded.
- * This must either be in the same directory as the .module file or in a subdirectory
- * named 'includes'.
+ * MODULENAME.views.inc must be in the directory specified by the 'path' key
+ * returned by MODULENAME_views_api(), or the same directory as the .module
+ * file, if 'path' is unspecified.
  *
  * The full documentation for this hook is in the advanced help.
  * @link http://views-help.doc.logrus.com/help/views/api-tables @endlink
@@ -211,8 +212,9 @@ function hook_views_data() {
  * You can add/edit/remove to existing tables defined by hook_views_data().
  *
  * This hook should be placed in MODULENAME.views.inc and it will be auto-loaded.
- * This must either be in the same directory as the .module file or in a subdirectory
- * named 'includes'.
+ * MODULENAME.views.inc must be in the directory specified by the 'path' key
+ * returned by MODULENAME_views_api(), or the same directory as the .module
+ * file, if 'path' is unspecified.
  *
  * The full documentation for this hook is in the advanced help.
  * @link http://views-help.doc.logrus.com/help/views/api-tables @endlink
@@ -239,8 +241,9 @@ function hook_views_data_alter(&$data) {
  * The full documentation for this hook is now in the advanced help.
  *
  * This hook should be placed in MODULENAME.views.inc and it will be auto-loaded.
- * This must either be in the same directory as the .module file or in a subdirectory
- * named 'includes'.
+ * MODULENAME.views.inc must be in the directory specified by the 'path' key
+ * returned by MODULENAME_views_api(), or the same directory as the .module
+ * file, if 'path' is unspecified.
  *
  * This is a stub list as a reminder that this needs to be doc'd and is not used
  * in views anywhere so might not be remembered when this is formally documented:
@@ -267,8 +270,7 @@ function hook_views_plugins_alter(&$plugins) {
  *   An array with the following possible keys:
  *   - api:  (required) The version of the Views API the module implements.
  *   - path: (optional) If includes are stored somewhere other than within
- *       the root module directory or a subdirectory called includes, specify
- *       its path here.
+ *       the root module directory, specify its path here.
  *   - template path: (optional) A path where the module has stored it's views template files.
  *        When you have specificed this key views automatically uses the template files for the views.
  *        You can use the same naming conventions like for normal views template files.
@@ -277,6 +279,7 @@ function hook_views_api() {
   return array(
     'api' => 2,
     'path' => drupal_get_path('module', 'example') . '/includes/views',
+    'template path' => drupal_get_path('module', 'example') . 'themes',
   );
 }
 
@@ -285,8 +288,9 @@ function hook_views_api() {
  * as-is or as a "starter" for users to build from.
  *
  * This hook should be placed in MODULENAME.views_default.inc and it will be
- * auto-loaded. This must either be in the same directory as the .module file
- * or in a subdirectory named 'includes'.
+ * auto-loaded. MODULENAME.views_default.inc must be in the directory specified
+ * by the 'path' key returned by MODULENAME_views_api(), or the same directory
+ * as the .module file, if 'path' is unspecified.
  *
  * The $view->disabled boolean flag indicates whether the View should be
  * enabled or disabled by default.
@@ -535,8 +539,21 @@ function hook_views_default_views() {
 }
 
 /**
+ * Alter default views defined by other modules.
+ *
  * This hook is called right before all default views are cached to the
  * database. It takes a keyed array of views by reference.
+ *
+ * Example usage to add a field to a view:
+ * @code
+ *   $handler =& $view->display['DISPLAY_ID']->handler;
+ *   // Add the user name field to the view.
+ *   $handler->display->display_options['fields']['name']['id'] = 'name';
+ *   $handler->display->display_options['fields']['name']['table'] = 'users';
+ *   $handler->display->display_options['fields']['name']['field'] = 'name';
+ *   $handler->display->display_options['fields']['name']['label'] = 'Author';
+ *   $handler->display->display_options['fields']['name']['link_to_user'] = 1;
+ * @endcode
  */
 function hook_views_default_views_alter(&$views) {
   if (isset($views['taxonomy_term'])) {
@@ -546,19 +563,34 @@ function hook_views_default_views_alter(&$views) {
 
 /**
  * Stub hook documentation
- *
- * This hook should be placed in MODULENAME.views_convert.inc and it will be auto-loaded.
- * This must either be in the same directory as the .module file or in a subdirectory
- * named 'includes'.
  */
-function hook_views_convert() {
+function hook_views_query_substitutions() {
   // example code here
 }
 
 /**
- * Stub hook documentation
+ * This hook is called to get a list of placeholders and their substitutions,
+ * used when preprocessing a View with form elements.
  */
-function hook_views_query_substitutions() {
+function hook_views_form_substitutions() {
+  return array(
+    '<!--views-form-example-substitutions-->' => 'Example Substitution',
+  );
+}
+
+/**
+ * Views form (View with form elements) validate handler.
+ * Called for all steps ($form_state['step']) of the multistep form.
+ */
+function hook_views_form_validate($form, &$form_state) {
+  // example code here
+}
+
+/**
+ * Views form (View with form elements) submit handler.
+ * Called for all steps ($form_state['step']) of the multistep form.
+ */
+function hook_views_form_submit($form, &$form_state) {
   // example code here
 }
 
@@ -664,8 +696,9 @@ function hook_views_post_render(&$view, &$output, &$cache) {
  * Stub hook documentation
  *
  * This hook should be placed in MODULENAME.views.inc and it will be auto-loaded.
- * This must either be in the same directory as the .module file or in a subdirectory
- * named 'includes'.
+ * MODULENAME.views.inc must be in the directory specified by the 'path' key
+ * returned by MODULENAME_views_api(), or the same directory as the .module
+ * file, if 'path' is unspecified.
  *
  */
 function hook_views_query_alter(&$view, &$query) {
@@ -674,8 +707,9 @@ function hook_views_query_alter(&$view, &$query) {
 
 /**
  * This hook should be placed in MODULENAME.views.inc and it will be auto-loaded.
- * This must either be in the same directory as the .module file or in a subdirectory
- * named 'includes'.
+ * MODULENAME.views.inc must be in the directory specified by the 'path' key
+ * returned by MODULENAME_views_api(), or the same directory as the .module
+ * file, if 'path' is unspecified.
  *
  * Alter the rows that appear with a view preview, which include query and
  * performance statistics. $rows is an associative array with two keys:
@@ -690,6 +724,21 @@ function hook_views_query_alter(&$view, &$query) {
  * @see theme_table
  */
 function hook_views_preview_info_alter(&$rows, $view) {
+  // example code here
+}
+
+/**
+ * This hooks allows to alter the links at the top of the view edit form.
+ * Some modules might want to add links there.
+ *
+ * @param $links
+ *   The links which will be displayed at the top of the view edit form.
+ * @param view $view
+ *   The full view object which is currently changed.
+ * @param $display_id
+ *   The current display id which is edited. For example that's 'default' or 'page_1'.
+ */
+function hook_views_ui_display_top_links_alter(&$links, $view, $display_id) {
   // example code here
 }
 

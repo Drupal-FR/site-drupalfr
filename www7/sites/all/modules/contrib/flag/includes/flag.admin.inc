@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.admin.inc,v 1.14 2011/01/10 13:03:01 mooffie Exp $
 
 /**
  * @file
@@ -106,7 +105,7 @@ function theme_flag_admin_page($variables) {
     $output .= '<p>' . t('Flagging an item may trigger <em>rules</em>. However, you don\'t have the <a href="@rules-url">Rules</a> module enabled, so you won\'t be able to enjoy this feature. The Rules module is a more extensive solution than Flag actions.', array('@rules-url' => url('http://drupal.org/node/407070'))) . '</p>';
   }
   else {
-    $output .= '<p>' . t('<del>Flagging an item may trigger <a href="@rules-url">rules</a>.</del> (This feature was not yet ported to Drupal 7.)', array('@rules-url' => url('admin/rules/trigger'))) . '</p>';
+    $output .= '<p>' . t('Flagging an item may trigger <a href="@rules-url">rules</a>.', array('@rules-url' => url('admin/config/workflow/rules'))) . '</p>';
   }
 
   $output .= '<p>' . t('To learn about the various ways to use flags, please check out the <a href="@handbook-url">Flag module handbook</a>.', array('@handbook-url' => 'http://drupal.org/handbook/modules/flag')) . '</p>';
@@ -136,7 +135,7 @@ function flag_add_form($form, &$form_state) {
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Flag name'),
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and my only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
     '#maxlength' => 32,
     '#required' => TRUE,
   );
@@ -188,7 +187,7 @@ function flag_form($form, &$form_state, $flag) {
     '#type' => 'textfield',
     '#title' => t('Name'),
     '#default_value' => $flag->name,
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and my only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
     '#maxlength' => 32,
     '#required' => TRUE,
     '#access' => empty($flag->locked['name']),
@@ -296,7 +295,7 @@ function flag_form($form, &$form_state, $flag) {
     '#tree' => FALSE,
     '#weight' => 10,
   );
-  
+
   $options = array();
   $node_types = node_type_get_types();
   foreach ($node_types as $node_type) {

@@ -5,7 +5,7 @@
  */
 
 class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_default {
-  function init(&$view, &$argument, &$options) {
+  function init(&$view, &$argument, $options) {
     parent::init($view, $argument, $options);
 
     // Convert legacy vids option to machine name vocabularies.
@@ -24,6 +24,7 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
 
     $options['term_page'] = array('default' => TRUE);
     $options['node'] = array('default' => FALSE);
+    $options['anyall'] = array('default' => ',');
     $options['limit'] = array('default' => FALSE);
     $options['vocabularies'] = array('default' => array());
 
@@ -38,7 +39,7 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
     );
     $form['node'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Load default filter from node page, that\'s good for related taxonomy blocks.'),
+      '#title' => t('Load default filter from node page, that\'s good for related taxonomy blocks'),
       '#default_value' => $this->options['node'],
     );
 
@@ -71,10 +72,24 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
         'edit-options-argument-default-taxonomy-tid-node' => array(1),
       ),
     );
+
+    $form['anyall'] = array(
+      '#type' => 'radios',
+      '#title' => t('Multiple-value handling'),
+      '#default_value'=> $this->options['anyall'],
+      '#process' => array('form_process_radios', 'ctools_dependent_process'),
+      '#options' => array(
+        ',' => t('Filter to items that share all terms'),
+        '+' => t('Filter to items that share any term'),
+      ),
+      '#dependency' => array(
+        'edit-options-argument-default-taxonomy-tid-node' => array(1),
+      ),
+    );
   }
 
-  function options_submit(&$form, &$form_state, &$options) {
-    // Clear checkbox values.
+  function options_submit(&$form, &$form_state, &$options = array()) {
+    // Filter unselected items so we don't unnecessarily store giant arrays.
     $options['vocabularies'] = array_filter($options['vocabularies']);
   }
 
@@ -116,11 +131,11 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
               $tids[] = $tid;
             }
           }
-          return implode(",", $tids);
+          return implode($this->options['anyall'], $tids);
         }
         // Return all tids.
         else {
-          return implode(",", array_keys($taxonomy));
+          return implode($this->options['anyall'], array_keys($taxonomy));
         }
       }
     }
@@ -128,9 +143,8 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
     // If the current page is a view that takes tid as an argument,
     // find the tid argument and return it.
     $views_page = views_get_page_view();
-    if ($views_page && isset($views_page->view->argument['tid'])) {
-      return $views_page->view->argument['tid']->argument;
+    if ($views_page && isset($views_page->argument['tid'])) {
+      return $views_page->argument['tid']->argument;
     }
   }
 }
-

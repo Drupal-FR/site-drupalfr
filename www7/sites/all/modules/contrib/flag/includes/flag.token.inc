@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.token.inc,v 1.5 2010/09/03 04:35:06 mooffie Exp $
 
 /**
  * @file
@@ -67,6 +66,10 @@ function flag_token_info() {
         'name' => t('@flag flag count', array('@flag' => $flag->get_title())),
         'description' => t('Total flag count for flag @flag', array('@flag' => $flag->get_title())),
       );
+      $tokens[$flag_type]['flag-'. str_replace('_', '-', $flag->name) .'-link'] = array(
+        'name' => t('@flag flag link', array('@flag' => $flag->get_title())),
+        'description' => t('Flag/unflag link for @flag', array('@flag' => $flag->get_title())),
+      );
     }
   }
 
@@ -110,13 +113,13 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
           $replacements[$original] = $sanitize ? check_plain($action->content_title) : $action->content_title;
           break;
         case 'content-type':
-          $replacements[$original] =$action->content_type;
+          $replacements[$original] = $action->content_type;
           break;
         case 'content-id':
-          $replacements[$original] =$action->content_id;
+          $replacements[$original] = $action->content_id;
           break;
         case 'count':
-          $replacements[$original] =$action->count;
+          $replacements[$original] = $action->count;
           break;
       }
     }
@@ -127,9 +130,13 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
     $object = $data[$type];
     foreach ($flags as $flag) {
       foreach ($tokens as $name => $original) {
-        $flag_token = 'flag-'. str_replace('_', '-', $flag->name) .'-count';
-        if ($name == $flag_token) {
+        $flag_count_token = 'flag-'. str_replace('_', '-', $flag->name) .'-count';
+        $flag_link_token = 'flag-'. str_replace('_', '-', $flag->name) .'-link';
+        if ($name == $flag_count_token) {
           $replacements[$original] = $flag->get_count($flag->get_content_id($object));
+        }
+        elseif ($name == $flag_link_token) {
+          $replacements[$original] = flag_create_link($flag->name, $flag->get_content_id($object));
         }
       }
     }

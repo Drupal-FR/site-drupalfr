@@ -8,7 +8,7 @@
  * Validate whether an argument is an acceptable node.
  */
 class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument_validate {
-  function init(&$view, &$argument, &$options) {
+  function init(&$view, &$argument, $options) {
     parent::init($view, $argument, $options);
 
     // Convert legacy vids option to machine name vocabularies.
@@ -68,8 +68,8 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
     );
   }
 
-  function options_submit(&$form, &$form_state, &$options) {
-    // filter trash out of the options so we don't store giant unnecessary arrays
+  function options_submit(&$form, &$form_state, &$options = array()) {
+    // Filter unselected items so we don't unnecessarily store giant arrays.
     $options['vocabularies'] = array_filter($options['vocabularies']);
   }
 
@@ -102,9 +102,15 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
         if (!$term) {
           return FALSE;
         }
+        $this->argument->validated_title = check_plain($term->name);
         return empty($vocabularies) || !empty($vocabularies[$term->machine_name]);
 
       case 'tids':
+        // An empty argument is not a term so doesn't pass.
+        if (empty($argument)) {
+          return FALSE;
+        }
+
         $tids = new stdClass();
         $tids->value = $argument;
         $tids = views_break_phrase($argument, $tids);
@@ -182,6 +188,34 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
           return TRUE;
         }
         return FALSE;
+    }
+  }
+
+  function process_summary_arguments(&$args) {
+    $type = $this->options['type'];
+    $transform = $this->options['transform'];
+    $vocabularies = array_filter($this->options['vocabularies']);
+
+    if ($type == 'convert') {
+      $arg_keys = array_flip($args);
+
+      $query = db_select('taxonomy_term_data', 'td');
+      $query->condition('tid', $args);
+      $query->addField('td', 'tid', 'tid');
+      if (!empty($vocabularies)) {
+        $query->leftJoin('taxonomy_vocabulary', 'tv', 'td.vid = tv.vid');
+        $query->condition('tv.machine_name', $vocabularies);
+      }
+      if ($transform) {
+        $query->addExpression("REPLACE(td.name, ' ', '-')", 'name');
+      }
+      else {
+        $query->addField('td', 'name', 'name');
+      }
+
+      foreach ($query->execute()->fetchAllKeyed() as $tid => $term) {
+        $args[$arg_keys[$tid]] = $term;
+      }
     }
   }
 }

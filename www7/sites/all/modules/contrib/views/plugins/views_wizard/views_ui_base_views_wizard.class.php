@@ -43,7 +43,7 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
   protected $filter_defaults = array(
     'id' => NULL,
     'expose' => array('operator' => FALSE),
-    'group' => 0,
+    'group' => 1,
   );
 
   function __construct($plugin) {
@@ -61,7 +61,7 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
 
     $entities = entity_get_info();
     foreach ($entities as $entity_type => $entity_info) {
-      if ($this->base_table == $entity_info['base table']) {
+      if (isset($entity_info['base table']) && $this->base_table == $entity_info['base table']) {
         $this->entity_info = $entity_info;
         $this->entity_type = $entity_type;
       }
@@ -133,11 +133,16 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
 
     $this->build_form_style($form, $form_state, 'page');
     $form['displays']['page']['options']['items_per_page'] = array(
-      '#title' => t('Items per page'),
+      '#title' => t('Items to display'),
       '#type' => 'textfield',
       '#default_value' => '10',
       '#size' => 5,
-      '#element_validate' => array('_element_validate_integer_positive'),
+      '#element_validate' => array('views_element_validate_integer'),
+    );
+    $form['displays']['page']['options']['pager'] = array(
+      '#title' => t('Use a pager'),
+      '#type' => 'checkbox',
+      '#default_value' => TRUE,
     );
     $form['displays']['page']['options']['link'] = array(
       '#title' => t('Create a menu link'),
@@ -263,7 +268,12 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
       '#type' => 'textfield',
       '#default_value' => '5',
       '#size' => 5,
-      '#element_validate' => array('_element_validate_integer_positive'),
+      '#element_validate' => array('views_element_validate_integer'),
+    );
+    $form['displays']['block']['options']['pager'] = array(
+      '#title' => t('Use a pager'),
+      '#type' => 'checkbox',
+      '#default_value' => FALSE,
     );
 
     return $form;
@@ -418,23 +428,27 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
    * By default, this adds a "sorted by [date]" filter (when it is available).
    */
   protected function build_sorts(&$form, &$form_state) {
+    $sorts = array(
+      'none' => t('Unsorted'),
+    );
     // Check if we are allowed to sort by creation date.
-    $sorts = array();
     if (!empty($this->plugin['created_column'])) {
-      $sorts = array(
+      $sorts += array(
         $this->plugin['created_column'] . ':DESC' => t('Newest first'),
         $this->plugin['created_column'] . ':ASC' => t('Oldest first'),
       );
-      if (isset($this->plugin['available_sorts'])) {
-        $sorts += $this->plugin['available_sorts'];
-      }
     }
+    if (isset($this->plugin['available_sorts'])) {
+      $sorts += $this->plugin['available_sorts'];
+    }
+
+    // If there is no sorts option available continue.
     if (!empty($sorts)) {
       $form['displays']['show']['sort'] = array(
         '#type' => 'select',
         '#title' => t('sorted by'),
         '#options' => $sorts,
-        '#default_value' => isset($this->plugin['created_column']) ? $this->plugin['created_column'] . ':DESC' : NULL,
+        '#default_value' => isset($this->plugin['created_column']) ? $this->plugin['created_column'] . ':DESC' : 'none',
       );
     }
   }
@@ -649,13 +663,26 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
           }
         }
       }
+      $table_data = views_fetch_data($table);
+      // Check whether the bundle key filter handler is or an child of it views_handler_filter_in_operator
+      // If it's not just use a single value instead of an array.
+      $handler = $table_data[$bundle_key]['filter']['handler'];
+      if ($handler == 'views_handler_filter_in_operator' || is_subclass_of($handler, 'views_handler_filter_in_operator')) {
+        $value = drupal_map_assoc(array($form_state['values']['show']['type']));
+      }
+      else {
+        $value = $form_state['values']['show']['type'];
+      }
+
       $filters[$bundle_key] = array(
         'id' => $bundle_key,
         'table' => $table,
         'field' => $bundle_key,
-        'value' => drupal_map_assoc(array($form_state['values']['show']['type'])),
+        'value' => $value,
       );
     }
+
+    // @todo: Figure out why this isn't part of node_views_wizard.
     if (!empty($form_state['values']['show']['tagged_with']['tids'])) {
       $filters['tid'] = array(
         'id' => 'tid',
@@ -696,7 +723,8 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
   protected function default_display_sorts_user($form, $form_state) {
     $sorts = array();
 
-    if (!empty($form_state['values']['show']['sort'])) {
+    // Don't add a sort if there is no form value or the user selected none as sort.
+    if (!empty($form_state['values']['show']['sort']) && $form_state['values']['show']['sort'] != 'none') {
       list($column, $sort) = explode(':', $form_state['values']['show']['sort']);
       // Column either be a column-name or the table-columnn-ame.
       $column = explode('-', $column);
@@ -728,7 +756,15 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
     $display_options['style_plugin'] = $page['style']['style_plugin'];
     // Not every style plugin supports row style plugins.
     $display_options['row_plugin'] = isset($page['style']['row_plugin']) ? $page['style']['row_plugin'] : 'fields';
-    $display_options['pager']['type'] = 'full';
+    if (empty($page['items_per_page'])) {
+      $display_options['pager']['type'] = 'none';
+    }
+    elseif ($page['pager']) {
+      $display_options['pager']['type'] = 'full';
+    }
+    else {
+      $display_options['pager']['type'] = 'some';
+    }
     $display_options['pager']['options']['items_per_page'] = $page['items_per_page'];
     if (!empty($page['link'])) {
       $display_options['menu']['type'] = 'normal';
@@ -744,7 +780,7 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
     $display_options['title'] = $block['title'];
     $display_options['style_plugin'] = $block['style']['style_plugin'];
     $display_options['row_plugin'] = isset($block['style']['row_plugin']) ? $block['style']['row_plugin'] : 'fields';
-    $display_options['pager']['type'] = 'full';
+    $display_options['pager']['type'] = $block['pager'] ? 'full' : (empty($block['items_per_page']) ? 'none' : 'some');
     $display_options['pager']['options']['items_per_page'] = $block['items_per_page'];
     return $display_options;
   }

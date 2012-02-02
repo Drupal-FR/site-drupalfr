@@ -1,0 +1,23 @@
+; $Id: fullcalendar.info,v 1.4.2.4 2011/02/09 19:20:23 timplunkett Exp $
+name = FullCalendar
+description = Provides a views style plugin for FullCalendar
+core = 7.x
+package = "Views"
+configure = admin/config/calendar/fullcalendar
+dependencies[] = views
+dependencies[] = date
+
+files[] = fullcalendar_plugin_display_page.inc
+files[] = fullcalendar_handler_empty.inc
+files[] = fullcalendar_handler_field_date.inc
+files[] = fullcalendar_handler_field_field.inc
+files[] = fullcalendar_handler_field_gcal.inc
+files[] = views_plugin_node_fullcalendar.inc
+files[] = views_plugin_style_fullcalendar.inc
+
+; Information added by drupal.org packaging script on January 1, 1970 - 00:00
+version = "7.x-2.0-alpha2"
+core = "7.x"
+project = "fullcalendar"
+datestamp = "1297622540"
+

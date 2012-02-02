@@ -23,6 +23,7 @@ function rules_scheduler_rules_action_info() {
         'label' => t('Component'),
         'options list' => 'rules_scheduler_component_options_list',
         'restriction' => 'input',
+        'description' => 'Select the component to schedule. Only components containing actions are available – no condition sets.',
       ),
       'date' => array(
         'type' => 'date',
@@ -31,7 +32,7 @@ function rules_scheduler_rules_action_info() {
       'identifier' => array(
         'type' => 'text',
         'label' => t('Identifier'),
-        'description' => t('User provided string to identify the task. Any existing tasks for this component with the same identifier will be replaced.'),
+        'description' => t('A string used for identifying this task. Any existing tasks for this component with the same identifier will be replaced.'),
         'optional' => TRUE,
       ),
       // Further needed parameter by the component are added during processing.
@@ -93,7 +94,7 @@ function rules_scheduler_action_schedule($args, $element) {
     ));
   }
   else {
-    throw new RulesException('Unable to get the component %name', array('%name' => $args['component']), $element);
+    throw new RulesEvaluationException('Unable to get the component %name', array('%name' => $args['component']), $element);
   }
 }
 
@@ -101,19 +102,57 @@ function rules_scheduler_action_schedule($args, $element) {
  * Info alteration callback for the schedule action.
  */
 function rules_scheduler_action_schedule_info_alter(&$element_info, RulesPlugin $element) {
-  if (isset($element->settings['component']) && $component = rules_get_cache('comp_' . $element->settings['component'])) {
-    // Add in the needed parameters.
-    foreach ($component->parameterInfo() as $name => $info) {
-      $element_info['parameter']['param_' . $name] = $info;
+  if (isset($element->settings['component'])) {
+    // If run during a cache rebuild the cache might not be instantiated yet,
+    // so fail back to loading the component from database.
+    if (($component = rules_get_cache('comp_' . $element->settings['component'])) || $component = rules_config_load($element->settings['component'])) {
+      // Add in the needed parameters.
+      foreach ($component->parameterInfo() as $name => $info) {
+        $element_info['parameter']['param_' . $name] = $info;
+      }
     }
   }
+}
+
+/**
+ * Validate callback for the schedule action to make sure the component exists and is not dirty.
+ *
+ * @see rules_element_invoke_component_validate()
+ */
+function rules_scheduler_action_schedule_validate(RulesPlugin $element) {
+  $recursion = &drupal_static('rules_element_invoke_component_validate', array());
+
+  // Bail out in case of recursive checks to avoid infinite loops. This is
+  // necessary when handling components that directly or indirectly call itself.
+  if (!empty($recursion[$element->root()->name])) {
+    return;
+  }
+  $recursion[$element->root()->name] = TRUE;
+
+  $info = $element->info();
+  $component = rules_config_load($element->settings['component']);
+  if (!$component) {
+    unset($recursion[$element->root()->name]);
+    throw new RulesIntegrityException(t('The component %config does not exist.', array('%config' => $element->settings['component'])), $element);
+  }
+  try {
+    $component->integrityCheck();
+  }
+  catch (RulesIntegrityException $e) {
+    unset($recursion[$element->root()->name]);
+    throw new RulesIntegrityException(t('The component %config fails the integrity check. Error: !message', array('%config' => $element->settings['component'], '!message' => $e->getMessage())), $element);
+  }
+
+  unset($recursion[$element->root()->name]);
 }
 
 /**
  * Help for the schedule action.
  */
 function rules_scheduler_action_schedule_help() {
-  return t("The evaluation of the component is going to be scheduled with the help of cron. Therefore make sure cron is configured correctly by checking your site's !status.", array('!status' => l('Status report', 'admin/reports/status'))) .' '. t('Note that the scheduling time accuracy depends on your configured cron interval.');
+  return t("Note that component evaluation is triggered by <em>cron</em> – make sure cron is configured correctly by checking your site's !status. The scheduling time accuracy depends on your configured cron interval. See <a href='@url'>the online documentation</a> for more information on how to schedule evaluation of components.",
+    array('!status' => l('Status report', 'admin/reports/status'),
+          '@url' => rules_external_help('scheduler')));
 }
 
 /**
@@ -173,7 +212,7 @@ function rules_scheduler_action_delete_validate($element) {
   if (empty($element->settings['task']) && empty($element->settings['task:select']) &&
       empty($element->settings['component']) && empty($element->settings['component:select'])) {
 
-    throw new RulesException(t('You have to specify at least either a component or a task identifier.'), array(), $element);
+    throw new RulesIntegrityException(t('You have to specify at least either a component or a task identifier.'), $element);
   }
 }
 

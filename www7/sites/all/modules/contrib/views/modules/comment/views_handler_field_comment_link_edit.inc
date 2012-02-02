@@ -1,6 +1,8 @@
 <?php
 /**
  * Field handler to present a link node edit.
+ *
+ * @ingroup views_field_handlers
  */
 class views_handler_field_comment_link_edit extends views_handler_field_comment_link {
   function construct() {
@@ -44,9 +46,8 @@ class views_handler_field_comment_link_edit extends views_handler_field_comment_
       $this->options['alter']['query'] = drupal_get_destination();
     }
 
-    $this->options['alter']['path'] = "comment/edit/" . $comment->cid;
+    $this->options['alter']['path'] = "comment/" . $comment->cid . "/edit";
 
     return $text;
   }
 }
-

@@ -1,4 +1,3 @@
-// $Id: pathauto.js,v 1.9 2010/11/11 17:34:54 davereid Exp $
 (function ($) {
 
 Drupal.behaviors.pathFieldsetSummaries = {

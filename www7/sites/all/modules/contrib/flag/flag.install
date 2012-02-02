@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.install,v 1.8 2010/11/09 07:03:08 mooffie Exp $
 
 /**
  * @file
@@ -145,38 +144,45 @@ function flag_schema() {
   $schema = array();
 
   $schema['flags'] = array(
+    'description' => 'All available flags in the system.',
     'fields' => array(
       'fid' => array(
+        'description' => 'The unique ID for this particular flag.',
         'type' => 'serial',
         'size' => 'small',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
       'content_type' => array(
+        'description' => 'The flag type, such as one of "node", "comment", or "user".',
         'type' => 'varchar',
         'length' => '32',
         'not null' => TRUE,
         'default' => '',
       ),
       'name' => array(
+        'description' => 'The machine-name for this flag.',
         'type' => 'varchar',
         'length' => '32',
         'not null' => FALSE,
         'default' => '',
       ),
       'title' => array(
+        'description' => 'The human-readable title for this flag.',
         'type' => 'varchar',
         'length' => '255',
         'not null' => FALSE,
         'default' => '',
       ),
       'global' => array(
+        'description' => 'Whether this flag state should act as a single toggle to all users across the site.',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => FALSE,
         'default' => 0,
       ),
       'options' => array(
+        'description' => 'The options and configuration of this flag.',
         'type' => 'text',
         'not null' => FALSE,
       ),
@@ -188,13 +194,16 @@ function flag_schema() {
   );
 
   $schema['flag_content'] = array(
+    'description' => 'Content that has been flagged.',
     'fields' => array(
       'fcid' => array(
+        'description' => 'The unique ID for this particular tag.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
       'fid' => array(
+        'description' => 'The unqiue flag ID this content has been flagged with, from {flags}.',
         'type' => 'int',
         'size' => 'small',
         'unsigned' => TRUE,
@@ -202,30 +211,35 @@ function flag_schema() {
         'default' => 0,
       ),
       'content_type' => array(
+        'description' => 'The flag type, one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '32',
         'not null' => TRUE,
         'default' => '',
       ),
       'content_id' => array(
+        'description' => 'The unique ID of the content, such as either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
       'uid' => array(
+        'description' => 'The user ID by which this content was created.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
       'sid' => array(
+        'description' => "The user's session id as stored in the session table.",
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
       'timestamp' => array(
+        'description' => 'The UNIX time stamp representing when the flag was set.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -244,8 +258,10 @@ function flag_schema() {
   );
 
   $schema['flag_types'] = array(
+    'description' => 'The types (usually as defined in {node_type}) that are affected by a flag.',
     'fields' => array(
       'fid' => array(
+        'description' => 'The unqiue flag ID as defined for the flag in {flags}.',
         'type' => 'int',
         'size' => 'small',
         'unsigned' => TRUE,
@@ -253,10 +269,12 @@ function flag_schema() {
         'default' => 0,
       ),
       'type' => array(
+        'description' => 'The types (usually from {node_type}) that can be flagged by this fid.',
         'type' => 'varchar',
         'length' => '32',
         'not null' => TRUE,
-        'default' => '')
+        'default' => '',
+      ),
     ),
     'indexes' => array(
       'fid' => array('fid'),
@@ -264,6 +282,7 @@ function flag_schema() {
   );
 
   $schema['flag_counts'] = array(
+    'description' => 'The number of times an item has been flagged.',
     'fields' => array(
       'fid' => array(
         'type' => 'int',
@@ -273,12 +292,14 @@ function flag_schema() {
         'default' => 0,
       ),
       'content_type' => array(
+        'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '32',
         'not null' => TRUE,
         'default' => '',
       ),
       'content_id' => array(
+        'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -286,6 +307,7 @@ function flag_schema() {
         'disp-width' => '10',
       ),
       'count' => array(
+        'description' => 'The number of times this content has been flagged for this flag.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,

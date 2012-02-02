@@ -26,6 +26,45 @@ function rules_test_default_rules_configuration() {
   // Test providing a rule using an export.
   $configs['rules_export_test'] = rules_import(_rules_export_get_test_export());
 
+  // An action set used to test merging term parents.
+  $configs['rules_retrieve_term_parents'] = rules_import('{ "rules_retrieve_term_parents" : {
+    "LABEL" : "Retrieve term parents",
+    "PLUGIN" : "action set",
+    "REQUIRES" : [ "rules" ],
+    "USES VARIABLES" : {
+      "terms" : { "label" : "Terms", "type" : "list\u003ctaxonomy_term\u003e" },
+      "term_parents" : {
+        "label" : "Term parents",
+        "type" : "list\u003ctaxonomy_term\u003e",
+        "parameter" : false
+      }
+    },
+    "ACTION SET" : [
+      { "LOOP" : {
+          "USING" : { "list" : [ "terms" ] },
+          "ITEM" : { "current_term" : "Current term" },
+          "DO" : [
+            { "LOOP" : {
+                "USING" : { "list" : [ "current-term:parent" ] },
+                "ITEM" : { "current_parent" : "Current parent" },
+                "DO" : [
+                  { "list_add" : {
+                      "list" : [ "term-parents" ],
+                      "item" : [ "current-parent" ],
+                      "unique" : 1
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "PROVIDES VARIABLES" : [ "term_parents" ]
+  }
+}');
+
   return $configs;
 }
 
@@ -38,6 +77,7 @@ function _rules_export_get_test_export() {
     "PLUGIN" : "reaction rule",
     "WEIGHT" : "-1",
     "ACTIVE" : false,
+    "TAGS" : [ "bar", "baz", "foo" ],
     "REQUIRES" : [ "rules", "comment" ],
     "ON" : [ "comment_insert" ],
     "IF" : [
@@ -71,7 +111,8 @@ function _rules_export_get_test_export() {
       },
       { "LOOP" : {
           "USING" : { "list" : [ "site:current-user:roles" ] },
-          "DO" : [ { "drupal_message" : { "message" : [ "list-item" ] } } ]
+          "ITEM" : { "current_role" : "Current role" },
+          "DO" : [ { "drupal_message" : { "message" : [ "current-role" ] } } ]
         }
       }
     ]

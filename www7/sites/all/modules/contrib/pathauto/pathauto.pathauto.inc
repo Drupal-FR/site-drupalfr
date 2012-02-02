@@ -1,5 +1,4 @@
 <?php
-// $Id: pathauto.pathauto.inc,v 1.7 2011/01/13 03:27:23 davereid Exp $
 
 /**
  * @file
@@ -91,8 +90,7 @@ function node_pathauto_bulk_update_batch_process(&$context) {
   }
 
   $query = db_select('node', 'n');
-  $concat = _pathauto_sql_concat("'node/'", 'n.nid');
-  $query->leftJoin('url_alias', 'ua', "$concat = ua.source");
+  $query->leftJoin('url_alias', 'ua', "CONCAT('node/', n.nid) = ua.source");
   $query->addField('n', 'nid');
   $query->isNull('ua.source');
   $query->condition('n.nid', $context['sandbox']['current'], '>');
@@ -166,10 +164,10 @@ function taxonomy_pathauto_bulk_update_batch_process(&$context) {
   }
 
   $query = db_select('taxonomy_term_data', 'td');
-  $concat = _pathauto_sql_concat("'taxonomy/term/'", 'td.tid');
-  $query->leftJoin('url_alias', 'ua', "$concat = ua.source");
+  $query->leftJoin('url_alias', 'ua', "CONCAT('taxonomy/term/', td.tid) = ua.source");
   $query->addField('td', 'tid');
   $query->isNull('ua.source');
+  $query->condition('td.tid', $context['sandbox']['current'], '>');
   // Exclude the forums terms.
   if ($forum_vid = variable_get('forum_nav_vocabulary', '')) {
     $query->condition('td.vid', $forum_vid, '<>');
@@ -232,11 +230,11 @@ function forum_pathauto_bulk_update_batch_process(&$context) {
   }
 
   $query = db_select('taxonomy_term_data', 'td');
-  $concat = _pathauto_sql_concat("'forum/'", 'td.tid');
-  $query->leftJoin('url_alias', 'ua', "$concat = ua.source");
+  $query->leftJoin('url_alias', 'ua', "CONCAT('forum/', td.tid) = ua.source");
   $query->addField('td', 'tid');
   $query->isNull('ua.source');
-  $query->condition('vid', variable_get('forum_nav_vocabulary', ''));
+  $query->condition('td.tid', $context['sandbox']['current'], '>');
+  $query->condition('td.vid', variable_get('forum_nav_vocabulary', ''));
   $query->orderBy('td.tid');
   $query->addTag('pathauto_bulk_update');
   $query->addMetaData('entity', 'taxonomy_term');
@@ -258,7 +256,7 @@ function forum_pathauto_bulk_update_batch_process(&$context) {
   pathauto_taxonomy_term_update_alias_multiple($tids, 'bulkupdate');
   $context['sandbox']['count'] += count($tids);
   $context['sandbox']['current'] = max($tids);
-  $context['message'] = t('Updated alias for fourm @tid.', array('@tid' => end($tids)));
+  $context['message'] = t('Updated alias for forum @tid.', array('@tid' => end($tids)));
 
   if ($context['sandbox']['count'] != $context['sandbox']['total']) {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
@@ -295,8 +293,7 @@ function user_pathauto_bulk_update_batch_process(&$context) {
   }
 
   $query = db_select('users', 'u');
-  $concat = _pathauto_sql_concat("'user/'", 'u.uid');
-  $query->leftJoin('url_alias', 'ua', "$concat = ua.source");
+  $query->leftJoin('url_alias', 'ua', "CONCAT('user/', u.uid) = ua.source");
   $query->addField('u', 'uid');
   $query->isNull('ua.source');
   $query->condition('u.uid', $context['sandbox']['current'], '>');
@@ -358,8 +355,7 @@ function blog_pathauto_bulk_update_batch_process(&$context) {
   }
 
   $query = db_select('users', 'u');
-  $concat = _pathauto_sql_concat("'blog/'", 'u.uid');
-  $query->leftJoin('url_alias', 'ua', "$concat = ua.source");
+  $query->leftJoin('url_alias', 'ua', "CONCAT('blog/', u.uid) = ua.source");
   $query->addField('u', 'uid');
   $query->isNull('ua.source');
   $query->condition('u.uid', $context['sandbox']['current'], '>');

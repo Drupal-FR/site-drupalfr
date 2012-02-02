@@ -24,8 +24,7 @@
 }
 
 .box-margin {
-  margin-left: 12px;
-  margin-right: 12px;
+  margin: 12px 12px 0 12px;
 }
 
 /* @end */
@@ -205,9 +204,9 @@ input.form-radio {
   margin-left: 16px; /* LTR */
 }
 
-/* Hide 'remove' checkboxes. This might be scoped too widely. */
-[class*="form-type-checkbox"][class*="remove"] {
-  display: none;
+/* Hide 'remove' checkboxes. */
+.views-remove-checkbox {
+    display: none;
 }
 
 /* sizes the labels of checkboxes and radio button to the height of the text */
@@ -407,21 +406,27 @@ td.group-title {
 
 .views-displays {
   border: 1px solid #CCC;
-  margin-bottom: 36px;
   padding-bottom: 36px;
 }
 
 .views-display-top {
   background-color: #F9F9F9;
   border-bottom: 1px solid #CCCCCC;
-  margin-bottom: 14px;
-  padding: 8px 8px 6px; /* LTR */
+  padding: 8px 8px 8px; /* LTR */
   position: relative;
 }
 
-.views-display-top .secondary > li + li {
-  margin-left: 6px;
+.views-display-top .secondary {
+  margin-right: 18em;
+}
+
+.views-display-top .secondary > li {
+  margin-right: 6px;
   padding-left: 0;
+}
+
+.views-display-top .secondary > li:last-child {
+  margin-right: 0;
 }
 
 #views-display-extra-actions li {
@@ -499,11 +504,6 @@ td.group-title {
 
 /* @group Attachment details */
 
-#edit-display-settings {
-  border-bottom: 3px solid #CCC;
-  padding-bottom: 12px;
-}
-
 #edit-display-settings-title {
   font-size: 14px;
   line-height: 1.5;
@@ -540,33 +540,30 @@ td.group-title {
  * The auto-preview checkbox line.
  */
 
-#edit-display-preview-controls {
-  margin-top: 36px;
-}
-
-#edit-display-preview-controls > div,
-#edit-display-preview-controls > input {
+#views-ui-preview-form > div > div,
+#views-ui-preview-form > div > input {
   float: left;
 }
 
-#edit-display-preview-controls > .form-type-checkbox {
+#views-ui-preview-form .form-type-checkbox {
   margin-top: 2px;
+  margin-left: 2px;
 }
 
-#edit-display-preview-controls > .form-type-textfield {
+#views-ui-preview-form .form-type-textfield {
   margin-top: 5px;
 }
 
-#edit-display-preview-controls .arguments-preview {
+#views-ui-preview-form .arguments-preview {
   font-size: 1em;
 }
 
-#edit-display-preview-controls .arguments-preview,
-#edit-display-preview-controls .form-type-textfield {
+#views-ui-preview-form .arguments-preview,
+#views-ui-preview-form .form-type-textfield {
   margin-left: 14px;
 }
 
-#edit-display-preview-controls .form-type-textfield label {
+#views-ui-preview-form .form-type-textfield label {
   display: inline-block;
   float: left;
   font-weight: normal;
@@ -574,7 +571,7 @@ td.group-title {
   margin-right: 0.75em;
 }
 
-#edit-display-preview-controls .form-type-textfield .description {
+#views-ui-preview-form .form-type-textfield .description {
   white-space: nowrap;
 }
 
@@ -606,8 +603,13 @@ td.group-title {
   margin: 0;
 }
 
-.views-ui-display-tab-bucket .links.actions {
-  margin-top: 2px;
+.views-ui-display-tab-bucket .horizontal.actions {
+  margin-right: 6px;
+}
+
+.views-ui-display-tab-bucket .actions.horizontal li + li {
+  margin-left: 3px;
+  padding-left: 3px;
 }
 
 .views-ui-display-tab-bucket.access {
@@ -627,27 +629,16 @@ td.group-title {
 
 /* @group Attachment bucket overridden
  *
- * Applies a broken link icon to overridden buckets.
+ * Applies a overriden(italics) font style to overridden buckets.
  * The better way to implement this would be to add the overridden class
  * to the bucket header when the bucket is overridden and style it as a
  * generic icon classed element. For the moment, we'll style the bucket
- * header specifically with the broken link icon.
+ * header specifically with the overriden font style.
  */
 
 .views-ui-display-tab-setting.overridden,
 .views-ui-display-tab-bucket.overridden > h3 {
-  background-attachment: scroll;
-  background-image: url("../images/sprites.png");
-  background-position: left -172px; /* LTR */
-  background-repeat: no-repeat;
-  overflow: hidden;
-  padding-left: 21px;
-  zoom: 1;
-  margin-left: 4px;
-}
-
-.views-ui-display-tab-bucket.overridden .views-display-setting {
-  margin-left: 15px; /* LTR */
+  font-style: italic;
 }
 
 /* @end */
@@ -926,11 +917,23 @@ td.group-title {
 
 /* @group Live preview elements */
 
-/**
- * Create a horizontal rule above the live preview area.
- */
+#views-preview-wrapper {
+  border: 1px solid #CCC;
+  border-top: 2px solid #CCC;
+  padding-bottom: 12px;
+  padding-top: 12px;
+}
+
+#views-ui-preview-form {
+  margin: 12px;
+}
+
 #views-live-preview {
   margin: 0 12px;
+}
+
+#views-live-preview .views-query-info {
+  overflow: auto;
 }
 
 /* Intentionally targeting h1 */

@@ -1,5 +1,4 @@
 <?php
-// $Id: flag_handler_argument_content_id.inc,v 1.4 2010/12/22 23:32:26 mooffie Exp $
 
 /**
  * @file

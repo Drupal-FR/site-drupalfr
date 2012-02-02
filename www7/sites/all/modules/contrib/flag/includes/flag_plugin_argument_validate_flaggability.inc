@@ -1,5 +1,4 @@
 <?php
-// $Id: flag_plugin_argument_validate_flaggability.inc,v 1.4 2010/12/20 23:05:12 mooffie Exp $
 
 /**
  * @file

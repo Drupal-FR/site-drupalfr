@@ -40,6 +40,7 @@ function views_views_plugins() {
         'contextual links locations' => array('page'),
         'use ajax' => TRUE,
         'use pager' => TRUE,
+        'use more' => TRUE,
         'accept attachments' => TRUE,
         'admin' => t('Page'),
         'help topic' => 'display-page',
@@ -63,6 +64,7 @@ function views_views_plugins() {
         'help' => t('Attachments added to other displays to achieve multiple views in the same view.'),
         'handler' => 'views_plugin_display_attachment',
         'theme' => 'views_view',
+        'contextual links locations' => array(),
         'use ajax' => TRUE,
         'use pager' => FALSE,
         'use more' => TRUE,
@@ -79,6 +81,17 @@ function views_views_plugins() {
         'accept attachments' => FALSE,
         'admin' => t('Feed'),
         'help topic' => 'display-feed',
+      ),
+    ),
+    'display_extender' => array(
+      // Default settings for all display_extender plugins.
+      'default' => array(
+        'title' => t('Empty display extender'),
+        'help' => t('Default settings for this view.'),
+        'handler' => 'views_plugin_display_extender',
+        // You can force the plugin to be enabled
+        'enabled' => FALSE,
+        'no ui' => TRUE,
       ),
     ),
     'style' => array(
@@ -183,6 +196,10 @@ function views_views_plugins() {
       'php' => array(
         'title' => t('PHP Code'),
         'handler' => 'views_plugin_argument_default_php',
+      ),
+      'raw' => array(
+        'title' => t('Raw value from URL'),
+        'handler' => 'views_plugin_argument_default_raw',
       ),
     ),
     'argument validator' => array(
@@ -409,6 +426,9 @@ function views_discover_plugins() {
         if (!isset($def['parent'])) {
           $def['parent'] = 'parent';
         }
+        // Set the internal name to be able to read it out later.
+        $def['name'] = $plugin;
+
         // merge the new data in
         $cache[$type][$plugin] = $def;
       }
@@ -439,6 +459,11 @@ class views_plugin extends views_object {
   var $display = NULL;
 
   /**
+   * The plugin type of this plugin, for example style or query.
+   */
+  var $plugin_type = NULL;
+
+  /**
    * Init will be called after construct, when the plugin is attached to a
    * view and a display.
    */
@@ -446,7 +471,13 @@ class views_plugin extends views_object {
   /**
    * Provide a form to edit options for this plugin.
    */
-  function options_form(&$form, &$form_state) { }
+  function options_form(&$form, &$form_state) {
+    // Some form elements belong in a fieldset for presentation, but can't
+    // be moved into one because of the form_state['values'] hierarchy. Those
+    // elements can add a #fieldset => 'fieldset_name' property, and they'll
+    // be moved to their fieldset during pre_render.
+    $form['#pre_render'][] = 'views_ui_pre_render_add_fieldset_markup';
+  }
 
   /**
    * Validate the options form.
@@ -509,4 +540,17 @@ class views_plugin extends views_object {
     }
     return check_plain($this->definition['title']);
   }
+}
+
+/**
+ * Get enabled display extenders.
+ */
+function views_get_enabled_display_extenders() {
+  $enabled = array_filter(variable_get('views_display_extenders', array()));
+  $options = views_fetch_plugin_names('display_extender');
+  foreach ($options as $name => $plugin) {
+    $enabled[$name] = $name;
+  }
+
+  return $enabled;
 }

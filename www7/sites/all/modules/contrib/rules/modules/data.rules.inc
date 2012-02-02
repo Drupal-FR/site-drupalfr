@@ -30,204 +30,104 @@ function rules_data_action_info() {
         'restriction' => 'selector',
         'wrapped' => TRUE,
         'allow null' => TRUE,
-       ),
+      ),
       'value' => array(
         'type' => '*',
         'label' => t('Value'),
         'description' => t('The new value to set for the specified data.'),
+        'allow null' => TRUE,
+        'optional' => TRUE,
       ),
     ),
     'group' => t('Data'),
     'base' => 'rules_action_data_set',
   );
-
-  if (rules_data_action_type_options('entity_fetch')) {
-    $return['entity_fetch'] = array(
-      'label' => t('Fetch entity by id'),
-      'parameter' => array(
-        'type' => array(
-          'type' => 'text',
-          'label' => t('Entity type'),
-          'options list' => 'rules_data_action_type_options',
-          'description' => t('Specifies the type of entity that should be fetched.'),
-          'restriction' => 'input',
-         ),
-         'id' => array('type' => 'unknown', 'label' => t('Identifier')),
-      ),
-      'provides' => array(
-        'entity_fetched' => array('type' => 'unknown', 'label' => t('Fetched entity')),
-      ),
-      'group' => t('Entities'),
-      'access callback' => 'rules_data_action_access',
-      'base' => 'rules_action_entity_fetch',
-      'callbacks' => array(
-        'access' => 'rules_action_entity_createfetch_access',
-        'form_alter' => 'rules_action_type_form_alter',
-      ),
-    );
-    $return['entity_query'] = array(
-      'label' => t('Fetch entity by property'),
-      'parameter' => array(
-        'type' => array(
-          'type' => 'text',
-          'label' => t('Entity type'),
-          'options list' => 'rules_data_action_type_options',
-          'description' => t('Specifies the type of the entity that should be fetched.'),
-          'restriction' => 'input',
-         ),
-        'property' => array(
-          'type' => 'text',
-          'label' => t('Property'),
-          'description' => t('The property by which the entity is to be selected.'),
-          'restriction' => 'input',
-         ),
-        'value' => array(
-          'type' => 'unknown',
-          'label' => t('Value'),
-          'description' => t('The property value of the entity to be fetched.'),
-         ),
-         'limit' => array(
-           'type' => 'integer',
-           'label' => t('Limit result count'),
-           'description' => t('Limit the maximum number of fetched entities.'),
-           'optional' => TRUE,
-           'default value' => '10',
-         ),
-      ),
-      'provides' => array(
-        'entity_fetched' => array('type' => 'list', 'label' => t('Fetched entity')),
-      ),
-      'group' => t('Entities'),
-      'access callback' => 'rules_data_action_access',
-      'base' => 'rules_action_entity_query',
-      'callbacks' => array(
-        'form_alter' => 'rules_action_type_form_alter',
-      ),
-    );
-  }
-
-  if (rules_data_action_type_options('entity_create')) {
-    $return['entity_create'] = array(
-      'label' => t('Create a new entity'),
-      'named parameter' => TRUE,
-      'parameter' => array(
-        'type' => array(
-          'type' => 'text',
-          'label' => t('Entity type'),
-          'options list' => 'rules_data_action_type_options',
-          'description' => t('Specifies the type of the entity that should be created.'),
-          'restriction' => 'input',
-         ),
-         // Further needed parameter depends on the type.
-      ),
-      'provides' => array(
-        'entity_created' => array(
-          'type' => 'unknown',
-          'label' => t('Created entity'),
-          'save' => TRUE,
-        ),
-      ),
-      'group' => t('Entities'),
-      'access callback' => 'rules_data_action_access',
-      'base' => 'rules_action_entity_create',
-      'callbacks' => array(
-        'access' => 'rules_action_entity_createfetch_access',
-        'form_alter' => 'rules_action_type_form_alter',
-        'validate' => 'rules_action_create_type_validate',
-      ),
-    );
-  }
-
-  $return['entity_save'] = array(
-    'label' => t('Save entity'),
+  $return['data_calc'] = array(
+    'label' => t('Calculate a value'),
     'parameter' => array(
-      'data' => array(
-        'type' => 'entity',
-        'label' => t('Entity'),
-        'description' => t('Specifies the entity, which should be saved permanently.'),
-        'restriction' => 'selector',
-        'wrapped' => TRUE,
-       ),
-       'immediate' => array(
-         'type' => 'boolean',
-         'label' => t('Force saving immediately'),
-         'description' => t('Usually saving is postponed till the end of the evaluation, so that multiple saves can be fold into one. If this set, saving is forced to happen immediately.'),
-         'default value' => FALSE,
-         'optional' => TRUE,
-         'restriction' => 'input',
-       ),
-    ),
-    'group' => t('Entities'),
-    'access callback' => 'rules_data_action_access',
-    'base' => 'rules_action_entity_save',
-    'callbacks' => array(
-      'access' => 'rules_action_entity_savedelete_access',
-    ),
-  );
-
-  $return['entity_delete'] = array(
-    'label' => t('Delete entity'),
-    'parameter' => array(
-      'data' => array(
-        'type' => 'entity',
-        'label' => t('Entity'),
-        'description' => t('Specifies the entity, which should be deleted permanently.'),
-        'restriction' => 'selector',
-        'wrapped' => TRUE,
+      'input_1' => array(
+        'type' => array('decimal', 'date'),
+        'label' => t('Input value 1'),
+        'description' => t('The first input value for the calculation.'),
+      ),
+      'op' => array(
+        'type' => 'text',
+        'label' => t('Operator'),
+        'description' => t('The calculation operator.'),
+        'options list' => 'rules_action_data_calc_operator_options',
+        'restriction' => 'input',
+        'default value' => '+',
+      ),
+      'input_2' => array(
+        'type' => 'decimal',
+        'label' => t('Input value 2'),
+        'description' => t('The second input value.'),
       ),
     ),
-    'group' => t('Entities'),
-    'access callback' => 'rules_data_action_access',
-    'base' => 'rules_action_entity_delete',
-    'callbacks' => array(
-      'access' => 'rules_action_entity_savedelete_access',
+    'group' => t('Data'),
+    'base' => 'rules_action_data_calc',
+    'provides' => array(
+      'result' => array(
+        'type' => 'unknown',
+        'label' => t('Calculation result'),
+      ),
     ),
   );
   $return['list_add'] = array(
-    'label' => t('Add list item'),
+    'label' => t('Add an item to a list'),
     'parameter' => array(
       'list' => array(
         'type' => 'list',
-        'label' => t('List'),
+        'label' => t('List', array(), array('context' => 'data_types')),
         'description' => t('The data list, to which an item is to be added.'),
         'restriction' => 'selector',
-       ),
+        'allow null' => TRUE,
+      ),
       'item' => array(
         'type' => 'unknown',
         'label' => t('Item to add'),
-       ),
-       'pos' => array(
-         'type' => 'text',
-         'label' => t('Insert position'),
-         'optional' => TRUE,
-         'default value' => 'end',
-         'options list' => 'rules_action_data_list_add_positions',
-       ),
+      ),
+      'unique' => array(
+        'type' => 'boolean',
+        'label' => t('Enforce uniqueness'),
+        'description' => t('Only add the item to the list if it is not yet contained.'),
+        'optional' => TRUE,
+        'default value' => FALSE,
+      ),
+      'pos' => array(
+        'type' => 'text',
+        'label' => t('Insert position'),
+        'optional' => TRUE,
+        'default value' => 'end',
+        'options list' => 'rules_action_data_list_add_positions',
+      ),
     ),
     'group' => t('Data'),
     'base' => 'rules_action_data_list_add',
     'callbacks' => array(
-      'validate' => 'rules_data_validate_list_item_type',
+      'info_alter' => 'rules_data_list_info_alter',
+      'form_alter' => 'rules_data_list_form_alter',
     ),
   );
   $return['list_remove'] = array(
-    'label' => t('Remove a list item'),
+    'label' => t('Remove an item from a list'),
     'parameter' => array(
       'list' => array(
         'type' => 'list',
-        'label' => t('List'),
+        'label' => t('List', array(), array('context' => 'data_types')),
         'description' => t('The data list for which an item is to be removed.'),
         'restriction' => 'selector',
-       ),
+      ),
       'item' => array(
         'type' => 'unknown',
         'label' => t('Item to remove'),
-       ),
+      ),
     ),
     'group' => t('Data'),
     'base' => 'rules_action_data_list_remove',
     'callbacks' => array(
-      'validate' => 'rules_data_validate_list_item_type',
+      'info_alter' => 'rules_data_list_info_alter',
+      'form_alter' => 'rules_data_list_form_alter',
     ),
   );
   $return['variable_add'] = array(
@@ -244,6 +144,8 @@ function rules_data_action_info() {
       'value' => array(
         'type' => 'unknown',
         'label' => t('Value'),
+        'optional' => TRUE,
+        'description' => t('Optionally, specify the initial value of the variable.')
       ),
     ),
     'provides' => array(
@@ -271,8 +173,8 @@ function rules_data_action_info() {
           'options list' => 'rules_data_action_data_create_options',
           'description' => t('Specifies the type of the data structure that should be created.'),
           'restriction' => 'input',
-         ),
-         // Further needed parameters depend on the type.
+        ),
+        // Further needed parameters depend on the type.
       ),
       'provides' => array(
         'data_created' => array(
@@ -307,7 +209,7 @@ function rules_action_data_set_validate(RulesAbstractPlugin $element) {
   $element->settings += array('data:select' => NULL);
   $info = $element->applyDataSelector($element->settings['data:select'])->info();
   if (strpos($element->settings['data:select'], ':') !== FALSE && empty($info['setter callback'])) {
-    throw new RulesException("The selected data property doesn't support writing.", array(), array($element, 'parameter', 'data'));
+    throw new RulesIntegrityException(t("The selected data property doesn't support writing."), array($element, 'parameter', 'data'));
   }
 }
 
@@ -342,46 +244,19 @@ function rules_action_data_set_form_alter(&$form, &$form_state, $options, RulesA
 }
 
 /**
- * Custom access callback for data create and fetch action.
+ * Form alter callback for the data calculation action.
  */
-function rules_action_entity_createfetch_access(RulesAbstractPlugin $element) {
-  $op = $element->getElementName() == 'entity_create' ? 'create' : 'view';
-  return entity_access($op, $element->settings['type']);
-}
+function rules_action_data_calc_form_alter(&$form, &$form_state, $options, RulesAbstractPlugin $element) {
 
-/**
- * Custom validate callback for data fetch action.
- */
-function rules_action_entity_fetch_validate($element) {
-  if (!isset($element->settings['type'])) {
-    throw new RulesException('Invalid type specified.', array(), array($element, 'parameter', 'type'));
-  }
-}
-
-/**
- * Custom validate callback for data query action.
- */
-function rules_action_entity_query_validate($element) {
-  if (!isset($element->settings['type'])) {
-    throw new RulesException('Invalid type specified.', array(), array($element, 'parameter', 'type'));
-  }
-  if (!isset($element->settings['property'])) {
-    throw new RulesException('Invalid property specified.', array(), array($element, 'parameter', 'property'));
-  }
-}
-
-/**
- * Custom access callback for the data query action.
- */
-function rules_action_entity_query_access(RulesAbstractPlugin $element) {
-  if (!rules_action_entity_createfetch_access($element)) {
-    return FALSE;
-  }
-  $properties = entity_get_all_property_info($element->settings['type']);
-  if (isset($element->settings['property']) && isset($properties[$element->settings['property']]['access callback'])) {
-    return call_user_func($properties[$element->settings['property']]['access callback'], 'view', $element->settings['property'], $element->settings['type'], NULL, NULL);
-  }
-  return TRUE;
+  $form['reload'] = array(
+    '#weight' => 5,
+    '#type' => 'submit',
+    '#name' => 'reload',
+    '#value' => t('Reload form'),
+    '#limit_validation_errors' => array(array('parameter', 'input_1')),
+    '#submit' => array('rules_form_submit_rebuild'),
+    '#ajax' => rules_ui_form_default_ajax(),
+  );
 }
 
 /**
@@ -390,20 +265,42 @@ function rules_action_entity_query_access(RulesAbstractPlugin $element) {
  */
 function rules_action_create_type_validate($element) {
   if (!isset($element->settings['type'])) {
-    throw new RulesException('Invalid type specified.', array(), array($element, 'parameter', 'type'));
+    throw new RulesIntegrityException(t('Invalid type specified.'), array($element, 'parameter', 'type'));
   }
 }
 
 /**
- * Options list callback for a parameter of entity_create.
+ * Form alter callback for the list add and remove actions.
+ *
+ * Use multiple steps to configure the action to update the item configuration
+ * form once we know the data type.
+ *
+ * @see rules_data_list_info_alter()
  */
-function rules_action_entity_parameter_options_list(RulesPlugin $element, $param_name) {
-  // Remove the parameter name prefix 'param_'.
-  $property_name = substr($param_name, 6);
-  $wrapper = entity_metadata_wrapper($element->settings['type']);
-  // The possible values of the "value" parameter are those of the data param.
-  return $wrapper->$property_name->optionsList();
+function rules_data_list_form_alter(&$form, &$form_state, $options, RulesAbstractPlugin $element) {
+  if (!empty($options['init']) && !isset($form_state['rules_element_step'])) {
+    unset($form['parameter']['item'], $form['parameter']['pos']);
+    $form_state['rules_element_step'] = 1;
+    $form['negate']['#access'] = FALSE;
+    $form['parameter']['unique']['#access'] = FALSE;
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Continue'),
+      '#limit_validation_errors' => array(array('parameter', 'list')),
+      '#submit' => array('rules_form_submit_rebuild'),
+    );
+  }
+  else {
+    // Change the list parameter to be not editable any more.
+    $form['parameter']['list']['settings']['#access'] = FALSE;
+    $form['parameter']['list']['info'] = array(
+      '#prefix' => '<p>',
+      '#markup' => t('<strong>Selected list:</strong> %selector', array('%selector' => $element->settings['list:select'])),
+      '#suffix' => '</p>',
+    );
+  }
 }
+
 
 /**
  * Form alter callback for actions relying on the entity type or the data type.
@@ -455,60 +352,6 @@ function rules_action_type_form_submit_rebuild($form, &$form_state) {
   $form_state['parameter_mode'] = array();
 }
 
-
-/**
- * Custom access callback for data save and delete action.
- */
-function rules_action_entity_savedelete_access(RulesAbstractPlugin $element) {
-  if ($wrapper = $element->applyDataSelector($element->settings['data:select'])) {
-    $op = $element->getElementName() == 'entity_save' ? 'save' : 'delete';
-    return $wrapper instanceof EntityDrupalWrapper && $wrapper->entityAccess($op);
-  }
-  return FALSE;
-}
-
-/**
- * Options list callback for data actions.
- *
- * @param $element
- *   The element to return options for.
- * @param $param
- *   The name of the parameter to return options for.
- */
-function rules_data_action_type_options($element, $name = NULL) {
-  // We allow calling this function with just the element name too. That way
-  // we ease manual re-use.
-  $name = is_object($element) ? $element->getElementName() : $element;
-  return ($name == 'entity_create') ? rules_entity_type_options('create') : rules_entity_type_options();
-}
-
-/**
- * Returns options containing entity types having the given key set in the info.
- */
-function rules_entity_type_options($key = NULL) {
-  $info = entity_get_info();
-  $types = array();
-  foreach ($info as $type => $entity_info) {
-    if (!isset($key) || entity_type_supports($type, $key)) {
-      $types[$type] = $entity_info['label'];
-    }
-  }
-  return $types;
-}
-
-/**
- * Validation callback to ensure the list item matches to the list.
- */
-function rules_data_validate_list_item_type(RulesAbstractPlugin $element) {
-  $list_info = $element->getArgumentInfo('list');
-  $list_info['type'] = isset($list_info['type']) ? entity_property_list_extract_type($list_info['type']) : FALSE;
-  if (!empty($list_info['type']) && ($item_info = $element->getArgumentInfo('item'))) {
-    if (!RulesData::typesMatch($item_info, $list_info)) {
-      throw new RulesException('The item specified is of an invalid type.', array(), array($element, 'parameter', 'item'));
-    }
-  }
-}
-
 /**
  * Options list callback for possible insertion positions.
  */
@@ -523,7 +366,25 @@ function rules_action_data_list_add_positions() {
  * Options list callback for variable add action.
  */
 function rules_data_action_variable_add_options() {
-  return RulesPluginUI::getOptions('data_info');
+  return RulesPluginUI::getOptions('data');
+}
+
+/**
+ * Options list callback for the data calculation action.
+ */
+function rules_action_data_calc_operator_options(RulesPlugin $element, $param_name) {
+  $options = array(
+    '+' => '( + )',
+    '-' => '( - )',
+    '*' => '( * )',
+    '/' => '( / )',
+  );
+  // Only show +/- in case a date has been selected.
+  if (($info = $element->getArgumentInfo('input_1')) && $info['type'] == 'date') {
+    unset($options['*']);
+    unset($options['/']);
+  }
+  return $options;
 }
 
 /**
@@ -559,7 +420,8 @@ function rules_data_condition_info() {
           'type' => '*',
           'label' => t('Data to compare'),
           'description' => t('The data to be compared, specified by using a data selector, e.g. "node:author:name".'),
-         ),
+          'allow null' => TRUE,
+        ),
         'op' => array(
           'type' => 'text',
           'label' => t('Operator'),
@@ -573,6 +435,7 @@ function rules_data_condition_info() {
           'type' => '*',
           'label' => t('Data value'),
           'description' => t('The value to compare the data with.'),
+          'allow null' => TRUE,
         ),
       ),
       'group' => t('Data'),
@@ -586,62 +449,56 @@ function rules_data_condition_info() {
           'label' => t('Data to check'),
           'description' => t('The data to be checked to be empty, specified by using a data selector, e.g. "node:author:name".'),
           'allow null' => TRUE,
-         ),
+        ),
       ),
       'group' => t('Data'),
       'base' => 'rules_condition_data_is_empty',
     ),
-    'entity_is_new' => array(
-      'label' => t('Entity is new'),
+    'list_contains'  => array(
+      'label' => t('List contains item'),
       'parameter' => array(
-        'entity' => array(
-          'type' => 'entity',
-          'label' => t('Entity'),
-          'description' => t('Specifies the entity for which to evaluate the condition.'),
+        'list' => array(
+          'type' => 'list',
+          'label' => t('List', array(), array('context' => 'data_types')),
           'restriction' => 'selector',
+        ),
+        'item' => array(
+          'type' => 'unknown',
+          'label' => t('Item'),
+          'description' => t('The item to check for.'),
         ),
       ),
-      'group' => t('Entities'),
-      'base' => 'rules_condition_entity_is_new',
+      'group' => t('Data'),
+      'base' => 'rules_condition_data_list_contains',
+      'callbacks' => array(
+        'info_alter' => 'rules_data_list_info_alter',
+        'form_alter' => 'rules_data_list_form_alter',
+      ),
     ),
-    'entity_has_field' => array(
-      'label' => t('Entity has field'),
+    'text_matches'  => array(
+      'label' => t('Text comparison'),
       'parameter' => array(
-        'entity' => array(
-          'type' => 'entity',
-          'label' => t('Entity'),
-          'description' => t('Specifies the entity for which to evaluate the condition.'),
-          'restriction' => 'selector',
-        ),
-        'field' => array(
+        'text' => array(
           'type' => 'text',
-          'label' => t('Field'),
-          'description' => t('The name of the field to check for.'),
-          'options list' => 'rules_condition_entity_has_field_options',
+          'label' => t('Text'),
+          'restriction' => 'selector',
+        ),
+        'match' => array(
+          'type' => 'text',
+          'label' => t('Matching text'),
+        ),
+        'operation' => array(
+          'type' => 'text',
+          'label' => t('Comparison operation'),
+          'options list' => 'rules_data_text_comparison_operation_list',
           'restriction' => 'input',
+          'default value' => 'contains',
+          'optional' => TRUE,
+          'description' => t('In case the comparison operation @regex is selected, the matching pattern will be interpreted as a <a href="@regex-wikipedia">regular expression</a>.  Tip: <a href="@RegExr">RegExr: Online Regular Expression Testing Tool</a> is helpful for learning, writing, and testing Regular Expressions.', array('@regex-wikipedia' => 'http://en.wikipedia.org/wiki/Regular_expression', '@RegExr' => 'http://gskinner.com/RegExr/', '@regex' => t('regular expression'))),
         ),
       ),
-      'group' => t('Entities'),
-      'base' => 'rules_condition_entity_has_field',
-    ),
-    'entity_is_of_type' => array(
-      'label' => t('Entity is of type'),
-      'parameter' => array(
-        'entity' => array(
-          'type' => 'entity',
-          'label' => t('Entity'),
-          'description' => t('Specifies the entity for which to evaluate the condition.'),
-        ),
-        'type' => array(
-          'type' => 'token',
-          'label' => t('Entity type'),
-          'description' => t('The entity type to check for.'),
-          'options list' => 'rules_data_action_type_options',
-          'restriction' => 'input',
-        ),
-      ),
-      'group' => t('Entities'),
-      'base' => 'rules_condition_entity_is_of_type',
+      'group' => t('Data'),
+      'base' => 'rules_data_text_comparison',
     ),
   );
 }
@@ -722,106 +579,35 @@ function rules_condition_data_is_operator_options() {
   return array(
     '==' => t('equals'),
     '<' => t('is lower than'),
-    '>' => t('is greather than'),
+    '>' => t('is greater than'),
     'contains' => t('contains'),
   );
 }
 
 /**
- * Help callback for condition entity_is_new.
+ * Options list callback for condition text_matches.
  */
-function rules_condition_entity_is_new_help() {
-  return t('This condition determines whether the specified entity has just been created and has not yet been saved to the database.');
+function rules_data_text_comparison_operation_list() {
+  return array(
+    'contains' => t('contains'),
+    'starts' => t('starts with'),
+    'ends' => t('ends with'),
+    'regex' => t('regular expression'),
+  );
 }
 
 /**
- * Returns options for choosing a field for the selected entity.
- */
-function rules_condition_entity_has_field_options(RulesAbstractPlugin $element) {
-  $options = array();
-  foreach (field_info_fields() as $field_name => $field) {
-    $options[$field_name] = $field_name;
-  }
-  return $options;
-}
-
-/**
- * Assert that the entity has the field, if there is metadata for the field.
- */
-function rules_condition_entity_has_field_assertions($element) {
-  // Assert the field is there if the condition matches.
-  if ($wrapper = $element->applyDataSelector($element->settings['entity:select'])) {
-    $type = $wrapper->type();
-    $field_property = $element->settings['field'];
-    // Get all possible properties and check whether we have one for the field.
-    $properties = entity_get_all_property_info($type == 'entity' ? NULL : $type);
-
-    if (isset($properties[$field_property])) {
-      $assertion = array('property info' => array($field_property => $properties[$field_property]));
-      return array($element->settings['entity:select'] => $assertion);
-    }
-  }
-}
-
-/**
- * Assert the selected entity type.
- */
-function rules_condition_entity_is_of_type_assertions($element) {
-  if ($type = $element->settings['type']) {
-    return array('entity' => array('type' => $type));
-  }
-}
-
-/**
- * Returns the options list specified by the selected data property.
+ * Returns the options list as specified by the selected property of the first parameter.
  *
+ * @see rules_data_list_info_alter()
  * @see rules_action_data_set_info_alter()
  * @see rules_condition_data_is_info_alter()
  */
 function rules_data_selector_options_list(RulesAbstractPlugin $element) {
-  // The possible values of the "value" parameter are those of the data param.
-  if (isset($element->settings['data:select']) && $wrapper = $element->applyDataSelector($element->settings['data:select'])) {
+  $name = rules_array_key($element->pluginParameterInfo());
+  // If the selected data property has an option list, make use of it.
+  if (isset($element->settings[$name . ':select']) && $wrapper = $element->applyDataSelector($element->settings[$name . ':select'])) {
     return $wrapper->optionsList($element instanceof RulesActionInterface ? 'edit' : 'view');
-  }
-}
-
-/**
- * Returns the options list for choosing a property of an entity type.
- */
-function rules_action_entity_query_property_options_list(RulesAbstractPlugin $element) {
-  $element->settings += array('type' => NULL);
-  if ($element->settings['type']) {
-    $properties = entity_get_all_property_info($element->settings['type']);
-    return rules_extract_property($properties, 'label');
-  }
-}
-
-/**
- * Returns the options list specified for the choosen property.
- */
-function rules_action_entity_query_value_options_list(RulesAbstractPlugin $element) {
-  // Get the possible values for the selected property.
-  $element->settings += array('type' => NULL, 'property' => NULL);
-  if ($element->settings['type'] && $element->settings['property']) {
-    $wrapper = entity_metadata_wrapper($element->settings['type']);
-
-    if (isset($wrapper->{$element->settings['property']}) && $property = $wrapper->{$element->settings['property']}) {
-      return $property->optionsList('view');
-    }
-  }
-}
-
-/**
- * Gets all view modes of an entity for an entity_view event.
- */
-function rules_get_entity_view_modes($type, $name) {
-  if ($type == 'event') {
-    $entity_type = substr($name, 0, -5);
-    $info = entity_get_info($entity_type);
-    foreach ($info['view modes'] as $mode => $mode_info) {
-      $modes[$mode] = $mode_info['label'];
-    }
-    return $modes;
   }
 }
 

@@ -8,7 +8,7 @@
  * Implements hook_install().
  */
 function views_install() {
-  if (db_driver() == 'pgsql') {
+  if (Database::getConnection()->databaseType() == 'pgsql') {
     db_query('CREATE OR REPLACE FUNCTION first(anyelement, anyelement) RETURNS anyelement AS \'SELECT COALESCE($1, $2);\' LANGUAGE \'sql\';');
     db_query("DROP AGGREGATE IF EXISTS first(anyelement)");
     db_query("CREATE AGGREGATE first(sfunc = first, basetype = anyelement, stype = anyelement);");
@@ -111,6 +111,8 @@ function views_schema_6000() {
       'save callback' => 'views_save_view',
       'delete callback' => 'views_delete_view',
       'export callback' => 'views_export_view',
+      'cache defaults' => TRUE,
+      'default cache bin' => 'cache_views',
     ),
     'fields' => array(
       'vid' => array(
@@ -259,15 +261,14 @@ function views_schema_6000() {
  * if you've been running a beta version or something.
  */
 function views_update_6000() {
-  $ret = array();
   if (db_table_exists('views_view')) {
-    return $ret;
+    return;
   }
 
   // This has the beneficial effect of wiping out any Views 1 cache at the
   // same time; not wiping that cache could easily cause problems with Views 2.
   if (db_table_exists('cache_views')) {
-    db_drop_table($ret, 'cache_views');
+    db_drop_table('cache_views');
   }
 
   // This is mostly the same as drupal_install_schema, but it forces
@@ -277,24 +278,20 @@ function views_update_6000() {
   _drupal_initialize_schema('views', $schema);
 
   foreach ($schema as $name => $table) {
-    db_create_table($ret, $name, $table);
+    db_create_table($name, $table);
   }
-  return $ret;
 }
 
 /**
  * Remove '$' symbol in special blocks, as it is invalid for theming.
  */
 function views_update_6001() {
-  $ret = array();
   $result = db_query("SELECT * FROM {blocks} WHERE module = 'views' AND delta LIKE '\$exp%'");
   foreach ($result as $block) {
     $new = strtr($block->delta, '$', '-');
-    $ret[] = update_sql("UPDATE {blocks} SET delta = '" . db_escape_string($new) . "' WHERE module = 'views' AND delta = '" . db_escape_string($block->delta) . "'");
+    update_sql("UPDATE {blocks} SET delta = '" . db_escape_string($new) . "' WHERE module = 'views' AND delta = '" . db_escape_string($block->delta) . "'");
   }
-  $ret[] = update_sql("UPDATE {blocks} SET delta = CONCAT(delta, '-block_1') WHERE module = 'views'");
-
-  return $ret;
+  update_sql("UPDATE {blocks} SET delta = CONCAT(delta, '-block_1') WHERE module = 'views'");
 }
 
 // NOTE: Update 6002 removed because it did not always work.
@@ -310,9 +307,7 @@ function views_schema_6003() {
   return $schema;
 }
 function views_update_6003() {
-  $ret = array();
-  db_add_unique_key($ret, 'views_view', 'name', array('name'));
-  return $ret;
+  db_add_unique_key('views_view', 'name', array('name'));
 }
 
 /**
@@ -326,8 +321,6 @@ function views_schema_6004() {
   return $schema;
 }
 function views_update_6004() {
-  $ret = array();
-
   $new_field = array(
     'type' => 'text',
     'size' => 'big',
@@ -337,10 +330,8 @@ function views_update_6004() {
 
   // Drop and re-add this field because there is a bug in
   // db_change_field that causes this to fail when trying to cast the data.
-  db_drop_field($ret, 'views_object_cache', 'data');
-  db_add_field($ret, 'views_object_cache', 'data', $new_field);
-
-  return $ret;
+  db_drop_field('views_object_cache', 'data');
+  db_add_field('views_object_cache', 'data', $new_field);
 }
 
 /**
@@ -352,8 +343,6 @@ function views_schema_6005() {
   return $schema;
 }
 function views_update_6005() {
-  $ret = array();
-
   $new_field = array(
     'type' => 'varchar',
     'length' => '64',
@@ -361,8 +350,7 @@ function views_update_6005() {
     'not null' => TRUE,
     'description' => 'What table this view is based on, such as node, user, comment, or term.',
   );
-  db_change_field($ret, 'views_view', 'base_table', 'base_table', $new_field);
-  return $ret;
+  db_change_field('views_view', 'base_table', 'base_table', $new_field);
 }
 
 /**
@@ -376,15 +364,11 @@ function views_schema_6006() {
   return $schema;
 }
 function views_update_6006() {
-  $ret = array();
-
   $table = drupal_get_schema_unprocessed('system', 'cache');
   $table['description'] = 'Cache table for views to store pre-rendered queries, results, and display output.';
   $table['fields']['serialized']['default'] = 1;
 
-  db_create_table($ret, 'cache_views_data', $table);
-
-  return $ret;
+  db_create_table('cache_views_data', $table);
 }
 
 /**
@@ -392,13 +376,11 @@ function views_update_6006() {
  * one result to be returned for each item.
  */
 function views_update_6007() {
-  $ret = array();
-  if (db_driver() == 'pgsql') {
-    $ret[] = update_sql('CREATE OR REPLACE FUNCTION first(anyelement, anyelement) RETURNS anyelement AS \'SELECT COALESCE($1, $2);\' LANGUAGE \'sql\';');
-    $ret[] = update_sql("DROP AGGREGATE IF EXISTS first(anyelement)");
-    $ret[] = update_sql("CREATE AGGREGATE first(sfunc = first, basetype = anyelement, stype = anyelement);");
+  if (Database::getConnection()->databaseType() == 'pgsql') {
+    db_query('CREATE OR REPLACE FUNCTION first(anyelement, anyelement) RETURNS anyelement AS \'SELECT COALESCE($1, $2);\' LANGUAGE \'sql\';');
+    db_query("DROP AGGREGATE IF EXISTS first(anyelement)");
+    db_query("CREATE AGGREGATE first(sfunc = first, basetype = anyelement, stype = anyelement);");
   }
-  return $ret;
 }
 
 /**
@@ -414,11 +396,7 @@ function views_schema_6008() {
  * Add the primary key to the views_display table.
  */
 function views_update_6008() {
-  $ret = array();
-
-  db_add_primary_key($ret, 'views_display', array('vid', 'id'));
-
-  return $ret;
+  db_add_primary_key('views_display', array('vid', 'id'));
 }
 
 /**
@@ -438,29 +416,29 @@ function views_schema_6009() {
 }
 
 function views_update_6009() {
-  $ret = array();
-
   $schema = views_schema_6009();
 
-  if ($GLOBALS['db_type'] == 'pgsql') {
-    $ret[] = update_sql('ALTER TABLE {views_display} RENAME "display_options" TO "display_options_old"');
-    db_add_field($ret, 'views_display', 'display_options', $schema['views_display']['fields']['display_options']);
+  if (Database::getConnection()->databaseType() == 'pgsql') {
+    db_query('ALTER TABLE {views_display} RENAME "display_options" TO "display_options_old"');
+    db_add_field('views_display', 'display_options', $schema['views_display']['fields']['display_options']);
 
     $sql = "SELECT vid, id, display_options_old FROM {views_display}";
     $result = db_query($sql);
-    while ($row = db_fetch_array($result)) {
+    foreach ($result as $row) {
       $row['display_options_old'] = db_decode_blob($row['display_options_old']);
-      $sql = "UPDATE {views_display} SET display_options = '%s' WHERE vid = %d AND id = '%s'";
-      db_query($sql, $row['display_options_old'], $row['vid'], $row['id']);
+      $sql = "UPDATE {views_display} SET display_options = :display_optons WHERE vid = :vid AND id = :id";
+      db_query($sql, array(
+        ':display_optons' => $row['display_options_old'],
+        ':vid' => $row['vid'],
+        ':id' => $row['id'],
+      ));
     }
 
-    db_drop_field($ret, 'views_display', 'display_options_old');
+    db_drop_field('views_display', 'display_options_old');
   }
   else {
-    db_change_field($ret, 'views_display', 'display_options', 'display_options', $schema['views_display']['fields']['display_options']);
+    db_change_field('views_display', 'display_options', 'display_options', $schema['views_display']['fields']['display_options']);
   }
-
-  return $ret;
 }
 
 /**
@@ -477,13 +455,8 @@ function views_schema_6010() {
  * Remove the view_php and is_cacheable field
  */
 function views_update_6010() {
-  $ret = array();
-
-  db_drop_field($ret, 'views_view', 'view_php');
-  db_drop_field($ret, 'views_view', 'is_cacheable');
-
-
-  return $ret;
+  db_drop_field('views_view', 'view_php');
+  db_drop_field('views_view', 'is_cacheable');
 }
 
 /**
@@ -499,15 +472,11 @@ function views_schema_6011() {
  * Remove views_object_cache table and move the data to ctools_object_cache.
  */
 function views_update_6011() {
-  $ret = array();
-
-  $caches = db_query("SELECT * FROM {views_object_cache}")->fetch();
+  $caches = db_query("SELECT * FROM {views_object_cache}");
   foreach ($caches as $item) {
     drupal_write_record('ctools_object_cache', $item);
   }
-  db_drop_table($ret, 'views_object_cache');
-
-  return $ret;
+  db_drop_table('views_object_cache');
 }
 
 /**
@@ -516,15 +485,11 @@ function views_update_6011() {
  * @see http://drupal.org/node/910864
  */
 function views_update_6012() {
-  $ret = array();
-
   // There is only one simple query to run.
   $update = db_update('blocks')
     ->condition('module', 'views')
     ->condition('delta', db_like('-exp-') . '%', 'LIKE')
     ->fields(array('cache' => DRUPAL_NO_CACHE));
-
-  return $ret;
 }
 
 
@@ -543,18 +508,18 @@ function views_schema_6013() {
 }
 
 function views_update_6013() {
-  $ret = array();
+  // Check because D6 installs may already have added this.
+  if (!db_field_exists('views_view', 'human_name')) {
 
-  $new_field = array(
-    'type' => 'varchar',
-    'length' => '255',
-    'default' => '',
-    'description' => 'A human readable name used to be displayed in the admin interface',
-  );
+    $new_field = array(
+      'type' => 'varchar',
+      'length' => '255',
+      'default' => '',
+      'description' => 'A human readable name used to be displayed in the admin interface',
+    );
 
-  db_add_field('views_view', 'human_name', $new_field);
-
-  return $ret;
+    db_add_field('views_view', 'human_name', $new_field);
+  }
 }
 
 function views_schema_6014() {
@@ -571,16 +536,15 @@ function views_schema_6014() {
  * Add a drupal core version field.
  */
 function views_update_6014() {
-  $ret = array();
-  $new_field = array(
-    'type' => 'int',
-    'default' => 0,
-    'description' => 'Stores the drupal core version of the view.',
-  );
-
-  db_add_field('views_view', 'core', $new_field);
-
-  return $ret;
+  // Check because D6 installs may already have added this.
+  if (!db_field_exists('views_view', 'core')) {
+    $new_field = array(
+      'type' => 'int',
+      'default' => 0,
+      'description' => 'Stores the drupal core version of the view.',
+    );
+    db_add_field('views_view', 'core', $new_field);
+  }
 }
 
 /**
@@ -609,4 +573,59 @@ function views_update_7000() {
 
   // Rename the unused views_no_hover_links variable.
   variable_del('views_no_hover_links');
+}
+
+/**
+ * Fix missing items from Views administrative breadcrumb
+ */
+function views_update_7001() {
+  $depth = db_select('menu_links')
+    ->fields('menu_links', array('depth'))
+    ->condition('link_path', 'admin/structure/views/view/%')
+    ->execute()
+    ->fetchField();
+
+  if ($depth == 3) {
+    db_delete('menu_links')
+      ->condition('link_path', 'admin/structure/views/%', 'LIKE')
+      ->execute();
+    cache_clear_all(NULL, 'cache_menu');
+    menu_rebuild();
+  }
+}
+
+function views_schema_7300() {
+  return views_schema_6013();
+}
+/**
+ * Make sure the human_name field is added to the views_view table.
+ *
+ * If you updated from 6.x-2.x-dev to 7.x-3.x you already had schema
+ * version 6014, so update 6013 never was nor will be run. As a result,
+ * the human_name field is missing from the database.
+ *
+ * This will add the human_name field if it doesn't already exist.
+ */
+function views_update_7300() {
+  views_update_6013();
+}
+
+function views_schema_7301() {
+  $schema = views_schema(__FUNCTION__);
+  $schema['views_view']['fields']['name']['length'] = 128;
+  return $schema;
+}
+
+/**
+ * Enlarge the name column
+ */
+function views_update_7301() {
+  $new_field = array(
+    'type' => 'varchar',
+    'length' => '128',
+    'default' => '',
+    'not null' => TRUE,
+    'description' => 'The unique name of the view. This is the primary field views are loaded from, and is used so that views may be internal and not necessarily in the database. May only be alphanumeric characters plus underscores.',
+  );
+  db_change_field('views_view', 'name', 'name', $new_field);
 }
