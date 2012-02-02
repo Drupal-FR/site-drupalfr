@@ -1,4 +1,3 @@
-// $Id: machine-name.js,v 1.2 2010/11/22 00:05:58 dries Exp $
 (function ($) {
 
 /**
@@ -36,6 +35,8 @@ Drupal.behaviors.machineName = {
       if ($target.hasClass('error')) {
         return;
       }
+      // Figure out the maximum length for the machine name.
+      options.maxlength = $target.attr('maxlength');
       // Hide the form item container of the machine name form element.
       $wrapper.hide();
       // Determine the initial machine name value. Unless the machine name form
@@ -104,13 +105,14 @@ Drupal.behaviors.machineName = {
    *     disallowed characters in the machine name; e.g., '[^a-z0-9]+'.
    *   - replace: A character to replace disallowed characters with; e.g., '_'
    *     or '-'.
+   *   - maxlength: The maximum length of the machine name.
    *
    * @return
    *   The transliterated source string.
    */
   transliterate: function (source, settings) {
     var rx = new RegExp(settings.replace_pattern, 'g');
-    return source.toLowerCase().replace(rx, settings.replace);
+    return source.toLowerCase().replace(rx, settings.replace).substr(0, settings.maxlength);
   }
 };
 

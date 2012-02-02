@@ -1,5 +1,4 @@
 <?php
-// $Id: cache-install.inc,v 1.9 2010/05/18 18:26:30 dries Exp $
 
 /**
  * @file
@@ -7,7 +6,7 @@
  */
 
 /**
- * A stub cache implementation to be used during the installation process.
+ * Defines a stub cache implementation to be used during installation.
  *
  * The stub implementation is needed when database access is not yet available.
  * Because Drupal's caching system never requires that cached data be present,
@@ -16,22 +15,35 @@
  * normal operations would have a negative impact on performance.
  */
 class DrupalFakeCache extends DrupalDatabaseCache implements DrupalCacheInterface {
+
+  /**
+   * Overrides DrupalDatabaseCache::get().
+   */
   function get($cid) {
     return FALSE;
   }
 
+  /**
+   * Overrides DrupalDatabaseCache::getMultiple().
+   */
   function getMultiple(&$cids) {
     return array();
   }
 
+  /**
+   * Overrides DrupalDatabaseCache::set().
+   */
   function set($cid, $data, $expire = CACHE_PERMANENT) {
   }
 
+  /**
+   * Overrides DrupalDatabaseCache::clear().
+   */
   function clear($cid = NULL, $wildcard = FALSE) {
     // If there is a database cache, attempt to clear it whenever possible. The
     // reason for doing this is that the database cache can accumulate data
     // during installation due to any full bootstraps that may occur at the
-    // same time (for example, AJAX requests triggered by the installer). If we
+    // same time (for example, Ajax requests triggered by the installer). If we
     // didn't try to clear it whenever this function is called, the data in the
     // cache would become stale; for example, the installer sometimes calls
     // variable_set(), which updates the {variable} table and then clears the
@@ -53,6 +65,9 @@ class DrupalFakeCache extends DrupalDatabaseCache implements DrupalCacheInterfac
     }
   }
 
+  /**
+   * Overrides DrupalDatabaseCache::isEmpty().
+   */
   function isEmpty() {
     return TRUE;
   }

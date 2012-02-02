@@ -1,5 +1,4 @@
 <?php
-// $Id: install.inc,v 1.152 2011/01/02 17:23:20 webchick Exp $
 
 /**
  * Indicates that a module has not been installed yet.
@@ -199,7 +198,7 @@ function drupal_install_profile_distribution_name() {
   // At all other times, we load the profile via standard methods.
   else {
     $profile = drupal_get_profile();
-    $info = install_profile_info($profile);
+    $info = system_get_info('module', $profile);
     return $info['distribution_name'];
   }
 }
@@ -548,7 +547,7 @@ abstract class DatabaseTasks {
    *
    * @param $database
    *   An array of driver specific configuration options.
-   * 
+   *
    * @return
    *   An array of driver configuration errors, keyed by form element name.
    */
@@ -571,7 +570,7 @@ abstract class DatabaseTasks {
 }
 
 /**
- * @class Exception class used to throw error if the DatabaseInstaller fails.
+ * Exception thrown if the database installer fails.
  */
 class DatabaseTaskException extends Exception {
 }
@@ -783,44 +782,12 @@ function drupal_uninstall_modules($module_list = array(), $uninstall_dependents 
   }
 
   foreach ($module_list as $module) {
-    // First, retrieve all the module's menu paths from db.
-    drupal_load('module', $module);
-    $paths = module_invoke($module, 'menu');
-
     // Uninstall the module.
     module_load_install($module);
     module_invoke($module, 'uninstall');
     drupal_uninstall_schema($module);
 
     watchdog('system', '%module module uninstalled.', array('%module' => $module), WATCHDOG_INFO);
-
-    // Now remove the menu links for all paths declared by this module.
-    if (!empty($paths)) {
-      $paths = array_keys($paths);
-      // Clean out the names of load functions.
-      foreach ($paths as $index => $path) {
-        $parts = explode('/', $path, MENU_MAX_PARTS);
-        foreach ($parts as $k => $part) {
-          if (preg_match('/^%[a-z_]*$/', $part)) {
-            $parts[$k] = '%';
-          }
-        }
-        $paths[$index] = implode('/', $parts);
-      }
-
-      $result = db_select('menu_links')
-        ->fields('menu_links')
-        ->condition('router_path', $paths, 'IN')
-        ->condition('external', 0)
-        ->orderBy('depth')
-        ->execute();
-      // Remove all such items. Starting from those with the greatest depth will
-      // minimize the amount of re-parenting done by menu_link_delete().
-      foreach ($result as $item) {
-        _menu_delete_item($item, TRUE);
-      }
-    }
-
     drupal_set_installed_schema_version($module, SCHEMA_UNINSTALLED);
   }
 
@@ -1032,7 +999,6 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
   }
 }
 
-
 /**
  * Send the user to a different installer page.
  *
@@ -1050,12 +1016,79 @@ function install_goto($path) {
 }
 
 /**
+ * Returns the URL of the current script, with modified query parameters.
+ *
+ * This function can be called by low-level scripts (such as install.php and
+ * update.php) and returns the URL of the current script. Existing query
+ * parameters are preserved by default, but new ones can optionally be merged
+ * in.
+ *
+ * This function is used when the script must maintain certain query parameters
+ * over multiple page requests in order to work correctly. In such cases (for
+ * example, update.php, which requires the 'continue=1' parameter to remain in
+ * the URL throughout the update process if there are any requirement warnings
+ * that need to be bypassed), using this function to generate the URL for links
+ * to the next steps of the script ensures that the links will work correctly.
+ *
+ * @param $query
+ *   (optional) An array of query parameters to merge in to the existing ones.
+ *
+ * @return
+ *   The URL of the current script, with query parameters modified by the
+ *   passed-in $query. The URL is not sanitized, so it still needs to be run
+ *   through check_url() if it will be used as an HTML attribute value.
+ *
+ * @see drupal_requirements_url()
+ */
+function drupal_current_script_url($query = array()) {
+  $uri = $_SERVER['SCRIPT_NAME'];
+  $query = array_merge(drupal_get_query_parameters(), $query);
+  if (!empty($query)) {
+    $uri .= '?' . drupal_http_build_query($query);
+  }
+  return $uri;
+}
+
+/**
+ * Returns a URL for proceeding to the next page after a requirements problem.
+ *
+ * This function can be called by low-level scripts (such as install.php and
+ * update.php) and returns a URL that can be used to attempt to proceed to the
+ * next step of the script.
+ *
+ * @param $severity
+ *   The severity of the requirements problem, as returned by
+ *   drupal_requirements_severity().
+ *
+ * @return
+ *   A URL for attempting to proceed to the next step of the script. The URL is
+ *   not sanitized, so it still needs to be run through check_url() if it will
+ *   be used as an HTML attribute value.
+ *
+ * @see drupal_current_script_url()
+ */
+function drupal_requirements_url($severity) {
+  $query = array();
+  // If there are no errors, only warnings, append 'continue=1' to the URL so
+  // the user can bypass this screen on the next page load.
+  if ($severity == REQUIREMENT_WARNING) {
+    $query['continue'] = 1;
+  }
+  return drupal_current_script_url($query);
+}
+
+/**
  * Functional equivalent of t(), used when some systems are not available.
  *
  * Used during the install process, when database, theme, and localization
  * system is possibly not yet available.
  *
+ * Use t() if your code will never run during the Drupal installation phase.
+ * Use st() if your code will only run during installation and never any other
+ * time. Use get_t() if your code could run in either circumstance.
+ *
  * @see t()
+ * @see get_t()
  * @ingroup sanitization
  */
 function st($string, array $args = array(), array $options = array()) {
@@ -1199,6 +1232,10 @@ function drupal_check_module($module) {
  *   installed, to be shown throughout the installation process. Defaults to
  *   'Drupal'.
  *
+ * Note that this function does an expensive file system scan to get info file
+ * information for dependencies. If you only need information from the info
+ * file itself, use system_get_info().
+ *
  * Example of .info file:
  * @code
  *    name = Minimal
@@ -1207,10 +1244,11 @@ function drupal_check_module($module) {
  *    dependencies[] = dblog
  * @endcode
  *
- * @param profile
+ * @param $profile
  *   Name of profile.
- * @param locale
+ * @param $locale
  *   Name of locale used (if any).
+ *
  * @return
  *   The info array.
  */

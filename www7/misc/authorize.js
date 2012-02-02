@@ -1,4 +1,3 @@
-// $Id: authorize.js,v 1.3 2010/01/04 16:08:52 webchick Exp $
 
 /**
  * @file
@@ -17,7 +16,6 @@ Drupal.behaviors.authorizeFileTransferForm = {
 
     // Removes the float on the select box (used for non-JS interface).
     if ($('.connection-settings-update-filetransfer-default-wrapper').length > 0) {
-      console.log($('.connection-settings-update-filetransfer-default-wrapper'));
       $('.connection-settings-update-filetransfer-default-wrapper').css('float', 'none');
     }
     // Hides the submit button for non-js users.

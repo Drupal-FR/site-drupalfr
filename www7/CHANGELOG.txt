@@ -1,6 +1,180 @@
-// $Id: CHANGELOG.txt,v 1.396 2011/01/05 06:17:58 webchick Exp $
 
-Drupal 7.0, 2011-01-05
+Drupal 7.13 xxxx-xx-xx (development version)
+----------------------
+
+Drupal 7.12, 2012-02-01
+----------------------
+- Fixed bug preventing custom menus from receiving an active trail.
+- Fixed hook_field_delete() no longer invoked during field_purge_data().
+- Fixed bug causing entity info cache to not be cleared with the rest of caches.
+- Fixed file_unmanaged_copy() fails with Drupal 7.7+ and safe_mode() or
+  open_basedir().
+- Fixed Nested transactions throw exceptions when they got out of scope.
+- Fixed bugs with the Return-Path when sending mail on both Windows and
+  non-Windows systems.
+- Fixed bug with DrupalCacheArray property visibility preventing others from
+  extending it (API change: http://drupal.org/node/1422264).
+- Fixed bug with handling of non-ASCII characters in file names (API change:
+  http://drupal.org/node/1424840).
+- Reconciled field maximum length with database column size in image and
+  aggregator modules.
+- Fixes to various core JavaScript files to allow for minification and
+  aggregation.
+- Fixed Prevent tests from deleting main installation's tables when
+  parent::setUp() is not called.
+- Fixed several Poll module bugs.
+- Fixed several Shortcut module bugs.
+- Added new hook_system_theme_info() to provide ability for contributed modules
+  to test theme functionality.
+- Added ability to cancel mail sending from hook_mail_alter().
+- Added support for configurable PDO connection options, enabling master-master
+  database replication.
+- Numerous improvements to tests and test runner to pave the way for faster test
+  runs.
+- Expanded test coverage.
+- Numerous API documentation improvements.
+- Numerous performance improvements, including token replacement and render
+  cache.
+
+Drupal 7.11, 2012-02-01
+----------------------
+- Fixed security issues (Multiple vulnerabilities), see SA-CORE-2012-001.
+
+Drupal 7.10, 2011-12-05
+----------------------
+- Fixed Content-Language HTTP header to not cause issues with Drush 5.x.
+- Reduce memory usage of theme registry (performance).
+- Fixed PECL upload progress bar for FileField
+- Fixed running update.php doesn't always clear the cache.
+- Fixed PDO exceptions on long titles.
+- Fixed Overlay redirect does not include query string.
+- Fixed D6 modules satisfy D7 module dependencies.
+- Fixed the ordering of module hooks when using module_implements_alter().
+- Fixed "floating" submit buttons during AJAX requests.
+- Fixed timezone selected on install not propogating to admin account.
+- Added msgctx context to JS translation functions, for feature parity with t().
+- Profiles' .install files now available during hook_install_tasks().
+- Added test coverage of 7.0 -> 7.x upgrade path.
+- Numerous notice fixes.
+- Numerous documentation improvements.
+- Additional automated test coverage.
+
+Drupal 7.9, 2011-10-26
+----------------------
+- Critical fixes to OpenID to spec violations that could allow for
+  impersonation in certain scenarios. Existing OpenID users should see
+  http://drupal.org/node/1120290#comment-5092796 for more information on
+  transitioning.
+- Fixed files getting lost when adding multiple files to multiple file fields
+  at the same time.
+- Improved usability of the clean URL test screens.
+- Restored height/width attributes on images run through the theme system.
+- Fixed usability bug with first password field being pre-filled by certain
+  browser plugins.
+- Fixed file_usage_list() so that it can return more than one result.
+- Fixed bug preventing preview of private images on node form.
+- Fixed PDO error when inserting an aggregator title longer than 255 characters.
+- Spelled out what TRADITIONAL means in MySQL sql_mode.
+- Deprecated "!=" operator for DBTNG; should be "<>".
+- Added two new API functions (menu_tree_set_path()/menu_tree_get_path()) were
+  added in order to enable setting the active menu trail for dynamically
+  generated menu paths.
+- Added new "fast 404" capability in settings.php to bypass Drupal bootstrap
+  when serving 404 pages for certain file types.
+- Added format_string() function which can perform string munging ala the t()
+  function without the overhead of the translation system.
+- Numerous #states system fixes.
+- Numerous EntityFieldQuery, DBTNG, and SQLite fixes.
+- Numerous Shortcut module fixes.
+- Numerous language system fixes.
+- Numerous token fixes.
+- Numerous CSS fixes.
+- Numerous upgrade path fixes.
+- Numerous minor string fixes.
+- Numerous notice fixes.
+
+Drupal 7.8, 2011-08-31
+----------------------
+- Fixed critical upgrade path issue with multilingual sites, leading to lost
+  content.
+- Numerous fixes to upgrade path, preventing fatal errors due to incorrect
+  dependencies.
+- Fixed issue with saving files on hosts with open_basedir restrictions.
+- Fixed Update manger error when used with Overlay.
+- Fixed RTL support in Seven administration theme and Overlay.
+- Fixes to nested transaction support.
+- Introduced performance pattern to reduce Drupal core's RAM usage.
+- Added support for HTML 5 tags to filter_xss_admin().
+- Added exception handling to cron.
+- Added new hook hook_field_widget_form_alter() for contribtued modules.
+- element_validate_*() functions now available to contrib.
+- Added new maintainers for several subsystems.
+- Numerous testing system improvements.
+- Numerous markup and CSS fixes.
+- Numerous poll module fixes.
+- Numerous notice/warning fixes.
+- Numerous documentation fixes.
+- Numerous token fixes.
+
+Drupal 7.7, 2011-07-27
+----------------------
+- Fixed VERSION string.
+
+Drupal 7.6, 2011-07-27
+----------------------
+- Fixed support for remote streamwrappers.
+- AJAX now binds to 'click' instead of 'mousedown'.
+- 'Translatable' flag on fields created in UI now defaults to FALSE, to match those created via the API.
+- Performance enhancement to permissions page on large numbers of permissions.
+- More secure password generation.
+- Fix for temporary directory on Windows servers.
+- run-tests.sh now uses proc_open() instead of pcntl_fork() for better Windows support.
+- Numerous upgrade path fixes.
+- Numerous documentation fixes.
+- Numerous notice fixes.
+- Numerous fixes to improve PHP 5.4 support.
+- Numerous RTL improvements.
+
+Drupal 7.5, 2011-07-27
+----------------------
+- Fixed security issue (Access bypass), see SA-CORE-2011-003.
+
+Drupal 7.4, 2011-06-29
+----------------------
+- Rolled back patch that caused fatal errors in CTools, Feeds, and other modules using the class registry.
+- Fixed critical bug with saving default images.
+- Fixed fatal errors when uninstalling some modules.
+- Added workaround for MySQL transaction support breaking on DDL statments.
+- Improved page caching with external caching systems.
+- Fix to Batch API, which was terminating too early.
+- Numerous upgrade path fixes.
+- Performance fixes.
+- Additional test coverage.
+- Numerous documentation fixes.
+
+Drupal 7.3, 2011-06-29
+----------------------
+- Fixed security issue (Access bypass), see SA-CORE-2011-002.
+
+Drupal 7.2, 2011-05-25
+----------------------
+- Added a default .gitignore file.
+- Improved PostgreSQL and SQLite support.
+- Numerous critical performance improvements.
+- Numerous critical fixes to the upgrade path.
+- Numerous fixes to language and translation systems.
+- Numerous fixes to AJAX and #states systems.
+- Improvements to the locking system.
+- Numerous documentation fixes.
+- Numerous styling and theme system fixes.
+- Numerous fixes for schema mis-matches between Drupal 6 and 7.
+- Minor internal API clean-ups.
+
+Drupal 7.1, 2011-05-25
+----------------------
+- Fixed security issues (Cross site scripting, File access bypass), see SA-CORE-2011-001.
+
+Drupal 7.0, 2011-01-05 
 ----------------------
 - Database:
     * Fully rewritten database layer utilizing PHP 5's PDO abstraction layer.
@@ -103,7 +277,7 @@ Drupal 7.0, 2011-01-05
       are available.
 - OpenID:
     * Added support for Gmail and Google Apps for Domain identifiers. Users can
-      now login with their user@domain.com identifier when domain.com is powered
+      now login with their user@example.com identifier when example.com is powered
       by Google.
     * Made the OpenID module more pluggable.
 - Added code registry:
@@ -219,6 +393,159 @@ Drupal 7.0, 2011-01-05
     * Added a locking framework to coordinate long-running operations across
       requests.
 
+Drupal 6.23-dev, xxxx-xx-xx (development release)
+-----------------------
+
+Drupal 6.22, 2011-05-25
+-----------------------
+- Made Drupal 6 work better with IIS and Internet Explorer.
+- Fixed .po file imports to work better with custom textgroups.
+- Improved code documentation at various places.
+- Fixed a variety of other bugs.
+
+Drupal 6.21, 2011-05-25
+----------------------
+- Fixed security issues (Cross site scripting), see SA-CORE-2011-001.
+
+Drupal 6.20, 2010-12-15
+----------------------
+- Fixed a variety of small bugs, improved code documentation.
+
+Drupal 6.19, 2010-08-11
+----------------------
+- Fixed a variety of small bugs, improved code documentation.
+
+Drupal 6.18, 2010-08-11
+----------------------
+- Fixed security issues (OpenID authentication bypass, File download access
+  bypass, Comment unpublishing bypass, Actions cross site scripting),
+  see SA-CORE-2010-002.
+
+Drupal 6.17, 2010-06-02
+----------------------
+- Improved PostgreSQL compatibility
+- Better PHP 5.3 and PHP 4 compatibility
+- Better browser compatibility of CSS and JS aggregation
+- Improved logging for login failures
+- Fixed an incompatibility with some contributed modules and the locking system
+- Fixed a variety of other bugs.
+
+Drupal 6.16, 2010-03-03
+----------------------
+- Fixed security issues (Installation cross site scripting, Open redirection,
+  Locale module cross site scripting, Blocked user session regeneration),
+  see SA-CORE-2010-001.
+- Better support for updated jQuery versions.
+- Reduced resource usage of update.module.
+- Fixed several issues relating to support of install profiles and
+  distributions.
+- Added a locking framework to avoid data corruption on long operations.
+- Fixed a variety of other bugs.
+
+Drupal 6.15, 2009-12-16
+----------------------
+- Fixed security issues (Cross site scripting), see SA-CORE-2009-009.
+- Fixed a variety of other bugs.
+
+Drupal 6.14, 2009-09-16
+----------------------
+- Fixed security issues (OpenID association cross site request forgeries,
+  OpenID impersonation and File upload), see SA-CORE-2009-008.
+- Changed the system modules page to not run all cache rebuilds; use the
+  button on the performance settings page to achieve the same effect.
+- Added support for PHP 5.3.0 out of the box.
+- Fixed a variety of small bugs.
+
+Drupal 6.13, 2009-07-01
+----------------------
+- Fixed security issues (Cross site scripting, Input format access bypass and
+  Password leakage in URL), see SA-CORE-2009-007.
+- Fixed a variety of small bugs.
+
+Drupal 6.12, 2009-05-13
+----------------------
+- Fixed security issues (Cross site scripting), see SA-CORE-2009-006.
+- Fixed a variety of small bugs.
+
+Drupal 6.11, 2009-04-29
+----------------------
+- Fixed security issues (Cross site scripting and limited information
+  disclosure), see SA-CORE-2009-005
+- Fixed performance issues with the menu router cache, the update
+  status cache and improved cache invalidation
+- Fixed a variety of small bugs.
+
+Drupal 6.10, 2009-02-25
+----------------------
+- Fixed a security issue, (Local file inclusion on Windows),
+  see SA-CORE-2009-003
+- Fixed node_feed() so custom fields can show up in RSS feeds.
+- Improved PostgreSQL compatibility.
+- Fixed a variety of small bugs.
+
+Drupal 6.9, 2009-01-14
+----------------------
+- Fixed security issues, (Access Bypass, Validation Bypass and Hardening
+  against SQL injection), see SA-CORE-2009-001
+- Made HTTP request checking more robust and informative.
+- Fixed HTTP_HOST checking to work again with HTTP 1.0 clients and
+  basic shell scripts.
+- Removed t() calls from all schema documentation. Suggested best practice
+  changed for contributed modules, see http://drupal.org/node/322731.
+- Fixed a variety of small bugs.
+
+Drupal 6.8, 2008-12-11
+----------------------
+- Removed a previous change incompatible with PHP 5.1.x and lower.
+
+Drupal 6.7, 2008-12-10
+----------------------
+- Fixed security issues, (Cross site request forgery and Cross site scripting), see SA-2008-073
+- Updated robots.txt and .htaccess to match current file use.
+- Fixed a variety of small bugs.
+
+Drupal 6.6, 2008-10-22
+----------------------
+- Fixed security issues, (File inclusion, Cross site scripting), see SA-2008-067
+- Fixed a variety of small bugs.
+
+Drupal 6.5, 2008-10-08
+----------------------
+- Fixed security issues, (File upload access bypass, Access rules bypass,
+  BlogAPI access bypass), see SA-2008-060.
+- Fixed a variety of small bugs.
+
+Drupal 6.4, 2008-08-13
+----------------------
+- Fixed a security issue (Cross site scripting, Arbitrary file uploads via
+  BlogAPI, Cross site request forgeries and Various Upload module
+  vulnerabilities), see SA-2008-047.
+- Improved error messages during installation.
+- Fixed a bug that prevented AHAH handlers to be attached to radios widgets.
+- Fixed a variety of small bugs.
+
+Drupal 6.3, 2008-07-09
+----------------------
+- Fixed security issues, (Cross site scripting, cross site request forgery,
+  session fixation and SQL injection), see SA-2008-044.
+- Slightly modified installation process to prevent file ownership issues on
+  shared hosts.
+- Improved PostgreSQL compatibility (rewritten queries; custom blocks).
+- Upgraded to jQuery 1.2.6.
+- Performance improvements to search, menu handling and form API caches.
+- Fixed Views compatibility issues (Views for Drupal 6 requires Drupal 6.3+).
+- Fixed a variety of small bugs.
+
+Drupal 6.2, 2008-04-09
+----------------------
+- Fixed a variety of small bugs.
+- Fixed a security issue (Access bypasses), see SA-2008-026.
+
+Drupal 6.1, 2008-02-27
+----------------------
+- Fixed a variety of small bugs.
+- Fixed a security issue (Cross site scripting), see SA-2008-018.
+
 Drupal 6.0, 2008-02-13
 ----------------------
 - New, faster and better menu system.
@@ -320,6 +647,95 @@ Drupal 6.0, 2008-02-13
   contributed module (http://drupal.org/project/site_network).
 - Removed old system updates. Updates from Drupal versions prior to 5.x will
   require upgrading to 5.x before upgrading to 6.x.
+
+Drupal 5.23, 2010-08-11
+-----------------------
+- Fixed security issues (File download access bypass, Comment unpublishing
+  bypass), see SA-CORE-2010-002.
+
+Drupal 5.22, 2010-03-03
+-----------------------
+- Fixed security issues (Open redirection, Locale module cross site scripting,
+  Blocked user session regeneration), see SA-CORE-2010-001.
+
+Drupal 5.21, 2009-12-16
+-----------------------
+- Fixed a security issue (Cross site scripting), see SA-CORE-2009-009.
+- Fixed a variety of small bugs.
+
+Drupal 5.20, 2009-09-16
+-----------------------
+- Avoid security problems resulting from writing Drupal 6-style menu
+  declarations.
+- Fixed security issues (session fixation), see SA-CORE-2009-008.
+- Fixed a variety of small bugs.
+
+Drupal 5.19, 2009-07-01
+-----------------------
+- Fixed security issues (Cross site scripting and Password leakage in URL), see
+  SA-CORE-2009-007.          
+- Fixed a variety of small bugs.
+
+Drupal 5.18, 2009-05-13
+-----------------------
+- Fixed security issues (Cross site scripting), see SA-CORE-2009-006.
+- Fixed a variety of small bugs.
+
+Drupal 5.17, 2009-04-29
+-----------------------
+- Fixed security issues (Cross site scripting and limited information
+  disclosure) see SA-CORE-2009-005.
+- Fixed a variety of small bugs.
+
+Drupal 5.16, 2009-02-25
+-----------------------
+- Fixed a security issue, (Local file inclusion on Windows), see SA-CORE-2009-004.
+- Fixed a variety of small bugs.
+
+Drupal 5.15, 2009-01-14
+-----------------------
+- Fixed security issues, (Hardening against SQL injection), see
+  SA-CORE-2009-001
+- Fixed HTTP_HOST checking to work again with HTTP 1.0 clients and basic shell
+  scripts.
+- Fixed a variety of small bugs.
+
+Drupal 5.14, 2008-12-11
+-----------------------
+- removed a previous change incompatible with PHP 5.1.x and lower.
+
+Drupal 5.13, 2008-12-10
+-----------------------
+- fixed a variety of small bugs.
+- fixed security issues, (Cross site request forgery and Cross site scripting), see SA-2008-073
+- updated robots.txt and .htaccess to match current file use.
+
+Drupal 5.12, 2008-10-22
+-----------------------
+- fixed security issues, (File inclusion), see SA-2008-067
+
+Drupal 5.11, 2008-10-08
+-----------------------
+- fixed a variety of small bugs.
+- fixed security issues, (File upload access bypass, Access rules bypass,
+  BlogAPI access bypass, Node validation bypass), see SA-2008-060
+
+Drupal 5.10, 2008-08-13
+-----------------------
+- fixed a variety of small bugs.
+- fixed security issues, (Cross site scripting, Arbitrary file uploads via
+  BlogAPI and Cross site request forgery), see SA-2008-047
+
+Drupal 5.9, 2008-07-23
+----------------------
+- fixed a variety of small bugs.
+- fixed security issues, (Session fixation), see SA-2008-046
+
+Drupal 5.8, 2008-07-09
+----------------------
+- fixed a variety of small bugs.
+- fixed security issues, (Cross site scripting, cross site request forgery, and
+  session fixation), see SA-2008-044
 
 Drupal 5.7, 2008-01-28
 ----------------------
@@ -737,7 +1153,7 @@ Drupal 4.5.0, 2004-10-18
 - Filter system:
     * Added support for using multiple input formats on the site
     * Expanded the embedded PHP-code feature so it can be used everywhere
-    * Added support for role-dependant filtering, through input formats
+    * Added support for role-dependent filtering, through input formats
 - UI translation:
     * Managing translations is now completely done through the administration interface
     * Added support for importing/exporting gettext .po files

@@ -1,5 +1,4 @@
 <?php
-// $Id: standard.install,v 1.30 2011/01/04 18:24:24 webchick Exp $
 
 /**
  * Implements hook_install().
@@ -66,7 +65,7 @@ function standard_install() {
   // Enable some standard blocks.
   $default_theme = variable_get('theme_default', 'bartik');
   $admin_theme = 'seven';
-  $values = array(
+  $blocks = array(
     array(
       'module' => 'system',
       'delta' => 'main',
@@ -189,8 +188,8 @@ function standard_install() {
     ),
   );
   $query = db_insert('block')->fields(array('module', 'delta', 'theme', 'status', 'weight', 'region', 'pages', 'cache'));
-  foreach ($values as $record) {
-    $query->values($record);
+  foreach ($blocks as $block) {
+    $query->values($block);
   }
   $query->execute();
 
@@ -272,7 +271,7 @@ function standard_install() {
   $description = st('Use tags to group articles on similar topics into categories.');
   $help = st('Enter a comma-separated list of words to describe your content.');
   $vocabulary = (object) array(
-    'name' => 'Tags',
+    'name' => st('Tags'),
     'description' => $description,
     'machine_name' => 'tags',
     'help' => $help,
@@ -299,7 +298,7 @@ function standard_install() {
   $instance = array(
     'field_name' => 'field_' . $vocabulary->machine_name,
     'entity_type' => 'node',
-    'label' => $vocabulary->name,
+    'label' => 'Tags',
     'bundle' => 'article',
     'description' => $vocabulary->help,
     'widget' => array(
@@ -328,7 +327,6 @@ function standard_install() {
     'field_name' => 'field_image',
     'type' => 'image',
     'cardinality' => 1,
-    'translatable' => TRUE,
     'locked' => FALSE,
     'indexes' => array('fid' => array('fid')),
     'settings' => array(

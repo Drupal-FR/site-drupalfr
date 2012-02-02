@@ -1,5 +1,4 @@
 <?php
-// $Id: module.inc,v 1.209 2010/11/27 20:41:38 dries Exp $
 
 /**
  * @file
@@ -127,6 +126,9 @@ function system_list($type) {
   // if not fetch only the required information to fire bootstrap hooks
   // in case we are going to serve the page from cache.
   if ($type == 'bootstrap') {
+    if (isset($lists['bootstrap'])) {
+      return $lists['bootstrap'];
+    }
     if ($cached = cache_get('bootstrap_modules', 'cache_bootstrap')) {
       $bootstrap_list = $cached->data;
     }
@@ -372,7 +374,7 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
 
       // Add dependencies to the list, with a placeholder weight.
       // The new modules will be processed as the while loop continues.
-      foreach ($module_data[$module]->info['dependencies'] as $dependency) {
+      foreach (array_keys($module_data[$module]->requires) as $dependency) {
         if (!isset($module_list[$dependency])) {
           $module_list[$dependency] = 0;
         }
@@ -537,6 +539,7 @@ function module_disable($module_list, $disable_dependents = TRUE) {
     system_list_reset();
     module_list(TRUE);
     module_implements('', FALSE, TRUE);
+    entity_info_cache_clear();
     // Invoke hook_modules_disabled before disabling modules,
     // so we can still call module hooks to get information.
     module_invoke_all('modules_disabled', $invoke_modules);
@@ -784,10 +787,9 @@ function module_implements_write_cache() {
  * @return
  *   The return value of the hook implementation.
  */
-function module_invoke() {
+function module_invoke($module, $hook) {
   $args = func_get_args();
-  $module = $args[0];
-  $hook = $args[1];
+  // Remove $module and $hook from the arguments.
   unset($args[0], $args[1]);
   if (module_hook($module, $hook)) {
     return call_user_func_array($module . '_' . $hook, $args);
@@ -806,9 +808,9 @@ function module_invoke() {
  *   An array of return values of the hook implementations. If modules return
  *   arrays from their implementations, those are merged into one array.
  */
-function module_invoke_all() {
+function module_invoke_all($hook) {
   $args = func_get_args();
-  $hook = $args[0];
+  // Remove $hook from the arguments.
   unset($args[0]);
   $return = array();
   foreach (module_implements($hook) as $module) {
@@ -854,7 +856,7 @@ function drupal_required_modules() {
 /**
  * Hands off alterable variables to type-specific *_alter implementations.
  *
- * This dispatch function hands off the passed in variables to type-specific
+ * This dispatch function hands off the passed-in variables to type-specific
  * hook_TYPE_alter() implementations in modules. It ensures a consistent
  * interface for all altering operations.
  *
@@ -888,14 +890,14 @@ function drupal_required_modules() {
  *   values in $type. For example, when Form API is using drupal_alter() to
  *   execute both hook_form_alter() and hook_form_FORM_ID_alter()
  *   implementations, it passes array('form', 'form_' . $form_id) for $type.
- * @param &$data
+ * @param $data
  *   The variable that will be passed to hook_TYPE_alter() implementations to be
  *   altered. The type of this variable depends on the value of the $type
  *   argument. For example, when altering a 'form', $data will be a structured
  *   array. When altering a 'profile', $data will be an object.
- * @param &$context1
+ * @param $context1
  *   (optional) An additional variable that is passed by reference.
- * @param &$context2
+ * @param $context2
  *   (optional) An additional variable that is passed by reference. If more
  *   context needs to be provided to implementations, then this should be an
  *   associative array as described above.
@@ -951,10 +953,24 @@ function drupal_alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
       }
       // If any modules implement one of the extra hooks that do not implement
       // the primary hook, we need to add them to the $modules array in their
-      // appropriate order.
+      // appropriate order. module_implements() can only return ordered
+      // implementations of a single hook. To get the ordered implementations
+      // of multiple hooks, we mimic the module_implements() logic of first
+      // ordering by module_list(), and then calling
+      // drupal_alter('module_implements').
       if (array_diff($extra_modules, $modules)) {
-        // Order the modules by the order returned by module_list().
+        // Merge the arrays and order by module_list().
         $modules = array_intersect(module_list(), array_merge($modules, $extra_modules));
+        // Since module_implements() already took care of loading the necessary
+        // include files, we can safely pass FALSE for the array values.
+        $implementations = array_fill_keys($modules, FALSE);
+        // Let modules adjust the order solely based on the primary hook. This
+        // ensures the same module order regardless of whether this if block
+        // runs. Calling drupal_alter() recursively in this way does not result
+        // in an infinite loop, because this call is for a single $type, so we
+        // won't end up in this code block again.
+        drupal_alter('module_implements', $implementations, $hook);
+        $modules = array_keys($implementations);
       }
       foreach ($modules as $module) {
         // Since $modules is a merged array, for any given module, we do not
@@ -1002,4 +1018,3 @@ function drupal_alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
     $function($data, $context1, $context2);
   }
 }
-

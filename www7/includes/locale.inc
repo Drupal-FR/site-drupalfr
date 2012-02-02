@@ -1,5 +1,4 @@
 <?php
-// $Id: locale.inc,v 1.266 2011/01/03 18:03:54 webchick Exp $
 
 /**
  * @file
@@ -42,6 +41,36 @@ define('LOCALE_LANGUAGE_NEGOTIATION_SESSION', 'locale-session');
  * Regular expression pattern used to localize JavaScript strings.
  */
 define('LOCALE_JS_STRING', '(?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")(?:\s*\+\s*)?)+');
+
+/**
+ * Regular expression pattern used to match simple JS object literal.
+ *
+ * This pattern matches a basic JS object, but will fail on an object with
+ * nested objects. Used in JS file parsing for string arg processing.
+ */
+define('LOCALE_JS_OBJECT', '\{.*?\}');
+
+/**
+ * Regular expression to match an object containing a key 'context'.
+ *
+ * Pattern to match a JS object containing a 'context key' with a string value,
+ * which is captured. Will fail if there are nested objects.
+ */
+define('LOCALE_JS_OBJECT_CONTEXT', '
+  \{              # match object literal start
+  .*?             # match anything, non-greedy
+  (?:             # match a form of "context"
+    \'context\'
+    |
+    "context"
+    |
+    context
+  )
+  \s*:\s*         # match key-value separator ":"
+  (' . LOCALE_JS_STRING . ')  # match context string
+  .*?             # match anything, non-greedy
+  \}              # match end of object literal
+');
 
 /**
  * Translation import mode overwriting all existing translations
@@ -94,39 +123,82 @@ function locale_language_from_interface() {
  * otherwise we would cache a user-specific preference.
  *
  * @param $languages
- *   An array of valid language objects.
+ *   An array of language objects for enabled languages ordered by weight.
  *
  * @return
  *   A valid language code on success, FALSE otherwise.
  */
 function locale_language_from_browser($languages) {
-  // Specified by the user via the browser's Accept Language setting
-  // Samples: "hu, en-us;q=0.66, en;q=0.33", "hu,en-us;q=0.5"
-  $browser_langs = array();
+  if (empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    return FALSE;
+  }
 
-  if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    $browser_accept = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-    foreach ($browser_accept as $langpart) {
-      // The language part is either a code or a code with a quality.
-      // We cannot do anything with a * code, so it is skipped.
-      // If the quality is missing, it is assumed to be 1 according to the RFC.
-      if (preg_match("!([a-z-]+)(;q=([0-9\\.]+))?!", trim($langpart), $found)) {
-        $browser_langs[$found[1]] = (isset($found[3]) ? (float) $found[3] : 1.0);
+  // The Accept-Language header contains information about the language
+  // preferences configured in the user's browser / operating system.
+  // RFC 2616 (section 14.4) defines the Accept-Language header as follows:
+  //   Accept-Language = "Accept-Language" ":"
+  //                  1#( language-range [ ";" "q" "=" qvalue ] )
+  //   language-range  = ( ( 1*8ALPHA *( "-" 1*8ALPHA ) ) | "*" )
+  // Samples: "hu, en-us;q=0.66, en;q=0.33", "hu,en-us;q=0.5"
+  $browser_langcodes = array();
+  if (preg_match_all('@([a-zA-Z-]+|\*)(?:;q=([0-9.]+))?(?:$|\s*,\s*)@', trim($_SERVER['HTTP_ACCEPT_LANGUAGE']), $matches, PREG_SET_ORDER)) {
+    foreach ($matches as $match) {
+      // We can safely use strtolower() here, tags are ASCII.
+      // RFC2616 mandates that the decimal part is no more than three digits,
+      // so we multiply the qvalue by 1000 to avoid floating point comparisons.
+      $langcode = strtolower($match[1]);
+      $qvalue = isset($match[2]) ? (float) $match[2] : 1;
+      $browser_langcodes[$langcode] = (int) ($qvalue * 1000);
+    }
+  }
+
+  // We should take pristine values from the HTTP headers, but Internet Explorer
+  // from version 7 sends only specific language tags (eg. fr-CA) without the
+  // corresponding generic tag (fr) unless explicitly configured. In that case,
+  // we assume that the lowest value of the specific tags is the value of the
+  // generic language to be as close to the HTTP 1.1 spec as possible.
+  // See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4 and
+  // http://blogs.msdn.com/b/ie/archive/2006/10/17/accept-language-header-for-internet-explorer-7.aspx
+  asort($browser_langcodes);
+  foreach ($browser_langcodes as $langcode => $qvalue) {
+    $generic_tag = strtok($langcode, '-');
+    if (!isset($browser_langcodes[$generic_tag])) {
+      $browser_langcodes[$generic_tag] = $qvalue;
+    }
+  }
+
+  // Find the enabled language with the greatest qvalue, following the rules
+  // of RFC 2616 (section 14.4). If several languages have the same qvalue,
+  // prefer the one with the greatest weight.
+  $best_match_langcode = FALSE;
+  $max_qvalue = 0;
+  foreach ($languages as $langcode => $language) {
+    // Language tags are case insensitive (RFC2616, sec 3.10).
+    $langcode = strtolower($langcode);
+
+    // If nothing matches below, the default qvalue is the one of the wildcard
+    // language, if set, or is 0 (which will never match).
+    $qvalue = isset($browser_langcodes['*']) ? $browser_langcodes['*'] : 0;
+
+    // Find the longest possible prefix of the browser-supplied language
+    // ('the language-range') that matches this site language ('the language tag').
+    $prefix = $langcode;
+    do {
+      if (isset($browser_langcodes[$prefix])) {
+        $qvalue = $browser_langcodes[$prefix];
+        break;
       }
     }
-  }
+    while ($prefix = substr($prefix, 0, strrpos($prefix, '-')));
 
-  // Order the codes by quality
-  arsort($browser_langs);
-
-  // Try to find the first preferred language we have
-  foreach ($browser_langs as $langcode => $q) {
-    if (isset($languages[$langcode])) {
-      return $langcode;
+    // Find the best match.
+    if ($qvalue > $max_qvalue) {
+      $best_match_langcode = $language->language;
+      $max_qvalue = $qvalue;
     }
   }
 
-  return FALSE;
+  return $best_match_langcode;
 }
 
 /**
@@ -208,10 +280,16 @@ function locale_language_from_url($languages) {
 
     case LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN:
       foreach ($languages as $language) {
-        $host = parse_url($language->domain, PHP_URL_HOST);
-        if ($host && ($_SERVER['HTTP_HOST'] == $host)) {
-          $language_url = $language->language;
-          break;
+        // Skip check if the language doesn't have a domain.
+        if ($language->domain) {
+          // Only compare the domains not the protocols or ports.
+          // Remove protocol and add http:// so parse_url works
+          $host = 'http://' . str_replace(array('http://', 'https://'), '', $language->domain);
+          $host = parse_url($host, PHP_URL_HOST);
+          if ($_SERVER['HTTP_HOST'] == $host) {
+            $language_url = $language->language;
+            break;
+          }
         }
       }
       break;
@@ -586,159 +664,250 @@ function _locale_import_po($file, $langcode, $mode, $group = NULL) {
  */
 function _locale_import_read_po($op, $file, $mode = NULL, $lang = NULL, $group = 'default') {
 
-  $fd = fopen($file->uri, "rb"); // File will get closed by PHP on return
+  // The file will get closed by PHP on returning from this function.
+  $fd = fopen($file->uri, 'rb');
   if (!$fd) {
     _locale_import_message('The translation import failed, because the file %filename could not be read.', $file);
     return FALSE;
   }
 
-  $context = "COMMENT"; // Parser context: COMMENT, MSGID, MSGID_PLURAL, MSGSTR and MSGSTR_ARR
-  $current = array();   // Current entry being read
-  $plural = 0;          // Current plural form
-  $lineno = 0;          // Current line
+  /*
+   * The parser context. Can be:
+   *  - 'COMMENT' (#)
+   *  - 'MSGID' (msgid)
+   *  - 'MSGID_PLURAL' (msgid_plural)
+   *  - 'MSGCTXT' (msgctxt)
+   *  - 'MSGSTR' (msgstr or msgstr[])
+   *  - 'MSGSTR_ARR' (msgstr_arg)
+   */
+  $context = 'COMMENT';
+
+  // Current entry being read.
+  $current = array();
+
+  // Current plurality for 'msgstr[]'.
+  $plural = 0;
+
+  // Current line.
+  $lineno = 0;
 
   while (!feof($fd)) {
-    $line = fgets($fd, 10*1024); // A line should not be this long
+    // A line should not be longer than 10 * 1024.
+    $line = fgets($fd, 10 * 1024);
+
     if ($lineno == 0) {
       // The first line might come with a UTF-8 BOM, which should be removed.
       $line = str_replace("\xEF\xBB\xBF", '', $line);
     }
+
     $lineno++;
+
+    // Trim away the linefeed.
     $line = trim(strtr($line, array("\\\n" => "")));
 
-    if (!strncmp("#", $line, 1)) { // A comment
-      if ($context == "COMMENT") { // Already in comment context: add
-        $current["#"][] = substr($line, 1);
+    if (!strncmp('#', $line, 1)) {
+      // Lines starting with '#' are comments.
+
+      if ($context == 'COMMENT') {
+        // Already in comment token, insert the comment.
+        $current['#'][] = substr($line, 1);
       }
-      elseif (($context == "MSGSTR") || ($context == "MSGSTR_ARR")) { // End current entry, start a new one
+      elseif (($context == 'MSGSTR') || ($context == 'MSGSTR_ARR')) {
+        // We are currently in string token, close it out.
         _locale_import_one_string($op, $current, $mode, $lang, $file, $group);
-        $current = array();
-        $current["#"][] = substr($line, 1);
-        $context = "COMMENT";
+
+        // Start a new entry for the comment.
+        $current         = array();
+        $current['#'][]  = substr($line, 1);
+
+        $context = 'COMMENT';
       }
-      else { // Parse error
+      else {
+        // A comment following any other token is a syntax error.
         _locale_import_message('The translation file %filename contains an error: "msgstr" was expected but not found on line %line.', $file, $lineno);
         return FALSE;
       }
     }
-    elseif (!strncmp("msgid_plural", $line, 12)) {
-      if ($context != "MSGID") { // Must be plural form for current entry
+    elseif (!strncmp('msgid_plural', $line, 12)) {
+      // A plural form for the current message.
+
+      if ($context != 'MSGID') {
+        // A plural form cannot be added to anything else but the id directly.
         _locale_import_message('The translation file %filename contains an error: "msgid_plural" was expected but not found on line %line.', $file, $lineno);
         return FALSE;
       }
+
+      // Remove 'msgid_plural' and trim away whitespace.
       $line = trim(substr($line, 12));
+      // At this point, $line should now contain only the plural form.
+
       $quoted = _locale_import_parse_quoted($line);
       if ($quoted === FALSE) {
+        // The plural form must be wrapped in quotes.
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      $current["msgid"] = $current["msgid"] . "\0" . $quoted;
-      $context = "MSGID_PLURAL";
+
+      // Append the plural form to the current entry.
+      $current['msgid'] .= "\0" . $quoted;
+
+      $context = 'MSGID_PLURAL';
     }
-    elseif (!strncmp("msgid", $line, 5)) {
-      if (($context == "MSGSTR") || ($context == "MSGSTR_ARR")) {   // End current entry, start a new one
+    elseif (!strncmp('msgid', $line, 5)) {
+      // Starting a new message.
+
+      if (($context == 'MSGSTR') || ($context == 'MSGSTR_ARR')) {
+        // We are currently in a message string, close it out.
         _locale_import_one_string($op, $current, $mode, $lang, $file, $group);
+
+        // Start a new context for the id.
         $current = array();
       }
-      elseif ($context == "MSGID") { // Already in this context? Parse error
+      elseif ($context == 'MSGID') {
+        // We are currently already in the context, meaning we passed an id with no data.
         _locale_import_message('The translation file %filename contains an error: "msgid" is unexpected on line %line.', $file, $lineno);
         return FALSE;
       }
+
+      // Remove 'msgid' and trim away whitespace.
       $line = trim(substr($line, 5));
+      // At this point, $line should now contain only the message id.
+
       $quoted = _locale_import_parse_quoted($line);
       if ($quoted === FALSE) {
+        // The message id must be wrapped in quotes.
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      $current["msgid"] = $quoted;
-      $context = "MSGID";
+
+      $current['msgid'] = $quoted;
+      $context = 'MSGID';
     }
-    elseif (!strncmp("msgctxt", $line, 7)) {
-      if (($context == "MSGSTR") || ($context == "MSGSTR_ARR")) {   // End current entry, start a new one
+    elseif (!strncmp('msgctxt', $line, 7)) {
+      // Starting a new context.
+
+      if (($context == 'MSGSTR') || ($context == 'MSGSTR_ARR')) {
+        // We are currently in a message, start a new one.
         _locale_import_one_string($op, $current, $mode, $lang, $file, $group);
         $current = array();
       }
-      elseif (!empty($current["msgctxt"])) { // Already in this context? Parse error
+      elseif (!empty($current['msgctxt'])) {
+        // A context cannot apply to another context.
         _locale_import_message('The translation file %filename contains an error: "msgctxt" is unexpected on line %line.', $file, $lineno);
         return FALSE;
       }
+
+      // Remove 'msgctxt' and trim away whitespaces.
       $line = trim(substr($line, 7));
+      // At this point, $line should now contain the context.
+
       $quoted = _locale_import_parse_quoted($line);
       if ($quoted === FALSE) {
+        // The context string must be quoted.
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      $current["msgctxt"] = $quoted;
-      $context = "MSGCTXT";
+
+      $current['msgctxt'] = $quoted;
+
+      $context = 'MSGCTXT';
     }
-    elseif (!strncmp("msgstr[", $line, 7)) {
-      if (($context != "MSGID") && ($context != "MSGCTXT") && ($context != "MSGID_PLURAL") && ($context != "MSGSTR_ARR")) { // Must come after msgid, msgxtxt, msgid_plural, or msgstr[]
+    elseif (!strncmp('msgstr[', $line, 7)) {
+      // A message string for a specific plurality.
+
+      if (($context != 'MSGID') && ($context != 'MSGCTXT') && ($context != 'MSGID_PLURAL') && ($context != 'MSGSTR_ARR')) {
+        // Message strings must come after msgid, msgxtxt, msgid_plural, or other msgstr[] entries.
         _locale_import_message('The translation file %filename contains an error: "msgstr[]" is unexpected on line %line.', $file, $lineno);
         return FALSE;
       }
-      if (strpos($line, "]") === FALSE) {
+
+      // Ensure the plurality is terminated.
+      if (strpos($line, ']') === FALSE) {
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      $frombracket = strstr($line, "[");
-      $plural = substr($frombracket, 1, strpos($frombracket, "]") - 1);
+
+      // Extract the plurality.
+      $frombracket = strstr($line, '[');
+      $plural = substr($frombracket, 1, strpos($frombracket, ']') - 1);
+
+      // Skip to the next whitespace and trim away any further whitespace, bringing $line to the message data.
       $line = trim(strstr($line, " "));
+
       $quoted = _locale_import_parse_quoted($line);
       if ($quoted === FALSE) {
+        // The string must be quoted.
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      $current["msgstr"][$plural] = $quoted;
-      $context = "MSGSTR_ARR";
+
+      $current['msgstr'][$plural] = $quoted;
+
+      $context = 'MSGSTR_ARR';
     }
     elseif (!strncmp("msgstr", $line, 6)) {
-      if (($context != "MSGID") && ($context != "MSGCTXT")) {   // Should come just after a msgid or msgctxt block
+      // A string for the an id or context.
+
+      if (($context != 'MSGID') && ($context != 'MSGCTXT')) {
+        // Strings are only valid within an id or context scope.
         _locale_import_message('The translation file %filename contains an error: "msgstr" is unexpected on line %line.', $file, $lineno);
         return FALSE;
       }
+
+      // Remove 'msgstr' and trim away away whitespaces.
       $line = trim(substr($line, 6));
+      // At this point, $line should now contain the message.
+
       $quoted = _locale_import_parse_quoted($line);
       if ($quoted === FALSE) {
+        // The string must be quoted.
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      $current["msgstr"] = $quoted;
-      $context = "MSGSTR";
+
+      $current['msgstr'] = $quoted;
+
+      $context = 'MSGSTR';
     }
-    elseif ($line != "") {
+    elseif ($line != '') {
+      // Anything that is not a token may be a continuation of a previous token.
+
       $quoted = _locale_import_parse_quoted($line);
       if ($quoted === FALSE) {
+        // The string must be quoted.
         _locale_import_message('The translation file %filename contains a syntax error on line %line.', $file, $lineno);
         return FALSE;
       }
-      if (($context == "MSGID") || ($context == "MSGID_PLURAL")) {
-        $current["msgid"] .= $quoted;
+
+      // Append the string to the current context.
+      if (($context == 'MSGID') || ($context == 'MSGID_PLURAL')) {
+        $current['msgid'] .= $quoted;
       }
-      elseif ($context == "MSGCTXT") {
-        $current["msgctxt"] .= $quoted;
+      elseif ($context == 'MSGCTXT') {
+        $current['msgctxt'] .= $quoted;
       }
-      elseif ($context == "MSGSTR") {
-        $current["msgstr"] .= $quoted;
+      elseif ($context == 'MSGSTR') {
+        $current['msgstr'] .= $quoted;
       }
-      elseif ($context == "MSGSTR_ARR") {
-        $current["msgstr"][$plural] .= $quoted;
+      elseif ($context == 'MSGSTR_ARR') {
+        $current['msgstr'][$plural] .= $quoted;
       }
       else {
+        // No valid context to append to.
         _locale_import_message('The translation file %filename contains an error: there is an unexpected string on line %line.', $file, $lineno);
         return FALSE;
       }
     }
   }
 
-  // End of PO file, flush last entry.
-  if (($context == "MSGSTR") || ($context == "MSGSTR_ARR")) {
+  // End of PO file, closed out the last entry.
+  if (($context == 'MSGSTR') || ($context == 'MSGSTR_ARR')) {
     _locale_import_one_string($op, $current, $mode, $lang, $file, $group);
   }
-  elseif ($context != "COMMENT") {
+  elseif ($context != 'COMMENT') {
     _locale_import_message('The translation file %filename ended unexpectedly at line %line.', $file, $lineno);
     return FALSE;
   }
-
 }
 
 /**
@@ -1304,55 +1473,106 @@ function _locale_parse_js_file($filepath) {
 
   // Match all calls to Drupal.t() in an array.
   // Note: \s also matches newlines with the 's' modifier.
-  preg_match_all('~[^\w]Drupal\s*\.\s*t\s*\(\s*(' . LOCALE_JS_STRING . ')\s*[,\)]~s', $file, $t_matches);
+  preg_match_all('~
+    [^\w]Drupal\s*\.\s*t\s*                       # match "Drupal.t" with whitespace
+    \(\s*                                         # match "(" argument list start
+    (' . LOCALE_JS_STRING . ')\s*                 # capture string argument
+    (?:,\s*' . LOCALE_JS_OBJECT . '\s*            # optionally capture str args
+      (?:,\s*' . LOCALE_JS_OBJECT_CONTEXT . '\s*) # optionally capture context
+    ?)?                                           # close optional args
+    [,\)]                                         # match ")" or "," to finish
+    ~sx', $file, $t_matches);
 
   // Match all Drupal.formatPlural() calls in another array.
-  preg_match_all('~[^\w]Drupal\s*\.\s*formatPlural\s*\(\s*.+?\s*,\s*(' . LOCALE_JS_STRING . ')\s*,\s*((?:(?:\'(?:\\\\\'|[^\'])*@count(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*@count(?:\\\\"|[^"])*")(?:\s*\+\s*)?)+)\s*[,\)]~s', $file, $plural_matches);
+  preg_match_all('~
+    [^\w]Drupal\s*\.\s*formatPlural\s*  # match "Drupal.formatPlural" with whitespace
+    \(                                  # match "(" argument list start
+    \s*.+?\s*,\s*                       # match count argument
+    (' . LOCALE_JS_STRING . ')\s*,\s*   # match singular string argument
+    (                             # capture plural string argument
+      (?:                         # non-capturing group to repeat string pieces
+        (?:
+          \'                      # match start of single-quoted string
+          (?:\\\\\'|[^\'])*       # match any character except unescaped single-quote
+          @count                  # match "@count"
+          (?:\\\\\'|[^\'])*       # match any character except unescaped single-quote
+          \'                      # match end of single-quoted string
+          |
+          "                       # match start of double-quoted string
+          (?:\\\\"|[^"])*         # match any character except unescaped double-quote
+          @count                  # match "@count"
+          (?:\\\\"|[^"])*         # match any character except unescaped double-quote
+          "                       # match end of double-quoted string
+        )
+        (?:\s*\+\s*)?             # match "+" with possible whitespace, for str concat
+      )+                          # match multiple because we supports concatenating strs
+    )\s*                          # end capturing of plural string argument
+    (?:,\s*' . LOCALE_JS_OBJECT . '\s*          # optionally capture string args
+      (?:,\s*' . LOCALE_JS_OBJECT_CONTEXT . '\s*)?  # optionally capture context
+    )?
+    [,\)]
+    ~sx', $file, $plural_matches);
 
-  // Loop through all matches and process them.
-  $all_matches = array_merge($plural_matches[1], $t_matches[1]);
-  foreach ($all_matches as $key => $string) {
-    $strings = array($string);
+  $matches = array();
+
+  // Add strings from Drupal.t().
+  foreach ($t_matches[1] as $key => $string) {
+    $matches[] = array(
+      'string'  => $string,
+      'context' => $t_matches[2][$key],
+    );
+  }
+
+  // Add string from Drupal.formatPlural().
+  foreach ($plural_matches[1] as $key => $string) {
+    $matches[] = array(
+      'string'  => $string,
+      'context' => $plural_matches[3][$key],
+    );
 
     // If there is also a plural version of this string, add it to the strings array.
     if (isset($plural_matches[2][$key])) {
-      $strings[] = $plural_matches[2][$key];
+      $matches[] = array(
+        'string'  => $plural_matches[2][$key],
+        'context' => $plural_matches[3][$key],
+      );
     }
+  }
 
-    foreach ($strings as $key => $string) {
-      // Remove the quotes and string concatenations from the string.
-      $string = implode('', preg_split('~(?<!\\\\)[\'"]\s*\+\s*[\'"]~s', substr($string, 1, -1)));
+  foreach ($matches as $key => $match) {
+    // Remove the quotes and string concatenations from the string.
+    $string = implode('', preg_split('~(?<!\\\\)[\'"]\s*\+\s*[\'"]~s', substr($match['string'], 1, -1)));
+    $context = implode('', preg_split('~(?<!\\\\)[\'"]\s*\+\s*[\'"]~s', substr($match['context'], 1, -1)));
 
-      $source = db_query("SELECT lid, location FROM {locales_source} WHERE source = :source AND textgroup = 'default'", array(':source' => $string))->fetchObject();
-      if ($source) {
-        // We already have this source string and now have to add the location
-        // to the location column, if this file is not yet present in there.
-        $locations = preg_split('~\s*;\s*~', $source->location);
+    $source = db_query("SELECT lid, location FROM {locales_source} WHERE source = :source AND context = :context AND textgroup = 'default'", array(':source' => $string, ':context' => $context))->fetchObject();
+    if ($source) {
+      // We already have this source string and now have to add the location
+      // to the location column, if this file is not yet present in there.
+      $locations = preg_split('~\s*;\s*~', $source->location);
 
-        if (!in_array($filepath, $locations)) {
-          $locations[] = $filepath;
-          $locations = implode('; ', $locations);
+      if (!in_array($filepath, $locations)) {
+        $locations[] = $filepath;
+        $locations = implode('; ', $locations);
 
-          // Save the new locations string to the database.
-          db_update('locales_source')
-            ->fields(array(
-              'location' => $locations,
-            ))
-            ->condition('lid', $source->lid)
-            ->execute();
-        }
-      }
-      else {
-        // We don't have the source string yet, thus we insert it into the database.
-        db_insert('locales_source')
+        // Save the new locations string to the database.
+        db_update('locales_source')
           ->fields(array(
-            'location' => $filepath,
-            'source' => $string,
-            'context' => '',
-            'textgroup' => 'default',
+            'location' => $locations,
           ))
+          ->condition('lid', $source->lid)
           ->execute();
       }
+    }
+    else {
+      // We don't have the source string yet, thus we insert it into the database.
+      db_insert('locales_source')
+        ->fields(array(
+          'location' => $filepath,
+          'source' => $string,
+          'context' => $context,
+          'textgroup' => 'default',
+        ))
+        ->execute();
     }
   }
 }
@@ -1773,11 +1993,11 @@ function _locale_rebuild_js($langcode = NULL) {
 
   // Construct the array for JavaScript translations.
   // Only add strings with a translation to the translations array.
-  $result = db_query("SELECT s.lid, s.source, t.translation FROM {locales_source} s INNER JOIN {locales_target} t ON s.lid = t.lid AND t.language = :language WHERE s.location LIKE '%.js%' AND s.textgroup = :textgroup AND t.translation IS NOT NULL", array(':language' => $language->language, ':textgroup' => 'default'));
+  $result = db_query("SELECT s.lid, s.source, s.context, t.translation FROM {locales_source} s INNER JOIN {locales_target} t ON s.lid = t.lid AND t.language = :language WHERE s.location LIKE '%.js%' AND s.textgroup = :textgroup", array(':language' => $language->language, ':textgroup' => 'default'));
 
   $translations = array();
   foreach ($result as $data) {
-    $translations[$data->source] = $data->translation;
+    $translations[$data->context][$data->source] = $data->translation;
   }
 
   // Construct the JavaScript file, if there are translations.
@@ -2073,7 +2293,7 @@ function _locale_batch_import($filepath, &$context) {
   // The filename is either {langcode}.po or {prefix}.{langcode}.po, so
   // we can extract the language code to use for the import from the end.
   if (preg_match('!(/|\.)([^\./]+)\.po$!', $filepath, $langcode)) {
-    $file = (object) array('filename' => basename($filepath), 'uri' => $filepath);
+    $file = (object) array('filename' => drupal_basename($filepath), 'uri' => $filepath);
     _locale_import_read_po('db-store', $file, LOCALE_IMPORT_KEEP, $langcode[2]);
     $context['results'][] = $filepath;
   }

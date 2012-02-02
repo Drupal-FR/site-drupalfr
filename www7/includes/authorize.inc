@@ -1,5 +1,4 @@
 <?php
-// $Id: authorize.inc,v 1.15 2011/01/04 04:37:27 webchick Exp $
 
 /**
  * @file
@@ -7,7 +6,13 @@
  */
 
 /**
- * Build the form for choosing a FileTransfer type and supplying credentials.
+ * Form constructor for the file transfer authorization form.
+ *
+ * Allows the user to choose a FileTransfer type and supply credentials.
+ *
+ * @see authorize_filetransfer_form_validate()
+ * @see authorize_filetransfer_form_submit()
+ * @ingroup forms
  */
 function authorize_filetransfer_form($form, &$form_state) {
   global $base_url, $is_https;
@@ -128,10 +133,11 @@ function authorize_filetransfer_form($form, &$form_state) {
 }
 
 /**
- * Generate the Form API array for the settings for a given connection backend.
+ * Generates the Form API array for a given connection backend's settings.
  *
  * @param $backend
  *   The name of the backend (e.g. 'ftp', 'ssh', etc).
+ *
  * @return
  *   Form API array of connection settings for the given backend.
  *
@@ -152,7 +158,7 @@ function _authorize_filetransfer_connection_settings($backend) {
 }
 
 /**
- * Recursively fill in the default settings on a file transfer connection form.
+ * Sets the default settings on a file transfer connection form recursively.
  *
  * The default settings for the file transfer connection forms are saved in
  * the database. The settings are stored as a nested array in the case of a
@@ -160,14 +166,12 @@ function _authorize_filetransfer_connection_settings($backend) {
  * Therefore, to properly add defaults, we need to walk through all the
  * children form elements and process those defaults recursively.
  *
- * @param &$element
+ * @param $element
  *   Reference to the Form API form element we're operating on.
  * @param $key
  *   The key for our current form element, if any.
  * @param array $defaults
  *   The default settings for the file transfer backend we're operating on.
- * @return
- *   Nothing, this function just sets $element['#default_value'] if needed.
  */
 function _authorize_filetransfer_connection_settings_set_defaults(&$element, $key, array $defaults) {
   // If we're operating on a form element which isn't a fieldset, and we have
@@ -187,14 +191,15 @@ function _authorize_filetransfer_connection_settings_set_defaults(&$element, $ke
 }
 
 /**
- * Validate callback for the filetransfer authorization form.
+ * Form validation handler for authorize_filetransfer_form().
  *
  * @see authorize_filetransfer_form()
+ * @see authorize_filetransfer_submit()
  */
 function authorize_filetransfer_form_validate($form, &$form_state) {
   // Only validate the form if we have collected all of the user input and are
   // ready to proceed with updating or installing.
-  if ($form_state['clicked_button']['#name'] != 'process_updates') {
+  if ($form_state['triggering_element']['#name'] != 'process_updates') {
     return;
   }
 
@@ -219,13 +224,14 @@ function authorize_filetransfer_form_validate($form, &$form_state) {
 }
 
 /**
- * Submit callback when a file transfer is being authorized.
+ * Form submission handler for authorize_filetransfer_form().
  *
  * @see authorize_filetransfer_form()
+ * @see authorize_filetransfer_validate()
  */
 function authorize_filetransfer_form_submit($form, &$form_state) {
   global $base_url;
-  switch ($form_state['clicked_button']['#name']) {
+  switch ($form_state['triggering_element']['#name']) {
     case 'process_updates':
 
       // Save the connection settings to the DB.
@@ -281,7 +287,7 @@ function authorize_filetransfer_form_submit($form, &$form_state) {
 }
 
 /**
- * Run the operation specified in $_SESSION['authorize_operation']
+ * Runs the operation specified in $_SESSION['authorize_operation'].
  *
  * @param $filetransfer
  *   The FileTransfer object to use for running the operation.
@@ -299,12 +305,13 @@ function authorize_run_operation($filetransfer) {
 }
 
 /**
- * Get a FileTransfer class for a specific transfer method and settings.
+ * Gets a FileTransfer class for a specific transfer method and settings.
  *
  * @param $backend
  *   The FileTransfer backend to get the class for.
  * @param $settings
  *   Array of settings for the FileTransfer.
+ *
  * @return
  *   An instantiated FileTransfer object for the requested method and settings,
  *   or FALSE if there was an error finding or instantiating it.

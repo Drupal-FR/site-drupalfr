@@ -1,4 +1,3 @@
-// $Id: states.js,v 1.5 2010/12/06 16:10:29 webchick Exp $
 (function ($) {
 
 /**
@@ -64,6 +63,13 @@ states.Dependent.comparisons = {
   'Function': function (reference, value) {
     // The "reference" variable is a comparison function.
     return reference(value);
+  },
+  'Number': function (reference, value) {
+    // If "reference" is a number and "value" is a string, then cast reference
+    // as a string before applying the strict comparison in compare(). Otherwise
+    // numeric keys in the form's #states array fail to match string values
+    // returned from jQuery's val().
+    return (value.constructor.name === 'String') ? compare(String(reference), value) : compare(reference, value);
   }
 };
 
@@ -363,7 +369,12 @@ states.State.prototype = {
 
   $(document).bind('state:required', function(e) {
     if (e.trigger) {
-      $(e.target).closest('.form-item, .form-submit, .form-wrapper')[e.value ? 'addClass' : 'removeClass']('form-required');
+      if (e.value) {
+        $(e.target).closest('.form-item, .form-wrapper').find('label').append('<span class="form-required">*</span>');
+      }
+      else {
+        $(e.target).closest('.form-item, .form-wrapper').find('label .form-required').remove();
+      }
     }
   });
 

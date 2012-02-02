@@ -1,6 +1,4 @@
 <?php
-// $Id: batch.inc,v 1.54 2010/11/30 17:16:37 dries Exp $
-
 
 /**
  * @file
@@ -22,6 +20,7 @@
  * @param $id
  *   The ID of the batch to load. When a progressive batch is being processed,
  *   the relevant ID is found in $_REQUEST['id'].
+ *
  * @return
  *   An array representing the batch, or FALSE if no batch was found.
  */
@@ -37,7 +36,7 @@ function batch_load($id) {
 }
 
 /**
- * State-based dispatcher for the batch processing page.
+ * Renders the batch processing page based on the current state of the batch.
  *
  * @see _batch_shutdown()
  */
@@ -95,7 +94,7 @@ function _batch_page() {
 }
 
 /**
- * Initialize the batch processing.
+ * Initializes the batch processing.
  *
  * JavaScript-enabled clients are identified by the 'has_js' cookie set in
  * drupal.js. If no JavaScript-enabled page has been visited during the current
@@ -111,7 +110,7 @@ function _batch_start() {
 }
 
 /**
- * Output a batch processing page with JavaScript support.
+ * Outputs a batch processing page with JavaScript support.
  *
  * This initializes the batch and error messages. Note that in JavaScript-based
  * processing, the batch processing page is displayed only once and updated via
@@ -145,7 +144,7 @@ function _batch_progress_page_js() {
 }
 
 /**
- * Do one execution pass in JavaScript-mode and return progress to the browser.
+ * Does one execution pass with JavaScript and returns progress to the browser.
  *
  * @see _batch_progress_page_js()
  * @see _batch_process()
@@ -165,7 +164,7 @@ function _batch_do() {
 }
 
 /**
- * Output a batch processing page without JavaScript support.
+ * Outputs a batch processing page without JavaScript support.
  *
  * @see _batch_process()
  */
@@ -229,7 +228,7 @@ function _batch_progress_page_nojs() {
 }
 
 /**
- * Process sets in a batch.
+ * Processes sets in a batch.
  *
  * If the batch was marked for progressive execution (default), this executes as
  * many operations in batch sets until an execution time of 1 second has been
@@ -340,6 +339,8 @@ function _batch_process() {
       $progress_message = $old_set['progress_message'];
     }
 
+    // Total progress is the number of operations that have fully run plus the
+    // completion level of the current operation.
     $current    = $total - $remaining + $finished;
     $percentage = _batch_api_percentage($total, $current);
     $elapsed    = isset($current_set['elapsed']) ? $current_set['elapsed'] : 0;
@@ -369,17 +370,23 @@ function _batch_process() {
 }
 
 /**
- * Helper function for _batch_process(): returns the formatted percentage.
+ * Formats the percent completion for a batch set.
  *
  * @param $total
  *   The total number of operations.
  * @param $current
- *   The number of the current operation.
+ *   The number of the current operation. This may be a floating point number
+ *   rather than an integer in the case of a multi-step operation that is not
+ *   yet complete; in that case, the fractional part of $current represents the
+ *   fraction of the operation that has been completed.
+ *
  * @return
  *   The properly formatted percentage, as a string. We output percentages
  *   using the correct number of decimal places so that we never print "100%"
  *   until we are finished, but we also never print more decimal places than
  *   are meaningful.
+ *
+ * @see _batch_process()
  */
 function _batch_api_percentage($total, $current) {
   if (!$total || $total == $current) {
@@ -391,13 +398,22 @@ function _batch_api_percentage($total, $current) {
     // We add a new digit at 200, 2000, etc. (since, for example, 199/200
     // would round up to 100% if we didn't).
     $decimal_places = max(0, floor(log10($total / 2.0)) - 1);
-    $percentage = sprintf('%01.' . $decimal_places . 'f', round($current / $total * 100, $decimal_places));
+    do {
+      // Calculate the percentage to the specified number of decimal places.
+      $percentage = sprintf('%01.' . $decimal_places . 'f', round($current / $total * 100, $decimal_places));
+      // When $current is an integer, the above calculation will always be
+      // correct. However, if $current is a floating point number (in the case
+      // of a multi-step batch operation that is not yet complete), $percentage
+      // may be erroneously rounded up to 100%. To prevent that, we add one
+      // more decimal place and try again.
+      $decimal_places++;
+    } while ($percentage == '100');
   }
   return $percentage;
 }
 
 /**
- * Return the batch set being currently processed.
+ * Returns the batch set being currently processed.
  */
 function &_batch_current_set() {
   $batch = &batch_get();
@@ -405,7 +421,7 @@ function &_batch_current_set() {
 }
 
 /**
- * Retrieve the next set in a batch.
+ * Retrieves the next set in a batch.
  *
  * If there is a subsequent set in this batch, assign it as the new set to
  * process and execute its form submit handler (if defined), which may add
@@ -429,7 +445,7 @@ function _batch_next_set() {
 }
 
 /**
- * End the batch processing.
+ * Ends the batch processing.
  *
  * Call the 'finished' callback of each batch set to allow custom handling of
  * the results and resolve page redirection.
@@ -508,7 +524,10 @@ function _batch_finished() {
 }
 
 /**
- * Shutdown function; store the current batch data for the next request.
+ * Shutdown function: Stores the current batch data for the next request.
+ *
+ * @see _batch_page()
+ * @see drupal_register_shutdown_function()
  */
 function _batch_shutdown() {
   if ($batch = batch_get()) {
@@ -518,4 +537,3 @@ function _batch_shutdown() {
       ->execute();
   }
 }
-

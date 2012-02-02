@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlrpc.inc,v 1.69 2010/08/14 03:15:01 dries Exp $
 
 /**
  * @file
@@ -623,4 +622,3 @@ function xmlrpc_error_msg() {
 function xmlrpc_clear_error() {
   xmlrpc_error(NULL, NULL, TRUE);
 }
-

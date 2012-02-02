@@ -1,5 +1,4 @@
 <?php
-// $Id: theme.inc,v 1.627 2011/01/03 08:02:11 webchick Exp $
 
 /**
  * @file
@@ -104,7 +103,7 @@ function drupal_theme_initialize() {
   drupal_static_reset('drupal_alter');
 
   // Provide the page with information about the theme that's used, so that a
-  // later AJAX request can be rendered using the same theme.
+  // later Ajax request can be rendered using the same theme.
   // @see ajax_base_page_theme()
   $setting['ajaxPageState'] = array(
     'theme' => $theme_key,
@@ -238,18 +237,33 @@ function _drupal_theme_initialize($theme, $base_theme = array(), $registry_callb
 /**
  * Get the theme registry.
  *
+ * @param $complete
+ *   Optional boolean to indicate whether to return the complete theme registry
+ *   array or an instance of the ThemeRegistry class. If TRUE, the complete
+ *   theme registry array will be returned. This is useful if you want to
+ *   foreach over the whole registry, use array_* functions or inspect it in a
+ *   debugger. If FALSE, an instance of the ThemeRegistry class will be
+ *   returned, this provides an ArrayObject which allows it to be accessed
+ *   with array syntax and  isset(), and should be more lightweight
+ *   than the full registry. Defaults to TRUE.
+ *
  * @return
- *   The theme registry array if it has been stored in memory, NULL otherwise.
+ *   The complete theme registry array, or an instance of the ThemeRegistry
+ *   class.
  */
-function theme_get_registry() {
-  static $theme_registry = NULL;
+function theme_get_registry($complete = TRUE) {
+  static $theme_registry = array();
+  $key = (int) $complete;
 
-  if (!isset($theme_registry)) {
+  if (!isset($theme_registry[$key])) {
     list($callback, $arguments) = _theme_registry_callback();
-    $theme_registry = call_user_func_array($callback, $arguments);
+    if (!$complete) {
+      $arguments[] = FALSE;
+    }
+    $theme_registry[$key] = call_user_func_array($callback, $arguments);
   }
 
-  return $theme_registry;
+  return $theme_registry[$key];
 }
 
 /**
@@ -269,32 +283,43 @@ function _theme_registry_callback($callback = NULL, array $arguments = array()) 
 }
 
 /**
- * Get the theme_registry cache from the database; if it doesn't exist, build it.
+ * Get the theme_registry cache; if it doesn't exist, build it.
  *
  * @param $theme
  *   The loaded $theme object as returned by list_themes().
  * @param $base_theme
  *   An array of loaded $theme objects representing the ancestor themes in
  *   oldest first order.
- * @param theme_engine
+ * @param $theme_engine
  *   The name of the theme engine.
+ * @param $complete
+ *   Whether to load the complete theme registry or an instance of the
+ *   ThemeRegistry class.
+ *
+ * @return
+ *   The theme registry array, or an instance of the ThemeRegistry class.
  */
-function _theme_load_registry($theme, $base_theme = NULL, $theme_engine = NULL) {
-  // Check the theme registry cache; if it exists, use it.
-  $cache = cache_get("theme_registry:$theme->name", 'cache');
-  if (isset($cache->data)) {
-    $registry = $cache->data;
+function _theme_load_registry($theme, $base_theme = NULL, $theme_engine = NULL, $complete = TRUE) {
+  if ($complete) {
+    // Check the theme registry cache; if it exists, use it.
+    $cached = cache_get("theme_registry:$theme->name");
+    if (isset($cached->data)) {
+      $registry = $cached->data;
+    }
+    else {
+      // If not, build one and cache it.
+      $registry = _theme_build_registry($theme, $base_theme, $theme_engine);
+      // Only persist this registry if all modules are loaded. This assures a
+      // complete set of theme hooks.
+      if (module_load_all(NULL)) {
+        _theme_save_registry($theme, $registry);
+      }
+    }
+    return $registry;
   }
   else {
-    // If not, build one and cache it.
-    $registry = _theme_build_registry($theme, $base_theme, $theme_engine);
-   // Only persist this registry if all modules are loaded. This assures a
-   // complete set of theme hooks.
-    if (module_load_all(NULL)) {
-      _theme_save_registry($theme, $registry);
-    }
+    return new ThemeRegistry('theme_registry:runtime:' . $theme->name, 'cache');
   }
-  return $registry;
 }
 
 /**
@@ -314,14 +339,124 @@ function drupal_theme_rebuild() {
 }
 
 /**
+ * Builds the run-time theme registry.
+ *
+ * Extends DrupalCacheArray to allow the theme registry to be accessed as a
+ * complete registry, while internally caching only the parts of the registry
+ * that are actually in use on the site. On cache misses the complete
+ * theme registry is loaded and used to update the run-time cache.
+ */
+class ThemeRegistry Extends DrupalCacheArray {
+
+  /**
+   * Whether the partial registry can be persisted to the cache.
+   *
+   * This is only allowed if all modules and the request method is GET. theme()
+   * should be very rarely called on POST requests and this avoids polluting
+   * the runtime cache.
+   */
+  protected $persistable;
+
+  /**
+   * The complete theme registry array.
+   */
+  protected $completeRegistry;
+
+  function __construct($cid, $bin) {
+    $this->cid = $cid;
+    $this->bin = $bin;
+    $this->persistable = module_load_all(NULL) && $_SERVER['REQUEST_METHOD'] == 'GET';
+
+    $data = array();
+    if ($this->persistable && $cached = cache_get($this->cid, $this->bin)) {
+      $data = $cached->data;
+    }
+    else {
+      // If there is no runtime cache stored, fetch the full theme registry,
+      // but then initialize each value to NULL. This allows offsetExists()
+      // to function correctly on non-registered theme hooks without triggering
+      // a call to resolveCacheMiss().
+      $data = $this->initializeRegistry();
+      if ($this->persistable) {
+        $this->set($data);
+      }
+    }
+    $this->storage = $data;
+  }
+
+  /**
+   * Initializes the full theme registry.
+   *
+   * @return
+   *   An array with the keys of the full theme registry, but the values
+   *   initialized to NULL.
+   */
+  function initializeRegistry() {
+    $this->completeRegistry = theme_get_registry();
+
+    return array_fill_keys(array_keys($this->completeRegistry), NULL);
+  }
+
+  public function offsetExists($offset) {
+    // Since the theme registry allows for theme hooks to be requested that
+    // are not registered, just check the existence of the key in the registry.
+    // Use array_key_exists() here since a NULL value indicates that the theme
+    // hook exists but has not yet been requested.
+    return array_key_exists($offset, $this->storage);
+  }
+
+  public function offsetGet($offset) {
+    // If the offset is set but empty, it is a registered theme hook that has
+    // not yet been requested. Offsets that do not exist at all were not
+    // registered in hook_theme().
+    if (isset($this->storage[$offset])) {
+      return $this->storage[$offset];
+    }
+    elseif (array_key_exists($offset, $this->storage)) {
+      return $this->resolveCacheMiss($offset);
+    }
+  }
+
+  public function resolveCacheMiss($offset) {
+    if (!isset($this->completeRegistry)) {
+      $this->completeRegistry = theme_get_registry();
+    }
+    $this->storage[$offset] = $this->completeRegistry[$offset];
+    if ($this->persistable) {
+      $this->persist($offset);
+    }
+    return $this->storage[$offset];
+  }
+
+  public function set($data, $lock = TRUE) {
+    $lock_name = $this->cid . ':' . $this->bin;
+    if (!$lock || lock_acquire($lock_name)) {
+      if ($cached = cache_get($this->cid, $this->bin)) {
+        // Use array merge instead of union so that filled in values in $data
+        // overwrite empty values in the current cache.
+        $data = array_merge($cached->data, $data);
+      }
+      else {
+        $registry = $this->initializeRegistry();
+        $data = array_merge($registry, $data);
+      }
+      cache_set($this->cid, $data, $this->bin);
+      if ($lock) {
+        lock_release($lock_name);
+      }
+    }
+  }
+}
+
+/**
  * Process a single implementation of hook_theme().
  *
  * @param $cache
  *   The theme registry that will eventually be cached; It is an associative
  *   array keyed by theme hooks, whose values are associative arrays describing
  *   the hook:
- *   - 'type': The passed in $type.
- *   - 'theme path': The passed in $path.
+ *   - 'type': The passed-in $type.
+ *   - 'theme path': The passed-in $path.
  *   - 'function': The name of the function generating output for this theme
  *     hook. Either defined explicitly in hook_theme() or, if neither 'function'
  *     nor 'template' is defined, then the default theme function name is used.
@@ -363,7 +498,6 @@ function drupal_theme_rebuild() {
  */
 function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
   $result = array();
-  $function = $name . '_theme';
 
   // Processor functions work in two distinct phases with the process
   // functions always being executed after the preprocess functions.
@@ -372,24 +506,43 @@ function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
     'process functions'    => 'process',
   );
 
+  $hook_defaults = array(
+    'variables' => TRUE,
+    'render element' => TRUE,
+    'pattern' => TRUE,
+    'base hook' => TRUE,
+  );
+
+  // Invoke the hook_theme() implementation, process what is returned, and
+  // merge it into $cache.
+  $function = $name . '_theme';
   if (function_exists($function)) {
     $result = $function($cache, $type, $theme, $path);
     foreach ($result as $hook => $info) {
+      // When a theme or engine overrides a module's theme function
+      // $result[$hook] will only contain key/value pairs for information being
+      // overridden.  Pull the rest of the information from what was defined by
+      // an earlier hook.
+
+      // Fill in the type and path of the module, theme, or engine that
+      // implements this theme function.
       $result[$hook]['type'] = $type;
       $result[$hook]['theme path'] = $path;
-      // if function and file are left out, default to standard naming
+
+      // If function and file are omitted, default to standard naming
       // conventions.
       if (!isset($info['template']) && !isset($info['function'])) {
         $result[$hook]['function'] = ($type == 'module' ? 'theme_' : $name . '_') . $hook;
       }
-      // If a path is set in the info, use what was set. Otherwise use the
-      // default path. This is mostly so system.module can declare theme
-      // functions on behalf of core .include files.
-      // All files are included to be safe. Conditionally included
-      // files can prevent them from getting registered.
+
       if (isset($cache[$hook]['includes'])) {
         $result[$hook]['includes'] = $cache[$hook]['includes'];
       }
+
+      // If the theme implementation defines a file, then also use the path
+      // that it defined. Otherwise use the default path. This allows
+      // system.module to declare theme functions on behalf of core .include
+      // files.
       if (isset($info['file'])) {
         $include_file = isset($info['path']) ? $info['path'] : $path;
         $include_file .= '/' . $info['file'];
@@ -397,14 +550,10 @@ function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
         $result[$hook]['includes'][] = $include_file;
       }
 
-      // If these keys are left unspecified within overridden entries returned
-      // by hook_theme(), carry them forward from the prior entry. This is so
-      // that themes don't need to specify this information, since the module
-      // that registered the theme hook already has.
-      foreach (array('variables', 'render element', 'pattern', 'base hook') as $key) {
-        if (!isset($info[$key]) && isset($cache[$hook][$key])) {
-          $result[$hook][$key] = $cache[$hook][$key];
-        }
+      // If the default keys are not set, use the default values registered
+      // by the module.
+      if (isset($cache[$hook])) {
+        $result[$hook] += array_intersect_key($cache[$hook], $hook_defaults);
       }
 
       // The following apply only to theming hooks implemented as templates.
@@ -469,7 +618,7 @@ function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
     }
 
     // Merge the newly created theme hooks into the existing cache.
-    $cache = array_merge($cache, $result);
+    $cache = $result + $cache;
   }
 
   // Let themes have variable processors even if they didn't register a template.
@@ -499,22 +648,33 @@ function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
 }
 
 /**
- * Rebuild the theme registry cache.
+ * Build the theme registry cache.
  *
  * @param $theme
  *   The loaded $theme object as returned by list_themes().
  * @param $base_theme
  *   An array of loaded $theme objects representing the ancestor themes in
  *   oldest first order.
- * @param theme_engine
+ * @param $theme_engine
  *   The name of the theme engine.
  */
 function _theme_build_registry($theme, $base_theme, $theme_engine) {
   $cache = array();
   // First, process the theme hooks advertised by modules. This will
-  // serve as the basic registry.
-  foreach (module_implements('theme') as $module) {
-    _theme_process_registry($cache, $module, 'module', $module, drupal_get_path('module', $module));
+  // serve as the basic registry. Since the list of enabled modules is the same
+  // regardless of the theme used, this is cached in its own entry to save
+  // building it for every theme.
+  if ($cached = cache_get('theme_registry:build:modules')) {
+    $cache = $cached->data;
+  }
+  else {
+    foreach (module_implements('theme') as $module) {
+      _theme_process_registry($cache, $module, 'module', $module, drupal_get_path('module', $module));
+    }
+    // Only cache this registry if all modules are loaded.
+    if (module_load_all(NULL)) {
+      cache_set('theme_registry:build:modules', $cache);
+    }
   }
 
   // Process each base theme.
@@ -633,8 +793,9 @@ function list_themes($refresh = FALSE) {
  * Generates themed output.
  *
  * All requests for themed output must go through this function. It examines
- * the request and routes it to the appropriate theme function or template, by
- * checking the theme registry.
+ * the request and routes it to the appropriate
+ * @link themeable theme function or template @endlink, by checking the theme
+ * registry.
  *
  * The first argument to this function is the name of the theme hook. For
  * instance, to theme a table, the theme hook name is 'table'. By default, this
@@ -734,6 +895,8 @@ function list_themes($refresh = FALSE) {
  *
  * @return
  *   An HTML string representing the themed output.
+ *
+ * @see themeable
  */
 function theme($hook, $variables = array()) {
   static $hooks = NULL;
@@ -747,7 +910,7 @@ function theme($hook, $variables = array()) {
 
   if (!isset($hooks)) {
     drupal_theme_initialize();
-    $hooks = theme_get_registry();
+    $hooks = theme_get_registry(FALSE);
   }
 
   // If an array of hook candidates were passed, use the first one that has an
@@ -972,7 +1135,7 @@ function drupal_find_theme_functions($cache, $prefixes) {
       // start with. The default is the name of the hook followed by '__'. An
       // 'base hook' key is added to each entry made for a found suggestion,
       // so that common functionality can be implemented for all suggestions of
-      // the same base hook. To keep things simple, deep heirarchy of
+      // the same base hook. To keep things simple, deep hierarchy of
       // suggestions is not supported: each suggestion's 'base hook' key
       // refers to a base hook, not to another suggestion, and all suggestions
       // are found using the base hook's pattern, not a pattern from an
@@ -982,7 +1145,7 @@ function drupal_find_theme_functions($cache, $prefixes) {
         $matches = preg_grep('/^' . $prefix . '_' . $pattern . '/', $functions['user']);
         if ($matches) {
           foreach ($matches as $match) {
-            $new_hook = str_replace($prefix . '_', '', $match);
+            $new_hook = substr($match, strlen($prefix) + 1);
             $arg_name = isset($info['variables']) ? 'variables' : 'render element';
             $implementations[$new_hook] = array(
               'function' => $match,
@@ -1256,15 +1419,8 @@ function theme_enable($theme_list) {
   menu_rebuild();
   drupal_theme_rebuild();
 
-  // Notify locale module about new themes being enabled, so translations can
-  // be imported. This might start a batch, and only return to the redirect
-  // path after that.
-  module_invoke('locale', 'system_update', $theme_list);
-
-  // Invoke hook_themes_enabled after the themes have been enabled.
+  // Invoke hook_themes_enabled() after the themes have been enabled.
   module_invoke_all('themes_enabled', $theme_list);
-
-  return;
 }
 
 /**
@@ -1296,10 +1452,8 @@ function theme_disable($theme_list) {
   menu_rebuild();
   drupal_theme_rebuild();
 
-  // Invoke hook_themes_enabled after the themes have been enabled.
+  // Invoke hook_themes_disabled after the themes have been disabled.
   module_invoke_all('themes_disabled', $theme_list);
-
-  return;
 }
 
 /**
@@ -1376,7 +1530,7 @@ function theme_link($variables) {
  * @param $variables
  *   An associative array containing:
  *   - links: An associative array of links to be themed. The key for each link
- *     is used as its css class. Each link should be itself an array, with the
+ *     is used as its CSS class. Each link should be itself an array, with the
  *     following elements:
  *     - title: The link text.
  *     - href: The link URL. If omitted, the 'title' is shown as a plain text
@@ -1384,7 +1538,8 @@ function theme_link($variables) {
  *     - html: (optional) Whether or not 'title' is HTML. If set, the title
  *       will not be passed through check_plain().
  *     - attributes: (optional) Attributes for the anchor, or for the <span> tag
- *       used in its place if no 'href' is supplied.
+ *       used in its place if no 'href' is supplied. If element 'class' is
+ *       included, it must be an array of one or more class names.
  *     If the 'href' element is supplied, the entire link array is passed to l()
  *     as its $options parameter.
  *   - attributes: A keyed array of attributes for the UL containing the
@@ -1756,10 +1911,10 @@ function theme_table($variables) {
  */
 function theme_tablesort_indicator($variables) {
   if ($variables['style'] == "asc") {
-    return theme('image', array('path' => 'misc/arrow-asc.png', 'alt' => t('sort ascending'), 'title' => t('sort ascending')));
+    return theme('image', array('path' => 'misc/arrow-asc.png', 'width' => 13, 'height' => 13, 'alt' => t('sort ascending'), 'title' => t('sort ascending')));
   }
   else {
-    return theme('image', array('path' => 'misc/arrow-desc.png', 'alt' => t('sort descending'), 'title' => t('sort descending')));
+    return theme('image', array('path' => 'misc/arrow-desc.png', 'width' => 13, 'height' => 13, 'alt' => t('sort descending'), 'title' => t('sort descending')));
   }
 }
 
@@ -1816,6 +1971,7 @@ function theme_item_list($variables) {
     foreach ($items as $i => $item) {
       $attributes = array();
       $children = array();
+      $data = '';
       if (is_array($item)) {
         foreach ($item as $key => $value) {
           if ($key == 'data') {
@@ -1872,7 +2028,7 @@ function theme_more_help_link($variables) {
  */
 function theme_feed_icon($variables) {
   $text = t('Subscribe to @feed-title', array('@feed-title' => $variables['title']));
-  if ($image = theme('image', array('path' => 'misc/feed.png', 'alt' => $text))) {
+  if ($image = theme('image', array('path' => 'misc/feed.png', 'width' => 16, 'height' => 16, 'alt' => $text))) {
     return l($image, $variables['url'], array('html' => TRUE, 'attributes' => array('class' => array('feed-icon'), 'title' => $text)));
   }
 }
@@ -1897,11 +2053,12 @@ function theme_feed_icon($variables) {
  */
 function theme_html_tag($variables) {
   $element = $variables['element'];
+  $attributes = isset($element['#attributes']) ? drupal_attributes($element['#attributes']) : '';
   if (!isset($element['#value'])) {
-    return '<' . $element['#tag'] . drupal_attributes($element['#attributes']) . " />\n";
+    return '<' . $element['#tag'] . $attributes . " />\n";
   }
   else {
-    $output = '<' . $element['#tag'] . drupal_attributes($element['#attributes']) . '>';
+    $output = '<' . $element['#tag'] . $attributes . '>';
     if (isset($element['#value_prefix'])) {
       $output .= $element['#value_prefix'];
     }
@@ -1962,6 +2119,8 @@ function theme_username($variables) {
 
 /**
  * Returns HTML for a progress bar.
+ *
+ * Note that the core Batch API uses this only for non-JavaScript batch jobs.
  *
  * @param $variables
  *   An associative array containing:
@@ -2042,6 +2201,9 @@ function _theme_table_cell($cell, $header = FALSE) {
  * Adds a default set of helper variables for variable processors and templates.
  * This comes in before any other preprocess function which makes it possible to
  * be used in default theme implementations (non-overridden theme functions).
+ *
+ * For more detailed information, see theme().
+ *
  */
 function template_preprocess(&$variables, $hook) {
   global $user;
@@ -2077,7 +2239,7 @@ function template_preprocess(&$variables, $hook) {
 }
 
 /**
- * Returns hook-independant variables to template_preprocess().
+ * Returns hook-independent variables to template_preprocess().
  */
 function _template_preprocess_default_variables() {
   global $user;
@@ -2119,6 +2281,9 @@ function _template_preprocess_default_variables() {
 
 /**
  * A default process function used to alter variables as late as possible.
+ *
+ * For more detailed information, see theme().
+ *
  */
 function template_process(&$variables, $hook) {
   // Flatten out classes.
@@ -2472,7 +2637,6 @@ function template_preprocess_maintenance_page(&$variables) {
   $variables['site_slogan']       = (theme_get_setting('toggle_slogan') ? variable_get('site_slogan', '') : '');
   $variables['tabs']              = '';
   $variables['title']             = drupal_get_title();
-  $variables['closure']           = '';
 
   // Compile a list of classes that are going to be applied to the body element.
   $variables['classes_array'][] = 'in-maintenance';

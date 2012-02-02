@@ -1,9 +1,8 @@
-// $Id: tableselect.js,v 1.13 2009/08/31 05:51:08 dries Exp $
 (function ($) {
 
 Drupal.behaviors.tableSelect = {
   attach: function (context, settings) {
-    $('form table:has(th.select-all)', context).once('table-select', Drupal.tableSelect);
+    $('table:has(th.select-all)', context).once('table-select', Drupal.tableSelect);
   }
 };
 
@@ -37,8 +36,8 @@ Drupal.tableSelect = function () {
     }
   });
 
-  // For each of the checkboxes within the table.
-  checkboxes = $('td input:checkbox', table).click(function (e) {
+  // For each of the checkboxes within the table that are not disabled.
+  checkboxes = $('td input:checkbox:enabled', table).click(function (e) {
     // Either add or remove the selected class based on the state of the check all checkbox.
     $(this).parents('tr:first')[ this.checked ? 'addClass' : 'removeClass' ]('selected');
 
