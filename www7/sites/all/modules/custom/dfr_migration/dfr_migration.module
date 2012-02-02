@@ -14,3 +14,138 @@ function dfr_migration_content_migrate_data_record_alter(&$record, &$field, &$in
     $record[$field_name] = $allowed_values_keys[$key];
   }
 }
+
+/**
+ * Implements hook_enable().
+ * When the migration module is enabled, migrate the user profiles to D7.
+ * The content of the user profile is stored in the content profile fields content.
+ * We need to fetch those values and saved them in the user profile fields.
+ */
+function dfr_migration_enable() {
+  // TODO: make a batch action
+  $offset = 0;
+  $limit = 10;
+  // Fetch the existing user profiles nid + vid.
+  $query = db_select('node', 'n');
+  $query
+      ->condition('n.type', 'profile', '=')
+      ->fields('n', array('nid', 'vid', 'uid'))
+      ->range($offset, $limit);
+  $result = $query->execute();
+  foreach ($result as $user) {
+    $user_ids[$user->uid] = $user;
+  }
+  // Load the users and extract the old profiles data.
+  $users = entity_load('user', array(array_keys($user_ids)));
+  foreach ($users as $user) {
+    $query = db_select('content_type_profile', 'ctp');
+    $query->condition('ctp.nid', $user_ids[$user->uid]->nid, '=')
+        ->condition('ctp.vid', $user_ids[$user->uid]->vid, '=')
+        ->fields('ctp', array(
+      'field_icq_value',
+      'field_jabber_value',
+      'field_link_url',
+      'field_link_title',
+      'field_link_attributes',
+      'field_msn_email',
+      'field_nickname_value',
+      'field_picture_fid',
+      'field_picture_list',
+      'field_picture_data',
+      'field_realname_value',
+      'field_company_nid'
+    ));
+    $query->leftJoin('field_data_body', 'body', 'ctp.nid = body.entity_id AND ctp.vid = body.revision_id');
+    $query->fields('body', array('body_value'));
+    $result = $query->execute();
+    $content_profile_user = $result->fetch();
+
+    // Set new values in destination fields.
+    // Let's define a flexible structure to easily store values in the new user entity.
+    // The values are arrays with two keys:
+    //   - key: Field's name where to store the value (from the user entity point of view),
+    //   - value: The value of the field to save.
+    $classic_fields = array(
+      array(
+        'key' => 'field_icq',
+        'value' => $content_profile_user->field_icq_value,
+      ),
+      array(
+        'key' => 'field_jabber',
+        'value' => $content_profile_user->field_jabber_value,
+      ),
+      array(
+        'key' => 'field_nickname',
+        'value' => $content_profile_user->field_nickname_value,
+      ),
+      array(
+        'key' => 'field_realname',
+        'value' => $content_profile_user->field_realname_value,
+      ),
+      array(
+        'key' => 'field_biography',
+        'value' => $content_profile_user->body_value,
+      ),
+    );
+    foreach ($classic_fields as $field) {
+      $user->$field['key'] = array(
+        LANGUAGE_NONE => array(
+          array(
+            'value' => $field['value'],
+            'format' => NULL,
+            'safe_value' => check_plain($field['value']),
+          ),
+        ),
+      );
+    }
+
+    // Handle the special structure of the msn email field.
+    $user->field_msn = array(
+      LANGUAGE_NONE => array(
+        array(
+          'email' => $content_profile_user->field_msn_email,
+        ),
+      ),
+    );
+
+    // Handle the special structure of the website field.
+    $user->field_website = array(
+      LANGUAGE_NONE => array(
+        array(
+          'url' => $content_profile_user->field_link_url,
+          'title' => $content_profile_user->field_link_title,
+          'attributes' => unserialize($content_profile_user->field_link_attributes),
+        ),
+      ),
+    );
+
+    // Handle the special structure of the company field.
+    $user->field_company = array(
+      LANGUAGE_NONE => array(
+        array(
+          'nid' => $content_profile_user->field_company_nid,
+        ),
+      ),
+    );
+
+    // TODO: Check that file id is consistant during import and check NULL structure.
+    // Handle the special structure of the picture field.
+    $profile_picture = file_load($content_profile_user->field_picture_fid);
+    if ($profile_picture) {
+      $user->field_picture = array(
+        LANGUAGE_NONE => array(
+          array($profile_picture),
+        ),
+      );
+    }
+    else {
+      $user->field_picture = array(
+        LANGUAGE_NONE => array(NULL),
+      );
+    }
+
+    // TODO: Export events.
+    // entity_save('user', $user);
+  }
+
+}
