@@ -1,5 +1,4 @@
 <?php
-// $Id: forum-list.tpl.php,v 1.5 2008/10/13 12:31:42 dries Exp $
 
 /**
  * @file
@@ -16,6 +15,8 @@
  *   FALSE if the forum can contain only topics.
  * - $forum->depth: How deep the forum is in the current hierarchy.
  * - $forum->zebra: 'even' or 'odd' string used for row class.
+ * - $forum->icon_class: 'default' or 'new' string used for forum icon class.
+ * - $forum->icon_title: Text alternative for the forum icon.
  * - $forum->name: The name of the forum.
  * - $forum->link: The URL to link to this forum.
  * - $forum->description: The description of this forum.
@@ -49,6 +50,9 @@
                * left-margin for indenting.
                */ ?>
         <?php print str_repeat('<div class="indent">', $forum->depth); ?>
+          <div class="icon forum-status-<?php print $forum->icon_class; ?>" title="<?php print $forum->icon_title; ?>">
+            <span class="element-invisible"><?php print $forum->icon_title; ?></span>
+          </div>
           <div class="name"><a href="<?php print $forum->link; ?>"><?php print $forum->name; ?></a></div>
           <?php if ($forum->description): ?>
             <div class="description"><?php print $forum->description; ?></div>

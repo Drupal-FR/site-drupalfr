@@ -1,13 +1,12 @@
-/* $Id: locale.css,v 1.8 2010/10/08 03:30:40 webchick Exp $ */
 
 .locale-untranslated {
   font-style: normal;
   text-decoration: line-through;
 }
 
-.form-item-language,
-.form-item-translation,
-.form-item-group {
+#locale-translation-filter-form .form-item-language,
+#locale-translation-filter-form .form-item-translation,
+#locale-translation-filter-form .form-item-group {
   float: left; /* LTR */
   padding-right: .8em; /* LTR */
   margin: 0.1em;
@@ -22,14 +21,12 @@
   width: 100%;
 }
 #locale-translation-filter-form .form-actions {
-  float: left;
-  padding: 3ex 0 0 1em;
+  float: left; /* LTR */
+  padding: 3ex 0 0 1em; /* LTR */
 }
-
 .language-switcher-locale-session a.active {
   color: #0062A0;
 }
-
 .language-switcher-locale-session a.session-active {
   color: #000000;
 }

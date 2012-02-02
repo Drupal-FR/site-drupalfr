@@ -1,5 +1,4 @@
 <?php
-// $Id: block.admin.inc,v 1.91 2010/11/06 23:24:33 webchick Exp $
 
 /**
  * @file
@@ -17,7 +16,7 @@ function block_admin_demo($theme = NULL) {
 /**
  * Menu callback for admin/structure/block.
  *
- * @param $theme
+ * @param $theme
  *   The theme to display the administration page for. If not provided, defaults
  *   to the currently used theme.
  */
@@ -58,7 +57,7 @@ function block_admin_display_prepare_blocks($theme) {
 }
 
 /**
- * Form builder for the main blocks administration form.
+ * Form constructor for the main block administration form.
  *
  * @param $blocks
  *   An array of blocks, as returned by block_admin_display_prepare_blocks().
@@ -78,7 +77,7 @@ function block_admin_display_prepare_blocks($theme) {
  */
 function block_admin_display_form($form, &$form_state, $blocks, $theme, $block_regions = NULL) {
 
-  drupal_add_css(drupal_get_path('module', 'block') . '/block.css');
+  $form['#attached']['css'] = array(drupal_get_path('module', 'block') . '/block.css');
 
   // Get a list of block regions if one was not provided.
   if (!isset($block_regions)) {
@@ -166,36 +165,41 @@ function block_admin_display_form($form, &$form_state, $blocks, $theme, $block_r
 }
 
 /**
- * Form submission handler for the main blocks administration form.
+ * Form submission handler for block_admin_display_form().
  *
  * @see block_admin_display_form()
  */
 function block_admin_display_form_submit($form, &$form_state) {
-  $txn = db_transaction();
-
-  foreach ($form_state['values']['blocks'] as $block) {
-    $block['status'] = (int) ($block['region'] != BLOCK_REGION_NONE);
-    $block['region'] = $block['status'] ? $block['region'] : '';
-    db_update('block')
-      ->fields(array(
-        'status' => $block['status'],
-        'weight' => $block['weight'],
-        'region' => $block['region'],
-      ))
-      ->condition('module', $block['module'])
-      ->condition('delta', $block['delta'])
-      ->condition('theme', $block['theme'])
-      ->execute();
+  $transaction = db_transaction();
+  try {
+    foreach ($form_state['values']['blocks'] as $block) {
+      $block['status'] = (int) ($block['region'] != BLOCK_REGION_NONE);
+      $block['region'] = $block['status'] ? $block['region'] : '';
+      db_update('block')
+        ->fields(array(
+          'status' => $block['status'],
+          'weight' => $block['weight'],
+          'region' => $block['region'],
+        ))
+        ->condition('module', $block['module'])
+        ->condition('delta', $block['delta'])
+        ->condition('theme', $block['theme'])
+        ->execute();
+    }
+  }
+  catch (Exception $e) {
+    $transaction->rollback();
+    watchdog_exception('block', $e);
+    throw $e;
   }
   drupal_set_message(t('The block settings have been updated.'));
   cache_clear_all();
 }
 
 /**
- * Helper function for sorting blocks on admin/structure/block.
+ * Sorts active blocks by region, then by weight; sorts inactive blocks by name.
  *
- * Active blocks are sorted by region, then by weight.
- * Disabled blocks are sorted by name.
+ * Callback for usort() in block_admin_display_prepare_blocks().
  */
 function _block_compare($a, $b) {
   global $theme_key;
@@ -235,7 +239,7 @@ function _block_compare($a, $b) {
 }
 
 /**
- * Form builder for the block configuration form.
+ * Form constructor for the block configuration form.
  *
  * Also used by block_add_block_form() for adding a new custom block.
  *
@@ -271,7 +275,7 @@ function block_admin_configure($form, &$form_state, $module, $delta) {
     '#maxlength' => 64,
     '#description' => $block->module == 'block' ? t('The title of the block as shown to the user.') : t('Override the default title for the block. Use <em>!placeholder</em> to display no title, or leave blank to use the default block title.', array('!placeholder' => '&lt;none&gt;')),
     '#default_value' => isset($block->title) ? $block->title : '',
-    '#weight' => -18,
+    '#weight' => -19,
   );
 
   // Module-specific block configuration.
@@ -436,7 +440,7 @@ function block_admin_configure($form, &$form_state, $module, $delta) {
 }
 
 /**
- * Form validation handler for the block configuration form.
+ * Form validation handler for block_admin_configure().
  *
  * @see block_admin_configure()
  * @see block_admin_configure_submit()
@@ -454,53 +458,59 @@ function block_admin_configure_validate($form, &$form_state) {
 }
 
 /**
- * Form submission handler for the block configuration form.
+ * Form submission handler for block_admin_configure().
  *
  * @see block_admin_configure()
  * @see block_admin_configure_validate()
  */
 function block_admin_configure_submit($form, &$form_state) {
   if (!form_get_errors()) {
-    $txn = db_transaction();
-
-    db_update('block')
-      ->fields(array(
-        'visibility' => (int) $form_state['values']['visibility'],
-        'pages' => trim($form_state['values']['pages']),
-        'custom' => (int) $form_state['values']['custom'],
-        'title' => $form_state['values']['title'],
-      ))
-      ->condition('module', $form_state['values']['module'])
-      ->condition('delta', $form_state['values']['delta'])
-      ->execute();
-
-    db_delete('block_role')
-      ->condition('module', $form_state['values']['module'])
-      ->condition('delta', $form_state['values']['delta'])
-      ->execute();
-    $query = db_insert('block_role')->fields(array('rid', 'module', 'delta'));
-    foreach (array_filter($form_state['values']['roles']) as $rid) {
-      $query->values(array(
-        'rid' => $rid,
-        'module' => $form_state['values']['module'],
-        'delta' => $form_state['values']['delta'],
-      ));
-    }
-    $query->execute();
-
-    // Store regions per theme for this block
-    foreach ($form_state['values']['regions'] as $theme => $region) {
-      db_merge('block')
-        ->key(array('theme' => $theme, 'delta' => $form_state['values']['delta'], 'module' => $form_state['values']['module']))
+    $transaction = db_transaction();
+    try {
+      db_update('block')
         ->fields(array(
-          'region' => ($region == BLOCK_REGION_NONE ? '' : $region),
+          'visibility' => (int) $form_state['values']['visibility'],
           'pages' => trim($form_state['values']['pages']),
-          'status' => (int) ($region != BLOCK_REGION_NONE),
+          'custom' => (int) $form_state['values']['custom'],
+          'title' => $form_state['values']['title'],
         ))
+        ->condition('module', $form_state['values']['module'])
+        ->condition('delta', $form_state['values']['delta'])
         ->execute();
-    }
 
-    module_invoke($form_state['values']['module'], 'block_save', $form_state['values']['delta'], $form_state['values']);
+      db_delete('block_role')
+        ->condition('module', $form_state['values']['module'])
+        ->condition('delta', $form_state['values']['delta'])
+        ->execute();
+      $query = db_insert('block_role')->fields(array('rid', 'module', 'delta'));
+      foreach (array_filter($form_state['values']['roles']) as $rid) {
+        $query->values(array(
+          'rid' => $rid,
+          'module' => $form_state['values']['module'],
+          'delta' => $form_state['values']['delta'],
+        ));
+      }
+      $query->execute();
+
+      // Store regions per theme for this block
+      foreach ($form_state['values']['regions'] as $theme => $region) {
+        db_merge('block')
+          ->key(array('theme' => $theme, 'delta' => $form_state['values']['delta'], 'module' => $form_state['values']['module']))
+          ->fields(array(
+            'region' => ($region == BLOCK_REGION_NONE ? '' : $region),
+            'pages' => trim($form_state['values']['pages']),
+            'status' => (int) ($region != BLOCK_REGION_NONE),
+          ))
+          ->execute();
+      }
+
+      module_invoke($form_state['values']['module'], 'block_save', $form_state['values']['delta'], $form_state['values']);
+    }
+    catch (Exception $e) {
+      $transaction->rollback();
+      watchdog_exception('block', $e);
+      throw $e;
+    }
     drupal_set_message(t('The block configuration has been saved.'));
     cache_clear_all();
     $form_state['redirect'] = 'admin/structure/block';
@@ -508,7 +518,7 @@ function block_admin_configure_submit($form, &$form_state) {
 }
 
 /**
- * Form builder for the add block form.
+ * Form constructor for the add block form.
  *
  * @see block_add_block_form_validate()
  * @see block_add_block_form_submit()
@@ -519,7 +529,7 @@ function block_add_block_form($form, &$form_state) {
 }
 
 /**
- * Form validation handler for the add block form.
+ * Form validation handler for block_add_block_form().
  *
  * @see block_add_block_form()
  * @see block_add_block_form_submit()
@@ -533,7 +543,7 @@ function block_add_block_form_validate($form, &$form_state) {
 }
 
 /**
- * Form submission handler for the add block form.
+ * Form submission handler for block_add_block_form().
  *
  * Saves the new custom block.
  *
@@ -598,7 +608,7 @@ function block_add_block_form_submit($form, &$form_state) {
 }
 
 /**
- * Form builder for the custom block deletion form.
+ * Form constructor for the custom block deletion form.
  *
  * @param $module
  *   The name of the module that implements the block to be deleted. This should
@@ -618,7 +628,7 @@ function block_custom_block_delete($form, &$form_state, $module, $delta) {
 }
 
 /**
- * Form submission handler for the custom block deletion form.
+ * Form submission handler for block_custom_block_delete().
  *
  * @see block_custom_block_delete()
  */

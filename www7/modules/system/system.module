@@ -1,5 +1,4 @@
 <?php
-// $Id: system.module,v 1.1003 2011/01/04 00:56:23 webchick Exp $
 
 /**
  * @file
@@ -45,6 +44,13 @@ define('DRUPAL_OPTIONAL', 1);
  * Required option on forms and settings
  */
 define('DRUPAL_REQUIRED', 2);
+
+/**
+ * Maximum number of values in a weight select element.
+ *
+ * If the number of values is over the maximum, a text field is used instead.
+ */
+define('DRUPAL_WEIGHT_SELECT_MAX', 100);
 
 /**
  * Return only visible regions.
@@ -295,10 +301,10 @@ function system_element_info() {
     '#theme' => 'page',
     '#theme_wrappers' => array('html'),
   );
-  // By default, we don't want AJAX commands being rendered in the context of an
+  // By default, we don't want Ajax commands being rendered in the context of an
   // HTML page, so we don't provide defaults for #theme or #theme_wrappers.
   // However, modules can set these properties (for example, to provide an HTML
-  // debugging page that displays rather than executes AJAX commands).
+  // debugging page that displays rather than executes Ajax commands).
   $types['ajax'] = array(
     '#header' => TRUE,
     '#commands' => array(),
@@ -650,7 +656,7 @@ function system_menu() {
   // Modules.
   $items['admin/modules'] = array(
     'title' => 'Modules',
-    'description' => 'Enable or disable modules.',
+    'description' => 'Extend site functionality.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('system_modules'),
     'access arguments' => array('administer modules'),
@@ -970,7 +976,7 @@ function system_menu() {
   );
   $items['admin/config/system/site-information'] = array(
     'title' => 'Site information',
-    'description' => t('Change site name, e-mail address, slogan, default front page, and number of posts per page, error pages.'),
+    'description' => 'Change site name, e-mail address, slogan, default front page, and number of posts per page, error pages.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('system_site_information_settings'),
     'access arguments' => array('administer site configuration'),
@@ -978,8 +984,8 @@ function system_menu() {
     'weight' => -20,
   );
   $items['admin/config/system/cron'] = array(
-    'title' => t('Cron'),
-    'description' => t('Manage automatic site maintenance tasks.'),
+    'title' => 'Cron',
+    'description' => 'Manage automatic site maintenance tasks.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('system_cron_settings'),
     'access arguments' => array('administer site configuration'),
@@ -1079,7 +1085,7 @@ function _system_batch_theme() {
  * Implements hook_library().
  */
 function system_library() {
-  // Drupal's AJAX framework.
+  // Drupal's Ajax framework.
   $libraries['drupal.ajax'] = array(
     'title' => 'Drupal AJAX',
     'website' => 'http://api.drupal.org/api/drupal/includes--ajax.inc/group/ajax/7',
@@ -1109,7 +1115,7 @@ function system_library() {
     'title' => 'Drupal progress indicator',
     'version' => VERSION,
     'js' => array(
-      'misc/progress.js' => array('group' => JS_DEFAULT, 'cache' => FALSE),
+      'misc/progress.js' => array('group' => JS_DEFAULT),
     ),
   );
 
@@ -1360,7 +1366,7 @@ function system_library() {
     ),
   );
   $libraries['ui.mouse'] = array(
-    'title' => 'jQuery UI: Droppable',
+    'title' => 'jQuery UI: Mouse',
     'website' => 'http://docs.jquery.com/UI/Mouse',
     'version' => '1.8.7',
     'js' => array(
@@ -1791,6 +1797,13 @@ function system_authorized_get_url(array $options = array()) {
 }
 
 /**
+ * Returns the URL for the authorize.php script when it is processing a batch.
+ */
+function system_authorized_batch_processing_url() {
+  return system_authorized_get_url(array('query' => array('batch' => '1')));
+}
+
+/**
  * Setup and invoke an operation using authorize.php.
  *
  * @see system_authorized_init()
@@ -1807,7 +1820,7 @@ function system_authorized_run($callback, $file, $arguments = array(), $page_tit
  */
 function system_authorized_batch_process() {
   $finish_url = system_authorized_get_url();
-  $process_url = system_authorized_get_url(array('query' => array('batch' => '1')));
+  $process_url = system_authorized_batch_processing_url();
   batch_process($finish_url, $process_url);
 }
 
@@ -2019,6 +2032,7 @@ function system_block_info() {
   $blocks['help'] = array(
     'info' => t('System help'),
     'weight' => '5',
+    'cache' => DRUPAL_NO_CACHE,
   );
   // System-defined menu blocks.
   foreach (menu_list_system_menus() as $menu_name => $title) {
@@ -2387,9 +2401,14 @@ function _system_rebuild_module_data() {
     drupal_alter('system_info', $modules[$key]->info, $modules[$key], $type);
   }
 
-  // The install profile is required, if it's a valid module.
   if (isset($modules[$profile])) {
+    // The install profile is required, if it's a valid module.
     $modules[$profile]->info['required'] = TRUE;
+    // Add a default distribution name if the profile did not provide one. This
+    // matches the default value used in install_profile_info().
+    if (!isset($modules[$profile]->info['distribution_name'])) {
+      $modules[$profile]->info['distribution_name'] = 'Drupal';
+    }
   }
 
   return $modules;
@@ -2453,6 +2472,18 @@ function _system_update_bootstrap_status() {
 function _system_rebuild_theme_data() {
   // Find themes
   $themes = drupal_system_listing('/^' . DRUPAL_PHP_FUNCTION_PATTERN . '\.info$/', 'themes');
+  // Allow modules to add further themes.
+  if ($module_themes = module_invoke_all('system_theme_info')) {
+    foreach ($module_themes as $name => $uri) {
+      // @see file_scan_directory()
+      $themes[$name] = (object) array(
+        'uri' => $uri,
+        'filename' => pathinfo($uri, PATHINFO_FILENAME),
+        'name' => $name,
+      );
+    }
+  }
+
   // Find theme engines
   $engines = drupal_system_listing('/^' . DRUPAL_PHP_FUNCTION_PATTERN . '\.engine$/', 'themes/engines');
 
@@ -2677,7 +2708,7 @@ function system_region_list($theme_key, $show = REGIONS_ALL) {
   // If requested, suppress hidden regions. See block_admin_display_form().
   foreach ($info['regions'] as $name => $label) {
     if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
-      $list[$name] = $label;
+      $list[$name] = t($label);
     }
   }
 
@@ -2688,8 +2719,8 @@ function system_region_list($theme_key, $show = REGIONS_ALL) {
  * Implements hook_system_info_alter().
  */
 function system_system_info_alter(&$info, $file, $type) {
-  // Remove page-top from the blocks UI since it is reserved for modules to
-  // populate from outside the blocks system.
+  // Remove page-top and page-bottom from the blocks UI since they are reserved for
+  // modules to populate from outside the blocks system.
   if ($type == 'theme') {
     $info['regions_hidden'][] = 'page_top';
     $info['regions_hidden'][] = 'page_bottom';
@@ -2852,7 +2883,18 @@ function confirm_form($form, $question, $path, $description = NULL, $yes = NULL,
 }
 
 /**
- * Determines if the current user is in compact mode.
+ * Determines whether the current user is in compact mode.
+ *
+ * Compact mode shows certain administration pages with less description text,
+ * such as the configuration page and the permissions page.
+ *
+ * Whether the user is in compact mode is determined by a cookie, which is set
+ * for the user by system_admin_compact_page().
+ *
+ * If the user does not have the cookie, the default value is given by the
+ * system variable 'admin_compact_mode', which itself defaults to FALSE. This
+ * does not have a user interface to set it: it is a hidden variable which can
+ * be set in the settings.php file.
  *
  * @return
  *   TRUE when in compact mode, FALSE when in expanded mode.
@@ -2900,7 +2942,7 @@ function system_get_module_admin_tasks($module, $info) {
       ->condition('ml.hidden', 0, '>=')
       ->condition('ml.module', 'system')
       ->condition('m.number_parts', 1, '>')
-      ->condition('m.page_callback', 'system_admin_menu_block_page', '!=');
+      ->condition('m.page_callback', 'system_admin_menu_block_page', '<>');
     foreach ($query->execute() as $link) {
       _menu_link_translate($link);
       if ($link['access']) {
@@ -2992,7 +3034,7 @@ function system_cron() {
     }
   }
 
-  $core = array('cache', 'cache_filter', 'cache_page', 'cache_form', 'cache_menu');
+  $core = array('cache', 'cache_path', 'cache_filter', 'cache_page', 'cache_form', 'cache_menu');
   $cache_tables = array_merge(module_invoke_all('flush_caches'), $core);
   foreach ($cache_tables as $table) {
     cache_clear_all(NULL, $table);
@@ -3013,6 +3055,7 @@ function system_cron() {
     ->fields(array(
       'expire' => 0,
     ))
+    ->condition('expire', 0, '<>')
     ->condition('expire', REQUEST_TIME, '<')
     ->execute();
 }
@@ -3407,12 +3450,12 @@ function system_image_toolkits() {
 function system_retrieve_file($url, $destination = NULL, $managed = FALSE, $replace = FILE_EXISTS_RENAME) {
   $parsed_url = parse_url($url);
   if (!isset($destination)) {
-    $path = file_build_uri(basename($parsed_url['path']));
+    $path = file_build_uri(drupal_basename($parsed_url['path']));
   }
   else {
     if (is_dir(drupal_realpath($destination))) {
       // Prevent URIs with triple slashes when glueing parts together.
-      $path = str_replace('///', '//', "$destination/") . basename($parsed_url['path']);
+      $path = str_replace('///', '//', "$destination/") . drupal_basename($parsed_url['path']);
     }
     else {
       $path = $destination;
@@ -3451,7 +3494,7 @@ function system_page_alter(&$page) {
  */
 function system_run_automated_cron() {
   // If the site is not fully installed, suppress the automated cron run.
-  // Otherwise it could be triggered prematurely by AJAX requests during
+  // Otherwise it could be triggered prematurely by Ajax requests during
   // installation.
   if (($threshold = variable_get('cron_safe_threshold', DRUPAL_CRON_DEFAULT_THRESHOLD)) > 0 && variable_get('install_task') == 'done') {
     $cron_last = variable_get('cron_last', NULL);
@@ -3847,7 +3890,10 @@ function system_date_format_save($date_format, $dfid = 0) {
     drupal_write_record('date_formats', $info, $keys);
   }
 
+  // Retrieve an array of language objects for enabled languages.
   $languages = language_list('enabled');
+  // This list is keyed off the value of $language->enabled; we want the ones
+  // that are enabled (value of 1).
   $languages = $languages[1];
 
   $locale_format = array();
@@ -3858,7 +3904,7 @@ function system_date_format_save($date_format, $dfid = 0) {
   if (!empty($date_format['locales'])) {
     foreach ($date_format['locales'] as $langcode) {
       // Only proceed if language is enabled.
-      if (in_array($langcode, $languages)) {
+      if (isset($languages[$langcode])) {
         $is_existing = (bool) db_query_range('SELECT 1 FROM {date_format_locale} WHERE type = :type AND language = :language', 0, 1, array(':type' => $date_format['type'], ':language' => $langcode))->fetchField();
         if (!$is_existing) {
           $locale_format['language'] = $langcode;

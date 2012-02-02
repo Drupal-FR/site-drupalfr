@@ -1,5 +1,4 @@
 <?php
-// $Id: aggregator-wrapper.tpl.php,v 1.3 2009/07/23 22:14:26 webchick Exp $
 
 /**
  * @file
@@ -11,6 +10,8 @@
  *
  * @see template_preprocess()
  * @see template_preprocess_aggregator_wrapper()
+ *
+ * @ingroup themeable
  */
 ?>
 <div id="aggregator">

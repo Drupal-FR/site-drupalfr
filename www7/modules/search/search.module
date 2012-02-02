@@ -1,5 +1,4 @@
 <?php
-// $Id: search.module,v 1.371 2011/01/04 05:31:09 webchick Exp $
 
 /**
  * @file
@@ -1005,7 +1004,6 @@ function search_form($form, &$form_state, $action = '', $keys = '', $module = NU
  *
  * @ingroup forms
  * @see search_box_form_submit()
- * @see search-theme-form.tpl.php
  * @see search-block-form.tpl.php
  */
 function search_box($form, &$form_state, $form_id) {
@@ -1190,7 +1188,7 @@ function search_excerpt($keys, $text) {
           if (($s = strrpos($end, ' ')) !== FALSE) {
             // Account for the added spaces.
             $q = max($q - 1, 0);
-            $s = min($s, drupal_strlen($end) - 1);
+            $s = min($s, strlen($end) - 1);
             $ranges[$q] = $p + $s;
             $length += $p + $s - $q;
             $included[$key] = $p + 1;

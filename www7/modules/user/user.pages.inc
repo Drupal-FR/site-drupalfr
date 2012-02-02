@@ -1,5 +1,4 @@
 <?php
-// $Id: user.pages.inc,v 1.78 2010/12/01 00:29:41 webchick Exp $
 
 /**
  * @file
@@ -77,9 +76,11 @@ function user_pass_submit($form, &$form_state) {
 
   $account = $form_state['values']['account'];
   // Mail one time login URL and instructions using current language.
-  _user_mail_notify('password_reset', $account, $language);
-  watchdog('user', 'Password reset instructions mailed to %name at %email.', array('%name' => $account->name, '%email' => $account->mail));
-  drupal_set_message(t('Further instructions have been sent to your e-mail address.'));
+  $mail = _user_mail_notify('password_reset', $account, $language);
+  if (!empty($mail)) {
+    watchdog('user', 'Password reset instructions mailed to %name at %email.', array('%name' => $account->name, '%email' => $account->mail));
+    drupal_set_message(t('Further instructions have been sent to your e-mail address.'));
+  }
 
   $form_state['redirect'] = 'user';
   return;

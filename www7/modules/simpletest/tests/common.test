@@ -1,5 +1,4 @@
 <?php
-// $Id: common.test,v 1.138 2010/12/15 04:21:39 webchick Exp $
 
 /**
  * @file
@@ -57,6 +56,14 @@ class DrupalAlterTestCase extends DrupalWebTestCase {
     $this->assertEqual($array_copy, $array_expected, t('First argument to drupal_alter() was altered.'));
     $this->assertEqual($entity_copy, $entity_expected, t('Second argument to drupal_alter() was altered.'));
     $this->assertEqual($array2_copy, $array2_expected, t('Third argument to drupal_alter() was altered.'));
+
+    // Verify alteration order when passing an array of types to drupal_alter().
+    // common_test_module_implements_alter() places 'block' implementation after
+    // other modules.
+    $array_copy = $array;
+    $array_expected = array('foo' => 'Drupal block theme');
+    drupal_alter(array('drupal_alter', 'drupal_alter_foo'), $array_copy);
+    $this->assertEqual($array_copy, $array_expected, t('hook_TYPE_alter() implementations ran in correct order.'));
   }
 }
 
@@ -346,14 +353,14 @@ class CommonURLUnitTest extends DrupalWebTestCase {
 }
 
 /**
- * Tests for the check_plain() and filter_xss() functions.
+ * Tests for the check_plain(), filter_xss() and format_string() functions.
  */
 class CommonXssUnitTest extends DrupalUnitTestCase {
 
   public static function getInfo() {
     return array(
       'name' => 'String filtering tests',
-      'description' => 'Confirm that check_plain(), filter_xss(), and check_url() work correctly, including invalid multi-byte sequences.',
+      'description' => 'Confirm that check_plain(), filter_xss(), format_string() and check_url() work correctly, including invalid multi-byte sequences.',
       'group' => 'System',
     );
   }
@@ -384,6 +391,22 @@ class CommonXssUnitTest extends DrupalUnitTestCase {
      $this->assertEqual($text, '&lt;script&gt;', 'check_plain() escapes &lt;script&gt;');
      $text = check_plain('<>&"\'');
      $this->assertEqual($text, '&lt;&gt;&amp;&quot;&#039;', 'check_plain() escapes reserved HTML characters.');
+  }
+
+  /**
+   * Test t() and format_string() replacement functionality.
+   */
+  function testFormatStringAndT() {
+    foreach (array('format_string', 't') as $function) {
+      $text = $function('Simple text');
+      $this->assertEqual($text, 'Simple text', $function . ' leaves simple text alone.');
+      $text = $function('Escaped text: @value', array('@value' => '<script>'));
+      $this->assertEqual($text, 'Escaped text: &lt;script&gt;', $function . ' replaces and escapes string.');
+      $text = $function('Placeholder text: %value', array('%value' => '<script>'));
+      $this->assertEqual($text, 'Placeholder text: <em class="placeholder">&lt;script&gt;</em>', $function . ' replaces, escapes and themes string.');
+      $text = $function('Verbatim text: !value', array('!value' => '<script>'));
+      $this->assertEqual($text, 'Verbatim text: <script>', $function . ' replaces verbatim string as-is.');
+    }
   }
 
   /**
@@ -501,7 +524,7 @@ class CommonSizeTestCase extends DrupalUnitTestCase {
 /**
  * Test drupal_explode_tags() and drupal_implode_tags().
  */
-class DrupalTagsHandlingTestCase extends DrupalWebTestCase {
+class DrupalTagsHandlingTestCase extends DrupalUnitTestCase {
   var $validTags = array(
     'Drupal' => 'Drupal',
     'Drupal with some spaces' => 'Drupal with some spaces',
@@ -1001,6 +1024,13 @@ class DrupalHTTPRequestTestCase extends DrupalWebTestCase {
 
     $redirect_307 = drupal_http_request(url('system-test/redirect/307', array('absolute' => TRUE)), array('max_redirects' => 0));
     $this->assertFalse(isset($redirect_307->redirect_code), t('drupal_http_request does not follow 307 redirect if max_redirects = 0.'));
+
+    $multiple_redirect_final_url = url('system-test/multiple-redirects/0', array('absolute' => TRUE));
+    $multiple_redirect_1 = drupal_http_request(url('system-test/multiple-redirects/1', array('absolute' => TRUE)), array('max_redirects' => 1));
+    $this->assertEqual($multiple_redirect_1->redirect_url, $multiple_redirect_final_url, t('redirect_url contains the final redirection location after 1 redirect.'));
+
+    $multiple_redirect_3 = drupal_http_request(url('system-test/multiple-redirects/3', array('absolute' => TRUE)), array('max_redirects' => 3));
+    $this->assertEqual($multiple_redirect_3->redirect_url, $multiple_redirect_final_url, t('redirect_url contains the final redirection location after 3 redirects.'));
   }
 }
 
@@ -1089,7 +1119,7 @@ class DrupalGotoTest extends DrupalWebTestCase {
     $destination = 'common-test/drupal_goto/destination?foo=%2525&bar=123';
     $this->drupalGet('common-test/drupal_goto/redirect', array('query' => array('destination' => $destination)));
     $this->assertText('drupal_goto', t('Drupal goto redirect with destination succeeded.'));
-    $this->assertEqual($this->getUrl(), url('common-test/drupal_goto/destination', array('query' => array('foo' => '%25', 'bar' => '123'), 'absolute' => TRUE)), t('Drupal goto redirected to given query string destination. '));
+    $this->assertEqual($this->getUrl(), url('common-test/drupal_goto/destination', array('query' => array('foo' => '%25', 'bar' => '123'), 'absolute' => TRUE)), t('Drupal goto redirected to given query string destination.'));
   }
 
   /**
@@ -1171,6 +1201,8 @@ class JavaScriptTestCase extends DrupalWebTestCase {
     $this->assertTrue(array_key_exists('misc/drupal.js', $javascript), t('Drupal.js is added when file is added.'));
     $this->assertTrue(array_key_exists('misc/collapse.js', $javascript), t('JavaScript files are correctly added.'));
     $this->assertEqual(base_path(), $javascript['settings']['data'][0]['basePath'], t('Base path JavaScript setting is correctly set.'));
+    url('', array('prefix' => &$prefix));
+    $this->assertEqual(empty($prefix) ? '' : $prefix, $javascript['settings']['data'][1]['pathPrefix'], t('Path prefix JavaScript setting is correctly set.'));
   }
 
   /**
@@ -1178,8 +1210,8 @@ class JavaScriptTestCase extends DrupalWebTestCase {
    */
   function testAddSetting() {
     $javascript = drupal_add_js(array('drupal' => 'rocks', 'dries' => 280342800), 'setting');
-    $this->assertEqual(280342800, $javascript['settings']['data'][1]['dries'], t('JavaScript setting is set correctly.'));
-    $this->assertEqual('rocks', $javascript['settings']['data'][1]['drupal'], t('The other JavaScript setting is set correctly.'));
+    $this->assertEqual(280342800, $javascript['settings']['data'][2]['dries'], t('JavaScript setting is set correctly.'));
+    $this->assertEqual('rocks', $javascript['settings']['data'][2]['drupal'], t('The other JavaScript setting is set correctly.'));
   }
 
   /**
@@ -1209,6 +1241,7 @@ class JavaScriptTestCase extends DrupalWebTestCase {
     $javascript = drupal_get_js('header');
     $this->assertTrue(strpos($javascript, 'basePath') > 0, t('Rendered JavaScript header returns basePath setting.'));
     $this->assertTrue(strpos($javascript, 'misc/jquery.js') > 0, t('Rendered JavaScript header includes jQuery.'));
+    $this->assertTrue(strpos($javascript, 'pathPrefix') > 0, t('Rendered JavaScript header returns pathPrefix setting.'));
 
     // Test whether drupal_add_js can be used to override a previous setting.
     $this->assertTrue(strpos($javascript, 'commonTestShouldAppear') > 0, t('Rendered JavaScript header returns custom setting.'));
@@ -1522,6 +1555,56 @@ class DrupalRenderTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Test #attached functionality in children elements.
+   */
+  function testDrupalRenderChildrenAttached() {
+    // The cache system is turned off for POST requests.
+    $request_method = $_SERVER['REQUEST_METHOD'];
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+
+    // Create an element with a child and subchild.  Each element loads a
+    // different JavaScript file using #attached.
+    $parent_js = drupal_get_path('module', 'user') . '/user.js';
+    $child_js = drupal_get_path('module', 'forum') . '/forum.js';
+    $subchild_js = drupal_get_path('module', 'book') . '/book.js';
+    $element = array(
+      '#type' => 'fieldset',
+      '#cache' => array(
+        'keys' => array('simpletest', 'drupal_render', 'children_attached'),
+      ),
+      '#attached' => array('js' => array($parent_js)),
+      '#title' => 'Parent',
+    );
+    $element['child'] = array(
+      '#type' => 'fieldset',
+      '#attached' => array('js' => array($child_js)),
+      '#title' => 'Child',
+    );
+    $element['child']['subchild'] = array(
+      '#attached' => array('js' => array($subchild_js)),
+      '#markup' => 'Subchild',
+    );
+
+    // Render the element and verify the presence of #attached JavaScript.
+    drupal_render($element);
+    $scripts = drupal_get_js();
+    $this->assertTrue(strpos($scripts, $parent_js), t('The element #attached JavaScript was included.'));
+    $this->assertTrue(strpos($scripts, $child_js), t('The child #attached JavaScript was included.'));
+    $this->assertTrue(strpos($scripts, $subchild_js), t('The subchild #attached JavaScript was included.'));
+
+    // Load the element from cache and verify the presence of the #attached
+    // JavaScript.
+    drupal_static_reset('drupal_add_js');
+    $this->assertTrue(drupal_render_cache_get($element), t('The element was retrieved from cache.'));
+    $scripts = drupal_get_js();
+    $this->assertTrue(strpos($scripts, $parent_js), t('The element #attached JavaScript was included when loading from cache.'));
+    $this->assertTrue(strpos($scripts, $child_js), t('The child #attached JavaScript was included when loading from cache.'));
+    $this->assertTrue(strpos($scripts, $subchild_js), t('The subchild #attached JavaScript was included when loading from cache.'));
+
+    $_SERVER['REQUEST_METHOD'] = $request_method;
+  }
+
+  /**
    * Test passing arguments to the theme function.
    */
   function testDrupalRenderThemeArguments() {
@@ -1663,6 +1746,37 @@ class DrupalRenderTestCase extends DrupalWebTestCase {
     $this->assertFieldByXPath($xpath, $element['#value'], t('#type @type was properly rendered.', array(
       '@type' => var_export($element['#type'], TRUE),
     )));
+  }
+
+  /**
+   * Tests caching of an empty render item.
+   */
+  function testDrupalRenderCache() {
+    // Force a request via GET.
+    $request_method = $_SERVER['REQUEST_METHOD'];
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    // Create an empty element.
+    $test_element = array(
+      '#cache' => array(
+        'cid' => 'render_cache_test',
+      ),
+      '#markup' => '',
+    );
+
+    // Render the element and confirm that it goes through the rendering
+    // process (which will set $element['#printed']).
+    $element = $test_element;
+    drupal_render($element);
+    $this->assertTrue(isset($element['#printed']), t('No cache hit'));
+
+    // Render the element again and confirm that it is retrieved from the cache
+    // instead (so $element['#printed'] will not be set).
+    $element = $test_element;
+    drupal_render($element);
+    $this->assertFalse(isset($element['#printed']), t('Cache hit'));
+
+    // Restore the previous request method.
+    $_SERVER['REQUEST_METHOD'] = $request_method;
   }
 }
 
@@ -1989,7 +2103,7 @@ class DrupalErrorCollectionUnitTest extends DrupalWebTestCase {
   function assertError($error, $group, $function, $file, $message = NULL) {
     $this->assertEqual($error['group'], $group, t("Group was %group", array('%group' => $group)));
     $this->assertEqual($error['caller']['function'], $function, t("Function was %function", array('%function' => $function)));
-    $this->assertEqual(basename($error['caller']['file']), $file, t("File was %file", array('%file' => $file)));
+    $this->assertEqual(drupal_basename($error['caller']['file']), $file, t("File was %file", array('%file' => $file)));
     if (isset($message)) {
       $this->assertEqual($error['message'], $message, t("Message was %message", array('%message' => $message)));
     }
@@ -1999,7 +2113,7 @@ class DrupalErrorCollectionUnitTest extends DrupalWebTestCase {
 /**
  * Test the drupal_parse_info_file() API function.
  */
-class ParseInfoFilesTestCase extends DrupalWebTestCase {
+class ParseInfoFilesTestCase extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Parsing .info files',
@@ -2258,8 +2372,10 @@ class DrupalJSONTest extends DrupalUnitTestCase {
       $str .= chr($i);
     }
     // Characters that must be escaped.
-    $html_unsafe = array('<', '>', '&');
-    $html_unsafe_escaped = array('\u003c', '\u003e', '\u0026');
+    // We check for unescaped " separately.
+    $html_unsafe = array('<', '>', '\'', '&');
+    // The following are the encoded forms of: < > ' & "
+    $html_unsafe_escaped = array('\u003C', '\u003E', '\u0027', '\u0026', '\u0022');
 
     // Verify there aren't character encoding problems with the source string.
     $this->assertIdentical(strlen($str), 128, t('A string with the full ASCII table has the correct length.'));
@@ -2270,6 +2386,11 @@ class DrupalJSONTest extends DrupalUnitTestCase {
     // Verify that JSON encoding produces a string with all of the characters.
     $json = drupal_json_encode($str);
     $this->assertTrue(strlen($json) > strlen($str), t('A JSON encoded string is larger than the source string.'));
+
+    // The first and last characters should be ", and no others.
+    $this->assertTrue($json[0] == '"', t('A JSON encoded string begins with ".'));
+    $this->assertTrue($json[strlen($json) - 1] == '"', t('A JSON encoded string ends with ".'));
+    $this->assertTrue(substr_count($json, '"') == 2, t('A JSON encoded string contains exactly two ".'));
 
     // Verify that encoding/decoding is reversible.
     $json_decoded = drupal_json_decode($json);

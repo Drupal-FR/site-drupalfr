@@ -1,5 +1,9 @@
 <?php
-// $Id: comment.test,v 1.98 2011/01/02 23:54:05 webchick Exp $
+
+/**
+ * @file 
+ * Tests for comment.module.
+ */
 
 class CommentHelperCase extends DrupalWebTestCase {
   protected $admin_user;
@@ -303,6 +307,26 @@ class CommentInterfaceTest extends CommentHelperCase {
     $this->drupalLogin($this->admin_user);
     $this->setCommentSubject(TRUE);
     $this->setCommentPreview(DRUPAL_OPTIONAL);
+
+    // Test changing the comment author to "Anonymous".
+    $this->drupalGet('comment/' . $comment->id . '/edit');
+    $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => ''));
+    $comment_loaded = comment_load($comment->id);
+    $this->assertTrue(empty($comment_loaded->name) && $comment_loaded->uid == 0, t('Comment author successfully changed to anonymous.'));
+
+    // Test changing the comment author to an unverified user.
+    $random_name = $this->randomName();
+    $this->drupalGet('comment/' . $comment->id . '/edit');
+    $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => $random_name));
+    $this->drupalGet('node/' . $this->node->nid);
+    $this->assertText($random_name . ' (' . t('not verified') . ')', t('Comment author successfully changed to an unverified user.'));
+
+    // Test changing the comment author to a verified user.
+    $this->drupalGet('comment/' . $comment->id . '/edit');
+    $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => $this->web_user->name));
+    $comment_loaded = comment_load($comment->id);
+    $this->assertTrue($comment_loaded->name == $this->web_user->name && $comment_loaded->uid == $this->web_user->uid, t('Comment author successfully changed to a registered user.'));
+
     $this->drupalLogout();
 
     // Reply to comment #2 creating comment #3 with optional preview and no
@@ -389,6 +413,163 @@ class CommentInterfaceTest extends CommentHelperCase {
     $this->drupalLogout();
     $this->drupalLogin($this->admin_user);
     $this->setCommentForm(FALSE);
+  }
+
+  /**
+   * Tests new comment marker.
+   */
+  public function testCommentNewCommentsIndicator() {
+    // Test if the right links are displayed when no comment is present for the
+    // node.
+    $this->drupalLogin($this->admin_user);
+    $this->node = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1, 'comment' => COMMENT_NODE_OPEN));
+    $this->drupalGet('node');
+    $this->assertNoLink(t('@count comments', array('@count' => 0)));
+    $this->assertNoLink(t('@count new comments', array('@count' => 0)));
+    $this->assertLink(t('Read more'));
+    $count = $this->xpath('//div[@id=:id]/div[@class=:class]/ul/li', array(':id' => 'node-' . $this->node->nid, ':class' => 'link-wrapper'));
+    $this->assertTrue(count($count) == 1, t('One child found'));
+
+    // Create a new comment. This helper function may be run with different
+    // comment settings so use comment_save() to avoid complex setup.
+    $comment = (object) array(
+      'cid' => NULL,
+      'nid' => $this->node->nid,
+      'node_type' => $this->node->type,
+      'pid' => 0,
+      'uid' => $this->loggedInUser->uid,
+      'status' => COMMENT_PUBLISHED,
+      'subject' => $this->randomName(),
+      'hostname' => ip_address(),
+      'language' => LANGUAGE_NONE,
+      'comment_body' => array(LANGUAGE_NONE => array($this->randomName())),
+    );
+    comment_save($comment);
+    $this->drupalLogout();
+
+    // Log in with 'web user' and check comment links.
+    $this->drupalLogin($this->web_user);
+    $this->drupalGet('node');
+    $this->assertLink(t('1 new comment'));
+    $this->clickLink(t('1 new comment'));
+    $this->assertRaw('<a id="new"></a>', t('Found "new" marker.'));
+    $this->assertTrue($this->xpath('//a[@id=:new]/following-sibling::a[1][@id=:comment_id]', array(':new' => 'new', ':comment_id' => 'comment-1')), t('The "new" anchor is positioned at the right comment.'));
+
+    // Test if "new comment" link is correctly removed.
+    $this->drupalGet('node');
+    $this->assertLink(t('1 comment'));
+    $this->assertLink(t('Read more'));
+    $this->assertNoLink(t('1 new comment'));
+    $this->assertNoLink(t('@count new comments', array('@count' => 0)));
+    $count = $this->xpath('//div[@id=:id]/div[@class=:class]/ul/li', array(':id' => 'node-' . $this->node->nid, ':class' => 'link-wrapper'));
+    $this->assertTrue(count($count) == 2, print_r($count, TRUE));
+  }
+
+  /**
+   * Tests CSS classes on comments.
+   */
+  function testCommentClasses() {
+    // Create all permutations for comments, users, and nodes.
+    $parameters = array(
+      'node_uid' => array(0, $this->web_user->uid),
+      'comment_uid' => array(0, $this->web_user->uid, $this->admin_user->uid),
+      'comment_status' => array(COMMENT_PUBLISHED, COMMENT_NOT_PUBLISHED),
+      'user' => array('anonymous', 'authenticated', 'admin'),
+    );
+    $permutations = $this->generatePermutations($parameters);
+
+    foreach ($permutations as $case) {
+      // Create a new node.
+      $node = $this->drupalCreateNode(array('type' => 'article', 'uid' => $case['node_uid']));
+
+      // Add a comment.
+      $comment = (object) array(
+        'cid' => NULL,
+        'nid' => $node->nid,
+        'pid' => 0,
+        'uid' => $case['comment_uid'],
+        'status' => $case['comment_status'],
+        'subject' => $this->randomName(),
+        'language' => LANGUAGE_NONE,
+        'comment_body' => array(LANGUAGE_NONE => array($this->randomName())),
+      );
+      comment_save($comment);
+
+      // Adjust the current/viewing user.
+      switch ($case['user']) {
+        case 'anonymous':
+          $this->drupalLogout();
+          $case['user_uid'] = 0;
+          break;
+
+        case 'authenticated':
+          $this->drupalLogin($this->web_user);
+          $case['user_uid'] = $this->web_user->uid;
+          break;
+
+        case 'admin':
+          $this->drupalLogin($this->admin_user);
+          $case['user_uid'] = $this->admin_user->uid;
+          break;
+      }
+      // Request the node with the comment.
+      $this->drupalGet('node/' . $node->nid);
+
+      // Verify classes if the comment is visible for the current user.
+      if ($case['comment_status'] == COMMENT_PUBLISHED || $case['user'] == 'admin') {
+        // Verify the comment-by-anonymous class.
+        $comments = $this->xpath('//*[contains(@class, "comment-by-anonymous")]');
+        if ($case['comment_uid'] == 0) {
+          $this->assertTrue(count($comments) == 1, 'comment-by-anonymous class found.');
+        }
+        else {
+          $this->assertFalse(count($comments), 'comment-by-anonymous class not found.');
+        }
+
+        // Verify the comment-by-node-author class.
+        $comments = $this->xpath('//*[contains(@class, "comment-by-node-author")]');
+        if ($case['comment_uid'] > 0 && $case['comment_uid'] == $case['node_uid']) {
+          $this->assertTrue(count($comments) == 1, 'comment-by-node-author class found.');
+        }
+        else {
+          $this->assertFalse(count($comments), 'comment-by-node-author class not found.');
+        }
+
+        // Verify the comment-by-viewer class.
+        $comments = $this->xpath('//*[contains(@class, "comment-by-viewer")]');
+        if ($case['comment_uid'] > 0 && $case['comment_uid'] == $case['user_uid']) {
+          $this->assertTrue(count($comments) == 1, 'comment-by-viewer class found.');
+        }
+        else {
+          $this->assertFalse(count($comments), 'comment-by-viewer class not found.');
+        }
+      }
+
+      // Verify the comment-unpublished class.
+      $comments = $this->xpath('//*[contains(@class, "comment-unpublished")]');
+      if ($case['comment_status'] == COMMENT_NOT_PUBLISHED && $case['user'] == 'admin') {
+        $this->assertTrue(count($comments) == 1, 'comment-unpublished class found.');
+      }
+      else {
+        $this->assertFalse(count($comments), 'comment-unpublished class not found.');
+      }
+
+      // Verify the comment-new class.
+      if ($case['comment_status'] == COMMENT_PUBLISHED || $case['user'] == 'admin') {
+        $comments = $this->xpath('//*[contains(@class, "comment-new")]');
+        if ($case['user'] != 'anonymous') {
+          $this->assertTrue(count($comments) == 1, 'comment-new class found.');
+
+          // Request the node again. The comment-new class should disappear.
+          $this->drupalGet('node/' . $node->nid);
+          $comments = $this->xpath('//*[contains(@class, "comment-new")]');
+          $this->assertFalse(count($comments), 'comment-new class not found.');
+        }
+        else {
+          $this->assertFalse(count($comments), 'comment-new class not found.');
+        }
+      }
+    }
   }
 
   /**
@@ -1694,7 +1875,7 @@ class CommentTokenReplaceTestCase extends CommentHelperCase {
 
     foreach ($tests as $input => $expected) {
       $output = token_replace($input, array('comment' => $comment), array('language' => $language));
-      $this->assertFalse(strcmp($output, $expected), t('Sanitized comment token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($output, $expected, t('Sanitized comment token %token replaced.', array('%token' => $input)));
     }
 
     // Generate and test unsanitized tokens.
@@ -1710,7 +1891,7 @@ class CommentTokenReplaceTestCase extends CommentHelperCase {
 
     foreach ($tests as $input => $expected) {
       $output = token_replace($input, array('comment' => $comment), array('language' => $language, 'sanitize' => FALSE));
-      $this->assertFalse(strcmp($output, $expected), t('Unsanitized comment token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($output, $expected, t('Unsanitized comment token %token replaced.', array('%token' => $input)));
     }
 
     // Load node so comment_count gets computed.
@@ -1723,7 +1904,7 @@ class CommentTokenReplaceTestCase extends CommentHelperCase {
 
     foreach ($tests as $input => $expected) {
       $output = token_replace($input, array('node' => $node), array('language' => $language));
-      $this->assertFalse(strcmp($output, $expected), t('Node comment token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($output, $expected, t('Node comment token %token replaced.', array('%token' => $input)));
     }
   }
 }
@@ -1887,5 +2068,20 @@ class CommentFieldsTest extends CommentHelperCase {
     $this->postComment($blog_node, $this->randomName(), $this->randomName());
     $this->postComment($book_node, $this->randomName(), $this->randomName());
     $this->postComment($poll_node, $this->randomName(), $this->randomName());
+  }
+
+  /**
+   * Test that comment module works correctly with plain text format.
+   */
+  function testCommentFormat() {
+    // Disable text processing for comments.
+    $this->drupalLogin($this->admin_user);
+    $edit = array('instance[settings][text_processing]' => 0);
+    $this->drupalPost('admin/structure/types/manage/article/comment/fields/comment_body', $edit, t('Save settings'));
+
+    // Post a comment without an explicit subject.
+    $this->drupalLogin($this->web_user);
+    $edit = array('comment_body[und][0][value]' => $this->randomName(8));
+    $this->drupalPost('node/' . $this->node->nid, $edit, t('Save'));
   }
 }

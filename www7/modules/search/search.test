@@ -1,5 +1,9 @@
 <?php
-// $Id: search.test,v 1.86 2011/01/04 05:31:09 webchick Exp $
+
+/**
+ * @file
+ * Tests for search.module.
+ */
 
 // The search index can contain different types of content. Typically the type is 'node'.
 // Here we test with _test_ and _test2_ as the type.
@@ -286,6 +290,20 @@ class SearchPageText extends DrupalWebTestCase {
     $this->drupalGet('search/node/' . $arg);
     $input = $this->xpath("//input[@id='edit-keys' and @value='{$arg}']");
     $this->assertFalse(empty($input), 'Search keys with a / are correctly set as the default value in the search box.');
+
+    // Test a search input exceeding the limit of AND/OR combinations to test
+    // the Denial-of-Service protection.
+    $limit = variable_get('search_and_or_limit', 7);
+    $keys = array();
+    for ($i = 0; $i < $limit + 1; $i++) {
+      $keys[] = $this->randomName(3);
+      if ($i % 2 == 0) {
+        $keys[] = 'OR';
+      }
+    }
+    $edit['keys'] = implode(' ', $keys);
+    $this->drupalPost('search/node', $edit, t('Search'));
+    $this->assertRaw(t('Your search used too many AND/OR expressions. Only the first @count terms were included in this search.', array('@count' => $limit)));
   }
 }
 
@@ -328,7 +346,7 @@ class SearchAdvancedSearchForm extends DrupalWebTestCase {
 
     // Assert that the dummy title doesn't equal the real title.
     $dummy_title = 'Lorem ipsum';
-    $this->assertNotEqual($dummy_title, $this->node->title, t("Dummy title doens't equal node title"));
+    $this->assertNotEqual($dummy_title, $this->node->title, t("Dummy title doesn't equal node title"));
 
     // Search for the dummy title with a GET query.
     $this->drupalGet('search/node/' . $dummy_title);
@@ -580,11 +598,11 @@ class SearchBlockTestCase extends DrupalWebTestCase {
   }
 
   function testSearchFormBlock() {
-    // Set block title to confirm that the interface is availble.
+    // Set block title to confirm that the interface is available.
     $this->drupalPost('admin/structure/block/manage/search/form/configure', array('title' => $this->randomName(8)), t('Save block'));
     $this->assertText(t('The block configuration has been saved.'), t('Block configuration set.'));
 
-    // Set the block to a region to confirm block is availble.
+    // Set the block to a region to confirm block is available.
     $edit = array();
     $edit['blocks[search_form][region]'] = 'footer';
     $this->drupalPost('admin/structure/block', $edit, t('Save blocks'));
@@ -1581,6 +1599,12 @@ class SearchExcerptTestCase extends DrupalUnitTestCase {
     $result = preg_replace('| +|', ' ', search_excerpt('nothing', $entities));
     $this->assertFalse(strpos($result, '&'), 'Entities are not present in excerpt');
     $this->assertTrue(strpos($result, 'í') > 0, 'Entities are converted in excerpt');
+
+    // The node body that will produce this rendered $text is:
+    // 123456789 HTMLTest +123456789+&lsquo;  +&lsquo;  +&lsquo;  +&lsquo;  +12345678  &nbsp;&nbsp;  +&lsquo;  +&lsquo;  +&lsquo;   &lsquo;
+    $text = "<div class=\"field field-name-body field-type-text-with-summary field-label-hidden\"><div class=\"field-items\"><div class=\"field-item even\" property=\"content:encoded\"><p>123456789 HTMLTest +123456789+‘  +‘  +‘  +‘  +12345678      +‘  +‘  +‘   ‘</p>\n</div></div></div> ";
+    $result = search_excerpt('HTMLTest', $text);
+    $this->assertFalse(empty($result),  'Rendered Multi-byte HTML encodings are not corrupted in search excerpts');
   }
 
   /**
@@ -1941,5 +1965,48 @@ class SearchLanguageTestCase extends DrupalWebTestCase {
     // Check that there are again no languages displayed.
     $this->drupalGet('search/node');
     $this->assertNoText(t('Languages'), t('No languages to choose from.'));
+  }
+}
+
+/**
+ * Tests node search with node access control.
+ */
+class SearchNodeAccessTest extends DrupalWebTestCase {
+  public $test_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Search and node access',
+      'description' => 'Tests search functionality with node access control.',
+      'group' => 'Search',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('search', 'node_access_test');
+    node_access_rebuild();
+
+    // Create a test user and log in.
+    $this->test_user = $this->drupalCreateUser(array('access content', 'search content', 'use advanced search'));
+    $this->drupalLogin($this->test_user);
+  }
+
+  /**
+   * Tests that search returns results with punctuation in the search phrase.
+   */
+  function testPhraseSearchPunctuation() {
+    $node = $this->drupalCreateNode(array('body' => array(LANGUAGE_NONE => array(array('value' => "The bunny's ears were fuzzy.")))));
+
+    // Update the search index.
+    module_invoke_all('update_index');
+    search_update_totals();
+
+    // Refresh variables after the treatment.
+    $this->refreshVariables();
+
+    // Submit a phrase wrapped in double quotes to include the punctuation.
+    $edit = array('keys' => '"bunny\'s"');
+    $this->drupalPost('search/node', $edit, t('Search'));
+    $this->assertText($node->title);
   }
 }

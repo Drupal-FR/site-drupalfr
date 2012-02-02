@@ -1,5 +1,4 @@
 <?php
-// $Id: file_test.module,v 1.25 2010/08/22 13:52:58 dries Exp $
 
 /**
  * @file
@@ -37,6 +36,11 @@ function file_test_stream_wrappers() {
       'name' => t('Dummy files'),
       'class' => 'DrupalDummyStreamWrapper',
       'description' => t('Dummy wrapper for simpletest.'),
+    ),
+    'dummy-remote' => array(
+      'name' => t('Dummy files (remote)'),
+      'class' => 'DrupalDummyRemoteStreamWrapper',
+      'description' => t('Dummy wrapper for simpletest (remote).'),
     ),
   );
 }
@@ -134,7 +138,7 @@ function _file_test_form_submit(&$form, &$form_state) {
 /**
  * Reset/initialize the history of calls to the file_* hooks.
  *
- * @see file_test_get_calls() 
+ * @see file_test_get_calls()
  * @see file_test_reset()
  */
 function file_test_reset() {
@@ -443,3 +447,15 @@ class DrupalDummyStreamWrapper extends DrupalLocalStreamWrapper {
   }
 }
 
+/**
+ * Helper class for testing the stream wrapper registry.
+ *
+ * Dummy remote stream wrapper implementation (dummy-remote://).
+ *
+ * Basically just the public scheme but not returning a local file for realpath.
+ */
+class DrupalDummyRemoteStreamWrapper extends DrupalPublicStreamWrapper {
+  function realpath() {
+    return FALSE;
+  }
+}

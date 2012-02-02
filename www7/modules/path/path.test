@@ -1,9 +1,8 @@
 <?php
-// $Id: path.test,v 1.41 2010/10/09 17:38:41 webchick Exp $
 
 /**
  * @file
- * Tests for the path module
+ * Tests for path.module.
  */
 
 class PathTestCase extends DrupalWebTestCase {
@@ -280,8 +279,9 @@ class PathLanguageTestCase extends DrupalWebTestCase {
     $this->drupalGet('node/' . $english_node->nid . '/translate');
     $this->clickLink(t('add translation'));
     $edit = array();
+    $langcode = LANGUAGE_NONE;
     $edit["title"] = $this->randomName();
-    $edit["body[fr][0][value]"] = $this->randomName();
+    $edit["body[$langcode][0][value]"] = $this->randomName();
     $french_alias = $this->randomName();
     $edit['path[alias]'] = $french_alias;
     $this->drupalPost(NULL, $edit, t('Save'));

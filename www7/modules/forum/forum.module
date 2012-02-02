@@ -1,5 +1,4 @@
 <?php
-// $Id: forum.module,v 1.582 2010/11/29 04:53:32 webchick Exp $
 
 /**
  * @file
@@ -170,12 +169,9 @@ function forum_menu_local_tasks_alter(&$data, $router_item, $root_path) {
     $tid = (isset($router_item['page_arguments'][0]) ? $router_item['page_arguments'][0]->tid : 0);
     $forum_term = forum_forum_load($tid);
     if ($forum_term) {
-      $vid = variable_get('forum_nav_vocabulary', 0);
-      $vocabulary = taxonomy_vocabulary_load($vid);
-
       $links = array();
       // Loop through all bundles for forum taxonomy vocabulary field.
-      $field = field_info_field('taxonomy_' . $vocabulary->machine_name);
+      $field = field_info_field('taxonomy_forums');
       foreach ($field['bundles']['node'] as $type) {
         if (node_access('create', $type)) {
           $links[$type] = array(
@@ -219,7 +215,7 @@ function forum_menu_local_tasks_alter(&$data, $router_item, $root_path) {
  * Implements hook_entity_info_alter().
  */
 function forum_entity_info_alter(&$info) {
-  // Take over URI constuction for taxonomy terms that are forums.
+  // Take over URI construction for taxonomy terms that are forums.
   if ($vid = variable_get('forum_nav_vocabulary', 0)) {
     // Within hook_entity_info(), we can't invoke entity_load() as that would
     // cause infinite recursion, so we call taxonomy_vocabulary_get_names()
@@ -374,7 +370,7 @@ function forum_node_update($node) {
     }
     // If the node has a shadow forum topic, update the record for this
     // revision.
-    if ($node->shadow) {
+    if (!empty($node->shadow)) {
       db_delete('forum')
         ->condition('nid', $node->nid)
         ->condition('vid', $node->vid)
@@ -557,27 +553,24 @@ function forum_field_storage_pre_update($entity_type, $entity, &$skip_fields) {
       $first_call[$entity->nid] = FALSE;
       db_delete('forum_index')->condition('nid', $entity->nid)->execute();
     }
-    // Only save data to the table if the node is published.
-    if ($entity->status) {
-      $query = db_insert('forum_index')->fields(array('nid', 'title', 'tid', 'sticky', 'created', 'comment_count', 'last_comment_timestamp'));
-      foreach ($entity->taxonomy_forums as $language) {
-        foreach ($language as $item) {
-          $query->values(array(
-            'nid' => $entity->nid,
-            'title' => $entity->title,
-            'tid' => $item['tid'],
-            'sticky' => $entity->sticky,
-            'created' => $entity->created,
-            'comment_count' => 0,
-            'last_comment_timestamp' => $entity->created,
-          ));
-        }
+    $query = db_insert('forum_index')->fields(array('nid', 'title', 'tid', 'sticky', 'created', 'comment_count', 'last_comment_timestamp'));
+    foreach ($entity->taxonomy_forums as $language) {
+      foreach ($language as $item) {
+        $query->values(array(
+          'nid' => $entity->nid,
+          'title' => $entity->title,
+          'tid' => $item['tid'],
+          'sticky' => $entity->sticky,
+          'created' => $entity->created,
+          'comment_count' => 0,
+          'last_comment_timestamp' => $entity->created,
+        ));
       }
-      $query->execute();
-      // The logic for determining last_comment_count is fairly complex, so
-      // call _forum_update_forum_index() too.
-      _forum_update_forum_index($entity->nid);
     }
+    $query->execute();
+    // The logic for determining last_comment_count is fairly complex, so
+    // call _forum_update_forum_index() too.
+    _forum_update_forum_index($entity->nid);
   }
 }
 
@@ -586,7 +579,7 @@ function forum_field_storage_pre_update($entity_type, $entity, &$skip_fields) {
  */
 function forum_form_alter(&$form, $form_state, $form_id) {
   $vid = variable_get('forum_nav_vocabulary', 0);
-  if (isset($form['vid']) && $form['vid']['#value'] == $vid) {
+  if (isset($form['vid']['#value']) && $form['vid']['#value'] == $vid) {
     // Hide critical options from forum vocabulary.
     if ($form_id == 'taxonomy_form_vocabulary') {
       $form['help_forum_vocab'] = array(
@@ -611,7 +604,7 @@ function forum_form_alter(&$form, $form_state, $form_id) {
       // ID from the URL (e.g., if we are on a page like node/add/forum/2, we
       // expect "2" to be the ID of the forum that was requested).
       $requested_forum_id = arg(3);
-      $form['taxonomy_forums'][$langcode]['#default_value'] = is_numeric($requested_forum_id) ? $requested_forum_id : NULL;
+      $form['taxonomy_forums'][$langcode]['#default_value'] = is_numeric($requested_forum_id) ? $requested_forum_id : '';
     }
   }
 }
@@ -880,7 +873,6 @@ function forum_get_topics($tid, $sortby, $forum_per_page) {
     ->addTag('node_access')
     ->orderBy('f.sticky', 'DESC')
     ->orderByHeader($forum_topic_list_header)
-    ->orderBy('f.last_comment_timestamp', 'DESC')
     ->limit($forum_per_page);
 
   $count_query = db_select('forum_index', 'f');
@@ -895,7 +887,29 @@ function forum_get_topics($tid, $sortby, $forum_per_page) {
     $nids[] = $record->nid;
   }
   if ($nids) {
-    $result = db_query("SELECT n.title, n.nid, n.type, n.sticky, n.created, n.uid, n.comment AS comment_mode, ncs.*, f.tid AS forum_tid, u.name, CASE ncs.last_comment_uid WHEN 0 THEN ncs.last_comment_name ELSE u2.name END AS last_comment_name FROM {node} n INNER JOIN {node_comment_statistics} ncs ON n.nid = ncs.nid INNER JOIN {forum} f ON n.vid = f.vid INNER JOIN {users} u ON n.uid = u.uid INNER JOIN {users} u2 ON ncs.last_comment_uid = u2.uid WHERE n.nid IN (:nids)", array(':nids' => $nids));
+    $query = db_select('node', 'n')->extend('TableSort');
+    $query->fields('n', array('title', 'nid', 'type', 'sticky', 'created', 'uid'));
+    $query->addField('n', 'comment', 'comment_mode');
+
+    $query->join('node_comment_statistics', 'ncs', 'n.nid = ncs.nid');
+    $query->fields('ncs', array('cid', 'last_comment_uid', 'last_comment_timestamp', 'comment_count'));
+
+    $query->join('forum_index', 'f', 'f.nid = ncs.nid');
+    $query->addField('f', 'tid', 'forum_tid');
+
+    $query->join('users', 'u', 'n.uid = u.uid');
+    $query->addField('u', 'name');
+
+    $query->join('users', 'u2', 'ncs.last_comment_uid = u2.uid');
+
+    $query->addExpression('CASE ncs.last_comment_uid WHEN 0 THEN ncs.last_comment_name ELSE u2.name END', 'last_comment_name');
+
+    $query
+      ->orderBy('f.sticky', 'DESC')
+      ->orderByHeader($forum_topic_list_header)
+      ->condition('n.nid', $nids);
+
+    $result = $query->execute();
   }
   else {
     $result = array();
@@ -1047,11 +1061,15 @@ function template_preprocess_forum_list(&$variables) {
     $variables['forums'][$id]->new_url = '';
     $variables['forums'][$id]->new_topics = 0;
     $variables['forums'][$id]->old_topics = $forum->num_topics;
+    $variables['forums'][$id]->icon_class = 'default';
+    $variables['forums'][$id]->icon_title = t('No new posts');
     if ($user->uid) {
       $variables['forums'][$id]->new_topics = _forum_topics_unread($forum->tid, $user->uid);
       if ($variables['forums'][$id]->new_topics) {
         $variables['forums'][$id]->new_text = format_plural($variables['forums'][$id]->new_topics, '1 new', '@count new');
         $variables['forums'][$id]->new_url = url("forum/$forum->tid", array('fragment' => 'new'));
+        $variables['forums'][$id]->icon_class = 'new';
+        $variables['forums'][$id]->icon_title = t('New posts');
       }
       $variables['forums'][$id]->old_topics = $forum->num_topics - $variables['forums'][$id]->new_topics;
     }
@@ -1106,7 +1124,6 @@ function template_preprocess_forum_topic_list(&$variables) {
         $variables['topics'][$id]->title = l($topic->title, "node/$topic->nid");
         $variables['topics'][$id]->message = '';
       }
-      $topic->uid = $topic->last_comment_uid ? $topic->last_comment_uid : $topic->uid;
       $variables['topics'][$id]->created = theme('forum_submitted', array('topic' => $topic));
       $variables['topics'][$id]->last_reply = theme('forum_submitted', array('topic' => isset($topic->last_reply) ? $topic->last_reply : NULL));
 
@@ -1194,16 +1211,16 @@ function _forum_user_last_visit($nid) {
 function _forum_get_topic_order($sortby) {
   switch ($sortby) {
     case 1:
-      return array('field' => 'ncs.last_comment_timestamp', 'sort' => 'desc');
+      return array('field' => 'f.last_comment_timestamp', 'sort' => 'desc');
       break;
     case 2:
-      return array('field' => 'ncs.last_comment_timestamp', 'sort' => 'asc');
+      return array('field' => 'f.last_comment_timestamp', 'sort' => 'asc');
       break;
     case 3:
-      return array('field' => 'ncs.comment_count', 'sort' => 'desc');
+      return array('field' => 'f.comment_count', 'sort' => 'desc');
       break;
     case 4:
-      return array('field' => 'ncs.comment_count', 'sort' => 'asc');
+      return array('field' => 'f.comment_count', 'sort' => 'asc');
       break;
   }
 }

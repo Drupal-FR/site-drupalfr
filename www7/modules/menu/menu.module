@@ -1,9 +1,14 @@
 <?php
-// $Id: menu.module,v 1.233 2010/09/24 00:37:43 dries Exp $
 
 /**
  * @file
- * Allows administrators to customize the site navigation menu.
+ * Allows administrators to customize the site's navigation menus.
+ *
+ * A menu (in this context) is a hierarchical collection of links, generally
+ * used for navigation. This is not to be confused with the
+ * @link menu Menu system @endlink of menu.inc and hook_menu(), which defines
+ * page routing requests for Drupal, and also allows the defined page routing
+ * URLs to be added to the main site navigation menu.
  */
 
 /**
@@ -20,7 +25,7 @@ function menu_help($path, $arg) {
     case 'admin/help#menu':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Menu module provides an interface for managing menus. A menu is a hierarchical collection of links, which can be within or external to the site, generally used for navigation. Each menu is rendered in a block that can be enabled and positioned through the <a href="@blocks"">Blocks administration page</a>. You can view and manage menus on the <a href="@menus">Menus administration page</a>. For more information, see the online handbook entry for the <a href="@menu">Menu module</a>.', array('@blocks' => url('admin/structure/block'), '@menus' => url('admin/structure/menu'), '@menu' => 'http://drupal.org/handbook/modules/menu/')) . '</p>';
+      $output .= '<p>' . t('The Menu module provides an interface for managing menus. A menu is a hierarchical collection of links, which can be within or external to the site, generally used for navigation. Each menu is rendered in a block that can be enabled and positioned through the <a href="@blocks">Blocks administration page</a>. You can view and manage menus on the <a href="@menus">Menus administration page</a>. For more information, see the online handbook entry for the <a href="@menu">Menu module</a>.', array('@blocks' => url('admin/structure/block'), '@menus' => url('admin/structure/menu'), '@menu' => 'http://drupal.org/handbook/modules/menu/')) . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Managing menus') . '</dt>';
@@ -241,7 +246,8 @@ function menu_load_all() {
  *
  * @param $menu
  *   An array representing a custom menu:
- *   - menu_name: The unique name of the custom menu.
+ *   - menu_name: The unique name of the custom menu (composed of lowercase
+ *     letters, numbers, and hyphens).
  *   - title: The human readable menu title.
  *   - description: The custom menu description.
  *
@@ -262,6 +268,15 @@ function menu_save($menu) {
 
   switch ($status) {
     case SAVED_NEW:
+      // Make sure the menu is present in the active menus variable so that its
+      // items may appear in the menu active trail.
+      // @see menu_set_active_menu_names()
+      $active_menus = variable_get('menu_default_active_menus', array_keys(menu_get_menus()));
+      if (!in_array($menu['menu_name'], $active_menus)) {
+        $active_menus[] = $menu['menu_name'];
+        variable_set('menu_default_active_menus', $active_menus);
+      }
+
       module_invoke_all('menu_insert', $menu);
       break;
 
@@ -299,6 +314,15 @@ function menu_delete($menu) {
   // Delete all links from the menu.
   menu_delete_links($menu['menu_name']);
 
+  // Remove menu from active menus variable.
+  $active_menus = variable_get('menu_default_active_menus', array_keys(menu_get_menus()));
+  foreach ($active_menus as $i => $menu_name) {
+    if ($menu['menu_name'] == $menu_name) {
+      unset($active_menus[$i]);
+      variable_set('menu_default_active_menus', $active_menus);
+    }
+  }
+
   // Delete the custom menu.
   db_delete('menu_custom')
     ->condition('menu_name', $menu['menu_name'])
@@ -316,6 +340,9 @@ function menu_delete($menu) {
  * @param $item
  *   The menu item or the node type for which to generate a list of parents.
  *   If $item['mlid'] == 0 then the complete tree is returned.
+ * @param $type
+ *   The node type for which to generate a list of parents.
+ *   If $item itself is a node type then $type is ignored.
  * @return
  *   An array of menu link titles keyed on the a string containing the menu name
  *   and mlid. The list excludes the given item and its children.
@@ -323,7 +350,7 @@ function menu_delete($menu) {
  * @todo This has to be turned into a #process form element callback. The
  *   'menu_override_parent_selector' variable is entirely superfluous.
  */
-function menu_parent_options($menus, $item) {
+function menu_parent_options($menus, $item, $type = '') {
   // The menu_links table can be practically any size and we need a way to
   // allow contrib modules to provide more scalable pattern choosers.
   // hook_form_alter is too late in itself because all the possible parents are
@@ -333,18 +360,22 @@ function menu_parent_options($menus, $item) {
   }
 
   $available_menus = array();
-  if (is_array($item)) {
-    // If $item is an array fill it with all menus given to this function.
+  if (!is_array($item)) {
+    // If $item is not an array then it is a node type.
+    // Use it as $type and prepare a dummy menu item for _menu_get_options().
+    $type = $item;
+    $item = array('mlid' => 0);
+  }
+  if (empty($type)) {
+    // If no node type is set, use all menus given to this function.
     $available_menus = $menus;
   }
   else {
-    // If $item is a node type, get all available menus for this type and
-    // prepare a dummy menu item for _menu_parent_depth_limit().
-    $type_menus = variable_get('menu_options_' . $item, array('main-menu' => 'main-menu'));
+    // If a node type is set, use all available menus for this type.
+    $type_menus = variable_get('menu_options_' . $type, array('main-menu' => 'main-menu'));
     foreach ($type_menus as $menu) {
       $available_menus[$menu] = $menu;
     }
-    $item = array('mlid' => 0);
   }
 
   return _menu_get_options($menus, $available_menus, $item);
@@ -352,7 +383,7 @@ function menu_parent_options($menus, $item) {
 
 /**
  * Page callback.
- * Get all available menus and menu items as Javascript array.
+ * Get all the available menus and menu items as a JavaScript array.
  */
 function menu_parent_options_js() {
   $available_menus = array();
@@ -535,18 +566,23 @@ function menu_node_delete($node) {
 function menu_node_prepare($node) {
   if (empty($node->menu)) {
     // Prepare the node for the edit form so that $node->menu always exists.
-    $menu_name = variable_get('menu_parent_' . $node->type, 'main-menu:0');
+    $menu_name = strtok(variable_get('menu_parent_' . $node->type, 'main-menu:0'), ':');
     $item = array();
     if (isset($node->nid)) {
+      $mlid = FALSE;
       // Give priority to the default menu
-      $mlid = db_query_range("SELECT mlid FROM {menu_links} WHERE link_path = :path AND menu_name = :menu_name AND module = 'menu' ORDER BY mlid ASC", 0, 1, array(
-        ':path' => 'node/' . $node->nid,
-        ':menu_name' => $menu_name,
-      ))->fetchField();
-      // Check all menus if a link does not exist in the default menu.
-      if (!$mlid) {
-        $mlid = db_query_range("SELECT mlid FROM {menu_links} WHERE link_path = :path AND module = 'menu' ORDER BY mlid ASC", 0, 1, array(
+      $type_menus = variable_get('menu_options_' . $node->type, array('main-menu' => 'main-menu'));
+      if (in_array($menu_name, $type_menus)) {
+        $mlid = db_query_range("SELECT mlid FROM {menu_links} WHERE link_path = :path AND menu_name = :menu_name AND module = 'menu' ORDER BY mlid ASC", 0, 1, array(
           ':path' => 'node/' . $node->nid,
+          ':menu_name' => $menu_name,
+        ))->fetchField();
+      }
+      // Check all allowed menus if a link does not exist in the default menu.
+      if (!$mlid && !empty($type_menus)) {
+        $mlid = db_query_range("SELECT mlid FROM {menu_links} WHERE link_path = :path AND module = 'menu' AND menu_name IN (:type_menus) ORDER BY mlid ASC", 0, 1, array(
+          ':path' => 'node/' . $node->nid,
+          ':type_menus' => array_values($type_menus),
         ))->fetchField();
       }
       if ($mlid) {
@@ -589,15 +625,18 @@ function _menu_parent_depth_limit($item) {
  * @see menu_node_submit()
  */
 function menu_form_node_form_alter(&$form, $form_state) {
-  // Generate a list of possible parents.
+  // Generate a list of possible parents (not including this link or descendants).
   // @todo This must be handled in a #process handler.
+  $link = $form['#node']->menu;
   $type = $form['#node']->type;
-  $options = menu_parent_options(menu_get_menus(), $type);
+  // menu_parent_options() is goofy and can actually handle either a menu link
+  // or a node type both as second argument. Pick based on whether there is
+  // a link already (menu_node_prepare() sets mlid default to 0).
+  $options = menu_parent_options(menu_get_menus(), $link['mlid'] ? $link : $type, $type);
   // If no possible parent menu items were found, there is nothing to display.
   if (empty($options)) {
     return;
   }
-  $link = $form['#node']->menu;
 
   $form['menu'] = array(
     '#type' => 'fieldset',
@@ -648,9 +687,13 @@ function menu_form_node_form_alter(&$form, $form_state) {
   );
 
   $default = ($link['mlid'] ? $link['menu_name'] . ':' . $link['plid'] : variable_get('menu_parent_' . $type, 'main-menu:0'));
-  // @todo This will fail with the new selective menus per content type.
+  // If the current parent menu item is not present in options, use the first
+  // available option as default value.
+  // @todo User should not be allowed to access menu link settings in such a
+  // case.
   if (!isset($options[$default])) {
-    $default = 'navigation:0';
+    $array = array_keys($options);
+    $default = reset($array);
   }
   $form['menu']['link']['parent'] = array(
     '#type' => 'select',

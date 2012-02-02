@@ -1,5 +1,4 @@
 <?php
-// $Id: node.pages.inc,v 1.136 2010/11/26 19:23:01 dries Exp $
 
 /**
  * @file
@@ -8,7 +7,7 @@
 
 
 /**
- * Menu callback; presents the node editing form, or redirects to delete confirmation.
+ * Menu callback; presents the node editing form.
  */
 function node_page_edit($node) {
   $type_name = node_type_get_name($node);

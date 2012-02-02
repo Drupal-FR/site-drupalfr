@@ -1,5 +1,4 @@
 <?php
-// $Id: aggregator.pages.inc,v 1.45 2010/10/15 23:37:55 webchick Exp $
 
 /**
  * @file
@@ -90,29 +89,60 @@ function aggregator_page_category_form($form, $form_state, $category) {
 }
 
 /**
- * Load feed items
+ * Loads and optionally filters feed items.
  *
  * @param $type
- *   The filter for the items. Possible values: 'sum', 'source', 'category'
+ *   The type of filter for the items. Possible values are:
+ *   - sum: No filtering.
+ *   - source: Filter the feed items, limiting the result to items from a
+ *     single source.
+ *   - category: Filter the feed items by category.
  * @param $data
- *   Feed or category data for filtering
+ *   Feed or category data used for filtering. The type and value of $data
+ *   depends on $type:
+ *   - source: $data is an object with $data->fid identifying the feed used to
+ *     as filter.
+ *   - category: $data is an array with $data['cid'] being the category id to
+ *     filter on.
+ *   The $data parameter is not used when $type is 'sum'.
+ *
  * @return
  *   An array of the feed items.
  */
 function aggregator_feed_items_load($type, $data = NULL) {
   $items = array();
-  $range_limit = 20;
   switch ($type) {
     case 'sum':
-      $result = db_query_range('SELECT i.*, f.title AS ftitle, f.link AS flink FROM {aggregator_item} i INNER JOIN {aggregator_feed} f ON i.fid = f.fid ORDER BY i.timestamp DESC, i.iid DESC', 0, $range_limit);
+      $query = db_select('aggregator_item', 'i');
+      $query->join('aggregator_feed', 'f', 'i.fid = f.fid');
+      $query->fields('i');
+      $query->addField('f', 'title', 'ftitle');
+      $query->addField('f', 'link', 'flink');
       break;
     case 'source':
-      $result = db_query_range('SELECT * FROM {aggregator_item} WHERE fid = :fid ORDER BY timestamp DESC, iid DESC', 0, $range_limit, array(':fid' => $data->fid));
+      $query = db_select('aggregator_item', 'i');
+      $query
+        ->fields('i')
+        ->condition('i.fid', $data->fid);
       break;
     case 'category':
-      $result = db_query_range('SELECT i.*, f.title AS ftitle, f.link AS flink FROM {aggregator_category_item} c LEFT JOIN {aggregator_item} i ON c.iid = i.iid LEFT JOIN {aggregator_feed} f ON i.fid = f.fid WHERE cid = :cid ORDER BY timestamp DESC, i.iid DESC', 0, $range_limit, array(':cid' => $data['cid']));
+      $query = db_select('aggregator_category_item', 'c');
+      $query->leftJoin('aggregator_item', 'i', 'c.iid = i.iid');
+      $query->leftJoin('aggregator_feed', 'f', 'i.fid = f.fid');
+      $query
+        ->fields('i')
+        ->condition('cid', $data['cid']);
+      $query->addField('f', 'title', 'ftitle');
+      $query->addField('f', 'link', 'flink');
       break;
   }
+
+  $result = $query
+    ->extend('PagerDefault')
+    ->limit(20)
+    ->orderBy('i.timestamp', 'DESC')
+    ->orderBy('i.iid', 'DESC')
+    ->execute();
 
   foreach ($result as $item) {
     $item->categories = db_query('SELECT c.title, c.cid FROM {aggregator_category_item} ci LEFT JOIN {aggregator_category} c ON ci.cid = c.cid WHERE ci.iid = :iid ORDER BY c.title', array(':iid' => $item->iid))->fetchAll();
@@ -130,11 +160,13 @@ function aggregator_feed_items_load($type, $data = NULL) {
  * @param $items
  *   The items to be listed.
  * @param $op
- *   Which form should be added to the items. Only 'categorize' is now recognized.
+ *   Which form should be added to the items. Only 'categorize' is now
+ *   recognized.
  * @param $feed_source
  *   The feed source URL.
+ *
  * @return
- *   The items HTML.
+ *   The rendered list of items for a feed.
  */
 function _aggregator_page_list($items, $op, $feed_source = '') {
   if (user_access('administer news feeds') && ($op == 'categorize')) {
@@ -154,14 +186,13 @@ function _aggregator_page_list($items, $op, $feed_source = '') {
 }
 
 /**
- * Form builder; build the page list form.
+ * Form constructor to build the page list form.
  *
  * @param $items
  *   An array of the feed items.
  * @param $feed_source
  *   The feed source URL.
- * @return
- *   The form structure.
+ *
  * @ingroup forms
  * @see aggregator_categorize_items_submit()
  */
@@ -206,7 +237,7 @@ function aggregator_categorize_items($items, $feed_source = '') {
 }
 
 /**
- * Process aggregator_categorize_items() form submissions.
+ * Form submission handler for aggregator_categorize_items().
  */
 function aggregator_categorize_items_submit($form, &$form_state) {
   if (!empty($form_state['values']['categories'])) {
@@ -263,7 +294,7 @@ function theme_aggregator_categorize_items($variables) {
 }
 
 /**
- * Process variables for aggregator-wrapper.tpl.php.
+ * Processes variables for aggregator-wrapper.tpl.php.
  *
  * @see aggregator-wrapper.tpl.php
  */
@@ -272,7 +303,7 @@ function template_preprocess_aggregator_wrapper(&$variables) {
 }
 
 /**
- * Process variables for aggregator-item.tpl.php.
+ * Processes variables for aggregator-item.tpl.php.
  *
  * @see aggregator-item.tpl.php
  */
@@ -469,7 +500,7 @@ function theme_aggregator_page_opml($variables) {
 }
 
 /**
- * Process variables for aggregator-summary-items.tpl.php.
+ * Processes variables for aggregator-summary-items.tpl.php.
  *
  * @see aggregator-summary-items.tpl.php
  */
@@ -480,7 +511,7 @@ function template_preprocess_aggregator_summary_items(&$variables) {
 }
 
 /**
- * Process variables for aggregator-summary-item.tpl.php.
+ * Processes variables for aggregator-summary-item.tpl.php.
  *
  * @see aggregator-summary-item.tpl.php
  */
@@ -500,7 +531,7 @@ function template_preprocess_aggregator_summary_item(&$variables) {
 }
 
 /**
- * Process variables for aggregator-feed-source.tpl.php.
+ * Processes variables for aggregator-feed-source.tpl.php.
  *
  * @see aggregator-feed-source.tpl.php
  */
@@ -508,7 +539,14 @@ function template_preprocess_aggregator_feed_source(&$variables) {
   $feed = $variables['feed'];
 
   $variables['source_icon'] = theme('feed_icon', array('url' => $feed->url, 'title' => t('!title feed', array('!title' => $feed->title))));
-  $variables['source_image'] = $feed->image;
+
+  if (!empty($feed->image) && !empty($feed->title) && !empty($feed->link)) {
+    $variables['source_image'] = l(theme('image', array('path' => $feed->image, 'alt' => $feed->title)), $feed->link, array('html' => TRUE, 'attributes' => array('class' => 'feed-image')));
+  }
+  else {
+    $variables['source_image'] = '';
+  }
+
   $variables['source_description'] = aggregator_filter_xss($feed->description);
   $variables['source_url'] = check_url(url($feed->link, array('absolute' => TRUE)));
 

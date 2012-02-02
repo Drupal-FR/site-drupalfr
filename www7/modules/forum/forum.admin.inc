@@ -1,5 +1,4 @@
 <?php
-// $Id: forum.admin.inc,v 1.36 2010/08/08 19:21:25 dries Exp $
 
 /**
  * @file
@@ -56,7 +55,7 @@ function forum_form_forum($form, &$form_state, $edit = array()) {
 
   $form['vid'] = array('#type' => 'hidden', '#value' => variable_get('forum_nav_vocabulary', ''));
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit' ] = array('#type' => 'submit', '#value' => t('Save'));
+  $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save'));
   if ($edit['tid']) {
     $form['actions']['delete'] = array('#type' => 'submit', '#value' => t('Delete'));
     $form['tid'] = array('#type' => 'hidden', '#value' => $edit['tid']);

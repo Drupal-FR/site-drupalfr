@@ -1,9 +1,8 @@
 <?php
-// $Id: poll.test,v 1.39 2010/10/25 15:51:21 webchick Exp $
 
 /**
  * @file
- * Tests for the poll module.
+ * Tests for poll.module.
  */
 
 class PollTestCase extends DrupalWebTestCase {
@@ -25,13 +24,26 @@ class PollTestCase extends DrupalWebTestCase {
   function pollCreate($title, $choices, $preview = TRUE) {
     $this->assertTrue(TRUE, 'Create a poll');
 
+    $admin_user = $this->drupalCreateUser(array('create poll content', 'administer nodes'));
     $web_user = $this->drupalCreateUser(array('create poll content', 'access content', 'edit own poll content'));
-    $this->drupalLogin($web_user);
+    $this->drupalLogin($admin_user);
 
     // Get the form first to initialize the state of the internal browser.
     $this->drupalGet('node/add/poll');
 
     // Prepare a form with two choices.
+    list($edit, $index) = $this->_pollGenerateEdit($title, $choices);
+
+    // Verify that the vote count element only allows non-negative integers.
+    $edit['choice[new:1][chvotes]'] = -1;
+    $edit['choice[new:0][chvotes]'] = $this->randomString(7);
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertText(t('Negative values are not allowed.'));
+    $this->assertText(t('Vote count for new choice must be an integer.'));
+
+    // Repeat steps for initializing the state of the internal browser.
+    $this->drupalLogin($web_user);
+    $this->drupalGet('node/add/poll');
     list($edit, $index) = $this->_pollGenerateEdit($title, $choices);
 
     // Re-submit the form until all choices are filled in.
@@ -89,10 +101,6 @@ class PollTestCase extends DrupalWebTestCase {
     }
     foreach ($new_choices as $k => $text) {
       $edit['choice[new:' . $k . '][chtext]'] = $text;
-      // To test poll choice weights, every new choice is sorted in front of
-      // existing choices. Existing/already submitted choices should keep their
-      // weight.
-      $edit['choice[new:' . $k . '][weight]'] = (- $index - $k);
     }
     return array($edit, count($already_submitted_choices) + count($new_choices));
   }
@@ -123,11 +131,11 @@ class PollTestCase extends DrupalWebTestCase {
    */
   function assertPollChoiceOrder(array $choices, $index = 0, $preview = FALSE) {
     $expected = array();
+    $weight = 0;
     foreach ($choices as $id => $label) {
       if ($id < $index) {
-        // The expected weight of each choice is exactly the negated id.
-        // @see PollTestCase::_pollGenerateEdit()
-        $weight = -$id;
+        // The expected weight of each choice is higher than the previous one.
+        $weight++;
         // Directly assert the weight form element value for this choice.
         $this->assertFieldByName('choice[chid:' . $id . '][weight]', $weight, t('Found choice @id with weight @weight.', array(
           '@id' => $id,
@@ -189,7 +197,7 @@ class PollCreateTestCase extends PollTestCase {
   function testPollCreate() {
     $title = $this->randomName();
     $choices = $this->_generateChoices(7);
-    $this->pollCreate($title, $choices, TRUE);
+    $poll_nid = $this->pollCreate($title, $choices, TRUE);
 
     // Verify poll appears on 'poll' page.
     $this->drupalGet('poll');
@@ -199,6 +207,32 @@ class PollCreateTestCase extends PollTestCase {
     // Click on the poll title to go to node page.
     $this->clickLink($title);
     $this->assertText('Total votes: 0', 'Link to poll correct.');
+
+    // Now add a new option to make sure that when we update the node the
+    // option is displayed.
+    $node = node_load($poll_nid);
+
+    $new_option = $this->randomName();
+
+    $vote_count = '2000';
+    $node->choice[] = array(
+      'chid' => '',
+      'chtext' => $new_option,
+      'chvotes' => (int) $vote_count,
+      'weight' => 1000,
+    );
+
+    node_save($node);
+
+    $this->drupalGet('poll');
+    $this->clickLink($title);
+    $this->assertText($new_option, 'New option found.');
+
+    $option = $this->xpath('//div[@id="node-1"]//div[@class="poll"]//div[@class="text"]');
+    $this->assertEqual(end($option), $new_option, 'Last item is equal to new option.');
+
+    $votes = $this->xpath('//div[@id="node-1"]//div[@class="poll"]//div[@class="percent"]');
+    $this->assertTrue(strpos(end($votes), $vote_count) > 0, t("Votes saved."));
   }
 
   function testPollClose() {
@@ -426,7 +460,7 @@ class PollJSAddChoice extends DrupalWebTestCase {
       'choice[new:1][chtext]' => $this->randomName(),
     );
 
-    // Press 'add choice' button through AJAX, and place the expected HTML result
+    // Press 'add choice' button through Ajax, and place the expected HTML result
     // as the tested content.
     $commands = $this->drupalPostAJAX(NULL, $edit, array('op' => t('More choices')));
     $this->content = $commands[1]['data'];
@@ -653,7 +687,7 @@ class PollTokenReplaceTestCase extends PollTestCase {
 
     foreach ($tests as $input => $expected) {
       $output = token_replace($input, array('node' => $poll), array('language' => $language));
-      $this->assertFalse(strcmp($output, $expected), t('Sanitized poll token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($output, $expected, t('Sanitized poll token %token replaced.', array('%token' => $input)));
     }
 
     // Generate and test unsanitized tokens.
@@ -661,7 +695,7 @@ class PollTokenReplaceTestCase extends PollTestCase {
 
     foreach ($tests as $input => $expected) {
       $output = token_replace($input, array('node' => $poll), array('language' => $language, 'sanitize' => FALSE));
-      $this->assertFalse(strcmp($output, $expected), t('Unsanitized poll token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($output, $expected, t('Unsanitized poll token %token replaced.', array('%token' => $input)));
     }
   }
 }
@@ -726,5 +760,41 @@ class PollExpirationTestCase extends PollTestCase {
     $this->drupalGet("node/$poll_nid/edit");
     $elements = $this->xpath('//input[@id="edit-active-0"]');
     $this->assertTrue(isset($elements[0]) && !empty($elements[0]['checked']), t('Poll has expired.'));
+  }
+}
+
+class PollDeleteChoiceTestCase extends PollTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Poll choice deletion',
+      'description' => 'Test the poll choice deletion logic.',
+      'group' => 'Poll',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('poll');
+  }
+
+  function testChoiceRemoval() {
+    // Set up a poll with three choices.
+    $title = $this->randomName();
+    $choices = array('First choice', 'Second choice', 'Third choice');
+    $poll_nid = $this->pollCreate($title, $choices, FALSE);
+    $this->assertTrue($poll_nid, t('Poll for choice deletion logic test created.'));
+
+    // Edit the poll, and try to delete first poll choice.
+    $this->drupalGet("node/$poll_nid/edit");
+    $edit['choice[chid:1][chtext]'] = '';
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Click on the poll title to go to node page.
+    $this->drupalGet('poll');
+    $this->clickLink($title);
+
+    // Check the first poll choice is deleted, while the others remain.
+    $this->assertNoText('First choice', t('First choice removed.'));
+    $this->assertText('Second choice', t('Second choice remains.'));
+    $this->assertText('Third choice', t('Third choice remains.'));
   }
 }

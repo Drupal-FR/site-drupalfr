@@ -1,5 +1,4 @@
 <?php
-// $Id: taxonomy-term.tpl.php,v 1.1 2010/02/10 06:28:10 webchick Exp $
 
 /**
  * @file
@@ -13,6 +12,7 @@
  *   hide($content['field_example']) to temporarily suppress the printing of a
  *   given element.
  * - $term_url: Direct url of the current term.
+ * - $term_name: Name of the current term.
  * - $classes: String of classes that can be used to style contextually through
  *   CSS. It can be manipulated through the variable $classes_array from
  *   preprocess functions. The default values can be one or more of the following:
@@ -38,7 +38,7 @@
  * @see template_process()
  */
 ?>
-<div id="taxonomy-term-<?php print $term->tid; ?>" class="<?php print $classes; ?> clearfix">
+<div id="taxonomy-term-<?php print $term->tid; ?>" class="<?php print $classes; ?>">
 
   <?php if (!$page): ?>
     <h2><a href="<?php print $term_url; ?>"><?php print $term_name; ?></a></h2>

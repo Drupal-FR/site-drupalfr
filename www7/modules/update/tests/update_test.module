@@ -1,5 +1,13 @@
 <?php
-// $Id: update_test.module,v 1.7 2011/01/03 02:41:33 webchick Exp $
+
+/**
+ * Implements hook_system_theme_info().
+ */
+function update_test_system_theme_info() {
+  $themes['update_test_basetheme'] = drupal_get_path('module', 'update_test') . '/themes/update_test_basetheme/update_test_basetheme.info';
+  $themes['update_test_subtheme'] = drupal_get_path('module', 'update_test') . '/themes/update_test_subtheme/update_test_subtheme.info';
+  return $themes;
+}
 
 /**
  * Implements hook_menu().
@@ -10,6 +18,12 @@ function update_test_menu() {
   $items['update-test'] = array(
     'title' => t('Update test'),
     'page callback' => 'update_test_mock_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['503-error'] = array(
+    'title' => t('503 Service unavailable'),
+    'page callback' => 'update_callback_service_unavailable',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -148,4 +162,12 @@ class UpdateTestFileTransfer {
     );
     return $form;
   }
+}
+
+/**
+ * Return an Error 503 (Service unavailable) page.
+ */
+function update_callback_service_unavailable() {
+  drupal_add_http_header('Status', '503 Service unavailable');
+  print "503 Service Temporarily Unavailable";
 }

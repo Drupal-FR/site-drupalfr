@@ -1,5 +1,4 @@
 <?php
-// $Id: field_ui.admin.inc,v 1.88 2010/12/15 04:13:48 webchick Exp $
 
 /**
  * @file
@@ -13,17 +12,27 @@ function field_ui_fields_list() {
   $instances = field_info_instances();
   $field_types = field_info_field_types();
   $bundles = field_info_bundles();
+
+  $modules = system_rebuild_module_data();
+
   $header = array(t('Field name'), t('Field type'), t('Used in'));
   $rows = array();
   foreach ($instances as $entity_type => $type_bundles) {
     foreach ($type_bundles as $bundle => $bundle_instances) {
       foreach ($bundle_instances as $field_name => $instance) {
         $field = field_info_field($field_name);
+
+        // Initialize the row if we encounter the field for the first time.
+        if (!isset($rows[$field_name])) {
+          $rows[$field_name]['class'] = $field['locked'] ? array('menu-disabled') : array('');
+          $rows[$field_name]['data'][0] = $field['locked'] ? t('@field_name (Locked)', array('@field_name' => $field_name)) : $field_name;
+          $module_name = $field_types[$field['type']]['module'];
+          $rows[$field_name]['data'][1] = $field_types[$field['type']]['label'] . ' ' . t('(module: !module)', array('!module' => $modules[$module_name]->info['name']));
+        }
+
+        // Add the current instance.
         $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
-        $rows[$field_name]['data'][0] = $field['locked'] ? t('@field_name (Locked)', array('@field_name' => $field_name)) : $field_name;
-        $rows[$field_name]['data'][1] = $field_types[$field['type']]['label'];
         $rows[$field_name]['data'][2][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
-        $rows[$field_name]['class'] = $field['locked'] ? array('menu-disabled') : array('');
       }
     }
   }
@@ -42,7 +51,7 @@ function field_ui_fields_list() {
 }
 
 /**
- * Helper function to display a message about inactive fields.
+ * Displays a message listing the inactive fields of a given bundle.
  */
 function field_ui_inactive_message($entity_type, $bundle) {
   $inactive_instances = field_ui_inactive_instances($entity_type, $bundle);
@@ -63,9 +72,9 @@ function field_ui_inactive_message($entity_type, $bundle) {
 }
 
 /**
- * Helper function: determines the rendering order of a tree array.
+ * Determines the rendering order of an array representing a tree.
  *
- * This is intended as a callback for array_reduce().
+ * Callback for array_reduce() within field_ui_table_pre_render().
  */
 function _field_ui_reduce_order($array, $a) {
   $array = !isset($array) ? array() : $array;
@@ -82,8 +91,9 @@ function _field_ui_reduce_order($array, $a) {
 /**
  * Returns the region to which a row in the 'Manage fields' screen belongs.
  *
- * This function is used as a #row_callback in field_ui_field_overview_form(),
- * and is called during field_ui_table_pre_render().
+ * This function is used as a #region_callback in
+ * field_ui_field_overview_form(). It is called during
+ * field_ui_table_pre_render().
  */
 function field_ui_field_overview_row_region($row) {
   switch ($row['#row_type']) {
@@ -100,8 +110,9 @@ function field_ui_field_overview_row_region($row) {
 /**
  * Returns the region to which a row in the 'Manage display' screen belongs.
  *
- * This function is used as a #row_callback in field_ui_field_overview_form(),
- * and is called during field_ui_table_pre_render().
+ * This function is used as a #region_callback in
+ * field_ui_field_overview_form(), and is called during
+ * field_ui_table_pre_render().
  */
 function field_ui_display_overview_row_region($row) {
   switch ($row['#row_type']) {
@@ -206,9 +217,9 @@ function theme_field_ui_table($variables) {
 
   // Determine the colspan to use for region rows, by checking the number of
   // columns in the headers.
-  $colums_count = 0;
+  $columns_count = 0;
   foreach ($table['header'] as $header) {
-    $colums_count += (is_array($header) && isset($header['colspan']) ? $header['colspan'] : 1);
+    $columns_count += (is_array($header) && isset($header['colspan']) ? $header['colspan'] : 1);
   }
 
   // Render rows, region by region.
@@ -221,7 +232,7 @@ function theme_field_ui_table($variables) {
         'class' => array('region-title', 'region-' . $region_name_class . '-title'),
         'no_striping' => TRUE,
         'data' => array(
-          array('data' => $region['title'], 'colspan' => $colums_count),
+          array('data' => $region['title'], 'colspan' => $columns_count),
         ),
       );
     }
@@ -231,7 +242,7 @@ function theme_field_ui_table($variables) {
         'class' => array('region-message', 'region-' . $region_name_class . '-message', $class),
         'no_striping' => TRUE,
         'data' => array(
-          array('data' => $region['message'], 'colspan' => $colums_count),
+          array('data' => $region['message'], 'colspan' => $columns_count),
         ),
       );
     }
@@ -245,12 +256,17 @@ function theme_field_ui_table($variables) {
         $row += $element['#attributes'];
       }
 
+      // Render children as table cells.
       foreach (element_children($element) as $cell_key) {
-        $cell = array('data' => drupal_render($element[$cell_key]));
-        if (isset($element[$cell_key]['#cell_attributes'])) {
-          $cell += $element[$cell_key]['#cell_attributes'];
+        $child = &$element[$cell_key];
+        // Do not render a cell for children of #type 'value'.
+        if (!(isset($child['#type']) && $child['#type'] == 'value')) {
+          $cell = array('data' => drupal_render($child));
+          if (isset($child['#cell_attributes'])) {
+            $cell += $child['#cell_attributes'];
+          }
+          $row['data'][] = $cell;
         }
-        $row['data'][] = $cell;
       }
       $table['rows'][] = $row;
     }
@@ -260,9 +276,13 @@ function theme_field_ui_table($variables) {
 }
 
 /**
- * Menu callback; listing of fields for a bundle.
+ * Form constructor for the 'Manage fields' form of a bundle.
  *
  * Allows fields and pseudo-fields to be re-ordered.
+ *
+ * @see field_ui_overview_form_validate().
+ * @see field_ui_overview_form_submit().
+ * @ingroup forms
  */
 function field_ui_field_overview_form($form, &$form_state, $entity_type, $bundle) {
   $bundle = field_extract_bundle($entity_type, $bundle);
@@ -510,6 +530,12 @@ function field_ui_field_overview_form($form, &$form_state, $entity_type, $bundle
         '#cell_attributes' => array('colspan' => 3),
         '#prefix' => '<div class="add-new-placeholder">&nbsp;</div>',
       ),
+      // Place the 'translatable' property as an explicit value so that contrib
+      // modules can form_alter() the value for newly created fields.
+      'translatable' => array(
+        '#type' => 'value',
+        '#value' => FALSE,
+      ),
     );
   }
 
@@ -610,7 +636,9 @@ function field_ui_field_overview_form($form, &$form_state, $entity_type, $bundle
 }
 
 /**
- * Validate handler for the field overview form.
+ * Form validation handler for field_ui_field_overview_form().
+ *
+ * @see field_ui_field_overview_form_submit()
  */
 function field_ui_field_overview_form_validate($form, &$form_state) {
   _field_ui_field_overview_form_validate_add_new($form, $form_state);
@@ -618,9 +646,9 @@ function field_ui_field_overview_form_validate($form, &$form_state) {
 }
 
 /**
- * Helper function for field_ui_field_overview_form_validate.
+ * Validates the 'add new field' row of field_ui_field_overview_form().
  *
- * Validate the 'add new field' row.
+ * @see field_ui_field_overview_form_validate()
  */
 function _field_ui_field_overview_form_validate_add_new($form, &$form_state) {
   $field = $form_state['values']['fields']['_add_new_field'];
@@ -682,9 +710,9 @@ function _field_ui_field_overview_form_validate_add_new($form, &$form_state) {
 }
 
 /**
- * Helper function for field_ui_field_overview_form_validate.
+ * Validates the 'add existing field' row of field_ui_field_overview_form().
  *
- * Validate the 'add existing field' row.
+ * @see field_ui_field_overview_form_validate()
  */
 function _field_ui_field_overview_form_validate_add_existing($form, &$form_state) {
   // The form element might be absent if no existing fields can be added to
@@ -720,7 +748,9 @@ function _field_ui_field_overview_form_validate_add_existing($form, &$form_state
 }
 
 /**
- * Submit handler for the field overview form.
+ * Form submission handler for field_ui_field_overview_form().
+ *
+ * @see field_ui_field_overview_form_validate()
  */
 function field_ui_field_overview_form_submit($form, &$form_state) {
   $form_values = $form_state['values']['fields'];
@@ -754,7 +784,7 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
     $field = array(
       'field_name' => $values['field_name'],
       'type' => $values['type'],
-      'translatable' => TRUE,
+      'translatable' => $values['translatable'],
     );
     $instance = array(
       'field_name' => $field['field_name'],
@@ -779,7 +809,7 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
       $form_state['fields_added']['_add_new_field'] = $field['field_name'];
     }
     catch (Exception $e) {
-      drupal_set_message(t('There was a problem creating field %label: @message.', array('%label' => $instance['label'], '@message' => $e->getMessage())));
+      drupal_set_message(t('There was a problem creating field %label: !message', array('%label' => $instance['label'], '!message' => $e->getMessage())), 'error');
     }
   }
 
@@ -788,7 +818,7 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
     $values = $form_values['_add_existing_field'];
     $field = field_info_field($values['field_name']);
     if (!empty($field['locked'])) {
-      drupal_set_message(t('The field %label cannot be added because it is locked.', array('%label' => $values['label'])));
+      drupal_set_message(t('The field %label cannot be added because it is locked.', array('%label' => $values['label'])), 'error');
     }
     else {
       $instance = array(
@@ -809,7 +839,7 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
         $form_state['fields_added']['_add_existing_field'] = $instance['field_name'];
       }
       catch (Exception $e) {
-        drupal_set_message(t('There was a problem creating field instance %label: @message.', array('%label' => $instance['label'], '@message' => $e->getMessage())));
+        drupal_set_message(t('There was a problem creating field instance %label: @message.', array('%label' => $instance['label'], '@message' => $e->getMessage())), 'error');
       }
     }
   }
@@ -826,7 +856,11 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
 }
 
 /**
- * Menu callback; presents field display settings for a given view mode.
+ * Form constructor for the field display settings for a given view mode.
+ *
+ * @see field_ui_display_overview_multistep_submit()
+ * @see field_ui_display_overview_form_submit()
+ * @ingroup forms
  */
 function field_ui_display_overview_form($form, &$form_state, $entity_type, $bundle, $view_mode) {
   $bundle = field_extract_bundle($entity_type, $bundle);
@@ -875,7 +909,7 @@ function field_ui_display_overview_form($form, &$form_state, $entity_type, $bund
       'class' => array('field-ui-overview'),
       'id' => 'field-display-overview',
     ),
-    // Add AJAX wrapper.
+    // Add Ajax wrapper.
     '#prefix' => '<div id="field-display-overview-wrapper">',
     '#suffix' => '</div>',
   );
@@ -1157,7 +1191,7 @@ function field_ui_display_overview_form($form, &$form_state, $entity_type, $bund
       'callback' => 'field_ui_display_overview_multistep_js',
       'wrapper' => 'field-display-overview-wrapper',
       'effect' => 'fade',
-      // The button stays hidden, so we hide the AJAX spinner too. Ad-hoc
+      // The button stays hidden, so we hide the Ajax spinner too. Ad-hoc
       // spinners will be added manually by the client-side script.
       'progress' => 'none',
     ),
@@ -1178,7 +1212,7 @@ function field_ui_display_overview_form($form, &$form_state, $entity_type, $bund
 
 
 /**
- * Form submit handler for multistep buttons on the 'Manage display' screen.
+ * Form submission handler for buttons in field_ui_display_overview_form().
  */
 function field_ui_display_overview_multistep_submit($form, &$form_state) {
   $trigger = $form_state['triggering_element'];
@@ -1218,13 +1252,13 @@ function field_ui_display_overview_multistep_submit($form, &$form_state) {
 }
 
 /**
- * AJAX handler for multistep buttons on the 'Manage display' screen.
+ * Ajax handler for multistep buttons on the 'Manage display' screen.
  */
 function field_ui_display_overview_multistep_js($form, &$form_state) {
   $trigger = $form_state['triggering_element'];
   $op = $trigger['#op'];
 
-  // Pick the elements that need ro receive the ajax-new-content effect.
+  // Pick the elements that need to receive the ajax-new-content effect.
   switch ($op) {
     case 'edit':
       $updated_rows = array($trigger['#field_name']);
@@ -1256,7 +1290,7 @@ function field_ui_display_overview_multistep_js($form, &$form_state) {
 }
 
 /**
- * Submit handler for the display overview form.
+ * Form submission handler for field_ui_display_overview_form().
  */
 function field_ui_display_overview_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
@@ -1334,7 +1368,7 @@ function field_ui_display_overview_form_submit($form, &$form_state) {
 }
 
 /**
- * Helper function for field_ui_display_overview_form_submit().
+ * Populates display settings for a new view mode from the default view mode.
  *
  * When an administrator decides to use custom display settings for a view mode,
  * that view mode needs to be initialized with the display settings for the
@@ -1342,8 +1376,6 @@ function field_ui_display_overview_form_submit($form, &$form_state) {
  * adds the new custom display settings to this bundle's instances, and saves
  * them. It also modifies the passed-in $settings array, which the caller can
  * then save using field_bundle_settings().
- *
- * @see field_bundle_settings()
  *
  * @param $entity_type
  *   The bundle's entity type.
@@ -1354,6 +1386,9 @@ function field_ui_display_overview_form_submit($form, &$form_state) {
  * @param $settings
  *   An associative array of bundle settings, as expected by
  *   field_bundle_settings().
+ *
+ * @see field_ui_display_overview_form_submit().
+ * @see field_bundle_settings()
  */
 function _field_ui_add_default_view_mode_settings($entity_type, $bundle, $view_mode, &$settings) {
   // Update display settings for field instances.
@@ -1378,7 +1413,7 @@ function _field_ui_add_default_view_mode_settings($entity_type, $bundle, $view_m
 }
 
 /**
- * Return an array of field_type options.
+ * Returns an array of field_type options.
  */
 function field_ui_field_type_options() {
   $options = &drupal_static(__FUNCTION__);
@@ -1400,7 +1435,7 @@ function field_ui_field_type_options() {
 }
 
 /**
- * Return an array of widget type options for a field type.
+ * Returns an array of widget type options for a field type.
  *
  * If no field type is provided, returns a nested array of all widget types,
  * keyed by field type human name.
@@ -1436,7 +1471,7 @@ function field_ui_widget_type_options($field_type = NULL, $by_label = FALSE) {
 }
 
 /**
- * Return an array of formatter options for a field type.
+ * Returns an array of formatter options for a field type.
  *
  * If no field type is provided, returns a nested array of all formatters, keyed
  * by field type.
@@ -1464,7 +1499,7 @@ function field_ui_formatter_options($field_type = NULL) {
 }
 
 /**
- * Return an array of existing field to be added to a bundle.
+ * Returns an array of existing fields to be added to a bundle.
  */
 function field_ui_existing_field_options($entity_type, $bundle) {
   $options = array();
@@ -1502,7 +1537,10 @@ function field_ui_existing_field_options($entity_type, $bundle) {
 }
 
 /**
- * Menu callback; presents the field settings edit page.
+ * Form constructor for the field settings edit page.
+ *
+ * @see field_ui_settings_form_submit()
+ * @ingroups forms
  */
 function field_ui_field_settings_form($form, &$form_state, $instance) {
   $bundle = $instance['bundle'];
@@ -1556,7 +1594,7 @@ function field_ui_field_settings_form($form, &$form_state, $instance) {
 }
 
 /**
- * Save a field's settings after editing.
+ * Form submission handler for field_ui_field_settings_form().
  */
 function field_ui_field_settings_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
@@ -1577,15 +1615,21 @@ function field_ui_field_settings_form_submit($form, &$form_state) {
     drupal_set_message(t('Updated field %label field settings.', array('%label' => $instance['label'])));
     $form_state['redirect'] = field_ui_next_destination($entity_type, $bundle);
   }
-  catch (FieldException $e) {
+  catch (Exception $e) {
     drupal_set_message(t('Attempt to update field %label failed: %message.', array('%label' => $instance['label'], '%message' => $e->getMessage())), 'error');
-    // TODO: Where do we go from here?
-    $form_state['redirect'] = field_ui_next_destination($entity_type, $bundle);
   }
 }
 
 /**
- * Menu callback; select a widget for the field.
+ * Form constructor for the widget selection form.
+ *
+ * Path: BUNDLE_ADMIN_PATH/fields/%field/widget-type, where BUNDLE_ADMIN_PATH is
+ * the path stored in the ['admin']['info'] property in the return value of
+ * hook_entity_info().
+ *
+ * @see field_ui_menu()
+ * @see field_ui_widget_type_form_submit()
+ * @ingroup forms
  */
 function field_ui_widget_type_form($form, &$form_state, $instance) {
   drupal_set_title($instance['label']);
@@ -1629,7 +1673,7 @@ function field_ui_widget_type_form($form, &$form_state, $instance) {
 }
 
 /**
- * Submit the change in widget type.
+ * Form submission handler for field_ui_widget_type_form().
  */
 function field_ui_widget_type_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
@@ -1651,15 +1695,18 @@ function field_ui_widget_type_form_submit($form, &$form_state) {
     field_update_instance($instance);
     drupal_set_message(t('Changed the widget for field %label.', array('%label' => $instance['label'])));
   }
-  catch (FieldException $e) {
-    drupal_set_message(t('There was a problem changing the widget for field %label.', array('%label' => $instance['label'])));
+  catch (Exception $e) {
+    drupal_set_message(t('There was a problem changing the widget for field %label.', array('%label' => $instance['label'])), 'error');
   }
 
   $form_state['redirect'] = field_ui_next_destination($entity_type, $bundle);
 }
 
 /**
- * Menu callback; present a form for removing a field instance from a bundle.
+ * Form constructor for removing a field instance from a bundle.
+ *
+ * @see field_ui_delete_form_submit()
+ * @ingroup forms
  */
 function field_ui_field_delete_form($form, &$form_state, $instance) {
   $bundle = $instance['bundle'];
@@ -1689,9 +1736,10 @@ function field_ui_field_delete_form($form, &$form_state, $instance) {
 }
 
 /**
- * Removes a field instance from a bundle.
+ * Form submission handler for field_ui_field_delete_form().
  *
- * If the field has no more instances, it will be marked as deleted too.
+ * Removes a field instance from a bundle. If the field has no more instances,
+ * it will be marked as deleted too.
  */
 function field_ui_field_delete_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
@@ -1709,15 +1757,27 @@ function field_ui_field_delete_form_submit($form, &$form_state) {
     drupal_set_message(t('The field %field has been deleted from the %type content type.', array('%field' => $instance['label'], '%type' => $bundle_label)));
   }
   else {
-    drupal_set_message(t('There was a problem removing the %field from the %type content type.', array('%field' => $instance['label'], '%type' => $bundle_label)));
+    drupal_set_message(t('There was a problem removing the %field from the %type content type.', array('%field' => $instance['label'], '%type' => $bundle_label)), 'error');
   }
 
   $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
   $form_state['redirect'] = field_ui_get_destinations(array($admin_path . '/fields'));
+
+  // Fields are purged on cron. However field module prevents disabling modules
+  // when field types they provided are used in a field until it is fully
+  // purged. In the case that a field has minimal or no content, a single call
+  // to field_purge_batch() will remove it from the system. Call this with a
+  // low batch limit to avoid administrators having to wait for cron runs when
+  // removing instances that meet this criteria.
+  field_purge_batch(10);
 }
 
 /**
- * Menu callback; presents the field instance edit page.
+ * Form constructor for the field instance settings form.
+ *
+ * @see field_ui_field_edit_form_validate()
+ * @see field_ui_field_edit_form_submit()
+ * @ingroup forms
  */
 function field_ui_field_edit_form($form, &$form_state, $instance) {
   $bundle = $instance['bundle'];
@@ -1793,7 +1853,7 @@ function field_ui_field_edit_form($form, &$form_state, $instance) {
     '#default_value' => !empty($instance['description']) ? $instance['description'] : '',
     '#rows' => 5,
     '#description' => t('Instructions to present to the user below this field on the editing form.<br />Allowed HTML tags: @tags', array('@tags' => _field_filter_xss_display_allowed_tags())),
-    '#weight' => 0,
+    '#weight' => -5,
   );
 
   // Build the widget component of the instance.
@@ -1898,7 +1958,7 @@ function field_ui_field_edit_instance_pre_render($element) {
 }
 
 /**
- * Build default value fieldset.
+ * Builds the default value fieldset for a given field instance.
  */
 function field_ui_default_value_widget($field, $instance, &$form, &$form_state) {
   $field_name = $field['field_name'];
@@ -1921,13 +1981,15 @@ function field_ui_default_value_widget($field, $instance, &$form, &$form_state) 
   $instance['description'] = '';
 
   // @todo Allow multiple values (requires more work on 'add more' JS handler).
-  $element += field_default_form(NULL, NULL, $field, $instance, LANGUAGE_NONE, $items, $element, $form_state, 0);
+  $element += field_default_form($instance['entity_type'], NULL, $field, $instance, LANGUAGE_NONE, $items, $element, $form_state, 0);
 
   return $element;
 }
 
 /**
- * Form validation handler for field instance settings form.
+ * Form validation handler for field_ui_field_edit_form().
+ *
+ * @see field_ui_field_edit_form_submit().
  */
 function field_ui_field_edit_form_validate($form, &$form_state) {
   // Take the incoming values as the $instance definition, so that the 'default
@@ -1962,7 +2024,9 @@ function field_ui_field_edit_form_validate($form, &$form_state) {
 }
 
 /**
- * Form submit handler for field instance settings form.
+ * Form submission handler for field_ui_field_edit_form().
+ *
+ * @see field_ui_field_edit_form_validate().
  */
 function field_ui_field_edit_form_submit($form, &$form_state) {
   $instance = $form_state['values']['instance'];
@@ -1971,7 +2035,13 @@ function field_ui_field_edit_form_submit($form, &$form_state) {
   // Update any field settings that have changed.
   $field_source = field_info_field($instance['field_name']);
   $field = array_merge($field_source, $field);
-  field_update_field($field);
+  try {
+    field_update_field($field);
+  }
+  catch (Exception $e) {
+    drupal_set_message(t('Attempt to update field %label failed: %message.', array('%label' => $instance['label'], '%message' => $e->getMessage())), 'error');
+    return;
+  }
 
   // Handle the default value.
   if (isset($form['instance']['default_value_widget'])) {
@@ -1996,7 +2066,9 @@ function field_ui_field_edit_form_submit($form, &$form_state) {
 }
 
 /**
- * Helper functions to handle multipage redirects.
+ * Extracts next redirect path from an array of multiple destinations.
+ *
+ * @see field_ui_next_destination()
  */
 function field_ui_get_destinations($destinations) {
   $path = array_shift($destinations);
@@ -2008,7 +2080,7 @@ function field_ui_get_destinations($destinations) {
 }
 
 /**
- * Return the next redirect path in a multipage sequence.
+ * Returns the next redirect path in a multipage sequence.
  */
 function field_ui_next_destination($entity_type, $bundle) {
   $destinations = !empty($_REQUEST['destinations']) ? $_REQUEST['destinations'] : array();

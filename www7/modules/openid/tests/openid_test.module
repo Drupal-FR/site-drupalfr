@@ -1,5 +1,4 @@
 <?php
-// $Id: openid_test.module,v 1.17 2010/07/07 08:05:01 webchick Exp $
 
 /**
  * @file
@@ -61,6 +60,19 @@ function openid_test_menu() {
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
+  $items['openid-test/redirect'] = array(
+    'title' => 'OpenID Provider Redirection Point',
+    'page callback' => 'openid_test_redirect',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['openid-test/redirected/%/%'] = array(
+    'title' => 'OpenID Provider Final URL',
+    'page callback' => 'openid_test_redirected_method',
+    'page arguments' => array(2, 3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
@@ -106,6 +118,10 @@ function openid_test_yadis_xrds() {
           <Service>
             <Type>http://example.com/this-is-ignored</Type>
           </Service>
+          <Service priority="5">
+            <Type>http://openid.net/signon/1.0</Type>
+            <URI>http://example.com/this-is-only-openid-1.0</URI>
+          </Service>
           <Service priority="10">
             <Type>http://specs.openid.net/auth/2.0/signon</Type>
             <Type>http://openid.net/srv/ax/1.0</Type>
@@ -134,7 +150,7 @@ function openid_test_yadis_xrds() {
     }
     elseif (arg(3) == 'delegate') {
       print '
-          <Service priority="5">
+          <Service priority="0">
             <Type>http://specs.openid.net/auth/2.0/signon</Type>
             <Type>http://openid.net/srv/ax/1.0</Type>
             <URI>' . url('openid-test/endpoint', array('absolute' => TRUE)) . '</URI>
@@ -210,6 +226,28 @@ function openid_test_endpoint() {
 }
 
 /**
+ * Menu callback; redirect during Normalization/Discovery.
+ */
+function openid_test_redirect($count = 0) {
+  if ($count == 0) {
+    $url = variable_get('openid_test_redirect_url', '');
+  }
+  else {
+    $url = url('openid-test/redirect/' . --$count, array('absolute' => TRUE));
+  }
+  $http_response_code = variable_get('openid_test_redirect_http_reponse_code', 301);
+  header('Location: ' . $url, TRUE, $http_response_code);
+  exit();
+}
+
+/**
+ * Menu callback; respond with appropriate callback.
+ */
+function openid_test_redirected_method($method1, $method2) {
+  return call_user_func('openid_test_' . $method1 . '_' . $method2);
+}
+
+/**
  * OpenID endpoint; handle "associate" requests (see OpenID Authentication 2.0,
  * section 8).
  *
@@ -228,14 +266,14 @@ function _openid_test_endpoint_associate() {
 
   // Generate private Diffie-Helmann key.
   $r = _openid_dh_rand($mod);
-  $private = bcadd($r, 1);
+  $private = _openid_math_add($r, 1);
 
   // Calculate public Diffie-Helmann key.
-  $public = bcpowmod($gen, $private, $mod);
+  $public = _openid_math_powmod($gen, $private, $mod);
 
   // Calculate shared secret based on Relying Party's public key.
   $cpub = _openid_dh_base64_to_long($_REQUEST['openid_dh_consumer_public']);
-  $shared = bcpowmod($cpub, $private, $mod);
+  $shared = _openid_math_powmod($cpub, $private, $mod);
 
   // Encrypt the MAC key using the shared secret.
   $enc_mac_key = base64_encode(_openid_dh_xorsecret($shared, base64_decode(variable_get('mac_key'))));
@@ -286,9 +324,7 @@ function _openid_test_endpoint_authenticate() {
   // Generate unique identifier for this authentication.
   $nonce = _openid_nonce();
 
-  // Generate response containing the user's identity. The openid.sreg.xxx
-  // entries contain profile data stored by the OpenID Provider (see OpenID
-  // Simple Registration Extension 1.0).
+  // Generate response containing the user's identity.
   $response = variable_get('openid_test_response', array()) + array(
     'openid.ns' => OPENID_NS_2_0,
     'openid.mode' => 'id_res',
@@ -298,14 +334,27 @@ function _openid_test_endpoint_authenticate() {
     'openid.return_to' => $_REQUEST['openid_return_to'],
     'openid.response_nonce' => $nonce,
     'openid.assoc_handle' => 'openid-test',
-    'openid.signed' => 'op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle',
   );
+
+  if (isset($response['openid.signed'])) {
+    $keys_to_sign = explode(',', $response['openid.signed']);
+  }
+  else {
+    // Unless openid.signed is explicitly defined, all keys are signed.
+    $keys_to_sign = array();
+    foreach ($response as $key => $value) {
+      // Strip off the "openid." prefix.
+      $keys_to_sign[] = substr($key, 7);
+    }
+    $response['openid.signed'] = implode(',', $keys_to_sign);
+  }
 
   // Sign the message using the MAC key that was exchanged during association.
   $association = new stdClass();
   $association->mac_key = variable_get('mac_key');
-  $keys_to_sign = explode(',', $response['openid.signed']);
-  $response['openid.sig'] = _openid_signature($association, $response, $keys_to_sign);
+  if (!isset($response['openid.sig'])) {
+    $response['openid.sig'] = _openid_signature($association, $response, $keys_to_sign);
+  }
 
   // Put the signed message into the query string of a URL supplied by the
   // Relying Party, and redirect the user.

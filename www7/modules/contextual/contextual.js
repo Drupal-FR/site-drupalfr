@@ -1,10 +1,14 @@
-// $Id: contextual.js,v 1.6 2010/11/16 18:43:06 dries Exp $
+/**
+ * @file
+ * Attaches behaviors for the Contextual module.
+ */
+
 (function ($) {
 
 Drupal.contextualLinks = Drupal.contextualLinks || {};
 
 /**
- * Attach outline behavior for regions associated with contextual links.
+ * Attaches outline behavior for regions associated with contextual links.
  */
 Drupal.behaviors.contextualLinks = {
   attach: function (context) {

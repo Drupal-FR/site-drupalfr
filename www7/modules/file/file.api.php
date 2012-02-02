@@ -1,5 +1,4 @@
 <?php
-// $Id: file.api.php,v 1.1 2010/08/23 14:53:50 webchick Exp $
 
 /**
  * @file
@@ -13,8 +12,8 @@
  * file is referenced, e.g., only users with access to a node should be allowed
  * to download files attached to that node.
  *
- * @param $field
- *   The field to which the file belongs.
+ * @param array $file_item
+ *   The array of information about the file to check access for.
  * @param $entity_type
  *   The type of $entity; for example, 'node' or 'user'.
  * @param $entity
@@ -27,7 +26,7 @@
  *
  * @see hook_field_access().
  */
-function hook_file_download_access($field, $entity_type, $entity) {
+function hook_file_download_access($file_item, $entity_type, $entity) {
   if ($entity_type == 'node') {
     return node_access('view', $entity);
   }
@@ -42,12 +41,12 @@ function hook_file_download_access($field, $entity_type, $entity) {
  *
  * @see hook_file_download_access().
  *
- * @param &$grants
+ * @param $grants
  *   An array of grants gathered by hook_file_download_access(). The array is
  *   keyed by the module that defines the entity type's access control; the
  *   values are Boolean grant responses for each module.
- * @param $field
- *   The field to which the file belongs.
+ * @param array $file_item
+ *   The array of information about the file to alter access for.
  * @param $entity_type
  *   The type of $entity; for example, 'node' or 'user'.
  * @param $entity
@@ -56,10 +55,10 @@ function hook_file_download_access($field, $entity_type, $entity) {
  * @return
  *   An array of grants, keyed by module name, each with a Boolean grant value.
  *   Return an empty array to assert FALSE. You may choose to return your own
- *   module's value in addition to other grants or to overwrite the values set by
- *   other modules.
+ *   module's value in addition to other grants or to overwrite the values set
+ *   by other modules.
  */
-function hook_file_download_access_alter(&$grants, $field, $entity_type, $entity) {
+function hook_file_download_access_alter(&$grants, $file_item, $entity_type, $entity) {
   // For our example module, we always enforce the rules set by node module.
   if (isset($grants['node'])) {
     $grants = array('node' => $grants['node']);

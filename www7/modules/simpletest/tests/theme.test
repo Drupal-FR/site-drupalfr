@@ -1,5 +1,4 @@
 <?php
-// $Id: theme.test,v 1.23 2010/11/14 21:04:45 webchick Exp $
 
 /**
  * @file
@@ -10,6 +9,8 @@
  * Unit tests for the Theme API.
  */
 class ThemeUnitTest extends DrupalWebTestCase {
+  protected $profile = 'testing';
+
   public static function getInfo() {
     return array(
       'name' => 'Theme API',
@@ -43,6 +44,11 @@ class ThemeUnitTest extends DrupalWebTestCase {
     $args = array('node', "1\0");
     $suggestions = theme_get_suggestions($args, 'page');
     $this->assertEqual($suggestions, array('page__node', 'page__node__%', 'page__node__1'), t('Removed invalid \\0 from suggestions'));
+    // Define path with hyphens to be used to generate suggestions.
+    $args = array('node', '1', 'hyphen-path');
+    $result = array('page__node', 'page__node__%', 'page__node__1', 'page__node__hyphen_path');
+    $suggestions = theme_get_suggestions($args, 'page');
+    $this->assertEqual($suggestions, $result, t('Found expected page suggestions for paths containing hyphens.'));
   }
 
   /**
@@ -190,7 +196,7 @@ class ThemeItemListUnitTest extends DrupalWebTestCase {
 /**
  * Unit tests for theme_links().
  */
-class ThemeLinksUnitTest extends DrupalUnitTestCase {
+class ThemeLinksTest extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Links',
@@ -348,5 +354,82 @@ class ThemeFastTestCase extends DrupalWebTestCase {
     $this->drupalLogin($this->account);
     $this->drupalGet('user/autocomplete/' . $this->account->name);
     $this->assertText('registry not initialized', t('The registry was not initialized'));
+  }
+}
+
+/**
+ * Unit tests for theme_html_tag().
+ */
+class ThemeHtmlTag extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Theme HTML Tag',
+      'description' => 'Tests theme_html_tag() built-in theme functions.',
+      'group' => 'Theme',
+    );
+  }
+
+  /**
+   * Test function theme_html_tag()
+   */
+  function testThemeHtmlTag() {
+    // Test auto-closure meta tag generation
+    $tag['element'] = array('#tag' => 'meta', '#attributes' => array('name' => 'description', 'content' => 'Drupal test'));
+    $this->assertEqual('<meta name="description" content="Drupal test" />'."\n", theme_html_tag($tag), t('Test auto-closure meta tag generation.'));
+
+    // Test title tag generation
+    $tag['element'] = array('#tag' => 'title', '#value' => 'title test');
+    $this->assertEqual('<title>title test</title>'."\n", theme_html_tag($tag), t('Test title tag generation.'));
+  }
+}
+
+/**
+ * Tests for the ThemeRegistry class.
+ */
+class ThemeRegistryTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'ThemeRegistry',
+      'description' => 'Tests the behavior of the ThemeRegistry class',
+      'group' => 'Theme',
+    );
+  }
+  function setUp() {
+    parent::setUp('theme_test');
+  }
+
+  /**
+   * Tests the behavior of the theme registry class.
+   */
+  function testRaceCondition() {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $cid = 'test_theme_registry';
+
+    // Directly instantiate the theme registry, this will cause a base cache
+    // entry to be written in __construct().
+    $registry = new ThemeRegistry($cid, 'cache');
+
+    $this->assertTrue(cache_get($cid), 'Cache entry was created.');
+
+    // Trigger a cache miss for an offset.
+    $this->assertTrue($registry['theme_test_template_test'], 'Offset was returned correctly from the theme registry.');
+    // This will cause the ThemeRegistry class to write an updated version of
+    // the cache entry when it is destroyed, usually at the end of the request.
+    // Before that happens, manually delete the cache entry we created earlier
+    // so that the new entry is written from scratch.
+    cache_clear_all($cid, 'cache');
+
+    // Destroy the class so that it triggers a cache write for the offset.
+    unset($registry);
+
+    $this->assertTrue(cache_get($cid), 'Cache entry was created.');
+
+    // Create a new instance of the class. Confirm that both the offset
+    // requested previously, and one that has not yet been requested are both
+    // available.
+    $registry = new ThemeRegistry($cid, 'cache');
+
+    $this->assertTrue($registry['theme_test_template_test'], 'Offset was returned correctly from the theme registry');
+    $this->assertTrue($registry['theme_test_template_test_2'], 'Offset was returned correctly from the theme registry');
   }
 }

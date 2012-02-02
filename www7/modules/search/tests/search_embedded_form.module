@@ -1,5 +1,4 @@
 <?php
-// $Id: search_embedded_form.module,v 1.1 2010/08/11 14:21:39 dries Exp $
 
 /**
  * @file
@@ -66,5 +65,6 @@ function search_embedded_form_form_submit($form, &$form_state) {
  * Adds the test form to search results.
  */
 function search_embedded_form_preprocess_search_result(&$variables) {
-  $variables['snippet'] .= drupal_render(drupal_get_form('search_embedded_form_form'));
+  $form = drupal_get_form('search_embedded_form_form');
+  $variables['snippet'] .= drupal_render($form);
 }

@@ -1,5 +1,4 @@
 <?php
-// $Id: options.api.php,v 1.1 2009/12/14 20:18:55 dries Exp $
 
 /**
  * @file
@@ -16,6 +15,11 @@
  *
  * @param $field
  *   The field definition.
+ * @param $instance
+ *   (optional) The instance definition. The hook might be called without an
+ *   $instance parameter in contexts where no specific instance can be targeted.
+ *   It is recommended to only use instance level properties to filter out
+ *   values from a list defined by field level properties.
  *
  * @return
  *   The array of options for the field. Array keys are the values to be
@@ -26,7 +30,7 @@
  *   widget. The HTML tags defined in _field_filter_xss_allowed_tags() are
  *   allowed, other tags will be filtered.
  */
-function hook_options_list($field) {
+function hook_options_list($field, $instance = NULL) {
   // Sample structure.
   $options = array(
     0 => t('Zero'),

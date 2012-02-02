@@ -1,5 +1,4 @@
 <?php
-// $Id: field.crud.inc,v 1.74 2011/01/02 17:26:39 webchick Exp $
 
 /**
  * @file
@@ -16,6 +15,9 @@
  *
  * The Field CRUD API uses
  * @link field Field API data structures @endlink.
+ *
+ * See @link field Field API @endlink for information about the other parts of
+ * the Field API.
  */
 
 /**
@@ -39,14 +41,15 @@
  *   - settings: each omitted setting is given the default value defined in
  *     hook_field_info().
  *   - storage:
- *     - type: the storage backend specified in the 'field_default_storage'
+ *     - type: the storage backend specified in the 'field_storage_default'
  *       system variable.
  *     - settings: each omitted setting is given the default value specified in
  *       hook_field_storage_info().
+ *
  * @return
  *   The $field array with the id property filled in.
- * @throw
- *   FieldException
+ *
+ * @throws FieldException
  *
  * See: @link field Field API data structures @endlink.
  */
@@ -422,7 +425,6 @@ function field_delete_field($field_name) {
  *   will be given the following default values:
  *   - label: the field name
  *   - description: empty string
- *   - weight: 0
  *   - required: FALSE
  *   - default_value_function: empty string
  *   - settings: each omitted setting is given the default value specified in
@@ -444,8 +446,8 @@ function field_delete_field($field_name) {
  *
  * @return
  *   The $instance array with the id property filled in.
- * @throw
- *   FieldException
+ *
+ * @throws FieldException
  *
  * See: @link field Field API data structures @endlink.
  */
@@ -512,8 +514,7 @@ function field_create_instance($instance) {
  *   properties specified in $instance overwrite the existing values for
  *   the instance.
  *
- * @throw
- *   FieldException
+ * @throws FieldException
  *
  * @see field_create_instance()
  */
@@ -635,12 +636,11 @@ function _field_write_instance($instance, $update = FALSE) {
 }
 
 /**
- * Reads a single instance record directly from the database.
+ * Reads a single instance record from the database.
  *
- * Generally, you should use the field_info_instance() instead.
- *
- * This function will not return deleted instances. Use
- * field_read_instances() instead for this purpose.
+ * Generally, you should use field_info_instance() instead, as it
+ * provides caching and allows other modules the opportunity to
+ * append additional formatters, widgets, and other information.
  *
  * @param $entity_type
  *   The type of entity to which the field is bound.
@@ -730,7 +730,7 @@ function field_read_instances($params = array(), $include_additional = array()) 
  *   An instance structure.
  * @param $field_cleanup
  *   If TRUE, the field will be deleted as well if its last instance is being
- *   deleted. If FALSE, it is the caller's responsability to handle the case of
+ *   deleted. If FALSE, it is the caller's responsibility to handle the case of
  *   fields left without instances. Defaults to TRUE.
  */
 function field_delete_instance($instance, $field_cleanup = TRUE) {
@@ -827,6 +827,9 @@ function field_delete_instance($instance, $field_cleanup = TRUE) {
  *     ),
  *   );
  * @endcode
+ *
+ * See @link field Field API @endlink for information about the other parts of
+ * the Field API.
  */
 
 /**

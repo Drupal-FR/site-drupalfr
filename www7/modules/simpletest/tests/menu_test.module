@@ -1,5 +1,4 @@
 <?php
-// $Id: menu_test.module,v 1.21 2010/12/02 17:34:24 webchick Exp $
 
 /**
  * @file
@@ -15,6 +14,13 @@ function menu_test_menu() {
     'title' => 'Test menu_name router item',
     'page callback' => 'node_save',
     'menu_name' => menu_test_menu_name(),
+  );
+  // This item is of type MENU_CALLBACK with no parents to test title.
+  $items['menu_callback_title'] = array(
+    'title' => 'Menu Callback Title',
+    'page callback' => 'menu_test_callback',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
   );
   // Use FALSE as 'title callback' to bypass t().
   $items['menu_no_title_callback'] = array(
@@ -211,6 +217,20 @@ function menu_test_menu() {
     'type' => MENU_LOCAL_TASK,
   ) + $base;
 
+  // Menu trail tests.
+  // @see MenuTrailTestCase
+  $items['menu-test/menu-trail'] = array(
+    'title' => 'Menu trail - Case 1',
+    'page callback' => 'menu_test_menu_trail_callback',
+    'access arguments' => array('access content'),
+  );
+  $items['admin/config/development/menu-trail'] = array(
+    'title' => 'Menu trail - Case 2',
+    'description' => 'Tests menu_tree_set_path()',
+    'page callback' => 'menu_test_menu_trail_callback',
+    'access arguments' => array('access administration pages'),
+  );
+
   // File inheritance tests. This menu item should inherit the page callback
   // system_admin_menu_block_page() and therefore render its children as links
   // on the page.
@@ -336,6 +356,17 @@ function menu_test_other_argument_load($arg1) {
  */
 function menu_test_callback() {
   return 'This is menu_test_callback().';
+}
+
+/**
+ * Callback that test menu_test_menu_tree_set_path().
+ */
+function menu_test_menu_trail_callback() {
+  $menu_path = variable_get('menu_test_menu_tree_set_path', array());
+  if (!empty($menu_path)) {
+    menu_tree_set_path($menu_path['menu_name'], $menu_path['path']);
+  }
+  return 'This is menu_test_menu_trail_callback().';
 }
 
 /**

@@ -1,5 +1,4 @@
 <?php
-// $Id: comment.tpl.php,v 1.21 2010/12/01 00:18:15 webchick Exp $
 ?>
 <div class="<?php print $classes . ' ' . $zebra; ?>"<?php print $attributes; ?>>
 
@@ -7,7 +6,7 @@
 
     <span class="submitted"><?php print $submitted ?></span>
 
-  <?php if ($new) : ?>
+  <?php if ($new): ?>
     <span class="new"><?php print drupal_ucfirst($new) ?></span>
   <?php endif; ?>
 

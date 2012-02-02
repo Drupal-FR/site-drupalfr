@@ -1,5 +1,4 @@
 <?php
-// $Id: user-profile-category.tpl.php,v 1.3 2008/10/13 12:31:43 dries Exp $
 
 /**
  * @file
@@ -25,7 +24,7 @@
  * @see template_preprocess_user_profile_category()
  */
 ?>
-<?php if ($title) : ?>
+<?php if ($title): ?>
   <h3><?php print $title; ?></h3>
 <?php endif; ?>
 

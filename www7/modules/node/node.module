@@ -1,5 +1,4 @@
 <?php
-// $Id: node.module,v 1.1336 2011/01/03 18:03:54 webchick Exp $
 
 /**
  * @file
@@ -273,10 +272,10 @@ function node_admin_paths() {
  * Gathers a listing of links to nodes.
  *
  * @param $result
- *   A DB result object from a query to fetch node entities. If your query
- *   joins the <code>node_comment_statistics</code> table so that the
- *   <code>comment_count</code> field is available, a title attribute will
- *   be added to show the number of comments.
+ *   A database result object from a query to fetch node entities. If your
+ *   query joins the {node_comment_statistics} table so that the comment_count
+ *   field is available, a title attribute will be added to show the number of
+ *   comments.
  * @param $title
  *   A heading for the resulting list.
  *
@@ -365,7 +364,7 @@ function node_mark($nid, $timestamp) {
  *   Either a string or object, containing the node type information.
  *
  * @return
- *   Node type of the passed in data.
+ *   Node type of the passed-in data.
  */
 function _node_extract_type($node) {
   return is_object($node) ? $node->type : $node;
@@ -490,7 +489,6 @@ function node_type_load($name) {
  *   Status flag indicating outcome of the operation.
  */
 function node_type_save($info) {
-  $is_existing = FALSE;
   $existing_type = !empty($info->old_type) ? $info->old_type : $info->type;
   $is_existing = (bool) db_query_range('SELECT 1 FROM {node_type} WHERE type = :type', 0, 1, array(':type' => $existing_type))->fetchField();
   $type = node_type_set_defaults($info);
@@ -560,7 +558,6 @@ function node_add_body_field($type, $label = 'Body') {
       'field_name' => 'body',
       'type' => 'text_with_summary',
       'entity_types' => array('node'),
-      'translatable' => TRUE,
     );
     $field = field_create_field($field);
   }
@@ -570,7 +567,7 @@ function node_add_body_field($type, $label = 'Body') {
       'entity_type' => 'node',
       'bundle' => $type->type,
       'label' => $label,
-      'widget_type' => 'text_textarea_with_summary',
+      'widget' => array('type' => 'text_textarea_with_summary'),
       'settings' => array('display_summary' => TRUE),
       'display' => array(
         'default' => array(
@@ -754,17 +751,20 @@ function node_type_cache_reset() {
 }
 
 /**
- * Set the default values for a node type.
+ * Sets the default values for a node type.
  *
- * The defaults are for a type defined through hook_node_info().
- * When populating a custom node type $info should have the 'custom'
- * key set to 1.
+ * The defaults are appropriate for a type defined through hook_node_info(),
+ * since 'custom' is TRUE for types defined in the user interface, and FALSE
+ * for types defined by modules. (The 'custom' flag prevents types from being
+ * deleted through the user interface.) Also, the default for 'locked' is TRUE,
+ * which prevents users from changing the machine name of the type.
  *
  * @param $info
- *   An object or array containing values to override the defaults.
+ *   An object or array containing values to override the defaults. See
+ *   hook_node_info() for details on what the array elements mean.
  *
  * @return
- *   A node type object.
+ *   A node type object, with missing values in $info set to their defaults.
  */
 function node_type_set_defaults($info = array()) {
   $info = (array) $info;
@@ -919,7 +919,7 @@ function node_load_multiple($nids = array(), $conditions = array(), $reset = FAL
  *   Whether to reset the node_load_multiple cache.
  *
  * @return
- *   A fully-populated node object.
+ *   A fully-populated node object, or FALSE if the node is not found.
  */
 function node_load($nid = NULL, $vid = NULL, $reset = FALSE) {
   $nids = (isset($nid) ? array($nid) : array());
@@ -1073,7 +1073,7 @@ function node_save($node) {
         $node->log = '';
       }
     }
-    elseif (empty($node->log)) {
+    elseif (!isset($node->log) || $node->log === '') {
       // If we are updating an existing node without adding a new revision, we
       // need to make sure $node->log is unset whenever it is empty. As long as
       // $node->log is unset, drupal_write_record() will not attempt to update
@@ -1349,15 +1349,15 @@ function node_build_content($node, $view_mode = 'full', $langcode = NULL) {
   // The 'view' hook can be implemented to overwrite the default function
   // to display nodes.
   if (node_hook($node, 'view')) {
-    $node = node_invoke($node, 'view', $view_mode);
+    $node = node_invoke($node, 'view', $view_mode, $langcode);
   }
 
   // Build fields content.
   // In case of a multiple view, node_view_multiple() already ran the
   // 'prepare_view' step. An internal flag prevents the operation from running
   // twice.
-  field_attach_prepare_view('node', array($node->nid => $node), $view_mode);
-  entity_prepare_view('node', array($node->nid => $node));
+  field_attach_prepare_view('node', array($node->nid => $node), $view_mode, $langcode);
+  entity_prepare_view('node', array($node->nid => $node), $langcode);
   $node->content += field_attach_view('node', $node, $view_mode, $langcode);
 
   // Always display a read more link on teasers because we have no way
@@ -1396,22 +1396,24 @@ function node_build_content($node, $view_mode = 'full', $langcode = NULL) {
  * @param $message
  *   A flag which sets a page title relevant to the revision being viewed.
  * @return
- *   A $page element suitable for use by drupal_page_render().
+ *   A $page element suitable for use by drupal_render().
  */
 function node_show($node, $message = FALSE) {
   if ($message) {
     drupal_set_title(t('Revision of %title from %date', array('%title' => $node->title, '%date' => format_date($node->revision_timestamp))), PASS_THROUGH);
   }
 
+  // For markup consistency with other pages, use node_view_multiple() rather than node_view().
+  $nodes = node_view_multiple(array($node->nid => $node), 'full');
+
   // Update the history table, stating that this user viewed this node.
   node_tag_new($node);
 
-  // For markup consistency with other pages, use node_view_multiple() rather than node_view().
-  return node_view_multiple(array($node->nid => $node), 'full');
+  return $nodes;
 }
 
 /**
- * Returns whether the current page is the full page view of the passed in node.
+ * Returns whether the current page is the full page view of the passed-in node.
  *
  * @param $node
  *   A node object.
@@ -1450,14 +1452,11 @@ function template_preprocess_node(&$variables) {
   $variables['title']     = check_plain($node->title);
   $variables['page']      = $variables['view_mode'] == 'full' && node_is_page($node);
 
-  if (!empty($node->in_preview)) {
-    unset($node->content['links']);
-  }
-
   // Flatten the node object's member fields.
   $variables = array_merge((array) $node, $variables);
 
   // Helpful $content variable for templates.
+  $variables += array('content' => array());
   foreach (element_children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
@@ -2076,6 +2075,15 @@ function node_page_title($node) {
   return $node->title;
 }
 
+/**
+ * Finds the last time a node was changed.
+ *
+ * @param $nid
+ *   The ID of a node.
+ *
+ * @return
+ *   A unix timestamp indicating the last time the node was changed.
+ */
 function node_last_changed($nid) {
   return db_query('SELECT changed FROM {node} WHERE nid = :nid', array(':nid' => $nid))->fetch()->changed;
 }
@@ -2161,7 +2169,7 @@ function node_block_save($delta = '', $edit = array()) {
 }
 
 /**
- * Find the most recent nodes that are available to the current user.
+ * Finds the most recently changed nodes that are available to the current user.
  *
  * @param $number
  *   (optional) The maximum number of nodes to find. Defaults to 10.
@@ -2190,7 +2198,7 @@ function node_get_recent($number = 10) {
   }
   $nids = $query
     ->fields('n', array('nid'))
-    ->orderBy('changed', 'DESC')
+    ->orderBy('n.changed', 'DESC')
     ->range(0, $number)
     ->addTag('node_access')
     ->execute()
@@ -2417,7 +2425,10 @@ function node_block_list_alter(&$blocks) {
 }
 
 /**
- * A generic function for generating RSS feeds from a set of nodes.
+ * Generates and prints an RSS feed.
+ *
+ * Generates an RSS feed from an array of node IDs, and prints it with an HTTP
+ * header, with Content Type set to RSS/XML.
  *
  * @param $nids
  *   An array of node IDs (nid). Defaults to FALSE so empty feeds can be
@@ -2436,7 +2447,7 @@ function node_feed($nids = FALSE, $channel = array()) {
     $nids = db_select('node', 'n')
       ->fields('n', array('nid', 'created'))
       ->condition('n.promote', 1)
-      ->condition('status', 1)
+      ->condition('n.status', 1)
       ->orderBy('n.created', 'DESC')
       ->range(0, variable_get('feed_default_items', 10))
       ->addTag('node_access')
@@ -2516,8 +2527,8 @@ function node_feed($nids = FALSE, $channel = array()) {
  *   An array in the format expected by drupal_render().
  */
 function node_view_multiple($nodes, $view_mode = 'teaser', $weight = 0, $langcode = NULL) {
-  field_attach_prepare_view('node', $nodes, $view_mode);
-  entity_prepare_view('node', $nodes);
+  field_attach_prepare_view('node', $nodes, $view_mode, $langcode);
+  entity_prepare_view('node', $nodes, $langcode);
   $build = array();
   foreach ($nodes as $node) {
     $build['nodes'][$node->nid] = node_view($node, $view_mode, $langcode);
@@ -2779,12 +2790,14 @@ function node_search_validate($form, &$form_state) {
  * that this table is a list of grants; any matching row is sufficient to
  * grant access to the node.
  *
- * In node listings, the process above is followed except that
- * hook_node_access() is not called on each node for performance reasons and for
- * proper functioning of the pager system. When adding a node listing to your
- * module, be sure to use a dynamic query created by db_select() and add a tag
- * of "node_access" to ensure that only nodes to which the user has access
- * are retrieved.
+ * In node listings (lists of nodes generated from a select query, such as the
+ * default home page at path 'node', an RSS feed, a recent content block, etc.),
+ * the process above is followed except that hook_node_access() is not called on
+ * each node for performance reasons and for proper functioning of the pager
+ * system. When adding a node listing to your module, be sure to use a dynamic
+ * query created by db_select() and add a tag of "node_access". This will allow
+ * modules dealing with node access to ensure only nodes to which the user has
+ * access are retrieved, through the use of hook_query_TAG_alter().
  *
  * Note: Even a single module returning NODE_ACCESS_DENY from hook_node_access()
  * will block access to the node. Therefore, implementers should take care to
@@ -2816,8 +2829,6 @@ function node_search_validate($form, &$form_state) {
  *   TRUE if the operation may be performed, FALSE otherwise.
  */
 function node_access($op, $node, $account = NULL) {
-  global $user;
-
   $rights = &drupal_static(__FUNCTION__, array());
 
   if (!$node || !in_array($op, array('view', 'update', 'delete', 'create'), TRUE)) {
@@ -2827,7 +2838,7 @@ function node_access($op, $node, $account = NULL) {
   }
   // If no user object is supplied, the access check is for the current user.
   if (empty($account)) {
-    $account = $user;
+    $account = $GLOBALS['user'];
   }
 
   // $node may be either an object or a node type. Since node types cannot be
@@ -2951,7 +2962,6 @@ function node_node_access($node, $op, $account) {
  */
 function node_list_permissions($type) {
   $info = node_type_get_type($type);
-  $type = check_plain($info->type);
 
   // Build standard list of node permissions for this type.
   $perms = array(
@@ -3112,7 +3122,7 @@ function node_access_view_all_nodes($account = NULL) {
  * 'update' and 'delete').
  */
 function node_query_node_access_alter(QueryAlterableInterface $query) {
-  _node_query_node_access_alter($query, 'node', 'node');
+  _node_query_node_access_alter($query, 'node');
 }
 
 /**
@@ -3123,7 +3133,7 @@ function node_query_node_access_alter(QueryAlterableInterface $query) {
  * conditions are added for field values belonging to nodes only.
  */
 function node_query_entity_field_access_alter(QueryAlterableInterface $query) {
-  _node_query_node_access_alter($query, $query->getMetaData('base_table'), 'entity');
+  _node_query_node_access_alter($query, 'entity');
 }
 
 /**
@@ -3131,14 +3141,12 @@ function node_query_entity_field_access_alter(QueryAlterableInterface $query) {
  *
  * @param $query
  *   The query to add conditions to.
- * @param $base_table
- *   The table holding node ids.
  * @param $type
  *   Either 'node' or 'entity' depending on what sort of query it is. See
  *   node_query_node_access_alter() and node_query_entity_field_access_alter()
  *   for more.
  */
-function _node_query_node_access_alter($query, $base_table, $type) {
+function _node_query_node_access_alter($query, $type) {
   global $user;
 
   // Read meta-data from query, if provided.
@@ -3162,14 +3170,61 @@ function _node_query_node_access_alter($query, $base_table, $type) {
     return;
   }
 
+  $tables = $query->getTables();
+  $base_table = $query->getMetaData('base_table');
+  // If no base table is specified explicitly, search for one.
+  if (!$base_table) {
+    $fallback = '';
+    foreach ($tables as $alias => $table_info) {
+      if (!($table_info instanceof SelectQueryInterface)) {
+        $table = $table_info['table'];
+        // If the node table is in the query, it wins immediately.
+        if ($table == 'node') {
+          $base_table = $table;
+          break;
+        }
+        // Check whether the table has a foreign key to node.nid. If it does,
+        // do not run this check again as we found a base table and only node
+        // can triumph that.
+        if (!$base_table) {
+          // The schema is cached.
+          $schema = drupal_get_schema($table);
+          if (isset($schema['fields']['nid'])) {
+            if (isset($schema['foreign keys'])) {
+              foreach ($schema['foreign keys'] as $relation) {
+                if ($relation['table'] === 'node' && $relation['columns'] === array('nid' => 'nid')) {
+                  $base_table = $table;
+                }
+              }
+            }
+            else {
+              // At least it's a nid. A table with a field called nid is very
+              // very likely to be a node.nid in a node access query.
+              $fallback = $table;
+            }
+          }
+        }
+      }
+    }
+    // If there is nothing else, use the fallback.
+    if (!$base_table) {
+      if ($fallback) {
+        watchdog('security', 'Your node listing query is using @fallback as a base table in a query tagged for node access. This might not be secure and might not even work. Specify foreign keys in your schema to node.nid ', array('@fallback' => $fallback), WATCHDOG_WARNING);
+        $base_table = $fallback;
+      }
+      else {
+        throw new Exception(t('Query tagged for node access but there is no nid. Add foreign keys to node.nid in schema to fix.'));
+      }
+    }
+  }
+
   // Prevent duplicate records.
   $query->distinct();
 
-  // Find all instances of the {node} table being joined -- could appear
+  // Find all instances of the base table being joined -- could appear
   // more than once in the query, and could be aliased. Join each one to
   // the node_access table.
 
-  $tables = $query->getTables();
   $grants = node_access_grants($op, $account);
   if ($type == 'entity') {
     // The original query looked something like:
@@ -3293,6 +3348,9 @@ function node_access_acquire_grants($node, $delete = TRUE) {
  * will always delete a grant from the 'all' realm. Modules that utilize
  * node_access can use this function when doing mass updates due to widespread
  * permission changes.
+ *
+ * Note: Don't call this function directly from a contributed module. Call
+ * node_access_acquire_grants() instead.
  *
  * @param $node
  *   The $node being written to. All that is necessary is that it contains a

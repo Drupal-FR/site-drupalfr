@@ -1,5 +1,4 @@
 <?php
-// $Id: taxonomy.admin.inc,v 1.116 2010/11/20 06:49:47 webchick Exp $
 
 /**
  * @file
@@ -100,10 +99,11 @@ function theme_taxonomy_overview_vocabularies($variables) {
 }
 
 /**
- * Display form for adding and editing vocabularies.
+ * Form builder for the vocabulary editing form.
  *
  * @ingroup forms
  * @see taxonomy_form_vocabulary_submit()
+ * @see taxonomy_form_vocabulary_validate()
  */
 function taxonomy_form_vocabulary($form, &$form_state, $edit = array()) {
   // During initial form build, add the entity to the form state for use
@@ -147,7 +147,7 @@ function taxonomy_form_vocabulary($form, &$form_state, $edit = array()) {
   $form['machine_name'] = array(
     '#type' => 'machine_name',
     '#default_value' => $vocabulary->machine_name,
-    '#maxlength' => 21,
+    '#maxlength' => 255,
     '#machine_name' => array(
       'exists' => 'taxonomy_vocabulary_machine_name_load',
     ),
@@ -175,14 +175,41 @@ function taxonomy_form_vocabulary($form, &$form_state, $edit = array()) {
     $form['vid'] = array('#type' => 'value', '#value' => $vocabulary->vid);
     $form['module'] = array('#type' => 'value', '#value' => $vocabulary->module);
   }
+  $form['#validate'][] = 'taxonomy_form_vocabulary_validate';
+
   return $form;
 }
 
 /**
- * Accept the form submission for a vocabulary and save the results.
+ * Form validation handler for taxonomy_form_vocabulary().
+ *
+ * Makes sure that the machine name of the vocabulary is not in the
+ * disallowed list (names that conflict with menu items, such as 'list'
+ * and 'add').
+ *
+ * @see taxonomy_form_vocabulary()
+ * @see taxonomy_form_vocabulary_submit()
+ */
+function taxonomy_form_vocabulary_validate($form, &$form_state) {
+  // During the deletion there is no 'machine_name' key
+  if (isset($form_state['values']['machine_name'])) {
+    // Do not allow machine names to conflict with taxonomy path arguments.
+    $machine_name = $form_state['values']['machine_name'];
+    $disallowed = array('add', 'list');
+    if (in_array($machine_name, $disallowed)) {
+      form_set_error('machine_name', t('The machine-readable name cannot be "add" or "list".'));
+    }
+  }
+}
+
+/**
+ * Form submission handler for taxonomy_form_vocabulary().
+ *
+ * @see taxonomy_form_vocabulary()
+ * @see taxonomy_form_vocabulary_validate()
  */
 function taxonomy_form_vocabulary_submit($form, &$form_state) {
-  if ($form_state['clicked_button']['#value'] == t('Delete')) {
+  if ($form_state['triggering_element']['#value'] == t('Delete')) {
     // Rebuild the form to confirm vocabulary deletion.
     $form_state['rebuild'] = TRUE;
     $form_state['confirm_delete'] = TRUE;
@@ -407,7 +434,7 @@ function taxonomy_overview_terms($form, &$form_state, $vocabulary) {
  * @see taxonomy_overview_terms()
  */
 function taxonomy_overview_terms_submit($form, &$form_state) {
-  if ($form_state['clicked_button']['#value'] == t('Reset to alphabetical')) {
+  if ($form_state['triggering_element']['#value'] == t('Reset to alphabetical')) {
     // Execute the reset action.
     if ($form_state['values']['reset_alphabetical'] === TRUE) {
       return taxonomy_vocabulary_confirm_reset_alphabetical_submit($form, $form_state);
@@ -647,9 +674,6 @@ function taxonomy_form_term($form, &$form_state, $edit = array(), $vocabulary = 
   if (isset($form_state['confirm_delete'])) {
     return array_merge($form, taxonomy_term_confirm_delete($form, $form_state, $term->tid));
   }
-  elseif (isset($form_state['confirm_parents'])) {
-    return array_merge($form, taxonomy_term_confirm_parents($form, $form_state, $vocabulary));
-  }
 
   $form['name'] = array(
     '#type' => 'textfield',
@@ -774,7 +798,7 @@ function taxonomy_form_term_validate($form, &$form_state) {
  * @see taxonomy_form_term()
  */
 function taxonomy_form_term_submit($form, &$form_state) {
-  if ($form_state['clicked_button']['#value'] == t('Delete')) {
+  if ($form_state['triggering_element']['#value'] == t('Delete')) {
     // Execute the term deletion.
     if ($form_state['values']['delete'] === TRUE) {
       return taxonomy_term_confirm_delete_submit($form, $form_state);
@@ -782,12 +806,6 @@ function taxonomy_form_term_submit($form, &$form_state) {
     // Rebuild the form to confirm term deletion.
     $form_state['rebuild'] = TRUE;
     $form_state['confirm_delete'] = TRUE;
-    return;
-  }
-  // Rebuild the form to confirm enabling multiple parents.
-  elseif ($form_state['clicked_button']['#value'] == t('Save') && count($form_state['values']['parent']) > 1 && $form['#vocabulary']->hierarchy < 2) {
-    $form_state['rebuild'] = TRUE;
-    $form_state['confirm_parents'] = TRUE;
     return;
   }
 
@@ -843,25 +861,6 @@ function taxonomy_form_term_submit_build_taxonomy_term($form, &$form_state) {
   $term->description = $description['value'];
   $term->format = $description['format'];
   return $term;
-}
-
-/**
- * Form builder for the confirmation of multiple term parents.
- *
- * @ingroup forms
- * @see taxonomy_form_term()
- */
-function taxonomy_term_confirm_parents($form, &$form_state, $vocabulary) {
-  foreach (element_children($form_state['values']) as $key) {
-    $form[$key] = array(
-      '#type' => 'value',
-      '#value' => $form_state['values'][$key],
-    );
-  }
-  $question = t('Set multiple term parents?');
-  $description = '<p>' . t("Adding multiple parents to a term will cause the %vocabulary vocabulary to look for multiple parents on every term. Because multiple parents are not supported when using the drag and drop outline interface, drag and drop will be disabled if you enable this option. If you choose to have multiple parents, you will only be able to set parents by using the term edit form.", array('%vocabulary' => $vocabulary->name)) . '</p>';
-  $description .= '<p>' . t("You may re-enable the drag and drop interface at any time by reducing multiple parents to a single parent for the terms in this vocabulary.") . '</p>';
-  return confirm_form($form, $question, drupal_get_destination(), $description, t('Set multiple parents'));
 }
 
 /**

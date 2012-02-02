@@ -1,5 +1,4 @@
 <?php
-// $Id: locale.admin.inc,v 1.23 2011/01/03 18:03:54 webchick Exp $
 
 /**
  * @file
@@ -81,9 +80,19 @@ function theme_locale_languages_overview_form($variables) {
       if ($key == $default->language) {
         $form['enabled'][$key]['#attributes']['disabled'] = 'disabled';
       }
+
+      // Add invisible labels for the checkboxes and radio buttons in the table
+      // for accessibility. These changes are only required and valid when the
+      // form is themed as a table, so it would be wrong to perform them in the
+      // form constructor.
+      $title = drupal_render($form['name'][$key]);
+      $form['enabled'][$key]['#title'] = t('Enable !title', array('!title' => $title));
+      $form['enabled'][$key]['#title_display'] = 'invisible';
+      $form['site_default'][$key]['#title'] = t('Set !title as default', array('!title' => $title));
+      $form['site_default'][$key]['#title_display'] = 'invisible';
       $rows[] = array(
         'data' => array(
-          '<strong>' . drupal_render($form['name'][$key]) . '</strong>',
+          '<strong>' . $title . '</strong>',
           drupal_render($form['native'][$key]),
           check_plain($key),
           drupal_render($form['direction'][$key]),
@@ -298,7 +307,7 @@ function _locale_languages_common_controls(&$form, $language = NULL) {
     '#title' => t('Language domain'),
     '#maxlength' => 128,
     '#default_value' => @$language->domain,
-    '#description' => t('URL <strong>including protocol</strong> to use for this language, if your <em>Detection and selection</em> settings use URL domains. For the default language, this value may be left blank. <strong>Modifying this value may break existing URLs. Use with caution in a production environment.</strong> Example: Specifying "http://example.de" or "http://de.example.com" as language domains for German results in URLs like "http://example.de/contact" and "http://de.example.com/contact", respectively.'),
+    '#description' => t('The domain name to use for this language if URL domains are used for <em>Detection and selection</em>. Leave blank for the default language. <strong>Changing this value may break existing URLs.</strong> Example: Specifying "de.example.com" as language domain for German will result in an URL like "http://de.example.com/contact".'),
   );
   $form['direction'] = array('#type' => 'radios',
     '#title' => t('Direction'),
@@ -468,6 +477,9 @@ function locale_languages_delete_form_submit($form, &$form_state) {
       ->fields(array('language' => ''))
       ->condition('language', $form_state['values']['langcode'])
       ->execute();
+    if ($languages[$form_state['values']['langcode']]->enabled) {
+      variable_set('language_count', variable_get('language_count', 1) - 1);
+    }
     module_invoke_all('multilingual_settings_changed');
     $variables = array('%locale' => $languages[$form_state['values']['langcode']]->name);
     drupal_set_message(t('The language %locale has been removed.', $variables));
@@ -539,6 +551,12 @@ function _locale_languages_configure_form_language_table(&$form, $type) {
   asort($providers_weight);
 
   foreach ($providers_weight as $id => $weight) {
+    // A language provider might be no more available if the defining module has
+    // been disabled after the last configuration saving.
+    if (!isset($language_providers[$id])) {
+      continue;
+    }
+
     $enabled = isset($enabled_providers[$id]);
     $provider = $language_providers[$id];
 
@@ -656,7 +674,6 @@ function theme_locale_languages_configure_form($variables) {
  * Submit handler for language negotiation settings.
  */
 function locale_languages_configure_form_submit($form, &$form_state) {
-  $language_types = array();
   $configurable_types = $form['#language_types'];
 
   foreach ($configurable_types as $type) {
@@ -664,7 +681,6 @@ function locale_languages_configure_form_submit($form, &$form_state) {
     $enabled_providers = $form_state['values'][$type]['enabled'];
     $enabled_providers[LANGUAGE_NEGOTIATION_DEFAULT] = TRUE;
     $providers_weight = $form_state['values'][$type]['weight'];
-    $language_types[$type] = TRUE;
 
     foreach ($providers_weight as $id => $weight) {
       if ($enabled_providers[$id]) {
@@ -678,27 +694,11 @@ function locale_languages_configure_form_submit($form, &$form_state) {
     variable_set("locale_language_providers_weight_$type", $providers_weight);
   }
 
-  // Save non-configurable language types negotiation.
-  $language_types_info = language_types_info();
-  $defined_providers = $form['#language_providers'];
-  foreach ($language_types_info as $type => $info) {
-    if (isset($info['fixed'])) {
-      $language_types[$type] = FALSE;
-      $negotiation = array();
-      foreach ($info['fixed'] as $weight => $id) {
-        if (isset($defined_providers[$id])) {
-          $negotiation[$id] = $defined_providers[$id];
-          $negotiation[$id]['weight'] = $weight;
-        }
-      }
-      language_negotiation_set($type, $negotiation);
-    }
-  }
+  // Update non-configurable language types and the related language negotiation
+  // configuration.
+  language_types_set();
 
-  // Save language types.
-  variable_set('language_types', $language_types);
-
-  $form_state['redirect'] = 'admin/config/regional/language';
+  $form_state['redirect'] = 'admin/config/regional/language/configure';
   drupal_set_message(t('Language negotiation configuration saved.'));
 }
 

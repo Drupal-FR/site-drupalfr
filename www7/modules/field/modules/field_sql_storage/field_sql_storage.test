@@ -1,9 +1,8 @@
 <?php
-// $Id: field_sql_storage.test,v 1.23 2010/12/14 19:50:05 dries Exp $
 
 /**
  * @file
- * Unit tests for field_sql_ storage.module
+ * Tests for field_sql_storage.module.
  *
  * Field_sql_storage.module implements the default back-end storage plugin
  * for the Field Strage API.
@@ -303,6 +302,31 @@ class FieldSqlStorageTestCase extends DrupalWebTestCase {
     }
     catch (FieldException $e) {
       $this->pass(t('Cannot update field schema with data.'));
+    }
+  }
+
+  /**
+   * Test that failure to create fields is handled gracefully.
+   */
+  function testFieldUpdateFailure() {
+    // Create a text field.
+    $field = array('field_name' => 'test_text', 'type' => 'text', 'settings' => array('max_length' => 255));
+    $field = field_create_field($field);
+
+    // Attempt to update the field in a way that would break the storage.
+    $prior_field = $field;
+    $field['settings']['max_length'] = -1;
+    try {
+      field_update_field($field);
+      $this->fail(t('Update succeeded.'));
+    }
+    catch (Exception $e) {
+      $this->pass(t('Update properly failed.'));
+    }
+
+    // Ensure that the field tables are still there.
+    foreach (_field_sql_storage_schema($prior_field) as $table_name => $table_info) {
+      $this->assertTrue(db_table_exists($table_name), t('Table %table exists.', array('%table' => $table_name)));
     }
   }
 

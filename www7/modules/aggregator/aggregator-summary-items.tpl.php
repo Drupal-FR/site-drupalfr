@@ -1,5 +1,4 @@
 <?php
-// $Id: aggregator-summary-items.tpl.php,v 1.4 2010/10/15 23:37:55 webchick Exp $
 
 /**
  * @file
@@ -15,6 +14,8 @@
  *
  * @see template_preprocess()
  * @see template_preprocess_aggregator_summary_items()
+ *
+ * @ingroup themeable
  */
 ?>
 <h3><?php print $title; ?></h3>

@@ -1,5 +1,4 @@
 <?php
-// $Id: openid.module,v 1.98 2010/11/30 17:16:37 dries Exp $
 
 /**
  * @file
@@ -147,11 +146,11 @@ function _openid_user_login_form_alter(&$form, &$form_state) {
 
   $items = array();
   $items[] = array(
-    'data' => l(t('Log in using OpenID'), '#'),
+    'data' => l(t('Log in using OpenID'), '#openid-login', array('external' => TRUE)),
     'class' => array('openid-link'),
   );
   $items[] = array(
-    'data' => l(t('Cancel OpenID login'), '#'),
+    'data' => l(t('Cancel OpenID login'), '#', array('external' => TRUE)),
     'class' => array('user-link'),
   );
 
@@ -186,10 +185,15 @@ function openid_form_user_register_form_alter(&$form, &$form_state) {
 
     $response = $_SESSION['openid']['response'];
 
-    // Extract Simple Registration keys from the response.
-    $sreg_values = openid_extract_namespace($response, OPENID_NS_SREG, 'sreg');
-    // Extract Attribute Exchanges keys from the response.
-    $ax_values = openid_extract_namespace($response, OPENID_NS_AX, 'ax');
+    // Extract Simple Registration keys from the response. We only include
+    // signed keys as required by OpenID Simple Registration Extension 1.0,
+    // section 4.
+    $sreg_values = openid_extract_namespace($response, OPENID_NS_SREG, 'sreg', TRUE);
+    // Extract Attribute Exchanges keys from the response. We only include
+    // signed keys. This is not required by the specification, but it is
+    // recommended by Google, see
+    // http://googlecode.blogspot.com/2011/05/security-advisory-to-websites-using.html
+    $ax_values = openid_extract_namespace($response, OPENID_NS_AX, 'ax', TRUE);
 
     if (!empty($sreg_values['nickname'])) {
       // Use the nickname returned by Simple Registration if available.
@@ -257,14 +261,23 @@ function openid_login_validate($form, &$form_state) {
 function openid_begin($claimed_id, $return_to = '', $form_values = array()) {
   module_load_include('inc', 'openid');
 
+  $service = NULL;
   $claimed_id = openid_normalize($claimed_id);
+  $discovery = openid_discovery($claimed_id);
 
-  $services = openid_discovery($claimed_id);
-  $service = _openid_select_service($services);
+  if (!empty($discovery['services'])) {
+    $service = _openid_select_service($discovery['services']);
+  }
 
-  if (!$service) {
+  // Quit if the discovery result was empty or if we can't select any service.
+  if (!$discovery || !$service) {
     form_set_error('openid_identifier', t('Sorry, that is not a valid OpenID. Ensure you have spelled your ID correctly.'));
     return;
+  }
+
+  // Set claimed id from discovery.
+  if (!empty($discovery['claimed_id'])) {
+    $claimed_id = $discovery['claimed_id'];
   }
 
   // Store discovered information in the users' session so we don't have to rediscover.
@@ -275,9 +288,9 @@ function openid_begin($claimed_id, $return_to = '', $form_values = array()) {
   // user_exteral_login later.
   $_SESSION['openid']['user_login_values'] = $form_values;
 
-  // If bcmath is present, then create an association
+  // If a supported math library is present, then create an association.
   $assoc_handle = '';
-  if (function_exists('bcadd')) {
+  if (_openid_get_math_library()) {
     $assoc_handle = openid_association($service['uri']);
   }
 
@@ -342,18 +355,24 @@ function openid_complete($response = array()) {
             $response['openid.claimed_id'] = $service['claimed_id'];
           }
           elseif ($service['version'] == 2) {
-            $response['openid.claimed_id'] = openid_normalize($response['openid.claimed_id']);
+            // Returned Claimed Identifier could contain unique fragment
+            // identifier to allow identifier recycling so we need to preserve
+            // it in the response.
+            $response_claimed_id = openid_normalize($response['openid.claimed_id']);
+
             // OpenID Authentication, section 11.2:
             // If the returned Claimed Identifier is different from the one sent
             // to the OpenID Provider, we need to do discovery on the returned
             // identififer to make sure that the provider is authorized to
             // respond on behalf of this.
-            if ($response['openid.claimed_id'] != $claimed_id) {
-              $services = openid_discovery($response['openid.claimed_id']);
-              $uris = array();
-              foreach ($services as $discovered_service) {
-                if (in_array('http://specs.openid.net/auth/2.0/server', $discovered_service['types']) || in_array('http://specs.openid.net/auth/2.0/signon', $discovered_service['types'])) {
-                  $uris[] = $discovered_service['uri'];
+            if ($response_claimed_id != $claimed_id) {
+              $discovery = openid_discovery($response['openid.claimed_id']);
+              if ($discovery && !empty($discovery['services'])) {
+                $uris = array();
+                foreach ($discovery['services'] as $discovered_service) {
+                  if (in_array('http://specs.openid.net/auth/2.0/server', $discovered_service['types']) || in_array('http://specs.openid.net/auth/2.0/signon', $discovered_service['types'])) {
+                    $uris[] = $discovered_service['uri'];
+                  }
                 }
               }
               if (!in_array($service['uri'], $uris)) {
@@ -375,10 +394,21 @@ function openid_complete($response = array()) {
 /**
  * Perform discovery on a claimed ID to determine the OpenID provider endpoint.
  *
- * @param $claimed_id The OpenID URL to perform discovery on.
+ * Discovery methods are provided by the hook_openid_discovery_method_info and
+ * could be further altered using the hook_openid_discovery_method_info_alter.
  *
- * @return Array of services discovered (including OpenID version, endpoint
- * URI, etc).
+ * @param $claimed_id
+ *   The OpenID URL to perform discovery on.
+ *
+ * @return
+ *   The resulting discovery array from the first successful discovery method,
+ *   which must contain following keys:
+ *   - 'services' (required) an array of discovered services (including OpenID
+ *   version, endpoint URI, etc).
+ *   - 'claimed_id' (optional) new claimed identifer, found by following HTTP
+ *   redirects during the services discovery.
+ *   If all the discovery method fails or if no appropriate discovery method is
+ *   found, FALSE is returned.
  */
 function openid_discovery($claimed_id) {
   module_load_include('inc', 'openid');
@@ -386,15 +416,15 @@ function openid_discovery($claimed_id) {
   $methods = module_invoke_all('openid_discovery_method_info');
   drupal_alter('openid_discovery_method_info', $methods);
 
-  // Execute each method in turn.
+  // Execute each method in turn and return first successful discovery.
   foreach ($methods as $method) {
-    $discovered_services = $method($claimed_id);
-    if (!empty($discovered_services)) {
-      return $discovered_services;
+    $discovery = $method($claimed_id);
+    if (!empty($discovery)) {
+      return $discovery;
     }
   }
 
-  return array();
+  return FALSE;
 }
 
 /**
@@ -418,24 +448,33 @@ function openid_openid_discovery_method_info() {
  *
  * @see http://openid.net/specs/openid-authentication-2_0.html#discovery
  * @see hook_openid_discovery_method_info()
+ * @see openid_discovery()
+ *
+ * @return
+ *   An array of discovered services and claimed identifier or NULL. See
+ *   openid_discovery() for more specific information.
  */
 function _openid_xri_discovery($claimed_id) {
   if (_openid_is_xri($claimed_id)) {
     // Resolve XRI using a proxy resolver (Extensible Resource Identifier (XRI)
     // Resolution Version 2.0, section 11.2 and 14.3).
     $xrds_url = variable_get('xri_proxy_resolver', 'http://xri.net/') . rawurlencode($claimed_id) . '?_xrd_r=application/xrds+xml';
-    $services = _openid_xrds_discovery($xrds_url);
-    foreach ($services as $i => &$service) {
-      $status = $service['xrd']->children(OPENID_NS_XRD)->Status;
-      if ($status && $status->attributes()->cid == 'verified') {
-        $service['claimed_id'] = openid_normalize((string)$service['xrd']->children(OPENID_NS_XRD)->CanonicalID);
+    $discovery = _openid_xrds_discovery($xrds_url);
+    if (!empty($discovery['services']) && is_array($discovery['services'])) {
+      foreach ($discovery['services'] as $i => &$service) {
+        $status = $service['xrd']->children(OPENID_NS_XRD)->Status;
+        if ($status && $status->attributes()->cid == 'verified') {
+          $service['claimed_id'] = openid_normalize((string)$service['xrd']->children(OPENID_NS_XRD)->CanonicalID);
+        }
+        else {
+          // Ignore service if the Canonical ID could not be verified.
+          unset($discovery['services'][$i]);
+        }
       }
-      else {
-        // Ignore service if CanonicalID could not be verified.
-        unset($services[$i]);
+      if (!empty($discovery['services'])) {
+        return $discovery;
       }
     }
-    return $services;
   }
 }
 
@@ -444,6 +483,11 @@ function _openid_xri_discovery($claimed_id) {
  *
  * @see http://openid.net/specs/openid-authentication-2_0.html#discovery
  * @see hook_openid_discovery_method_info()
+ * @see openid_discovery()
+ *
+ * @return
+ *   An array of discovered services and claimed identifier or NULL. See
+ *   openid_discovery() for more specific information.
  */
 function _openid_xrds_discovery($claimed_id) {
   $services = array();
@@ -455,7 +499,18 @@ function _openid_xrds_discovery($claimed_id) {
     $headers = array('Accept' => 'application/xrds+xml');
     $result = drupal_http_request($xrds_url, array('headers' => $headers));
 
-    if (!isset($result->error)) {
+    // Check for HTTP error and make sure, that we reach the target. If the
+    // maximum allowed redirects are exhausted, final destination URL isn't
+    // reached, but drupal_http_request() doesn't return any error.
+    // @todo Remove the check for 200 HTTP result code after the following issue
+    // will be fixed: http://drupal.org/node/1096890.
+    if (!isset($result->error) && $result->code == 200) {
+
+      // Replace the user-entered claimed_id if we received a redirect.
+      if (!empty($result->redirect_url)) {
+        $claimed_id = openid_normalize($result->redirect_url);
+      }
+
       if (isset($result->headers['content-type']) && preg_match("/application\/xrds\+xml/", $result->headers['content-type'])) {
         // Parse XML document to find URL
         $services = _openid_xrds_parse($result->data);
@@ -501,7 +556,13 @@ function _openid_xrds_discovery($claimed_id) {
       }
     }
   }
-  return $services;
+
+  if (!empty($services)) {
+    return array(
+      'services' => $services,
+      'claimed_id' => $claimed_id,
+    );
+  }
 }
 
 /**
@@ -540,8 +601,8 @@ function openid_association($op_endpoint) {
     $mod = OPENID_DH_DEFAULT_MOD;
     $gen = OPENID_DH_DEFAULT_GEN;
     $r = _openid_dh_rand($mod);
-    $private = bcadd($r, 1);
-    $public = bcpowmod($gen, $private, $mod);
+    $private = _openid_math_add($r, 1);
+    $public = _openid_math_powmod($gen, $private, $mod);
 
     // If there is no existing association, then request one
     $assoc_request = openid_association_request($public);
@@ -564,7 +625,7 @@ function openid_association($op_endpoint) {
     if ($assoc_response['session_type'] == 'DH-SHA1') {
       $spub = _openid_dh_base64_to_long($assoc_response['dh_server_public']);
       $enc_mac_key = base64_decode($assoc_response['enc_mac_key']);
-      $shared = bcpowmod($spub, $private, $mod);
+      $shared = _openid_math_powmod($spub, $private, $mod);
       $assoc_response['mac_key'] = base64_encode(_openid_dh_xorsecret($shared, $enc_mac_key));
     }
     db_insert('openid_association')
@@ -590,8 +651,15 @@ function openid_association($op_endpoint) {
  */
 function openid_authentication($response) {
   $identity = $response['openid.claimed_id'];
-
   $account = user_external_load($identity);
+
+  // Tries to load user account if user_external_load fails due to possibly
+  // incompletely stored OpenID identifier in the authmap.
+  if (!isset($account->uid) && variable_get('openid_less_obtrusive_transition', FALSE)) {
+    module_load_include('inc', 'openid');
+    $account = _openid_invalid_openid_transition($identity, $response);
+  }
+
   if (isset($account->uid)) {
     if (!variable_get('user_email_verification', TRUE) || $account->login) {
       // Check if user is blocked.
@@ -635,7 +703,7 @@ function openid_authentication($response) {
       drupal_set_message(t('Account registration using the information provided by your OpenID provider failed due to the reasons listed below. Complete the registration by filling out the form below. If you already have an account, you can <a href="@login">log in</a> now and add your OpenID under "My account".', array('@login' => url('user/login'))), 'warning');
       // Append form validation errors below the above warning.
       foreach ($messages['error'] as $message) {
-        drupal_set_message( $message, 'error');
+        drupal_set_message($message, 'error');
       }
     }
 

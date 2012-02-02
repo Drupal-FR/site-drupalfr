@@ -1,5 +1,4 @@
 <?php
-// $Id: search.admin.inc,v 1.19 2010/10/20 01:31:07 dries Exp $
 
 /**
  * @file
@@ -11,7 +10,7 @@
  */
 function search_reindex_confirm() {
   return confirm_form(array(), t('Are you sure you want to re-index the site?'),
-                  'admin/config/search/settings', t(' The search index is not cleared but systematically updated to reflect the new settings. Searching will continue to work but new content won\'t be indexed until all existing content has been re-indexed. This action cannot be undone.'), t('Re-index site'), t('Cancel'));
+                  'admin/config/search/settings', t('The search index is not cleared but systematically updated to reflect the new settings. Searching will continue to work but new content won\'t be indexed until all existing content has been re-indexed. This action cannot be undone.'), t('Re-index site'), t('Cancel'));
 }
 
 /**
@@ -32,18 +31,12 @@ function search_reindex_confirm_submit(&$form, &$form_state) {
 function _search_get_module_names() {
 
   $search_info = search_get_info(TRUE);
-  $modules = db_select('system', 's')
-    ->fields('s', array('name', 'info'))
-    ->condition('s.status', 1)
-    ->condition('s.type', 'module')
-    ->condition('s.name', array_keys($search_info), 'IN')
-    ->orderBy('s.name')
-    ->execute();
+  $system_info = system_get_info('module');
   $names = array();
-  foreach ($modules as $item) {
-    $info = unserialize($item->info);
-    $names[$item->name] = $info['name'];
+  foreach ($search_info as $module => $info) {
+    $names[$module] = $system_info[$module]['name'];
   }
+  asort($names, SORT_STRING);
   return $names;
 }
 
@@ -113,21 +106,22 @@ function search_admin_settings($form) {
 
   $form['active'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Active search modules ')
+    '#title' => t('Active search modules')
   );
+  $module_options = _search_get_module_names();
   $form['active']['search_active_modules'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Active modules'),
     '#title_display' => 'invisible',
     '#default_value' => variable_get('search_active_modules', array('node', 'user')),
-    '#options' => _search_get_module_names(),
+    '#options' => $module_options,
     '#description' => t('Choose which search modules are active from the available modules.')
   );
   $form['active']['search_default_module'] = array(
     '#title' => t('Default search module'),
     '#type' => 'radios',
     '#default_value' => variable_get('search_default_module', 'node'),
-    '#options' => _search_get_module_names(),
+    '#options' => $module_options,
     '#description' => t('Choose which search module is the default.')
   );
   $form['#validate'][] = 'search_admin_settings_validate';
@@ -149,7 +143,7 @@ function search_admin_settings($form) {
  */
 function search_admin_settings_validate($form, &$form_state) {
   // Check whether we selected a valid default.
-  if ($form_state['clicked_button']['#value'] != t('Reset to defaults')) {
+  if ($form_state['triggering_element']['#value'] != t('Reset to defaults')) {
     $new_modules = array_filter($form_state['values']['search_active_modules']);
     $default = $form_state['values']['search_default_module'];
     if (!in_array($default, $new_modules, TRUE)) {
@@ -170,7 +164,7 @@ function search_admin_settings_submit($form, &$form_state) {
   }
   $current_modules = variable_get('search_active_modules', array('node', 'user'));
   // Check whether we are resetting the values.
-  if ($form_state['clicked_button']['#value'] == t('Reset to defaults')) {
+  if ($form_state['triggering_element']['#value'] == t('Reset to defaults')) {
     $new_modules = array('node', 'user');
   }
   else {

@@ -1,5 +1,4 @@
 <?php
-// $Id: help.admin.inc,v 1.13 2010/10/01 15:24:18 webchick Exp $
 
 /**
  * @file
@@ -18,6 +17,9 @@ function help_main() {
 
 /**
  * Menu callback; prints a page listing general help for a module.
+ *
+ * @param $name
+ *   A module name to display a help page for.
  */
 function help_page($name) {
   $output = '';
@@ -47,6 +49,12 @@ function help_page($name) {
   return $output;
 }
 
+/**
+ * Provides a formatted list of available help topics.
+ *
+ * @return
+ *   A string containing the formatted list.
+ */
 function help_links_as_list() {
   $empty_arg = drupal_help_arg();
   $module_info = system_rebuild_module_data();
@@ -59,7 +67,7 @@ function help_links_as_list() {
   }
   asort($modules);
 
-  // Output pretty four-column list
+  // Output pretty four-column list.
   $count = count($modules);
   $break = ceil($count / 4);
   $output = '<div class="clearfix"><div class="help-items"><ul>';

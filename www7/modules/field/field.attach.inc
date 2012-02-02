@@ -1,5 +1,4 @@
 <?php
-// $Id: field.attach.inc,v 1.98 2010/12/07 05:09:58 webchick Exp $
 
 /**
  * @file
@@ -44,7 +43,10 @@ class FieldValidationException extends FieldException {
  * such as a cloud-based database.
  *
  * Each field defines which storage backend it uses. The Drupal system variable
- * 'field_default_storage' identifies the storage backend used by default.
+ * 'field_storage_default' identifies the storage backend used by default.
+ *
+ * See @link field Field API @endlink for information about the other parts of
+ * the Field API.
  */
 
 /**
@@ -118,6 +120,12 @@ define('FIELD_STORAGE_INSERT', 'insert');
  * The pre-operation hooks do not make the Field Storage API irrelevant. The
  * Field Storage API is essentially the "fallback mechanism" for any fields
  * that aren't being intercepted explicitly by pre-operation hooks.
+ *
+ * @link field_language Field Language API @endlink provides information about
+ * the structure of field objects.
+ *
+ * See @link field Field API @endlink for information about the other parts of
+ * the Field API.
  */
 
 /**
@@ -186,8 +194,10 @@ function _field_invoke($op, $entity_type, $entity, &$a = NULL, &$b = NULL, $opti
   // Iterate through the instances and collect results.
   $return = array();
   foreach ($instances as $instance) {
-    $field_name = $instance['field_name'];
-    $field = field_info_field($field_name);
+    // field_info_field() is not available for deleted fields, so use
+    // field_info_field_by_id().
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_name = $field['field_name'];
     $function = $options['default'] ? 'field_default_' . $op : $field['module'] . '_field_' . $op;
     if (function_exists($function)) {
       // Determine the list of languages to iterate on.
@@ -258,9 +268,9 @@ function _field_invoke($op, $entity_type, $entity, &$a = NULL, &$b = NULL, $opti
  *  - 'deleted': If TRUE, the function will operate on deleted fields
  *    as well as non-deleted fields. If unset or FALSE, only
  *    non-deleted fields are operated on.
- *  - 'language': A language code or an array of language codes keyed by field
- *    name. It will be used to narrow down to a single value the available
- *    languages to act on.
+ *  - 'language': A language code or an array of arrays of language codes keyed
+ *    by entity id and field name. It will be used to narrow down to a single
+ *    value the available languages to act on.
  *
  * @return
  *   An array of returned values keyed by entity id.
@@ -304,17 +314,19 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
         if (!isset($fields[$field_id])) {
           $fields[$field_id] = $field;
         }
-        // Group the corresponding instances and entities.
-        $grouped_instances[$field_id][$id] = $instance;
-        $grouped_entities[$field_id][$id] = $entities[$id];
         // Extract the field values into a separate variable, easily accessed
         // by hook implementations.
         // Unless a language suggestion is provided we iterate on all the
         // available languages.
         $available_languages = field_available_languages($entity_type, $field);
-        $languages = _field_language_suggestion($available_languages, $options['language'], $field_name);
+        $language = !empty($options['language'][$id]) ? $options['language'][$id] : $options['language'];
+        $languages = _field_language_suggestion($available_languages, $language, $field_name);
         foreach ($languages as $langcode) {
           $grouped_items[$field_id][$langcode][$id] = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
+          // Group the instances and entities corresponding to the current
+          // field.
+          $grouped_instances[$field_id][$langcode][$id] = $instance;
+          $grouped_entities[$field_id][$langcode][$id] = $entities[$id];
         }
       }
     }
@@ -327,8 +339,10 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
     $field_name = $field['field_name'];
     $function = $options['default'] ? 'field_default_' . $op : $field['module'] . '_field_' . $op;
     // Iterate over all the field translations.
-    foreach ($grouped_items[$field_id] as $langcode => $items) {
-      $results = $function($entity_type, $grouped_entities[$field_id], $field, $grouped_instances[$field_id], $langcode, $grouped_items[$field_id][$langcode], $a, $b);
+    foreach ($grouped_items[$field_id] as $langcode => &$items) {
+      $entities = $grouped_entities[$field_id][$langcode];
+      $instances = $grouped_instances[$field_id][$langcode];
+      $results = $function($entity_type, $entities, $field, $instances, $langcode, $items, $a, $b);
       if (isset($results)) {
         // Collect results by entity.
         // For hooks with array results, we merge results together.
@@ -346,8 +360,8 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
 
     // Populate field values back in the entities, but avoid replacing missing
     // fields with an empty array (those are not equivalent on update).
-    foreach ($grouped_entities[$field_id] as $id => $entity) {
-      foreach ($grouped_items[$field_id] as $langcode => $items) {
+    foreach ($grouped_entities[$field_id] as $langcode => $entities) {
+      foreach ($entities as $id => $entity) {
         if ($grouped_items[$field_id][$langcode][$id] !== array() || isset($entity->{$field_name}[$langcode])) {
           $entity->{$field_name}[$langcode] = $grouped_items[$field_id][$langcode][$id];
         }
@@ -691,7 +705,8 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     }
 
     // Invoke field-type module's hook_field_load().
-    _field_invoke_multiple('load', $entity_type, $queried_entities, $age, $options);
+    $null = NULL;
+    _field_invoke_multiple('load', $entity_type, $queried_entities, $age, $null, $options);
 
     // Invoke hook_field_attach_load(): let other modules act on loading the
     // entitiy.
@@ -780,11 +795,11 @@ function field_attach_validate($entity_type, $entity) {
  * There are two levels of validation for fields in forms: widget
  * validation, and field validation.
  * - Widget validation steps are specific to a given widget's own form
- * structure and UI metaphors. They are executed through FAPI's
- * #element_validate property during normal form validation.
+ *   structure and UI metaphors. They are executed through FAPI's
+ *   #element_validate property during normal form validation.
  * - Field validation steps are common to a given field type, independently of
- * the specific widget being used in a given form. They are defined in the
- * field type's implementation of hook_field_validate().
+ *   the specific widget being used in a given form. They are defined in the
+ *   field type's implementation of hook_field_validate().
  *
  * This function performs field validation in the context of a form
  * submission. It converts field validation errors into form errors
@@ -878,7 +893,7 @@ function field_attach_presave($entity_type, $entity) {
 /**
  * Save field data for a new entity.
  *
- * The passed in entity must already contain its id and (if applicable)
+ * The passed-in entity must already contain its id and (if applicable)
  * revision id attributes.
  * Default values (if any) will be saved for fields not present in the
  * $entity.
@@ -1075,8 +1090,13 @@ function field_attach_delete_revision($entity_type, $entity) {
  *   An array of entities, keyed by entity id.
  * @param $view_mode
  *   View mode, e.g. 'full', 'teaser'...
+ * @param $langcode
+ *   (Optional) The language the field values are to be shown in. If no language
+ *   is provided the current language is used.
  */
-function field_attach_prepare_view($entity_type, $entities, $view_mode) {
+function field_attach_prepare_view($entity_type, $entities, $view_mode, $langcode = NULL) {
+  $options = array('language' => array());
+
   // To ensure hooks are only run once per entity, only process items without
   // the _field_view_prepared flag.
   // @todo: resolve this more generally for both entity and field level hooks.
@@ -1086,17 +1106,22 @@ function field_attach_prepare_view($entity_type, $entities, $view_mode) {
       // Add this entity to the items to be prepared.
       $prepare[$id] = $entity;
 
+      // Determine the actual language to display for each field, given the
+      // languages available in the field data.
+      $options['language'][$id] = field_language($entity_type, $entity, NULL, $langcode);
+
       // Mark this item as prepared.
       $entity->_field_view_prepared = TRUE;
     }
   }
 
+  $null = NULL;
   // First let the field types do their preparation.
-  _field_invoke_multiple('prepare_view', $entity_type, $prepare);
+  _field_invoke_multiple('prepare_view', $entity_type, $prepare, $null, $null, $options);
   // Then let the formatters do their own specific massaging.
   // field_default_prepare_view() takes care of dispatching to the correct
   // formatters according to the display settings for the view mode.
-  _field_invoke_multiple_default('prepare_view', $entity_type, $prepare, $view_mode);
+  _field_invoke_multiple_default('prepare_view', $entity_type, $prepare, $view_mode, $null, $options);
 }
 
 /**
@@ -1323,8 +1348,10 @@ function field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
  *   The bundle to delete.
  */
 function field_attach_delete_bundle($entity_type, $bundle) {
-  // First, delete the instances themseves.
-  $instances = field_info_instances($entity_type, $bundle);
+  // First, delete the instances themselves. field_read_instances() must be
+  // used here since field_info_instances() does not return instances for
+  // disabled entity types or bundles.
+  $instances = field_read_instances(array('entity_type' => $entity_type, 'bundle' => $bundle), array('include_inactive' => 1));
   foreach ($instances as $instance) {
     field_delete_instance($instance);
   }

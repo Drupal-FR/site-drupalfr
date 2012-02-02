@@ -1,5 +1,4 @@
 <?php
-// $Id: taxonomy.pages.inc,v 1.57 2010/11/23 02:56:10 dries Exp $
 
 /**
  * @file
@@ -15,6 +14,9 @@
  *   The page content.
  */
 function taxonomy_term_page($term) {
+  // Assign the term name as the page title.
+  drupal_set_title($term->name);
+
   // Build breadcrumb based on the hierarchy of the term.
   $current = (object) array(
     'tid' => $term->tid,
@@ -32,14 +34,12 @@ function taxonomy_term_page($term) {
   drupal_add_feed('taxonomy/term/' . $term->tid . '/feed', 'RSS - ' . $term->name);
 
   $build = array();
-  // Add term heading if the term has a description
-  if (!empty($term->description)) {
-    $build['term_heading'] = array(
-      '#prefix' => '<div class="term-listing-heading">',
-      '#suffix' => '</div>',
-      'term' => taxonomy_term_view($term, 'full'),
-    );
-  }
+
+  $build['term_heading'] = array(
+    '#prefix' => '<div class="term-listing-heading">',
+    '#suffix' => '</div>',
+    'term' => taxonomy_term_view($term, 'full'),
+  );
 
   if ($nids = taxonomy_select_nodes($term->tid, TRUE, variable_get('default_nodes_main', 10))) {
     $nodes = node_load_multiple($nids);
@@ -77,7 +77,35 @@ function taxonomy_term_feed($term) {
 }
 
 /**
- * Helper function for autocompletion
+ * Page callback: Outputs JSON for taxonomy autocomplete suggestions.
+ *
+ * Path: taxonomy/autocomplete
+ *
+ * This callback outputs term name suggestions in response to Ajax requests
+ * made by the taxonomy autocomplete widget for taxonomy term reference
+ * fields. The output is a JSON object of plain-text term suggestions, keyed by
+ * the user-entered value with the completed term name appended.  Term names
+ * containing commas are wrapped in quotes.
+ *
+ * For example, suppose the user has entered the string 'red fish, blue' in the
+ * field, and there are two taxonomy terms, 'blue fish' and 'blue moon'. The
+ * JSON output would have the following structure:
+ * @code
+ *   {
+ *     "red fish, blue fish": "blue fish",
+ *     "red fish, blue moon": "blue moon",
+ *   };
+ * @endcode
+ *
+ * @param $field_name
+ *   The name of the term reference field.
+ * @param $tags_typed
+ *   (optional) A comma-separated list of term names entered in the
+ *   autocomplete form element. Only the last term is used for autocompletion.
+ *   Defaults to '' (an empty string).
+ *
+ * @see taxonomy_menu()
+ * @see taxonomy_field_widget_info()
  */
 function taxonomy_autocomplete($field_name, $tags_typed = '') {
   $field = field_info_field($field_name);
@@ -113,7 +141,7 @@ function taxonomy_autocomplete($field_name, $tags_typed = '') {
       ->execute()
       ->fetchAllKeyed();
 
-    $prefix = count($tags_typed) ? implode(', ', $tags_typed) . ', ' : '';
+    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . ', ' : '';
 
     $term_matches = array();
     foreach ($tags_return as $tid => $name) {
@@ -122,9 +150,7 @@ function taxonomy_autocomplete($field_name, $tags_typed = '') {
       if (strpos($name, ',') !== FALSE || strpos($name, '"') !== FALSE) {
         $n = '"' . str_replace('"', '""', $name) . '"';
       }
-      else {
-        $term_matches[$prefix . $n] = check_plain($name);
-      }
+      $term_matches[$prefix . $n] = check_plain($name);
     }
   }
 

@@ -1,4 +1,3 @@
-// $Id: overlay-parent.js,v 1.57 2010/11/06 00:18:24 dries Exp $
 
 (function ($) {
 
@@ -335,7 +334,7 @@ Drupal.overlay.setFocusBefore = function ($element, document) {
   $placeholder.one('blur', function () {
     $(this).remove();
   });
-}
+};
 
 /**
  * Check if the given link is in the administrative section of the site.
@@ -347,12 +346,17 @@ Drupal.overlay.setFocusBefore = function ($element, document) {
  *   TRUE if the URL represents an administrative link, FALSE otherwise.
  */
 Drupal.overlay.isAdminLink = function (url) {
+  if (Drupal.overlay.isExternalLink(url)) {
+    return false;
+  }
+
   var path = this.getPath(url);
 
   // Turn the list of administrative paths into a regular expression.
   if (!this.adminPathRegExp) {
-    var adminPaths = '^(' + Drupal.settings.overlay.paths.admin.replace(/\s+/g, ')$|^(') + ')$';
-    var nonAdminPaths = '^(' + Drupal.settings.overlay.paths.non_admin.replace(/\s+/g, ')$|^(') + ')$';
+    var regExpPrefix = '^' + Drupal.settings.pathPrefix + '(';
+    var adminPaths = regExpPrefix + Drupal.settings.overlay.paths.admin.replace(/\s+/g, ')$|' + regExpPrefix) + ')$';
+    var nonAdminPaths = regExpPrefix + Drupal.settings.overlay.paths.non_admin.replace(/\s+/g, ')$|'+ regExpPrefix) + ')$';
     adminPaths = adminPaths.replace(/\*/g, '.*');
     nonAdminPaths = nonAdminPaths.replace(/\*/g, '.*');
     this.adminPathRegExp = new RegExp(adminPaths);
@@ -360,6 +364,20 @@ Drupal.overlay.isAdminLink = function (url) {
   }
 
   return this.adminPathRegExp.exec(path) && !this.nonAdminPathRegExp.exec(path);
+};
+
+/**
+ * Determine whether a link is external to the site.
+ *
+ * @param url
+ *   The url to be tested.
+ *
+ * @return boolean
+ *   TRUE if the URL is external to the site, FALSE otherwise.
+ */
+Drupal.overlay.isExternalLink = function (url) {
+  var re = RegExp('^((f|ht)tps?:)?//(?!' + window.location.host + ')');
+  return re.test(url);
 };
 
 /**
@@ -413,6 +431,27 @@ Drupal.overlay.eventhandlerAlterDisplacedElements = function (event) {
   // IE6 doesn't support maxWidth, use width instead.
   var maxWidthName = (typeof document.body.style.maxWidth == 'string') ? 'maxWidth' : 'width';
 
+  if (Drupal.overlay.leftSidedScrollbarOffset === undefined && $(document.documentElement).attr('dir') === 'rtl') {
+    // We can't use element.clientLeft to detect whether scrollbars are placed
+    // on the left side of the element when direction is set to "rtl" as most
+    // browsers dont't support it correctly.
+    // http://www.gtalbot.org/BugzillaSection/DocumentAllDHTMLproperties.html
+    // There seems to be absolutely no way to detect whether the scrollbar
+    // is on the left side in Opera; always expect scrollbar to be on the left.
+    if ($.browser.opera) {
+      Drupal.overlay.leftSidedScrollbarOffset = document.documentElement.clientWidth - this.iframeWindow.document.documentElement.clientWidth + this.iframeWindow.document.documentElement.clientLeft;
+    }
+    else if (this.iframeWindow.document.documentElement.clientLeft) {
+      Drupal.overlay.leftSidedScrollbarOffset = this.iframeWindow.document.documentElement.clientLeft;
+    }
+    else {
+      var el1 = $('<div style="direction: rtl; overflow: scroll;"></div>').appendTo(document.body);
+      var el2 = $('<div></div>').appendTo(el1);
+      Drupal.overlay.leftSidedScrollbarOffset = parseInt(el2[0].offsetLeft - el1[0].offsetLeft);
+      el1.remove();
+    }
+  }
+
   // Consider any element that should be visible above the overlay (such as
   // a toolbar).
   $('.overlay-displace-top, .overlay-displace-bottom').each(function () {
@@ -421,6 +460,10 @@ Drupal.overlay.eventhandlerAlterDisplacedElements = function (event) {
     // In IE, Shadow filter makes element to overlap the scrollbar with 1px.
     if (this.filters && this.filters.length && this.filters.item('DXImageTransform.Microsoft.Shadow')) {
       maxWidth -= 1;
+    }
+
+    if (Drupal.overlay.leftSidedScrollbarOffset) {
+      $(this).css('left', Drupal.overlay.leftSidedScrollbarOffset);
     }
 
     // Prevent displaced elements overlapping window's scrollbar.
@@ -435,7 +478,12 @@ Drupal.overlay.eventhandlerAlterDisplacedElements = function (event) {
     var offset = $(this).offset();
     var offsetRight = offset.left + $(this).outerWidth();
     if ((data.drupalOverlay && data.drupalOverlay.clip) || offsetRight > maxWidth) {
-      $(this).css('clip', 'rect(auto, ' + (maxWidth - offset.left) + 'px, ' + (documentHeight - offset.top) + 'px, auto)');
+      if (Drupal.overlay.leftSidedScrollbarOffset) {
+        $(this).css('clip', 'rect(auto, auto, ' + (documentHeight - offset.top) + 'px, ' + (Drupal.overlay.leftSidedScrollbarOffset + 2) + 'px)');
+      }
+      else {
+        $(this).css('clip', 'rect(auto, ' + (maxWidth - offset.left) + 'px, ' + (documentHeight - offset.top) + 'px, auto)');
+      }
       (data.drupalOverlay = data.drupalOverlay || {}).clip = true;
     }
   });
@@ -453,7 +501,7 @@ Drupal.overlay.eventhandlerAlterDisplacedElements = function (event) {
 Drupal.overlay.eventhandlerRestoreDisplacedElements = function (event) {
   var $displacedElements = $('.overlay-displace-top, .overlay-displace-bottom');
   try {
-    $displacedElements.css({ maxWidth: null, clip: null });
+    $displacedElements.css({ maxWidth: '', clip: '' });
   }
   // IE bug that doesn't allow unsetting style.clip (http://dev.jquery.com/ticket/6512).
   catch (err) {
@@ -678,7 +726,7 @@ Drupal.overlay.eventhandlerDispatchEvent = function (event) {
  * Make a regular admin link into a URL that will trigger the overlay to open.
  *
  * @param link
- *   A Javascript Link object (i.e. an <a> element).
+ *   A JavaScript Link object (i.e. an <a> element).
  * @param parentLocation
  *   (optional) URL to override the parent window's location with.
  *
@@ -913,7 +961,7 @@ Drupal.overlay._recordTabindex = function () {
   var $element = $(this);
   var tabindex = $(this).attr('tabindex');
   $element.data('drupalOverlayOriginalTabIndex', tabindex);
-}
+};
 
 /**
  * Restore an element's original tabindex.

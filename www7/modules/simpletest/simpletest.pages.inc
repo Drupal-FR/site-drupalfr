@@ -1,5 +1,4 @@
 <?php
-// $Id: simpletest.pages.inc,v 1.33 2010/10/20 01:31:07 dries Exp $
 
 /**
  * @file
@@ -83,8 +82,8 @@ function theme_simpletest_test_table($variables) {
   // Define the images used to expand/collapse the test groups.
   $js = array(
     'images' => array(
-      theme('image', array('path' => 'misc/menu-collapsed.png', 'alt' => t('Expand'), 'title' => t('Expand'))) . ' <a href="#" class="simpletest-collapse">(' . t('Expand') . ')</a>',
-      theme('image', array('path' => 'misc/menu-expanded.png', 'alt' => t('Collapse'), 'title' => t('Collapse'))) . ' <a href="#" class="simpletest-collapse">(' . t('Collapse') . ')</a>',
+      theme('image', array('path' => 'misc/menu-collapsed.png', 'width' => 7, 'height' => 7, 'alt' => t('Expand'), 'title' => t('Expand'))) . ' <a href="#" class="simpletest-collapse">(' . t('Expand') . ')</a>',
+      theme('image', array('path' => 'misc/menu-expanded.png', 'width' => 7, 'height' => 7, 'alt' => t('Collapse'), 'title' => t('Collapse'))) . ' <a href="#" class="simpletest-collapse">(' . t('Collapse') . ')</a>',
     ),
   );
 
@@ -129,7 +128,7 @@ function theme_simpletest_test_table($variables) {
     );
 
     // Sorting $element by children's #title attribute instead of by class name.
-    uasort($element, '_simpletest_sort_by_title');
+    uasort($element, 'element_sort_by_title');
 
     // Cycle through each test within the current group.
     foreach (element_children($element) as $test_name) {
@@ -176,18 +175,6 @@ function theme_simpletest_test_table($variables) {
   else {
     return theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'simpletest-form-table')));
   }
-}
-
-/**
- * Sort element by title instead of by class name.
- */
-function _simpletest_sort_by_title($a, $b) {
-  // This is for parts of $element that are not an array.
-  if (!isset($a['#title']) || !isset($b['#title'])) {
-    return 1;
-  }
-
-  return strcasecmp($a['#title'], $b['#title']);
 }
 
 /**
@@ -267,7 +254,7 @@ function simpletest_result_form($form, &$form_state, $test_id) {
       $row = array();
       $row[] = $assertion->message;
       $row[] = $assertion->message_group;
-      $row[] = basename($assertion->file);
+      $row[] = drupal_basename($assertion->file);
       $row[] = $assertion->line;
       $row[] = $assertion->function;
       $row[] = simpletest_result_status_image($assertion->status);
@@ -318,7 +305,7 @@ function simpletest_result_form($form, &$form_state, $test_id) {
   );
   $form['action']['filter']['#default_value'] = ($filter['fail'] ? 'fail' : 'all');
 
-  // Catagorized test classes for to be used with selected filter value.
+  // Categorized test classes for to be used with selected filter value.
   $form['action']['filter_pass'] = array(
     '#type' => 'hidden',
     '#default_value' => implode(',', $filter['pass']),
@@ -427,10 +414,10 @@ function simpletest_result_status_image($status) {
 
   if (!isset($map)) {
     $map = array(
-      'pass' => theme('image', array('path' => 'misc/watchdog-ok.png', 'alt' => t('Pass'))),
-      'fail' => theme('image', array('path' => 'misc/watchdog-error.png', 'alt' => t('Fail'))),
-      'exception' => theme('image', array('path' => 'misc/watchdog-warning.png', 'alt' => t('Exception'))),
-      'debug' => theme('image', array('path' => 'misc/watchdog-warning.png', 'alt' => t('Debug'))),
+      'pass' => theme('image', array('path' => 'misc/watchdog-ok.png', 'width' => 18, 'height' => 18, 'alt' => t('Pass'))),
+      'fail' => theme('image', array('path' => 'misc/watchdog-error.png', 'width' => 18, 'height' => 18, 'alt' => t('Fail'))),
+      'exception' => theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('Exception'))),
+      'debug' => theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('Debug'))),
     );
   }
   if (isset($map[$status])) {
@@ -441,6 +428,9 @@ function simpletest_result_status_image($status) {
 
 /**
  * Provides settings form for SimpleTest variables.
+ *
+ * @ingroup forms
+ * @see simpletest_settings_form_validate()
  */
 function simpletest_settings_form($form, &$form_state) {
   $form['general'] = array(
@@ -480,16 +470,41 @@ function simpletest_settings_form($form, &$form_state) {
     ),
     '#default_value' => variable_get('simpletest_httpauth_method', CURLAUTH_BASIC),
   );
+  $username = variable_get('simpletest_httpauth_username');
+  $password = variable_get('simpletest_httpauth_password');
   $form['httpauth']['simpletest_httpauth_username'] = array(
     '#type' => 'textfield',
     '#title' => t('Username'),
-    '#default_value' => variable_get('simpletest_httpauth_username', ''),
+    '#default_value' => $username,
   );
+  if ($username && $password) {
+    $form['httpauth']['simpletest_httpauth_username']['#description'] = t('Leave this blank to delete both the existing username and password.');
+  }
   $form['httpauth']['simpletest_httpauth_password'] = array(
-    '#type' => 'textfield',
+    '#type' => 'password',
     '#title' => t('Password'),
-    '#default_value' => variable_get('simpletest_httpauth_password', ''),
   );
+  if ($password) {
+    $form['httpauth']['simpletest_httpauth_password']['#description'] = t('To change the password, enter the new password here.');
+  }
 
   return system_settings_form($form);
 }
+
+/**
+ * Validation handler for simpletest_settings_form().
+ */
+function simpletest_settings_form_validate($form, &$form_state) {
+  // If a username was provided but a password wasn't, preserve the existing
+  // password.
+  if (!empty($form_state['values']['simpletest_httpauth_username']) && empty($form_state['values']['simpletest_httpauth_password'])) {
+    $form_state['values']['simpletest_httpauth_password'] = variable_get('simpletest_httpauth_password', '');
+  }
+
+  // If a password was provided but a username wasn't, the credentials are
+  // incorrect, so throw an error.
+  if (empty($form_state['values']['simpletest_httpauth_username']) && !empty($form_state['values']['simpletest_httpauth_password'])) {
+    form_set_error('simpletest_httpauth_username', t('HTTP authentication credentials must include a username in addition to a password.'));
+  }
+}
+

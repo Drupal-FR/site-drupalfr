@@ -1,5 +1,4 @@
 <?php
-// $Id: update.fetch.inc,v 1.28 2010/05/06 05:59:31 webchick Exp $
 
 /**
  * @file
@@ -144,7 +143,7 @@ function _update_process_fetch_task($project) {
 
   if (empty($fail[$fetch_url_base]) || $fail[$fetch_url_base] < $max_fetch_attempts) {
     $xml = drupal_http_request($url);
-    if (isset($xml->data)) {
+    if (!isset($xml->error) && isset($xml->data)) {
       $data = $xml->data;
     }
   }

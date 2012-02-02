@@ -1,5 +1,4 @@
 <?php
-// $Id: field_ui.api.php,v 1.10 2010/11/12 03:10:38 dries Exp $
 
 /**
  * @file
@@ -43,7 +42,7 @@ function hook_field_settings_form($field, $instance, $has_data) {
     '#title' => t('Maximum length'),
     '#default_value' => $settings['max_length'],
     '#required' => FALSE,
-    '#element_validate' => array('_element_validate_integer_positive'),
+    '#element_validate' => array('element_validate_integer_positive'),
     '#description' => t('The maximum length of the field in characters. Leave blank for an unlimited size.'),
   );
   return $form;
@@ -83,7 +82,7 @@ function hook_field_instance_settings_form($field, $instance) {
         t('No'),
         t('Yes'),
       ),
-      '#description' => t('Display the summary to allow the user to input a summary value. Hide the summary to automatically fill it with a trimmed portion from the main post. '),
+      '#description' => t('Display the summary to allow the user to input a summary value. Hide the summary to automatically fill it with a trimmed portion from the main post.'),
       '#default_value' => !empty($settings['display_summary']) ? $settings['display_summary'] :  0,
     );
   }
@@ -114,7 +113,7 @@ function hook_field_widget_settings_form($field, $instance) {
       '#type' => 'textfield',
       '#title' => t('Size of textfield'),
       '#default_value' => $settings['size'],
-      '#element_validate' => array('_element_validate_integer_positive'),
+      '#element_validate' => array('element_validate_integer_positive'),
       '#required' => TRUE,
     );
   }
@@ -123,7 +122,7 @@ function hook_field_widget_settings_form($field, $instance) {
       '#type' => 'textfield',
       '#title' => t('Rows'),
       '#default_value' => $settings['rows'],
-      '#element_validate' => array('_element_validate_integer_positive'),
+      '#element_validate' => array('element_validate_integer_positive'),
       '#required' => TRUE,
     );
   }
@@ -133,7 +132,7 @@ function hook_field_widget_settings_form($field, $instance) {
 
 
 /**
- * Returns form elements for a formatter's settings.
+ * Specify the form elements for a formatter's settings.
  *
  * @param $field
  *   The field structure being configured.
@@ -161,7 +160,7 @@ function hook_field_formatter_settings_form($field, $instance, $view_mode, $form
       '#type' => 'textfield',
       '#size' => 20,
       '#default_value' => $settings['trim_length'],
-      '#element_validate' => array('_element_validate_integer_positive'),
+      '#element_validate' => array('element_validate_integer_positive'),
       '#required' => TRUE,
     );
   }
@@ -171,7 +170,7 @@ function hook_field_formatter_settings_form($field, $instance, $view_mode, $form
 }
 
 /**
- * Returns a short summary for the current formatter settings of an instance.
+ * Return a short summary for the current formatter settings of an instance.
  *
  * If an empty result is returned, the formatter is assumed to have no
  * configurable settings, and no UI will be provided to display a settings

@@ -1,5 +1,4 @@
 <?php
-// $Id: comment.install,v 1.76 2011/01/02 17:26:39 webchick Exp $
 
 /**
  * @file
@@ -17,6 +16,7 @@ function comment_uninstall() {
   variable_del('comment_block_count');
   $node_types = array_keys(node_type_get_types());
   foreach ($node_types as $node_type) {
+    field_attach_delete_bundle('comment', 'comment_node_' . $node_type);
     variable_del('comment_' . $node_type);
     variable_del('comment_anonymous_' . $node_type);
     variable_del('comment_controls_' . $node_type);
@@ -83,14 +83,16 @@ function comment_modules_enabled($modules) {
  * Implements hook_update_dependencies().
  */
 function comment_update_dependencies() {
-  // Comment update 7005 creates the comment body field and therefore must run
-  // after text module has been enabled and entities have been updated.
+  // comment_update_7005() creates the comment body field and therefore must
+  // run after all Field modules have been enabled, which happens in
+  // system_update_7027().
   $dependencies['comment'][7005] = array(
-    'system' => 7021,
+    'system' => 7027,
   );
 
-  // Comment update 7006 needs to query the list of existing text formats and
-  // therefore must run after filter_update_7000().
+  // comment_update_7006() needs to query the {filter_format} table to get a
+  // list of existing text formats, so it must run after filter_update_7000(),
+  // which creates that table.
   $dependencies['comment'][7006] = array(
     'filter' => 7000,
   );
@@ -163,9 +165,11 @@ function comment_update_7001() {
 function comment_update_7002() {
   db_rename_table('comments', 'comment');
 
-  // Add user-related indexes.
-  db_add_index('comment', 'comment_uid', array('uid'));
-  db_add_index('node_comment_statistics', 'last_comment_uid', array('last_comment_uid'));
+  // Add user-related indexes. These may already exist from Drupal 6.
+  if (!db_index_exists('comment', 'comment_uid')) {
+    db_add_index('comment', 'comment_uid', array('uid'));
+    db_add_index('node_comment_statistics', 'last_comment_uid', array('last_comment_uid'));
+  }
 
   // Create a language column.
   db_add_field('comment', 'language', array(
@@ -222,8 +226,11 @@ function comment_update_7004() {
   ));
   db_add_index('node_comment_statistics', 'cid', array('cid'));
 
-  // Add an index on the comment_count.
-  db_add_index('node_comment_statistics', 'comment_count', array('comment_count'));
+  // The comment_count index may have been added in Drupal 6.
+  if (!db_index_exists('node_comment_statistics', 'comment_count')) {
+    // Add an index on the comment_count.
+    db_add_index('node_comment_statistics', 'comment_count', array('comment_count'));
+  }
 }
 
 /**
@@ -338,7 +345,55 @@ function comment_update_7006(&$sandbox) {
 }
 
 /**
+ * Add an index to the created column.
+ */
+function comment_update_7007() {
+  db_add_index('comment', 'comment_created', array('created'));
+}
+
+/**
+ * Update database to match Drupal 7 schema.
+ */
+function comment_update_7008() {
+  // Update default status to 1.
+  db_change_field('comment', 'status', 'status', array(
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 1,
+    'size' => 'tiny',
+  ));
+
+  // Realign indexes.
+  db_drop_index('comment', 'comment_status_pid');
+  db_add_index('comment', 'comment_status_pid', array('pid', 'status'));
+  db_drop_index('comment', 'comment_pid_status');
+  db_drop_index('comment', 'nid');
+}
+
+/**
  * @} End of "addtogroup updates-6.x-to-7.x"
+ */
+
+/**
+ * @addtogroup updates-7.x-extra
+ * @{
+ */
+
+/**
+ * Change the last_comment_timestamp column description.
+ */
+function comment_update_7009() {
+  db_change_field('node_comment_statistics', 'last_comment_timestamp', 'last_comment_timestamp', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+    'description' => 'The Unix timestamp of the last comment that was posted within this node, from {comment}.changed.',
+  ));
+}
+
+/**
+ * @} End of "addtogroup updates-7.x-extra"
  */
 
 /**
@@ -442,6 +497,7 @@ function comment_schema() {
       'comment_num_new' => array('nid', 'status', 'created', 'cid', 'thread'),
       'comment_uid' => array('uid'),
       'comment_nid_language' => array('nid', 'language'),
+      'comment_created' => array('created'),
     ),
     'primary key' => array('cid'),
     'foreign keys' => array(
@@ -476,7 +532,7 @@ function comment_schema() {
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-        'description' => 'The Unix timestamp of the last comment that was posted within this node, from {comment}.timestamp.',
+        'description' => 'The Unix timestamp of the last comment that was posted within this node, from {comment}.changed.',
       ),
       'last_comment_name' => array(
         'type' => 'varchar',

@@ -1,5 +1,4 @@
 <?php
-// $Id: aggregator-feed-source.tpl.php,v 1.2 2008/05/15 21:27:32 dries Exp $
 
 /**
  * @file
@@ -18,6 +17,8 @@
  *
  * @see template_preprocess()
  * @see template_preprocess_aggregator_feed_source()
+ *
+ * @ingroup themeable
  */
 ?>
 <div class="feed-source">

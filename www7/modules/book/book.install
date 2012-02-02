@@ -1,5 +1,4 @@
 <?php
-// $Id: book.install,v 1.36 2010/06/23 19:05:15 dries Exp $
 
 /**
  * @file
@@ -18,6 +17,10 @@ function book_install() {
  * Implements hook_uninstall().
  */
 function book_uninstall() {
+  variable_del('book_allowed_types');
+  variable_del('book_child_type');
+  variable_del('book_block_mode');
+
   // Delete menu links.
   db_delete('menu_links')
     ->condition('module', 'book')

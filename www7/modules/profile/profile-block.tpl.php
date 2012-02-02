@@ -1,5 +1,4 @@
 <?php
-// $Id: profile-block.tpl.php,v 1.4 2009/08/06 05:05:59 webchick Exp $
 
 /**
  * @file
@@ -32,9 +31,9 @@
 ?>
 <?php print $user_picture; ?>
 
-<?php foreach ($profile as $field) : ?>
+<?php foreach ($profile as $field): ?>
   <p>
-    <?php if ($field->type != 'checkbox') : ?>
+    <?php if ($field->type != 'checkbox'): ?>
       <strong><?php print $field->title; ?></strong><br />
     <?php endif; ?>
     <?php print $field->value; ?>

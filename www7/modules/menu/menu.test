@@ -1,9 +1,8 @@
 <?php
-// $Id: menu.test,v 1.42 2010/10/13 13:43:21 dries Exp $
 
 /**
  * @file
- * Tests file for the menu module.
+ * Tests for menu.module.
  */
 
 class MenuTestCase extends DrupalWebTestCase {
@@ -206,7 +205,7 @@ class MenuTestCase extends DrupalWebTestCase {
 
     // Add menu links.
     $item1 = $this->addMenuLink(0, 'node/' . $node1->nid, $menu_name);
-    $item2 = $this->addMenuLink($item1['mlid'], 'node/' . $node2->nid, $menu_name);
+    $item2 = $this->addMenuLink($item1['mlid'], 'node/' . $node2->nid, $menu_name, FALSE);
     $item3 = $this->addMenuLink($item2['mlid'], 'node/' . $node3->nid, $menu_name);
     $this->assertMenuLink($item1['mlid'], array('depth' => 1, 'has_children' => 1, 'p1' => $item1['mlid'], 'p2' => 0));
     $this->assertMenuLink($item2['mlid'], array('depth' => 2, 'has_children' => 1, 'p1' => $item1['mlid'], 'p2' => $item2['mlid'], 'p3' => 0));
@@ -284,7 +283,7 @@ class MenuTestCase extends DrupalWebTestCase {
    * @param string $menu_name Menu name.
    * @return array Menu link created.
    */
-  function addMenuLink($plid = 0, $link = '<front>', $menu_name = 'navigation') {
+  function addMenuLink($plid = 0, $link = '<front>', $menu_name = 'navigation', $expanded = TRUE) {
     // View add menu link page.
     $this->drupalGet("admin/structure/menu/manage/$menu_name/add");
     $this->assertResponse(200);
@@ -295,7 +294,7 @@ class MenuTestCase extends DrupalWebTestCase {
       'link_title' => $title,
       'description' => '',
       'enabled' => TRUE, // Use this to disable the menu and test.
-      'expanded' => TRUE, // Setting this to true should test whether it works when we do the std_user tests.
+      'expanded' => $expanded, // Setting this to true should test whether it works when we do the std_user tests.
       'parent' =>  $menu_name . ':' . $plid,
       'weight' => '0',
     );
@@ -346,7 +345,7 @@ class MenuTestCase extends DrupalWebTestCase {
     if (isset($parent)) {
       // Verify menu link.
       $title = $parent['link_title'];
-      $this->assertText($title, 'Parent menu link was displayed');
+      $this->assertLink($title, 0, 'Parent menu link was displayed');
 
       // Verify menu link link.
       $this->clickLink($title);
@@ -356,7 +355,7 @@ class MenuTestCase extends DrupalWebTestCase {
 
     // Verify menu link.
     $title = $item['link_title'];
-    $this->assertText($title, 'Menu link was displayed');
+    $this->assertLink($title, 0, 'Menu link was displayed');
 
     // Verify menu link link.
     $this->clickLink($title);
@@ -380,7 +379,7 @@ class MenuTestCase extends DrupalWebTestCase {
   /**
    * Modify a menu link using the menu module UI.
    *
-   * @param array &$item Menu link passed by reference.
+   * @param array $item Menu link passed by reference.
    */
   function modifyMenuLink(&$item) {
     $item['link_title'] = $this->randomName(16);
@@ -665,5 +664,61 @@ class MenuNodeTestCase extends DrupalWebTestCase {
     // Assert that there is no link for the node.
     $this->drupalGet('');
     $this->assertNoLink($node_title);
+
+    // Add a menu link to the Management menu.
+    $item = array(
+      'link_path' => 'node/' . $node->nid,
+      'link_title' => $this->randomName(16),
+      'menu_name' => 'management',
+    );
+    menu_link_save($item);
+
+    // Assert that disabled Management menu is not shown on the node/$nid/edit page.
+    $this->drupalGet('node/' . $node->nid . '/edit');
+    $this->assertText('Provide a menu link', t('Link in not allowed menu not shown in node edit form'));
+    // Assert that the link is still in the management menu after save.
+    $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
+    $link = menu_link_load($item['mlid']);
+    $this->assertTrue($link, t('Link in not allowed menu still exists after saving node'));
+
+    // Move the menu link back to the Navigation menu.
+    $item['menu_name'] = 'navigation';
+    menu_link_save($item);
+    // Create a second node.
+    $child_node = $this->drupalCreateNode(array('type' => 'article'));
+    // Assign a menu link to the second node, being a child of the first one.
+    $child_item = array(
+      'link_path' => 'node/'. $child_node->nid,
+      'link_title' => $this->randomName(16),
+      'plid' => $item['mlid'],
+    );
+    menu_link_save($child_item);
+    // Edit the first node.
+    $this->drupalGet('node/'. $node->nid .'/edit');
+    // Assert that it is not possible to set the parent of the first node to itself or the second node.
+    $this->assertNoOption('edit-menu-parent', 'navigation:'. $item['mlid']);
+    $this->assertNoOption('edit-menu-parent', 'navigation:'. $child_item['mlid']);
+    // Assert that unallowed Management menu is not available in options.
+    $this->assertNoOption('edit-menu-parent', 'management:0');
+  }
+
+  /**
+   * Asserts that a select option in the current page does not exist.
+   *
+   * @param $id
+   *   Id of select field to assert.
+   * @param $option
+   *   Option to assert.
+   * @param $message
+   *   Message to display.
+   * @return
+   *   TRUE on pass, FALSE on fail.
+   *
+   * @todo move to simpletest drupal_web_test_case.php.
+   */
+  protected function assertNoOption($id, $option, $message = '') {
+    $selects = $this->xpath('//select[@id=:id]', array(':id' => $id));
+    $options = $this->xpath('//select[@id=:id]//option[@value=:option]', array(':id' => $id, ':option' => $option));
+    return $this->assertTrue(isset($selects[0]) && !isset($options[0]), $message ? $message : t('Option @option for field @id does not exist.', array('@option' => $option, '@id' => $id)), t('Browser'));
   }
 }

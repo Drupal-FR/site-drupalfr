@@ -1,5 +1,4 @@
 <?php
-// $Id: field_test.storage.inc,v 1.8 2010/10/13 05:19:26 webchick Exp $
 
 /**
  * @file
@@ -283,12 +282,12 @@ function field_test_field_storage_query($field_id, $conditions, $count, &$cursor
           case '=':
             $match = $match && $row->{$column} == $value;
             break;
-          case '!=':
+          case '<>':
           case '<':
           case '<=':
           case '>':
           case '>=':
-            eval('$match = $match && '. $row->{$column} . ' ' . $operator . ' '. $value);
+            eval('$match = $match && ' . $row->{$column} . ' ' . $operator . ' '. $value);
             break;
           case 'IN':
             $match = $match && in_array($row->{$column}, $value);
