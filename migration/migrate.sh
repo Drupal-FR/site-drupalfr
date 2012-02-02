@@ -45,3 +45,6 @@ drush en -y flag
 drush en -y rules rules_admin
 
 drush cc all
+drush updatedb -y --verbose
+
+drush en -y dfr_format
