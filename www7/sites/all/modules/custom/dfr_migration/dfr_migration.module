@@ -7,7 +7,7 @@ function dfr_migration_content_migrate_data_record_alter(&$record, &$field, &$in
   // The options widget for fields with select lists are kind of screwing
   // the match on the key/value. We are simply fetching the right value
   // based on the record / instance.
-  if ($instance['widget_type'] == 'optionwidgets_select') {
+  if (($instance['widget_type'] == 'optionwidgets_buttons') || ($instance['widget_type'] == 'optionwidgets_select')) {
     $field_name = $instance['field_name'] . '_value';
     $key = $record[$field_name];
     $allowed_values_keys = array_flip($field['settings']['allowed_values']);
