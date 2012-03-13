@@ -21,7 +21,7 @@ function phone_countries($code = NULL) {
       'pa' => 'Panama',
       'gb' => 'Great Britain - United Kingdom',
       'ru' => 'Russia',
-      'ua' => 'Ukraine - in Kiev',
+      'ua' => 'Ukraine',
       'es' => 'Spain',
       'au' => 'Australia',
       'cs' => 'Czech Republic',
@@ -68,6 +68,7 @@ function phone_field_info() {
       ),
       'default_formatter' => 'phone',
       'default_widget' => 'phone_textfield',
+      'property_type' => 'text',
     ),
   );
 }
@@ -90,7 +91,7 @@ function phone_field_settings_form($field, $instance, $has_data) {
     '#type' => 'select',
     '#title' => t('Country'),
     '#options' => phone_countries(),
-    '#default_value' => $settings['country'],
+    '#default_value' => isset ($settings['country']) ? $settings['country'] : NULL,
     '#description' => t('Which country-specific rules should this field be validated against and formatted according to.'),
     '#disabled' => $has_data,
     '#required' => TRUE,
@@ -227,10 +228,12 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
   $element['value'] = array(
     '#type' => 'textfield',
     '#title' => $element['#title'],
+    '#description' => $element['#description'],
     '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
+    '#required' => $element['#required'],
     '#size' => 17,
     '#maxlength' => (
-      $field['settings']['country'] == 'int' ? 
+      $field['settings']['country'] == 'int' ?
         (isset($instance['settings']['phone_int_max_length']) ? $instance['settings']['phone_int_max_length'] : NULL)
         : NULL
     ),
