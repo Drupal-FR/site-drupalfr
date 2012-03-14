@@ -161,7 +161,6 @@ function content_migrate_filefield_instance_alter(&$instance_value, $field_value
  * Tweaks individual records in a field.
  */
 function content_migrate_filefield_data_record_alter(&$record, $field, $instance) {
-
   switch($field['type']) {
     case 'image':
       // Map D6 imagefield field columns to D7 image field columns.
@@ -202,6 +201,11 @@ function content_migrate_filefield_data_record_alter(&$record, $field, $instance
 
       $file = db_select('files', 'f')->fields('f', array('fid', 'uid', 'filename', 'filepath', 'filemime', 'filesize', 'timestamp', 'status'))->condition('fid', $fid)->execute()->fetchObject();
 
+      if (!is_object($file)) {
+        $record = NULL;
+        return;
+      }
+
       $basename = variable_get('file_directory_path', conf_path() . '/files');
       $scheme = file_default_scheme() . '://';
 
@@ -209,6 +213,7 @@ function content_migrate_filefield_data_record_alter(&$record, $field, $instance
       // and stripping off the existing file directory path.
       $file->uri = $scheme . str_replace($basename, '', $file->filepath);
       $file->uri = file_stream_wrapper_uri_normalize($file->uri);
+
       unset($file->filepath);
 
       // Insert into the file_managed table.
