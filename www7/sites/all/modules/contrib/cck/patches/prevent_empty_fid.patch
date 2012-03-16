@@ -1,0 +1,72 @@
+diff --git a/www7/sites/all/modules/contrib/cck/modules/content_migrate/modules/content_migrate.filefield.inc b/www7/sites/all/modules/contrib/cck/modules/content_migrate/modules/content_migrate.filefield.inc
+old mode 100644
+new mode 100755
+index 9e5fc3b..07e5b42
+--- a/www7/sites/all/modules/contrib/cck/modules/content_migrate/modules/content_migrate.filefield.inc
++++ b/www7/sites/all/modules/contrib/cck/modules/content_migrate/modules/content_migrate.filefield.inc
+@@ -201,35 +201,36 @@ function content_migrate_filefield_data_record_alter(&$record, $field, $instance
+       };
+ 
+       $file = db_select('files', 'f')->fields('f', array('fid', 'uid', 'filename', 'filepath', 'filemime', 'filesize', 'timestamp', 'status'))->condition('fid', $fid)->execute()->fetchObject();
+-
+-      $basename = variable_get('file_directory_path', conf_path() . '/files');
+-      $scheme = file_default_scheme() . '://';
+-
+-      // We will convert filepaths to uri using the default scheme
+-      // and stripping off the existing file directory path.
+-      $file->uri = $scheme . str_replace($basename, '', $file->filepath);
+-      $file->uri = file_stream_wrapper_uri_normalize($file->uri);
+-      unset($file->filepath);
+-
+-      // Insert into the file_managed table.
+-      // Each fid should only be stored once in file_managed.
+-      db_merge('file_managed')
+-        ->key(array(
+-          'fid' => $file->fid,
+-        ))
+-        ->fields(array(
+-          'uid' => $file->uid,
+-          'filename' => $file->filename,
+-          'uri' => $file->uri,
+-          'filemime' => $file->filemime,
+-          'filesize' => $file->filesize,
+-          'status' => $file->status,
+-          'timestamp' => $file->timestamp,
+-        ))
+-        ->execute();
+-
+-      // Add the usage entry for the file.
+-      file_usage_add($file, 'file', 'node', $nid);
++      if ($file != NULL) {
++        $basename = variable_get('file_directory_path', conf_path() . '/files');
++        $scheme = file_default_scheme() . '://';
++
++        // We will convert filepaths to uri using the default scheme
++        // and stripping off the existing file directory path.
++        $file->uri = $scheme . str_replace($basename, '', $file->filepath);
++        $file->uri = file_stream_wrapper_uri_normalize($file->uri);
++        unset($file->filepath);
++
++        // Insert into the file_managed table.
++        // Each fid should only be stored once in file_managed.
++        db_merge('file_managed')
++          ->key(array(
++            'fid' => $file->fid,
++          ))
++          ->fields(array(
++            'uid' => $file->uid,
++            'filename' => $file->filename,
++            'uri' => $file->uri,
++            'filemime' => $file->filemime,
++            'filesize' => $file->filesize,
++            'status' => $file->status,
++            'timestamp' => $file->timestamp,
++          ))
++          ->execute();
++
++        // Add the usage entry for the file.
++        file_usage_add($file, 'file', 'node', $nid);
++      }
+       break;
+   }
+ }
