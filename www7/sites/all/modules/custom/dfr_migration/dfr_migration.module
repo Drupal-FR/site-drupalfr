@@ -1,23 +1,70 @@
 <?php
 
 /**
- * Implements hook_enable().
- * When the migration module is enabled, migrate the user profiles to D7.
+ * Implements hook_menu().
+ */
+function dfr_migration_menu() {
+  return array(
+    'admin/migration' => array(
+      'title' => 'Migration User',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dfr_migration_admin_migrate_users'),
+      'access arguments' => array('administer users'),
+    ),
+  );
+}
+
+/**
+ * Display a form to migrate users.
+ */
+function dfr_migration_admin_migrate_users($form, $form_state) {
+  $form['submit']['#type'] = 'submit';
+  $form['submit']['#value'] = t('Migrer les profils utilisateurs');
+  return $form;
+}
+
+/**
+ * Submit callback settings the batch.
+ */
+function dfr_migration_admin_migrate_users_submit($form, $form_state) {
+  $batch = array(
+    'operations' => array(
+      array('dfr_migration_migrate_profiles_batch', array()),
+    ),
+    'finished' => 'dfr_migration_migrate_profiles_batch_finished',
+    'title' => t('Migrating users'),
+    'init_message' => t('Préparation de la migration des profils.'),
+    'progress_message' => t('Traitement @current sur @total.'),
+    'error_message' => t('Le batch de migraiton des profils a échoué.'),
+  );
+  batch_set($batch);
+  batch_process('admin/migration');
+}
+function dfr_migration_migrate_profiles_batch_finished() {
+  drupal_set_message('Migration des utilisateurs terminée.');
+  return '';
+}
+
+/**
+ * Migrate the user profiles to D7.
  * The content of the user profile is stored in the content profile fields
  * content.
  * We need to fetch those values and saved them in the user profile fields.
  */
-function dfr_migration_enable() {
-  // TODO: make a batch action
-  $offset = 0;
-  $limit = 200;
+function dfr_migration_migrate_profiles_batch(&$context) {
+  $limit = 100;
+  if (empty($context['sandbox']['progress'])) {
+    // Initialize batch update information.
+    $context['sandbox']['progress'] = 0;
+    $count = db_select('users', 'u')->condition('u.uid', '0', '<>')->countQuery()->execute()->fetchField();;
+    $context['sandbox']['max'] = $count;
+  }
+
   // Fetch the existing user profiles nid + vid.
   $query = db_select('node', 'n');
-  $query
-      ->condition('n.type', 'profile', '=')
-//      ->condition('n.uid', 1084, '=') // Bes UID
+  $query->condition('n.type', 'profile', '=')
       ->fields('n', array('nid', 'vid', 'uid'))
-      ->range($offset, $limit);
+      ->range($context['sandbox']['progress'], $limit);
   $result = $query->execute();
   foreach ($result as $user) {
     $user_ids[$user->uid] = $user;
@@ -122,14 +169,12 @@ function dfr_migration_enable() {
     if ($profile_picture) {
       $user->field_picture = array(
         LANGUAGE_NONE => array(
-          (array) $profile_picture,
+          (array)$profile_picture,
         ),
       );
     }
     else {
-      $user->field_picture = array(
-        LANGUAGE_NONE => array(NULL),
-      );
+      $user->field_picture = NULL;
     }
     // Fetch the events the user attended.
     $query_events = db_select('content_field_events', 'cfe');
@@ -146,7 +191,12 @@ function dfr_migration_enable() {
     }
     $user->field_events = $user_events;
     entity_save('user', $user);
+
+    // Update the batch progression.
+    $context['sandbox']['progress']++;
+    $context['message'] = $context['sandbox']['progress'] . ' sur ' . $context['sandbox']['max'];
   }
+  $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
 }
 
 /**

@@ -21,6 +21,7 @@ drush sqlc < ../migration/sql/pre-migration.sql
 drush updatedb -y --verbose
 
 # enable modules
+drush en -y drupalfr_user
 drush en -y content_migrate
 drush en -y dfr_migration
 drush en -y markdown
