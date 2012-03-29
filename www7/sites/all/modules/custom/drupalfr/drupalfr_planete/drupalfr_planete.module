@@ -21,3 +21,68 @@ function drupalfr_planete_preprocess_node(&$vars) {
     $vars['content']['field_blog_author']['#access'] = FALSE;
   }
 }
+
+/**
+ * Implements hook_block_info().
+ */
+function drupalfr_planete_block_info() {
+  return array(
+    'user_bio' => array(
+      'info' => t('User bio push'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_view();
+ */
+function drupalfr_planete_block_view($delta = '') {
+  if ($delta == 'user_bio') {
+    $node = node_load(arg(1));
+    $user = user_load($node->uid);
+    $block['subject'] = "A propos de l'auteur";
+    $block['content'] = theme('block_user_bio', array('user' => $user, 'node' => $node));
+    return $block;
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function drupalfr_planete_entity_info_alter(&$entity_info) {
+  $entity_info['user']['view modes']['user_bio'] = array(
+    'label' => t('User biography'),
+    'custom settings' => TRUE,
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_planete_theme() {
+  return array(
+    'block_user_bio' => array(
+      'variables' => array(
+        'user' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Theme the user biography profile.
+ * Display the user picture, its biography, the url of its feed and
+ * the description of this feed.
+ *
+ * @variables array of variables:
+ *   - user: user entity type.
+ */
+function theme_block_user_bio($variables) {
+  $content_user = user_view($variables['user'], 'user_bio');
+
+  $output = '<div class="user-info">' . drupal_render($content_user['field_picture']);
+  $output .= '' . drupal_render($content_user['field_biography']) . '</div>';
+  $output .= '<div class="feed-info">' . drupal_render($content_user['field_feed_url']);
+  $output .= '' . drupal_render($content_user['field_feed_description']) . '</div>';
+  return $output;
+}
