@@ -49,3 +49,7 @@ drush cc all
 drush updatedb -y --verbose
 
 drush en -y dfr_format
+
+drush -y content-migrate-fields
+
+echo "aller sur la page admin/migration et lancer la migration\n";
