@@ -92,10 +92,21 @@ function drush_content_migrate_fields() {
   }
 
   foreach ($field_names as $field_name) {
-    drush_invoke_process_args('content-migrate-field-structure', array($field_name));
+    // Allow compatibility with drush 4 and later.
+    if (function_exists('drush_invoke_process_args')) {
+      drush_invoke_process_args('content-migrate-field-structure', array($field_name));
+    }
+    else {
+      drush_invoke_process('@self', 'content-migrate-field-structure', array($field_name));
+    }
   }
   foreach ($field_names as $field_name) {
-    drush_invoke_process_args('content-migrate-field-data', array($field_name));
+    if (function_exists('drush_invoke_process_args')) {
+      drush_invoke_process_args('content-migrate-field-data', array($field_name));
+    }
+    else {
+      drush_invoke_process('@self', 'content-migrate-field-data', array($field_name));
+    }
   }
   // TODO: make an API function for this in Drush.
   _drush_log_drupal_messages();

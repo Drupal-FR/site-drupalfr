@@ -7,7 +7,7 @@
 
 /**
  * Implements hook_content_migrate_field_alter().
- * 
+ *
  * Use this to tweak the conversion of field settings
  * from the D6 style to the D7 style for specific
  * situations not handled by basic conversion,
@@ -40,7 +40,7 @@ function content_migrate_filefield_field_alter(&$field_value, $instance_value) {
 
 /**
  * Implements hook_content_migrate_instance_alter().
- * 
+ *
  * Use this to tweak the conversion of instance or widget settings
  * from the D6 style to the D7 style for specific
  * situations not handled by basic conversion, as when
@@ -88,14 +88,14 @@ function content_migrate_filefield_instance_alter(&$instance_value, $field_value
       // Note; the 'path_plain' D6 formatter has disappeared.
       if (in_array($settings['type'], array('default', 'url_plain'))) {
         $instance_value['display'][$context]['type'] = 'file_'. $settings['type'];
-        $instance_value['display'][$context]['moduke'] = 'file';
+        $instance_value['display'][$context]['module'] = 'file';
       }
     }
   }
 
   // Translate the original imagefield and fielfield widgets.
   switch ($instance_value['widget']['module']) {
-  
+
     case 'imagefield':
       // Module names and types changed.
       $instance_value['widget']['module'] = 'image';
@@ -128,7 +128,7 @@ function content_migrate_filefield_instance_alter(&$instance_value, $field_value
       unset($instance_value['widget']['settings']['alt']);
       unset($instance_value['widget']['settings']['max_filesize_per_node']);
       unset($instance_value['widget']['settings']['title_type']);
-               
+
       // default_image is now a field setting.
       unset($instance_value['widget']['settings']['default_image']);
       break;
@@ -161,6 +161,7 @@ function content_migrate_filefield_instance_alter(&$instance_value, $field_value
  * Tweaks individual records in a field.
  */
 function content_migrate_filefield_data_record_alter(&$record, $field, $instance) {
+
   switch($field['type']) {
     case 'image':
       // Map D6 imagefield field columns to D7 image field columns.
@@ -199,10 +200,14 @@ function content_migrate_filefield_data_record_alter(&$record, $field, $instance
         return;
       };
 
-      $file = db_select('files', 'f')->fields('f', array('fid', 'uid', 'filename', 'filepath', 'filemime', 'filesize', 'timestamp', 'status'))->condition('fid', $fid)->execute()->fetchObject();
+      $file = db_select('files', 'f')
+        ->fields('f', array('fid', 'uid', 'filename', 'filepath', 'filemime', 'filesize', 'timestamp', 'status'))
+        ->condition('fid', $fid)
+        ->execute()
+        ->fetchObject();
 
+      // In case of unknown file, just abort.
       if (!is_object($file)) {
-        $record = NULL;
         return;
       }
 
@@ -213,7 +218,6 @@ function content_migrate_filefield_data_record_alter(&$record, $field, $instance
       // and stripping off the existing file directory path.
       $file->uri = $scheme . str_replace($basename, '', $file->filepath);
       $file->uri = file_stream_wrapper_uri_normalize($file->uri);
-
       unset($file->filepath);
 
       // Insert into the file_managed table.

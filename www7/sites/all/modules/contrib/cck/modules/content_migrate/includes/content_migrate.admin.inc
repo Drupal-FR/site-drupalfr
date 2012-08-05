@@ -338,18 +338,10 @@ function _content_migrate_batch_process_migrate_data($field_name, &$context) {
     $context['sandbox']['types'] = $types;
     $context['sandbox']['field'] = $field;
     $context['sandbox']['add_delta'] = $add_delta;
-   
   }
 
-  // Process one node in each batch.
-
-  $node = array_shift($context['sandbox']['nodes']);
-  if (!$node) {
-    return;
-  }
-
+  // Process 100 nodes in each batch.
   $field = field_info_field($field_name);
-  $instance = field_info_instance('node', $field_name, $node['type']);
 
   // Construct an record to insert into the new field table
   // from the data in the old table.
@@ -385,43 +377,55 @@ function _content_migrate_batch_process_migrate_data($field_name, &$context) {
   else {
     $query->addExpression(0, 'delta');
   }
-  $query->condition('nid', $node['nid']);
-  $result = $query->execute();
 
-  foreach ($result as $record) {
+  $base_query = $query;
+  for ($i = 0; $i <=100; $i++) {
+    $query = clone($base_query);
+
+    $node = array_shift($context['sandbox']['nodes']);
+    if (!$node) {
+      return;
+    }
+    $instance = field_info_instance('node', $field_name, $node['type']);
+    $query->addExpression("'". $node['type'] ."'", 'bundle');
+    $query->condition('nid', $node['nid']);
+    $result = $query->execute();
+
+    foreach ($result as $record) {
   
-    // Let modules alter this before the insert.
-    drupal_alter('content_migrate_data_record', $record, $field, $instance);
+      // Let modules alter this before the insert.
+      drupal_alter('content_migrate_data_record', $record, $field, $instance);
 
-    // Don't save empty values.
-    if (!empty($record)) {
-      $function = $field['module'] . '_field_is_empty';
-      if (function_exists($function)) {
-        // The $record array has the database columns as keys, which drupal_write_record() will need,
-        // but the _field_is_empty() function will be looking for the short, normalized column name.
-        $item = array();
-        foreach ($context['sandbox']['new_cols'] as $column_name => $db_column_name) {
-          if (array_key_exists($db_column_name, $record)) {
-            $item[$column_name] = $record[$db_column_name];
+      // Don't save empty values.
+      if (!empty($record)) {
+        $function = $field['module'] . '_field_is_empty';
+        if (function_exists($function)) {
+          // The $record array has the database columns as keys, which drupal_write_record() will need,
+          // but the _field_is_empty() function will be looking for the short, normalized column name.
+          $item = array();
+          foreach ($context['sandbox']['new_cols'] as $column_name => $db_column_name) {
+            if (array_key_exists($db_column_name, $record)) {
+              $item[$column_name] = $record[$db_column_name];
+            }
+          }
+          if ($function($item, $field)) {
+            $record = NULL;
           }
         }
-        if ($function($item, $field)) {
-          $record = NULL;
+      }
+
+      if (!empty($record)) {
+        if ($record['revision_id'] == $node['vid']) {
+          drupal_write_record($context['sandbox']['new_table'], $record);
         }
+        drupal_write_record($context['sandbox']['new_revision_table'], $record);
       }
     }
 
-    if (!empty($record)) {
-      if ($record['revision_id'] == $node['vid']) {
-        drupal_write_record($context['sandbox']['new_table'], $record);
-      }
-      drupal_write_record($context['sandbox']['new_revision_table'], $record);
-    }
+    // Update our progress information.
+    $context['sandbox']['progress']++;
   }
-
-  // Update our progress information.
-  $context['sandbox']['progress']++;
-  $context['message'] = t('Processing %nid : %title', array('%title' => $node['title'], '%nid' => $node['nid']));
+  $context['message'] = t('Processing through nid %nid', array('%nid' => $node['nid']));
 
   // Inform the batch engine that we are not finished,
   // and provide an estimation of the completion level we reached.

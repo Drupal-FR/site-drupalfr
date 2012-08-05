@@ -12,8 +12,8 @@ class ContentMigrateTestCase extends DrupalWebTestCase {
   public $content_type;
 
   /**
-   * In the base setUp() method we need to create a content type, and 
-   * Drupal 6 tables relating to CCK: content_node_field, 
+   * In the base setUp() method we need to create a content type, and
+   * Drupal 6 tables relating to CCK: content_node_field,
    * content_node_field_instance, and content_type_TYPENAME. It is up
    * to a child class to make the proper inserts into these tables.
    */
@@ -89,7 +89,7 @@ class ContentMigrateTestCase extends DrupalWebTestCase {
    * @param $default the default value to use.
    * @return $field field definition array
    */
-  public function setupField($type, $widget, $multiple = 0, $required = 0, $default = '') {
+  function setupField($type, $widget, $multiple = 0, $required = 0, $default = '') {
     // This is going to look a little different from exported CCK
     // fields. I want to be pretty efficient in the insert phase.
     // Apologies for any confusion this might cause.
@@ -206,7 +206,7 @@ class ContentMigrateTestCase extends DrupalWebTestCase {
         }
       }
       db_add_field($table, $field['field_name'] . '_' . $key, $db_columns);
-      $this->assertTrue(db_field_exists($table, $field['field_name'] . '_' . $key), t('Successfully added field %field to table %table.', array('%field' => $field['field_name'], '%table' => $table))); 
+      $this->assertTrue(db_field_exists($table, $field['field_name'] . '_' . $key), t('Successfully added field %field to table %table.', array('%field' => $field['field_name'], '%table' => $table)));
     }
 
   }
@@ -281,7 +281,7 @@ class ContentMigrateTextTestCase extends ContentMigrateTestCase {
     $field['db_columns']['value']['not null'] = false;
     $field['db_columns']['value']['sortable'] = true;
     $field['db_columns']['value']['views'] = true;
- 
+
     if ($multiple <> 0) {
       $field['db_storage'] = 0;
     }
@@ -310,7 +310,7 @@ class ContentMigrateTextTestCase extends ContentMigrateTestCase {
 
     // Okay, let's login.
     $this->drupalLogin($this->admin_user);
-    
+
     $id = str_replace('_', '-', $test_field['field_name']);
 
     $this->drupalGet('admin/structure/content_migrate');
@@ -363,7 +363,7 @@ class ContentMigrateTextTestCase extends ContentMigrateTestCase {
     $this->createFieldData($value, $test_field, $test_node, 'content_type_' . $settings['type']);
 
     // Revise the node and the field value.
-    $test_node2 = $this->drupalCreateNode(get_object_vars($test_node));    
+    $test_node2 = $this->drupalCreateNode(get_object_vars($test_node));
     $value2 = array('value' => $this->randomName(10));
     $this->createFieldData($value2, $test_field, $test_node2, 'content_type_' . $settings['type']);
 
@@ -552,7 +552,7 @@ class ContentMigrateListTestCase extends ContentMigrateTestCase {
     $field['db_columns']['value']['not null'] = false;
     $field['db_columns']['value']['sortable'] = true;
     $field['db_columns']['value']['views'] = true;
- 
+
     if ($multiple <> 0) {
       $field['db_storage'] = 0;
     }
