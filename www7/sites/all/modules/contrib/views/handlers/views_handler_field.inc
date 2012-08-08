@@ -7,6 +7,23 @@
  */
 
 /**
+ * Indicator of the render_text() mehtod for rendering a single item.
+ * (If no render_item() is present).
+ */
+define('VIEWS_HANDLER_RENDER_TEXT_PHASE_SINGLE_ITEM', 0);
+
+/**
+ * Indicator of the render_text() method for rendering the whole element.
+ * (if no render_item() method is available).
+ */
+define('VIEWS_HANDLER_RENDER_TEXT_PHASE_COMPLETELY', 1);
+
+/**
+ * Indicator of the render_text() method for rendering the empty text.
+ */
+define('VIEWS_HANDLER_RENDER_TEXT_PHASE_EMPTY', 2);
+
+/**
  * Base field handler that has no options and renders an unformatted field.
  *
  * Definition terms:
@@ -331,6 +348,9 @@ class views_handler_field extends views_handler {
   /**
    * Get the value that's supposed to be rendered.
    *
+   * This api exists so that other modules can easy set the values of the field
+   * without having the need to change the render method as well.
+   *
    * @param $values
    *   An object containing all retrieved values.
    * @param $field
@@ -369,6 +389,9 @@ class views_handler_field extends views_handler {
         'max_length' => array('default' => ''),
         'word_boundary' => array('default' => TRUE),
         'ellipsis' => array('default' => TRUE),
+        'more_link' => array('default' => FALSE),
+        'more_link_text' => array('default' => '', 'translatable' => TRUE),
+        'more_link_path' => array('default' => ''),
         'strip_tags' => array('default' => FALSE),
         'trim' => array('default' => FALSE),
         'preserve_tags' => array('default' => ''),
@@ -788,6 +811,7 @@ If you would like to have the characters %5B and %5D please use the html entity 
         '#dependency' => array(
           'edit-options-alter-make-link' => array(1),
           'edit-options-alter-alter-text' => array(1),
+          'edit-options-alter-more-link' => array(1),
         ),
       );
 
@@ -825,6 +849,39 @@ If you would like to have the characters %5B and %5D please use the html entity 
         '#default_value' => $this->options['alter']['ellipsis'],
         '#dependency' => array(
           'edit-options-alter-trim' => array(1),
+        ),
+      );
+
+      $form['alter']['more_link'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Add a read-more link if output is trimmed.'),
+        '#description' => t('If checked, a read-more link will be added at the end of the trimmed output'),
+        '#default_value' => $this->options['alter']['more_link'],
+        '#dependency' => array(
+          'edit-options-alter-trim' => array(1),
+        ),
+      );
+
+      $form['alter']['more_link_text'] = array(
+        '#type' => 'textfield',
+        '#title' => t('More link text'),
+        '#default_value' => $this->options['alter']['more_link_text'],
+        '#description' => t('The text which will be displayed on the more link. You may enter data from this view as per the "Replacement patterns" above.'),
+        '#dependency_count' => 2,
+        '#dependency' => array(
+          'edit-options-alter-trim' => array(1),
+          'edit-options-alter-more-link' => array(1),
+        ),
+      );
+      $form['alter']['more_link_path'] = array(
+        '#type' => 'textfield',
+        '#title' => t('More link path'),
+        '#default_value' => $this->options['alter']['more_link_path'],
+        '#description' => t('The path which is used for the more link. You may enter data from this view as per the "Replacement patterns" above.'),
+        '#dependency_count' => 2,
+        '#dependency' => array(
+          'edit-options-alter-trim' => array(1),
+          'edit-options-alter-more-link' => array(1),
         ),
       );
 
@@ -972,13 +1029,15 @@ If you would like to have the characters %5B and %5D please use the html entity 
           $this->original_value = $this->last_render;
 
           $alter = $item + $this->options['alter'];
+          $alter['phase'] = VIEWS_HANDLER_RENDER_TEXT_PHASE_SINGLE_ITEM;
           $items[] = $this->render_text($alter);
         }
 
         $value = $this->render_items($items);
       }
       else {
-        $value = $this->render_text($this->options['alter']);
+        $alter = array('phase' => VIEWS_HANDLER_RENDER_TEXT_PHASE_COMPLETELY) + $this->options['alter'];
+        $value = $this->render_text($alter);
       }
 
       if (is_array($value)) {
@@ -994,6 +1053,7 @@ If you would like to have the characters %5B and %5D please use the html entity 
         $alter = $this->options['alter'];
         $alter['alter_text'] = 1;
         $alter['text'] = $this->options['empty'];
+        $alter['phase'] = VIEWS_HANDLER_RENDER_TEXT_PHASE_EMPTY;
         $this->last_render = $this->render_text($alter);
       }
     }
@@ -1009,36 +1069,67 @@ If you would like to have the characters %5B and %5D please use the html entity 
    */
   function render_text($alter) {
     $value = $this->last_render;
-    if (!empty($this->options['alter']['trim_whitespace'])) {
-      $value = trim($value);
-    }
 
     if (!empty($alter['alter_text']) && $alter['text'] !== '') {
       $tokens = $this->get_render_tokens($alter);
       $value = $this->render_altered($alter, $tokens);
     }
 
+    if (!empty($this->options['alter']['trim_whitespace'])) {
+      $value = trim($value);
+    }
+
+    // Check if there should be no further rewrite for empty values.
+    $no_rewrite_for_empty = $this->options['hide_alter_empty'] && empty($this->original_value);
+
     // Check whether the value is empty and return nothing, so the field isn't rendered.
     // First check whether the field should be hidden if the value(hide_alter_empty = TRUE) /the rewrite is empty (hide_alter_empty = FALSE).
     // For numeric values you can specify whether "0"/0 should be empty.
     if ((($this->options['hide_empty'] && empty($value))
-        || ($this->options['hide_alter_empty'] && empty($this->original_value)))
+        || ($alter['phase'] != VIEWS_HANDLER_RENDER_TEXT_PHASE_EMPTY && $no_rewrite_for_empty))
       && (($value !== 0 && $value !== '0')
         || $this->options['empty_zero'])) {
       return '';
+    }
+    // Only in empty phase.
+    if ($alter['phase'] == VIEWS_HANDLER_RENDER_TEXT_PHASE_EMPTY && $no_rewrite_for_empty) {
+      // If we got here then $alter contains the value of "No results text"
+      // and so there is nothing left to do.
+      return $value;
     }
 
     if (!empty($alter['strip_tags'])) {
       $value = strip_tags($value, $alter['preserve_tags']);
     }
 
+    $suffix = '';
     if (!empty($alter['trim']) && !empty($alter['max_length'])) {
+      $length = strlen($value);
       $value = $this->render_trim_text($alter, $value);
+      if ($this->options['alter']['more_link'] && strlen($value) < $length) {
+        $tokens = $this->get_render_tokens($alter);
+        $more_link_text = $this->options['alter']['more_link_text'] ? $this->options['alter']['more_link_text'] : t('more');
+        $more_link_text = strtr(filter_xss_admin($more_link_text), $tokens);
+        $more_link_path = $this->options['alter']['more_link_path'];
+        $more_link_path = strip_tags(decode_entities(strtr($more_link_path, $tokens)));
+
+        // Take sure that paths which was runned through url() does work as well.
+        $base_path = base_path();
+        // Checks whether the path starts with the base_path.
+        if (strpos($more_link_path, $base_path) === 0) {
+          $more_link_path = drupal_substr($more_link_path, drupal_strlen($base_path));
+        }
+
+        $more_link = l($more_link_text, $more_link_path);
+
+        $suffix .= " " . $more_link;
+      }
     }
 
     if (!empty($alter['nl2br'])) {
       $value = nl2br($value);
     }
+    $this->last_render_text = $value;
 
     if (!empty($alter['make_link']) && !empty($alter['path'])) {
       if (!isset($tokens)) {
@@ -1047,7 +1138,7 @@ If you would like to have the characters %5B and %5D please use the html entity 
       $value = $this->render_as_link($alter, $value, $tokens);
     }
 
-    return $value;
+    return $value . $suffix;
   }
 
   /**

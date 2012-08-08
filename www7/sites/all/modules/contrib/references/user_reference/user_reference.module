@@ -47,6 +47,29 @@ function user_reference_field_info() {
 }
 
 /**
+ * Implements hook_field_schema();
+ */
+function user_reference_field_schema($field) {
+  $columns = array(
+    'uid' => array(
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => FALSE,
+    ),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => array('uid' => array('uid')),
+    'foreign keys' => array(
+      'uid' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),
+  );
+}
+
+/**
  * Implements hook_field_settings_form().
  */
 function user_reference_field_settings_form($field, $instance, $has_data) {
@@ -227,8 +250,6 @@ function user_reference_field_prepare_view($entity_type, $entities, $field, $ins
     $ids_to_check = array_diff($ids, array_keys($checked_ids));
     if (!empty($ids_to_check)) {
       $query = db_select('users', 'u')
-        ->addMetaData('id', 'user_reference_field_prepare_view')
-        ->addMetaData('field', $field)
         ->fields('u', array('uid'))
         ->condition('u.uid', $ids_to_check, 'IN');
       $accessible_ids = $query->execute()->fetchAllAssoc('uid');
@@ -394,7 +415,7 @@ function user_reference_field_formatter_prepare_view($entity_type, $entities, $f
         }
       }
     }
-  }
+  } 
 }
 
 /**
@@ -745,18 +766,14 @@ function _user_reference_options($field, $flat = TRUE) {
 
   $options = array();
   foreach ($references as $key => $value) {
-    // The label, displayed in selects and checkboxes/radios, should have HTML
-    // entities unencoded. The widgets (core's options.module) take care of
-    // applying the relevant filters (strip_tags() or filter_xss()).
-    $label = html_entity_decode($value['rendered'], ENT_QUOTES);
     if (empty($value['group']) || $flat) {
-      $options[$key] = $label;
+      $options[$key] = $value['rendered'];
     }
     else {
       // The group name, displayed in selects, cannot contain tags, and should
       // have HTML entities unencoded.
       $group = html_entity_decode(strip_tags($value['group']), ENT_QUOTES);
-      $options[$group][$key] = $label;
+      $options[$group][$key] = $value['rendered'];
     }
   }
 
@@ -1045,7 +1062,7 @@ function user_reference_content_migrate_field_alter(&$field_value, $instance_val
         'args' => $view_args,
       );
       if ($view_name) {
-        $field_value['messages'][] = t("The field uses the view @view_name to determine referenceable users. You will need to manually edit the view and add a display of type 'References'.", array('@view_name' => $view_name));
+        $field_value['messages'][] = t("The field uses the view @view_name to determine referenceable users. You will need to manually edit the view and add a display of type 'References'.");
       }
       unset($field_value['settings']['advanced_view']);
       unset($field_value['settings']['advanced_view_args']);

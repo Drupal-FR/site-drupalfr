@@ -82,6 +82,7 @@ function rules_data_action_info() {
         'description' => t('The data list, to which an item is to be added.'),
         'restriction' => 'selector',
         'allow null' => TRUE,
+        'save' => TRUE,
       ),
       'item' => array(
         'type' => 'unknown',
@@ -117,6 +118,7 @@ function rules_data_action_info() {
         'label' => t('List', array(), array('context' => 'data_types')),
         'description' => t('The data list for which an item is to be removed.'),
         'restriction' => 'selector',
+        'save' => TRUE,
       ),
       'item' => array(
         'type' => 'unknown',
@@ -190,7 +192,68 @@ function rules_data_action_info() {
       ),
     );
   }
+  $return['data_convert'] = array(
+    'label' => t('Convert data type'),
+    'parameter' => array(
+      'type' => array(
+        'type' => 'token',
+        'label' => t('Target type'),
+        'description' => t('The data type to convert a value to.'),
+        'options list' => 'rules_action_data_convert_types_options',
+        'restriction' => 'input',
+      ),
+      'value' => array(
+        'type' => array('decimal', 'integer', 'text'),
+        'label' => t('Value to convert'),
+        'default mode' => 'selector',
+      ),
+      // For to-integer conversion only.
+      'rounding_behavior' => array(
+        'type' => 'token',
+        'label' => t('Rounding behavior'),
+        'description' => t('The rounding behavior the conversion should use.'),
+        'options list' => 'rules_action_data_convert_rounding_behavior_options',
+        'restriction' => 'input',
+        'default value' => 'round',
+        'optional' => TRUE,
+      ),
+    ),
+    'provides' => array(
+      'conversion_result' => array(
+        'type' => 'unknown',
+        'label' => t('Conversion result'),
+      ),
+    ),
+    'group' => t('Data'),
+    'base' => 'rules_action_data_convert',
+    'named parameter' => TRUE,
+    'callbacks' => array(
+      'form_alter' => 'rules_action_type_form_alter',
+    ),
+  );
   return $return;
+}
+
+/**
+ * Data conversation action: Options list callback for the target type.
+ */
+function rules_action_data_convert_types_options(RulesPlugin $element, $param_name) {
+  return array(
+    'decimal' => t('Decimal'),
+    'integer' => t('Integer'),
+    'text' => t('Text'),
+  );
+}
+
+/**
+ * Data conversation action: Options list callback for rounding behavior.
+ */
+function rules_action_data_convert_rounding_behavior_options(RulesPlugin $element, $param_name) {
+  return array(
+    'down' => t('Always down (9.5 -> 9)'),
+    'round' => t('Round, half up (9.5 -> 10)'),
+    'up' => t('Always up (9.5 -> 10)'),
+  );
 }
 
 /**
@@ -220,6 +283,7 @@ function rules_action_data_set_form_alter(&$form, &$form_state, $options, RulesA
   if (!empty($options['init']) && !isset($form_state['rules_element_step'])) {
     $form['negate']['#access'] = FALSE;
     unset($form['parameter']['value']);
+    unset($form['parameter']['language']);
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Continue'),
@@ -449,6 +513,7 @@ function rules_data_condition_info() {
           'label' => t('Data to check'),
           'description' => t('The data to be checked to be empty, specified by using a data selector, e.g. "node:author:name".'),
           'allow null' => TRUE,
+          'wrapped' => TRUE,
         ),
       ),
       'group' => t('Data'),
@@ -526,6 +591,7 @@ function rules_condition_data_is_assertions($element) {
 
 /**
  * Form alter callback for the condition data_is.
+ *
  * Use multiple steps to configure the condition as the needed type of the value
  * depends on the selected data.
  */
@@ -537,7 +603,7 @@ function rules_condition_data_is_form_alter(&$form, &$form_state, $options, Rule
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Continue'),
-      '#limit_validation_errors' => array(array('parameter', 'data')),
+      '#limit_validation_errors' => array(array('parameter', 'data'), array('parameter', 'op')),
       '#submit' => array('rules_form_submit_rebuild'),
     );
     // Clear the parameter mode for the value parameter, so its gets the proper
@@ -554,15 +620,39 @@ function rules_condition_data_is_form_alter(&$form, &$form_state, $options, Rule
       '#suffix' => '</p>',
     );
 
-    // Limit the operations to what makes sense for the data type.
+    // Limit the operations to what makes sense for the selected data type.
     $info = $element->pluginParameterInfo();
-    if (!RulesData::typesMatch($info['value'], array('type' => array('decimal', 'date')))) {
+    $data_info = $info['value'];
+    if ($element->settings['op'] == 'IN') {
+      $data_info['type'] = entity_property_list_extract_type($data_info['type']);
+    }
+
+    if (!RulesData::typesMatch($data_info, array('type' => array('decimal', 'date')))) {
       $options =& $form['parameter']['op']['settings']['op']['#options'];
       unset($options['<'], $options['>']);
     }
-    if ($info['value']['type'] != 'text' || !empty($info['value']['options list'])) {
+    // Remove 'contains' if it is not selected, as it is deprecated by the
+    // text comparison condition.
+    if ($element->settings['op'] != 'contains') {
       unset($form['parameter']['op']['settings']['op']['#options']['contains']);
     }
+
+    // Auto-refresh the form if the operation is changed, so the input form
+    // changes in case "is one of" requires a list value.
+    $form['parameter']['op']['settings']['op']['#ajax'] = rules_ui_form_default_ajax() + array(
+      'trigger_as' => array('name' => 'reload'),
+    );
+    // Provide a reload button for non-JS users.
+    $form['reload'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reload form'),
+      '#limit_validation_errors' => array(array('parameter', 'data'), array('parameter', 'op')),
+      '#submit' => array('rules_form_submit_rebuild'),
+      '#ajax' => rules_ui_form_default_ajax(),
+      '#weight' => 5,
+    );
+    // Hide the reload button in case JS is enabled.
+    $form['reload']['#attributes'] = array('class' => array('rules-hide-js'));
   }
 }
 
@@ -570,7 +660,8 @@ function rules_condition_data_is_form_alter(&$form, &$form_state, $options, Rule
  * Provides configuration help for the data_is condition.
  */
 function rules_condition_data_is_help() {
-  return array('#markup' => t('Compare two data values of the same type with each other.'));}
+  return array('#markup' => t('Compare two data values of the same type with each other.'));
+}
 
 /**
  * Options list callback for condition data_is.
@@ -578,8 +669,10 @@ function rules_condition_data_is_help() {
 function rules_condition_data_is_operator_options() {
   return array(
     '==' => t('equals'),
+    'IN' => t('is one of'),
     '<' => t('is lower than'),
     '>' => t('is greater than'),
+    // Note: This is deprecated by the text comparison condition.
     'contains' => t('contains'),
   );
 }

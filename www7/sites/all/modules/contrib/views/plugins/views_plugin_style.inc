@@ -167,7 +167,8 @@ class views_plugin_style extends views_plugin {
     // @TODO: Document "uses grouping" in docs.php when docs.php is written.
     if ($this->uses_fields() && $this->definition['uses grouping']) {
       $options = array('' => t('- None -'));
-      $options += $this->display->handler->get_field_labels();
+      $field_labels = $this->display->handler->get_field_labels();
+      $options += $field_labels;
 
       // If there are no fields, we can't group on them.
       if (count($options) > 1) {
@@ -177,15 +178,16 @@ class views_plugin_style extends views_plugin {
           $this->options['grouping'] = array();
           $this->options['grouping'][0]['field'] = $grouping;
         }
-        if (is_string($this->options['group_rendered'])) {
+        if (isset($this->options['group_rendered']) && is_string($this->options['group_rendered'])) {
           $this->options['grouping'][0]['rendered'] = $this->options['group_rendered'];
+          unset($this->options['group_rendered']);
         }
 
         $c = count($this->options['grouping']);
         // Add a form for every grouping, plus one.
         for ($i = 0; $i <= $c; $i++) {
           $grouping = !empty($this->options['grouping'][$i]) ? $this->options['grouping'][$i] : array();
-          $grouping += array('field' => '', 'rendered' => TRUE);
+          $grouping += array('field' => '', 'rendered' => TRUE, 'rendered_strip' => FALSE);
           $form['grouping'][$i]['field'] = array(
             '#type' => 'select',
             '#title' => t('Grouping field Nr.@number', array('@number' => $i + 1)),
@@ -198,6 +200,17 @@ class views_plugin_style extends views_plugin {
             '#title' => t('Use rendered output to group rows'),
             '#default_value' => $grouping['rendered'],
             '#description' => t('If enabled the rendered output of the grouping field is used to group the rows.'),
+            '#dependency' => array(
+              'edit-style-options-grouping-' . $i . '-field' => array_keys($field_labels),
+            )
+          );
+          $form['grouping'][$i]['rendered_strip'] = array(
+            '#type' => 'checkbox',
+            '#title' => t('Remove tags from rendered output'),
+            '#default_value' => $grouping['rendered_strip'],
+            '#dependency' => array(
+              'edit-style-options-grouping-' . $i . '-field' => array_keys($field_labels),
+            )
           );
         }
       }
@@ -218,10 +231,13 @@ class views_plugin_style extends views_plugin {
   }
 
   function options_validate(&$form, &$form_state) {
-    // Don't save grouping if no field is specified.
-    foreach ($form_state['values']['style_options']['grouping'] as $index => $grouping) {
-      if (empty($grouping['field'])) {
-        unset($form_state['values']['style_options']['grouping'][$index]);
+    // Don't run validation on style plugins without the grouping setting.
+    if (isset($form_state['values']['style_options']['grouping'])) {
+      // Don't save grouping if no field is specified.
+      foreach ($form_state['values']['style_options']['grouping'] as $index => $grouping) {
+        if (empty($grouping['field'])) {
+          unset($form_state['values']['style_options']['grouping'][$index]);
+        }
       }
     }
   }
@@ -381,6 +397,7 @@ class views_plugin_style extends views_plugin {
         foreach ($groupings as $info) {
           $field = $info['field'];
           $rendered = isset($info['rendered']) ? $info['rendered'] : $group_rendered;
+          $rendered_strip = isset($info['rendered_strip']) ? $info['rendered_strip'] : FALSE;
           $grouping = '';
           $group_content = '';
           // Group on the rendered version of the field, not the raw.  That way,
@@ -393,6 +410,9 @@ class views_plugin_style extends views_plugin {
             }
             if ($rendered) {
               $grouping = $group_content;
+              if ($rendered_strip) {
+                $group_content = $grouping = strip_tags(htmlspecialchars_decode($group_content));
+              }
             }
             else {
               $grouping = $this->get_field_value($index, $field);

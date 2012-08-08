@@ -530,7 +530,7 @@ function rules_ui_import_form_validate($form, &$form_state) {
       $rules_config->integrityCheck();
     }
     catch (RulesIntegrityException $e) {
-      form_set_error('import', t('Integrity check for the imported configuratoin failed. Error message: %message.', array('%message' => $e->getMessage())));
+      form_set_error('import', t('Integrity check for the imported configuration failed. Error message: %message.', array('%message' => $e->getMessage())));
     }
     if (!user_access('bypass rules access') && !$rules_config->access()) {
       form_set_error('import', t('You have insufficient access permissions for importing this Rules configuration.'));
@@ -713,7 +713,11 @@ function rules_ui_element_duration_multipliers() {
     1 => t('seconds'),
     60 => t('minutes'),
     3600 => t('hours'),
+    // Just use approximate numbers for days (might last 23h on DST change),
+    // months and years.
     86400 => t('days'),
+    86400 * 30 => t('months'),
+    86400 * 30 * 12 => t('years'),
   );
 }
 

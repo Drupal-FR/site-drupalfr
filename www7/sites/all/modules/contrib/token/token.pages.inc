@@ -163,7 +163,7 @@ function _token_token_tree_format_row($token, array $token_info, $is_group = FAL
  * @see drupal_clean_css_identifier()
  */
 function _token_clean_css_identifier($id) {
-  static $replacements = array(' ' => '-', '_' => '-', '/' => '-', '[' => '-', ']' => '', ':' => '--', '?' => '');
+  static $replacements = array(' ' => '-', '_' => '-', '/' => '-', '[' => '-', ']' => '', ':' => '--', '?' => '', '<' => '-', '>' => '-');
   return 'token-' . rtrim(strtr(trim($id, '[]'), $replacements), '-');
 }
 

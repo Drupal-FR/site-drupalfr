@@ -6,14 +6,14 @@
  */
 
 /**
- * Implementation of hook_flag(). Trigger actions if any are available.
+ * Implements hook_flag(). Trigger actions if any are available.
  */
 function flag_actions_flag($event, $flag, $content_id, $account) {
   flag_actions_do($event, $flag, $content_id, $account);
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function flag_actions_menu() {
   $items = array();
@@ -54,7 +54,7 @@ function flag_actions_menu() {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function flag_actions_theme() {
   return array(

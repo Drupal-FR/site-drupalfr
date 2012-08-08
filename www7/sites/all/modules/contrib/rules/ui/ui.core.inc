@@ -282,7 +282,7 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
    * Actually generates the parameter form for the given data type.
    */
   protected function getParameterForm($name, $info, $settings, &$mode) {
-    $class = $this->getDataTypeClass($info['type']);
+    $class = $this->getDataTypeClass($info['type'], $info);
     $supports_input_mode = in_array('RulesDataDirectInputFormInterface', class_implements($class));
 
     // Init the mode.
@@ -297,8 +297,18 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
         $mode = $info['restriction'];
       }
       else {
-        $mode = call_user_func(array($class, 'getDefaultMode'));
+        // Allow the parameter to define the 'default mode' and fallback to the
+        // data type default.
+        $mode = !empty($info['default mode']) ? $info['default mode'] : call_user_func(array($class, 'getDefaultMode'));
       }
+    }
+
+    // For translatable parameters, pre-populate an internal translation source
+    // key so data type forms or input evaluators (i18n) may produce suiting
+    // help.
+    if (drupal_multilingual() && !empty($info['translatable'])) {
+      $parameter = $this->element->pluginParameterInfo();
+      $info['custom translation language'] = !empty($parameter['language']);
     }
 
     // Add the parameter form.
@@ -420,7 +430,9 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
     $form['settings']['name'] = array(
       '#type' => 'machine_name',
       '#default_value' => isset($machine_name) ? $machine_name : '',
-      '#maxlength' => 64,
+      // The string 'rules_' is pre-pended to machine names, so the
+      // maxlength must be less than the field length of 64 characters.
+      '#maxlength' => 58,
       '#disabled' => entity_has_status('rules_config', $this->element, ENTITY_IN_CODE) && !(isset($form_state['op']) && $form_state['op'] == 'clone'),
       '#machine_name' => array(
         'exists' => 'rules_config_load',
@@ -478,9 +490,75 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
         '#limit_validation_errors' => array(array('vars')),
         '#submit' => array('rules_form_submit_rebuild'),
       );
+      if (!empty($this->element->id)) {
+        // Display a setting to manage access.
+        $form['settings']['access'] = array(
+          '#weight' => 50,
+        );
+        $plugin_type = $this->element instanceof RulesActionInterface ? t('action') : t('condition');
+        $form['settings']['access']['access_exposed'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Configure access for using this component with a permission.'),
+          '#default_value' => !empty($this->element->access_exposed),
+          '#description' => t('By default, the @plugin-type for using this component may be only used by users that have access to configure the component. If checked, access is determined by a permission instead.', array('@plugin-type' => $plugin_type))
+        );
+        $form['settings']['access']['permissions'] = array(
+          '#type' => 'container',
+          '#states' => array(
+            'visible' => array(
+              ':input[name="settings[access][access_exposed]"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+        $form['settings']['access']['permissions']['matrix'] = $this->settingsFormPermissionMatrix();
+      }
     }
 
     // TODO: Attach field form thus description.
+  }
+
+  /**
+   * Provides a matrix permission for the component based in the existing roles.
+   *
+   * @return
+   *   Form elements with the matrix of permissions for a component.
+   */
+  protected function settingsFormPermissionMatrix() {
+    $form['#theme'] = 'user_admin_permissions';
+    $status = array();
+    $options = array();
+
+    $role_names = user_roles();
+    $role_permissions = user_role_permissions($role_names);
+    $component_permission = rules_permissions_by_component(array($this->element));
+    $component_permission_name = key($component_permission);
+
+    $form['permission'][$component_permission_name] = array(
+      '#type' => 'item',
+      '#markup' => $component_permission[$component_permission_name]['title'],
+    );
+    $options[$component_permission_name] = '';
+    foreach ($role_names as $rid => $name) {
+      if (isset($role_permissions[$rid][$component_permission_name])) {
+        $status[$rid][] = $component_permission_name;
+      }
+    }
+
+    // Build the checkboxes for each role.
+    foreach ($role_names as $rid => $name) {
+      $form['checkboxes'][$rid] = array(
+        '#type' => 'checkboxes',
+        '#options' => $options,
+        '#default_value' => isset($status[$rid]) ? $status[$rid] : array(),
+        '#attributes' => array('class' => array('rid-' . $rid)),
+      );
+      $form['role_names'][$rid] = array('#markup' => check_plain($name), '#tree' => TRUE);
+    }
+
+    // Attach the default permissions page JavaScript.
+    $form['#attached']['js'][] = drupal_get_path('module', 'user') . '/user.permissions.js';
+
+    return $form;
   }
 
   public function settingsFormExtractValues($form, &$form_state) {
@@ -522,6 +600,7 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
       }
       unset($input['vars']);
     }
+    $this->element->access_exposed = isset($form_values['access']['access_exposed']) ? $form_values['access']['access_exposed'] : FALSE;
   }
 
   public function settingsFormValidate($form, &$form_state) {
@@ -532,7 +611,12 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
   }
 
   public function settingsFormSubmit($form, &$form_state) {
-
+    if (isset($form_state['values']['settings']['access']) && !empty($this->element->access_exposed)) {
+      // Save the permission matrix.
+      foreach ($form_state['values']['settings']['access']['permissions']['matrix']['checkboxes'] as $rid => $value) {
+        user_role_change_permissions($rid, $value);
+      }
+    }
   }
 
   /**
@@ -583,9 +667,14 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
    * Returns the name of class for the given data type.
    *
    * @param $data_type
-   *  The name of the data typ
+   *   The name of the data typ
+   * @param $parameter_info
+   *   (optional) An array of info about the to be configured parameter.
    */
-  public function getDataTypeClass($data_type) {
+  public function getDataTypeClass($data_type, $parameter_info = array()) {
+    if (!empty($parameter_info['ui class'])) {
+      return $parameter_info['ui class'];
+    }
     $cache = rules_get_cache();
     $data_info = $cache['data_info'];
     return (is_string($data_type) && isset($data_info[$data_type]['ui class'])) ? $data_info[$data_type]['ui class'] : 'RulesDataUI';
@@ -621,7 +710,7 @@ class RulesPluginUI extends FacesExtender implements RulesPluginUIInterface {
       }
       elseif (isset($this->element->settings[$name]) && (!isset($parameter['default value']) || $parameter['default value'] != $this->element->settings[$name])) {
         $method = empty($parameter['options list']) ? 'render' : 'renderOptionsLabel';
-        $class = $this->getDataTypeClass($parameter['type']);
+        $class = $this->getDataTypeClass($parameter['type'], $parameter);
         // We cannot use method_exists() here as it would trigger a PHP bug,
         // @see http://drupal.org/node/1258284
         $element = call_user_func(array($class, $method), $this->element->settings[$name], $name, $parameter, $this->element);
@@ -887,7 +976,7 @@ class RulesContainerPluginUI extends RulesPluginUI {
     $form['elements']['#attributes']['class'][] = 'rules-container-plugin';
 
     // Recurse over all element childrens or use the provided iterator.
-    $iterator = isset($iterator) ? $iterator : new RecursiveIteratorIterator($this->element, RecursiveIteratorIterator::SELF_FIRST);
+    $iterator = isset($iterator) ? $iterator : $this->element->elements();
     $root_depth = $this->element->depth();
     foreach ($iterator as $key => $child) {
       $id = $child->elementId();

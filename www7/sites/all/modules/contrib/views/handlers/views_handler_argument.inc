@@ -461,6 +461,12 @@ class views_handler_argument extends views_handler {
       // Copy the now submitted options to their final resting place so they get saved.
       $form_state['values']['options']['validate_options'] = $options;
     }
+
+    // Clear out the content of title if it's not enabled.
+    $options =& $form_state['values']['options'];
+    if (empty($options['title_enable'])) {
+      $options['title'] = '';
+    }
   }
 
   /**
@@ -584,7 +590,7 @@ class views_handler_argument extends views_handler {
     $summary_plugins = array();
     $format_options = array();
     foreach ($style_plugins as $key => $plugin) {
-      if ($plugin['type'] == 'summary') {
+      if (isset($plugin['type']) && $plugin['type'] == 'summary') {
         $summary_plugins[$key] = $plugin;
         $format_options[$key] = $plugin['title'];
       }
