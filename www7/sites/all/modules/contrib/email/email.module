@@ -17,6 +17,13 @@ function email_field_info() {
 }
 
 /**
+ * Implements hook_migrate_api().
+ */
+function email_migrate_api() {
+  return array('api' => 2);
+}
+
+/**
  * Implements hook_field_validate().
  *
  * Possible error codes:
@@ -115,7 +122,7 @@ function email_field_formatter_view($object_type, $object, $field, $instance, $l
     case 'email_spamspan':
       foreach ($items as $delta => $item) {
         if (module_exists('spamspan')) {
-          $element[$delta] = spamspan($item['email']);
+          $element[$delta] = array('#markup' => spamspan($item['email']));
         }
         else {
           $output = l($item['email'], 'mailto:' . $item['email']);
@@ -204,15 +211,13 @@ function email_mail_page($object_type, $object_id, $field_name) {
   global $user;
 
   if (!is_numeric($object_id)) {
-    drupal_not_found();
-    return;
+    return MENU_NOT_FOUND;
   }
 
   //verify this is an email field
   $field_info = field_info_field($field_name);
-  if ($field_info['type'] != 'email') {
-    drupal_not_found();
-    return;
+  if (!isset($field_info) || $field_info['type'] != 'email') {
+    return MENU_NOT_FOUND;
   }
 
   $objects = entity_load($object_type, array($object_id));
@@ -220,16 +225,12 @@ function email_mail_page($object_type, $object_id, $field_name) {
 
   //verify the object really exists
   if (!$object) {
-    drupal_not_found();
-    return;
+    return MENU_NOT_FOUND;
   }
 
-  //check field perm
-  if (module_exists('field_permissions')) {
-    if (!field_permissions_field_access('view', $field_info, $object_type, $object, $user)) {
-      drupal_not_found();
-      return;
-    }
+  // Check for field access.
+  if (!field_access('view', $field_info, $object_type, $object, $user)) {
+    return MENU_ACCESS_DENIED;
   }
 
   //use the first email address as receiver
@@ -243,8 +244,7 @@ function email_mail_page($object_type, $object_id, $field_name) {
 
   //verify that the email address is not empty
   if (empty($email)) {
-    drupal_not_found();
-    return;
+    return MENU_NOT_FOUND;
   }
 
   $entity_info = entity_extract_ids($object_type, $object);
@@ -257,8 +257,7 @@ function email_mail_page($object_type, $object_id, $field_name) {
     }
   }
   if (!$found) {
-    drupal_not_found();
-    return;
+    return MENU_NOT_FOUND;
   }
 
   if (!flood_is_allowed('email', variable_get('email_hourly_threshold', 3))) {
