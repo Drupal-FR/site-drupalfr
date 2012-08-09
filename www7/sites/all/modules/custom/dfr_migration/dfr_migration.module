@@ -66,8 +66,12 @@ function dfr_migration_migrate_profiles_batch(&$context) {
       ->fields('n', array('nid', 'vid', 'uid'))
       ->range($context['sandbox']['progress'], $limit);
   $result = $query->execute();
+  $user_ids = array();
   foreach ($result as $user) {
     $user_ids[$user->uid] = $user;
+  }
+  if (count($user_ids) == 0) {
+    watchdog('migration dfr7', 'Range: ' . $context['sandbox']['progress'] . ' - ' . $limit, WATCHDOG_ERROR);
   }
   // Load the users and extract the old profiles data.
   $users = entity_load('user', array(array_keys($user_ids)));
