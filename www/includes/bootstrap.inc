@@ -1,5 +1,4 @@
 <?php
-// $Id: bootstrap.inc,v 1.206.2.23 2010/06/02 13:07:45 goba Exp $
 
 /**
  * @file
@@ -214,6 +213,11 @@ define('LANGUAGE_LTR', 0);
  */
 define('LANGUAGE_RTL', 1);
 
+// Hide E_DEPRECATED messages.
+if (defined('E_DEPRECATED')) {
+  error_reporting(error_reporting() & ~E_DEPRECATED);
+}
+
 /**
  * Start the timer with the specified name. If you start and stop
  * the same timer multiple times, the measured intervals will be
@@ -371,8 +375,12 @@ function conf_init() {
   global $base_url, $base_path, $base_root;
 
   // Export the following settings.php variables to the global namespace
-  global $db_url, $db_prefix, $cookie_domain, $conf, $installed_profile, $update_free_access;
+  global $db_url, $db_prefix, $db_collation, $cookie_domain, $conf, $installed_profile, $update_free_access;
   $conf = array();
+
+  if (!isset($_SERVER['SERVER_PROTOCOL']) || ($_SERVER['SERVER_PROTOCOL'] != 'HTTP/1.0' && $_SERVER['SERVER_PROTOCOL'] != 'HTTP/1.1')) {
+    $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.0';
+  }
 
   if (isset($_SERVER['HTTP_HOST'])) {
     // As HTTP_HOST is user input, ensure it only contains characters allowed
@@ -381,7 +389,7 @@ function conf_init() {
     $_SERVER['HTTP_HOST'] = strtolower($_SERVER['HTTP_HOST']);
     if (!drupal_valid_http_host($_SERVER['HTTP_HOST'])) {
       // HTTP_HOST is invalid, e.g. if containing slashes it may be an attack.
-      header('HTTP/1.1 400 Bad Request');
+      header($_SERVER['SERVER_PROTOCOL'] .' 400 Bad Request');
       exit;
     }
   }
@@ -483,7 +491,7 @@ function conf_init() {
  * the above, depending on where the module is located.
  *
  * @param $type
- *   The type of the item (i.e. theme, theme_engine, module).
+ *   The type of the item (i.e. theme, theme_engine, module, profile).
  * @param $name
  *   The name of the item for which the filename is requested.
  * @param $filename
@@ -561,7 +569,11 @@ function variable_init($conf = array()) {
 }
 
 /**
- * Return a persistent variable.
+ * Returns a persistent variable.
+ *
+ * Case-sensitivity of the variable_* functions depends on the database
+ * collation used. To avoid problems, always use lower case for persistent
+ * variable names.
  *
  * @param $name
  *   The name of the variable to return.
@@ -579,7 +591,11 @@ function variable_get($name, $default) {
 }
 
 /**
- * Set a persistent variable.
+ * Sets a persistent variable.
+ *
+ * Case-sensitivity of the variable_* functions depends on the database
+ * collation used. To avoid problems, always use lower case for persistent
+ * variable names.
  *
  * @param $name
  *   The name of the variable to set.
@@ -604,7 +620,11 @@ function variable_set($name, $value) {
 }
 
 /**
- * Unset a persistent variable.
+ * Unsets a persistent variable.
+ *
+ * Case-sensitivity of the variable_* functions depends on the database
+ * collation used. To avoid problems, always use lower case for persistent
+ * variable names.
  *
  * @param $name
  *   The name of the variable to undefine.
@@ -670,7 +690,7 @@ function bootstrap_invoke_all($hook) {
  * including a theme, engine, module, etc., more than once.
  *
  * @param $type
- *   The type of item to load (i.e. theme, theme_engine, module).
+ *   The type of item to load (i.e. theme, theme_engine, module, profile).
  * @param $name
  *   The name of the item to load.
  *
@@ -733,7 +753,7 @@ function drupal_page_cache_header($cache) {
   if ($if_modified_since && $if_none_match
       && $if_none_match == $etag // etag must match
       && $if_modified_since == $last_modified) {  // if-modified-since must match
-    header('HTTP/1.1 304 Not Modified');
+    header($_SERVER['SERVER_PROTOCOL'] .' 304 Not Modified');
     // All 304 responses must send an etag if the 200 response for the same object contained an etag
     header("Etag: $etag");
     return;
@@ -791,7 +811,7 @@ function bootstrap_hooks() {
 function drupal_unpack($obj, $field = 'data') {
   if ($obj->$field && $data = unserialize($obj->$field)) {
     foreach ($data as $key => $value) {
-      if (!isset($obj->$key)) {
+      if (!empty($key) && !isset($obj->$key)) {
         $obj->$key = $value;
       }
     }
@@ -909,7 +929,8 @@ function request_uri() {
  * Log a system message.
  *
  * @param $type
- *   The category to which this message belongs.
+ *   The category to which this message belongs. Can be any string, but the
+ *   general practice is to use the name of the module calling watchdog().
  * @param $message
  *   The message to store in the log. See t() for documentation
  *   on how $message and $variables interact. Keep $message
@@ -919,7 +940,8 @@ function request_uri() {
  *   NULL if message is already translated or not possible to
  *   translate.
  * @param $severity
- *   The severity of the message, as per RFC 3164
+ *   The severity of the message, as per RFC 3164. Possible values are
+ *   WATCHDOG_ERROR, WATCHDOG_WARNING, etc.
  * @param $link
  *   A link to associate with the message.
  *
@@ -943,7 +965,7 @@ function watchdog($type, $message, $variables = array(), $severity = WATCHDOG_NO
     );
 
   // Call the logging hooks to log/process the message
-  foreach (module_implements('watchdog', TRUE) as $module) {
+  foreach (module_implements('watchdog') as $module) {
     module_invoke($module, 'watchdog', $log_message);
   }
 }
@@ -1131,7 +1153,7 @@ function _drupal_bootstrap($phase) {
     case DRUPAL_BOOTSTRAP_ACCESS:
       // Deny access to hosts which were banned - t() is not yet available.
       if (drupal_is_denied('host', ip_address())) {
-        header('HTTP/1.1 403 Forbidden');
+        header($_SERVER['SERVER_PROTOCOL'] .' 403 Forbidden');
         print 'Sorry, '. check_plain(ip_address()) .' has been banned.';
         exit();
       }

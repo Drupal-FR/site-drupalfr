@@ -1,5 +1,4 @@
 <?php
-// $Id: search.module,v 1.250.2.10 2010/05/28 15:20:35 goba Exp $
 
 /**
  * @file
@@ -911,7 +910,7 @@ function _search_parse_query(&$word, &$scores, $not = FALSE) {
  *              Default: 'ORDER BY score DESC'
  *
  * @return
- *   An array of SIDs for the search results.
+ *   An array of objects for the search results.
  *
  * @ingroup search
  */
@@ -988,15 +987,14 @@ function search_get_keys() {
  * for all of the search features to work.
  *
  * There are three ways to interact with the search system:
- * - Specifically for searching nodes, you can implement nodeapi('update index')
- *   and nodeapi('search result'). However, note that the search system already
- *   indexes all visible output of a node, i.e. everything displayed normally
- *   by hook_view() and hook_nodeapi('view'). This is usually sufficient.
- *   You should only use this mechanism if you want additional, non-visible data
- *   to be indexed.
+ * - Specifically for searching nodes, you can implement
+ *   hook_nodeapi('update index') and hook_nodeapi('search result'). However,
+ *   note that the search system already indexes all visible output of a node,
+ *   i.e. everything displayed normally by hook_view() and hook_nodeapi('view').
+ *   This is usually sufficient. You should only use this mechanism if you want
+ *   additional, non-visible data to be indexed.
  * - Implement hook_search(). This will create a search tab for your module on
- *   the /search page with a simple keyword search form. You may optionally
- *   implement hook_search_item() to customize the display of your results.
+ *   the /search page with a simple keyword search form.
  * - Implement hook_update_index(). This allows your module to use Drupal's
  *   HTML indexing mechanism for searching full text efficiently.
  *
@@ -1019,7 +1017,7 @@ function search_get_keys() {
  * @param $prompt
  *   A piece of text to put before the form (e.g. "Enter your keywords")
  * @return
- *   An HTML string containing the search form.
+ *   A Form API array for the search form.
  */
 function search_form(&$form_state, $action = '', $keys = '', $type = NULL, $prompt = NULL) {
 
@@ -1038,7 +1036,7 @@ function search_form(&$form_state, $action = '', $keys = '', $type = NULL, $prom
     '#attributes' => array('class' => 'search-form'),
   );
   $form['module'] = array('#type' => 'value', '#value' => $type);
-  $form['basic'] = array('#type' => 'item', '#title' => $prompt);
+  $form['basic'] = array('#type' => 'item', '#title' => $prompt, '#id' => 'edit-keys');
   $form['basic']['inline'] = array('#prefix' => '<div class="container-inline">', '#suffix' => '</div>');
   $form['basic']['inline']['keys'] = array(
     '#type' => 'textfield',
@@ -1060,7 +1058,7 @@ function search_form(&$form_state, $action = '', $keys = '', $type = NULL, $prom
  *
  * @ingroup forms
  * @see search_box_form_submit()
- * @see theme_search_box_form()
+ * @see search-block-form.tpl.php
  */
 function search_box(&$form_state, $form_id) {
   $form[$form_id] = array(

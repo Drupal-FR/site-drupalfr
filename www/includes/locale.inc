@@ -1,5 +1,4 @@
 <?php
-// $Id: locale.inc,v 1.174.2.13 2010/05/28 13:07:27 goba Exp $
 
 /**
  * @file
@@ -1145,7 +1144,7 @@ function _locale_import_read_po($op, $file, $mode = NULL, $lang = NULL, $group =
       $context = "MSGID_PLURAL";
     }
     elseif (!strncmp("msgid", $line, 5)) {
-      if ($context == "MSGSTR") {   // End current entry, start a new one
+      if (($context == "MSGSTR") || ($context == "MSGSTR_ARR")) { // End current entry, start a new one
         _locale_import_one_string($op, $current, $mode, $lang, $file, $group);
         $current = array();
       }
@@ -1290,7 +1289,7 @@ function _locale_import_one_string($op, $value = NULL, $mode = NULL, $lang = NUL
         $languages = language_list();
         if (($mode != LOCALE_IMPORT_KEEP) || empty($languages[$lang]->plurals)) {
           // Since we only need to parse the header if we ought to update the
-          // plural formula, only run this if we don't need to keep existing 
+          // plural formula, only run this if we don't need to keep existing
           // data untouched or if we don't have an existing plural formula.
           $header = _locale_import_parse_header($value['msgstr']);
 
@@ -1672,7 +1671,7 @@ function _locale_import_shorten_comments($comment) {
       break;
     }
   }
-  return substr($comm, 0, -2);
+  return trim(substr($comm, 0, -2));
 }
 
 /**
@@ -2159,35 +2158,12 @@ function _locale_rebuild_js($langcode = NULL) {
   }
 
   // Construct the array for JavaScript translations.
-  // We sort on plural so that we have all plural forms before singular forms.
-  $result = db_query("SELECT s.lid, s.source, t.plid, t.plural, t.translation FROM {locales_source} s LEFT JOIN {locales_target} t ON s.lid = t.lid AND t.language = '%s' WHERE s.location LIKE '%%.js%%' AND s.textgroup = 'default' ORDER BY t.plural DESC", $language->language);
+  // Only add strings with a translation to the translations array.
+  $result = db_query("SELECT s.lid, s.source, t.translation FROM {locales_source} s INNER JOIN {locales_target} t ON s.lid = t.lid AND t.language = '%s' WHERE s.location LIKE '%%.js%%' AND s.textgroup = 'default'", $language->language);
 
-  $translations = $plurals = array();
+  $translations = array();
   while ($data = db_fetch_object($result)) {
-    // Only add this to the translations array when there is actually a translation.
-    if (!empty($data->translation)) {
-      if ($data->plural) {
-        // When the translation is a plural form, first add it to another array and
-        // wait for the singular (parent) translation.
-        if (!isset($plurals[$data->plid])) {
-          $plurals[$data->plid] = array($data->plural => $data->translation);
-        }
-        else {
-          $plurals[$data->plid] += array($data->plural => $data->translation);
-        }
-      }
-      elseif (isset($plurals[$data->lid])) {
-        // There are plural translations for this translation, so get them from
-        // the plurals array and add them to the final translations array.
-        $translations[$data->source] = array($data->plural => $data->translation) + $plurals[$data->lid];
-        unset($plurals[$data->lid]);
-      }
-      else {
-        // There are no plural forms for this translation, so just add it to
-        // the translations array.
-        $translations[$data->source] = $data->translation;
-      }
-    }
+    $translations[$data->source] = $data->translation;
   }
 
   // Construct the JavaScript file, if there are translations.
@@ -2622,20 +2598,21 @@ function _locale_batch_build($files, $finished = NULL, $components = array()) {
     $operations = array();
     foreach ($files as $file) {
       // We call _locale_batch_import for every batch operation.
-      $operations[] = array('_locale_batch_import', array($file->filename));    }
-      $batch = array(
-        'operations'    => $operations,
-        'title'         => $t('Importing interface translations'),
-        'init_message'  => $t('Starting import'),
-        'error_message' => $t('Error importing interface translations'),
-        'file'          => './includes/locale.inc',
-        // This is not a batch API construct, but data passed along to the
-        // installer, so we know what did we import already.
-        '#components'   => $components,
-      );
-      if (isset($finished)) {
-        $batch['finished'] = $finished;
-      }
+      $operations[] = array('_locale_batch_import', array($file->filename));
+    }
+    $batch = array(
+      'operations'    => $operations,
+      'title'         => $t('Importing interface translations'),
+      'init_message'  => $t('Starting import'),
+      'error_message' => $t('Error importing interface translations'),
+      'file'          => './includes/locale.inc',
+      // This is not a batch API construct, but data passed along to the
+      // installer, so we know what did we import already.
+      '#components'   => $components,
+    );
+    if (isset($finished)) {
+      $batch['finished'] = $finished;
+    }
     return $batch;
   }
   return FALSE;

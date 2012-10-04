@@ -1,5 +1,4 @@
 <?php
-// $Id: openid.module,v 1.19.2.9.2.1 2010/08/11 20:22:27 goba Exp $
 
 /**
  * @file
@@ -111,7 +110,7 @@ function openid_form_alter(&$form, $form_state, $form_id) {
       '#weight' => -1,
       '#description' => l(t('What is OpenID?'), 'http://openid.net/', array('external' => TRUE)),
     );
-    $form['openid.return_to'] = array('#type' => 'hidden', '#value' => url('openid/authenticate', array('absolute' => TRUE, 'query' => drupal_get_destination())));
+    $form['openid.return_to'] = array('#type' => 'hidden', '#value' => url('openid/authenticate', array('absolute' => TRUE, 'query' => user_login_destination())));
   }
   elseif ($form_id == 'user_register' && isset($_SESSION['openid']['values'])) {
     // We were unable to auto-register a new user. Prefill the registration
@@ -426,14 +425,17 @@ function openid_authentication($response) {
   elseif (variable_get('user_register', 1)) {
     // Register new user
     $form_state['redirect'] = NULL;
-    $form_state['values']['name'] = (empty($response['openid.sreg.nickname'])) ? '' : $response['openid.sreg.nickname'];
-    $form_state['values']['mail'] = (empty($response['openid.sreg.email'])) ? '' : $response['openid.sreg.email'];
+    // Only signed SREG keys are included as required by OpenID Simple
+    // Registration Extension 1.0, section 4.
+    $signed_keys = explode(',', $response['openid.signed']);
+    $form_state['values']['name'] = in_array('sreg.nickname', $signed_keys) ? $response['openid.sreg.nickname'] : '';
+    $form_state['values']['mail'] = in_array('sreg.email', $signed_keys) ? $response['openid.sreg.email'] : '';
     $form_state['values']['pass']  = user_password();
     $form_state['values']['status'] = variable_get('user_register', 1) == 1;
     $form_state['values']['response'] = $response;
     $form_state['values']['auth_openid'] = $identity;
 
-    if (empty($response['openid.sreg.email']) && empty($response['openid.sreg.nickname'])) {
+    if (empty($form_state['values']['name']) && empty($form_state['values']['mail'])) {
       drupal_set_message(t('Please complete the registration by filling out the form below. If you already have an account, you can <a href="@login">log in</a> now and add your OpenID under "My account".', array('@login' => url('user/login'))), 'warning');
       $success = FALSE;
     }

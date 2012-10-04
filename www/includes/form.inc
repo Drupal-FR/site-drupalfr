@@ -1,5 +1,4 @@
 <?php
-// $Id: form.inc,v 1.265.2.33 2010/05/19 15:02:32 goba Exp $
 
 /**
  * @defgroup forms Form builder functions
@@ -42,8 +41,8 @@
  *
  * For information on the format of the structured arrays used to define forms,
  * and more detailed explanations of the Form API workflow, see the
- * @link http://api.drupal.org/api/file/developer/topics/forms_api_reference.html reference @endlink
- * and the @link http://api.drupal.org/api/file/developer/topics/forms_api.html quickstart guide. @endlink
+ * @link http://api.drupal.org/api/file/developer/topics/forms_api_reference.html/6 reference @endlink
+ * and the @link http://drupal.org/node/204270 Form API guide. @endlink
  */
 
 /**
@@ -62,7 +61,9 @@
  *   Any additional arguments are passed on to the functions called by
  *   drupal_get_form(), including the unique form constructor function.
  *   For example, the node_edit form requires that a node object be passed
- *   in here when it is called.
+ *   in here when it is called. These are available to implementations of
+ *   hook_form_alter() and hook_form_FORM_ID_alter() as the array
+ *   $form['#parameters'].
  * @return
  *   The rendered form.
  */
@@ -248,9 +249,14 @@ function form_get_cache($form_build_id, &$form_state) {
 }
 
 /**
- * Retrieves a form using a form_id, populates it with $form_state['values'],
- * processes it, and returns any validation errors encountered. This
- * function is the programmatic counterpart to drupal_get_form().
+ * Retrieves, populates, and processes a form.
+ *
+ * This function allows you to supply values for form elements and submit a
+ * form for processing. Compare to drupal_get_form(), which also builds and
+ * processes a form, but does not allow you to supply values.
+ *
+ * There is no return value, but you can check to see if there are errors by
+ * calling form_get_errors().
  *
  * @param $form_id
  *   The unique string identifying the desired form. If a function
@@ -270,7 +276,6 @@ function form_get_cache($form_build_id, &$form_state) {
  *   For example, the node_edit form requires that a node object be passed
  *   in here when it is called.
  * For example:
- *
  * @code
  * // register a new user
  * $form_state = array();
@@ -1715,9 +1720,9 @@ function expand_date($element) {
 /**
  * Validates the date type to stop dates like February 30, 2006.
  */
-function date_validate($form) {
-  if (!checkdate($form['#value']['month'], $form['#value']['day'], $form['#value']['year'])) {
-    form_error($form, t('The specified date is invalid.'));
+function date_validate($element) {
+  if (!checkdate($element['#value']['month'], $element['#value']['day'], $element['#value']['year'])) {
+    form_error($element, t('The specified date is invalid.'));
   }
 }
 
@@ -2319,8 +2324,9 @@ function form_clean_id($id = NULL, $flush = FALSE) {
  *   'file' => 'path_to_file_containing_myfunctions',
  * );
  * batch_set($batch);
- * // only needed if not inside a form _submit handler :
- * batch_process();
+ * // Only needed if not inside a form _submit handler.
+ * // Setting redirect in batch_process.
+ * batch_process('node/1');
  * @endcode
  *
  * Note: if the batch 'title', 'init_message', 'progress_message', or

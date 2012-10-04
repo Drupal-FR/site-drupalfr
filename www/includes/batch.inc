@@ -1,5 +1,4 @@
 <?php
-// $Id: batch.inc,v 1.14 2007/12/20 11:57:20 goba Exp $
 
 /**
  * @file Batch processing API for processes to run in multiple HTTP requests.
@@ -133,6 +132,7 @@ function _batch_progress_page_nojs() {
     // followed by the error message.
     ob_start();
     $fallback = $current_set['error_message'] .'<br/>'. $batch['error_message'];
+    drupal_maintenance_theme();
     $fallback = theme('maintenance_page', $fallback, FALSE, FALSE);
 
     // We strip the end of the page using a marker in the template, so any
@@ -189,7 +189,7 @@ function _batch_process() {
       call_user_func_array($function, array_merge($args, array(&$batch_context)));
     }
 
-    if ($finished == 1) {
+    if ($finished >= 1) {
       // Make sure this step isn't counted double when computing $current.
       $finished = 0;
       // Remove the operation and clear the sandbox.
@@ -244,7 +244,7 @@ function _batch_process() {
       '@percentage' => $percentage,
       );
     $message = strtr($progress_message, $values) .'<br/>';
-    $message .= $task_message ? $task_message : '&nbsp';
+    $message .= $task_message ? $task_message : '&nbsp;';
 
     return array($percentage, $message);
   }
