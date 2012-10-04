@@ -417,6 +417,19 @@ div.warning {
   font-size: 0.9em;
 }
 
+
+/**
+ * Drupal 7 block
+ */
+
+#page #block-block-8,
+#page #block-block-8 .content,
+#page #block-block-8 .content .content-inner {
+  background-image: none;
+  background-color: white;
+  text-align: center;
+}
+
 /**
  * Drupal download block.
  */
@@ -1046,3 +1059,32 @@ ul.links li.tweetbutton {
   top: 5px;
 }
 
+
+/* Block Twitter */
+div#block-drupalfr_specific-0 {
+  margin-left: 510px;
+  width: 250px;
+}
+div#block-drupalfr_specific-0 .title, 
+div#block-drupalfr_specific-0 .title h2, 
+div#block-drupalfr_specific-0 .title .title-inner, 
+div#block-drupalfr_specific-0 .content,
+div#block-drupalfr_specific-0 .content .content-inner{
+  background: none;
+}
+div#block-drupalfr_specific-0 .title h2 {
+  color: black;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 0;
+}
+div#block-drupalfr_specific-0 .content ul {
+  padding: 0 0 0.25em 0;
+}
+
+div#block-drupalfr_specific-0 .content ul li {
+  list-style: none;
+}
+div#block-drupalfr_specific-0 div.tweets-pulled-listing div.tweet-divider {
+  clear: none;
+}
