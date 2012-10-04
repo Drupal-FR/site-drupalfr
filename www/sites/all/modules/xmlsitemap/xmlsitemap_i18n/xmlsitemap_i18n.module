@@ -1,16 +1,28 @@
 <?php
-// $Id: xmlsitemap_i18n.module,v 1.1.2.10 2010/02/11 02:25:42 davereid Exp $
+
+/**
+ * Implements hook_xmlsitemap_context_info().
+ */
+function xmlsitemap_i18n_xmlsitemap_context_info() {
+  $context['language'] = array(
+    'label' => t('Language'),
+    'summary callback' => 'locale_language_name',
+    'default' => language_default('language'),
+  );
+  return $context;
+}
 
 /**
  * Implements hook_xmlsitemap_context().
  */
 function xmlsitemap_i18n_xmlsitemap_context() {
-  global $language;
-
-  $context['language'] = $language->language;
+  $context['language'] = $GLOBALS['language']->language;
   return $context;
 }
 
+/**
+ * Implements xmlsitemap_context_url_options().
+ */
 function xmlsitemap_i18n_xmlsitemap_context_url_options(array $context) {
   $options = array();
   if (isset($context['language'])) {
@@ -20,31 +32,24 @@ function xmlsitemap_i18n_xmlsitemap_context_url_options(array $context) {
 }
 
 /**
- * Implements hook_xmlsitemap_context().
+ * Implements hook_form_FORM_ID_alter().
  */
-function xmlsitemap_i18n_xmlsitemap_context_fallback() {
-  $context['language'] = language_default('language');
-  return $context;
-}
-
-function xmlsitemap_i18n_xmlsitemap_context_info() {
-  $context['language'] = array(
-    'label' => t('Language'),
-    'summary callback' => 'locale_language_name',
-    'settings callback' => 'xmlsitemap_i18n_xmlsitemap_language_context_settings',
-  );
-  return $context;
-}
-
-function xmlsitemap_i18n_xmlsitemap_language_context_settings(stdClass $sitemap) {
-  $form['language'] = array(
+function xmlsitemap_i18n_form_xmlsitemap_sitemap_edit_form_alter(&$form, $form_state) {
+  $form['context']['language'] = array(
     '#type' => 'select',
     '#title' => t('Language'),
     '#options' => locale_language_list(),
-    '#default_value' => issset($sitemap->context['language']) ? $sitemap->context['language'] : '',
-    '#description' => t("Each language's sitemap will respect the <a href=\"@i18n-settings\">multilingual content selection mode</a>.", array('@i18n-settings' => url('admin/settings/language/i18n'))),
+    '#default_value' => isset($form['#sitemap']->context['language']) ? $form['#sitemap']->context['language'] : '',
   );
-  return $form;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Set the regeneration needed flag if settings are changed.
+ */
+function xmlsitemap_form_locale_languages_overview_form_alter(&$form, $form_state) {
+  array_unshift($form['#submit'], 'xmlsitemap_form_submit_flag_regenerate');
 }
 
 /**
@@ -57,29 +62,19 @@ function xmlsitemap_i18n_form_i18n_admin_settings_alter(&$form, $form_state) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- *
- * Allow the user to have multilingual sitemaps.
- */
-function xmlsitemap_i18n_form_xmlsitemap_settings_form_alter(&$form, $form_state) {
-  $form['xmlsitemap']['xmlsitemap_languages']['#options'] = locale_language_list();
-  $form['xmlsitemap']['xmlsitemap_languages']['#description'] = t("Each language's sitemap will respect the <a href=\"@i18n-settings\">multilingual content selection mode</a>.", array('@i18n-settings' => url('admin/settings/language/i18n')));
-}
-
-/**
- * Implements hook_xmlsitemap_query_alter().
+ * Implements hook_query_xmlsitemap_generate_alter().
  *
  * @see i18n_db_rewrite_where()
  */
-function xmlsitemap_i18n_xmlsitemap_query_alter(array &$query, array &$args, array $context) {
+function xmlsitemap_i18n_query_xmlsitemap_generate_alter(array &$query, array &$args, stdClass $sitemap) {
   $mode = variable_get('i18n_selection_mode', 'simple');
 
-  if (!isset($context['language']) || $mode == 'off') {
+  if (!isset($sitemap->context['language']) || $mode == 'off') {
     return;
   }
 
   // Get languages to simplify query building.
-  $current = $context['language'];
+  $current = $sitemap->context['language'];
   $default = i18n_default_language();
 
   if ($mode == 'mixed' && $current == $default) {

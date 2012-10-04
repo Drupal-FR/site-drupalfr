@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_filter_user_current.inc,v 1.2 2009/09/15 16:18:38 merlinofchaos Exp $
 
 /**
  * Filter handler for the current user
@@ -23,6 +22,6 @@ class views_handler_filter_user_current extends views_handler_filter_boolean_ope
     else {
       $where .= '= ***CURRENT_USER***';
     }
-    $this->query->add_where($this->options['group'], $where);    
+    $this->query->add_where($this->options['group'], $where);
   }
 }

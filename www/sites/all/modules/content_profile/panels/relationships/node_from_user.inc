@@ -1,5 +1,5 @@
 <?php
-// $Id: node_from_user.inc,v 1.1.2.1 2009/06/15 10:55:24 fago Exp $
+// $Id: node_from_user.inc,v 1.1.2.2 2009/08/05 13:41:06 fago Exp $
 
 /**
  * @file
@@ -25,25 +25,30 @@ function content_profile_node_from_user_ctools_relationships() {
 }
 
 /**
- * Return a new context based on an existing context
+ * Return a new context based on an existing context.
  */
-function content_profile_node_from_user_ctools_context($context = NULL, $conf) {
-  // If unset it wants a generic, unfilled context, which is just NULL
-  if (empty($context->data)) {
-    return ctools_context_create_empty('node', NULL);
+function content_profile_node_from_user_ctools_context($context, $conf) {
+  // If unset it wants a generic, unfilled context, which is just NULL.
+  if (empty($context->data) || !isset($context->data->uid)) {
+    $new_context = ctools_context_create_empty('node', NULL);
   }
-
-  if (isset($context->data->uid)) {
+  else {
     // Load the node for the requested type
     $uid = $context->data->uid;
     $content_profile_node = content_profile_load($conf['type'], $uid);
 
-    // Send it to ctools
-    return ctools_context_create('node', $content_profile_node);
+    // Send it to ctools.
+    $new_context = ctools_context_create('node', $content_profile_node);
+  }
+
+  // Have content profile relationships limit CCK field availability.
+  if (isset($new_context->restrictions['type'])) {
+    $new_context->restrictions['type'][] = $conf['type'];
   }
   else {
-    return ctools_context_create_empty('node', NULL);
+    $new_context->restrictions['type'] = array($conf['type']);
   }
+  return $new_context;
 }
 
 /**

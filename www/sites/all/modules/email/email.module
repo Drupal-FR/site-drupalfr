@@ -1,6 +1,5 @@
 <?php
 
-// $Id: email.module,v 1.9.2.8.4.12 2009/06/13 19:01:32 mh86 Exp $
 
 
 /**
@@ -18,6 +17,9 @@ function email_theme() {
       'arguments' => array('element' => NULL),
     ),
     'email_formatter_contact' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'email_formatter_plain' => array(
       'arguments' => array('element' => NULL),
     ),
   );
@@ -99,6 +101,11 @@ function email_field_formatter_info() {
       'field types' => array('email'),
       'multiple values' => CONTENT_HANDLE_CORE,
     ),
+    'plain' => array(
+      'label' => t('Email plain text'),
+      'field types' => array('email'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
   );
   if (module_exists('spamspan')) {
     $formats += array(
@@ -139,6 +146,13 @@ function theme_email_formatter_spamspan($element) {
  */
 function theme_email_formatter_contact($element) {
   return !empty($element['#item']['safe']) ? l(t('Email contact form'), 'email/'. $element['#node']->nid .'/'. $element['#field_name']) : '';
+}
+
+/**
+ * Theme function for 'plain' email field formatter.
+ */
+function theme_email_formatter_plain($element) {
+  return !empty($element['#item']['safe']) ? $element['#item']['safe'] : '';
 }
 
 
@@ -242,12 +256,12 @@ function theme_email_textfield($element) {
  * Implementation of hook_menu().
  */
 function email_menu() {
-  $items['email/%/%'] = array(
+  $items['email/%node/%'] = array(
     'title' => 'Email Contact Form',
     'page callback' => 'email_mail_page',
     'page arguments' => array(1, 2),
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
+    'access callback' => 'node_access',
+    'access arguments' => array('view', 1),
     'type' => MENU_CALLBACK,
   );
   $items['admin/settings/email'] = array(
@@ -263,19 +277,22 @@ function email_menu() {
 
 /**
  * The contact form page.
+ *
+ * @param $node
+ *   The node object on which the email address is stored.
+ * @param $field_name
+ *   The name of the CCK field which holds the email address.
+ *
+ * @return
+ *  Rendered page output containing either the contact form or a flood warning.
  */
-function email_mail_page($nid, $field_name) {
-  if (!is_numeric($nid)) {
-    drupal_not_found();
-    return;
-  }
+function email_mail_page($node, $field_name) {
   if (module_exists('content_permissions')) {
     if (!user_access('view '. $field_name)) {
       drupal_not_found();
       return;
     }
   }
-  $node = node_load(intval($nid));
   if (!$node) {
     drupal_not_found();
     return;

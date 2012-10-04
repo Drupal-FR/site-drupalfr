@@ -1,5 +1,4 @@
 <?php
-// $Id: path.rules_forms.inc,v 1.1.2.6 2009/08/25 18:16:42 fago Exp $
 
 /**
  * @file Rules configuration forms for the path module

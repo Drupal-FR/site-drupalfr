@@ -1,5 +1,4 @@
 <?php
-// $Id: jquery_ui.module,v 1.6.2.2 2009/06/21 03:43:03 sun Exp $
 
 /**
  * @file
@@ -9,20 +8,6 @@
  * modules that implement the JQuery UI library. It ensures that multiple
  * modules will all include the same library script just once on any given page.
  */
-
-/**
- * Path to jQuery UI library.
- *
- * During site installation, JQUERY_UI_PATH is the absolute path to the
- * jQuery UI library.  At all other times JQUERY_UI_PATH is relative, and
- * safe for use in URLs.
- */
-if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
-  define('JQUERY_UI_PATH', dirname(__FILE__) . '/jquery.ui');
-}
-else {
-  define('JQUERY_UI_PATH', drupal_get_path('module', 'jquery_ui') . '/jquery.ui');
-}
 
 /**
  * Add the specified jQuery UI library files to this page.
@@ -36,7 +21,12 @@ else {
  */
 function jquery_ui_add($files = array()) {
   static $loaded_files, $ui_core, $effects_core;
-  $jquery_ui_path = JQUERY_UI_PATH . '/ui';
+
+  $jquery_ui_path = jquery_ui_get_path();
+  if ($jquery_ui_path === FALSE) {
+    return FALSE;
+  }
+  $jquery_ui_path .= '/ui';
   $compression = variable_get('jquery_update_compression_type', 'mini');
 
   // Convert file to an array if it's not one already, to compensate for
@@ -83,13 +73,62 @@ function jquery_ui_add($files = array()) {
 }
 
 /**
+ * Returns the path to the jQuery UI library or FALSE if not found.
+ */
+function jquery_ui_get_path() {
+  static $path;
+
+  if (isset($path)) {
+    return $path;
+  }
+  $path = FALSE;
+
+  // Libraries API integration.
+  if (function_exists('libraries_get_path')) {
+    $path = libraries_get_path('jquery.ui');
+    // Libraries API 1.x returns a default path; 2.x returns FALSE.
+    if ($path !== FALSE && !file_exists($path)) {
+      $path = FALSE;
+    }
+  }
+  // Manually check sites/all/libraries in case Libraries API is not available.
+  elseif (file_exists('./sites/all/libraries/jquery.ui')) {
+    $path = 'sites/all/libraries/jquery.ui';
+  }
+
+  // Check the module directory for backwards compatibility if other methods
+  // failed.
+  if (!$path) {
+    // drupal_get_path() is not available during Drupal installation.
+    if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
+      $path = drupal_substr(dirname(__FILE__), drupal_strlen(getcwd()) + 1);
+      $path = strtr($path, '\\', '/');
+      $path .= '/jquery.ui';
+    }
+    else {
+      $path = drupal_get_path('module', 'jquery_ui') . '/jquery.ui';
+    }
+    if (!file_exists($path)) {
+      $path = FALSE;
+    }
+  }
+
+  return $path;
+}
+
+/**
  * Return the version of jQuery UI installed.
  */
 function jquery_ui_get_version() {
   $version = 0;
 
-  if (file_exists(JQUERY_UI_PATH . '/version.txt')) {
-    $version = file_get_contents(JQUERY_UI_PATH . '/version.txt');
+  $path = jquery_ui_get_path();
+  if ($path === FALSE) {
+    return $version;
+  }
+  $file = $path . '/version.txt';
+  if (file_exists($file)) {
+    $version = file_get_contents($file);
   }
 
   return $version;

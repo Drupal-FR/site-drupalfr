@@ -1,4 +1,3 @@
-// $Id: ajax.js,v 1.26.2.8 2010/04/08 21:29:59 merlinofchaos Exp $
 /**
  * @file ajax_admin.js
  *
@@ -82,8 +81,9 @@ Drupal.Views.Ajax.ajaxResponse = function(data) {
   else if (!data.tab) {
     // If no display, reset the form.
     Drupal.Views.Ajax.setForm('', Drupal.settings.views.ajax.defaultForm);
-    //Enable the save button.
+    //Enable the save and delete button.
     $('#edit-save').removeAttr('disabled');
+    $('#edit-delete').removeAttr('disabled');
     // Trigger an update for the live preview when we reach this state:
     if ($('#views-ui-preview-form input#edit-live-preview').is(':checked')) {
       $('#views-ui-preview-form').trigger('submit');
@@ -216,7 +216,6 @@ Drupal.Views.updatePreviewFilterForm = function() {
   var url = $(this).attr('action');
   url = url.replace('nojs', 'ajax');
 
-  $('input[type=submit], button', this).after('<span class="views-throbbing">&nbsp</span>');
   $('input[name=q]', this).remove(); // remove 'q' for live preview.
   $(this).ajaxSubmit({
     url: url,
@@ -233,7 +232,9 @@ Drupal.Views.updatePreviewFilterForm = function() {
 Drupal.Views.updatePreviewLink = function() {
   var url = $(this).attr('href');
   url = url.replace('nojs', 'ajax');
-  if (url.substring(0, 18) != '/admin/build/views') {
+  var intern_url = Drupal.Views.getPath(url);
+
+  if (intern_url.substring(0, 17) != 'admin/build/views') {
     return true;
   }
 
@@ -261,8 +262,9 @@ Drupal.behaviors.ViewsAjaxLinks = function() {
     // Turn on the hilite to indicate this is in use.
     $(this).addClass('hilite');
 
-    // Disable the save button.
+    // Disable the save and delete button.
     $('#edit-save').attr('disabled', 'true');
+    $('#edit-delete').attr('disabled', 'true');
 
     $(this).addClass('views-throbbing');
     $.ajax({
@@ -304,7 +306,13 @@ Drupal.behaviors.ViewsAjaxLinks = function() {
 
   $('div#views-live-preview form:not(.views-processed)')
     .addClass('views-processed')
-    .submit(Drupal.Views.updatePreviewFilterForm);
+    .submit(Drupal.Views.updatePreviewFilterForm)
+    .find('input[type=submit], button').click(function() {
+      $(this).after('<span class="views-throbbing">&nbsp</span>');
+      // We have to actually tell it what button got clicked if we want
+      // anything to be sent:
+      this.form.clk = this;
+    });
 
   $('div#views-live-preview a:not(.views-processed)')
     .addClass('views-processed')
@@ -359,4 +367,70 @@ Drupal.Views.Ajax.handleErrors = function (xhr, path) {
   }
 
   alert(Drupal.t("An error occurred at @path.\n\nError Description: @error", {'@path': path, '@error': error_text}));
+}
+
+
+Drupal.behaviors.ViewsGroupedTableDrag = function(context) {
+  var table_id = 'arrange';
+  var table = $('table#arrange');
+  var tableDrag = Drupal.tableDrag[table_id];
+
+  if (tableDrag) {
+    // Add a handler for when a row is swapped, update empty regions.
+    tableDrag.row.prototype.onSwap = function(swappedRow) {
+      checkEmptyRegions(table, this);
+    };
+
+    $('a.views-groups-remove-link')
+      .addClass('views-processed')
+      .click(function() {
+        var id = $(this).attr('id').replace('views-remove-link-', '');
+        var $row = $('#views-row-' + id);
+        $row.hide().removeClass('draggable');
+        $('#views-removed-' + id).attr('checked', true);
+        tableDrag.rowObject = new tableDrag.row($row.get(0), 'mouse', tableDrag.indentEnabled, tableDrag.maxDepth, true);
+        // If there is a draggable row after the row we just removed, swap us
+        // down by one so that the empty region check does not see this row
+        // and think that the region is empty.
+        if ($row.next('tr').is('.draggable')) {
+          tableDrag.rowObject.swap('after', $row.next('tr').get(0));
+        }
+        checkEmptyRegions(table, tableDrag.rowObject);
+        return false;
+      });
+
+    // Add a handler so when a row is dropped, update fields dropped into new group.
+    tableDrag.onDrop = function() {
+      dragObject = this;
+      // If this occurs row is in an empty group or its is the first of the group
+      if ($(dragObject.rowObject.element).prev('tr').is('.group-message')) {
+        // Get the previous group, this contains the group id
+        var regionRow = $(dragObject.rowObject.element).prev('tr').get(0);
+        var groupId = regionRow.className.replace(/([^ ]+[ ]+)*group-([^ ]+)-message([ ]+[^ ]+)*/, '$2');
+        // Then, update the select group value
+        var selectGroupField = $('select.views-group-select', dragObject.rowObject.element);
+        selectGroupField.val(groupId);
+      }
+    }
+
+    var checkEmptyRegions = function(table, rowObject) {
+      $('tr.group-message', table).each(function() {
+        // If the dragged row is in this region, but above the message row, swap it down one space.
+        if ($(this).prev('tr').get(0) == rowObject.element) {
+          // Prevent a recursion problem when using the keyboard to move rows up.
+          if ((rowObject.method != 'keyboard' || rowObject.direction == 'down')) {
+            rowObject.swap('after', this);
+          }
+        }
+        // This region has become empty
+        if ($(this).next('tr').is(':not(.draggable)') || $(this).next('tr').size() == 0) {
+          $(this).removeClass('group-populated').addClass('group-empty');
+        }
+        // This region has become populated.
+        else if ($(this).is('.group-empty')) {
+          $(this).removeClass('group-empty').addClass('group-populated');
+        }
+      });
+    };
+  }
 }

@@ -1,0 +1,36 @@
+<?php
+
+class UAPhoneNumberTestCase extends DrupalWebTestCase {
+  /**
+   * Implementation of getInfo()
+   *
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Ukraine Phone number test'),
+      'description' => t('Tests various valid and invalid Ukraine phone numbers for validity'),
+      'group' => t('Phone')
+    );
+  }
+  
+  function setUp() {
+    parent::setUp();
+  }  
+
+  public function testPhoneUAValid() {
+    $this->assertTrue(valid_phone_number('ua', '+38-044-283-93-57'), t('Test valid'));
+    $this->assertTrue(valid_phone_number('ua', '(044)2839357'), t('Test valid'));
+    $this->assertTrue(valid_phone_number('ua', '+380442839357'), t('Test valid'));
+    $this->assertTrue(valid_phone_number('ua', '+38 (044)537-28-07'), t('Test valid'));
+    $this->assertTrue(valid_phone_number('ua', '8044223-95-26'), t('Test valid'));
+
+  }
+
+  public function testPhoneUAInvalid() {
+    $this->assertFalse(valid_phone_number('ua', '+380612839357'), t('Test invalid '));
+  }
+
+  public function testPhoneUAFormatting() {
+    //$this->assertEqual(format_phone_number('ua', '+6421123456', null), '+64 21 123 456', t('Check international mobile format'));
+  }
+}

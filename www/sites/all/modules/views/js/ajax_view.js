@@ -1,4 +1,3 @@
-// $Id: ajax_view.js,v 1.19.2.5 2010/03/25 18:25:28 merlinofchaos Exp $
 
 /**
  * @file ajaxView.js
@@ -47,12 +46,14 @@ Drupal.behaviors.ViewsAjaxView = function() {
       ajax_path = ajax_path[0];
     }
     $.each(Drupal.settings.views.ajaxViews, function(i, settings) {
-      var view = '.view-dom-id-' + settings.view_dom_id;
-      if (!$(view).size()) {
-        // Backward compatibility: if 'views-view.tpl.php' is old and doesn't
-        // contain the 'view-dom-id-#' class, we fall back to the old way of
-        // locating the view:
-        view = '.view-id-' + settings.view_name + '.view-display-id-' + settings.view_display_id;
+      if (settings.view_dom_id) {
+        var view = '.view-dom-id-' + settings.view_dom_id;
+        if (!$(view).size()) {
+          // Backward compatibility: if 'views-view.tpl.php' is old and doesn't
+          // contain the 'view-dom-id-#' class, we fall back to the old way of
+          // locating the view:
+          view = '.view-id-' + settings.view_name + '.view-display-id-' + settings.view_display_id;
+        }
       }
 
 
@@ -65,6 +66,13 @@ Drupal.behaviors.ViewsAjaxView = function() {
         // but this method is submitting elsewhere.
         $('input[name=q]', this).remove();
         var form = this;
+
+        $('input[type=submit], button', this).click(function () {
+          $(this).after('<span class="views-throbbing">&nbsp</span>');
+          // We have to actually tell it what button got clicked if we want
+          // anything to be sent:
+          form.clk = this;
+        });
         // ajaxSubmit doesn't accept a data argument, so we have to
         // pass additional fields this way.
         $.each(settings, function(key, setting) {
@@ -73,7 +81,6 @@ Drupal.behaviors.ViewsAjaxView = function() {
       })
       .addClass('views-processed')
       .submit(function () {
-        $('input[type=submit], button', this).after('<span class="views-throbbing">&nbsp</span>');
         var object = this;
         $(this).ajaxSubmit({
           url: ajax_path,

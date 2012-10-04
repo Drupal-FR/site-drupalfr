@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_node.test,v 1.1.2.22 2010/02/11 02:23:42 davereid Exp $
 
 /**
  * @file
@@ -18,8 +17,10 @@ class XMLSitemapNodeFunctionalTest extends XMLSitemapTestHelper {
     );
   }
 
-  function setUp() {
-    parent::setUp('xmlsitemap_node', 'comment');
+  function setUp($modules = array()) {
+    $modules[] = 'xmlsitemap_node';
+    $modules[] = 'comment';
+    parent::setUp($modules);
 
     $this->admin_user = $this->drupalCreateUser(array('administer nodes', 'administer content types', 'administer xmlsitemap'));
     $this->normal_user = $this->drupalCreateUser(array('create page content', 'edit any page content', 'access content'));
@@ -54,6 +55,7 @@ class XMLSitemapNodeFunctionalTest extends XMLSitemapTestHelper {
       'status' => TRUE,
     );
     $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
+    $node = node_load($node->nid);
     $this->assertText('Page Test node title has been updated.');
     $this->assertSitemapLinkValues('node', $node->nid, array('access' => 1, 'status' => 0, 'priority' => 0.9, 'status_override' => 1, 'priority_override' => 1));
 
@@ -110,11 +112,8 @@ class XMLSitemapNodeFunctionalTest extends XMLSitemapTestHelper {
    * Test the import of old nodes via cron.
    */
   function testCron() {
-    $this->drupalLogin($this->admin_user);
-
     $limit = 5;
-    $this->drupalPost('admin/settings/xmlsitemap', array('xmlsitemap_batch_limit' => $limit), t('Save configuration'));
-    $this->assertText(t('The configuration options have been saved.'));
+    variable_set('xmlsitemap_batch_limit', $limit);
 
     $nodes = array();
     for ($i = 1; $i <= ($limit + 1); $i++) {

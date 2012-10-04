@@ -1,5 +1,4 @@
 <?php
-// $Id: views_ui.module,v 1.109.4.1 2010/04/07 23:40:35 merlinofchaos Exp $
 /**
  * @file views_ui.module
  * Provide structure for the administrative interface to Views.
@@ -121,13 +120,29 @@ function views_ui_menu() {
     'page callback' => 'views_ui_analyze_view',
     'page arguments' => array(3, 5),
   );
-  $items['admin/build/views/%views_ui_js/details/%views_ui_cache'] = $callback + array(
-    'page callback' => 'views_ui_edit_details',
+  $items['admin/build/views/%views_ui_js/reorder-displays/%views_ui_cache'] = $callback + array(
+    'page callback' => 'views_ui_reorder_view',
     'page arguments' => array(3, 5),
+  );
+  $items['admin/build/views/%views_ui_js/human_name/%views_ui_cache'] = $callback + array(
+    'page callback' => 'views_ui_edit_details',
+    'page arguments' => array('human_name', 3, 5),
+  );
+  $items['admin/build/views/%views_ui_js/tag/%views_ui_cache'] = $callback + array(
+    'page callback' => 'views_ui_edit_details',
+    'page arguments' => array('tag', 3, 5),
+  );
+  $items['admin/build/views/%views_ui_js/description/%views_ui_cache'] = $callback + array(
+    'page callback' => 'views_ui_edit_details',
+    'page arguments' => array('description', 3, 5),
   );
   $items['admin/build/views/%views_ui_js/add-display/%views_ui_cache'] = $callback + array(
     'page callback' => 'views_ui_add_display',
     'page arguments' => array(3, 5),
+  );
+    $items['admin/build/views/%views_ui_js/clone-display/%views_ui_cache'] = $callback + array(
+    'page callback' => 'views_ui_clone_display',
+    'page arguments' => array(3, 5, 6),
   );
   // Live preview
   $items['admin/build/views/%views_ui_js/preview/%views_ui_cache'] = $callback + array(
@@ -189,6 +204,10 @@ function views_ui_theme() {
       'arguments' => array('form' => NULL),
       'file' => 'includes/admin.inc',
     ),
+    'views_ui_rearrange_filter_form' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'includes/admin.inc',
+    ),
 
     // list views
     'views_ui_list_views' => array(
@@ -209,6 +228,11 @@ function views_ui_theme() {
       'arguments' => array('body' => NULL),
       'file' => 'includes/tabs.inc',
     ),
+    'views_ui_reorder_displays_form' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'includes/admin.inc',
+    ),
+
 
     // On behalf of a plugin
     'views_ui_style_plugin_table' => array(
@@ -234,6 +258,10 @@ function views_ui_cache_load($name) {
       // Check to see if someone else is already editing this view.
       global $user;
       $view->locked = db_fetch_object(db_query("SELECT s.uid, v.updated FROM {views_object_cache} v INNER JOIN {sessions}  s ON v.sid = s.sid WHERE s.sid != '%s' and v.name = '%s' and v.obj = 'view' ORDER BY v.updated ASC", session_id(), $view->name));
+      // Set a flag to indicate that this view is being edited.
+      // This flag will be used e.g. to determine whether strings
+      // should be localized.
+      $view->editing = TRUE;
     }
   }
 
@@ -266,6 +294,7 @@ function views_ui_cache_set(&$view) {
   unset($view->display_handler);
   unset($view->current_display);
   unset($view->default_display);
+  $view->query = NULL;
   foreach (array_keys($view->display) as $id) {
     unset($view->display[$id]->handler);
     unset($view->display[$id]->default_display);

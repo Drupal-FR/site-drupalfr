@@ -1,4 +1,3 @@
-// $Id: xmlsitemap.xsl.js,v 1.1.2.3 2009/12/23 07:34:55 davereid Exp $
 (function($){
 
 $.tablesorter.addParser({

@@ -1,4 +1,4 @@
-$Id: README.txt,v 1.25 2010/01/02 14:10:50 thierrygd Exp $
+$Id: README.txt,v 1.32 2011/01/03 14:40:44 thierrygd Exp $
 
 Copyright 2010 http://www.arvoriad.com
 
@@ -9,34 +9,45 @@ This module provides a phone field type for CCK.
 
 Features:
 ---------
-* Validation of phone numbers : support of 
-	+ French, 
-	+ British, 
-	+ Switzerland, 
-	+ Italian, 
-	+ Dutch, 
-	+ Israelian, 
-	+ Russian, 
-	+ Australian
-	+ Spanish,
-	+ Czech, 
-	+ Hungarian,
-	+ Costa Rican, 
-	+ Panamanian, 
-	+ Brazilian, 
-	+ New Zealand, 
-	+ Hong-Kong, 
-	+ Macau,  
-	+ Philippine, 
-	+ US, 
+* Validation of phone numbers : support of
+	+ France,
+	+ Belgium,
+	+ Great Britain,
+	+ Switzerland,
+	+ Italy,
+	+ Greece,
+	+ Netherland,
+	+ Israel,
+	+ Russia,
+	+ Ukraine,
+	+ Australia
+	+ Spain,
+	+ Czech,
+	+ Hungary,
+	+ Poland (mobile only),
+	+ Costa Rica,
+	+ Panamana,
+	+ Brazil,
+	+ Chili,
+	+ New Zealand,
+	+ China,
+	+ Hong-Kong,
+	+ Macau,
+	+ Philippine,
+	+ Singapore,
+	+ US,
 	+ Swiss,
-	+ Jordanian, 
-	+ Egyptian,
-	and Canadian phone numbers 
+	+ Jordan,
+	+ Egypt,
+	+ South Africa,
+	+ Pakistan,
+	and Canadian phone numbers
 	and generic international phone numbers
-* Formating of phone numbers 
-* Option for internationalization of phone numbers  
-* IPhone support 
+* Formating of phone numbers
+* Option for internationalization of phone numbers
+* IPhone support
+* Phone CCK fields can be used as a Token 
+* This module is compatible with module http://drupal.org/project/node_import Node Import module, this module allowing to import data into phone fields 
 
 Prerequisites
 -------------
@@ -59,9 +70,9 @@ http://drupal.org/project/phone
 
 Todo List:
 ----------
-* add support to other country phone numbers 
-* improve the validation of phone numbers for the different countries 
-* internationalization of the module 
+* add support to other country phone numbers
+* improve the validation of phone numbers for the different countries
+* internationalization of the module
 
 Author
 ------

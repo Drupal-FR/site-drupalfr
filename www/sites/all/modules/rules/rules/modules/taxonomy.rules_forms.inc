@@ -1,5 +1,4 @@
 <?php
-// $Id: taxonomy.rules_forms.inc,v 1.1.2.10 2009/09/10 10:57:54 fago Exp $
 
 
 /**
@@ -185,6 +184,28 @@ function _rules_action_taxonomy_get_vocab() {
     $options[$vocab->vid] = check_plain($vocab->name);
   }
   return $options;
+}
+
+/**
+ * Condition: Check for terms; Configuration form.
+ */
+function rules_condition_content_has_term_form($settings, &$form) {
+  $vocabularies = taxonomy_get_vocabularies();
+  $options = array();
+  foreach ($vocabularies as $vocabulary) {
+    $terms = taxonomy_get_tree($vocabulary->vid);
+    foreach ($terms as $term) {
+      $options[check_plain($vocabulary->name)][$term->tid] = check_plain($term->name);
+    }
+  }
+  $form['settings']['tids'] = array(
+    '#type' => 'select',
+    '#title' => t('Taxonomy terms'),
+    '#options' => $options,
+    '#multiple' => TRUE,
+    '#default_value' => isset($settings['tids']) ? $settings['tids'] : array(),
+    '#required' => TRUE,
+  );
 }
 
 /**

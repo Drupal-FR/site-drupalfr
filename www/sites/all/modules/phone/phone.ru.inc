@@ -1,24 +1,24 @@
 <?php
-// $Id: phone.ru.inc,v 1.23 2010/01/02 14:10:50 thierrygd Exp $
+// $Id: phone.ru.inc,v 1.30 2011/01/03 14:40:32 thierrygd Exp $
 
 /**
  * @file
  * CCK Field for Russian phone numbers.
  */
- 
+
 function phone_ru_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Russian Phone Numbers',
+    'label' => 'Phone Numbers - Russia',
     'error' => '"%value" is not a valid Russian phone number<br>Russian Phone numbers should .... ',
   );
 }
- 
-/**  
+
+/**
  * Verifies that $phonenumber is a valid ten-digit Russian phone number
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 
 function valid_ru_phone_number($phonenumber) {
@@ -29,7 +29,7 @@ function valid_ru_phone_number($phonenumber) {
   $regex = "/
     \D*           # ignore non-digits
     [78]?         # an optional 78
-    \D*           # optional separator 
+    \D*           # optional separator
     \d{3,5}       # area code 3-5 digit
     \D*           # optional separator
     \d{1,3}       # 3-digit prefix
@@ -40,22 +40,22 @@ function valid_ru_phone_number($phonenumber) {
     \D*           # ignore trailing non-digits
     /x";
   // return true if valid, false otherwise
-  return (bool) preg_match($regex, $phonenumber); 
-} 
+  return (bool) preg_match($regex, $phonenumber);
+}
 
 /**
  * Convert a valid Russian phone number into standard +7 (495) 567-53-09 or +7 (444xx) 67-53-09 or mobile 8 910 414-56-90 format
- * 
+ *
  * @param $phonenumber must be a valid ten-digit number (with optional extension)
- * 
+ *
  */
 function format_ru_phone_number($phonenumber, $field = FALSE) {
 
-  // define regular expression   
+  // define regular expression
   $regex = "/
     ^\D*          # ignore non-digits
     ([78])?       # an optional 78
-    \D*           # optional separator 
+    \D*           # optional separator
     (\d{3,5})  	  # area code 3-5 digit
     \D*           # optional separator
     (\d{1,3})  	  # capture 3-digit prefix
@@ -64,7 +64,7 @@ function format_ru_phone_number($phonenumber, $field = FALSE) {
     \D*           # optional separator
     (\d{2})       # 2-digit line number
     \D*           # ignore trailing non-digits
-  /x"; 
+  /x";
 
   // get digits of phone number
   preg_match($regex, $phonenumber, $matches);

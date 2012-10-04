@@ -1,5 +1,4 @@
 <?php
-// $Id: node.rules.inc,v 1.1.2.39 2009/08/25 17:28:58 fago Exp $
 
 /**
  * @file rules integration for the node module
@@ -363,6 +362,9 @@ function node_rules_data_type_info() {
 class rules_data_type_node extends rules_data_type {
   function save() {
     $node = &$this->get();
+    // Bug fix: Make sure we don't create another revision when we react on the
+    // creation of an revision.
+    unset($node->revision);
     node_save($node);
     return TRUE;
   }

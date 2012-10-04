@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_engines.admin.inc,v 1.1.4.14 2010/02/04 23:15:18 davereid Exp $
 
 /**
  * @file
@@ -27,7 +26,7 @@ function xmlsitemap_engines_settings_form() {
   $form['xmlsitemap_engines_minimum_lifetime'] = array(
     '#type' => 'select',
     '#title' => t('Do not submit more often than every'),
-    '#options' => drupal_map_assoc(array(300, 900, 1800, 3600, 10800, 21600, 32400, 43200, 86400, 172800, 259200, 604800, 604800 * 2, 604800 * 4), 'format_interval'),
+    '#options' => drupal_map_assoc(array(3600, 10800, 21600, 32400, 43200, 86400, 172800, 259200, 604800, 604800 * 2, 604800 * 4), 'format_interval'),
     '#default_value' => variable_get('xmlsitemap_engines_minimum_lifetime', 86400),
   );
   $form['xmlsitemap_engines_submit_updated'] = array(

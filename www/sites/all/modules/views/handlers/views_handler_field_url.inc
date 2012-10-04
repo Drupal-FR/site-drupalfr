@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_field_url.inc,v 1.1.4.1 2010/06/17 02:46:52 merlinofchaos Exp $
 
 /**
  * Field handler to provide simple renderer that turns a URL into a clickable link.
@@ -28,12 +27,12 @@ class views_handler_field_url extends views_handler_field {
   }
 
   function render($values) {
-    $value = $values->{$this->field_alias};
+    $value = $this->get_value($values);
     if (!empty($this->options['display_as_link'])) {
-      return l(check_plain($value), $value, array('html' => TRUE));
+      return l($this->sanitize_value($value), $value, array('html' => TRUE));
     }
     else {
-      return check_url($value);
+      return $this->sanitize_value($value, 'url');
     }
   }
 }

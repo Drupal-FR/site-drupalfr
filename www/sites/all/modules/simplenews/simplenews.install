@@ -1,10 +1,29 @@
 <?php
-// $Id: simplenews.install,v 1.8.2.33 2010/05/21 15:37:41 sutharsan Exp $
 
 /**
  * @file
  * Simplenews installation.
  */
+
+/**
+ * Implementation of hook_requirements().
+ */
+function simplenews_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+  // Report if token module got missing (e.g. after 6--1 to 6--2 upgrade)
+  if ($phase == 'runtime') {
+    if (!module_exists('token')) {
+      $requirements['simplenews_token'] = array(
+        'title' => $t('Simplenews'),
+        'value' => l($t('token.module missing'), 'http://drupal.org/project/token'),
+        'description' => $t("Simplenews is broken if token.module is missing. This could happen after 6.x-1.x upgrade to 6.x-2.x upgrade since token is a new dependency and Drupal 6 core doesn't check for presence. Please install token.module immediately since all sending processes are broken."),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
 
 /**
  * Implementation of hook_schema().
@@ -44,6 +63,13 @@ function simplenews_schema() {
         'not null' => TRUE,
         'default' => '',
         'description' => 'Anonymous subscriber preferred language. Empty for authenticated users.',
+      ),
+      'timestamp' => array(
+        'description' => 'UNIX timestamp of when the user first subscribed to a newsletter.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
       ),
     ),
     'indexes' => array(
@@ -102,24 +128,51 @@ function simplenews_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'sent_subscriber_count' => array(
+        'description' => 'The count of subscribers to the newsletter when it was sent.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('nid'),
   );
 
   $schema['simplenews_snid_tid'] = array(
-    'description' => t('Newsletter series subscription data.'),
+    'description' => 'Newsletter series subscription data.',
     'fields' => array(
        'snid' => array(
-        'description' => t('The {simplenews_subscriptions}.snid who is subscribed.'),
+        'description' => 'The {simplenews_subscriptions}.snid who is subscribed.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
-       'tid' => array(
-        'description' => t('The newsletter series ({term_data}.tid) the subscriber is subscribed to.'),
+      'tid' => array(
+        'description' => 'The newsletter series ({term_data}.tid) the subscriber is subscribed to.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'A flag indicating whether the user is subscribed (1) or unsubscribed (0).',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 1
+      ),
+      'timestamp' => array(
+        'description' => 'UNIX timestamp of when the user is (un)subscribed.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'source' => array(
+        'description' => 'The source via which the user is (un)subscription.',
+        'type' => 'varchar',
+        'length' => 24,
+        'not null' => TRUE,
+        'default' => '',
       ),
     ),
     'primary key' => array('snid', 'tid'),
@@ -133,8 +186,15 @@ function simplenews_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         ),
+      'snid' => array(
+        'description' => 'Foreign key for subscriber table ({simplenews_subscriptions}.snid)',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        ),
       'mail' => array(
-        'description' => 'The formatted email address of mail message receipient.',
+        'description' => 'The formatted email address of mail message recipient.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -167,7 +227,7 @@ function simplenews_schema() {
         'size' => 'tiny',
       ),
       'error' => array(
-        'description' => 'A boolean indicating whether an error occured while sending the email.',
+        'description' => 'A boolean indicating whether an error occurred while sending the email.',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
@@ -215,7 +275,9 @@ function simplenews_install() {
  */
 function simplenews_uninstall() {
   drupal_uninstall_schema('simplenews');
-  db_query("DELETE FROM {variable} WHERE name LIKE 'simplenews_%%'");
+  db_query("
+    DELETE FROM {variable}
+    WHERE name LIKE 'simplenews_%%'");
 }
 
 /**
@@ -248,7 +310,11 @@ function _simplenews_install_nodetype() {
  */
 function _simplenews_install_vocabulary() {
   // Create the simplenews vocabulary. If it exists, set it as the simplenews_vid.
- if ($vocabulary = db_fetch_array(db_query("SELECT * FROM {vocabulary} WHERE name = '%s'", t('Newsletter')))) {
+  if ($vocabulary = db_fetch_array(db_query("
+    SELECT *
+    FROM {vocabulary}
+    WHERE name = '%s'",
+    t('Newsletter')))) {
     $vocabulary['nodes'] = variable_get('simplenews_content_types', array('simplenews' => 'simplenews'));
   }
   else {
@@ -266,7 +332,11 @@ function _simplenews_install_vocabulary() {
   variable_set('simplenews_vid', $vocabulary['vid']);
 
   // Check to see if at least 1 term exists, else create one
-  $tid = db_result(db_query('SELECT tid FROM {term_data} WHERE vid = %d', $vocabulary['vid']));
+  $tid = db_result(db_query('
+    SELECT tid
+    FROM {term_data}
+    WHERE vid = %d',
+      $vocabulary['vid']));
   if (!$tid) {
     $form_values = array(
       'name' => t('@site_name newsletter', array('@site_name' => variable_get('site_name', 'Drupal'))),
@@ -323,15 +393,35 @@ function simplenews_update_6000() {
   $ret = array();
 
   // Convert the block delta: remove 'newsletter-' prefix from the delta.
-  $result = db_query("SELECT module, delta FROM {blocks} WHERE module = 'simplenews' AND delta LIKE 'newsletter-%'");
+  $result = db_query("
+    SELECT module, delta
+    FROM {blocks}
+    WHERE module = 'simplenews'
+      AND delta LIKE 'newsletter-%'");
   while ($data = db_fetch_object($result)) {
     $delta = strtr($data->delta, array('newsletter-' => ''));
-    $ret[] = update_sql("UPDATE {blocks} SET delta = '%s' WHERE module = 'simplenews' AND delta = 'newsletter-%s'", $delta, $delta);
+    $ret[] = update_sql("
+      UPDATE {blocks}
+      SET delta = '%s'
+      WHERE module = 'simplenews'
+        AND delta = 'newsletter-%s'",
+      $delta,
+      $delta);
   }
-  $result = db_query("SELECT module, delta FROM {blocks_roles} WHERE module = 'simplenews' AND delta LIKE 'newsletter-%'");
+  $result = db_query("
+    SELECT module, delta
+    FROM {blocks_roles}
+    WHERE module = 'simplenews'
+      AND delta LIKE 'newsletter-%'");
   while ($data = db_fetch_object($result)) {
     $delta = strtr($data->delta, array('newsletter-' => ''));
-    $ret[] = update_sql("UPDATE {blocks_roles} SET delta = '%s' WHERE module = 'simplenews' AND delta = 'newsletter-%s'", $delta, $delta);
+    $ret[] = update_sql("
+      UPDATE {blocks_roles}
+      SET delta = '%s'
+      WHERE module = 'simplenews'
+        AND delta = 'newsletter-%s'",
+      $delta,
+      $delta);
   }
 
   // Convert newsletter priority: change field type int to string
@@ -391,7 +481,7 @@ function simplenews_update_6001() {
         'default' => '',
       ),
       'mail' => array(
-        'description' => 'The formatted email address of mail message receipient.',
+        'description' => 'The formatted email address of mail message recipient.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -441,8 +531,10 @@ function simplenews_update_6001() {
 }
 
 /**
+ * Addition of node version to simplenews_newsletters in order to record the
+ * node version which is being send.
  * Addition of nid to simplenews_mail_cache to be able to check the newsletter
- * send status.
+ * sent status.
  */
 function simplenews_update_6002() {
   $ret = array();
@@ -474,7 +566,7 @@ function simplenews_update_6004() {
         'not null' => TRUE,
         ),
       'mail' => array(
-        'description' => 'The formatted email address of mail message receipient.',
+        'description' => 'The formatted email address of mail message recipient.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -539,9 +631,20 @@ function simplenews_update_6005() {
   );
 
   // Set preferred language for all current none anonymous subscribers.
-  $result = db_query('SELECT s.snid, u.language FROM {simplenews_subscriptions} s INNER JOIN {users} u ON u.uid = s.uid WHERE s.uid > %d', 0);
+  $result = db_query('
+    SELECT s.snid, u.language
+    FROM {simplenews_subscriptions} s
+    INNER JOIN {users} u
+      ON u.uid = s.uid
+    WHERE s.uid > %d',
+    0);
   while ($subscriber = db_fetch_object($result)) {
-    $ret[] = update_sql("UPDATE {simplenews_subscriptions} SET language = '%s' WHERE snid = %d", $subscriber->language, $subscriber->snid);
+    $ret[] = update_sql("
+      UPDATE {simplenews_subscriptions}
+      SET language = '%s'
+      WHERE snid = %d",
+      $subscriber->language,
+      $subscriber->snid);
   }
   return $ret;
 }
@@ -551,7 +654,7 @@ function simplenews_update_6005() {
  */
 function simplenews_update_6006() {
   $ret = array();
-  
+
   // Convert existing node type or re-create it.
   // If _node_types_build() if called before update, the simplenews
   // node type gets deleted because simplenews_node_info() no longer exists.
@@ -565,7 +668,7 @@ function simplenews_update_6006() {
   else {
     _simplenews_install_nodetype();
   }
-  
+
   return $ret;
 }
 
@@ -574,13 +677,19 @@ function simplenews_update_6006() {
  */
 function simplenews_update_6007() {
   $ret = array();
-  $result = db_query("SELECT rid, perm FROM {permission} ORDER BY rid");
+  $result = db_query("
+    SELECT rid, perm
+    FROM {permission}
+    ORDER BY rid");
   while ($role = db_fetch_object($result)) {
     $patterns = array('/create newsletter/', '/edit own newsletter/', '/edit any newsletter/', '/delete own newsletter/', '/delete any newsletter/');
-    $replacements = array('create simplenews content', 'edit own simplenews content', 'edit any simplenews content' ,'delete own simplenews content', 'delete any simplenews content');
+    $replacements = array('create simplenews content', 'edit own simplenews content', 'edit any simplenews content', 'delete own simplenews content', 'delete any simplenews content');
     $renamed_permission = preg_replace($patterns, $replacements, $role->perm);
     if ($renamed_permission != $role->perm) {
-      $ret[] = update_sql("UPDATE {permission} SET perm = '$renamed_permission' WHERE rid = $role->rid");
+      $ret[] = update_sql("
+        UPDATE {permission}
+        SET perm = '$renamed_permission'
+        WHERE rid = $role->rid");
     }
   }
   return $ret;
@@ -597,35 +706,97 @@ function simplenews_update_6008() {
 }
 
 /**
- * Addition of error to simplenews_mail_cache to mark an email error.
+ * Add (un)subscription data to table simplenews_snid_tid.
  */
-function simplenews_update_6009() {
+function simplenews_update_6100() {
   $ret = array();
-  db_add_field($ret, 'simplenews_mail_spool', 'error', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+  db_add_field($ret, 'simplenews_snid_tid', 'status', array(
+      'description' => 'A flag indicating whether the user is subscribed (1) or unsubscribed (0).',
+      'type' => 'int',
+      'size' => 'small',
+      'not null' => TRUE,
+      'default' => 1
+    )
+  );
+  db_add_field($ret, 'simplenews_snid_tid', 'timestamp', array(
+      'description' => 'UNIX timestamp of when the user is (un)subscribed.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    )
+  );
+  db_add_field($ret, 'simplenews_snid_tid', 'source', array(
+      'description' => 'The source via which the user is (un)subscription.',
+      'type' => 'varchar',
+      'length' => 24,
+      'not null' => TRUE,
+      'default' => '',
+    )
+  );
   return $ret;
-}
-
-function simplenews_update_6200() {
-  // Added for compatibility with HEAD.
-  return array();
 }
 
 /**
- * Faulty update function. Corrected by the next one.
- *
- * @see simplenews_update_6011().
+ * Convert Simplenews custom tokens to Token tokens.
  */
-function simplenews_update_6010() {
+function simplenews_update_6101() {
   $ret = array();
-  // Function removed.
-  
+
+  $old = array(
+    '!site',
+    '!mailto',
+    '!date',
+    '!login_uri',
+    '!uri',
+    '!confirm_subscribe_url',
+    '!confirm_unsubscribe_url',
+    '!newsletter_url',
+    '!newsletter_name',
+  );
+  $new = array(
+    '[site-name]',
+    '[user-mail]',
+    '[site-date]',
+    '[site-url]/user',
+    '[site-url]',
+    '[simplenews-subscribe-url]',
+    '[simplenews-unsubscribe-url]',
+    '[simplenews-newsletter-url]',
+    '[simplenews-newsletters-name]',
+  );
+  $variables = array(
+    'simplenews_confirm_subscribe_subject',
+    'simplenews_confirm_subscribe_unsubscribed',
+    'simplenews_confirm_subscribe_subscribed',
+    'simplenews_confirm_unsubscribe_subscribed',
+    'simplenews_confirm_unsubscribe_unsubscribed',
+  );
+  foreach ($variables as $variable) {
+    if ($text = variable_get($variable, FALSE)) {
+      $text = str_replace($old, $new, $text);
+      variable_set($variable, $text);
+    }
+  }
+  drupal_set_message(t('Simplenews custom tokens have been deprecated. An attempt was made to replace custom tokens in the confirmation messages. Check the messages at <a href="!url">Simplenews subscription settings</a>. Manually replace Simplenews tokens in (unsent) newsletter issues.', array('!url' => url('admin/settings/simplenews/subscription'))));
   return $ret;
+}
+
+
+/**
+ * Dummy update for compatibility with HEAD
+ *
+ * Accidentally added in DRUPAL-6--1-1 branch already.
+ * Continuing with 6200 numbers!
+ */
+function simplenews_update_6200() {
+  return array();
 }
 
 /**
  * Correction of field size mismatch caused by simplenews_update_6009().
  */
-function simplenews_update_6011() {
+function simplenews_update_6201() {
   $ret = array();
   db_change_field($ret, 'simplenews_mail_spool', 'error', 'error', array(
         'type' => 'int',
@@ -633,5 +804,115 @@ function simplenews_update_6011() {
         'not null' => TRUE,
         'default' => 0,
   ));
+  return $ret;
+}
+
+/**
+ * Add fields 'status', 'timestamp', 'source' to 'simplenews_snid_tid' table.
+ *
+ * First update of DRUPAL-6--2 branch.
+ */
+function simplenews_update_6251() {
+  $ret = array();
+  db_add_field($ret, 'simplenews_snid_tid', 'status', array(
+        'description' => 'A flag indicating whether the user is subscribed (1) or unsubscribed (0).',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 1
+    )
+  );
+  db_add_field($ret, 'simplenews_snid_tid', 'timestamp', array(
+        'description' => 'UNIX timestamp of when the user is (un)subscribed.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+    )
+  );
+  db_add_field($ret, 'simplenews_snid_tid', 'source', array(
+        'description' => 'The source via which the user is (un)subscription.',
+        'type' => 'varchar',
+        'length' => 24,
+        'not null' => TRUE,
+        'default' => '',
+    )
+  );
+  return $ret;
+}
+
+/**
+ * Add 'sent_subscriber_count' field to 'simplenews_newsletters' table.
+ */
+function simplenews_update_6252() {
+  $ret = array();
+  db_add_field($ret, 'simplenews_newsletters', 'sent_subscriber_count', array(
+    'description' => 'The count of subscribers to the newsletter when it was sent.',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+    )
+  );
+  db_query("
+    UPDATE {simplenews_newsletters} sn
+    SET sent_subscriber_count = (
+      SELECT count(tid)
+      FROM {simplenews_snid_tid} AS sst
+      INNER JOIN {simplenews_subscriptions} AS ss
+        ON sst.snid = ss.snid
+      WHERE tid = sn.tid
+        AND ss.activated = %d
+    )",
+    SIMPLENEWS_SUBSCRIPTION_STATUS_SUBSCRIBED);
+  return $ret;
+}
+
+/**
+ * Add timestamp field to simplenews subscriptions table.
+ * Port timestamps from `simplenews_snid_tid` table to `simplenews_subscriptions`
+ */
+function simplenews_update_6253() {
+  $ret = array();
+  db_add_field($ret, 'simplenews_subscriptions', 'timestamp', array(
+    'description' => 'UNIX timestamp of when the user first subscribed to a newsletter.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  // http://dev.mysql.com/doc/refman/5.1/en/correlated-subqueries.html
+  // this subquery already works with mysql 4.
+  db_query("
+    UPDATE {simplenews_subscriptions} s
+    SET s.timestamp = (
+      SELECT MIN(timestamp)
+      FROM {simplenews_snid_tid}
+      WHERE snid = s.snid
+    )");
+  return $ret;
+}
+
+/**
+ * Add snid field to simplenews spool table.
+ */
+function simplenews_update_6254() {
+  $ret = array();
+  db_add_field($ret, 'simplenews_mail_spool', 'snid', array(
+    'description' => 'Foreign key for subscriber table ({simplenews_subscriptions}.snid)',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  // populate snid for previous mail spool entries
+  db_query("
+    UPDATE {simplenews_mail_spool} s
+    SET s.snid = (
+      SELECT snid
+      FROM {simplenews_subscriptions}
+      WHERE mail = s.mail
+      LIMIT 1
+    )"
+  );
   return $ret;
 }

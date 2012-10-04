@@ -1,8 +1,8 @@
-// $Id: active_tags.js,v 1.1.2.24 2010/03/01 19:59:19 dragonwize Exp $
+// $Id: active_tags.js,v 1.1.2.30 2010/05/10 14:38:25 dragonwize Exp $
 
 /**
  * @file
- *
+ * Changes taxonomy tags fields to Active Tags style widgets.
  */
 
 /**
@@ -68,10 +68,10 @@ function activeTagsParseCsv(sep, string) {
   return result;
 }
 
-function activeTagsActivate(context) {
+function activeTagsActivate(context, index) {
   var wrapper = $(context);
   if (wrapper.length == 1) {
-    var tagarea = activeTagsWidget(context);
+    var tagarea = activeTagsWidget(context, index);
     wrapper.before(tagarea);
     Drupal.behaviors.autocomplete(document);
   }
@@ -111,17 +111,17 @@ function activeTagsCheckEnter(event) {
   }
 }
 
-function activeTagsAdd(context, v) {
+function activeTagsAdd(context, tag) {
   $('#autocomplete').each(function () {
     this.owner.hidePopup();
   });
 
   // Removing all HTML tags. Need to wrap in tags for text() to work correctly.
-  v = $('<div>' + v + '</div>').text();
-  v = Drupal.checkPlain(v);
-  v = jQuery.trim(v);
-  if (v != '') {
-    $(context).prev().children('.tag-holder').append(Drupal.theme('activeTagsTerm', v));
+  tag = $('<div>' + tag + '</div>').text();
+  tag = Drupal.checkPlain(tag);
+  tag = jQuery.trim(tag);
+  if (tag != '') {
+    $(context).prev().find('.tag-holder').append(Drupal.theme('activeTagsTerm', tag));
     $('.remove-tag:not(.tag-processed)').click(function () {
       $(this).parent().remove();
       activeTagsUpdate(context);
@@ -133,7 +133,7 @@ function activeTagsUpdate(context) {
   var wrapper = $(context);
   var textFields = wrapper.children('input.form-text');
   textFields.val('');
-  wrapper.prev().children('.tag-holder').children().children('.tag-text').each(function (i) {
+  wrapper.prev().find('.tag-holder .tag-text').each(function (i) {
     // Get tag and revome quotes to prevent doubling
     var tag = $(this).text().replace(/["]/g, '');
 
@@ -151,9 +151,9 @@ function activeTagsUpdate(context) {
   });
 }
 
-function activeTagsWidget(context) {
+function activeTagsWidget(context, index) {
   var vid = context.substring(20, context.lastIndexOf('-'));
-  return Drupal.theme('activeTagsWidget', context, vid);
+  return Drupal.theme('activeTagsWidget', context, vid, index);
 }
 
 function activeTagsAddTagOnSubmit() {
@@ -170,7 +170,7 @@ Drupal.theme.prototype.activeTagsTerm = function (value) {
 /**
  * Theme Active Tags widget.
  */
-Drupal.theme.prototype.activeTagsWidget = function (context, vid) {
+Drupal.theme.prototype.activeTagsWidget = function (context, vid, index) {
   var wrapper = $(context);
   var cleanId = context.replace('#', '');
 
@@ -178,16 +178,16 @@ Drupal.theme.prototype.activeTagsWidget = function (context, vid) {
   var desc    = wrapper.find('.description').html();
   var coreStr = Drupal.t('A comma-separated list of terms describing this content. Example: funny, bungee jumping, "Company, Inc.".');
   var atStr   = Drupal.t('Enter one(1) term at a time. A comma will be included in the term and will NOT seperate terms.');
-  desc = desc.replace(coreStr, atStr);
+  desc = desc ? desc.replace(coreStr, atStr) : '';
 
   // Check if the field has an error class to add.
   var error = wrapper.find('input').hasClass('error') ? 'error ' : '';
   return '<div id="' + cleanId + '-activetags" class="form-item">' +
-    '<label for="active-tag-edit0' + vid + '">' + wrapper.find('label').html() + '</label>' +
+    '<label for="active-tag-edit0' + vid + '-' + index + '">' + wrapper.find('label').html() + '</label>' +
     '<div class="tag-holder"></div>' +
-    '<input type="text" class="' + error + 'tag-entry form-autocomplete" size="30" id="active-tag-edit0' + vid + '" />' +
+    '<input type="text" class="' + error + 'tag-entry form-autocomplete" size="30" id="active-tag-edit0' + vid + '-' + index + '" />' +
     '<input type="button" value="' + Drupal.t('Add') + '" class="add-tag" />' +
-    '<input class="autocomplete" type="hidden" id="active-tag-edit0' + vid + '-autocomplete" ' +
+    '<input class="autocomplete" type="hidden" id="active-tag-edit0' + vid + '-' + index + '-autocomplete" ' +
     'value="' + $(context.replace('-wrapper', '-autocomplete')).val() + '" disabled="disabled" />' +
     '<div class="description">' + desc + '</div>' +
   '</div>';
@@ -197,7 +197,7 @@ Drupal.behaviors.activeTagsWidget = function (context) {
   jQuery.each(Drupal.settings['active_tags'], function (i, v) {
     var wrapper = $(v);
     if (wrapper.length == 1 && !wrapper.hasClass('active-tags-processed')) {
-      activeTagsActivate(v);
+      activeTagsActivate(v, i);
       wrapper.addClass('active-tags-processed');
     }
   });

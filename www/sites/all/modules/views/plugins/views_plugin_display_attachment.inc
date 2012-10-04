@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_display_attachment.inc,v 1.6.2.1 2009/11/30 19:05:47 merlinofchaos Exp $
 /**
  * @file
  * Contains the attachment display plugin.
@@ -22,7 +21,7 @@ class views_plugin_display_attachment extends views_plugin_display {
     $options['inherit_arguments'] = array('default' => TRUE);
     $options['inherit_exposed_filters'] = array('default' => FALSE);
     $options['inherit_pager'] = array('default' => FALSE);
-    $options['render_pager'] = array('default' => TRUE);
+    $options['render_pager'] = array('default' => FALSE);
     $options['displays'] = array('default' => array());
 
     return $options;
@@ -142,7 +141,7 @@ class views_plugin_display_attachment extends views_plugin_display {
         $form['inherit_pager'] = array(
           '#type' => 'checkbox',
           '#title' => t('Inherit'),
-          '#description' => t('Should this display inherit its paging values from the parent display to which it is attached? Note that this will provide unexpected results if the number of items to display do not match.'),
+          '#description' => t('Should this display inherit its paging values from the parent display to which it is attached?'),
           '#default_value' => $this->get_option('inherit_pager'),
         );
         break;
@@ -151,7 +150,7 @@ class views_plugin_display_attachment extends views_plugin_display {
         $form['render_pager'] = array(
           '#type' => 'checkbox',
           '#title' => t('Render'),
-          '#description' => t('Should this display render the pager values? If not it can inherit from the parent...'),
+          '#description' => t('Should this display render the pager values? This is only meaningful if inheriting a pager.'),
           '#default_value' => $this->get_option('render_pager'),
         );
         break;
@@ -186,7 +185,7 @@ class views_plugin_display_attachment extends views_plugin_display {
    * Perform any necessary changes to the form values prior to storage.
    * There is no need for this function to actually store the data.
    */
-  function options_submit(&$form, &$form_state) {
+  function options_submit($form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_submit($form, $form_state);
     switch ($form_state['section']) {
@@ -225,11 +224,9 @@ class views_plugin_display_attachment extends views_plugin_display {
     $view->set_display($this->display->id);
     if ($this->get_option('inherit_pager')) {
       $view->display_handler->use_pager = $this->view->display[$display_id]->handler->use_pager();
-      $view->display_handler->set_option('pager_element', $this->view->display[$display_id]->handler->get_option('pager_element'));
+      $view->display_handler->set_option('pager', $this->view->display[$display_id]->handler->get_option('pager'));
     }
 
-    // because of this, it is very very important that displays that can accept
-    // attachments not also be attachments, or this could explode messily.
     $attachment = $view->execute_display($this->display->id, $args);
 
     switch ($this->get_option('attachment_position')) {

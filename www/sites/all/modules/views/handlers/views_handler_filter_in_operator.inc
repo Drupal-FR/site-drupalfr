@@ -1,14 +1,21 @@
 <?php
-// $Id: views_handler_filter_in_operator.inc,v 1.12.2.2 2010/04/07 19:14:57 merlinofchaos Exp $
 /**
  * Simple filter to handle matching of multiple options selectable via checkboxes
  *
  * Definition items:
  * - numeric: If set to true, this item will use numeric operators instead of string.
+ * - options callback: The function to call in order to generate the value options. If omitted, the options 'Yes' and 'No' will be used.
+ * - options arguments: An array of arguments to pass to the options callback.
  *
  */
 class views_handler_filter_in_operator extends views_handler_filter {
   var $value_form_type = 'checkboxes';
+
+  /**
+   * @var array
+   * Stores all operations which are available on the form.
+   */
+  var $value_options = NULL;
 
   function construct() {
     parent::construct();
@@ -23,6 +30,9 @@ class views_handler_filter_in_operator extends views_handler_filter {
    *
    * This can use a guard to be used to reduce database hits as much as
    * possible.
+   *
+   * @return
+   *   Return the stored values in $this->value_options if someone expects it.
    */
   function get_value_options() {
     if (isset($this->value_options)) {
@@ -30,11 +40,18 @@ class views_handler_filter_in_operator extends views_handler_filter {
     }
 
     if (isset($this->definition['options callback']) && is_callable($this->definition['options callback'])) {
-      $this->value_options = call_user_func($this->definition['options callback']);
+      if (isset($this->definition['options arguments']) && is_array($this->definition['options arguments'])) {
+        $this->value_options = call_user_func_array($this->definition['options callback'], $this->definition['options arguments']);
+      }
+      else {
+        $this->value_options = call_user_func($this->definition['options callback']);
+      }
     }
     else {
       $this->value_options = array(t('Yes'), t('No'));
     }
+
+    return $this->value_options;
   }
 
   function expose_options() {
@@ -57,6 +74,7 @@ class views_handler_filter_in_operator extends views_handler_filter {
 
     $options['operator']['default'] = 'in';
     $options['value']['default'] = array();
+    $options['expose']['contains']['reduce'] = array('default' => FALSE);
 
     return $options;
   }
@@ -272,7 +290,6 @@ class views_handler_filter_in_operator extends views_handler_filter {
     // instead.
 
     $form_state['values']['options']['value'] = $form['value']['#value'];
-//    $form_state['values']['options']['value'] = array_filter($form_state['values']['options']['value']);
   }
 
   function admin_summary() {
@@ -308,7 +325,12 @@ class views_handler_filter_in_operator extends views_handler_filter {
 
         $keys = $this->value;
         $value = array_shift($keys);
-        $values = check_plain($this->value_options[$value]);
+        if (isset($this->value_options[$value])) {
+          $values = check_plain($this->value_options[$value]);
+        }
+        else {
+          $values = '';
+        }
       }
       else {
         foreach ($this->value as $value) {
@@ -319,7 +341,9 @@ class views_handler_filter_in_operator extends views_handler_filter {
             $values .= '...';
             break;
           }
-          $values .= check_plain($this->value_options[$value]);
+          if (isset($this->value_options[$value])) {
+            $values .= check_plain($this->value_options[$value]);
+          }
         }
       }
     }
@@ -361,5 +385,48 @@ class views_handler_filter_in_operator extends views_handler_filter {
     }
 
     $this->query->add_where($this->options['group'], "$field $operator");
+  }
+
+  function validate() {
+    $this->get_value_options();
+    $errors = array();
+
+    // If the operator is an operator which doesn't require a value, there is
+    // no need for additional validation.
+    if (in_array($this->operator, $this->operator_values(0))) {
+      return array();
+    }
+
+    if (!in_array($this->operator, $this->operator_values(1))) {
+      $errors[] = t('The operator is invalid on filter: @filter.', array('@filter' => $this->ui_name(TRUE)));
+    }
+    if (is_array($this->value)) {
+      if (!isset($this->value_options)) {
+        // Don't validate if there are none value options provided, for example for special handlers.
+        return $errors;
+      }
+      if ($this->options['exposed'] && !$this->options['expose']['required'] && empty($this->value)) {
+        // Don't validate if the field is exposed and no default value is provided.
+        return $errors;
+      }
+
+      // Some filter_in_operator usage uses optgroups forms, so flatten it.
+      $flat_options = form_options_flatten($this->value_options, TRUE);
+
+      // Remove every element which is not known.
+      foreach ($this->value as $value) {
+        if (!isset($flat_options[$value])) {
+          unset($this->value[$value]);
+        }
+      }
+      // Choose different kind of ouput for 0, a single and multiple values.
+      if (count($this->value) == 0) {
+        $errors[] = t('No valid values found on filter: @filter.', array('@filter' => $this->ui_name(TRUE)));
+      }
+    }
+    elseif (!empty($this->value) && ($this->operator == 'in' || $this->operator == 'not in')) {
+      $errors[] = t('The value @value is not an array for @operator on filter: @filter', array('@value' => views_var_export($this->value), '@operator' => $this->operator, '@filter' => $this->ui_name(TRUE)));
+    }
+    return $errors;
   }
 }

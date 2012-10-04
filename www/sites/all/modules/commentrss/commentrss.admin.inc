@@ -1,5 +1,4 @@
 <?php
-// $Id: commentrss.admin.inc,v 1.1.2.3 2009/07/17 15:56:31 davereid Exp $
 
 /**
  * @file
@@ -33,6 +32,7 @@ function commentrss_admin_settings() {
     '#title' => t('Enable individual comment feeds for each taxonomy term listing on the website'),
     '#description' => t('Feeds will be accessible at @url type of URLs. Only supports one term, no composition.', array('@url' => url('crss/term/...', array('absolute' => TRUE)))),
     '#default_value' => variable_get('commentrss_term', FALSE),
+    '#access' => FALSE,
   );
 
   return system_settings_form($form);

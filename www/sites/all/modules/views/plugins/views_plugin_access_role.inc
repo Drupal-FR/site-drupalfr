@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_access_role.inc,v 1.2.4.1 2010/03/10 21:03:25 merlinofchaos Exp $
 
 /**
  * Access plugin that provides role-based access control.
@@ -23,13 +22,17 @@ class views_plugin_access_role extends views_plugin_access {
     }
     else {
       $rids = views_ui_get_roles();
-      $rid = array_shift($this->options['role']);
+      $rid = reset($this->options['role']);
       return $rids[$rid];
     }
   }
 
-  function option_defaults(&$options) {
-    $options['role'] = array();
+
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['role'] = array('default' => array());
+
+    return $options;
   }
 
   function options_form(&$form, &$form_state) {
@@ -53,6 +56,3 @@ class views_plugin_access_role extends views_plugin_access {
     $form_state['values']['access_options']['role'] = array_filter($form_state['values']['access_options']['role']);
   }
 }
-
-
-

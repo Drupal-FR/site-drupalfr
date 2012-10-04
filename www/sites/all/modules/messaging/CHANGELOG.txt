@@ -1,4 +1,17 @@
-// $Id: CHANGELOG.txt,v 1.1.2.8.2.29.2.14 2009/11/13 19:07:10 jareyero Exp $
+// $Id: CHANGELOG.txt,v 1.1.2.8.2.29.2.21 2011/02/16 23:30:37 jareyero Exp $
+
+6.x-2.3 to 6.x-2.4
+------------------------
+- Added proper filtering for messaging method names.
+
+6.x-2.2 to 6.x-2.3
+------------------------
+- Added PHPMailer support for secure sending port (Gmail support), by foxtrotcharlie, #549382
+- Check message['headers'] is actually an array, by Scott Reynolds, #653856
+- Removed obsoleted messaging_get_log() function, #717852
+- Fixing issue: Unsupported operand types (method disabled), #451638
+- Improved logging system so it needs to be enabled, see #733176
+- Updated translation function to work with latest i18nstrings. New messaging_translate()
 
 6.x-2.1 to 6.x-2.2
 -------------------------

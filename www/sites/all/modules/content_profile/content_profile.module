@@ -1,5 +1,5 @@
 <?php
-// $Id: content_profile.module,v 1.1.2.39 2009/06/15 10:55:24 fago Exp $
+// $Id: content_profile.module,v 1.1.2.48 2010/04/07 15:09:17 fago Exp $
 
 /**
  * @file
@@ -69,15 +69,17 @@ function content_profile_menu() {
  */
 function content_profile_menu_alter(&$items) {
   foreach (content_profile_get_types('names', 'edit_tab', 'sub') as $type => $type_name) {
-    $item = &$items['user/%user_category/edit/'. $type];
-    $item = array(
-      'page callback' => 'content_profile_page_edit',
-      'page arguments' => array($type, 1),
-      'access callback' => 'content_profile_page_access',
-      'access arguments' => array($type, 1),
-      'file' => 'node.pages.inc',
-      'file path' => drupal_get_path('module', 'node'),
-    ) + $item;
+    if (!empty($items['user/%user_category/edit/'. $type])) {
+      $item = &$items['user/%user_category/edit/'. $type];
+      $item = array(
+        'page callback' => 'content_profile_page_edit',
+        'page arguments' => array($type, 1),
+        'access callback' => 'content_profile_page_access',
+        'access arguments' => array($type, 1),
+        'file' => 'node.pages.inc',
+        'file path' => drupal_get_path('module', 'node'),
+      ) + $item;
+    }
   }
 }
 
@@ -258,6 +260,7 @@ function content_profile_form_alter(&$form, $form_state, $form_id) {
     $form['content_profile'] = array(
       '#type' => 'fieldset',
       '#title' => t('Content Profile'),
+      '#group' => 'additional_settings',
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#weight' => 32,
@@ -372,7 +375,6 @@ function _content_profile_node_delete($node) {
  * Implementation of hook_nodeapi().
  */
 function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-  global $last_nid;
 
   if ($op == 'prepare' && is_content_profile($node) && !isset($node->nid) && $node->uid && !user_access('administer nodes') && arg(0) != 'admin') {
     // Check if this nodetype already exists
@@ -389,7 +391,7 @@ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
     }
     //check whether the selected user has already a profile
     $uid = db_result(db_query("SELECT uid FROM {users} WHERE name = '%s'", $node->name));
-    if (content_profile_profile_exists($node, $uid)) {
+    if ($uid && content_profile_profile_exists($node, $uid)) {
       form_set_error('name', t('This user already has a content profile of this type. You can only create one profile per user.'));
     }
   }
@@ -468,24 +470,47 @@ function content_profile_content_profile_settings() {
  * Loads the node, like node_load but makes sure the results are cached.
  *
  * @param $type
- *   The content profile's type
+ *   The content profile's type.
  * @param $uid
- *   The profile owner's user id
+ *   The profile owner's user id.
  * @param $lang
  *   Optional. If translation is enabled, the language of the profile to return.
+ * @param $reset
+ *   Optional. If set, the cache is reset.
  */
-function content_profile_load($type, $uid, $lang = '') {
+function content_profile_load($type, $uid, $lang = '', $reset = NULL) {
   static $cache = array();
 
-  if (!isset($cache[$type][$uid][$lang])) {
+  if (!isset($cache[$type][$uid][$lang]) || $reset) {
     $cache[$type][$uid][$lang] = FALSE;
     $params = array('type' => $type, 'uid' => $uid);
-    if ($node = node_load($lang ? $params + array('language' => $lang) : $params)) {
+    if ($node = node_load($lang ? $params + array('language' => $lang) : $params, NULL, $reset)) {
       $cache[$type][$uid][$lang] = $node->nid;
     }
     return $node;
   }
   return !empty($cache[$type][$uid][$lang]) ? node_load($cache[$type][$uid][$lang]) : FALSE;
+}
+
+/**
+ * Implementation of hook_help().
+ *
+ * Show node submission guidelines for content profile node forms.
+ */
+function content_profile_help($path, $arg) {
+  if (preg_match('/user\/\%\/(profile|edit)\/(.*)/', $path, $matches)) {
+    foreach (content_profile_get_types('names') as $type => $typename) {
+      if ($type == $matches[2]) {
+        $node = content_profile_load($type, $arg[1]);
+        if ($node) {
+          return node_help('node/%/edit', array(1 => $node->nid));
+        }
+        else {
+          return node_help('node/add/'. $type, array('node', 'add', $type));
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -523,6 +548,8 @@ function content_profile_show_profiles($uid) {
         '#suffix' => '<br />',
       );
     }
+  }
+  if ($content) {
     $content['#prefix'] = '<p id="content-profile-view">';
     $content['#suffix'] = '</p>';
   }
@@ -533,7 +560,7 @@ function content_profile_show_profiles($uid) {
  * Implementation of hook_theme().
  */
 function content_profile_theme() {
-  return array(
+  $return = array(
     'content_profile_display_view' => array(
       'template'  => 'content_profile-display-view',
       'arguments' => array('element' => NULL),
@@ -552,6 +579,13 @@ function content_profile_theme() {
       'file' => 'content_profile.theme.inc',
     ),
   );
+  if (module_exists('pageroute')) {
+    $return['content_profile_pageroute_empty']  = array(
+      'arguments' => array('type_name' => NULL),
+    	'file' => 'content_profile.pageroute.inc',
+    );
+  }
+  return $return;
 }
 
 /**
@@ -600,4 +634,16 @@ function content_profile_simpletest() {
   // Scan through content_profile/tests directory for any .test files to tell SimpleTest module.
   $tests = file_scan_directory(drupal_get_path('module', 'content_profile') .'/tests', '\.test');
   return array_keys($tests);
+}
+
+/**
+ * Implementation of hook_pageroute_info() for Pageroute integration.
+ */
+function content_profile_pageroute_info() {
+  return array(
+    'content_profile' => array(
+      'viewprofile' => 'content_profile.pageroute',
+      'editprofile' => 'content_profile.pageroute',
+    )
+  );
 }

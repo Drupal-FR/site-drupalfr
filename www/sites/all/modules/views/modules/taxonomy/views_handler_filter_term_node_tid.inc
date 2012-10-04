@@ -1,10 +1,11 @@
 <?php
-// $Id: views_handler_filter_term_node_tid.inc,v 1.8 2009/04/07 23:21:01 merlinofchaos Exp $
 
 /**
  * Filter by term id
  */
 class views_handler_filter_term_node_tid extends views_handler_filter_many_to_one {
+  function can_group() { return FALSE; }
+
   function has_extra_options() { return TRUE; }
 
   function get_value_options() { /* don't overwrite the value options */ }
@@ -15,6 +16,8 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
     $options['type'] = array('default' => 'textfield');
     $options['limit'] = array('default' => TRUE);
     $options['vid'] = array('default' => 0);
+    $options['hierarchy'] = array('default' => 0);
+    $options['error_message'] = array('default' => TRUE);
 
     return $options;
   }
@@ -26,10 +29,10 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
     }
 
     if ($this->options['limit']) {
-      // We only do this when the form is displayed so this query doesn't run
-      // unnecessarily just when the object is constructed.
+      // We only do this when the form is displayed.
       if ($this->options['vid'] == 0) {
-        $this->options['vid'] = db_result(db_query('SELECT MIN(vid) FROM {vocabulary} v'));
+        $first_vocabulary = reset($vocabularies);
+        $this->options['vid'] = $first_vocabulary->vid;
       }
 
       $form['vid'] = array(
@@ -116,10 +119,10 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
       else {
         $options = array();
         if ($this->options['limit']) {
-          $result = db_query("SELECT * FROM {term_data} WHERE vid = %d ORDER BY weight, name", $vocabulary->vid);
+          $result = db_query(db_rewrite_sql("SELECT t.* FROM {term_data} t WHERE t.vid = %d ORDER BY t.weight, t.name", 't', 'tid'), $vocabulary->vid);
         }
         else {
-          $result = db_query("SELECT td.* FROM {term_data} td INNER JOIN {vocabulary} v ON td.vid = v.vid ORDER BY v.weight, v.name, td.weight, td.name");
+          $result = db_query(db_rewrite_sql("SELECT td.* FROM {term_data} td INNER JOIN {vocabulary} v ON td.vid = v.vid ORDER BY v.weight, v.name, td.weight, td.name", 'td', 'tid'));
         }
         while ($term = db_fetch_object($result)) {
           $options[$term->tid] = $term->name;
@@ -174,7 +177,7 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
     }
   }
 
-  function value_validate(&$form, &$form_state) {
+  function value_validate($form, &$form_state) {
     // We only validate if they've chosen the text field style.
     if ($this->options['type'] != 'textfield') {
       return;
@@ -191,6 +194,12 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
   function accept_exposed_input($input) {
     if (empty($this->options['exposed'])) {
       return TRUE;
+    }
+
+    // If view is an attachment and is inheriting exposed filters, then assume
+    // exposed input has already been validated
+    if (isset($this->view->is_attachment) && $this->view->display_handler->uses_exposed()) {
+      $this->validated_exposed_input = (array)$this->view->exposed_raw_input[$this->options['expose']['identifier']];
     }
 
     // If it's optional and there's no value don't bother filtering.
@@ -263,14 +272,17 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
     // add the taxonomy vid to the argument list.
     $args[] = $this->options['vid'];
 
-    $result = db_query("SELECT * FROM {term_data} WHERE name IN (" . implode(', ', $placeholders) . ") AND vid = %d", $args);
+    $result = db_query("SELECT * FROM {term_data} td WHERE td.name IN (" . implode(', ', $placeholders) . ") AND td.vid = %d", $args);
     while ($term = db_fetch_object($result)) {
       unset($missing[strtolower($term->name)]);
       $tids[] = $term->tid;
     }
 
-    if ($missing) {
+    if ($missing && !empty($this->options['error_message'])) {
       form_error($form, format_plural(count($missing), 'Unable to find term: @terms', 'Unable to find terms: @terms', array('@terms' => implode(', ', array_keys($missing)))));
+    }
+    elseif ($missing && empty($this->options['error_message'])) {
+      $tids = array(0);
     }
 
     return $tids;
@@ -285,6 +297,11 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
     if ($this->options['type'] != 'select') {
       unset($form['expose']['reduce']);
     }
+    $form['error_message'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display error message'),
+      '#default_value' => !empty($this->options['error_message']),
+    );
   }
 
   function admin_summary() {

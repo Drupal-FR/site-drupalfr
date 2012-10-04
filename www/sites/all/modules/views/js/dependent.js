@@ -1,4 +1,3 @@
-// $Id: dependent.js,v 1.9.2.1 2009/11/18 02:43:47 merlinofchaos Exp $
 /**
  * @file dependent.js
  *
@@ -40,7 +39,7 @@ Drupal.Views.dependent.inArray = function(array, search_term) {
 
 Drupal.Views.dependent.autoAttach = function() {
   // Clear active bindings and triggers.
-  for (i in Drupal.Views.dependent.activeTriggers) {
+  for (var i in Drupal.Views.dependent.activeTriggers) {
     jQuery(Drupal.Views.dependent.activeTriggers[i]).unbind('change');
   }
   Drupal.Views.dependent.activeTriggers = [];
@@ -52,13 +51,13 @@ Drupal.Views.dependent.autoAttach = function() {
   }
 
   // Iterate through all relationships
-  for (id in Drupal.settings.viewsAjax.formRelationships) {
+  for (var id in Drupal.settings.viewsAjax.formRelationships) {
 
     // Drupal.Views.dependent.activeBindings[id] is a boolean,
     // whether the binding is active or not.  Defaults to no.
     Drupal.Views.dependent.activeBindings[id] = 0;
     // Iterate through all possible values
-    for(bind_id in Drupal.settings.viewsAjax.formRelationships[id].values) {
+    for(var bind_id in Drupal.settings.viewsAjax.formRelationships[id].values) {
       // This creates a backward relationship.  The bind_id is the ID
       // of the element which needs to change in order for the id to hide or become shown.
       // The id is the ID of the item which will be conditionally hidden or shown.
@@ -114,7 +113,7 @@ Drupal.Views.dependent.autoAttach = function() {
         var changeTrigger = function() {
           var val = getValue(bind_id, trigger_id);
 
-          for (i in Drupal.Views.dependent.bindings[bind_id]) {
+          for (var i in Drupal.Views.dependent.bindings[bind_id]) {
             var id = Drupal.Views.dependent.bindings[bind_id][i];
 
             // Fix numerous errors
@@ -136,7 +135,7 @@ Drupal.Views.dependent.autoAttach = function() {
             }
 
             var len = 0;
-            for (i in Drupal.Views.dependent.activeBindings[id]) {
+            for (var i in Drupal.Views.dependent.activeBindings[id]) {
               len++;
             }
 

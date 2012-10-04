@@ -1,4 +1,3 @@
-// $Id: README.txt,v 1.1.4.6.2.1 2009/10/28 00:01:31 quicksketch Exp $
 
 You may want to visit the handbook of this module, at:
 

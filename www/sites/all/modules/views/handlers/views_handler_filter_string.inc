@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_filter_string.inc,v 1.8.2.2 2010/04/29 19:29:17 merlinofchaos Exp $
 
 /**
  * Basic textfield filter to handle string filtering commands
@@ -8,10 +7,12 @@
 class views_handler_filter_string extends views_handler_filter {
   // exposed filter options
   var $no_single = TRUE;
+  var $no_optional = TRUE;
 
   function option_definition() {
     $options = parent::option_definition();
 
+    $options['expose']['contains']['optional'] = array('default' => FALSE);
     $options['case'] = array('default' => TRUE);
 
     return $options;
@@ -82,6 +83,18 @@ class views_handler_filter_string extends views_handler_filter {
         'title' => t('Does not contain'),
         'short' => t('!has'),
         'method' => 'op_not',
+        'values' => 1,
+      ),
+      'shorterthan' => array(
+        'title' => t('Length is shorter than'),
+        'short' => t('shorter than'),
+        'method' => 'op_shorter',
+        'values' => 1,
+      ),
+      'longerthan' => array(
+        'title' => t('Length is longer than'),
+        'short' => t('longer than'),
+        'method' => 'op_longer',
         'values' => 1,
       ),
     );
@@ -286,6 +299,14 @@ class views_handler_filter_string extends views_handler_filter {
 
   function op_not($field, $upper) {
     $this->query->add_where($this->options['group'], "$upper($field) NOT LIKE $upper('%%%s%%')", $this->value);
+  }
+
+  function op_shorter($field, $upper) {
+    $this->query->add_where($this->options['group'], "LENGTH($upper($field)) < %d", $this->value);
+  }
+
+  function op_longer($field, $upper) {
+    $this->query->add_where($this->options['group'], "LENGTH($upper($field)) > %d", $this->value);
   }
 
   function op_empty($field) {

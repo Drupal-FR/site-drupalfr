@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_relationship.inc,v 1.4.2.1 2009/11/02 23:25:14 merlinofchaos Exp $
 /**
  * @file
  * Views' relationship handlers.
@@ -44,7 +43,9 @@ class views_handler_relationship extends views_handler {
       $this->table = $this->definition['relationship table'];
     }
     if (isset($this->definition['relationship field'])) {
-      $this->field = $this->definition['relationship field'];
+      // Set both real_field and field so custom handler
+      // can rely on the old field value.
+      $this->real_field = $this->field = $this->definition['relationship field'];
     }
   }
 
@@ -61,7 +62,15 @@ class views_handler_relationship extends views_handler {
   function option_definition() {
     $options = parent::option_definition();
 
-    $label = !empty($this->definition['label']) ? $this->definition['label'] : $this->definition['field'];
+
+    // Relationships definitions should define a default label, but if they aren't get another default value.
+    if (!empty($this->definition['label'])) {
+      $label = $this->definition['label'];
+    }
+    else {
+      $label = !empty($this->definition['field']) ? $this->definition['field'] : $this->definition['base field'];
+    }
+
     $options['label'] = array('default' => $label, 'translatable' => TRUE);
     $options['required'] = array('default' => FALSE);
 
@@ -73,11 +82,13 @@ class views_handler_relationship extends views_handler {
    * should have.
    */
   function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => t('Label'),
       '#default_value' => isset($this->options['label']) ? $this->options['label'] : '',
       '#description' => t('The label for this relationship that will be displayed only administratively.'),
+      '#required' => TRUE,
     );
 
     $form['required'] = array(
@@ -102,7 +113,7 @@ class views_handler_relationship extends views_handler {
     $def['table'] = $this->definition['base'];
     $def['field'] = $base_field;
     $def['left_table'] = $this->table_alias;
-    $def['left_field'] = $this->field;
+    $def['left_field'] = $this->real_field;
     if (!empty($this->options['required'])) {
       $def['type'] = 'INNER';
     }
@@ -115,6 +126,7 @@ class views_handler_relationship extends views_handler {
     }
 
     $join->definition = $def;
+    $join->options = $this->options;
     $join->construct();
     $join->adjusted = TRUE;
 
@@ -122,6 +134,13 @@ class views_handler_relationship extends views_handler {
     $alias = $def['table'] . '_' . $this->table;
 
     $this->alias = $this->query->add_relationship($alias, $join, $this->definition['base'], $this->relationship);
+  }
+
+  /**
+   * You can't groupby a relationship.
+   */
+  function use_group_by() {
+    return FALSE;
   }
 }
 

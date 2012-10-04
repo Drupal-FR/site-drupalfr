@@ -1,5 +1,4 @@
 <?php
-// $Id: comment.rules_forms.inc,v 1.1.2.3 2009/05/15 13:03:12 fago Exp $
 
 
 /**

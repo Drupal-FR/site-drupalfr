@@ -1,5 +1,4 @@
 <?php
-// $Id: token.rules.inc,v 1.1.2.3 2009/05/31 15:56:09 greggles Exp $
 /**
  * @file
  * Rules integration for the token module.
@@ -34,10 +33,13 @@ function token_rules_evaluator() {
 function token_rules_input_evaluator_prepare($string, $variables) {
   $used_vars = array();
   foreach ($variables as $name => $info) {
-    if (strpos($string, '['. $name .':') !== FALSE) {
+    if (strpos($string, TOKEN_PREFIX. $name .':') !== FALSE) {
       $used_vars[] = $name;
     }
   }
+  // Using ':global' instead of 'global' to avoid potential namespace conflicts
+  // See http://drupal.org/node/932460#comment-3884866
+  $used_vars[] = ':global';
   return $used_vars ? $used_vars : NULL;
 }
 
@@ -55,26 +57,28 @@ function token_rules_input_evaluator_apply($text, $used_vars, &$state) {
   static $token_cache = array();
 
   if ($used_vars) {
-    $vars = rules_get_variables(drupal_map_assoc($used_vars), $state);
-    if (!$vars) {
+    $vars = rules_get_variables(drupal_map_assoc(array_diff($used_vars, array(':global'))), $state);
+    if ($vars === FALSE) {
       //there not all needed variables available!
       return FALSE;
     }
+    $vars[':global'] = ':global';
 
     foreach ($used_vars as $name) {
-      $type = $state['variables'][$name]->info['type'];
+      $type = ($name == ':global') ? 'global' : _token_rules_map_type($state['variables'][$name]->info['type']);
+      if ($type) {
+        $token_id = _token_get_id($type, $vars[$name]);
+        if (isset($token_cache[$token_id]) && $token_cache[$token_id] != $name) {
+          // this is the same variable in another state
+          // so we need to flush the token cache to get the fresh values
+          token_get_values('reset');
+        }
 
-      $token_id = _token_get_id($type, $vars[$name]);
-      if (isset($token_cache[$token_id]) && $token_cache[$token_id] != $name) {
-        // this is the same variable in another state
-        // so we need to flush the token cache to get the fresh values
-        token_get_values('global', NULL, TRUE);
+        $text = token_replace($text, $type, $vars[$name], TOKEN_PREFIX. $name .':', TOKEN_SUFFIX);
+
+        // remember that this variable has been used and got cached
+        $token_cache[$token_id] = $name;
       }
-
-      $text = token_replace($text, $type, $vars[$name], '['. $name .':', ']');
-
-      // remember that this variable has been used and got cached
-      $token_cache[$token_id] = $name;
     }
   }
 
@@ -82,20 +86,35 @@ function token_rules_input_evaluator_apply($text, $used_vars, &$state) {
 }
 
 /**
+ * Map rules types to corresponding token types
+ */
+function _token_rules_map_type($type) {
+  if (($data_type = rules_get_data_types($type)) && isset($data_type['token type'])) {
+    return $data_type['token type'];
+  }
+  return $type;
+}
+
+/**
  * Some token replacement help for the condition/action edit form.
  */
 function token_rules_input_evaluator_help($variables) {
 
+  $variables[':global'] = array('type' => 'global', 'label' => t('global token'),);
+
   foreach ($variables as $name => $info) {
-    $form[$name] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Replacement patterns for @name', array('@name' => $info['label'])),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form[$name]['content'] = array(
-      '#value' => theme('token_help', $info['type'], '['. $name .':', ']'),
-    );
+    $type = _token_rules_map_type($info['type']);
+    if ($type) {
+      $form[$name] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Replacement patterns for @name', array('@name' => $info['label'])),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+      );
+      $form[$name]['content'] = array(
+        '#value' => theme('token_help', $type, TOKEN_PREFIX. $name . ':', TOKEN_SUFFIX),
+      );
+    }
   }
   return $form;
 }

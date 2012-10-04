@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_argument_default_taxonomy_tid.inc,v 1.1.6.2 2010/03/22 22:34:18 merlinofchaos Exp $
 /**
  * @file
  *   Taxonomy tid default argument.
@@ -12,10 +11,21 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
     $options['term_page'] = array('default' => TRUE);
     $options['node'] = array('default' => FALSE);
     $options['limit'] = array('default' => FALSE);
-    $options['vids'] = array('default' => NULL);
+    $options['vids'] = array('default' => array());
 
     return $options;
   }
+
+  function convert_options(&$options) {
+    $names = array_keys($this->option_definition());
+    $old_prefix = 'default_taxonomy_tid';
+    foreach ($names as $name) {
+      if (!isset($options[$name]) && isset($this->argument->options[$old_prefix . '_' . $name])) {
+        $options[$name] = $this->argument->options[$old_prefix . '_' . $name];
+      }
+    }
+  }
+
 
   function options_form(&$form, &$form_state) {
     $form['term_page'] = array(
@@ -25,7 +35,7 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
     );
     $form['node'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Load default argument from node page, thats good for related taxonomy blocks.'),
+      '#title' => t('Load default argument from node page, thats good for related taxonomy blocks'),
       '#default_value' => $this->options['node'],
     );
 
@@ -98,6 +108,12 @@ class views_plugin_argument_default_taxonomy_tid extends views_plugin_argument_d
         }
       }
     }
+
+    // If the current page is a view that takes tid as an argument,
+    // find the tid argument and return it.
+    $views_page = views_get_page_view();
+    if ($views_page && isset($views_page->view->argument['tid'])) {
+      return $views_page->view->argument['tid']->argument;
+    }
   }
 }
-

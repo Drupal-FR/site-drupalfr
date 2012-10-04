@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_argument_term_node_tid_depth_modifier.inc,v 1.1 2008/09/03 19:21:30 merlinofchaos Exp $
 
 /**
  * Argument handler for to modify depth for a previous term.
@@ -56,4 +55,3 @@ class views_handler_argument_term_node_tid_depth_modifier extends views_handler_
     }
   }
 }
-

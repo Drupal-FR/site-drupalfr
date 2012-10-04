@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_argument.inc,v 1.9.2.2 2010/03/12 21:25:33 merlinofchaos Exp $
 
 /**
  * @defgroup views_argument_handlers Handlers for arguments
@@ -46,7 +45,7 @@ class views_handler_argument extends views_handler {
     }
   }
 
-  function init(&$view, &$options) {
+  function init(&$view, $options) {
     parent::init($view, $options);
   }
 
@@ -96,21 +95,24 @@ class views_handler_argument extends views_handler {
     $options = parent::option_definition();
 
     $options['default_action'] = array('default' => 'ignore');
-    $options['style_plugin'] = array('default' => 'default_summary');
-    $options['style_options'] = array('default' => array());
+    $options['style_plugin'] = array('default' => 'default_summary', 'export' => 'export_style');
+    $options['style_options'] = array('default' => array(), 'export' => FALSE);
     $options['wildcard'] = array('default' => 'all');
     $options['wildcard_substitution'] = array('default' => t('All'), 'translatable' => TRUE);
     $options['title'] = array('default' => '', 'translatable' => TRUE);
     $options['breadcrumb'] = array('default' => '', 'translatable' => TRUE);
-    $options['default_argument_type'] = array('default' => 'fixed');
-    $options['default_argument'] = array('default' => '');
-    $options['validate_type'] = array('default' => 'none');
+    $options['default_argument_type'] = array('default' => 'fixed', 'export' => 'export_plugin');
+    $options['default_argument_options'] = array('default' => array(), 'export' => FALSE);
+    $options['default_argument_skip_url'] = array('default' => FALSE);
+    $options['validate_type'] = array('default' => 'none', 'export' => 'export_plugin');
+    $options['validate_options'] = array('default' => array(), 'export' => FALSE);
     $options['validate_fail'] = array('default' => 'not found');
 
     return $options;
   }
 
   function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
     $defaults = $this->default_actions();
 
     $form['title'] = array(
@@ -197,7 +199,7 @@ class views_handler_argument extends views_handler {
       '#default_value' => $this->options['validate_type'],
     );
 
-    $validate_types = array('none' => t('<Basic validation>'));
+    $validate_types = array('none' => t('- Basic validation -'));
     $plugins = views_fetch_plugin_data('argument validator');
     foreach ($plugins as $id => $info) {
       if (!empty($info['no ui'])) {
@@ -220,11 +222,18 @@ class views_handler_argument extends views_handler {
 
       // If we decide this validator is ok, add it to the list.
       if ($valid) {
-        $plugin = views_get_plugin('argument validator', $id);
+        $plugin = $this->get_plugin('argument validator', $id);
         if ($plugin) {
-          $plugin->init($this->view, $this, $id);
           if ($plugin->access() || $this->options['validate_type'] == $id) {
-            $plugin->validate_form($form, $form_state, $id);
+            $form['argument_validate'][$id] = array(
+              '#type' => 'item',
+              '#input' => TRUE, // trick it into checking input to make #process run
+              '#process' => array('views_process_dependency'),
+              '#dependency' => array(
+                'edit-options-validate-type' => array($id)
+              ),
+            );
+            $plugin->options_form($form['argument_validate'][$id], $form_state);
             $validate_types[$id] = $info['title'];
           }
         }
@@ -244,6 +253,51 @@ class views_handler_argument extends views_handler {
     $form['validate_options_div_suffix'] = array(
       '#value' => '</fieldset>',
     );
+  }
+
+  function options_validate(&$form, &$form_state) {
+    if (empty($form_state['values']['options'])) {
+      return;
+    }
+
+    // Let the plugins do validation.
+    $default_id = $form_state['values']['options']['default_argument_type'];
+    $plugin = $this->get_plugin('argument default', $default_id);
+    if ($plugin) {
+      $plugin->options_validate($form['argument_default'][$default_id], $form_state, $form_state['values']['options']['argument_default'][$default_id]);
+    }
+
+    $validate_id = $form_state['values']['options']['validate_type'];
+    $plugin = $this->get_plugin('argument validator', $validate_id);
+    if ($plugin) {
+      $plugin->options_validate($form['argument_validate'][$default_id], $form_state, $form_state['values']['options']['argument_validate'][$validate_id]);
+    }
+
+  }
+
+  function options_submit($form, &$form_state) {
+    if (empty($form_state['values']['options'])) {
+      return;
+    }
+
+    // Let the plugins make submit modifications if necessary.
+    $default_id = $form_state['values']['options']['default_argument_type'];
+    $plugin = $this->get_plugin('argument default', $default_id);
+    if ($plugin) {
+      $options = &$form_state['values']['options']['argument_default'][$default_id];
+      $plugin->options_submit($form['argument_default'][$default_id], $form_state, $options);
+      // Copy the now submitted options to their final resting place so they get saved.
+      $form_state['values']['options']['default_argument_options'] = $options;
+    }
+
+    $validate_id = $form_state['values']['options']['validate_type'];
+    $plugin = $this->get_plugin('argument validator', $validate_id);
+    if ($plugin) {
+      $options = &$form_state['values']['options']['argument_validate'][$validate_id];
+      $plugin->options_submit($form['argument_validate'][$validate_id], $form_state, $options);
+      // Copy the now submitted options to their final resting place so they get saved.
+      $form_state['values']['options']['validate_options'] = $options;
+    }
   }
 
   /**
@@ -280,6 +334,20 @@ class views_handler_argument extends views_handler {
         'title' => t('Summary, sorted descending'),
         'method' => 'default_summary',
         'method args' => array('desc'),
+        'style plugin' => TRUE,
+        'breadcrumb' => TRUE, // generate a breadcrumb to here
+      ),
+      'summary asc by count' => array(
+        'title' => t('Summary, sorted by number of records ascending'),
+        'method' => 'default_summary',
+        'method args' => array('asc', 'num_records'),
+        'style plugin' => TRUE,
+        'breadcrumb' => TRUE, // generate a breadcrumb to here
+      ),
+      'summary desc by count' => array(
+        'title' => t('Summary, sorted by number of records descending'),
+        'method' => 'default_summary',
+        'method args' => array('desc', 'num_records'),
         'style plugin' => TRUE,
         'breadcrumb' => TRUE, // generate a breadcrumb to here
       ),
@@ -322,6 +390,13 @@ class views_handler_argument extends views_handler {
       '#dependency' => array('radio:options[default_action]' => array('default')),
     );
 
+    $form['default_argument_skip_url'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Skip default argument for view URL'),
+      '#default_value' => $this->options['default_argument_skip_url'],
+      '#description' => t('Select whether to include this default argument when constructing the URL for this view. Skipping default arguments is useful e.g. in the case of feeds.')
+    );
+
     $form['default_argument_type'] = array(
       '#prefix' => '<div id="edit-options-default-argument-type-wrapper">',
       '#suffix' => '</div>',
@@ -329,18 +404,28 @@ class views_handler_argument extends views_handler {
       '#id' => 'edit-options-default-argument-type',
       '#title' => t('Default argument type'),
       '#default_value' => $this->options['default_argument_type'],
-      '#process' => array('expand_radios', 'views_process_dependency'),
-      '#dependency' => array('radio:options[default_action]' => array('default')),
     );
 
     foreach ($plugins as $id => $info) {
-      $plugin = views_get_plugin('argument default', $id);
-      if ($plugin) {
-        $plugin->init($this->view, $this, $id);
+      if (!empty($info['no ui'])) {
+        continue;
+      }
 
+      $plugin = $this->get_plugin('argument default', $id);
+      if ($plugin) {
         if ($plugin->access() || $this->options['default_argument_type'] == $id) {
+          $form['argument_default'][$id] = array(
+            '#type' => 'item',
+            '#input' => TRUE, // trick it into checking input to make #process run
+            '#process' => array('views_process_dependency'),
+            '#dependency' => array(
+              'radio:options[default_action]' => array('default'),
+              'radio:options[default_argument_type]' => array($id)
+            ),
+            '#dependency_count' => 2,
+          );
           $options[$id] = $info['title'];
-          $plugin->argument_form($form, $form_state);
+          $plugin->options_form($form['argument_default'][$id], $form_state);
         }
       }
     }
@@ -442,9 +527,8 @@ class views_handler_argument extends views_handler {
    * Get a default argument, if available.
    */
   function get_default_argument() {
-    $plugin = views_get_plugin('argument default', $this->options['default_argument_type']);
+    $plugin = $this->get_plugin('argument default');
     if ($plugin) {
-      $plugin->init($this->view, $this);
       return $plugin->get_argument();
     }
   }
@@ -455,7 +539,7 @@ class views_handler_argument extends views_handler {
    * If an argument was expected and was not given, in this case, display
    * a summary query.
    */
-  function default_summary($order) {
+  function default_summary($order, $by = NULL) {
     $this->view->build_info['summary'] = TRUE;
     $this->view->build_info['summary_level'] = $this->options['id'];
 
@@ -469,7 +553,7 @@ class views_handler_argument extends views_handler {
     $this->query->clear_fields();
     $this->summary_query();
 
-    $this->summary_sort($order);
+    $this->summary_sort($order, $by);
 
     // Summaries have their own sorting and fields, so tell the View not
     // to build these.
@@ -509,7 +593,7 @@ class views_handler_argument extends views_handler {
     if (isset($this->name_table)) {
       // if the alias is different then we're probably added, not ensured,
       // so look up the join and add it instead.
-      if ($this->table_alias != $this->table) {
+      if ($this->table_alias != $this->name_table) {
         $j = views_get_table_join($this->name_table, $this->table);
         if ($j) {
           $join = drupal_clone($j);
@@ -560,8 +644,8 @@ class views_handler_argument extends views_handler {
    * @param $order
    *   The order selected in the UI.
    */
-  function summary_sort($order) {
-    $this->query->add_orderby(NULL, NULL, $order, $this->name_alias);
+  function summary_sort($order, $by = NULL) {
+    $this->query->add_orderby(NULL, NULL, $order, (!empty($by) ? $by : $this->name_alias));
   }
 
   /**
@@ -642,9 +726,8 @@ class views_handler_argument extends views_handler {
       return $this->argument_validated = $this->validate_argument_basic($arg);
     }
 
-    $plugin = views_get_plugin('argument validator', $this->options['validate_type']);
+    $plugin = $this->get_plugin('argument validator');
     if ($plugin) {
-      $plugin->init($this->view, $this, $this->options['validate_type']);
       return $this->argument_validated = $plugin->validate_argument($arg);
     }
 
@@ -714,7 +797,7 @@ class views_handler_argument extends views_handler {
     if (isset($this->argument)) {
       return $this->argument;
     }
-    
+
     // Otherwise, we have to pretend to process ourself to find the value.
     $value = NULL;
     // Find the position of this argument within the view.
@@ -734,6 +817,9 @@ class views_handler_argument extends views_handler {
     $argument = drupal_clone($this);
     if (!isset($arg) && $argument->has_default_argument()) {
       $arg = $argument->get_default_argument();
+
+      // remember that this argument was computed, not passed on the URL.
+      $this->is_default = TRUE;
     }
     // Set the argument, which will also validate that the argument can be set.
     if ($argument->set_argument($arg)) {
@@ -741,6 +827,92 @@ class views_handler_argument extends views_handler {
     }
     unset($argument);
     return $value;
+  }
+
+  /**
+   * Special handling for the style export.
+   *
+   * Arguments can have styles for the summary view. This special export
+   * handler makes sure this works properly.
+   */
+  function export_style($indent, $prefix, $storage, $option, $definition, $parents) {
+    $output = '';
+    $name = $storage[$option];
+    $options = $storage['style_options'];
+
+    $plugin = views_get_plugin('style', $name);
+    if ($plugin) {
+      $plugin->init($this->view, $this->display, $options);
+      // Write which plugin to use.
+      $output .= $indent . $prefix . "['$option'] = '$name';\n";
+
+      // Pass off to the plugin to export itself.
+      $output .= $plugin->export_options($indent, $prefix . "['style_options']");
+    }
+
+    return $output;
+  }
+
+  /**
+   * Special handling for the style export.
+   *
+   * Arguments can have styles for the summary view. This special export
+   * handler makes sure this works properly.
+   */
+  function export_plugin($indent, $prefix, $storage, $option, $definition, $parents) {
+    $output = '';
+    if ($option == 'default_argument_type') {
+      $type = 'argument default';
+      $option_name = 'default_argument_options';
+    }
+    else {
+      $type = 'argument validator';
+      $option_name = 'validate_options';
+    }
+    $plugin = $this->get_plugin($type);
+    $name = $this->options[$option];
+
+    if ($plugin) {
+      // Write which plugin to use.
+      $output .= $indent . $prefix . "['$option'] = '$name';\n";
+
+      // Pass off to the plugin to export itself.
+      $output .= $plugin->export_options($indent, $prefix . "['$option_name']");
+    }
+
+    return $output;
+  }
+
+  /**
+   * Get the display or row plugin, if it exists.
+   */
+  function get_plugin($type = 'argument default', $name = NULL) {
+    $options = array();
+    switch ($type) {
+      case 'argument default':
+        $plugin_name = 'default_argument_type';
+        $options_name = 'default_argument_options';
+        break;
+      case 'argument validator':
+        $plugin_name = 'validate_type';
+        $options_name = 'validate_options';
+    }
+
+    if (!$name) {
+      $name = $this->options[$plugin_name];
+    }
+
+    // we only fetch the options if we're fetching the plugin actually
+    // in use.
+    if ($name == $this->options[$plugin_name]) {
+      $options = $this->options[$options_name];
+    }
+
+    $plugin = views_get_plugin($type, $name);
+    if ($plugin) {
+      $plugin->init($this->view, $this, $options);
+      return $plugin;
+    }
   }
 }
 

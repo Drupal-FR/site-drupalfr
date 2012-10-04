@@ -1,4 +1,3 @@
-; $Id: xmlsitemap.info,v 1.2.2.4.2.20 2010/02/11 05:19:40 davereid Exp $
 name = XML sitemap
 description = Creates an XML sitemap conforming to the <a href="http://sitemaps.org/">sitemaps.org protocol</a>.
 package = XML sitemap
@@ -9,17 +8,19 @@ files[] = xmlsitemap.inc
 files[] = xmlsitemap.admin.inc
 files[] = xmlsitemap.drush.inc
 files[] = xmlsitemap.generate.inc
+files[] = xmlsitemap.xmlsitemap.inc
 files[] = xmlsitemap.pages.inc
 files[] = xmlsitemap.install
 files[] = xmlsitemap.test
 recommends[] = ctools
-recommends[] = dialog
+recommends[] = elements
 recommends[] = robotstxt
 recommends[] = vertical_tabs
+configure = admin/config/search/xmlsitemap
 
-; Information added by drupal.org packaging script on 2010-03-06
-version = "6.x-2.x-dev"
+; Information added by drupal.org packaging script on 2011-12-16
+version = "6.x-2.0-rc1"
 core = "6.x"
 project = "xmlsitemap"
-datestamp = "1267834752"
+datestamp = "1324004145"
 

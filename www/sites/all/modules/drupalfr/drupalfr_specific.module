@@ -35,3 +35,22 @@ function drupalfr_specific_front_page() {
   return "test";
 }
 
+/**
+ * Implements hook_block().
+ */
+function drupalfr_specific_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[0] = array(
+      'info' => 'Twitter DFR',
+    );
+    return $blocks;
+  }
+  else if ($op == 'view') {
+    if ($delta == 0) {
+      $block['title'] = 'Twitter #drupalfr';
+      $content = twitter_pull_render('drupalfr', '', 10);
+      $block['content'] = $content;
+      return $block;
+    }
+  }
+}

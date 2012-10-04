@@ -1,5 +1,4 @@
 <?php
-// $Id: features.module,v 1.1.2.58 2009/12/21 17:43:22 yhahn Exp $
 
 /**
  * @file
@@ -17,13 +16,15 @@ define('FEATURES_DEFAULT', 0);
 define('FEATURES_OVERRIDDEN', 1);
 define('FEATURES_NEEDS_REVIEW', 2);
 define('FEATURES_REBUILDING', 3);
+define('FEATURES_CONFLICT', 4);
+define('FEATURES_DISABLED', 5);
 
 // Duration of rebuild semaphore: 10 minutes.
 define('FEATURES_SEMAPHORE_TIMEOUT', 10 * 60);
 
 /**
  * Components with this 'default_file' flag will have exports written to the
- * common defaults file 'MODULENAME.defaults.inc'. This is the default
+ * common defaults file 'MODULENAME.features.inc'. This is the default
  * behavior.
  */
 define('FEATURES_DEFAULTS_INCLUDED_COMMON', 0);
@@ -31,11 +32,13 @@ define('FEATURES_DEFAULTS_INCLUDED_COMMON', 0);
 /**
  * Components with this 'default_file' flag will have exports written to a
  * defaults based on the component name like 'MODULENAME.features.COMPONENT-NAME.inc'.
+ * Any callers to this component's defaults hook must call
+ * features_include_defaults('component') in order to include this file.
  */
 define('FEATURES_DEFAULTS_INCLUDED', 1);
 
 /**
- * Components with this 'default_file' flag must specify a filename for thier
+ * Components with this 'default_file' flag must specify a filename for their
  * exports. Additionally a stub will NOT be written to 'MODULENAME.features.inc'
  * allowing the file to be included directly by the implementing module.
  */
@@ -110,7 +113,6 @@ function features_menu() {
     'description' => 'Display components of a feature.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('features_admin_components', 3),
-    'load arguments' => array(3, TRUE),
     'access callback' => 'user_access',
     'access arguments' => array('administer features'),
     'type' => MENU_CALLBACK,
@@ -129,7 +131,6 @@ function features_menu() {
     'description' => 'Recreate an existing feature.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('features_export_form', 3),
-    'load arguments' => array(3, TRUE),
     'access callback' => 'user_access',
     'access arguments' => array('administer features'),
     'type' => MENU_LOCAL_TASK,
@@ -142,7 +143,6 @@ function features_menu() {
       'description' => 'Compare default and current feature.',
       'page callback' => 'features_feature_diff',
       'page arguments' => array(3, 5),
-      'load arguments' => array(3, TRUE),
       'access callback' => 'features_access_override_actions',
       'access arguments' => array(3),
       'type' => MENU_LOCAL_TASK,
@@ -154,7 +154,6 @@ function features_menu() {
     'description' => 'Javascript status call back.',
     'page callback' => 'features_feature_status',
     'page arguments' => array(3),
-    'load arguments' => array(3, TRUE),
     'access callback' => 'user_access',
     'access arguments' => array('administer features'),
     'type' => MENU_CALLBACK,
@@ -167,27 +166,6 @@ function features_menu() {
     }
   }
   return $items;
-}
-
-/**
- * Implementation of hook_menu_alter().
- */
-function features_menu_alter(&$cache) {
-  // Collect exported menu items and graft them into the features menu.
-  $items = module_invoke_all('menu_default_items');
-  drupal_alter('menu_default_items', $items);
-
-  foreach ($items as $item) {
-    if (!empty($item['path'])) {
-      $path = $item['path'];
-      unset($item['path']);
-      if (!empty($cache[$path])) {
-        $cache[$path] = array_merge($cache[$path], $item);
-        $cache[$path]['type'] = MENU_NORMAL_ITEM;
-        $cache[$path]['menu_name'] = 'features';
-      }
-    }
-  }
 }
 
 /**
@@ -221,20 +199,6 @@ function features_theme() {
   ) + $base;
 
   return $items;
-}
-
-/**
- * Implementation of hook_theme_registry_alter().
- */
-function features_theme_registry_alter(&$theme_registry) {
-  // Ensures that features_preprocess_page() comes immediately after
-  // template_preprocess_page().
-  if ($position = array_search('features_preprocess_page', $theme_registry['page']['preprocess functions'])) {
-    unset($theme_registry['page']['preprocess functions'][$position]);
-  }
-  $position = array_search('template_preprocess_page', $theme_registry['page']['preprocess functions']);
-  $position = $position ? $position + 1 : 2;
-  array_splice($theme_registry['page']['preprocess functions'], $position, 0, 'features_preprocess_page');
 }
 
 /**
@@ -280,35 +244,103 @@ function features_perm() {
 }
 
 /**
+ * Implementation of hook_help().
+ */
+function features_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#features':
+      $output = file_get_contents(drupal_get_path('module', 'features') .'/README.txt');
+      return module_exists('markdown') ? filter_xss_admin(module_invoke('markdown', 'filter', 'process', 0, -1, $output)) : '<pre>'. check_plain($output) .'</pre>';
+    case 'admin/build/features':
+      return '<p>'. t('A "Feature" is a certain type of Drupal module with contains a package of configuration that, when enabled, provides a new set of functionality for your Drupal site. Enable features by selecting the checkboxes below and clicking the Save configuration button. If the configuration of the feature has been changed its "State" will be either "overridden" or "needs review", otherwise it will be "default", indicating that the configuration has not been changed. Click on the state to see more details about the feature and its components.') .'</p>';
+  }
+}
+
+/**
  * Load includes for any modules that implement the features API and
  * load includes for those provided by features.
  */
-function features_include() {
-  // Check for implementing modules and make necessary inclusions.
-  foreach (module_implements('features_api') as $module) {
-    $info = module_invoke($module, 'features_api');
-    foreach ($info as $component) {
-      if (isset($component['file'])) {
-        require_once $component['file'];
+function features_include($reset = FALSE) {
+  static $once;
+  if (!isset($once) || $reset) {
+    $once = TRUE;
+
+    // Check for implementing modules and make necessary inclusions.
+    foreach (module_implements('features_api') as $module) {
+      $info = module_invoke($module, 'features_api');
+      foreach ($info as $component) {
+        if (isset($component['file'])) {
+          require_once $component['file'];
+        }
+      }
+    }
+
+    // Features provides integration on behalf of these modules.
+    // The features include provides handling for the feature dependencies.
+    // Note that ctools is placed last because it implements hooks "dynamically" for other modules.
+    $modules = array('features', 'block', 'content', 'context', 'fieldgroup', 'filter', 'imagecache', 'menu', 'node', 'taxonomy', 'user', 'views', 'ctools');
+
+    foreach (array_filter($modules, 'module_exists') as $module) {
+      if (!module_hook($module, 'features_api')) {
+        module_load_include('inc', 'features', "includes/features.$module");
+      }
+    }
+
+    // Clear static cache, since we've now included new implementers.
+    module_implements('features_api', FALSE, TRUE);
+  }
+}
+
+/**
+ * Load features includes for all components that require includes before
+ * collecting defaults.
+ */
+function features_include_defaults($components = NULL, $reset = FALSE) {
+  static $included = array();
+  static $include_components;
+
+  // Build an array of components that require inclusion:
+  // Views, CTools components and those using FEATURES_DEFAULTS_INCLUDED.
+  if (!isset($include_components) || $reset) {
+    $include_components = features_get_components();
+    foreach ($include_components as $component => $info) {
+      if ($component !== 'views' && !isset($info['api']) && (!isset($info['default_file']) || $info['default_file'] !== FEATURES_DEFAULTS_INCLUDED)) {
+        unset($include_components[$component]);
       }
     }
   }
 
-  // Always load the menu module include to be able to deal with menu items.
-  module_load_include('inc', 'features', "includes/features.menu");
-
-  // Features provides integration on behalf of these modules.
-  // Note that ctools is placed last because it implements hooks "dynamically" for other modules.
-  $modules = array('block', 'content', 'context', 'filter', 'imagecache', 'node', 'user', 'views', 'ctools');
-
-  foreach (array_filter($modules, 'module_exists') as $module) {
-    if (!module_hook($module, 'features_api')) {
-      module_load_include('inc', 'features', "includes/features.$module");
+  // If components are specified, only include for the specified components.
+  if (isset($components)) {
+    $components = is_array($components) ? $components : array($components);
+  }
+  // Use all include components if none are explicitly specified.
+  else {
+    $components = $include_components;
+  }
+  foreach ($components as $component) {
+    if (isset($include_components[$component]) && (!isset($included[$component]) || $reset)) {
+      $info = $include_components[$component];
+      // Inclusion of defaults for Views.
+      if ($component === 'views') {
+        views_include('view');
+        views_include_default_views();
+      }
+      // Inclusion of defaults for CTools.
+      else if (isset($info['api'], $info['module'], $info['current_version'])) {
+        ctools_include('plugins');
+        ctools_plugin_api_include($info['module'], $info['api'], $info['current_version'], $info['current_version']);
+      }
+      // Inclusion of defaults for components using FEATURES_DEFAULTS_INCLUDED.
+      else {
+        $features = isset($features) ? $features : features_get_features(NULL, $reset);
+        foreach ($features as $feature) {
+          module_load_include('inc', $feature->name, "{$feature->name}.features.{$component}");
+        }
+      }
+      $included[$component] = TRUE;
     }
   }
-
-  // Clear static cache, since we've now included new implementers.
-  module_implements('features_api', FALSE, TRUE);
 }
 
 /**
@@ -342,68 +374,53 @@ function features_get_modules($name = NULL, $reset = FALSE) {
  *   If set to to TRUE return feature sources only.
  * @return An array of component labels keyed by the component names.
  */
-function features_get_components($feature_source = FALSE) {
+function features_get_components($feature_source = FALSE, $reset = FALSE) {
   features_include();
-
-  $components = array();
-  foreach (module_implements('features_api') as $module) {
-    $info = module_invoke($module, 'features_api');
-
-    if ($feature_source) {
-      // Gather only components that are declared as feature sources.
+  static $components_all;
+  static $components_source;
+  if (!isset($components_all) || $reset) {
+    $components_all = $components_source = array();
+    foreach (module_implements('features_api') as $module) {
+      $info = module_invoke($module, 'features_api');
       foreach ($info as $k => $v) {
-        if ($v['feature_source']) {
-          $components[$k] = $v;
+        $components_all[$k] = $v;
+        if (!empty($v['feature_source'])) {
+          $components_source[$k] = $v;
         }
       }
     }
-    else {
-      $components = array_merge($components, $info);
-    }
   }
-
-  return $components;
+  return $feature_source ? $components_source : $components_all;
 }
 
 /**
- * Like module_invoke() but for arbitrary callback base names.
+ * Invoke a component callback.
  */
-function features_invoke() {
+function features_invoke($component, $callback) {
   $args = func_get_args();
-  $base = $args[0];
-  $hook = $args[1];
   unset($args[0], $args[1]);
-  $function = $base .'_'. $hook;
-  if (features_hook($base, $hook)) {
+  // Append the component name to the arguments.
+  $args[] = $component;
+  if ($function = features_hook($component, $callback)) {
     return call_user_func_array($function, $args);
   }
 }
 
 /**
- * Like module_invoke_all() but for arbitrary callback base names.
+ * Checks whether a component implements the given hook.
+ *
+ * @return
+ *   The function implementing the hook, or FALSE.
  */
-function features_invoke_all() {
-  $args = func_get_args();
-  $hook = $args[0];
-  unset($args[0]);
-  $return = array();
-  foreach (features_get_components() as $component => $info) {
-    $result = features_invoke($component, $hook);
-    if (isset($result) && is_array($result)) {
-      $return = array_merge_recursive($return, $result);
-    }
-    else if (isset($result)) {
-      $return[] = $result;
-    }
-  }
-  return $return;
-}
+function features_hook($component, $hook, $reset = FALSE) {
+  static $info;
 
-/**
- * Like module_hook() but for arbitrary callback base names.
- */
-function features_hook($base, $hook) {
-  return function_exists($base .'_'. $hook);
+  if (!isset($info) || $reset) {
+    $info = module_invoke_all('features_api');
+  }
+  // Determine the function callback base.
+  $base = isset($info[$component]['base']) ? $info[$component]['base'] : $component;
+  return function_exists($base . '_' . $hook) ? $base . '_' . $hook : FALSE;
 }
 
 /**
@@ -486,7 +503,7 @@ function features_get_info($type = 'module', $name = NULL, $reset = FALSE) {
     $cache->data = $data;
   }
   if (!empty($name)) {
-    return !empty($cache->data[$type][$name]) ? $cache->data[$type][$name] : array();
+    return !empty($cache->data[$type][$name]) ? $cache->data[$type][$name] : FALSE;
   }
   return !empty($cache->data[$type]) ? $cache->data[$type] : array();
 }
@@ -505,7 +522,9 @@ function features_get_orphans($reset = FALSE) {
     $features = features_get_features();
     foreach ($features as $feature) {
       $key = module_exists($feature->name) ? 'enabled' : 'disabled';
-      $dependencies[$key] = array_merge($dependencies[$key], _features_export_maximize_dependencies($feature->info['dependencies']));
+      if (!empty($feature->info['dependencies'])) {
+        $dependencies[$key] = array_merge($dependencies[$key], _features_export_maximize_dependencies($feature->info['dependencies']));
+      }
     }
     $dependencies['enabled'] = array_unique($dependencies['enabled']);
     $dependencies['disabled'] = array_unique($dependencies['disabled']);
@@ -542,21 +561,24 @@ function features_get_orphans($reset = FALSE) {
 function features_get_conflicts($reset = FALSE) {
   $conflicts = array();
   $component_info = features_get_components();
-  $map = features_get_component_map($reset);
+  $map = features_get_component_map(NULL, $reset);
 
   foreach ($map as $type => $components) {
-    foreach ($components as $component => $modules) {
-      if (isset($component_info[$type]['duplicates']) && $component_info[$type]['duplicates'] == FEATURES_DUPLICATES_ALLOWED) {
-        continue;
-      }
-      else if (count($modules) > 1) {
-        foreach ($modules as $module) {
-          if (!isset($conflicts[$module])) {
-            $conflicts[$module] = array();
-          }
-          foreach ($modules as $m) {
-            if ($m != $module) {
-              $conflicts[$module][$m] = $m;
+    // Only check conflicts for components we know about.
+    if (isset($component_info[$type])) {
+      foreach ($components as $component => $modules) {
+        if (isset($component_info[$type]['duplicates']) && $component_info[$type]['duplicates'] == FEATURES_DUPLICATES_ALLOWED) {
+          continue;
+        }
+        else if (count($modules) > 1) {
+          foreach ($modules as $module) {
+            if (!isset($conflicts[$module])) {
+              $conflicts[$module] = array();
+            }
+            foreach ($modules as $m) {
+              if ($m != $module) {
+                $conflicts[$module][$m][$type][] = $component;
+              }
             }
           }
         }
@@ -570,12 +592,11 @@ function features_get_conflicts($reset = FALSE) {
 /**
  * Provide a component to feature map.
  */
-function features_get_component_map($reset = FALSE) {
+function features_get_component_map($key = NULL, $reset = FALSE) {
   static $map;
-
   if (!isset($map) || $reset) {
     $map = array();
-    $features = features_get_features('', TRUE);
+    $features = features_get_features(NULL, $reset);
     foreach ($features as $feature) {
       foreach ($feature->info['features'] as $type => $components) {
         if (!isset($map[$type])) {
@@ -587,7 +608,9 @@ function features_get_component_map($reset = FALSE) {
       }
     }
   }
-
+  if (isset($key)) {
+    return isset($map[$key]) ? $map[$key] : array();
+  }
   return $map;
 }
 
@@ -618,16 +641,19 @@ function features_get_feature_title($feature) {
  * override actions for a given feature.
  */
 function features_access_override_actions($feature) {
-  static $access = array();
-  if (!isset($access[$feature->name])) {
-    // Set a value first. We may get called again from within features_detect_overrides().
-    $access[$feature->name] = FALSE;
+  if (user_access('administer features')) {
+    static $access = array();
+    if (!isset($access[$feature->name])) {
+      // Set a value first. We may get called again from within features_detect_overrides().
+      $access[$feature->name] = FALSE;
 
-    features_include();
-    module_load_include('inc', 'features', 'features.export');
-    $access[$feature->name] = in_array(features_get_storage($feature->name), array(FEATURES_OVERRIDDEN, FEATURES_NEEDS_REVIEW)) && user_access('administer features');
+      features_include();
+      module_load_include('inc', 'features', 'features.export');
+      $access[$feature->name] = in_array(features_get_storage($feature->name), array(FEATURES_OVERRIDDEN, FEATURES_NEEDS_REVIEW)) && user_access('administer features');
+    }
+    return $access[$feature->name];
   }
-  return $access[$feature->name];
+  return FALSE;
 }
 
 /**
@@ -708,54 +734,15 @@ function features_rebuild($rebuild = array()) {
 }
 
 /**
- * Returns a links array in the theme_links() format for the features menu.
- *
- * @return
- *   Array of links.
- */
-function features_menu_links($level = 0, $reset = FALSE) {
-  static $links;
-  if (!isset($links[$level]) || $reset) {
-    if (!isset($links)) {
-      $links = array();
-    }
-    $links[$level] = menu_navigation_links('features', $level);
-  }
-  drupal_alter('features_menu_links', $links[$level]);
-  return $links[$level];
-}
-
-/**
- * Theme functions ====================================================
- */
-
-/**
- * Preprocess function for features links.
- */
-function features_preprocess_page(&$vars) {
-  if (variable_get('menu_primary_links_source', 'primary-links') == 'features') {
-    $vars['primary_links'] = features_menu_links();
-  }
-  if (variable_get('menu_secondary_links_source', 'secondary-links') == 'features') {
-    if (variable_get('menu_secondary_links_source', 'primary-links') == 'features') {
-      $vars['secondary_links'] = features_menu_links(1);
-    }
-    else {
-      $vars['secondary_links'] = features_menu_links();
-    }
-  }
-}
-
-/**
  * Utility functions ==================================================
  */
- 
+
 /**
  * Represent the current state of permissions as a role name to role/perm array.
  */
 function _features_get_roles() {
   $roles = array();
-  $result = db_query("SELECT r.rid, r.name, p.perm FROM {role} r LEFT JOIN {permission} p ON r.rid = p.rid");
+  $result = db_query("SELECT r.rid, r.name, p.perm FROM {role} r LEFT JOIN {permission} p ON r.rid = p.rid ORDER BY r.name");
   while ($row = db_fetch_object($result)) {
     $roles[$row->name] = array(
       'rid' => $row->rid,
@@ -764,3 +751,36 @@ function _features_get_roles() {
   }
   return $roles;
 }
+
+/**
+ * Log a message, environment agnostic.
+ *
+ * @param $message
+ *   The message to log.
+ * @param $severity
+ *   The severity of the message: status, warning or error.
+ */
+function features_log($message, $severity = 'status') {
+  if (function_exists('drush_verify_cli')) {
+    $message = strip_tags($message);
+    if ($severity == 'status') {
+      $severity = 'ok';
+    }
+    elseif ($severity == 'error') {
+      drush_set_error($message);
+      return;
+    }
+    drush_log($message, $severity);
+    return;
+  }
+  drupal_set_message($message, $severity, FALSE);
+}
+
+/**
+ * Targeted form_alter for vocabulary edit pages.
+ */
+function features_form_taxonomy_form_vocabulary_alter(&$form, &$form_state) {
+  module_load_include('inc', 'features', "includes/features.taxonomy");
+  _features_form_taxonomy_form_vocabulary_alter($form, $form_state);
+}
+

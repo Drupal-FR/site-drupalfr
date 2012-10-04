@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.input_evaluators.inc,v 1.1.2.9 2009/04/19 15:03:44 fago Exp $
 
 
 /**

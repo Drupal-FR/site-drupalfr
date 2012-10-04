@@ -1,5 +1,4 @@
 <?php
-// $Id: features.filter.inc,v 1.1.2.8 2009/12/21 22:00:48 yhahn Exp $
 
 /**
  * Implementation of hook_features_api().
@@ -9,6 +8,7 @@ function filter_features_api() {
     'filter' => array(
       'name' => t('Filter formats'),
       'default_hook' => 'filter_default_formats',
+      'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
   );
 }
@@ -41,7 +41,7 @@ function filter_features_export($data, &$export, $module_name = '') {
 /**
  * Implementation of hook_features_export_render().
  */
-function filter_features_export_render($module = 'foo', $data) {
+function filter_features_export_render($module, $data) {
   $code = array();
   $code[] = '  $formats = array();';
   $code[] = '';
@@ -49,9 +49,11 @@ function filter_features_export_render($module = 'foo', $data) {
   $formats = _filter_get_formats();
   foreach ($formats as $format) {
     if (in_array($format['name'], $data)) {
-      $code[] = '  // Exported format: '. $format['name'];
-      $code[] = '  $formats[] = '. features_var_export($format, '  ') .';';
-      $code[] = '';
+      $format_export = features_var_export($format, '  ');
+      $format_identifier = features_var_export($format['name']);
+      $code[] = "  // Exported format: {$format['name']}";
+      $code[] = "  \$formats[{$format_identifier}] = {$format_export};";
+      $code[] = "";
     }
   }
 
@@ -71,8 +73,7 @@ function filter_features_revert($module) {
  * Implementation of hook_features_rebuild().
  */
 function filter_features_rebuild($module) {
-  $defaults = module_invoke($module, 'filter_default_formats');
-  if (!empty($defaults)) {
+  if ($defaults = features_get_default('filter', $module)) {
     foreach ($defaults as $format) {
       _filter_features_update($format);
     }
@@ -85,13 +86,14 @@ function filter_features_rebuild($module) {
 function _filter_get_formats() {
   $formats = array();
 
-  $roles = user_roles();
+  // We cannot use user_roles() here because it has the names translated.
+  $roles = _features_get_roles();
   $result = db_query("SELECT * FROM {filter_formats}");
   while ($row = db_fetch_object($result)) {
     $format_roles = array();
     // Prepare a roles array with roles that may access the filter.
-    foreach ($roles as $rid => $name) {
-      if (strstr($row->roles, ",$rid,")) {
+    foreach ($roles as $name => $role) {
+      if (strstr($row->roles, ','. $role['rid'] .',')) {
         $format_roles[] = $name;
       }
     }

@@ -1,5 +1,4 @@
 <?php
-// $Id: system.rules_forms.inc,v 1.1.2.11 2009/07/31 10:21:43 fago Exp $
 
 
 /**
@@ -79,12 +78,13 @@ function rules_action_mail_to_user_form($settings = array(), &$form) {
  */
 function rules_action_mail_form($settings = array(), &$form) {
   $form['settings']['to'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Recipient'),
     '#default_value' => isset($settings['to']) ? $settings['to'] : '',
     '#description' => t("The mail's recipient address. You may separate multiple addresses with ','."),
     '#required' => TRUE,
     '#weight' => -1,
+    '#rows' => 1,
   );
   rules_action_mail_to_user_form($settings, $form);
 }

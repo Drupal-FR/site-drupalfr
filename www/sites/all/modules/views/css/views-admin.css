@@ -1,4 +1,3 @@
-/* $Id: views-admin.css,v 1.14.2.1 2009/11/18 20:24:22 merlinofchaos Exp $ */
 
 /*
  * Summary pad
@@ -465,6 +464,20 @@ html.js #arrange thead {
   display: none;
 }
 
+html.js #ungroupable_arrange .views-hide-label {
+  color: #D4E7F3;
+}
+
+#ungroupable_arrange thead tr {
+  /* this CSS mirrors what is found in core for blocks admin. */
+  background-color: #D4E7F3;
+  border-bottom: 1px solid #B4D7F0;
+  border-top: 1.5em solid #FFFFFF;
+  color: #455067;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 html.js .views-remove-checkbox {
   display: none;
 }
@@ -477,14 +490,14 @@ html.js a.views-button-remove {
   display: inline;
 }
 
-#arrange tr.even,
-#arrange tr.odd,
-#arrange td {
+.arrange tr.even,
+.arrange tr.odd,
+.arrange td {
   padding-top: 0;
   padding-bottom: 0;
 }
 
-#arrange .form-item {
+.arrange .form-item {
   padding: 0;
 }
 
@@ -547,6 +560,14 @@ div.changed div.view-changed {
   border: 1px solid #333;
   background-color: #f0f0f0;
   padding: .5em;
+}
+
+form#views-ui-reorder-displays-button {
+  margin-bottom: 0em;
+  border-bottom: 1px solid #ccc;
+}
+form#views-ui-reorder-displays-button input.form-submit{
+  margin-bottom: 2em;
 }
 
 form#views-add-display-form {
@@ -639,6 +660,7 @@ html.js .views-hidden {
   max-width: 95%;
 }
 
+.clone-display,
 .remove-display {
   float: right;
   margin: 0;
@@ -648,7 +670,9 @@ html.js .views-hidden {
 }
 
 .views-display .remove-display form,
-.remove-display input {
+.remove-display input,
+.views-display .clone-display form,
+.clone-display input {
   margin: 0 !important;
 }
 
@@ -656,4 +680,35 @@ html.js .views-hidden {
   padding: 0 1em;
   margin: 0 1em;
   border: 1px solid;
+}
+
+.group-populated {
+  display: none;
+}
+
+td.group {
+  /* this CSS mirrors what is found in core for blocks admin. */
+  background-color: #D4E7F3;
+  border-bottom: 1px solid #B4D7F0;
+  border-top: 1.5em solid #FFFFFF;
+  color: #455067;
+}
+
+td.group-title {
+  font-weight: bold;
+}
+
+tr.group-message {
+  font-style: italic;
+  color:#999999;
+}
+
+.group-message .form-submit,
+#views-add-group {
+  float: right;
+  clear: both;
+}
+
+html.js .views-group-select {
+  display: none;
 }

@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_filter_many_to_one.inc,v 1.2.2.2 2010/03/08 19:53:49 merlinofchaos Exp $
 
 /**
  * Complex filter to handle filtering for many to one relationships,
@@ -20,6 +19,8 @@ class views_handler_filter_many_to_one extends views_handler_filter_in_operator 
 
     $options['operator']['default'] = 'or';
     $options['value']['default'] = array();
+
+    views_many_to_one_helper::option_definition($options);
 
     return $options;
   }

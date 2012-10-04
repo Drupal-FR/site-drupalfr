@@ -1,12 +1,19 @@
 <?php
-// $Id: xmlsitemap_custom.admin.inc,v 1.1.2.17 2010/02/07 14:25:41 davereid Exp $
 
 /**
  * @file
  * Administrative page callbacks for the xmlsitemap_custom module.
  */
 
+function xmlsitemap_custom_link_links_local_actions() {
+  $local_actions['add'] = xmlsitemap_get_operation_link('admin/settings/xmlsitemap/custom/add', array('modal' => TRUE));
+  return $local_actions;
+}
+
 function xmlsitemap_custom_list_links() {
+  $output = '';
+  $output .= theme('links', xmlsitemap_custom_link_links_local_actions(), array('class' => 'item-list action-links'));
+
   $header = array(
     'loc' => array('data' => t('Location'), 'field' => 'loc', 'sort' => 'asc'),
     'priority' => array('data' => t('Priority'), 'field' => 'priority'),
@@ -35,16 +42,8 @@ function xmlsitemap_custom_list_links() {
       $row['language'] = module_invoke('locale', 'language_name', $link->language);
     }
     $operations = array();
-    $operations['edit'] = array(
-      'title' => t('Edit'),
-      'href' => 'admin/settings/xmlsitemap/custom/edit/' . $link->id,
-      'query' => $destination,
-    );
-    $operations['delete'] = array(
-      'title' => t('Delete'),
-      'href' => 'admin/settings/xmlsitemap/custom/delete/' . $link->id,
-      'query' => $destination,
-    );
+    $operations['edit'] = xmlsitemap_get_operation_link('admin/settings/xmlsitemap/custom/edit/' . $link->id, array('title' => t('Edit'), 'modal' => TRUE));
+    $operations['delete'] = xmlsitemap_get_operation_link('admin/settings/xmlsitemap/custom/delete/' . $link->id, array('title' => t('Delete'), 'modal' => TRUE));
     $row['operations'] = theme('links', $operations, array('class' => 'links inline nowrap'));
     $rows[] = $row;
   }
@@ -58,18 +57,19 @@ function xmlsitemap_custom_list_links() {
     );
   }
 
-  $output = theme('table', $header, $rows);
+  $output .= theme('table', $header, $rows);
   $output .= theme('pager', NULL, 50, 0);
   return $output;
 }
 
 function xmlsitemap_custom_edit_link_form($form_state, $link = array()) {
   module_load_include('inc', 'xmlsitemap', 'xmlsitemap.admin');
+  _xmlsitemap_set_breadcrumb('admin/settings/xmlsitemap/custom');
 
   $link += array(
-    'id' => (int) db_result(db_query("SELECT MAX(id) FROM {xmlsitemap} WHERE type = 'custom'")) + 1,
+    'id' => db_result(db_query("SELECT MAX(id) FROM {xmlsitemap} WHERE type = 'custom'")) + 1,
     'loc' => '',
-    'priority' => 0.5,
+    'priority' => XMLSITEMAP_PRIORITY_DEFAULT,
     'lastmod' => 0,
     'changefreq' => 0,
     'changecount' => 0,
@@ -115,14 +115,17 @@ function xmlsitemap_custom_edit_link_form($form_state, $link = array()) {
     '#access' => $languages,
   );
 
-  $form['submit'] = array(
+  $form['actions'] = array(
+    '#weight' => 100,
+  );
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
-    '#weight' => 10,
+    '#weight' => 5,
   );
-  $form['cancel'] = array(
-    '#value' => l(t('Cancel'), 'admin/settings/xmlsitemap/custom'),
-    '#weight' => 11,
+  $form['actions']['cancel'] = array(
+    '#value' => l(t('Cancel'), isset($_GET['destination']) ? $_GET['destination'] : 'admin/settings/xmlsitemap/custom'),
+    '#weight' => 10,
   );
 
   return $form;
@@ -157,12 +160,14 @@ function xmlsitemap_custom_edit_link_form_validate($form, &$form_state) {
 
 function xmlsitemap_custom_edit_link_form_submit($form, &$form_state) {
   $link = $form_state['values'];
-  xmlsitemap_save_link($link);
+  xmlsitemap_link_save($link);
   drupal_set_message(t('The custom link for %loc was saved.', array('%loc' => $link['loc'])));
   $form_state['redirect'] = 'admin/settings/xmlsitemap/custom';
 }
 
 function xmlsitemap_custom_delete_link_form($form_state, array $link) {
+  _xmlsitemap_set_breadcrumb('admin/settings/xmlsitemap/custom');
+
   $form['link'] = array(
     '#type' => 'value',
     '#value' => $link,

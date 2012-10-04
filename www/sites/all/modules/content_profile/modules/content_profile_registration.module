@@ -1,5 +1,5 @@
 <?php
-// $Id: content_profile_registration.module,v 1.1.2.32 2009/05/31 11:56:50 fago Exp $
+// $Id: content_profile_registration.module,v 1.1.2.36 2010/03/26 16:32:28 fago Exp $
 
 /**
  * @file
@@ -47,6 +47,7 @@ function content_profile_registration_form_alter(&$form, &$form_state, $form_id)
     $form['registration']['registration_hide'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Hide form fields'),
+      '#description' => t('Hide fields from the user registration form. Required fields cannot be hidden and are not shown here.'),
       '#options' => _content_profile_registration_get_field_select($type),
       '#default_value' => content_profile_get_settings($type, 'registration_hide'),
     );
@@ -172,6 +173,11 @@ function content_profile_registration_add_profile_form($type, &$form, &$form_sta
   foreach (element_children($form_add) as $key) {
     $form['#content_profile_weights'] += array($key => $weight);
   }
+
+  // Set the enctype, if necessary.
+  if (isset($node_form['#attributes']['enctype'])){
+    $form['#attributes']['enctype'] = $node_form['#attributes']['enctype'];
+  }
 }
 
 /**
@@ -182,8 +188,10 @@ function content_profile_registration_add_profile_form($type, &$form, &$form_sta
  */
 function content_profile_registration_alter_weights($elements) {
   foreach ($elements['#content_profile_weights'] as $key => $weight) {
-    $elements[$key] += array('#weight' => 0);
-    $elements[$key]['#weight'] = $weight + $elements[$key]['#weight'] / 1000;
+    if (isset($elements[$key]) && is_array($elements[$key])) {
+      $elements[$key] += array('#weight' => 0);
+      $elements[$key]['#weight'] = $weight + $elements[$key]['#weight'] / 1000;
+    }
   }
   return $elements;
 }
@@ -204,7 +212,7 @@ function content_profile_registration_user_register_validate($form, &$form_state
     unset($node->name);
 
     if (!in_array('other', content_profile_get_settings($type, 'registration_hide'))) {
-      node_validate($node);
+      node_validate($node, $form);
     }
     elseif (module_exists('content')) {
       content_validate($node);

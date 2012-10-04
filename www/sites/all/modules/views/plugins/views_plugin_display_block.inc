@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_display_block.inc,v 1.5 2009/06/26 00:23:42 merlinofchaos Exp $
 /**
  * @file
  * Contains the block display plugin.
@@ -31,7 +30,12 @@ class views_plugin_display_block extends views_plugin_display {
       $desc = $this->get_option('block_description');
 
       if (empty($desc)) {
-        $desc = t('@view: @display', array('@view' => $this->view->name, '@display' => $this->display->display_title));
+        if ($this->display->display_title == $this->definition['title']) {
+          $desc = t('View: @view', array('@view' => $this->view->get_human_name()));
+        }
+        else {
+          $desc = t('View: @view: @display', array('@view' => $this->view->get_human_name(), '@display' => $this->display->display_title));
+        }
       }
       return array(
         $delta => array(
@@ -50,6 +54,7 @@ class views_plugin_display_block extends views_plugin_display {
     // display, and arguments should be set on the view.
     $info['content'] = $this->view->render();
     $info['subject'] = filter_xss_admin($this->view->get_title());
+    $info['view'] = $this->view;
     if (!empty($this->view->result) || $this->get_option('empty') || !empty($this->view->style_plugin->definition['even empty'])) {
       return $info;
     }
@@ -74,7 +79,7 @@ class views_plugin_display_block extends views_plugin_display {
     }
 
     if (strlen($block_description) > 16) {
-      $block_description = substr($block_description, 0, 16) . '...';
+      $block_description = drupal_substr($block_description, 0, 16) . '...';
     }
 
     $options['block_description'] = array(
@@ -156,7 +161,7 @@ class views_plugin_display_block extends views_plugin_display {
    * Perform any necessary changes to the form values prior to storage.
    * There is no need for this function to actually store the data.
    */
-  function options_submit(&$form, &$form_state) {
+  function options_submit($form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_submit($form, $form_state);
     switch ($form_state['section']) {
@@ -180,12 +185,15 @@ class views_plugin_display_block extends views_plugin_display {
 
     return FALSE;
   }
-  
+
   /**
-   * Save the block cache setting in the blocks table if this block allready 
+   * Save the block cache setting in the blocks table if this block allready
    * exists in the blocks table. Dirty fix untill http://drupal.org/node/235673 gets in.
    */
   function save_block_cache($delta, $cache_setting) {
+    if (strlen($delta) >= 32) {
+      $delta = md5($delta);
+    }
     if ($bid = db_fetch_object(db_query("SELECT bid, cache FROM {blocks} WHERE module = 'views' AND delta = '%s'", $delta))) {
       db_query("UPDATE {blocks} set cache = %d WHERE module = 'views' AND delta = '%s'", $cache_setting, $delta);
     }

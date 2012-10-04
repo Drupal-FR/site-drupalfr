@@ -1,5 +1,4 @@
 <?php
-// $Id: form.inc,v 1.11.2.1 2010/01/05 01:33:46 merlinofchaos Exp $
 
 /**
  * @file form.inc
@@ -298,4 +297,3 @@ function views_process_check_options($element, $edit, &$form_state, &$form) {
   }
   return $element;
 }
-

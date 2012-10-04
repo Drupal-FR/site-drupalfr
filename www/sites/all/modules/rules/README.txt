@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1.2.11 2009/12/10 11:58:31 fago Exp $
 
 Rules Module
 ------------

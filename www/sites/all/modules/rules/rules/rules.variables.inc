@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.variables.inc,v 1.1.2.33 2009/07/20 16:22:24 fago Exp $
 
 
 /**

@@ -1,5 +1,4 @@
 <?php
-// $Id: statistics.views.inc,v 1.9.4.1 2009/11/02 23:25:14 merlinofchaos Exp $
 /**
  * @file
  * Provide views data and handlers for statistics.module
@@ -102,6 +101,27 @@ function statistics_views_data() {
       'field' => 'uid',
       'left_field' => 'uid',
      ),
+  );
+
+  // accesslog.aid
+  $data['accesslog']['aid'] = array(
+    'title' => t('Aid'),
+    'help' => t('Unique access event ID.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+      'name field' => 'wid',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
   // session id

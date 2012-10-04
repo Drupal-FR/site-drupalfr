@@ -1,4 +1,4 @@
-// $Id: flag-admin.js,v 1.1.2.1 2009/09/28 02:05:06 quicksketch Exp $
+(function ($) {
 
 /**
  * Behavior to disable the "unflag" option if "flag" is not available.
@@ -25,7 +25,7 @@ Drupal.behaviors.flagRoles = function(context) {
   });
 
   $('#flag-roles input.unflag-access', context).change(function() {
-    if ($(this).parents('tr:first').find('input.unflag-access:checked:not(:disabled)').size() > 0) {
+    if ($(this).parents('table:first').find('input.unflag-access:enabled:not(:checked)').size() == 0) {
       $('#edit-unflag-denied-text-wrapper').slideUp();
     }
     else {
@@ -34,7 +34,7 @@ Drupal.behaviors.flagRoles = function(context) {
   });
 
   // Hide the link options by default if needed.
-  if ($('#flag-roles input.unflag-access:checked:not(:disabled)').size() > 0) {
+  if ($('#flag-roles input.unflag-access:enabled:not(:checked)').size() == 0) {
     $('#edit-unflag-denied-text-wrapper').css('display', 'none');
   }
 };
@@ -45,23 +45,43 @@ Drupal.behaviors.flagRoles = function(context) {
  */
 Drupal.behaviors.flagLinkOptions = function(context) {
   $('.flag-link-options input.form-radio', context).change(function() {
+    // Reveal only the fieldset whose ID is link-options-LINKTYPE,
+    // where LINKTYPE is the value of the selected radio button.
     var radioButton = this;
-    $('#link-options').slideUp(function() {
-      $('#link-options input').each(function() {
-        $(this).parents('.form-item:first').css('display', 'none');
-      });
-      var linkOptionFields = $(radioButton).attr('rel');
-      if (linkOptionFields) {
-        linkOptionFields = linkOptionFields.split(' ');
-        for (var n in linkOptionFields) {
-          $('#link-options input[name=' + linkOptionFields[n] + ']').parents('.form-item:first').css('display', 'block');
-        }
-        $('#link-options').slideDown();
-      }
-    });
-  });
+    var $relevant   = $('fieldset#link-options-' + radioButton.value);
+    var $irrelevant = $('fieldset[id^=link-options-]').not($relevant);
+
+    $relevant.show();
+    $irrelevant.hide();
+
+    if ($relevant.size()) {
+      $('#link-options-intro').show();
+    }
+    else {
+      $('#link-options-intro').hide();
+    }
+  })
   // Hide the link options by default if needed.
-  if (!$('.flag-link-options input.form-radio:checked').attr('rel')) {
-    $('#link-options').css('display', 'none');
-  }
+  .filter(':checked').trigger('change');
 };
+
+/**
+ * Vertical tabs integration.
+ */
+Drupal.verticalTabs = Drupal.verticalTabs || {};
+
+Drupal.verticalTabs.flag = function() {
+  var flags = [];
+  $('fieldset.vertical-tabs-flag input:checkbox:checked').each(function() {
+    flags.push(this.title);
+  });
+
+  if (flags.length) {
+    return flags.join(', ');
+  }
+  else {
+    return Drupal.t('No flags');
+  }
+}
+
+})(jQuery);

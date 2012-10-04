@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_test.rules_defaults.inc,v 1.1.2.14 2009/04/19 15:03:43 fago Exp $
 
 
 /**

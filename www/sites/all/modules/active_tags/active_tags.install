@@ -1,10 +1,21 @@
 <?php
-// $Id: active_tags.install,v 1.1.2.1 2009/09/27 15:58:59 dragonwize Exp $
+// $Id: active_tags.install,v 1.1.2.2 2010/03/28 16:37:05 dragonwize Exp $
 
 /**
  * @file
  *  Install & uninstall functions.
  */
+
+/**
+ * Implementation of hook_install().
+ */
+function active_tags_install() {
+  // Increase module weight to prevent compatibility issues.
+  $sql = "UPDATE {system}
+          SET weight = 10
+          WHERE name = 'active_tags'";
+  db_query($sql);
+}
 
 /**
  * Implementation of hook_uninstall().
@@ -14,4 +25,16 @@ function active_tags_uninstall() {
   $sql = "DELETE FROM {variable}
           WHERE name LIKE 'active_tags%'";
   db_query($sql);
+}
+
+/**
+ * Update from 1.7 to 1.8.
+ */
+function active_tags_update_6101() {
+  $ret = array();
+  $sql = "UPDATE {system}
+          SET weight = 10
+          WHERE name = 'active_tags'";
+  $ret[] = update_sql($sql);
+  return $ret;
 }

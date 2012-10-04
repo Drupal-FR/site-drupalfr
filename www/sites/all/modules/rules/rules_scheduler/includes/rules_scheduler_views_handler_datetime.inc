@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_scheduler_views_handler_datetime.inc,v 1.1.2.1 2009/07/13 13:34:27 fago Exp $
 
 /**
  * @file

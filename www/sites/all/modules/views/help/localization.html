@@ -1,0 +1,29 @@
+<p>On multilingual sites, custom and overridden views may contain text that could be translated into one or more languages. Views makes this data available for translation.</p>
+
+<p>You can select which localization plugin to use at <strong>Administer &gt;&gt; Site building &gt;&gt; Views &gt;&gt; Tools</strong>. By default, Views supports "None" (don't localize these strings) and "Core" (use Drupal core's t() function).</p>
+
+<p>While it "works", the Core plugin is not recommended, as it doesn't support updates to existing strings. If you need to translate Views labels into other languages, consider installing the <a href="http://drupal.org/project/i18n">Internationalization</a> package's Views translation module.</p>
+
+<p>To prevent security issues, you may wish to install the PHP translation module, also part of the <a href="http://drupal.org/project/i18n">Internationalization</a> package.
+
+When this module is installed, PHP code is replaced with placeholders before being passed for translation. For example, a header with the following text
+
+<code>Welcome, you are visitor number &lt;?php echo visitor_count(); ?&gt;.</code>
+
+would be passed as
+
+<code>Welcome, you are visitor number !php0.</code>
+
+As well as addressing potential security holes, using placeholders in translations avoids presenting confusing code to translators.</p>
+
+<p>To prevent the possible insertion of additional PHP in translations, translated text is passed through strip_tags(), a function used to strip out PHP and HTML tags from text.</p>
+
+<p>If you have enabled PHP translation and wish to retain some HTML in e.g. a header or footer that accepts PHP:
+
+<ul>
+<li>Create a filter format that has both the "HTML filter" and "PHP evaluator" filters.</li>
+<li>Rearrange the order of the filters if necessary to ensure that the PHP evaluator runs before the HTML filter (because otherwise the HTML filter will remove PHP before it can be run).</li>
+<li>Select this filter format for your Views property (e.g., header).</li>
+</ul>
+
+Following this approach will ensure that you can retain a subset of HTML tags while safely using PHP in translatable Views text.</p>

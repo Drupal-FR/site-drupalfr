@@ -1,5 +1,4 @@
 <?php
-// $Id: node.views_default.inc,v 1.11.4.1 2010/03/10 20:02:26 merlinofchaos Exp $
 /**
  * @file
  * Contains default views on behalf of the node module.
@@ -13,9 +12,8 @@ function node_views_default_views() {
   $view->name = 'frontpage';
   $view->description = 'Emulates the default Drupal front page; you may set the default home page path to this view to make it your front page.';
   $view->tag = 'default';
-  $view->view_php = '';
   $view->base_table = 'node';
-  $view->is_cacheable = '0';
+  $view->human_name = 'Front page';
   $view->api_version = 2;
   $view->disabled = TRUE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
@@ -121,9 +119,8 @@ function node_views_default_views() {
   $view->name = 'glossary';
   $view->description = 'A list of all content, by letter.';
   $view->tag = 'default';
-  $view->view_php = '';
   $view->base_table = 'node';
-  $view->is_cacheable = '0';
+  $view->human_name = 'Glossary';
   $view->api_version = 2;
   $view->disabled = TRUE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
@@ -278,9 +275,8 @@ function node_views_default_views() {
   $view->name = 'archive';
   $view->description = 'Display a list of months that link to content for that month.';
   $view->tag = 'default';
-  $view->view_php = '';
   $view->base_table = 'node';
-  $view->is_cacheable = '0';
+  $view->human_name = 'Archive';
   $view->api_version = 2;
   $view->disabled = TRUE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
@@ -377,7 +373,6 @@ function node_views_default_views() {
       'default_argument_type' => 'fixed',
     ),
   ));
-  $handler->override_option('block_description', 'Archive list');
   $views[$view->name] = $view;
 
   return $views;

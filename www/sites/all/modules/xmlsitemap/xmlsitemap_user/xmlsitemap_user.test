@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_user.test,v 1.1.2.3 2010/02/15 16:53:18 davereid Exp $
 
 /**
  * @file
@@ -18,8 +17,9 @@ class XMLSitemapUserFunctionalTest extends XMLSitemapTestHelper {
     );
   }
 
-  function setUp() {
-    parent::setUp('xmlsitemap_user');
+  function setUp($modules = array()) {
+    $modules[] = 'xmlsitemap_user';
+    parent::setUp($modules);
 
     // Save the user settings before creating the users.
     xmlsitemap_link_bundle_settings_save('user', 'user', array('status' => 1, 'priority' => 0.5));

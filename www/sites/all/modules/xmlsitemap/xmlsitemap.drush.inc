@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap.drush.inc,v 1.1.2.14 2010/02/16 20:00:02 davereid Exp $
 
 /**
  * @file
@@ -37,8 +36,10 @@ function xmlsitemap_drush_command() {
  * Regenerate the sitemap files from existing data.
  */
 function drush_xmlsitemap_regenerate() {
-  module_load_include('inc', 'xmlsitemap', 'xmlsitemap.generate');
-  xmlsitemap_regenerate();
+  module_load_include('generate.inc', 'xmlsitemap');
+
+  // Run the batch process.
+  xmlsitemap_run_unprogressive_batch('xmlsitemap_regenerate_batch');
 
   $vars = array(
     '@timer' => timer_read('xmlsitemap_regenerate'),
@@ -51,44 +52,13 @@ function drush_xmlsitemap_regenerate() {
  * Dump and rebuild all the sitemap data, then regenerate the files.
  */
 function drush_xmlsitemap_rebuild() {
-  module_load_include('inc', 'xmlsitemap', 'xmlsitemap.generate');
-  timer_start('xmlsitemap_rebuild');
+  module_load_include('generate.inc', 'xmlsitemap');
 
-  // Set the rebuild flag incase something fails during the rebuild.
-  variable_set('xmlsitemap_rebuild_needed', TRUE);
-
-  // Build the list of rebuildable entities.
-  $entities = xmlsitemap_get_link_info();
-  $callbacks = $options = array();
-  foreach ($entities as $entity => $info) {
-    if (empty($info['xmlsitemap']['rebuild callback'])) {
-      // If the entity is missing a rebuild callback, skip.
-      continue;
-    }
-    if (!empty($info['object keys']['bundle']) && !xmlsitemap_get_link_type_enabled_bundles($entity)) {
-      // If the entity has bundles, but no enabled bundles, skip since
-      // rebuilding wouldn't get any links.
-      continue;
-    }
-    else {
-      // Build the list of callbacks and options for the form and batch
-      // processing.
-      $callbacks[$entity] = $info['xmlsitemap']['rebuild callback'];
-      $options[$entity] = $info['label'];
-    }
-  }
-
-  // Build the batch array.
-  $batch = xmlsitemap_rebuild_batch(array_keys($options), $callbacks, TRUE);
-  batch_set($batch);
-
-  // We need to manually set the progressive variable again.
-  // @todo Remove when http://drupal.org/node/638712 is fixed.
-  $batch =& batch_get();
-  $batch['progressive'] = FALSE;
+  // Build a list of rebuildable link types.
+  $rebuild_types = xmlsitemap_get_rebuildable_link_types();
 
   // Run the batch process.
-  batch_process();
+  xmlsitemap_run_unprogressive_batch('xmlsitemap_rebuild_batch', $rebuild_types, TRUE);
 
   $vars = array(
     '@timer' => timer_read('xmlsitemap_rebuild'),

@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_row_comment_rss.inc,v 1.3 2009/01/08 19:40:44 merlinofchaos Exp $
 /**
  * @file
  * Contains the comment RSS row style plugin.
@@ -9,12 +8,14 @@
  * Plugin which formats the comments as RSS items.
  */
 class views_plugin_row_comment_rss extends views_plugin_row {
+  var $base_table = 'comments';
+  var $base_field = 'cid';
 
   function render($row) {
     global $base_url;
 
     // Load the specified comment:
-    $comment = _comment_load($row->cid);
+    $comment = _comment_load($row->{$this->field_alias});
 
     $item = new stdClass();
     $item->title = $comment->subject;

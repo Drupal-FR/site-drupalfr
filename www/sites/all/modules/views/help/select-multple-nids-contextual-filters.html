@@ -1,0 +1,25 @@
+We assume that you have a properly configured view at this point. You should have a page or block display with fields/node to be displayed in it.
+
+<ol>
+<li>In the views administration screen add a new <i>'argument'</i> using <i>'+'</i>.  You will see a configuration screen appear at the bottom of the views screen.</li>
+
+<li>In the <i>'Groups'</i> jump menu that you now see select <i>'Node'</i>. A list will appear below the jump menu.</li>
+
+<li>In the list look for <i>'Node: Nid'</i>, and check it. </li>
+
+<li>Press the <i>'Add'</i> button.  You will now get the configuration screen for <i>'Node: Nid'</i>.</li>
+
+<li>Under <i>'Action to take if argument is not present'</i> select <i>'Provide default argument'</i>, and leave it set at <i>'Fixed Entry'</i>.</li>
+
+<li>In the field <i>'Default argument'</i> add the Nids of the nodes separated by a '+' that you want to show by default.</li>
+
+<li>In <i>'Validator Options'</i> at <i>'Validator'</i> choose <i>'Node'</i>. Now select the node types you want, or leave blank for all nodes.</li>
+
+<li>Check the <i>'Validate user has access to the node'</i>. This will check if a user has permission to view nodes, that are going to be displayed</li>
+
+<li>For the <i>'Argument Type'</i> select <i>'Node IDs separated by , or +'</i>.</li>
+
+<li>Check <i>'Allow Multiple Terms per Argument'</i> and press <i>'Update Default Display'</i>. </li>
+</ol>
+
+Preview should now show nodes, that you selected as "default argument". You can now pass arguments to your view, to select custom node IDs. If you provide no argument, default will be used. Save the view when ready.

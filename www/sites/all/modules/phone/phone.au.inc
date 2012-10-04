@@ -1,25 +1,25 @@
 <?php
-// $Id: phone.au.inc,v 1.25 2010/01/02 14:10:50 thierrygd Exp $
+// $Id: phone.au.inc,v 1.32 2011/01/03 14:40:32 thierrygd Exp $
 
 /**
  * @file
  * CCK Field for Australian phone numbers.
  */
- 
+
  function phone_au_metadata() {
    return array(
-     'label' => 'Australian Phone Numbers',
+     'label' => 'Phone Numbers - Australia',
      'error' => '"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"',
    );
  }
- 
-/**  
- * Verification for Australian Phone Numbers.  
+
+/**
+ * Verification for Australian Phone Numbers.
  * According to http://www.itu.int/itudoc/itu-t/number/a/aus/70772.html
  *    (Released 2005/10/03, retrieved 2008/04/14)
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 function valid_au_phone_number($phonenumber) {
 
@@ -87,6 +87,7 @@ function valid_au_phone_number($phonenumber) {
   $rules[] = array("364", 9, 9);
   $rules[] = array("38", 9, 9);
   $rules[] = array("39", 9, 9);
+// begin mobile phone numbers     
   $rules[] = array("400", 9, 9);
   $rules[] = array("401", 9, 9);
   $rules[] = array("402", 9, 9);
@@ -107,12 +108,14 @@ function valid_au_phone_number($phonenumber) {
   $rules[] = array("417", 9, 9);
   $rules[] = array("418", 9, 9);
   $rules[] = array("419", 9, 9);
+  $rules[] = array("420", 9, 9);
   $rules[] = array("4200", 9, 9);
   $rules[] = array("42010", 9, 9);
   $rules[] = array("421", 9, 9);
   $rules[] = array("422", 9, 9);
   $rules[] = array("423", 9, 9);
   $rules[] = array("424", 9, 9);
+  $rules[] = array("425", 9, 9);
   $rules[] = array("4251", 9, 9);
   $rules[] = array("4252", 9, 9);
   $rules[] = array("4253", 9, 9);
@@ -123,15 +126,35 @@ function valid_au_phone_number($phonenumber) {
   $rules[] = array("428", 9, 9);
   $rules[] = array("429", 9, 9);
   $rules[] = array("430", 9, 9);
+  $rules[] = array("4300", 9, 9);
+  $rules[] = array("4301", 9, 9);
+  $rules[] = array("4302", 9, 9);
+  $rules[] = array("4303", 9, 9);
+  $rules[] = array("4304", 9, 9);
+  $rules[] = array("4305", 9, 9);
   $rules[] = array("431", 9, 9);
   $rules[] = array("432", 9, 9);
   $rules[] = array("433", 9, 9);
   $rules[] = array("434", 9, 9);
+  $rules[] = array("435 ", 9, 9);
+  $rules[] = array("4350", 9, 9);
   $rules[] = array("437", 9, 9);
   $rules[] = array("438", 9, 9);
   $rules[] = array("439", 9, 9);
+  $rules[] = array("447", 9, 9);
   $rules[] = array("448", 9, 9);
   $rules[] = array("449", 9, 9);
+  $rules[] = array("449", 9, 9);  
+  $rules[] = array("450 ", 9, 9);
+  $rules[] = array("451", 9, 9);
+  $rules[] = array("457", 9, 9);
+  $rules[] = array("458", 9, 9);
+  $rules[] = array("4590", 9, 9);
+  $rules[] = array("4591", 9, 9);
+  $rules[] = array("4592", 9, 9);
+  $rules[] = array("466", 9, 9);
+  $rules[] = array("488", 9, 9);
+// end mobile phone numbers   
   $rules[] = array("50", 9, 9);
   $rules[] = array("51", 9, 9);
   $rules[] = array("52", 9, 9);
@@ -186,7 +209,7 @@ function valid_au_phone_number($phonenumber) {
     }
   }
   return FALSE;
-}  
+}
 
 /**
  * Formatting for Australian Phone Numbers. Based upon ITU-T E.123 (but let's not get too crazy)

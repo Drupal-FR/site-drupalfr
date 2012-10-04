@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_admin.render.inc,v 1.1.2.3 2009/08/03 16:42:25 fago Exp $
 
 
 /**

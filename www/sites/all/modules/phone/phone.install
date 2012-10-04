@@ -1,5 +1,5 @@
 <?php
-// $Id: phone.install,v 1.9 2010/01/02 14:10:50 thierrygd Exp $
+// $Id: phone.install,v 1.16 2011/01/03 14:40:32 thierrygd Exp $
 
 /**
  * @file
@@ -26,7 +26,7 @@
 function phone_install() {
   drupal_load('module', 'content');
   content_notify('install', 'phone');
-  drupal_set_message(t('Phone module installed successfully.')); 
+  drupal_set_message(t('Phone module installed successfully.'));
 }
 
 /**
@@ -44,11 +44,11 @@ function phone_uninstall() {
  */
 function phone_enable() {
   drupal_load('module', 'content');
-  
-  //The 2 next lines are for 5.x to 6.x upgrade 
-  db_query("UPDATE {". content_instance_tablename() ."} SET widget_module = 'phone' WHERE widget_type = 'phone'");  
+
+  //The 2 next lines are for 5.x to 6.x upgrade
+  db_query("UPDATE {". content_instance_tablename() ."} SET widget_module = 'phone' WHERE widget_type = 'phone'");
   db_query("UPDATE {". content_instance_tablename() ."} SET widget_type = 'phone_textfield' WHERE widget_type = 'phone'");
-  
+
   content_notify('enable', 'phone');
 }
 
@@ -72,17 +72,17 @@ function phone_update_6200() {
   $fields = content_fields();
 
   foreach ($fields as $field) {
-      
+
     if (substr($field['type'], 3) == 'phone') {
-  
-      //drupal_set_message('field type = phone ==> ' . $field['type']); 
-            
+
+      //drupal_set_message('field type = phone ==> ' . $field['type']);
+
       $db_info = content_database_info($field);
       if (isset($db_info['columns']['value'])) {
         $table = $db_info['table'];
         $value_column = $db_info['columns']['value']['column'];
-        //drupal_set_message('table = ' . $table, 'error');  
-        //drupal_set_message('value_column = ' . $value_column, 'error');  
+        //drupal_set_message('table = ' . $table, 'error');
+        //drupal_set_message('value_column = ' . $value_column, 'error');
 
         $ret[] = update_sql("ALTER TABLE {" . $table ."} CHANGE " .$value_column . " " .$value_column . " VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL");
       }

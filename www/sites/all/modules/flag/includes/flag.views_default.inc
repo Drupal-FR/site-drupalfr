@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.views_default.inc,v 1.1.2.5.2.1 2009/09/28 02:05:06 quicksketch Exp $
 
 /**
  * @file
@@ -7,14 +6,14 @@
  */
 
 /**
- * Implementation of hook_views_default_views().
+ * Implements hook_views_default_views().
  */
 function flag_views_default_views() {
   // Only setup views for the "bookmarks" flag.
   // If it's been deleted, don't create any views.
   $flag = flag_get_flag('bookmarks');
   if (!$flag) {
-    return;
+    return array();
   }
 
   // Set up properties that are used for both views.
@@ -38,6 +37,7 @@ function flag_views_default_views() {
       'id' => 'name',
       'table' => 'users',
       'field' => 'name',
+      'relationship' => 'uid_1',
     ),
   );
 
@@ -99,6 +99,13 @@ function flag_views_default_views() {
         'button' => 'Override',
       ),
     ),
+    'uid_1' => array(
+      'label' => 'author',
+      'required' => 0,
+      'id' => 'uid_1',
+      'table' => 'node',
+      'field' => 'uid',
+    ),
   );
 
   $access = array(
@@ -146,7 +153,7 @@ function flag_views_default_views() {
 
   // Additional relationship for this view.
   $relationships_tab = $relationships;
-  $relationships_tab['flag_content_rel']['user_scope'] = 'all';
+  $relationships_tab['flag_content_rel']['user_scope'] = 'any';
   $relationships_tab += array(
     'uid' => array(
       'label' => 'bookmarks_user',
@@ -204,7 +211,7 @@ function flag_views_default_views() {
   $handler->override_option('access', $access);
   $handler->override_option('title', 'User bookmarks');
   $handler->override_option('empty', 'This user has not yet bookmarked any content.');
-  $handler->override_option('empty_format', '1');
+  $handler->override_option('empty_format', FILTER_FORMAT_DEFAULT);
   $handler->override_option('items_per_page', '25');
   $handler->override_option('use_pager', TRUE);
   $handler->override_option('style_plugin', 'table');
@@ -241,7 +248,7 @@ function flag_views_default_views() {
   );
 
   $view = new view;
-  $view->name = 'flag_'. $flag->name;
+  $view->name = 'flag_' . $flag->name;
   $view->description = 'A page listing the current user\'s bookmarks at /bookmarks.';
   $view->tag = 'flag';
   $view->view_php = '';

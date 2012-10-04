@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_field_user_name.inc,v 1.2 2009/02/05 04:31:15 merlinofchaos Exp $
 /**
  * Field handler to provide simple renderer that allows using a themed user link
  */
@@ -46,13 +45,13 @@ class views_handler_field_user_name extends views_handler_field_user {
   function render_link($data, $values) {
     if (!empty($this->options['link_to_user']) || !empty($this->options['overwrite_anonymous'])) {
       $account = new stdClass();
-      $account->uid = $values->{$this->aliases['uid']};
+      $account->uid = $this->get_value($values, 'uid');
       if (!empty($this->options['overwrite_anonymous']) && !$account->uid) {
         // This is an anonymous user, and we're overriting the text.
         return check_plain($this->options['anonymous_text']);
       }
       elseif (!empty($this->options['link_to_user'])) {
-        $account->name = $values->{$this->field_alias};
+        $account->name = $this->get_value($values);
         return theme('username', $account);
       }
     }
@@ -60,4 +59,3 @@ class views_handler_field_user_name extends views_handler_field_user {
     return $data;
   }
 }
-

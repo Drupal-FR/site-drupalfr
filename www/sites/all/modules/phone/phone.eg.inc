@@ -1,5 +1,5 @@
 <?php
-// $Id: phone.eg.inc,v 1.4 2010/01/02 14:10:50 thierrygd Exp $
+// $Id: phone.eg.inc,v 1.11 2011/01/03 14:40:32 thierrygd Exp $
 
 /* 2009/10/24, Ahmad Gharbeia: initial release
 
@@ -34,7 +34,7 @@ Regional area codes:
 ???					96
 ?????					97
 mobile network operators' area codes:
-	Mobinil: 12, 16 
+	Mobinil: 12, 16
 	Vodafone: 10, 19
 	Etisalat: 11, 18
 
@@ -52,7 +52,7 @@ define('AREA_CODE_REGEX', "
 ");
 
 define('MOBILE_CODE_REGEX', "1(0|2|1|6|8|9)");		//area codes 10, 11, 12, 16, 18, or 19
-		
+
 define('TELEPHONE_REGEX', "
 	(\+20)\s																					# optional countrycode optionally followed by a space
 		(
@@ -64,11 +64,11 @@ define('TELEPHONE_REGEX', "
 		)
 		(\s\#\s\d+)?																# optional extension number shown with a hash divider
 ");
- 
+
 function phone_eg_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Egypt\'s telephone numbers',
+    'label' => 'Phone numbers - Egypt',
     'error' => '"%value" is not a valid phone number in Egypt. Telephone numbers in Egypt have the format +20 (#[#]) 1234567[8], where the digts between ( ) is the area or network code, without a leading zero; and digits between [ ] are optional',
   );
 
@@ -81,7 +81,7 @@ function valid_eg_phone_number($phonenumber) {
 	properly formatted: [+20][ ][(]#[#][)][ ]1234[ ]567[#]
 	common: [(][0#[#]][)][ ]123[ ]456[#]
 	area code could be within paranthises and|or prefixed with 0
-*/  
+*/
 
   $regex = "/^						# the same as the model regex above, but with elements made optional
 		(\+20)?\s?																					# country code, with following space being optional
@@ -94,7 +94,7 @@ function valid_eg_phone_number($phonenumber) {
 		)
 		(\s?\#\s?\d+)?  									# extension
 	$/x";
- 
+
   return (bool) preg_match($regex, $phonenumber);
 
 }#end function valid_eg_phone_number;
@@ -107,7 +107,7 @@ function format_eg_phone_number($phonenumber, $field) {
 	else {	//remove country code, zeros, and braces
 		$phonenumber = preg_replace("/(^(\+20)?\s?|\(0?|\)|^0?)/", '', $phonenumber);
 	}
-	
+
 	//If there are some spaces in the number assume some level of preformatting
   if (preg_match("/ /", $phonenumber)) {
 		$regex = "/^
@@ -125,7 +125,7 @@ function format_eg_phone_number($phonenumber, $field) {
 		$number = $matches[3] . ' ' . $matches[4];
 		$extension = $matches[7];
   }
-  else {					//no spaces?, then apply some guessing 
+  else {					//no spaces?, then apply some guessing
 		$regex = "/^  # order is important in this one
 			(
 					(\d)(\d{4})(\d{4})				# 2 area code, followed by 8 digits begining with 2 or 3: Greater Cairo
@@ -139,7 +139,7 @@ function format_eg_phone_number($phonenumber, $field) {
 		$number = $matches[3] . ' ' . $matches[4];
 		$extension = $matches[5];
   }
-	
+
 	return '+20 (' . $area . ') ' . $number . (empty($extension) ? '' : " #$extension");
 }#end function format_eg_phone_number;
 

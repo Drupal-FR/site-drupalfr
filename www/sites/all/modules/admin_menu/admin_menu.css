@@ -1,123 +1,37 @@
-/* $Id: admin_menu.css,v 1.25.2.4.2.8 2010/03/06 01:19:53 sun Exp $ */
-
 /**
- * @file
- * Administration menu.
+ * Administration Menu.
  *
  * Implementation of Sons of Suckerfish Dropdowns.
- *
  * @see www.htmldog.com/articles/suckerfish
- */
+ **/
+#admin-menu { position: absolute; top: 0px; left: 0px; font-size: 9px; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; background: url(images/bkg.png) bottom left repeat-x #101010; width: 100%; text-align: left; }
+#admin-menu li.admin-menu-icon a { padding: 1px 8px 4px; }
+#admin-menu li.admin-menu-icon ul a { padding: 4px 8px; }
+#admin-menu li.admin-menu-icon img { vertical-align: bottom; }
+#admin-menu li.admin-menu-users img { margin-top: 1px; }
+#admin-menu li.admin-menu-action { float: right; }
+#admin-menu li.admin-menu-action a { border-left: 1px solid #323232; border-right: none; }
+body.admin-menu { margin-top: 20px !important; }
 
-#admin-menu {
-  background: #101010 url(images/bkg.png) bottom left repeat-x;
-  font-size: 9px;
-  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
-  left: 0;
-  position: absolute;
-  text-align: left;
-  top: 0;
-  width: 100%;
-}
-#admin-menu-wrapper {
-  overflow: hidden;
-}
-#admin-menu li.admin-menu-icon a {
-  padding: 1px 8px 4px;
-}
-#admin-menu li.admin-menu-icon ul a {
-  padding: 4px 8px;
-}
-#admin-menu li.admin-menu-icon img {
-  vertical-align: bottom;
-}
-#admin-menu li.admin-menu-users a {
-  background: transparent url(images/icon_users.png) 90% center no-repeat;
-  padding-right: 22px;
-}
-#admin-menu li.admin-menu-action {
-  float: right;
-}
-#admin-menu li.admin-menu-action a {
-  border-left: 1px solid #323232;
-  border-right: none;
-}
-body.admin-menu {
-  margin-top: 20px !important;
-}
+/* all lists */
+#admin-menu, #admin-menu ul { padding: 0; margin: 0; list-style: none; line-height: 1.4em; z-index: 999; }
+#admin-menu ul { position: static; }
+#admin-menu ul a { display: block; border-right: 1px solid #323232; border-bottom: none; padding: 4px 8px; font-weight: normal; color: #eee; text-decoration: none; text-align: left; }
+#admin-menu ul li.admin-menu-tab a { border-right: 1px solid #52565e; }
+#admin-menu li li a { border-right: none; border-top: 1px solid #323232; }
 
-/* All lists */
-#admin-menu,
-#admin-menu ul {
-  line-height: 1.4em;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  z-index: 999;
-}
-#admin-menu ul {
-  position: static;
-}
-#admin-menu ul a {
-  background: transparent none;
-  border-bottom: none;
-  border-right: 1px solid #323232;
-  color: #EEE;
-  display: block;
-  font-weight: normal;
-  padding: 4px 8px;
-  text-align: left;
-  text-decoration: none;
-}
-#admin-menu ul li.admin-menu-tab a {
-  border-right: 1px solid #52565E;
-}
-#admin-menu li li a {
-  border-right: none;
-  border-top: 1px solid #323232;
-}
+/* all list items */
+/* width needed or else Opera goes nuts */
+#admin-menu li { float: left; height: 100%; margin: 0 !important; padding: 0; list-style-image: none; list-style-type: none; background-image: none; }
+#admin-menu li.admin-menu-tab { padding-bottom: 1px; background: url(images/bkg_tab.png) repeat-x left bottom; }
+#admin-menu li li { width: 160px; background: #202020; filter:Alpha(opacity=88); opacity: 0.88; }
 
-/* All list items */
-#admin-menu li {
-  background-image: none;
-  float: left;
-  height: 100%;
-  list-style-image: none;
-  list-style-type: none;
-  margin: 0 !important;
-  padding: 0;
-}
-#admin-menu li.admin-menu-tab {
-  background: url(images/bkg_tab.png) repeat-x left bottom;
-  padding-bottom: 1px;
-}
-#admin-menu li li {
-  background: #202020;
-  filter: Alpha(opacity=88);
-  opacity: 0.88;
-  width: 160px; /* Required for Opera */
-}
-#admin-menu li li li {
-  filter: Alpha(opacity=100);
-  opacity: 1;
-}
+/* second-level lists */
+/* Note: Use left instead of display to hide publicly visible menus because display: none isn't read by screen readers */
+#admin-menu li ul { position: absolute; background: none; margin: 0; width: 160px; left: -999em; display: none; line-height: 1.2em; }
 
-/* Second-level lists */
-/* Note: We must hide sub-lists or scrollbars might appear (display: none is not read by screen readers). */
-#admin-menu li ul {
-  background: none;
-  display: none;
-  left: -999em;
-  line-height: 1.2em;
-  margin: 0;
-  position: absolute;
-  width: 160px;
-}
-
-/* Third-and-above-level lists */
-#admin-menu li li.expandable ul {
-  margin: -20px 0 0 160px;
-}
+/* third-and-above-level lists */
+#admin-menu li li.expandable ul { margin: -20px 0 0 160px; }
 
 #admin-menu li:hover ul ul,
 #admin-menu li:hover ul ul ul,
@@ -127,11 +41,11 @@ body.admin-menu {
 #admin-menu li.iehover ul ul ul,
 #admin-menu li.iehover ul ul ul ul,
 #admin-menu li.iehover ul ul ul ul ul {
-  display: none;
   left: -999em;
+  display: none;
 }
 
-/* Lists nested under hovered list items */
+/* lists nested under hovered list items */
 #admin-menu li:hover ul,
 #admin-menu li li:hover ul,
 #admin-menu li li li:hover ul,
@@ -142,17 +56,15 @@ body.admin-menu {
 #admin-menu li li li.iehover ul,
 #admin-menu li li li li.iehover ul,
 #admin-menu li li li li li.iehover ul {
-  display: block;
   left: auto;
+  display: block;
 }
 #admin-menu li.admin-menu-action:hover ul {
   right: 0;
 }
 
-/* Second-and-more-level hovering */
-#admin-menu li li.expandable {
-  background: #45454A url(images/arrow.png) no-repeat 145px 7px;
-}
+/* second-and-more-level hovering */
+#admin-menu li li.expandable { background: #45454a url(images/arrow.png) no-repeat 145px 7px; }
 #admin-menu li li:hover,
 #admin-menu li li.iehover {
   background-color: #111;
@@ -160,12 +72,11 @@ body.admin-menu {
 #admin-menu li li:hover a,
 #admin-menu li li:hover li:hover a,
 #admin-menu li li:hover li:hover li:hover a {
-  color: #FFF;
+  color: #fff;
 }
 #admin-menu li li.expandable:hover a,
 #admin-menu li li.expandable:hover li.expandable:hover a {
-  border-color: #666666;
-  color: #EEE;
+  border-color: #666666; color: #eee;
 }
 #admin-menu li li.expandable:hover li a,
 #admin-menu li li.expandable:hover li.expandable:hover li a {
@@ -174,50 +85,18 @@ body.admin-menu {
 #admin-menu li li:hover li a,
 #admin-menu li li.iehover li a,
 #admin-menu li li.iehover li.iehover li a {
-  color: #EEE;
+  color: #eee;
 }
 #admin-menu li li.iehover a,
 #admin-menu li li.iehover li.iehover a,
 #admin-menu li li.iehover li.iehover li.iehover a {
-  color: #FFF;
-  width: 90%; /* IE */
+  color: #fff; width: 90%; /* IE */
 }
 
 /* #210615: Mozilla on Mac fix */
-html.js fieldset.collapsible div.fieldset-wrapper {
-  overflow: visible;
-}
+html.js fieldset.collapsible div.fieldset-wrapper { overflow: visible; }
 
-/* Hide the menu on print output. */
 @media print {
-  #admin-menu {
-    display: none !important;
-  }
-  body.admin-menu {
-    margin-top: 0 !important;
-  }
+  #admin-menu { display: none; }
+  body.admin-menu { margin-top: 0 !important; }
 }
-
-/**
- * Tweaks permissions, if enabled.
- */
-tr.admin-menu-tweak-permissions-processed {
-  cursor: pointer;
-  cursor: hand;
-}
-tr.admin-menu-tweak-permissions-processed td.module {
-  border-top: 0;
-}
-
-/**
- * Hide elements from all users. (D7 backport)
- *
- * Used for elements which should not be immediately displayed to any user. An
- * example would be a collapsible fieldset that will be expanded with a click
- * from a user. The effect of this class can be toggled with the jQuery show()
- * and hide() functions.
- */
-.element-hidden {
-  display: none;
-}
-

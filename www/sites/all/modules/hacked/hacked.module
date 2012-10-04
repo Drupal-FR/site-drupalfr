@@ -1,0 +1,375 @@
+<?php
+
+/**
+ * @file
+ * The Hacked! module, shows which project have been changed since download.
+ *
+ * We download the original project file, and hash all the files contained
+ * within, then we hash our local copies and compare.
+ * This module should never be used on a production server.
+ */
+
+define('HACKED_CACHE_TABLE', 'cache_hacked');
+
+define('HACKED_STATUS_UNCHECKED', 1);
+define('HACKED_STATUS_PERMISSION_DENIED', 2);
+define('HACKED_STATUS_HACKED', 3);
+define('HACKED_STATUS_DELETED', 4);
+define('HACKED_STATUS_UNHACKED', 5);
+
+define('HACKED_DEFAULT_FILE_HASHER', 'hacked_ignore_line_endings');
+
+/**
+ * Implementation of hook_menu().
+ */
+function hacked_menu() {
+  $items = array();
+
+  $items['admin/reports/hacked'] = array(
+    'title' => 'Hacked',
+    'description' => 'Get a code hacking report about your installed modules and themes.',
+    'page callback' => 'hacked_reports_hacked',
+    'access arguments' => array('administer site configuration'),
+    'weight' => 10,
+    'file' => 'hacked.report.inc',
+  );
+
+  $items['admin/reports/hacked/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('hacked_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'hacked.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/reports/hacked/list'] = array(
+    'title' => 'List projects',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['admin/reports/hacked/rebuild-report'] = array(
+    'type' => MENU_CALLBACK,
+    'page callback' => 'hacked_reports_rebuild',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'hacked.report.inc',
+  );
+
+  $items['admin/reports/hacked/%hacked_project'] = array(
+    'title callback' => 'hacked_reports_hacked_details_title',
+    'title arguments' => array(3),
+    'page callback' => 'hacked_reports_hacked_details',
+    'page arguments' => array(3),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'hacked.details.inc',
+  );
+
+  if (module_exists('diff')) {
+    $items['admin/reports/hacked/%hacked_project/diff/%hacked_tail'] = array(
+      'title callback' => 'hacked_reports_hacked_diff_title',
+      'title arguments' => array(3, 5),
+      'load arguments'   => array('%map', '%index'),
+      'page callback' => 'hacked_reports_hacked_diff',
+      'page arguments' => array(3, 5),
+      'access arguments' => array('view diffs of changed files'),
+      'type' => MENU_CALLBACK,
+      'file' => 'hacked.diff.inc',
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Helper to load the menu tail properly.
+ *
+ * Specifed as %hacked_tail in a menu path, this will return the entirety
+ * of the the rest of the menu path.
+ */
+function hacked_tail_load($arg, $map, $index) {
+  return implode('/', array_slice($map, $index));
+}
+
+/**
+ * Menu loader for loading a project from its short name.
+ *
+ * In this function we call the calculate function both the update module and
+ * our hacked module. This may mean we return FALSE when there is no internet
+ * connection.
+ *
+ * @param $short_name
+ *   The short name of the project to load.
+ * @param $ensure_downloaded
+ *   Should the project be downloaded to the local cache.
+ */
+function hacked_project_load($short_name) {
+  module_load_include('inc', 'hacked', 'includes/hacked_project');
+  return new hackedProject($short_name);
+}
+
+/**
+ * Menu title callback for the hacked details page.
+ */
+function hacked_reports_hacked_details_title($project) {
+  return t('Hacked status for @project', array('@project' => $project->title()));
+}
+
+/**
+ * Menu title callback for the hacked site report page.
+ */
+function hacked_reports_hacked_diff_title($project, $file) {
+  return t('Hacked status for file @file in project @project', array('@project' => $project->title(), '@file' => $file));
+}
+
+/**
+ * Implementation of hook_flush_caches().
+ */
+function hacked_flush_caches() {
+  return array(HACKED_CACHE_TABLE);
+}
+
+/**
+ * Implementation of the hook_theme() registry.
+ */
+function hacked_theme() {
+  return array(
+    'hacked_report' => array(
+      'arguments' => array('data' => NULL),
+      'file' => 'hacked.theme.inc',
+    ),
+    'hacked_detailed_report' => array(
+      'arguments' => array('data' => NULL),
+      'file' => 'hacked.details.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function hacked_perm() {
+  return array(
+    'view diffs of changed files',
+  );
+}
+
+/**
+ * Compute the report data for hacked.
+ *
+ * WARNING: This function can invoke a batch process and end your current page.
+ * So you'll want to be very careful if you call this!
+ */
+function hacked_calculate_project_data($projects, $force = FALSE, $redirect = NULL) {
+
+  // Try to get the report form cache if we can.
+  $cache = cache_get('hacked:full-report', HACKED_CACHE_TABLE);
+  if (!empty($cache->data) && !$force) {
+    return $cache->data;
+  }
+
+  // Enter a batch to build the report.
+  $operations = array();
+  foreach ($projects as $project) {
+    $operations[] = array(
+      'hacked_build_report_batch',
+      array($project['short_name']),
+    );
+  }
+
+  $batch = array(
+    'operations' => $operations,
+    'finished' => 'hacked_build_report_batch_finished',
+    'file' => drupal_get_path('module', 'hacked') . '/hacked.report.inc',
+    'title' => t('Building report'),
+  );
+
+  batch_set($batch);
+  // End page execution and run the batch.
+  batch_process($redirect);
+}
+
+/**
+ * Sort callback for sorting the projects in the report.
+ */
+function _hacked_project_report_sort_by_status($a, $b) {
+  if ($a['status'] == $b['status']) {
+    return strcmp($a['name'], $b['name']);
+  }
+  else {
+    return $a['status'] - $b['status'];
+  }
+}
+
+/**
+ * Determine if a file is a binary file.
+ *
+ * Taken from: http://www.ultrashock.com/forums/server-side/checking-if-a-file-is-binary-98391.html
+ * and then tweaked in: http://drupal.org/node/760362.
+ */
+function hacked_file_is_binary($file) {
+  if (file_exists($file)) {
+    if (!is_file($file)) return 0;
+    if (!is_readable($file)) return 1;
+
+    $fh  = fopen($file, "r");
+    $blk = fread($fh, 512);
+    fclose($fh);
+    clearstatcache();
+
+    return (
+      0 or substr_count($blk, "^\r\n") / 512 > 0.3
+        or substr_count($blk, "^ -~") / 512 > 0.3
+        or substr_count($blk, "\x00") > 0
+    );
+  }
+  return 0;
+}
+
+
+/**
+ * Hacked! version of the core function, can return hidden files too.
+ *
+ * @see file_scan_directory().
+ */
+function hacked_file_scan_directory($dir, $mask, $nomask = array('.', '..', 'CVS'), $callback = 0, $recurse = TRUE, $key = 'filename', $min_depth = 0, $depth = 0) {
+  $key = (in_array($key, array('filename', 'basename', 'name')) ? $key : 'filename');
+  $files = array();
+
+  if (is_dir($dir) && $handle = opendir($dir)) {
+    while (FALSE !== ($file = readdir($handle))) {
+      if (!in_array($file, $nomask)) {
+        if (is_dir("$dir/$file") && $recurse) {
+          // Give priority to files in this folder by merging them in after any subdirectory files.
+          $files = array_merge(hacked_file_scan_directory("$dir/$file", $mask, $nomask, $callback, $recurse, $key, $min_depth, $depth + 1), $files);
+        }
+        elseif ($depth >= $min_depth && preg_match($mask, $file)) {
+          // Always use this match over anything already set in $files with the same $$key.
+          $filename = "$dir/$file";
+          $basename = basename($file);
+          $name = substr($basename, 0, strrpos($basename, '.'));
+          $files[$$key] = new stdClass();
+          $files[$$key]->filename = $filename;
+          $files[$$key]->basename = $basename;
+          $files[$$key]->name = $name;
+          if ($callback) {
+            $callback($filename);
+          }
+        }
+      }
+    }
+
+    closedir($handle);
+  }
+
+  return $files;
+}
+
+/**
+ * Returns the version of the installed cvs executable on this machine
+ */
+function hacked_cvs_executable_get_version() {
+  $cvs_cmd = hacked_cvs_get_command();
+  // Run exec looking for the command:
+  $output_lines = array();
+  $return_value;
+  exec("$cvs_cmd --version", $output_lines, $return_value);
+  if ($return_value === 0) {
+    // We executed correctly, go looking for the version line:
+    $version = 'Concurrent Versions System (CVS)';
+    if (is_array($output_lines)) {
+      foreach ($output_lines as $line) {
+        if (strpos($line, 'CVS')) {
+          $version = $line;
+          break;
+        }
+      }
+    }
+    return $version;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Helper function to return the command to run cvs on the command line.
+ */
+function hacked_cvs_get_command() {
+  $cvs_cmd = variable_get('hacked_cvs_cmd', 'cvs');
+  return $cvs_cmd;
+}
+
+/**
+ * Checks out a folder from CVS to a temporary directory.
+ *
+ * @param $cvsroot
+ *   The CVSROOT of the folder to check out.
+ * @param $folder
+ *   The module to check out from CVS.
+ * @param $checkout_location
+ *   The location in which to place the checkout.
+ * @param $tag
+ *   The tag to checkout, defaults to 'HEAD'.
+ * @return
+ *   Either FALSE on failure or the location of the checked out files.
+ */
+function hacked_cvs_checkout($cvsroot, $folder, $checkout_location, $checkout_folder, $tag = 'HEAD') {
+  $cvs_cmd = hacked_cvs_get_command();
+  $t = $checkout_location . '/' . $checkout_folder;
+  file_check_directory($checkout_location, FILE_CREATE_DIRECTORY);
+  file_check_directory($t, FILE_CREATE_DIRECTORY);
+
+  exec("cd $checkout_location; $cvs_cmd -z6 -d$cvsroot -q checkout -d $checkout_folder -r $tag $folder", $output_lines, $return_value);
+
+  if ($return_value == 0) {
+    return $t;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Return the file hasher that is currently selected by the user.
+ */
+function hacked_get_file_hasher($name = NULL) {
+  if (is_null($name)) {
+    $name = variable_get('hacked_selected_file_hasher', HACKED_DEFAULT_FILE_HASHER);
+  }
+  $hashers = hacked_get_file_hashers();
+  $class_name = $hashers[$name]['class'];
+  return new $class_name;
+}
+
+/**
+ * Gets all the file hashers defined.
+ */
+function hacked_get_file_hashers() {
+  static $hashers;
+  if (is_null($hashers)) {
+    $hashers = module_invoke_all('hacked_file_hashers_info');
+    drupal_alter('hacked_file_hashers_info', $hashers);
+  }
+  return $hashers;
+}
+
+/**
+ * Implements hook_hacked_file_hashers_info().
+ */
+function hacked_hacked_file_hashers_info() {
+  $hashers = array();
+
+  $hashers['hacked_ignore_line_endings'] = array(
+    'class' => 'hackedFileIgnoreEndingsHasher',
+    'name' => t('Ignore line endings'),
+    'description' => t('When hashing files differences in line endings will be ignored. This might be useful if projects have been edited on a different platform than of the original author\'s. E.g. if a file has been opened and saved on Windows.'),
+  );
+
+  $hashers['hacked_include_line_endings'] = array(
+    'class' => 'hackedFileIncludeEndingsHasher',
+    'name' => t('Include line endings'),
+    'description' => t('When hashing files differences in line endings will be included.'),
+  );
+
+  return $hashers;
+}

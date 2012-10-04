@@ -1,5 +1,4 @@
 <?php
-// $Id: path.rules.inc,v 1.1.2.7 2009/08/25 18:16:42 fago Exp $
 
 
 /**
@@ -71,6 +70,11 @@ function rules_action_path_alias($settings) {
   // Only set the alias if the path alias isn't taken yet.
   if (!drupal_lookup_path('source', $dst)) {
     path_set_alias($settings['src'], $dst, NULL, $settings['language']);
+  }
+  // Otherwise, the path alias is taken.
+  // If the system path is empty, delete the alias.
+  elseif (!$settings['src']) {
+    path_set_alias(NULL, $dst, NULL, $settings['language']);
   }
 }
 

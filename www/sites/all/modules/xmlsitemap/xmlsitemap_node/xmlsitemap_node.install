@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_node.install,v 1.9.2.11.2.39 2010/02/06 05:05:04 davereid Exp $
 
 /**
  * @file
@@ -16,53 +15,6 @@ function xmlsitemap_node_uninstall() {
   foreach ($node_types as $node_type) {
     xmlsitemap_link_bundle_delete('node', $node_type);
   }
-}
-
-// @todo Remove these update functions before alpha.
-function xmlsitemap_node_update_1() {
-  $ret = array();
-  $field = array(
-    'description' => "The {node_type}.type of this link's node.",
-    'type' => 'varchar',
-    'length' => 32,
-  );
-  db_add_field($ret, 'xmlsitemap', 'node_type', $field);
-  db_add_index($ret, 'xmlsitemap', 'node_type', array('node_type'));
-  $ret[] = update_sql("UPDATE {xmlsitemap} SET node_type = (SELECT type FROM {node} WHERE nid = {xmlsitemap}.id) WHERE type = 'node'");
-  return $ret;
-}
-
-function xmlsitemap_node_update_2() {
-  $ret = array();
-  $node_types = array_keys(node_get_types('names'));
-  foreach ($node_types as $node_type) {
-    if (variable_get('xmlsitemap_node_priority_' . $node_type, 'default') === 'default') {
-      variable_set('xmlsitemap_node_priority_' . $node_type, 0.5);
-    }
-  }
-  return $ret;
-}
-
-function xmlsitemap_node_update_3() {
-  $ret = array();
-  $ret[] = update_sql("UPDATE {system} SET weight = 0 WHERE type = 'module' AND name = 'xmlsitemap_node'");
-  return $ret;
-}
-
-function xmlsitemap_node_update_4() {
-  return array();
-}
-
-function xmlsitemap_node_update_5() {
-  $ret = array();
-  if (db_column_exists('xmlsitemap', 'language')) {
-    $ret[] = update_sql("UPDATE {xmlsitemap} SET language = (SELECT {node}.language FROM {node} WHERE {node}.nid = {xmlsitemap}.id) WHERE {xmlsitemap}.type = 'node'");
-  }
-  else {
-    // Set the abort flag so this update runs again when the {xmlsitemap}.language field exists.
-    $ret['#abort'] = array('success' => FALSE, 'query' => 'The {xmlsitemap}.language field does not yet exist. Please re-run the update script.');
-  }
-  return $ret;
 }
 
 /**
@@ -124,7 +76,7 @@ function xmlsitemap_node_update_6198(&$context) {
         $link['priority'] = $record->priority_override;
         $link['priority_override'] = 1;
       }
-      xmlsitemap_save_link($link);
+      xmlsitemap_link_save($link);
     }
     $context['last'] = $record->nid;
     $context['progress']++;
@@ -139,11 +91,12 @@ function xmlsitemap_node_update_6198(&$context) {
  */
 function xmlsitemap_node_update_6200() {
   drupal_load('module', 'node');
+  drupal_load('module', 'xmlsitemap');
   $node_types = array_keys(node_get_types('names'));
   foreach ($node_types as $node_type) {
     $settings = array(
-      'status' => variable_get('xmlsitemap_node_status_' . $node_type, 0),
-      'priority' => variable_get('xmlsitemap_node_priority_' . $node_type, 0.5),
+      'status' => variable_get('xmlsitemap_node_status_' . $node_type, XMLSITEMAP_STATUS_DEFAULT),
+      'priority' => variable_get('xmlsitemap_node_priority_' . $node_type, XMLSITEMAP_PRIORITY_DEFAULT),
     );
     variable_set('xmlsitemap_settings_node_' . $node_type, $settings);
     variable_del('xmlsitemap_node_status_' . $node_type);

@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_menu.test,v 1.1.2.2 2010/02/11 02:23:42 davereid Exp $
 
 /**
  * @file
@@ -18,8 +17,10 @@ class XMLSitemapMenuFunctionalTest extends XMLSitemapTestHelper {
     );
   }
 
-  function setUp() {
-    parent::setUp('xmlsitemap_menu', 'menu');
+  function setUp($modules = array()) {
+    $modules[] = 'xmlsitemap_menu';
+    $modules[] = 'menu';
+    parent::setUp($modules);
 
     $this->admin_user = $this->drupalCreateUser(array('administer menu', 'administer xmlsitemap'));
     $this->normal_user = $this->drupalCreateUser(array('access content'));

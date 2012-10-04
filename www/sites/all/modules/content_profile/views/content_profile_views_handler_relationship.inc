@@ -1,15 +1,16 @@
 <?php
-// $Id: content_profile_views_handler_relationship.inc,v 1.1.2.3 2009/06/11 15:14:21 fago Exp $
+// $Id: content_profile_views_handler_relationship.inc,v 1.1.2.4 2010/01/12 10:05:01 fago Exp $
 // @file
 
 /**
  * Specialized relationship handler to adding content profiles.
  */
 class content_profile_views_handler_relationship extends views_handler_relationship {
-  function options(&$options) {
-    parent::options($options);
+  function option_definition() {
+    $options = parent::option_definition();
 
-    $options['type'] = '';
+    $options['type'] = array('default' => '');
+    return $options;
   }
 
   /**

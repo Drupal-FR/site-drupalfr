@@ -1,5 +1,5 @@
 <?php
-// $Id: phone.br.inc,v 1.6 2010/01/02 14:10:50 thierrygd Exp $
+// $Id: phone.br.inc,v 1.13 2011/01/03 14:40:32 thierrygd Exp $
 
 /**
  * @file
@@ -10,21 +10,20 @@ define('PHONE_BR_REGEX', "/^(\+|0{2}|)?(55|0|)[ -.]?((\(0?[1-9][0-9]\))|(0?[1-9]
 
 function phone_br_metadata() {
   return array(
-    'label' => 'Brazilian Phone Numbers',
+    'label' => ' Phone Numbers - Brazil',
     'error' => '"%value" is not a valid Brazilian phone number<br>Brazilian phone numbers should contain only numbers and spaces and - and be like 099 9999-9999 or 99 9999-9999 with an optional prefix of "+55".',
   );
-}      
+}
 
-/**  
- * Verification for Brazilian Phone Numbers.  
+/**
+ * Verification for Brazilian Phone Numbers.
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 function valid_br_phone_number($phonenumber) {
 
-  //$phonenumber = trim($phonenumber);
-
+  $phonenumber = trim($phonenumber);
 /*
   $phonenumber  = str_replace(array(' ','-','(',')'), '', $phonenumber);
 */
@@ -32,7 +31,7 @@ function valid_br_phone_number($phonenumber) {
 }
 
 /**
- * Formatting for Brazilian Phone Numbers.  
+ * Formatting for Brazilian Phone Numbers.
  *
  * @param string $phonenumber
  * @return string Returns a string containting the phone number with some formatting.
@@ -46,9 +45,9 @@ function format_br_phone_number($phonenumber, $field = FALSE) {
   if ($field && $field['phone_country_code']) {
     $formatedphone .= '+55 ';
   }
-  $formatedphone .= '(' . $matches[2] . ')';
-  $formatedphone .= ' ' . $matches[3] . '-';
-  $formatedphone .= '' . $matches[4];
+  $formatedphone .= '(' . $matches[3] . ')';
+  $formatedphone .= ' ' . $matches[6] . '-';
+  $formatedphone .= '' . $matches[7];
 
   return $formatedphone;
 }

@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.api.php,v 1.1.2.9 2009/09/10 11:05:36 fago Exp $
 
 /**
  * @file
@@ -637,7 +636,7 @@ function hook_rules_action_type_map() {
  * @param $rule
  *   An array representing the rule with its properties.
  */
-function hook_rules_import($rule) {
+function hook_rules_import(&$rule) {
   // Examine the rule, e.g. check if it is event-triggered.
   if ($rule['#set'] === 'event_my_module') {
     // Initiate post-processing that is needed to make to rule work.

@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.5.2.10 2010/01/04 05:44:34 sutharsan Exp $
 
 DESCRIPTION
 -----------
@@ -14,7 +13,7 @@ REQUIREMENTS
  * Taxonomy module
  * For large mailing lists, cron is required.
  * HTML-format newsletters and/or newsletters with file attachments require the
-   mime mail module. 
+   Mime Mail module or HTML Mail module.
 
 INSTALLATION
 ------------
@@ -42,16 +41,17 @@ INSTALLATION
     Select the content type Simplenews uses for newsletters.
     Select the taxonomy term Simplenews uses to manage newsletter series.
 
- 5. ENABLE SIMPLENEWS BLOCK
+ 5. ENABLE SIMPLENEWS BLOCKS
 
-    With the Simplenews block users can subscribe to a newsletter. For each
-    newsletter one block is available.
-    Enable the Simplenews block on the Administer blocks page:
+    With the Simplenews block users can subscribe to a newsletter. If you
+    select the multi-signup block, you can subscribe to several newsletters at
+    once. Otherwise, for each newsletter one block is available.
+    Enable the Simplenews blocks on the Administer blocks page:
       Administer > Site building > Blocks.
 
- 6. CONFIGURE SIMPLENEWS BLOCK
+ 6. CONFIGURE SIMPLENEWS BLOCKS
 
-    Configure the Simplenews block on the Block configuration page. You reach
+    Configure the Simplenews blocks on the Block configuration page. You reach
     this page from Block admin page (Administer > Site building > Blocks). 
     Click the 'Configure' link of the appropriate simplenews block.
  
@@ -82,13 +82,21 @@ INSTALLATION
     supported. 'per language vocabulary' is not supported.
     I18n-taxonomy module is required.
     Use 'Localized terms' for a multilingual newsletter. Taxonomy terms are
-    translated and translated newsletters are each taged with the same
+    translated and translated newsletters are each tagged with the same
     (translated) term. Subscribers receive the newsletter in the preferred
     language set in their account settings or in the site default language.
     Use 'per language terms' for mailing lists each with a different language.
     Newsletters of different language each have their own tag and own list of
     subscribers.
-    
+
+    To use multilingual confirmation you must use the String translation module.
+    Enter confirmation email title and body in ENGLISH at:
+      Administer > Site configuration > Simplenews > Subscription.
+    If required refresh the Simplenews text group at:
+      Administer > Site building > Translate interface > Refresh.
+    Enter translations of title and body text at:
+      Administer > Site building > Translate interface > Search.
+
     Path prefixes are added to footer message according to the subscribers
     preferred language.
 
@@ -140,12 +148,48 @@ INSTALLATION
     'Send mail' options at:
       Administer > Site configuration > Simplenews > Send mail.
 
- 11. TIPS
+ 11. (UN)SUBSCRIBE CONFIRMATION
+ 
+    By default the unsubscribe link will direct the user to a confirmation page.
+    Upon confirmation the user is directed to the home page, where a message
+    will be displayed. On the Simplenews subscription admin page you can
+    specify an alternative destination page.
+      Administer > Site configuration > Simplenews > Subscription
+    To skip the confirmation page you can add parameters to the subscription URL.
+      Example: [simplenews-subscribe-url]/ok
+    When an alternative destination page has been defined the extra parameters
+    will be added to the destination URL.
+      Example: [simplenews-subscribe-url]/ok
+      Destination: node/123
+      Destination URL: node/123/ok
+
+ 12. SINGLE OR DOUBLE OPT-IN AND OPT-OUT
+
+    Every newsletter can be set to be double opt-in/out (default), single
+    opt-in/out, or hidden.
+
+    Double: A confirmation email is sent to confirm the (un)subscribe action.
+            No confirmation is sent when a user is (un)subscribed by the
+            administrator or when the user subscribes when creating an account.
+    Single: No confirmation email is sent. (un)subscribe is immediately.
+    Hidden: The newsletter is not listed in newsletter lists. Use this for
+    mandatory newsletters. Only administrators or modules can add a user to this
+    mailing list.
+
+    Note that single opt-in/out or hidden (forced) subscription is in some
+    countries forbidden by law.
+
+    SECURITY NOTICE: a newsletter set to be single opt-in or opt-out is
+    vulnerable to Cross Site Request Forgeries. Email addresses may be
+    (un)subscribed without a notice. Do not use this setting in uncontrolled
+    environments (like the internet!).
+ 
+ 13. TIPS
 
     A subscription page is available at: /newsletter/subscriptions
-
+    
     If your unsubscribe URL looks like:
-      http:///newsletter/confirm/remove/8acd182182615t632
+      http://newsletter/confirm/remove/8acd182182615t632
     instead of:
       http://www.mysite.org/newsletter/confirm/remove/8acd182182615t632
     You should change the base URL in the settings.php file from

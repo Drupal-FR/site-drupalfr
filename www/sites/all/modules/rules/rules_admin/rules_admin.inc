@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_admin.inc,v 1.1.2.13 2009/11/02 11:34:33 fago Exp $
 
 
 /**
@@ -217,16 +216,6 @@ function rules_admin_get_categories($item_type) {
     }
   }
   return array_filter($categories);
-}
-
-/**
- * Gets an unique name for a newly added rule.
- */
-function _rules_admin_rule_get_new_unique_name() {
-  $id = variable_get('rules_counter', 0);
-  $id++;
-  variable_set('rules_counter', $id);
-  return 'rules_'. $id;
 }
 
 /**

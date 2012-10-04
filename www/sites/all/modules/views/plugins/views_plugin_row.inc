@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_row.inc,v 1.4 2009/06/01 23:34:55 merlinofchaos Exp $
 /**
  * @file
  * Contains the base row style plugin.
@@ -108,12 +107,14 @@ class views_plugin_row extends views_plugin {
   function options_submit($form, &$form_state) { }
 
   function query() {
-    if (isset($this->base_table) && isset($this->options['relationship']) && isset($this->view->relationship[$this->options['relationship']])) {
-      $relationship = $this->view->relationship[$this->options['relationship']];
-      $this->field_alias = $this->view->query->add_field($relationship->alias, $this->base_field);
-    }
-    else {
-      $this->field_alias = $this->view->base_field;
+    if (isset($this->base_table)) {
+      if (isset($this->options['relationship']) && isset($this->view->relationship[$this->options['relationship']])) {
+        $relationship = $this->view->relationship[$this->options['relationship']];
+        $this->field_alias = $this->view->query->add_field($relationship->alias, $this->base_field);
+      }
+      else {
+        $this->field_alias = $this->view->query->add_field($this->base_table, $this->base_field);
+      }
     }
   }
 
@@ -130,11 +131,10 @@ class views_plugin_row extends views_plugin {
    * of some form, but not always.
    */
   function render($row) {
-    return theme($this->theme_functions(), $this->view, $this->options, $row, $this->field_alias);
+    return theme($this->theme_functions(), $this->view, $this->options, $row, isset($this->field_alias) ? $this->field_alias : '');
   }
 }
 
 /**
  * @}
  */
-

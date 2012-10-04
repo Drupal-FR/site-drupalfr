@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_user.install,v 1.6.2.15.2.9 2010/02/06 06:11:06 davereid Exp $
 
 /**
  * @file
@@ -33,7 +32,6 @@ function xmlsitemap_user_requirements($phase) {
 function xmlsitemap_user_uninstall() {
   drupal_load('module', 'user');
   drupal_load('module', 'xmlsitemap');
-  db_query("DELETE FROM {variable} WHERE name LIKE 'xmlsitemap_settings_user_%%");
   xmlsitemap_link_bundle_delete('user', 'user');
 }
 
@@ -105,7 +103,7 @@ function xmlsitemap_user_update_6201(&$context) {
         $link['priority'] = $record->priority_override;
         $link['priority_override'] = 1;
       }
-      xmlsitemap_save_link($link);
+      xmlsitemap_link_save($link);
     }
     $context['last'] = $record->uid;
     $context['progress']++;

@@ -1,5 +1,4 @@
 <?php
-// $Id: views-ui-list-views.tpl.php,v 1.6 2008/10/28 18:11:43 merlinofchaos Exp $
 /**
  * @file
  *
@@ -33,7 +32,7 @@
             <em><?php print $view->displays; ?> </em><br />
           <?php endif; ?>
         </td>
-        <td colspan="2" class="description">
+        <td colspan="1" class="description">
           <?php print $view->description; ?>
         </td>
       </tr>

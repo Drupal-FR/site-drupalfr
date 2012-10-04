@@ -1,5 +1,4 @@
 <?php
-// $Id: user.rules.inc,v 1.1.2.20 2009/07/14 09:16:30 fago Exp $
 
 
 /**
@@ -144,14 +143,14 @@ function user_rules_action_info() {
     'rules_action_user_addrole' => array(
       'label' => t('Add user role'),
       'arguments' => array(
-        'user' => array('type' => 'user', 'label' => t('User whos roles should be changed')),
+        'user' => array('type' => 'user', 'label' => t('User whose roles should be changed')),
       ),
       'module' => 'User',
     ),
     'rules_action_user_removerole' => array(
       'label' => t('Remove user role'),
       'arguments' => array(
-        'user' => array('type' => 'user', 'label' => t('User whos roles should be changed')),
+        'user' => array('type' => 'user', 'label' => t('User whose roles should be changed')),
       ),
       'module' => 'User',
     ),

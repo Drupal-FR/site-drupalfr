@@ -1,5 +1,4 @@
 <?php
-// $Id: views-ui-edit-tab.tpl.php,v 1.11 2008/08/08 16:57:44 merlinofchaos Exp $
 /**
  * @file views-ui-edit-tab.tpl.php
  * Template for the primary view editing window.
@@ -9,6 +8,9 @@
   <?php // top section ?>
   <?php if ($remove): ?>
     <div class="remove-display"><?php print $remove ?></div>
+  <?php endif; ?>
+  <?php if ($clone): ?>
+    <div class="clone-display"><?php print $clone ?></div>
   <?php endif; ?>
   <div class="top">
     <div class="inside">
@@ -30,9 +32,11 @@
         <div class="views-category">
           <div class="views-category-title"><?php print t('View settings'); ?></div>
           <div class="views-category-content">
-            <div class="<?php $details_class; if (!empty($details_changed)) { print ' changed'; }?>">
-              <?php print $details ?>
+          <?php foreach ($details as $name => $detail): ?>
+            <div class="<?php $details_class[$name]; if (!empty($details_changed[$name])) { print ' changed'; }?>">
+              <?php print $detail ?>
             </div>
+          <?php endforeach; ?>
           </div>
         </div>
       <?php endif; ?>
@@ -67,12 +71,11 @@
   <?php // middle section ?>
   <div class="middle tab-section">
     <div class="inside">
+      <?php foreach ($areas as $area): ?>
       <div class="views-category">
-        <?php print $relationships; ?>
+        <?php print $area; ?>
       </div>
-      <div class="views-category">
-        <?php print $arguments; ?>
-      </div>
+      <?php endforeach;?>
       <?php if (!empty($fields)): ?>
         <div class="views-category">
           <?php print $fields; ?>
@@ -84,6 +87,12 @@
   <?php // right section ?>
   <div class="right tab-section">
     <div class="inside">
+      <div class="views-category">
+        <?php print $relationships; ?>
+      </div>
+      <div class="views-category">
+        <?php print $arguments; ?>
+      </div>
       <div class="views-category">
         <?php print $sorts; ?>
       </div>

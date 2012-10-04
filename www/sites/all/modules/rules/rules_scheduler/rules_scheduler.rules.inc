@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_scheduler.rules.inc,v 1.1.2.7 2009/09/06 16:24:13 klausi Exp $
 
 
 /**

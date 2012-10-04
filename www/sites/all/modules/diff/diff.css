@@ -1,35 +1,30 @@
-/* $Id: diff.css,v 1.7.4.2 2009/07/10 15:10:51 yhahn Exp $ */
+
+html.js .diff-js-hidden { display:none; }
 
 /**
- * Inline diff theming
+ * Inline diff metadata
  */
-div.diff-inline-controls {
-  margin:10px 0px;
-  background:#f4f4f4;
-  padding:5px;
+.diff-inline-metadata {
+  padding:4px;
+  border:1px solid #ddd;
+  background:#fff;
+  margin:0px 0px 10px;
   }
 
-  div.diff-inline-controls a.button { float:right; }
+.diff-inline-legend { font-size:11px; }
 
-  div.diff-inline-controls .diff-inline-legend span,
-  div.diff-inline-controls .diff-inline-legend label { margin-right:5px; }
-
-  div.diff-inline-controls .diff-inline-legend span { padding:2px 5px; }
-
-table.diff-inline-revisions td { vertical-align:top; }
-
-  table.diff-inline-revisions td.num { font-size:15px; }
-
-  table.diff-inline-revisions td.info { width:80%; }
-
-  table.diff-inline-revisions div.log { font-size:11px; }
+.diff-inline-legend span,
+.diff-inline-legend label { margin-right:5px; }
 
 /**
  * Inline diff markup
  */
 span.diff-deleted { color:#ccc; }
+span.diff-deleted img { border: solid 2px #ccc; }
 span.diff-changed { background:#ffb; }
+span.diff-changed img { border:solid 2px #ffb; }
 span.diff-added { background:#cfc; }
+span.diff-added img { border: solid 2px #cfc; }
 
 /**
  * Traditional split diff theming

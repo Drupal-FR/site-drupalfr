@@ -1,16 +1,27 @@
 <?php
 
 /**
+ * @file
+ * Menu callbacks for hook_menu().
+ */
+
+/**
+ * Menu callback - show latest diff for a given node.
+ */
+function diff_latest($node) {
+  $revisions = node_revision_list($node);
+  $new = array_shift($revisions);
+  $old = array_shift($revisions);
+  drupal_goto("node/{$node->nid}/revisions/view/{$old->vid}/{$new->vid}");
+}
+
+/**
  * Generate an overview table of older revisions of a node and provide
  * an input form to select two revisions for a comparison.
  */
-function diff_diffs_overview(&$node) {
-  $output = '';
-
+function diff_diffs_overview($node) {
   drupal_set_title(t('Revisions for %title', array('%title' => $node->title)));
-  $output .= drupal_get_form('diff_node_revisions', $node);
-
-  return $output;
+  return drupal_get_form('diff_node_revisions', $node);
 }
 
 /**
@@ -19,7 +30,7 @@ function diff_diffs_overview(&$node) {
  * @param $node
  *   Node whose revisions are displayed for selection.
  */
-function diff_node_revisions($form_state, &$node) {
+function diff_node_revisions($form_state, $node) {
   global $form_values;
   $form = array();
 
@@ -51,7 +62,7 @@ function diff_node_revisions($form_state, &$node) {
     $revert_permission = TRUE;
   }
   $delete_permission = FALSE;
-  if (user_access('administer nodes')) {
+  if ((user_access('delete revisions') || user_access('administer nodes')) && node_access('delete', $node)) {
     $delete_permission = TRUE;
   }
 
@@ -142,7 +153,7 @@ function diff_node_revisions_validate($form, &$form_state) {
  * @param $new_vid
  *   Version ID of the new revision.
  */
-function diff_diffs_show(&$node, $old_vid, $new_vid) {
+function diff_diffs_show($node, $old_vid, $new_vid) {
 
   // Set same title as on the 'Revisions' tab for consistency
   drupal_set_title(t('Revisions for %title', array('%title' => $node->title)));
@@ -231,20 +242,21 @@ function diff_diffs_show(&$node, $old_vid, $new_vid) {
  * @param $new_node
  *   Node for comparison which will be displayed on the right side.
  */
-function _diff_body_rows(&$old_node, &$new_node) {
+function _diff_body_rows($old_node, $new_node) {
   drupal_add_css(drupal_get_path('module', 'diff') .'/diff.css', 'module', 'all', FALSE);
-  module_load_include('php', 'diff', 'DiffEngine');
-  module_load_include('inc', 'diff', 'node');
+
+  module_load_include('inc', 'diff', 'includes/node');
   if (module_exists('taxonomy')) {
-    module_load_include('inc', 'diff', 'taxonomy');
+    module_load_include('inc', 'diff', 'includes/taxonomy');
   }
   if (module_exists('upload')) {
-    module_load_include('inc', 'diff', 'upload');
+    module_load_include('inc', 'diff', 'includes/upload');
   }
 
   $rows = array();
   $any_visible_change = FALSE;
-  $node_diffs = module_invoke_all('diff', $old_node, $new_node);
+  // @todo quick workaround for PHP >= 5.3.0 date_diff() conflict.
+  $node_diffs = _diff_module_invoke_all($old_node, $new_node);
 
   // We start off assuming all form elements are in the correct order.
   $node_diffs['#sorted'] = TRUE;
@@ -269,33 +281,25 @@ function _diff_body_rows(&$old_node, &$new_node) {
     uasort($node_diffs, "element_sort");
   }
 
+  // Render diffs for each.
   foreach ($node_diffs as $node_diff) {
-    $diff = new Diff($node_diff['#old'], $node_diff['#new']);
-    $formatter = new DrupalDiffFormatter();
-    if (isset($node_diff['#format'])) {
-      $formatter->show_header = $node_diff['#format']['show_header'];
-    }
-    $diff_rows = $formatter->format($diff);
-    if (count($diff_rows)) {
-      $rows[] = array(
-        array(
-          'data' => t('Changes to %name', array('%name' => $node_diff['#name'])),
-          'class' => 'diff-section-title',
-          'colspan' => 4
-        )
-      );
-      $rows = array_merge($rows, $diff_rows);
+    $show_header = isset($node_diff['#format']['show_header']) ? $node_diff['#format']['show_header'] : FALSE;
+    if ($node_diff_rows = diff_get_rows($node_diff['#old'], $node_diff['#new'], $show_header)) {
+      $rows[] = array(array(
+        'data' => t('Changes to %name', array('%name' => $node_diff['#name'])),
+        'class' => 'diff-section-title',
+        'colspan' => 4
+      ));
+      $rows = array_merge($rows, $node_diff_rows);
       $any_visible_change = TRUE;
     }
   }
   if (!$any_visible_change) {
-    $rows[] = array(
-      array(
-        'data' => t('No visible changes'),
-        'class' => 'diff-section-title',
-        'colspan' => 4
-      ),
-    );
+    $rows[] = array(array(
+      'data' => t('No visible changes'),
+      'class' => 'diff-section-title',
+      'colspan' => 4
+    ));
     // Needed to keep safari happy
     $rows[] = array(
       array('data' => ''),
@@ -304,7 +308,35 @@ function _diff_body_rows(&$old_node, &$new_node) {
       array('data' => ''),
     );
   }
+
   return $rows;
+}
+
+/**
+ * Helper function to invoke hook_diff in all enabled modules that implement it.
+ *
+ * Don't use module_invoke_all() since if date.module is enabled will clash with
+ * PHP 5.3's date_diff() function.
+ *
+ * @todo figure out any else possible solution but not workaround.
+ * @link http://drupal.org/node/639320
+ * @see module_invoke_all()
+ */
+function _diff_module_invoke_all($old_node, $new_node) {
+  $return = array();
+  foreach (module_implements('diff') as $module) {
+    if ($module == 'date') {
+      continue; // Avoid function name collision with date_diff().
+    }
+    $result = module_invoke($module, 'diff', $old_node, $new_node);
+    if (isset($result) && is_array($result)) {
+      $return = array_merge_recursive($return, $result);
+    }
+    elseif (isset($result)) {
+      $return[] = $result;
+    }
+  }
+  return $return;
 }
 
 /**
@@ -316,7 +348,7 @@ function _diff_body_rows(&$old_node, &$new_node) {
  * @param $vid
  *   Version ID to look for.
  */
-function _diff_get_next_vid(&$node_revisions, $vid) {
+function _diff_get_next_vid($node_revisions, $vid) {
   $previous = NULL;
   foreach ($node_revisions as $revision) {
     if ($revision->vid == $vid) {
@@ -336,7 +368,7 @@ function _diff_get_next_vid(&$node_revisions, $vid) {
  * @param $vid
  *   Version ID to look for.
  */
-function _diff_get_previous_vid(&$node_revisions, $vid) {
+function _diff_get_previous_vid($node_revisions, $vid) {
   $previous = NULL;
   foreach ($node_revisions as $revision) {
     if ($previous && $previous->vid == $vid) {
@@ -386,117 +418,41 @@ function _diff_default_header($old_header = '', $new_header = '') {
 }
 
 /**
- * Generate a rendered inline diff of the node body.
+ * AHAH callback for rendering the inline diff of a node.
  */
-function diff_inline_diff($node, $target_vid) {
-  module_load_include('php', 'diff', 'DiffEngine');
-  $new = drupal_clone($node);
-
-  // We could use a node_load() / node_prepare() combo here but for now
-  // we would rather save queries...
-  $old = db_fetch_object(db_query("SELECT body, format FROM {node_revisions} WHERE nid = %d AND vid = %d", $node->nid, $target_vid));
-  $old->body = check_markup($old->body, $old->format, FALSE);
-
-  $new = preg_split('/(<[^>]+?>| )/', $new->body, -1, PREG_SPLIT_DELIM_CAPTURE);
-  $old = preg_split('/(<[^>]+?>| )/', $old->body, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-  $diff = new Diff($old, $new);
-  $diff->edits = _diff_inline_process_edits($diff->edits);
-
-  // Assemble highlighted output
-  $output = '';
-  foreach ($diff->edits as $chunk) {
-    switch ($chunk->type) {
-      case 'copy':
-        $output .= implode("", $chunk->closing);
-        break;
-      case 'delete':
-        foreach ($chunk->orig as $i => $piece) {
-          if (strpos($piece, '<') === 0 && substr($piece, strlen($piece) - 1) === '>') {
-            $output .= $piece;
-          }
-          else {
-            $output .= theme('diff_inline_chunk', $piece, $chunk->type);
-          }
-        }
-        break;
-      default:
-        $chunk->closing = _diff_inline_process_chunk($chunk->closing);
-
-        foreach ($chunk->closing as $i => $piece) {
-          if ($piece === ' ' || (strpos($piece, '<') === 0 && substr($piece, strlen($piece) - 1) === '>')) {
-            $output .= $piece;
-          }
-          else {
-            $output .= theme('diff_inline_chunk', $piece, $chunk->type);
-          }
-        }
-        break;
+function diff_inline_ahah($node) {
+  $form_state = array('values' => $_POST);
+  if ($form = form_get_cache($form_state['values']['form_build_id'], $form_state)) {
+    if (!empty($form_state['values']['revision']) && is_numeric($form_state['values']['revision'])) {
+      $vid = $form_state['values']['revision'];
     }
+    else {
+      $vid = 0;
+    }
+    drupal_json(array('status' => TRUE, 'data' => diff_inline_show($node, $vid)));
+    exit;
   }
-  return $output;
+  drupal_json(array('status' => FALSE, 'data' => ''));
+  exit;
 }
 
 /**
- * Merge chunk segments between tag delimiters.
+ * Show the inline diff for a given node, vid. If vid = 0 or no previous vid
+ * exists for the given revision returns the normally rendered content of the
+ * specified revision.
  */
-function _diff_inline_process_chunk($chunk) {
-  $processed = array();
-  $j = 0;
-  foreach ($chunk as $i => $piece) {
-    $next = isset($chunk[$i+1]) ? $chunk[$i+1] : NULL;
-    if (strpos($piece, '<') === 0 && substr($piece, strlen($piece) - 1) === '>') {
-      $processed[$j] = $piece;
-      $j++;
-    }
-    else if (isset($next) && strpos($next, '<') === 0 && substr($next, strlen($next) - 1) === '>') {
-      $processed[$j] .= $piece;
-      $j++;
-    }
-    else {
-      $processed[$j] .= $piece;
-    }
+function diff_inline_show($node, $vid = 0, $metadata = TRUE) {
+  $new_node = $vid ? node_load($node->nid, $vid, TRUE) : drupal_clone($node);
+  $new = node_build_content($new_node);
+  $new = drupal_render($new->content);
+
+  $old = $vid ? _diff_get_previous_vid(node_revision_list($node), $vid) : 0;
+  if ($old) {
+    $old = node_build_content(node_load($node->nid, $old, TRUE));
+    $old = drupal_render($old->content);
+    $output = $metadata ? theme('diff_inline_metadata', $new_node) : '';
+    $output .= diff_get_inline($old, $new);
+    return $output;
   }
-  return $processed;
-}
-
-/**
- * Merge copy and equivalent edits into intelligible chunks.
- */
-function _diff_inline_process_edits($edits) {
-  $processed = array();
-  $current = array_shift($edits);
-
-  // Make two passes -- first merge space delimiter copies back into their originals.
-  while ($chunk = array_shift($edits)) {
-    if ($chunk->type == 'copy' && $chunk->orig === array(' ')) {
-      $current->orig = array_merge((array) $current->orig, (array) $chunk->orig);
-      $current->closing = array_merge((array) $current->closing, (array) $chunk->closing);
-    }
-    else {
-      $processed[] = $current;
-      $current = $chunk;
-    }
-  }
-  $processed[] = $current;
-
-  // Initial setup
-  $edits = $processed;
-  $processed = array();
-  $current = array_shift($edits);
-
-  // Second, merge equivalent chunks into each other.
-  while ($chunk = array_shift($edits)) {
-    if ($current->type == $chunk->type) {
-      $current->orig = array_merge((array) $current->orig, (array) $chunk->orig);
-      $current->closing = array_merge((array) $current->closing, (array) $chunk->closing);
-    }
-    else {
-      $processed[] = $current;
-      $current = $chunk;
-    }
-  }
-  $processed[] = $current;
-
-  return $processed;
+  return $new;
 }

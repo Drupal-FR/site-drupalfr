@@ -1,0 +1,31 @@
+<?php
+/**
+ * @file
+ * Install functions for the Hacked! module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function hacked_install() {
+  drupal_install_schema('hacked');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function hacked_uninstall() {
+  drupal_uninstall_schema('hacked');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function hacked_schema() {
+  $tables = array();
+
+  $tables['cache_hacked'] = drupal_get_schema_unprocessed('system', 'cache');
+  $tables['cache_hacked']['description'] = 'Cache table for the Hacked! module. Holds hashes for the various projects.';
+
+  return $tables;
+}

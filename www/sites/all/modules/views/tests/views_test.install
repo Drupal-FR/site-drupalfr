@@ -1,0 +1,13 @@
+<?php
+
+function views_test_install() {
+  drupal_install_schema('views_test');
+}
+
+function views_test_uninstall() {
+  drupal_uninstall_schema('views_test');
+}
+
+function views_test_schema() {
+  return variable_get('views_test_schema', array());
+}

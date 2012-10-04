@@ -1,5 +1,4 @@
 <?php
-// $Id: apachesolr.install,v 1.1.4.30 2009/12/27 16:47:37 pwolanin Exp $
 
 /**
  * @file
@@ -30,7 +29,7 @@ function apachesolr_requirements($phase) {
     catch (Exception $e) {
       watchdog('Apache Solr', nl2br(check_plain($e->getMessage())), NULL, WATCHDOG_ERROR);
     }
-    $value =  $ping ? $t('Your site has contacted the Apache Solr server.') : $t('Your site was unable to contact the Apache Solr server.');
+    $value = $ping ? $t('Your site has contacted the Apache Solr server.') : $t('Your site was unable to contact the Apache Solr server.');
     $severity = $ping ? REQUIREMENT_OK : REQUIREMENT_ERROR;
     $description = theme('item_list', array($t('Host: %host', array('%host' => $host)),
                         $t('Port: %port', array('%port' => $port)),
@@ -135,13 +134,14 @@ function apachesolr_schema() {
 }
 
 /**
- * Implementation of hook_uninstall()
+ * Implementation of hook_uninstall().
  */
 function apachesolr_uninstall() {
   variable_del('apachesolr_host');
   variable_del('apachesolr_port');
   variable_del('apachesolr_path');
   variable_del('apachesolr_rows');
+  variable_del('apachesolr_facet_show_children');
   variable_del('apachesolr_facet_query_limits');
   variable_del('apachesolr_facet_query_limit_default');
   variable_del('apachesolr_site_hash');
@@ -149,8 +149,11 @@ function apachesolr_uninstall() {
   variable_del('apachesolr_mlt_blocks');
   variable_del('apachesolr_cron_limit');
   variable_del('apachesolr_enabled_facets');
+  variable_del('apachesolr_exclude_nodeapi_types');
   // Remove tables.
   drupal_uninstall_schema('apachesolr');
+  // Remove blocks.
+  db_query('DELETE FROM {blocks} WHERE module = "apachesolr"');
 }
 
 /**
@@ -186,7 +189,7 @@ function apachesolr_update_6000() {
   db_create_table($ret, 'apachesolr_search_node', $schema['apachesolr_search_node']);
   // Populate table
   $ret[] = update_sql("INSERT INTO {apachesolr_search_node} (nid, status, changed)
-                       SELECT n.nid, n.status, GREATEST(n.created, n.changed, c.last_comment_timestamp) AS changed
+                       SELECT n.nid, n.status, GREATEST(n.created, n.changed, COALESCE(c.last_comment_timestamp, 0)) AS changed
                        FROM {node} n LEFT JOIN {apachesolr_search_node} asn ON n.nid = asn.nid
                        LEFT JOIN {node_comment_statistics} c ON n.nid = c.nid
                        WHERE asn.changed IS NULL");
@@ -212,11 +215,10 @@ function apachesolr_update_6001() {
  */
 function apachesolr_update_6002() {
   $ret = array();
-   // Make sure no nodes end up with a timestamp that's in the future.
-   $time = (int) time();
-   $ret[] = update_sql("UPDATE {apachesolr_search_node} SET changed = $time WHERE changed > $time");
-
-   return $ret;
+  // Make sure no nodes end up with a timestamp that's in the future.
+  $time = (int) time();
+  $ret[] = update_sql("UPDATE {apachesolr_search_node} SET changed = $time WHERE changed > $time");
+  return $ret;
 }
 
 /**
@@ -259,5 +261,32 @@ function apachesolr_update_6005() {
   $table = drupal_get_schema_unprocessed('system', 'cache');
   $table['description'] = 'Cache table for apachesolr to store Luke data and indexing information.';
   db_create_table($ret, 'cache_apachesolr', $table);
+  return $ret;
+}
+
+/**
+ * Move excluded comment types into a new variable.
+ */
+function apachesolr_update_6006() {
+  $exclude_comment_types = variable_get('apachesolr_exclude_comments_types', NULL);
+  if (is_array($exclude_comment_types)) {
+    $exclude = array();
+    foreach ($exclude_comment_types as $type) {
+      $exclude[$type]['comment'] = TRUE;
+    }
+    variable_set('apachesolr_exclude_nodeapi_types', $exclude);
+  }
+  variable_del('apachesolr_exclude_comments_types');
+  return array();
+}
+
+/**
+ * Fix block caching settings.
+ */
+function apachesolr_update_6007() {
+  $ret = array();
+
+  $ret[] = update_sql("UPDATE {blocks} set cache = " . (BLOCK_CACHE_PER_ROLE | BLOCK_CACHE_PER_PAGE) . " WHERE module LIKE 'apachesolr%' AND cache = " . BLOCK_CACHE_PER_PAGE . " AND delta != 'currentsearch' AND delta != 'sort'");
+
   return $ret;
 }

@@ -1,5 +1,5 @@
 <?php
-// $Id: phone.il.inc,v 1.1 2010/01/02 14:10:50 thierrygd Exp $
+// $Id: phone.il.inc,v 1.8 2011/01/03 14:40:32 thierrygd Exp $
 //drived from au module and manipulated by Moshe Beeri, email: moshe.beeri (at-shetrudel) google mail
 
 /**
@@ -9,7 +9,7 @@
 
 function phone_il_metadata() {
   return array(
-    'label' => 'Israeli Phone Numbers',
+    'label' => 'Phone Numbers - Israel',
     'error' => '"%value" is not a valid Israeli phone number',
   );
 }
@@ -90,20 +90,20 @@ function format_il_phone_number($phonenumber) {
   }
 
   /*
-  * cell phone
-  * Eg. 054 9999 999
-  */
-  if (preg_match('/^([0-9]{3})([0-9]{4})([0-9]{3})$/', $phonenumber, $match)) {
-    return $prefix . $match[1] . ' ' . $match[2] . ' ' . $match[3] . $extension;
-  }
-
-  /*
   * 10 digit numbers
   * Eg. 1800 999 999
   */
   if (preg_match('/^([0-9]{4})([0-9]{3})([0-9]{3})$/', $phonenumber, $match)) {
     return $prefix . $match[1] . ' ' . $match[2] . ' ' . $match[3] . $extension;
   }
+  
+  /*
+  * cell phone
+  * Eg. 054 9999 999
+  */
+  if (preg_match('/^([0-9]{3})([0-9]{4})([0-9]{3})$/', $phonenumber, $match)) {
+    return $prefix . $match[1] . ' ' . $match[2] . ' ' . $match[3] . $extension;
+  }   
 
   // default
   return $prefix . $phonenumber . $extension;

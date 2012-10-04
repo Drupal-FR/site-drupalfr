@@ -1,5 +1,4 @@
 <?php
-// $Id: docs.php,v 1.16.2.2 2010/03/08 20:04:40 merlinofchaos Exp $
 /**
  * @file
  * This file contains no working PHP code; it exists to provide additional documentation
@@ -179,6 +178,8 @@ function hook_views_data() {
       'handler' => 'views_handler_filter_boolean_operator',
       'label' => t('Published'),
       'type' => 'yes-no',
+      // use boolean_field = 1 instead of boolean_field <> 0 in WHERE statment
+      'use equal' => TRUE,
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
@@ -203,6 +204,36 @@ function hook_views_data() {
 
   return $data;
 }
+
+/**
+ * Alter table structure.
+ *
+ * You can add/edit/remove to existing tables defined by hook_views_data().
+ *
+ * This hook should be placed in MODULENAME.views.inc and it will be auto-loaded.
+ * This must either be in the same directory as the .module file or in a subdirectory
+ * named 'includes'.
+ *
+ * The full documentation for this hook is in the advanced help.
+ * @link http://views-help.doc.logrus.com/help/views/api-tables @endlink
+ */
+function hook_views_data_alter(&$data) {
+  // This example alters the title of the node: nid field for the admin.
+  $data['node']['nid']['title'] = t('Node-Nid');
+
+  // This example adds a example field to the users table
+  $data['users']['example_field'] = array(
+    'title' => t('Example field'),
+    'help' => t('Some examüple content that references a user'),
+    'handler' => 'hook_handlers_field_example_field',
+  );
+
+  // This example changes the handler of the node title field.
+  // In this handler you could do stuff, like preview of the node, when clicking the node title.
+
+  $data['node']['title']['handler'] = 'modulename_handlers_field_node_title';
+}
+
 
 /**
  * The full documentation for this hook is now in the advanced help.
@@ -248,11 +279,15 @@ function hook_views_handlers() {
  *   - path: (optional) If includes are stored somewhere other than within
  *       the root module directory or a subdirectory called includes, specify
  *       its path here.
+ *   - template path: (optional) A path where the module has stored it's views template files.
+ *        When you have specificed this key views automatically uses the template files for the views.
+ *        You can use the same naming conventions like for normal views template files.
  */
 function hook_views_api() {
   return array(
     'api' => 2,
-    'path' => drupal_get_path('module', 'example') . '/includes/views', 
+    'path' => drupal_get_path('module', 'example') . '/includes/views',
+    'template path' => drupal_get_path('module', 'example') . 'themes',
   );
 }
 
@@ -260,12 +295,16 @@ function hook_views_api() {
  * This hook allows modules to provide their own views which can either be used
  * as-is or as a "starter" for users to build from.
  *
- * This hook should be placed in MODULENAME.views_default.inc and it will be
+ * The hook should be placed in MODULENAME.views_default.inc and it will be
  * auto-loaded. This must either be in the same directory as the .module file
  * or in a subdirectory named 'includes'.
  *
+ * This hook requires an array of views, where each array has key/value pair and must
+ * have $value == $view->name, it is invalid if the keys not match.
+ *
  * The $view->disabled boolean flag indicates whether the View should be
  * enabled or disabled by default.
+ *
  *
  * @return
  *   An associative array containing the structures of views, as generated from
@@ -279,9 +318,7 @@ function hook_views_default_views() {
   $view->name = 'frontpage';
   $view->description = t('Emulates the default Drupal front page; you may set the default home page path to this view to make it your front page.');
   $view->tag = t('default');
-  $view->view_php = '';
   $view->base_table = 'node';
-  $view->is_cacheable = '0';
   $view->api_version = 2;
   $view->disabled = FALSE; // Edit this to true to make a default view disabled initially
   $view->display = array();
@@ -514,13 +551,25 @@ function hook_views_default_views() {
 }
 
 /**
+ * Alter default views defined by other modules.
+ *
  * This hook is called right before all default views are cached to the
  * database. It takes a keyed array of views by reference.
+ *
+ * Example usage to add a field to a view:
+ * @code
+ *   $handler =& $view->display['DISPLAY_ID']->handler;
+ *   // Add the user name field to the view.
+ *   $handler->display->display_options['fields']['name']['id'] = 'name';
+ *   $handler->display->display_options['fields']['name']['table'] = 'users';
+ *   $handler->display->display_options['fields']['name']['field'] = 'name';
+ *   $handler->display->display_options['fields']['name']['label'] = 'Author';
+ *   $handler->display->display_options['fields']['name']['link_to_user'] = 1;
+ * @endcode
  */
 function hook_views_default_views_alter(&$views) {
   if (isset($views['taxonomy_term'])) {
-    $views['taxonomy_term']->set_display('default');
-    $views['taxonomy_term']->display_handler->set_option('title', 'Categories');
+    $views['taxonomy_term']->display['default']->display_options['title'] = 'Categories';
   }
 }
 
@@ -539,6 +588,32 @@ function hook_views_convert() {
  * Stub hook documentation
  */
 function hook_views_query_substitutions() {
+  // example code here
+}
+
+/**
+ * This hook is called to get a list of placeholders and their substitutions,
+ * used when preprocessing a View with form elements.
+ */
+function hook_views_form_substitutions() {
+  return array(
+    '<!--views-form-example-substitutions-->' => 'Example Substitution',
+  );
+}
+
+/**
+ * Views form (View with form elements) validate handler.
+ * Called for all steps ($form_state['storage']['step']) of the multistep form.
+ */
+function hook_views_form_validate($form, &$form_state) {
+  // example code here
+}
+
+/**
+ * Views form (View with form elements) submit handler.
+ * Called for all steps ($form_state['storage']['step']) of the multistep form.
+ */
+function hook_views_form_submit($form, &$form_state) {
   // example code here
 }
 
@@ -565,6 +640,17 @@ function hook_views_pre_build(&$view) {
 }
 
 /**
+ * This hook is called right after the build process. The query is
+ * now fully built, but it has not yet been run through db_rewrite_sql.
+ *
+ * Adding output to the view can be accomplished by placing text on
+ * $view->attachment_before and $view->attachment_after.
+ */
+function hook_views_post_build(&$view) {
+  // example code here
+}
+
+/**
  * This hook is called right before the execute process. The query is
  * now fully built, but it has not yet been run through db_rewrite_sql.
  *
@@ -572,6 +658,19 @@ function hook_views_pre_build(&$view) {
  * $view->attachment_before and $view->attachment_after.
  */
 function hook_views_pre_execute(&$view) {
+  // example code here
+}
+
+/**
+ * This hook is called right after the execute process. The query has
+ * been executed, but the pre_render() phase has not yet happened for
+ * handlers.
+ *
+ * Adding output to the view can be accomplished by placing text on
+ * $view->attachment_before and $view->attachment_after. Altering the
+ * content can be achieved by editing the items of $view->result.
+ */
+function hook_views_post_execute(&$view) {
   // example code here
 }
 

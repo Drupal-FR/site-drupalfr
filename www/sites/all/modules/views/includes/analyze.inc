@@ -1,5 +1,4 @@
 <?php
-// $Id: analyze.inc,v 1.1 2008/10/28 22:50:00 merlinofchaos Exp $
 
 /**
  * @file
@@ -103,7 +102,44 @@ function views_ui_views_analyze($view) {
   if (count($view->display) < 2) {
     $ret[] = views_ui_analysis(t('This view has only a default display and therefore will not be placed anywhere on your site; perhaps you want to add a page or a block display.'), 'warning');
   }
+  foreach ($view->display as $display_id => $display) {
+    if (empty($display->handler) || !empty($display->handler->broken)) {
+      $ret[] = views_ui_analysis(t('Display plugin @plugin is not available.', array('@plugin' => $display->display_plugin)), 'error');
+    }
+
+    $plugin = $display->handler->get_plugin('style');
+    if ($plugin) {
+      $plugin->init($view, $display);
+      if ($validate_messages = $plugin->validate()) {
+        foreach ($validate_messages as $validate_message) {
+          $ret[] = views_ui_analysis(t('Style plugin @plugin: @message', array('@plugin' => $plugin_name, '@message' => $validate_message)));
+        }
+      }
+    }
+    else {
+      $ret[] = views_ui_analysis(t('Style plugin @plugin is not available.', array('@plugin' => $plugin_name)), 'error');
+    }
+
+    foreach (views_object_types() as $type => $info) {
+      $handlers = $display->handler->get_handlers($type);
+      if ($handlers) {
+        foreach ($handlers as $id => $handler) {
+          if ($validate_messages = $handler->validate()) {
+            foreach ($validate_messages as $message) {
+              $ret[] = views_ui_analysis("$display_id: $id: $message", 'error');
+            }
+          }
+          if ($handler->broken()) {
+            $ret[] = views_ui_analysis(t('@type handler @table.@field is not available.', array(
+              '@type' => $info['stitle'],
+              '@table' => $handler->table,
+                '@field' => $handler->field,
+            )), 'error');
+          }
+        }
+      }
+    }
+  }
 
   return $ret;
 }
-

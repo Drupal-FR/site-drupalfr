@@ -1,5 +1,4 @@
 <?php
-// $Id: translation.views.inc,v 1.8.4.1 2010/03/19 23:09:54 merlinofchaos Exp $
 
 /**
  * @file
@@ -40,6 +39,9 @@ function translation_views_data_alter(&$data) {
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_node_language',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
     ),
   );
 

@@ -1,5 +1,4 @@
 <?php
-// $Id: mollom.api.php,v 1.1.2.7 2010/09/12 23:44:14 dries Exp $
 
 /**
  * @file
@@ -150,6 +149,9 @@
  *       $form_info = array(
  *         // Optional: User permission list to skip Mollom's protection for.
  *         'bypass access' => array('administer instant messages'),
+ *         // Optional: Function to invoke to put a bad form submission into a
+ *         // moderation queue instead of discarding it.
+ *         'moderation callback' => 'im_mollom_form_moderation',
  *         // Optional: To allow textual analysis of the form values, the form
  *         // elements needs to be registered individually. The keys are the
  *         // field keys in $form_state['values']. Sub-keys are noted using "]["
@@ -205,6 +207,16 @@
  * Additionally, the "post_id" data property always needs to be mapped to a form
  * element that holds the entity id.
  *
+ * When registering a 'moderation callback', then the registered function needs
+ * to be available when the form is validated, and it is responsible for
+ * changing the submitted form values in a way that results in an unpublished
+ * post ending up in a moderation queue:
+ * @code
+ * function im_mollom_form_moderation(&$form, &$form_state) {
+ *   $form_state['values']['status'] = 0;
+ * }
+ * @endcode
+ *
  * @see mollom_node
  * @see mollom_comment
  * @see mollom_user
@@ -229,12 +241,19 @@
  *     that only send an e-mail, but do not store it in the database.
  *     Note that forms that specify 'entity' also need to specify 'post_id' in
  *     the 'mapping' (see below).
- *   - report access callback: (optional) A function name to invoke to check
- *     access to Mollom's dedicated "report to Mollom" form, which should return
- *     either TRUE or FALSE (like any other menu "access callback").
+ *   - delete form: (optional) The $form_id of a delete confirmation form
+ *     constructor function for 'entity'. Mollom automatically adds the
+ *     "Report as inappropriate" options to this confirmation form. Requires a
+ *     'post_id' mapping via hook_mollom_form_info(). Requires the delete
+ *     confirmation form constructor to assign the mapped post_id key in $form
+ *     as a #value. See http://drupal.org/node/645374 for examples. Optionally
+ *     limit access to report options by defining 'report access' permissions.
  *   - report access: (optional) A list containing user permission strings, from
  *     which the current user needs to have at least one. Should only be used if
  *     no "report access callback" was defined.
+ *   - report access callback: (optional) A function name to invoke to check
+ *     access to Mollom's dedicated "report to Mollom" form, which should return
+ *     either TRUE or FALSE (similar to menu access callbacks).
  *   - report delete callback: (optional) A function name to invoke to delete an
  *     entity after reporting it to Mollom.
  *
@@ -245,18 +264,49 @@ function hook_mollom_form_list() {
   $forms['mymodule_comment_form'] = array(
     'title' => t('Comment form'),
     'entity' => 'mymodule_comment',
+    // Mollom does not know how to determine access and the callback to invoke
+    // for reporting and deleting the entity, so your module needs to manually
+    // output links to Mollom's generic "Report to Mollom" form on
+    // 'mollom/report/[entity]/[id]' and supply the following two callbacks.
+    // This kind of integration is deprecated. Use the delete confirmation form
+    // integration below instead.
     'report access callback' => 'mymodule_comment_report_access',
     'report delete callback' => 'mymodule_comment_report_delete',
   );
   // Mymodule's user registration form.
   $forms['mymodule_user_register'] = array(
     'title' => t('User registration form'),
-    'entity' => 'user',
-    'report access' => array('administer comments', 'bypass node access'),
-    // Make it private, so it's not a hook_user_delete() implementation.
-    'report delete callback' => '_mymodule_user_delete',
+    'entity' => 'mymodule_user',
+    // Mollom will automatically integrate with the delete confirmation form and
+    // send feedback for the 'entity' specified above and the 'post_id'
+    // specified via hook_mollom_form_info(). The delete confirmation form has
+    // to provide the ID of the entity in the mapped post_id key
+    // (here: $form_state['values']['uid']).
+    // @see http://drupal.org/node/645374
+    'delete form' => 'mymodule_user_delete_confirm_form',
+    // Optionally specify an include file that contains the delete confirmation
+    // form constructor to be loaded. The array keys map to function arguments
+    // of module_load_include().
+    'delete form file' => array(
+      'name' => 'mymodule.pages',
+    ),
+    // Optionally limit access to report options on the delete confirmation form.
+    'report access' => array('administer users', 'bypass node access'),
   );
   return $forms;
+}
+
+/**
+ * Alter the list of forms that can be protected by Mollom.
+ *
+ * @param &$form_list
+ *   An associative array containing information about the forms that can be
+ *   protected, keyed by $form_id. See hook_mollom_form_list() for details.
+ */
+function hook_mollom_form_list_alter(&$form_list) {
+  if (isset($form_list['mymodule_user_register'])) {
+    $form_list['mymodule_user_register']['report delete callback'] = '_mymodule_user_register_delete';
+  }
 }
 
 /**
@@ -276,6 +326,10 @@ function hook_mollom_form_list() {
  *     current user to determine whether to protect the form with Mollom or do
  *     not validate submitted form values. If the current user has at least one
  *     of the listed permissions, the form will not be protected.
+ *   - moderation callback: (optional) A function name to invoke when a form
+ *     submission would normally be discarded. This allows modules to put such
+ *     posts into a moderation queue (i.e., to accept but not publish them) by
+ *     altering the $form or $form_state that are passed by reference.
  *   - mail ids: (optional) An array of mail IDs that will be sent as a result
  *     of this form being submitted. When these mails are sent, a 'report to
  *     Mollom' link will be included at the bottom of the mail body. Be sure to

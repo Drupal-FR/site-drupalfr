@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.actions.inc,v 1.1.4.2.2.1 2009/09/29 01:45:37 quicksketch Exp $
 
 /**
  * @file
@@ -65,7 +64,7 @@ function flag_action_info() {
 }
 
 /**
- * Implementation of hook_action_info_alter().
+ * Implements hook_action_info_alter().
  *
  * Enable Flag actions on Node, Comment, and User hooks without
  * the trigger_unlock.module.
@@ -101,7 +100,7 @@ function flag_action_info_alter(&$actions) {
 }
 
 /**
- * Implementation of a Drupal action. Flags a node.
+ * Implements Drupal action. Flags a node.
  *
  * Note the first parameter is "object" because it may be a comment or a node.
  */
@@ -127,7 +126,7 @@ function flag_node_action_submit($form, $form_state) {
 }
 
 /**
- * Implementation of a Drupal action. Flags a comment.
+ * Implements Drupal action. Flags a comment.
  */
 function flag_comment_action(&$comment, $context = array()) {
   if ($flag = flag_get_flag($context['flag_action']['flag'])) {
@@ -151,7 +150,7 @@ function flag_comment_action_submit($form, $form_state) {
 }
 
 /**
- * Implementation of a Drupal action. Flags a user.
+ * Implements Drupal action. Flags a user.
  */
 function flag_user_action(&$user, $context = array()) {
   if ($flag = flag_get_flag($context['flag_action']['flag'])) {

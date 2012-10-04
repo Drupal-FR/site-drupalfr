@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.data_types.inc,v 1.1.2.19 2009/04/19 15:03:44 fago Exp $
 
 
 /**

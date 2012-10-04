@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_style_table.inc,v 1.7.2.3 2010/03/11 00:06:18 merlinofchaos Exp $
 /**
  * @file
  * Contains the table style plugin.
@@ -20,6 +19,8 @@ class views_plugin_style_table extends views_plugin_style {
     $options['override'] = array('default' => TRUE);
     $options['sticky'] = array('default' => FALSE);
     $options['order'] = array('default' => 'asc');
+    $options['summary'] = array('default' => '');
+    $options['empty_table'] = array('default' => FALSE);
 
     return $options;
   }
@@ -51,7 +52,12 @@ class views_plugin_style_table extends views_plugin_style {
         return;
       }
       $sort = $this->options['default'];
-      $this->order = !empty($this->options['order']) ? $this->options['order'] : 'asc';
+      if (!empty($this->options['info'][$sort]['default_sort_order'])) {
+        $this->order = $this->options['info'][$sort]['default_sort_order'];
+      }
+      else {
+        $this->order = !empty($this->options['order']) ? $this->options['order'] : 'asc';
+      }
     }
     else {
       $sort = $_GET['order'];
@@ -157,12 +163,11 @@ class views_plugin_style_table extends views_plugin_style {
       '#description' => t('(Sticky header effects will not be active for preview below, only on live output.)'),
     );
 
-    $form['order'] = array(
-      '#type' => 'select',
-      '#title' => t('Default sort order'),
-      '#options' => array('asc' => t('Ascending'), 'desc' => t('Descending')),
-      '#default_value' => $this->options['order'],
-      '#description' => t('If a default sort order is selected, what order should it use by default.'),
+    $form['summary'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Table summary'),
+      '#description' => t('This value will be displayed as table-summary attribute in the html. Set this for better accessiblity of your site.'),
+      '#default_value' => $this->options['summary'],
     );
 
     // Note: views UI registers this theme handler on our behalf. Your module
@@ -201,6 +206,14 @@ class views_plugin_style_table extends views_plugin_style {
           '#process' => array('views_process_dependency'),
           '#dependency' => array($id => array($field)),
         );
+        $form['info'][$field]['default_sort_order'] = array(
+          '#type' => 'select',
+          '#options' => array('asc' => t('Ascending'), 'desc' => t('Descending')),
+          '#default_value' => !empty($this->options['info'][$field]['default_sort_order']) ? $this->options['info'][$field]['default_sort_order'] : 'asc',
+          '#process' => array('views_process_dependency'),
+          '#dependency_count' => 2,
+          '#dependency' => array($id => array($field), 'edit-style-options-info-' . $safe . '-sortable' => array(1)),
+        );
         // Provide an ID so we can have such things.
         $radio_id = form_clean_id('edit-default-' . $field);
         $form['default'][$field] = array(
@@ -215,6 +228,18 @@ class views_plugin_style_table extends views_plugin_style {
           '#dependency' => array($id => array($field)),
         );
       }
+      $form['info'][$field]['align'] = array(
+        '#type' => 'select',
+        '#default_value' => !empty($this->options['info'][$field]['align']) ? $this->options['info'][$field]['align'] : '',
+        '#options' => array(
+          '' => t('None'),
+          'views-align-left' => t('Left'),
+          'views-align-center' => t('Center'),
+          'views-align-right' => t('Right'),
+          ),
+        '#process' => array('views_process_dependency'),
+        '#dependency' => array($id => array($field)),
+      );
       $form['info'][$field]['separator'] = array(
         '#type' => 'textfield',
         '#size' => 10,
@@ -238,10 +263,21 @@ class views_plugin_style_table extends views_plugin_style {
       '#default_value' => $default,
     );
 
+    $form['empty_table'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show the empty text in the table'),
+      '#default_value' => $this->options['empty_table'],
+      '#description' => t('Per default the table is hidden for an empty view. With this option it is posible to show an empty table with the text in it.'),
+    );
+
     $form['description_markup'] = array(
       '#prefix' => '<div class="description form-item">',
       '#suffix' => '</div>',
       '#value' => t('Place fields into columns; you may combine multiple fields into the same column. If you do, the separator in the column specified will be used to separate the fields. Check the sortable box to make that column click sortable, and check the default sort radio to determine which column will be sorted by default, if any. You may control column order and field labels in the fields section.'),
     );
+  }
+
+  function even_empty() {
+    return parent::even_empty() || !empty($this->options['empty_table']);
   }
 }

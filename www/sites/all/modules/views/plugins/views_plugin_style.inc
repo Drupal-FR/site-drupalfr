@@ -1,5 +1,4 @@
 <?php
-// $Id: views_plugin_style.inc,v 1.8.2.8 2010/04/29 18:21:52 merlinofchaos Exp $
 
 /**
  * @defgroup views_style_plugins Views' style plugins
@@ -19,6 +18,10 @@
  * Base class to define a style plugin handler.
  */
 class views_plugin_style extends views_plugin {
+  /**
+   * Store all availible tokens row rows.
+   */
+  var $row_tokens = array();
   /**
    * Initialize a style plugin.
    *
@@ -64,6 +67,13 @@ class views_plugin_style extends views_plugin {
   }
 
   /**
+   * Return TRUE if this style also uses a row plugin.
+   */
+  function uses_row_class() {
+    return !empty($this->definition['uses row class']);
+  }
+
+  /**
    * Return TRUE if this style also uses fields.
    */
   function uses_fields() {
@@ -76,9 +86,72 @@ class views_plugin_style extends views_plugin {
     return !empty($this->definition['uses fields']);
   }
 
+  /**
+   * Return TRUE if this style uses tokens.
+   *
+   * Used to ensure we don't fetch tokens when not needed for performance.
+   */
+  function uses_tokens() {
+    if ($this->uses_row_class()) {
+      $class = $this->options['row_class'];
+      if (strpos($class, '[') !== FALSE || strpos($class, '!') !== FALSE || strpos($class, '%') !== FALSE) {
+        return TRUE;
+      }
+    }
+  }
+
+  /**
+   * Return the token replaced row class for the specified row.
+   */
+  function get_row_class($row_index) {
+    if ($this->uses_row_class()) {
+      $class = $this->options['row_class'];
+      if ($this->uses_fields() && $this->view->field) {
+        $class = strip_tags($this->tokenize_value($class, $row_index));
+      }
+
+      return views_css_safe($class);
+    }
+  }
+
+  /**
+   * Take a value and apply token replacement logic to it.
+   */
+  function tokenize_value($value, $row_index) {
+    if (strpos($value, '[') !== FALSE || strpos($value, '!') !== FALSE || strpos($value, '%') !== FALSE) {
+      $fake_item = array(
+        'alter_text' => TRUE,
+        'text' => $value,
+      );
+
+      // Row tokens might be empty, for example for node row style.
+      $tokens = isset($this->row_tokens[$row_index]) ? $this->row_tokens[$row_index] : array();
+      if (!empty($this->view->build_info['substitutions'])) {
+        $tokens += $this->view->build_info['substitutions'];
+      }
+
+      if ($tokens) {
+        $value = strtr($value, $tokens);
+      }
+    }
+
+    return $value;
+  }
+
+  /**
+   * Should the output of the style plugin be rendered even if it's a empty view.
+   */
+  function even_empty() {
+    return !empty($this->definition['even empty']);
+  }
+
   function option_definition() {
     $options = parent::option_definition();
     $options['grouping'] = array('default' => '');
+    if ($this->uses_row_class()) {
+      $options['row_class'] = array('default' => '');
+    }
+
     return $options;
   }
 
@@ -88,7 +161,7 @@ class views_plugin_style extends views_plugin {
     // key to FALSE.
     // @TODO: Document "uses grouping" in docs.php when docs.php is written.
     if ($this->uses_fields() && $this->definition['uses grouping']) {
-      $options = array('' => t('<None>'));
+      $options = array('' => t('- None -'));
       $options += $this->display->handler->get_field_labels();
 
       // If there are no fields, we can't group on them.
@@ -100,6 +173,19 @@ class views_plugin_style extends views_plugin {
           '#default_value' => $this->options['grouping'],
           '#description' => t('You may optionally specify a field by which to group the records. Leave blank to not group.'),
         );
+      }
+    }
+
+    if ($this->uses_row_class()) {
+      $form['row_class'] = array(
+        '#title' => t('Row class'),
+        '#description' => t('The class to provide on each row.'),
+        '#type' => 'textfield',
+        '#default_value' => $this->options['row_class'],
+      );
+
+      if ($this->uses_fields()) {
+        $form['row_class']['#description'] .= ' ' . t('You may use field tokens from as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
       }
     }
   }
@@ -149,7 +235,7 @@ class views_plugin_style extends views_plugin {
         $rows = array();
         foreach ($records as $row_index => $row) {
           $this->view->row_index = $row_index;
-          $rows[] = $this->row_plugin->render($row);
+          $rows[$row_index] = $this->row_plugin->render($row);
         }
       }
       else {
@@ -210,20 +296,26 @@ class views_plugin_style extends views_plugin {
       return;
     }
 
-    $start = views_microtime();
-    if (isset($this->rendered_fields)) {
-      return $this->rendered_fields;
+    if (!isset($this->rendered_fields)) {
+      $this->view->row_index = 0;
+      $keys = array_keys($this->view->field);
+
+      // If all fields have a field::access FALSE there might be no fields, so
+      // there is no reason to execute this code.
+      if (!empty($keys)) {
+        foreach ($result as $count => $row) {
+          $this->view->row_index = $count;
+          foreach ($keys as $id) {
+            $this->rendered_fields[$count][$id] = $this->view->field[$id]->theme($row);
+          }
+
+          $this->row_tokens[$count] = $this->view->field[$id]->get_render_tokens(array());
+        }
+      }
+      unset($this->view->row_index);
     }
 
-    $this->view->row_index = 0;
-    $keys = array_keys($this->view->field);
-    foreach ($result as $count => $row) {
-      $this->view->row_index = $count;
-      foreach ($keys as $id) {
-        $this->rendered_fields[$count][$id] = $this->view->field[$id]->theme($row);
-      }
-    }
-    unset($this->view->row_index);
+    return $this->rendered_fields;
   }
 
   /**
@@ -273,4 +365,3 @@ class views_plugin_style extends views_plugin {
 /**
  * @}
  */
-

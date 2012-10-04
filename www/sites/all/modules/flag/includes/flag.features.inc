@@ -1,5 +1,4 @@
 <?php
-// $Id: flag.features.inc,v 1.1.2.3 2010/01/08 04:59:06 quicksketch Exp $
 
 /**
  * @file
@@ -7,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_features_export().
+ * Implements hook_features_export().
  */
 function flag_features_export($data, &$export, $module_name = '') {
   $pipe = array();
@@ -19,7 +18,7 @@ function flag_features_export($data, &$export, $module_name = '') {
   $modules = flag_features_providing_module();
   foreach ($data as $key => $flag) {
     // Get the module that provided the flag definition.
-    if ($flag = flag_get_flag($flag)) {
+    if ($flag = flag_load($flag, TRUE)) {
       $module = $modules[$flag->content_type];
       $export['dependencies'][$module] = $module;
       $export['features']['flag'][$flag->name] = $flag->name;
@@ -30,28 +29,29 @@ function flag_features_export($data, &$export, $module_name = '') {
 }
 
 /**
- * Implementation of hook_features_export_options().
+ * Implements hook_features_export_options().
  */
 function flag_features_export_options() {
   $options = array();
-  // Get all flags.
-  foreach (flag_get_flags() as $name => $flag) {
-    $options[$name] = ucfirst(check_plain($flag->content_type)) .': '. check_plain($flag->title);
+  // Get all flags, including disabled defaults.
+  $flags = flag_get_flags() + flag_get_default_flags(TRUE);
+  foreach ($flags as $name => $flag) {
+    $options[$name] = drupal_ucfirst(check_plain($flag->content_type)) . ': ' . check_plain($flag->title);
   }
   return $options;
 }
 
 /**
- * Implementation of hook_features_export_render().
+ * Implements hook_features_export_render().
  */
-function flag_features_export_render($module = 'foo', $data, $features_export) {
+function flag_features_export_render($module, $data) {
   module_load_include('inc', 'flag', '/includes/flag.export');
-  $code = flag_export_flags($data, $features_export['project']);
+  $code = flag_export_flags($data, $module, '  ');
   return array('flag_default_flags' => $code);
 }
 
 /**
- * Implementation of hook_features_revert().
+ * Implements hook_features_revert().
  *
  * @param $module
  *   The name of module for which to revert content.
@@ -62,18 +62,19 @@ function flag_features_revert($module = NULL) {
     module_load_include('inc', 'flag', '/includes/flag.admin');
     $default_flags = module_invoke($module, 'flag_default_flags');
 
-    // Delete flags that are defined in code.
-    foreach ($default_flags as $default_flag) {
-      $current_flag = flag_get_flag($default_flag['name']);
-      $current_flag->delete();
+    // Revert flags that are defined in code.
+    foreach ($default_flags as $flag_name => $flag_info) {
+      if (is_numeric($flag_name)) {
+        // Backward compatibility.
+        $flag_name = $flag_info['name'];
+      }
+      $flag = flag_load($flag_name, TRUE);
+      if ($flag && $flag->revert() === FALSE) {
+        drupal_set_message(t('Could not revert flag %flag-name to the state described in your code: Your flag was created by a different version of the Flag module than is now being used.', array('%flag-name' => $flag->name)), 'error');
+      }
     }
     _flag_clear_cache();
   }
-  else {
-    drupal_set_message(t('Could not load default flag.'), 'error');
-    return FALSE;
-  }
-  return TRUE;
 }
 
 /**

@@ -6,7 +6,7 @@ E.164 (for input) specifications published by the ITU. In order to
 prevent ambiguity, we have chosen to restrict some of the stipulations
 these specifications give.
 
-In summary, country calling codes are assigned by the ITU Telecommunication 
+In summary, country calling codes are assigned by the ITU Telecommunication
 Standardization Sector in E.164. We take an international phone number to
 have the form +XX YYYYYYY where XX is the country code, and YYYYYYY to be
 the subscriber's number, possibly with intervening spaces. The maximum

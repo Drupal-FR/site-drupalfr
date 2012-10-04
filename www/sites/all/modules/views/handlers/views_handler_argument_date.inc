@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_argument_date.inc,v 1.3.4.2 2010/03/11 00:49:52 merlinofchaos Exp $
 /**
  * Abstract argument handler for dates.
  *
@@ -45,7 +44,7 @@ class views_handler_argument_date extends views_handler_argument_formula {
           continue;
         }
       }
-  
+
       if (arg(0) == 'node' && is_numeric(arg(1))) {
         $node = node_load(arg(1));
       }

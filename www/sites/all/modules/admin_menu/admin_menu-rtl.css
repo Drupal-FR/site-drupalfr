@@ -1,51 +1,25 @@
-/* $Id: admin_menu-rtl.css,v 1.1.2.3.2.2 2009/03/27 04:22:45 sun Exp $ */
 
-#admin-menu {
-  direction: rtl;
-  text-align: right;
-}
-#admin-menu li.admin-menu-action {
-  float: left;
-}
-#admin-menu li.admin-menu-action a {
-  border-left: none;
-  border-right: 1px solid #323232;
-}
+#admin-menu { text-align: right; direction: rtl; }
+#admin-menu li.admin-menu-action { float: left; }
+#admin-menu li.admin-menu-action a { border-right: 1px solid #323232; border-left: none; }
 
-/* All lists */
-#admin-menu ul a {
-  border-left: 1px solid #323232;
-  border-right: 0;
-  padding: 4px 8px;
-  text-align: right;
-}
+/* all lists */
+#admin-menu ul a { border-left: 1px solid #323232; border-right: 0; padding: 4px 8px; text-align: right; }
 
-/* All list items */
-#admin-menu li {
-  float: right;
-  position: relative;
-}
-#admin-menu li li {
-  position: static;
-}
+/* all list items */
+/* width needed or else Opera goes nuts */
+#admin-menu li { float: right; position: relative; }
+#admin-menu li li { position: static; }
+#admin-menu li ul { right: 0; }
 
-/* Second-level lists */
-#admin-menu li ul {
-  right: 0;
-}
+/* third-and-above-level lists */
+#admin-menu li li.expandable ul { margin: -20px 160px 0 0; }
 
-/* Third-and-above-level lists */
-#admin-menu li li.expandable ul {
-  margin: -20px 160px 0 0;
-}
-
-/* Lists nested under hovered list items */
 #admin-menu li.admin-menu-action:hover ul {
   left: 0 !important;
   right: auto;
 }
 
-/* Second-and-more-level hovering */
-#admin-menu li li.expandable {
-  background: #45454A url(images/arrow-rtl.png) no-repeat 5px 7px;
-}
+/* second-and-more-level hovering */
+#admin-menu li li.expandable { background: #45454a url(images/arrow-rtl.png) no-repeat 5px 7px; }
+

@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_field_contact_link.inc,v 1.2 2009/09/21 21:18:10 merlinofchaos Exp $
 /**
  * A field that links to the user contact page, if access is permitted.
  */
@@ -27,12 +26,25 @@ class views_handler_field_contact_link extends views_handler_field_user_link {
     $form['text']['#default_value'] = empty($this->options['text']) ? t('contact') : $this->options['text'];
   }
 
-  function render($values) {
+  // An example of field level access control.
+  // We must override the access method in the parent class, as that requires
+  // the 'access user profiles' permission, which the contact form does not.
+  function access() {
     global $user;
-    $uid = $values->{$this->aliases['uid']};
 
     // Only registered users can view other registered user's contact page.
-    if (empty($user->uid) || empty($uid)) {
+    if (empty($user->uid)) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  function render_link($data, $values) {
+    global $user;
+    $uid = $this->get_value($values, 'uid');
+
+    if (empty($uid)) {
       return;
     }
 
@@ -43,16 +55,23 @@ class views_handler_field_contact_link extends views_handler_field_user_link {
 
     // Check access when we pull up the user account so we know
     // if the user has made the contact page available.
-    if (!_contact_user_tab_access($account) || empty($account->contact)) {
+    $menu_item = menu_get_item("user/$uid/contact");
+    if (!$menu_item['access'] || empty($account->contact)) {
       return;
     }
 
+    $this->options['alter']['path'] = 'user/'. $account->uid .'/contact';
+    $this->options['alter']['attributes'] = array('title' => t('Contact %user', array('%user' => $account->name)));
+
+
     if ($this->options['link_display'] == 'icon') {
-      return l(theme('image', 'misc/forum-new.png'), 'user/'. $account->uid .'/contact', array('html' => TRUE, 'attributes' => array('title' => t('Contact %user', array('%user' => $account->name)))));
+      $text = theme('image', 'misc/forum-new.png');
+      $this->options['alter']['html'] = TRUE;
     }
     else {
-      return l($this->options['text'], 'user/'. $account->uid .'/contact', array('attributes' => array('title' => t('Contact %user', array('%user' => $account->name)))));
+      $text = $this->options['text'];
     }
+
+    return $text;
   }
 }
-

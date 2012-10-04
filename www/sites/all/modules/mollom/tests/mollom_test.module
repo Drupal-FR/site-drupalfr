@@ -1,179 +1,9 @@
 <?php
-// $Id: mollom_test.module,v 1.1.2.10 2010/09/12 23:44:15 dries Exp $
 
 /**
  * @file
  * Testing functionality for Mollom module.
  */
-
-/**
- * Implements hook_xmlrpc().
- */
-function mollom_test_xmlrpc() {
-  return array(
-    // $data contains a variable amount of properties, so we cannot specify a
-    // signature.
-    'mollom.getServerList' => 'mollom_test_get_server_list',
-    'mollom.verifyKey' => 'mollom_test_verify_key',
-    'mollom.checkContent' => 'mollom_test_check_content',
-    'mollom.getImageCaptcha' => 'mollom_test_get_captcha',
-    'mollom.checkCaptcha' => 'mollom_test_check_captcha',
- );
-}
-
-/**
- * XML-RPC callback for mollom.getServerList to retrieve new server list.
- */
-function mollom_test_get_server_list($data) {
-  $storage = variable_get(__FUNCTION__, array());
-  $storage[] = $data;
-  variable_set(__FUNCTION__, $storage);
-
-  return array($GLOBALS['base_url'] . '/xmlrpc.php?version=');
-}
-
-/**
- * XML-RPC callback for mollom.verifyKey to validate API keys.
- */
-function mollom_test_verify_key($data) {
-  $storage = variable_get(__FUNCTION__, array());
-  $storage[] = $data;
-  variable_set(__FUNCTION__, $storage);
-
-  module_load_include('inc', 'mollom');
-  module_load_include('php', 'simpletest', 'drupal_web_test_case');
-  module_load_include('test', 'mollom', 'tests/mollom');
-
-  if ($data['public_key'] === MOLLOM_TEST_PUBLIC_KEY) {
-    return TRUE;
-  }
-  xmlrpc_error(MOLLOM_ERROR);
-}
-
-/**
- * XML-RPC callback for mollom.checkContent to perform textual analysis.
- *
- * @todo Add support for 'redirect' and 'refresh' values.
- */
-function mollom_test_check_content($data) {
-  $storage = variable_get(__FUNCTION__, array());
-  $storage[] = $data;
-  variable_set(__FUNCTION__, $storage);
-
-  $response = array();
-
-  // Spam filter: Check post_title and post_body for ham, spam, or unsure.
-  if (!isset($data['checks']) || strpos($data['checks'], 'spam') !== FALSE) {
-    $spam = FALSE;
-    $ham = FALSE;
-    foreach (array('post_title', 'post_body') as $key) {
-      if (!isset($data[$key])) {
-        continue;
-      }
-      // 'spam' always has precedence.
-      if (strpos($data[$key], 'spam') !== FALSE) {
-        $spam = TRUE;
-      }
-      // Otherwise, check for 'ham'.
-      elseif (strpos($data[$key], 'ham') !== FALSE) {
-        $ham = TRUE;
-      }
-      // Lastly, take a forced 'unsure' into account.
-      elseif (strpos($data[$key], 'unsure') !== FALSE) {
-        $spam = TRUE;
-        $ham = TRUE;
-      }
-    }
-    if ($spam && $ham) {
-      $response['spam'] = MOLLOM_ANALYSIS_UNSURE;
-      $quality = 0.5;
-    }
-    elseif ($spam) {
-      $response['spam'] = MOLLOM_ANALYSIS_SPAM;
-      $quality = 0;
-    }
-    elseif ($ham) {
-      $response['spam'] = MOLLOM_ANALYSIS_HAM;
-      $quality = 1;
-    }
-    else {
-      $response['spam'] = MOLLOM_ANALYSIS_UNKNOWN;
-      $quality = NULL;
-    }
-  }
-
-  // Quality filter.
-  if (!isset($data['checks']) || strpos($data['checks'], 'quality') !== FALSE) {
-    if (isset($quality)) {
-      $response['quality'] = $quality;
-    }
-    // @todo No idea how quality is calculated during testing without spam
-    //   results above.
-    else {
-      $response['quality'] = 0;
-    }
-  }
-
-  // Profanity filter.
-  if (isset($data['checks']) && strpos($data['checks'], 'profanity') !== FALSE) {
-    $profanity = 0.0;
-    foreach (array('post_title', 'post_body') as $key) {
-      if (isset($data[$key]) && strpos($data[$key], 'profanity') !== FALSE) {
-        $profanity = 1.0;
-      }
-    }
-    $response['profanity'] = $profanity;
-  }
-
-  if (!empty($data['session_id'])) {
-    $response['session_id'] = $data['session_id'];
-  }
-  else {
-    // Drupal 6 Pressflow support.
-    if (function_exists('drupal_session_start')) {
-      drupal_session_start();
-    }
-    $response['session_id'] = session_id();
-  }
-
-  return $response;
-}
-
-/**
- * XML-RPC callback for mollom.getImageCaptcha to fetch a CATPCHA image.
- */
-function mollom_test_get_captcha($data) {
-  $storage = variable_get(__FUNCTION__, array());
-  $storage[] = $data;
-  variable_set(__FUNCTION__, $storage);
-
-  // Drupal 6 Pressflow support.
-  if (function_exists('drupal_session_start')) {
-    drupal_session_start();
-  }
-  return array(
-    'session_id' => !empty($data['session_id']) ? $data['session_id'] : session_id(),
-    'url' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'mollom') . '/images/powered-by-mollom-2.gif',
-  );
-}
-
-/**
- * XML-RPC callback for mollom.checkCaptcha to validate a CAPTCHA response.
- *
- * @todo Add support for 'redirect' and 'refresh' values.
- */
-function mollom_test_check_captcha($data) {
-  $storage = variable_get(__FUNCTION__, array());
-  $storage[] = $data;
-  variable_set(__FUNCTION__, $storage);
-
-  if ($data['captcha_result'] == 'correct') {
-    return TRUE;
-  }
-  if ($data['captcha_result'] == 'incorrect') {
-    return FALSE;
-  }
-}
 
 /**
  * Implements hook_menu().
@@ -185,7 +15,23 @@ function mollom_test_menu() {
     'page arguments' => array('mollom_test_form'),
     'access callback' => TRUE,
   );
+  $items['mollom-test/form/%mollom_test/delete'] = array(
+    'title' => 'Delete Mollom test item',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mollom_test_delete_form', 2),
+    'access callback' => TRUE,
+  );
   return $items;
+}
+
+/**
+ * Implements hook_forms().
+ */
+function mollom_forms() {
+  $forms['mollom_basic_test_form'] = array(
+    'callback' => 'mollom_test_form',
+  );
+  return $forms;
 }
 
 /**
@@ -195,6 +41,25 @@ function mollom_test_mollom_form_list() {
   $forms['mollom_test_form'] = array(
     'title' => 'Mollom test form',
     'entity' => 'mollom_test',
+    'moderation callback' => 'mollom_test_mollom_form_moderation',
+    'delete form' => 'mollom_test_delete_form',
+  );
+  // The basic test form is identical to the mollom_test_form, but only
+  // registers minimal information (e.g., no entity or moderation callback) to
+  // integrate with Mollom.
+  $forms['mollom_basic_test_form'] = array(
+    'title' => 'Mollom basic test form',
+  );
+  // Same as above, but supports elements for text analysis.
+  $forms['mollom_basic_elements_test_form'] = array(
+    'title' => 'Mollom basic elements test form',
+  );
+  // Same as mollom_test_form, but supports an entity delete callback.
+  // @todo Test mollom/moderate endpoint with entity delete callback.
+  $forms['mollom_entity_test_form'] = array(
+    'title' => 'Mollom entity test form',
+    'entity' => 'mollom_test',
+    'entity delete multiple callback' => 'mollom_test_delete_multiple',
   );
   return $forms;
 }
@@ -203,10 +68,11 @@ function mollom_test_mollom_form_list() {
  * Implements hook_mollom_form_info().
  */
 function mollom_test_mollom_form_info($form_id) {
+  if ($form_id == 'mollom_basic_test_form') {
+    return array();
+  }
   $form_info = array(
-    'title' => 'Mollom test form',
     'bypass access' => array('administer mollom'),
-    'entity' => 'mollom_test',
     'elements' => array(
       'title' => 'Title',
       'body' => 'Body',
@@ -227,20 +93,22 @@ function mollom_test_mollom_form_info($form_id) {
  * Form builder for Mollom test form.
  */
 function mollom_test_form(&$form_state, $mid = NULL) {
-  if (empty($form_state['storage'])) {
-    $body = '';
-    if (isset($mid)) {
-      $body = db_result(db_query("SELECT body FROM {mollom_test} WHERE mid = %d", $mid));
-    }
-    $form_state['storage'] = array(
-      'mid' => $mid,
-      'title' => '',
-      'body' => $body,
-      'exclude' => '',
-      'parent' => array('child' => ''),
-      'field' => array(),
-    );
+  // Drupal 6 defaults 'storage' to NULL.
+  if (!isset($form_state['storage'])) {
+    $form_state['storage'] = array();
   }
+  if (isset($mid) && ($record = mollom_test_load($mid))) {
+    $form_state['storage'] = $record;
+  }
+  $form_state['storage'] += array(
+    'mid' => $mid,
+    'title' => '',
+    'body' => '',
+    'exclude' => '',
+    'parent' => array('child' => ''),
+    'field' => array(),
+    'status' => 1,
+  );
   // Always add an empty field the user can submit.
   $form_state['storage']['field']['new'] = '';
 
@@ -288,9 +156,16 @@ function mollom_test_form(&$form_state, $mid = NULL) {
   $form['field']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Add',
-    '#validate_parents' => array('field'),
     '#submit' => array('mollom_test_form_field_submit'),
     '#weight' => 1000,
+  );
+
+  $form['status'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Published',
+    '#default_value' => $form_state['storage']['status'],
+    // For simplicity, re-use Mollom module's administration permission.
+    '#access' => user_access('administer mollom'),
   );
 
   $form['submit'] = array('#type' => 'submit', '#value' => 'Submit');
@@ -302,10 +177,16 @@ function mollom_test_form(&$form_state, $mid = NULL) {
  * Form element submit handler for mollom_test_form().
  */
 function mollom_test_form_field_submit($form, &$form_state) {
-  // Store the new value and clear out the 'new' field.
+  // Remove all empty values of the multiple value field.
+  $form_state['values']['field'] = array_filter($form_state['values']['field']);
+  // Update the storage with submitted values.
   $form_state['storage'] = $form_state['values'];
-  $form_state['storage']['field'][] = $form_state['values']['field']['new'];
+  // Store the new value and clear out the 'new' field.
+  if (isset($form_state['values']['field']['new'])) {
+    $form_state['storage']['field'][] = $form_state['values']['field']['new'];
+  }
   unset($form_state['input']['field']['new']);
+
   $form_state['rebuild'] = TRUE;
 }
 
@@ -320,22 +201,120 @@ function mollom_test_form_submit($form, &$form_state) {
   unset($form_state['values']['field']['new']);
 
   // Store submission.
-  $update = !empty($form_state['values']['mid']) ? 'mid' : array();
-  drupal_write_record('mollom_test', $form_state['values'], $update);
+  _mollom_form_state_values_clean($form_state);
+  $record = (object) $form_state['values'];
+  mollom_test_save($record);
+  $form_state['values']['mid'] = $record->mid;
 
   // Redirect to stored entry.
-  $form_state['redirect'] = 'mollom-test/form/' . $form_state['values']['mid'];
+  $form_state['redirect'] = 'mollom-test/form/' . $record->mid;
 
   drupal_set_message('Successful form submission.');
-  drupal_set_message('<pre>' . var_export($form_state['values'], TRUE) . '</pre>');
+  drupal_set_message('<pre>' . var_export($record, TRUE) . '</pre>');
 }
 
 /**
  * Implements hook_form_alter().
  */
 function mollom_test_form_alter(&$form, &$form_state, $form_id) {
-  if (variable_get('mollom_test_disable_mollom', FALSE)) {
+  if (variable_get('mollom_test.disable_mollom', FALSE)) {
     $form_state['mollom']['require_analysis'] = FALSE;
     $form_state['mollom']['require_captcha'] = FALSE;
   }
+}
+
+/**
+ * Mollom form moderation callback for a mollom_test record.
+ */
+function mollom_test_mollom_form_moderation(&$form, &$form_state) {
+  $form_state['values']['status'] = 0;
+}
+
+/**
+ * Implements hook_mollom_test_presave() on behalf of mollom.module.
+ */
+function mollom_mollom_test_presave($record) {
+  // If an existing record is published and we have session data stored for it,
+  // mark the data as moderated.
+  if (!empty($record->mid) && $record->status) {
+    mollom_data_moderate('mollom_test', $record->mid);
+  }
+}
+
+/**
+ * Loads a {mollom_test} data record by id.
+ */
+function mollom_test_load($mid) {
+  return db_fetch_array(db_query('SELECT * FROM {mollom_test} WHERE mid = %d', array($mid)));
+}
+
+/**
+ * Saves a {mollom_test} data record.
+ */
+function mollom_test_save($record) {
+  // Allow modules to alter the record before saving. This is done for code
+  // consistency only.
+  // @see mollom_mollom_test_presave()
+  module_invoke_all('mollom_test_presave', $record);
+
+  $update = !empty($record->mid) ? array('mid') : array();
+  $status = drupal_write_record('mollom_test', $record, $update);
+  if ($status === SAVED_NEW) {
+    module_invoke_all('mollom_test_insert', $record);
+    module_invoke_all('entity_insert', $record, 'mollom_test');
+  }
+  else {
+    $status = SAVED_UPDATED;
+    module_invoke_all('mollom_test_update', $record);
+    module_invoke_all('entity_update', $record, 'mollom_test');
+  }
+  return $status;
+}
+
+/**
+ * Deletes multiple stored {mollom_test} data records.
+ *
+ * @param $mids
+ *   The mids to delete.
+ */
+function mollom_test_delete_multiple(array $mids) {
+  foreach ($mids as $mid) {
+    // @todo The core entity system expects objects.
+    $record = (object) mollom_test_load($mid);
+    if ($record) {
+      module_invoke_all('entity_delete', $record, 'mollom_test');
+    }
+  }
+
+  $placeholders = db_placeholders($mids);
+  db_query("DELETE FROM {mollom_test} WHERE mid IN ($placeholders)", $mids);
+}
+
+/**
+ * Implements non-existing hook_entity_delete() on behalf of Mollom module.
+ */
+function mollom_entity_delete($entity, $type) {
+  mollom_data_delete('mollom_test', $entity->mid);
+}
+
+/**
+ * Form constructor for deleting a Mollom test item.
+ */
+function mollom_test_delete_form(&$form_state, $record) {
+  $form['mid'] = array('#type' => 'value', '#value' => $record['mid']);
+  return confirm_form($form,
+    t('Are you sure you want to delete the %title?', array('%title' => $record['title'])),
+    'mollom-test/form/' . $record['mid'],
+    NULL,
+    t('Delete')
+  );
+}
+
+/**
+ * Form submission handler for mollom_test_delete_form().
+ */
+function mollom_test_delete_form_submit($form, &$form_state) {
+  mollom_test_delete_multiple(array($form_state['values']['mid']));
+  drupal_set_message('The record has been deleted.');
+  $form_state['redirect'] = 'mollom-test/form';
 }

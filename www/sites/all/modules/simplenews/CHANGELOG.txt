@@ -1,0 +1,108 @@
+CHANGELOG for Simplenews for Drupal 6
+Simplenews 2.0 (Jan 01, 2011)
+  Maintainer: Miro Dietiker, Co-Maintainer: Simon Georges
+  Bug fixes:
+    o #1010684 by miro_dietiker: Support Elysia Cron hook_cronapi
+    o #362044 by 1st-angel, Sutharsan: support node creation by other modules
+    o #805114 by khaled.zaidan, Sutharsan, Thomas_Zahreddin & miro_dietiker: cleanup form creation process, addition of multi-signup block
+    o #658242 by Sutharsan: Add single opt-in/out, hidden newsletters and the option to subscribe at registration
+    o #936982 by miro_dietiker: support for Node Clone.
+    o #910404 by DanChadwick: Support for conversion of tables in message body to plain-text
+    o #579202 by miro_dietiker & Sutharsan: Exposing & updating language settings
+    o #508802 by Sutharsan: Removal of confirmation step when an user clicks the subscription/unsubscription links provided in the email
+    o #590736 by Sutharsan: add a class to the submit block
+    o #948894 by jmrivero & Simon Georges: integration of the email_verify module is existing, allows other emails validation solution to be integrated easily
+    o #308922 by joachim: Make core actions available to simplenews triggers
+    o #846878 by mr.andrey, miro_dietiker: Add [simplenews-from-name] and [simplenews-from-mail] tokens
+    o #466030 by netbear & Sutharsan: cache node_load() calls
+    o #1010124 by skilip: pass node context to template_preprocess_simplenews_newsletter_footer()
+    o #581058 by miro_dietiker: improve test adresse use
+    o #942238 by Dave Cohen & miro_dietiker: directly populate spool in database, avoid php memory limit exhaust
+    o #883376 by miro_dietiker: Separate mail functions into mail.inc
+    o #781708 by Simon Geoges & miro_dietiker: move Simplenews node actions into tab
+    o #1012142 by Sutharsan: hide test module from the module list
+    o #1010592 by DrupOn, miro_dietiker: separates include folder
+    o #668730 by DrupOn, miro_dietiker: integration with Views module
+  Other changes:
+    o #875672, #684864, #943980, #841520, #996392 by miro_dietiker, #292634 by miopa, miro_dietiker & Sutharsan, #839504 by fmjrey & miro_dietiker, #285719 by Sutharsan: lots of mutilanguage-related fixes
+    o #1004634 by AlexisWilke: empty emails are taken as erroneous emails
+    o #1002498 by pillarsdotnet: spellcheck of the whole module
+    o #775172 by Sutharsan: no language prefix in [simplenews-subscribe-url] token
+    o #976408 by carlescliment: undesired timeout when running cron from script
+    o #684858 by miro_dietiker, Sutharsan: stop subscribed messages from appearing at each user login
+    o #798020 by Sutharsan:
+    o #412234 by Sutharsan: prevent Simplenews from sending erroneous nodes again & again
+    o #722266 by AlexisWilke, Sutharsan: broken spool in PostgresSQL
+    o #884338 by miro_dietiker: avoid spool duplication on node resave
+    o #884348 by miro_dietiker: unsubscribed users not filtered in newsletter subscriptions page (regression from 1.x)
+    o #776370 by Simon Georges, miro_dietiker: removing the permission to unsubscribe, so unsubscribe links always work
+    o #904148 by miro_dietiker: don't unserialize twice user->data
+    o #972778 by AlexisWilke: fix broken watchdog message
+    o #520670 by neochief, Sutharsan: tranlsation fixes
+    o #757242: all user profile fields are deleted on login
+    o #650494 by Sutharsan: fix encoding newsletter Titles with special characters like '
+    o #471594 by miro_dietiker: send newsletter as anonymous user
+    o #777516 by miro_dietiker & Sutharsan: Add title to newsletter registration fieldset
+    o #530242 by Sutharsan: spellcheck
+    o #891558 by miro_dietiker: check new dependency to token on upgrade
+    o #1004100 by organicwire: sending multilingual newsletters fails if using a nodereference field and the i18n module
+
+TODO: add RC and BETA date & fixes
+
+Simplenews 1.3 (May 21, 2010)
+  Maintainer: Sutharsan
+  http://drupal.org/node/805680
+  Bug fixes
+    o #804252 by Sutharsan: Fixed: Database update error in 6.x-1.2
+
+Simplenews 1.2 (May 19, 2010)
+  http://drupal.org/node/803254
+  Security
+    o #662720 by miro_dietiker and Sutharsan: Fixes User can edit other user's account newsletter data.
+  Bugs
+    o #761800 by Sutharsan: Fixed various E_ALL notices.
+    o #767556 by Sutharsan: Schema mismatch after version update.
+
+Simplenews 1.1 (March 30, 2010)
+  http://drupal.org/node/757256
+  Bug fixes
+    o #Fixed Installation message not very useful if Help module is disabled. (#687956 by Sutharsan)
+    o #simplenews_recent_newsletters() not compatible with PostgreSQL in Drupal 6.16 (#734196 by AlexisWilke)
+    o #Fixed Missing return value in _update_N() function. (#716740 by AlexWilke)
+    o #Fixed: Mail spool not working correctly in PostgreSQL. (#722266 by AlexisWilke)
+    o #Fixed empty delimiter when sending (test) emails with short link text. (#680278 by Sutharsan)
+    o #Fixed Documentation added for missing site name in URL. (#439016 by Sutharsan)
+    o #Fixed Double escaping removed from Simplenews Actions. (#650494 by Simplenews)
+    o #Fixed newsletter send status should be updated on cron. (#585900 by hanoii\)
+    o #Fixed Simplenews does not take the recipient's text mail preference into account. (#401014 by miro_dietiker)
+    o #Fixed Various String issues. (#518564 by FrankT)
+    o #Fixed Header from mail inconsistent. (#581460 by miro_dietiker)
+    o #Fixed Typo in admin form. (#527262 by joachim)
+    o #Fixed "Manage my subscription" is being output in wrong way. (#520670 by neochief)
+    o #Fixed Various String issues. (#518564 by FrankT)
+    o #Fixed Link to translation source newsletter in newsletter editing form is incomplete for subsites. (#500686 by Sutharsan)
+    o #Fixed Wrong closing tag in simplenews_help (#459322 by sharlak)
+    o #Added update 6200 for compatibility with rev 1.223 (HEAD)
+    o #Added Handling non-existing nodes during send. (#412234 by Sutharsan)
+
+Simplenews 1.0 (Nov 26, 2009)
+  http://drupal.org/node/643692
+  Bug fixes
+    o #584334 by allartk, Sutharsan: Sending interrupted: PHP maximum execution time almost exceeded.
+    o #476756 by burn_ru, Karlheinz, Sutharsan: Fixed URL displayed twice in email
+    o #374222 by sutharsan: Fixed Template files do not work when using admin theme.
+    o #530232 by jamespharaoh: Fixed Do not allow an empty taxonomy term in the newsletter node form.
+    o #515274 by Dmitriy.trt: Fixed Make Vocabulary required at install. Fixed Losing content type settings when saving Vocabulary form.
+    o #153291 by Sutharsan: Fixed use unformatted from address on WIN-OS platforms.
+    o #367488: Added enable simplenews to send using HTML module.
+    o #365507 by Roberto Gerola, com2: Fixed !confirmation_url and !newsletter not replaced for anonymous users.
+    o #398496 by Sutharsan: Fixed !site, !mailto, !date not exploded in confirmation mails.
+    o #425890 by Sutharsan: Fixed Link does not take into account the installation directory
+  Other fixes
+    o #399966 by Sutharsan: Fixed My newsletters tab in users profile without persmission to subscribe.
+    o #457004 by univate: Fixed hook_user should not return anything for $op='view'.
+    o #541128 by Sutharsan: Fixed Handle capitals in email address the right way.
+    o #400988 by plach: Fixed UI typo.
+    o #484484 by mrfelton: simplenews.install should not use t() in hook_schema().
+    o #290695 by Xano, Sutharsan: Change 'e-mail' into 'email'
+

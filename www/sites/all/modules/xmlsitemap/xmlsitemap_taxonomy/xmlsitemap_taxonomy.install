@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_taxonomy.install,v 1.1.4.14 2010/02/06 06:13:57 davereid Exp $
 
 /**
  * @file
@@ -16,34 +15,6 @@ function xmlsitemap_taxonomy_uninstall() {
   foreach ($vids as $vid) {
     xmlsitemap_link_bundle_delete('taxonomy_term', $vid);
   }
-}
-
-// @todo Remove these update functions before alpha.
-function xmlsitemap_taxonomy_update_1() {
-  $ret = array();
-  $vids = array_keys(taxonomy_get_vocabularies());
-  foreach ($vids as $vid) {
-    if (variable_get('xmlsitemap_taxonomy_priority_' . $vid, 'default') === 'default') {
-      variable_set('xmlsitemap_taxonomy_priority_' . $vid, 0.5);
-    }
-  }
-  return $ret;
-}
-
-/**
- * Change 'taxonomy' type to 'taxonomy_term'.
- */
-function xmlsitemap_taxonomy_update_2() {
-  $ret = array();
-  $field = array(
-    'type' => 'varchar',
-    'length' => 32,
-    'not null' => TRUE,
-    'default' => '',
-  );
-  db_change_field($ret, 'xmlsitemap', 'type', 'type', $field);
-  $ret[] = update_sql("UPDATE {xmlsitemap} SET type = 'taxonomy_term' WHERE type = 'taxonomy'");
-  return $ret;
 }
 
 /**
@@ -105,7 +76,7 @@ function xmlsitemap_taxonomy_update_6198(&$context) {
         $link['priority'] = $record->priority_override;
         $link['priority_override'] = 1;
       }
-      xmlsitemap_save_link($link);
+      xmlsitemap_link_save($link);
     }
     $context['last'] = $record->tid;
     $context['progress']++;
@@ -120,11 +91,12 @@ function xmlsitemap_taxonomy_update_6198(&$context) {
  */
 function xmlsitemap_taxonomy_update_6200() {
   drupal_load('module', 'taxonomy');
+  drupal_load('module', 'xmlsitemap');
   $vids = array_keys(taxonomy_get_vocabularies());
   foreach ($vids as $vid) {
     $settings = array(
-      'status' => variable_get('xmlsitemap_taxonomy_status_' . $vid, 0),
-      'priority' => variable_get('xmlsitemap_taxonomy_priority_' . $vid, 0.5),
+      'status' => variable_get('xmlsitemap_taxonomy_status_' . $vid, XMLSITEMAP_STATUS_DEFAULT),
+      'priority' => variable_get('xmlsitemap_taxonomy_priority_' . $vid, XMLSITEMAP_PRIORITY_DEFAULT),
     );
     variable_set('xmlsitemap_settings_taxonomy_term_' . $vid, $settings);
     variable_del('xmlsitemap_taxonomy_status_' . $vid);

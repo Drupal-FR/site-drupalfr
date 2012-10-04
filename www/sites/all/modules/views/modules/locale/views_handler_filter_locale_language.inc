@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_filter_locale_language.inc,v 1.1 2009/02/20 23:02:09 merlinofchaos Exp $
 
 /**
  * Filter by language.
@@ -9,9 +8,8 @@ class views_handler_filter_locale_language extends views_handler_filter_in_opera
     if (!isset($this->value_options)) {
       $this->value_title = t('Language');
       $languages = array('***CURRENT_LANGUAGE***' => t("Current user's language"), '***DEFAULT_LANGUAGE***' => t("Default site language"), '***NO_LANGUAGE***' => t('No language'));
-      $languages = array_merge($languages, locale_language_list());
+      $languages = array_merge($languages, views_language_list());
       $this->value_options = $languages;
     }
   }
 }
-

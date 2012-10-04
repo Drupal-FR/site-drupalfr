@@ -1,5 +1,4 @@
 <?php
-// $Id: views_handler_filter_node_tnid.inc,v 1.1 2008/12/02 16:34:24 merlinofchaos Exp $
 /**
  * Filter by whether the node is the original translation.
  */
@@ -13,19 +12,19 @@ class views_handler_filter_node_tnid extends views_handler_filter {
     return $options;
   }
 
+  function operator_options() {
+    return array(
+        1 => t('Yes'),
+        0 => t('No'),
+    );
+  }
+
   /**
    * Provide simple boolean operator
    */
   function operator_form(&$form, &$form_state) {
-    $form['operator'] = array(
-      '#type' => 'radios',
-      '#title' => t('Include untranslated nodes'),
-      '#default_value' => $this->operator,
-      '#options' => array(
-        1 => t('Yes'),
-        0 => t('No'),
-      ),
-    );
+    parent::options_form($form, $form_state);
+    $form['operator']['#title'] = t('Include untranslated nodes');
   }
 
   function can_expose() { return FALSE; }
@@ -36,4 +35,3 @@ class views_handler_filter_node_tnid extends views_handler_filter {
     $this->query->add_where($this->options['group'], "$table.tnid = $table.nid" . ($this->operator ? " OR $table.tnid = 0" : ''));
   }
 }
-
