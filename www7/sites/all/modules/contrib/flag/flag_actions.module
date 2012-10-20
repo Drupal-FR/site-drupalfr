@@ -76,7 +76,7 @@ function flag_actions_get_action($aid) {
 }
 
 function flag_actions_get_actions($flag_name = NULL, $reset = FALSE) {
-  static $flag_actions;
+  $flag_actions = &drupal_static(__FUNCTION__);
   module_load_include('inc', 'flag', 'includes/flag.actions');
 
   // Get a list of all possible actions defined by modules.

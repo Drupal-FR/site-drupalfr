@@ -241,7 +241,7 @@ function flag_views_flag_config_form($form_type, $content_type, $current_flag) {
  * Helper function that gets the first defined flag and returns its name.
  */
 function flag_views_flag_default($content_type) {
-  static $default_flag = array();
+  $default_flag = &drupal_static(__FUNCTION__, array());
 
   if (!array_key_exists($content_type, $default_flag)) {
     $flag = array_shift(flag_get_flags($content_type));

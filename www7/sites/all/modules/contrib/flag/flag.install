@@ -163,7 +163,7 @@ function flag_schema() {
       'name' => array(
         'description' => 'The machine-name for this flag.',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => FALSE,
         'default' => '',
       ),
@@ -213,7 +213,7 @@ function flag_schema() {
       'content_type' => array(
         'description' => 'The flag type, one of "node", "comment", "user".',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
@@ -225,7 +225,7 @@ function flag_schema() {
         'default' => 0,
       ),
       'uid' => array(
-        'description' => 'The user ID by which this content was created.',
+        'description' => 'The user ID by whom this content was flagged.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -254,6 +254,7 @@ function flag_schema() {
     'indexes' => array(
       'content_type_uid_sid' => array('content_type', 'uid', 'sid'),
       'content_type_content_id_uid_sid' => array('content_type', 'content_id', 'uid', 'sid'),
+      'content_id_fid' => array('content_id', 'fid'),
     ),
   );
 
@@ -271,7 +272,7 @@ function flag_schema() {
       'type' => array(
         'description' => 'The types (usually from {node_type}) that can be flagged by this fid.',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
@@ -294,7 +295,7 @@ function flag_schema() {
       'content_type' => array(
         'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
@@ -478,4 +479,78 @@ function flag_update_7202() {
     db_query("DELETE FROM {flag_content} WHERE content_type = 'comment' AND NOT EXISTS (SELECT 1 FROM {comment} c WHERE content_id = c.cid)");
     db_query("DELETE FROM {flag_counts} WHERE content_type = 'comment' AND NOT EXISTS (SELECT 1 FROM {comment} c WHERE content_id = c.cid)");
   }
+}
+
+/**
+ * Add an index to help with view's flag_handler_relationship when not required.
+ */
+function flag_update_7203() {
+  // Skip if this index was also added by the 6.x-2.x branch.
+  if (!db_index_exists('flag_content', 'content_id_fid')) {
+    db_add_index('flag_content', 'content_id_fid', array('content_id', 'fid'));
+  }
+}
+
+/**
+ * Increase the size of the database columns that refer to entity types or bundles.
+ */
+function flag_update_7204() {
+  // Change the 'content_type' column on the {flags} table.
+  db_change_field('flags', 'content_type', 'content_type',
+    array(
+      'description' => 'The flag type, such as one of "node", "comment", or "user".',
+      'type' => 'varchar',
+      'length' => '128',
+      'not null' => TRUE,
+      'default' => '',
+    )
+  );
+
+  // Drop the indexes that use the 'content_type' column of the {flag_contents} table.
+  db_drop_index('flag_content', 'content_type_content_id_uid_sid');
+  db_drop_index('flag_content', 'content_type_uid_sid');
+
+  // Change the 'content_type' column on the {flag_content} table.
+  db_change_field('flag_content', 'content_type', 'content_type',
+    array(
+      'description' => 'The flag type, one of "node", "comment", "user".',
+      'type' => 'varchar',
+      'length' => '128',
+      'not null' => TRUE,
+      'default' => '',
+    )
+  );
+
+  // Recreate the indexes which utilize the 'content_type' of the {flag_content} table
+  db_add_index('flag_content', 'content_type_content_id_uid_sid', array('content_type', 'content_id', 'uid', 'sid'));
+  db_add_index('flag_content', 'content_type_uid_sid', array('content_type', 'uid', 'sid'));
+
+  // Change the 'type' column on the {flag_types} table.
+  db_change_field('flag_types', 'type', 'type',
+    array(
+      'description' => 'The types (usually from {node_type}) that can be flagged by this fid.',
+      'type' => 'varchar',
+      'length' => '128',
+      'not null' => TRUE,
+      'default' => '',
+    )
+  );
+
+  // Drop the indexes that use the 'content_type' column of the {flag_counts} table.
+  db_drop_index('flag_counts', 'fid_content_type');
+  db_drop_index('flag_counts', 'content_type_content_id');
+
+  // Change the 'content_type' column on the {flag_counts} table.
+  db_change_field('flag_counts', 'content_type', 'content_type',
+    array('description' => 'The flag type, usually one of "node", "comment", "user".',
+      'type' => 'varchar',
+      'length' => '128',
+      'not null' => TRUE,
+      'default' => '',
+    )
+  );
+
+  // Recreate the indexes which utilize the 'content_type' of the {flag_counts} table.
+  db_add_index('flag_counts', 'fid_content_type', array('fid', 'content_type'));
+  db_add_index('flag_counts', 'content_type_content_id', array('content_type', 'content_id'));
 }

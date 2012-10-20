@@ -203,33 +203,95 @@ function email_menu() {
   return $items;
 }
 
+/**
+ * Access callback for the email contact page.
+ *
+ * Checks whether the current user has view access to the entity. Access checks
+ * are performed for the fieldable core entity types, including nodes, users,
+ * comments and taxonomy terms. Furthermore entity types using Entity API's
+ * access system are supported. For custom entity types that are not using the
+ * Entity API, at least the access content permission is checked in the menu
+ * access callback.
+ *
+ * This function is called within the email page callback, as it takes care of
+ * loading the entity itself. If the entity is found, access checks are
+ * performed with this function.
+ *
+ * @param $entity_type
+ *   The entity type
+ * @param $entity
+ *   The entity for which the access should be checked
+ * @param $field_info
+ *   The field info for the email field.
+ *
+ * @return TRUE if the current user has view access, otherwise FALSE.
+ */
+function email_mail_page_access($entity_type, $entity, $field_info) {
+  // Check for field access.
+  if (!field_access('view', $field_info, $entity_type, $entity)) {
+    return FALSE;
+  }
+
+  // Check the access for fieldable core entities, including nodes, users,
+  // comments and taxonomy terms.
+  if ($entity_type == 'node') {
+    return node_access('view', $entity);
+  }
+  elseif ($entity_type == 'user') {
+    global $user;
+    if ($entity->uid == $user->uid && $entity->uid) {
+      return TRUE;
+    }
+    if (user_access('administer users') || (user_access('access user profiles') && $entity->status)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+  elseif ($entity_type == 'comment') {
+    return comment_access('view', $entity);
+  }
+  elseif ($entity_type == 'taxonomy_term') {
+    if (user_access('administer taxonomy') || user_access('access content')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  // Use Entity API for checking the view access for non-core entity types, if
+  // the module is installed.
+  if (module_exists('entity')) {
+    return entity_access('view', $entity_type, $entity);
+  }
+  return TRUE;
+}
 
 /**
  * The contact form page.
  */
 function email_mail_page($object_type, $object_id, $field_name) {
-  global $user;
-
   if (!is_numeric($object_id)) {
     return MENU_NOT_FOUND;
   }
-
-  //verify this is an email field
+  // Verify this is an email field.
   $field_info = field_info_field($field_name);
   if (!isset($field_info) || $field_info['type'] != 'email') {
     return MENU_NOT_FOUND;
   }
 
+  // Check that the entity exists.
   $objects = entity_load($object_type, array($object_id));
+  if (!isset($objects[$object_id])) {
+    return MENU_NOT_FOUND;
+  }
   $object = $objects[$object_id];
 
-  //verify the object really exists
-  if (!$object) {
+  // Check that the entity has the email field.
+  if (!isset($object->$field_name)) {
     return MENU_NOT_FOUND;
   }
 
-  // Check for field access.
-  if (!field_access('view', $field_info, $object_type, $object, $user)) {
+  // Check if the current user has access to the entity and to the field.
+  if (!email_mail_page_access($object_type, $object, $field_info)) {
     return MENU_ACCESS_DENIED;
   }
 

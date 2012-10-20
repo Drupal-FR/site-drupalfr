@@ -35,10 +35,17 @@ function flag_admin_listing($form, &$form_state, $flags) {
     '#type' => 'actions',
   );
 
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save flag order'),
-  );
+  if (count($flags) == 1) {
+    // Don't show weights with only one flag.
+    unset($form['flags'][$flag->name]['weight']);
+  }
+  else if (count($flags) > 1){
+    // Only show the form button if there are several flags.
+    $form['actions']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save flag order'),
+    );
+  }
 
   return $form;
 }
@@ -72,15 +79,17 @@ function theme_flag_admin_listing($variables) {
     );
 
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
-    $row = array(
-      $flag->name,
-      drupal_render($form['flags'][$flag->name]['weight']),
-      $flag->content_type,
-      empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles),
-      $flag->types ? implode(', ', $flag->types) : '-',
-      $flag->global ? t('Yes') : t('No'),
-      theme('links', array('links' => $ops)),
-    );
+    $row = array();
+    $row[] = $flag->name;
+    if (count($flags) > 1) {
+      $row[] = drupal_render($form['flags'][$flag->name]['weight']);
+    }
+    $row[] = $flag->content_type;
+    $row[] = empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles);
+    $row[] = $flag->types ? implode(', ', $flag->types) : '-';
+    $row[] = $flag->global ? t('Yes') : t('No');
+    $row[] = theme('links', array('links' => $ops));
+
     $rows[] = array(
       'data' => $row,
       'class' => array('draggable'),
@@ -91,11 +100,15 @@ function theme_flag_admin_listing($variables) {
       array('data' => t('No flags are currently defined.'), 'colspan' => 7),
     );
   }
-  else {
+  else if (count($flags) > 1) {
     drupal_add_tabledrag('flag-admin-listing-table', 'order', 'sibling', 'flag-weight');
   }
 
-  $header = array(t('Flag'), t('Weight'), t('Flag type'), t('Roles'), t('Entity bundles'), t('Global?'), t('Operations'));
+  $header = array(t('Flag'));
+  if (count($flags) > 1) {
+    $header[] = t('Weight');
+  }
+  $header = array_merge($header, array(t('Flag type'), t('Roles'), t('Entity bundles'), t('Global?'), t('Operations')));
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'flag-admin-listing-table')));
   $output .= drupal_render_children($form);
 
@@ -589,7 +602,7 @@ function flag_delete_confirm($form, &$form_state, $flag) {
   return confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $flag->get_title())),
     !empty($_GET['destination']) ? $_GET['destination'] : FLAG_ADMIN_PATH,
-    isset($flag->module) ? t('This flag is provided by the %module module. It will loose any customizations and be disabled.', array('%module' => $flag->module)) : t('This action cannot be undone.'),
+    isset($flag->module) ? t('This flag is provided by the %module module. It will lose any customizations and be disabled.', array('%module' => $flag->module)) : t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );
 }
