@@ -50,6 +50,7 @@ drush cc all
 drush updatedb -y --verbose
 drush en -y dfr_format
 drush cc all
+drush en -y migrate
 drush -y content-migrate-fields
 drush cc all
 
