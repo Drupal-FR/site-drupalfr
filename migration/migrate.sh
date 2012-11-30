@@ -48,9 +48,9 @@ drush en -y phone
 
 drush cc all
 drush updatedb -y --verbose
-
 drush en -y dfr_format
-
+drush cc all
 drush -y content-migrate-fields
+drush cc all
 
 echo "aller sur la page admin/migration et lancer la migration\n";
