@@ -80,6 +80,48 @@ function content_migrate_filefield_instance_alter(&$instance_value, $field_value
             'image_link' => 'file',
           );
           break;
+
+        default:
+          // Handle formatters using imagecache. D7 does not store them in the same way.
+          if (function_exists('image_styles')) {
+            foreach (image_styles() as $style_name => $style) {
+              if (substr($settings['type'], 0, strlen($style_name)) == $style_name) {
+                switch (substr($settings['type'], strlen($style_name))) {
+                  case '_default':
+                    $instance_value['display'][$context]['type'] = 'image';
+                    $instance_value['display'][$context]['module'] = 'image';
+                    $instance_value['display'][$context]['settings'] = array(
+                      'image_style' => $style_name,
+                      'image_link' => '',
+                    );
+                    break;
+
+                  case '_linked':
+                    $instance_value['display'][$context]['type'] = 'image';
+                    $instance_value['display'][$context]['module'] = 'image';
+                    $instance_value['display'][$context]['settings'] = array(
+                      'image_style' => $style_name,
+                      'image_link' => 'content',
+                    );
+                    break;
+
+                  case '_imagelink':
+                    $instance_value['display'][$context]['type'] = 'image';
+                    $instance_value['display'][$context]['module'] = 'image';
+                    $instance_value['display'][$context]['settings'] = array(
+                      'image_style' => $style_name,
+                      'image_link' => 'file',
+                    );
+                    break;
+
+                  case '_path':
+                  case '_uri':
+                    // Not supported in core D7.
+                    break;
+                }
+              }
+            }
+          }
       }
     }
   }

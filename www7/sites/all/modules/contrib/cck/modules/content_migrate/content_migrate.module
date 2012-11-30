@@ -253,16 +253,13 @@ function content_migrate_extract_allowed_values($legacy_values, $field_type) {
   if (!empty($legacy_values)) {
     foreach (explode("\n", $legacy_values) as $value) {
       $value = trim($value);
-      if (empty($value)) continue;
+      if (empty($value) && $value !== '0') continue;
       if (strstr($value, '|')) {
         $parts = explode('|', $value);
         $allowed_values[trim($parts[0])] = trim($parts[1]);
       }
-      elseif (is_numeric($value)) {
-        $allowed_values[$value] = $value;
-      }
       else {
-        $allowed_values[] = $value;
+        $allowed_values[$value] = $value;
       }
     }
   }
