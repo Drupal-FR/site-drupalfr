@@ -25,8 +25,8 @@ function phone_countries($code = NULL) {
       'es' => 'Spain',
       'au' => 'Australia',
       'cs' => 'Czech Republic',
-      'hu' => 'Poland - mobiles only',
-      'pl' => 'Netherland',
+      'hu' => 'Hungary',
+      'pl' => 'Poland - mobiles only',
       'nl' => 'Netherland',
       'se' => 'Sweden',
       'za' => 'South Africa',
@@ -156,7 +156,8 @@ function phone_field_validate($entity_type, $entity, $field, $instance, $langcod
       if (!valid_phone_number($ccode, $value)) {
         $country = phone_country_info($ccode);
         $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => t($country['error'], array('%value' => $value)),
+          'error' => 'phone_invalid_number',
+          'message' => t($country['error'], array('%value' => $value)),
         );
       }
     }
@@ -225,7 +226,7 @@ function phone_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $element['value'] = array(
+  $element += array(
     '#type' => 'textfield',
     '#title' => $element['#title'],
     '#description' => $element['#description'],
@@ -238,7 +239,7 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
         : NULL
     ),
   );
-  return $element;
+  return array('value' => $element);
 }
 
 /**
