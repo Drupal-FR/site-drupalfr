@@ -17,15 +17,29 @@ function dfr_documentation_menu() {
 }
 
 function dfr_documentation_page() {
-  $output = "";
-  $books = array(4395, 5037, 56, 9619, 4);
-  foreach ($books as $nid) {
-    $book = node_load($nid);
-    $output .= '<h2 style="clear: left;">'. l($book->title, 'node/'. $nid) .'</h2>';
-    $output .= '<p>'. $book->teaser .'</p>';
-    $output .= '<div class="column-left">'. book_children($book->book) .'</div>';
+  $output = array(
+    'books' => array(
+      '#prefix' => '<div id="documentation">',
+      '#suffix' => '</div>' 
+    )
+  );
+
+  $books = node_load_multiple(array(4395, 5037, 56, 9619, 4));
+  foreach ($books as $book) {
+    $body = field_get_items('node', $book, 'body');
+    $output['books']['book-'.$book->nid] = array(
+      '#prefix' => '<div class="book book-'.$book->nid.'">', '#suffix'=>'</div>',
+      'title' => array(
+        '#markup' => '<h2>'. l($book->title, 'node/'. $nbook->nid) .'</h2>'
+      ),
+      'summary' => array(
+        '#markup' => '<p>'. text_summary($body[0]['value']) .'</p>'
+      ),
+      'children' => array(
+        '#markup' => book_children($book->book)
+      )
+    );
   }
-  $output .= '<div style="clear: both"></div>';
   return $output;
 }
 
