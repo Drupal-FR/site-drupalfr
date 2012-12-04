@@ -46,6 +46,9 @@ drush en -y flag
 drush en -y rules rules_admin
 drush en -y phone
 
+# Remove a useless redirection.
+drush php-eval "redirect_delete(1);"
+
 drush cc all
 drush updatedb -y --verbose
 drush en -y dfr_format
