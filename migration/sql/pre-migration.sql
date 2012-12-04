@@ -30,7 +30,7 @@ DELETE FROM `actions` WHERE CONVERT(`actions`.`aid` USING utf8) = 'user_block_ip
 -- fake uninstall of profile module
 -- UPDATE system SET schema_version = -1 WHERE name = 'profile';
 
--- remove internal:links
-UPDATE node_revisions SET body = REPLACE(body, "internal:", "/");
-UPDATE node_revisions SET teaser = REPLACE(teaser, "internal:", "/");
+-- remove internal:links (replaced by the module pathologic).
+-- UPDATE node_revisions SET body = REPLACE(body, "internal:", "/");
+-- UPDATE node_revisions SET teaser = REPLACE(teaser, "internal:", "/");
 
