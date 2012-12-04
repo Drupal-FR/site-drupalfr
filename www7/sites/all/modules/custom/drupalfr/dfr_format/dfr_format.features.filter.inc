@@ -10,7 +10,100 @@
 function dfr_format_filter_default_formats() {
   $formats = array();
 
-  // Exported format: Format Wiki
+  // Exported format: Filtered HTML.
+  $formats['1'] = array(
+    'format' => '1',
+    'name' => 'Filtered HTML',
+    'cache' => '1',
+    'status' => '1',
+    'weight' => '-1',
+    'filters' => array(
+      'codefilter' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(),
+      ),
+      'filter_autop' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(),
+      ),
+      'filter_url' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(
+          'filter_url_length' => 72,
+        ),
+      ),
+      'filter_markdown' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(),
+      ),
+      'filter_htmlcorrector' => array(
+        'weight' => '10',
+        'status' => '1',
+        'settings' => array(),
+      ),
+      'pathologic' => array(
+        'weight' => '50',
+        'status' => '1',
+        'settings' => array(
+          'local_paths' => '',
+          'protocol_style' => 'full',
+        ),
+      ),
+    ),
+  );
+
+  // Exported format: PHP code.
+  $formats['2'] = array(
+    'format' => '2',
+    'name' => 'PHP code',
+    'cache' => '0',
+    'status' => '1',
+    'weight' => '0',
+    'filters' => array(
+      'php_code' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(),
+      ),
+    ),
+  );
+
+  // Exported format: Full HTML.
+  $formats['3'] = array(
+    'format' => '3',
+    'name' => 'Full HTML',
+    'cache' => '1',
+    'status' => '1',
+    'weight' => '0',
+    'filters' => array(
+      'filter_autop' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(),
+      ),
+      'filter_htmlcorrector' => array(
+        'weight' => '11',
+        'status' => '1',
+        'settings' => array(),
+      ),
+    ),
+  );
+
+  // Exported format: markdown.
+  $formats['6'] = array(
+    'format' => '6',
+    'name' => 'markdown',
+    'cache' => '1',
+    'status' => '1',
+    'weight' => '0',
+    'filters' => array(),
+  );
+
+  // Exported format: Format Wiki.
   $formats['7'] = array(
     'format' => '7',
     'name' => 'Format Wiki',
@@ -43,6 +136,44 @@ function dfr_format_filter_default_formats() {
         'settings' => array(
           'filter_url_length' => '72',
         ),
+      ),
+    ),
+  );
+
+  // Exported format: Messaging plain text.
+  $formats['8'] = array(
+    'format' => '8',
+    'name' => 'Messaging plain text',
+    'cache' => '0',
+    'status' => '1',
+    'weight' => '0',
+    'filters' => array(),
+  );
+
+  // Exported format: Plain text.
+  $formats['9'] = array(
+    'format' => '9',
+    'name' => 'Plain text',
+    'cache' => '1',
+    'status' => '1',
+    'weight' => '1',
+    'filters' => array(
+      'filter_html_escape' => array(
+        'weight' => '0',
+        'status' => '1',
+        'settings' => array(),
+      ),
+      'filter_url' => array(
+        'weight' => '1',
+        'status' => '1',
+        'settings' => array(
+          'filter_url_length' => 72,
+        ),
+      ),
+      'filter_autop' => array(
+        'weight' => '2',
+        'status' => '1',
+        'settings' => array(),
       ),
     ),
   );

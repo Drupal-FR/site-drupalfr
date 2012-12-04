@@ -47,9 +47,6 @@ drush en -y flag
 drush en -y rules rules_admin
 drush en -y phone
 
-# Remove a useless redirection.
-drush php-eval "redirect_delete(1);"
-
 drush cc all
 drush updatedb -y --verbose
 drush en -y dfr_format
@@ -57,5 +54,9 @@ drush cc all
 drush en -y migrate
 drush -y content-migrate-fields
 drush cc all
+
+# Remove a useless redirection.
+drush php-eval "redirect_delete(1);"
+
 
 echo "aller sur la page admin/migration et lancer la migration\n";
