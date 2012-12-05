@@ -56,7 +56,11 @@ function dfr_migration_migrate_profiles_batch(&$context) {
   if (empty($context['sandbox']['progress'])) {
     // Initialize batch update information.
     $context['sandbox']['progress'] = 0;
-    $count = db_select('users', 'u')->condition('u.uid', '0', '<>')->countQuery()->execute()->fetchField();;
+    $count = db_select('node', 'n')->condition('n.type', 'profile', '=')->countQuery()->execute()->fetchField();
+//    $query = db_select('node', 'n');
+//    $query->condition('n.type', 'profile', '=')
+//      ->fields('n', array('nid', 'vid', 'uid'))
+//      $count = db
     $context['sandbox']['max'] = $count;
   }
 
