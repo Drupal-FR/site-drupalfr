@@ -12,46 +12,57 @@
  *   The new CAPTCHA type to retrieve, e.g. 'image' or 'audio'.
  * @param $form_build_id
  *   The internal form build id of the form to update the CAPTCHA for.
- * @param $mollom_session_id
- *   The last known Mollom session id contained in the form.
+ * @param $contentId
+ *   (optional) The associated content ID in the form.
  *
  * @return
  *   A JSON array containing:
  *   - content: The HTML markup for the new CAPTCHA.
- *   - session_id: The Mollom session id for the new CAPTCHA.
+ *   - captchaId: The ID for the new CAPTCHA.
  *
  * @todo Add error handling.
  */
-function mollom_captcha_js($type, $form_build_id, $mollom_session_id) {
-  $captcha = mollom_get_captcha($type, array('session_id' => $mollom_session_id));
-
-  // Update cached session id in the cached $form_state.
-  // We rely on native form caching of Form API to store our Mollom session
-  // data. When retrieving a new CAPTCHA through this JavaScript callback, the
-  // cached $form_state is not updated and still contains the Mollom session
-  // data that was known when rendering the form. Since above XML-RPC requests
-  // may return a new Mollom session id for the new CAPTCHA, the user would not
-  // be able to successfully complete the CAPTCHA, because we would try to
-  // validate the user's response in combination with the old/previous session
-  // id. Therefore, we need to update the session id in the cached $form_state.
-  // @todo Replace the entire CAPTCHA switch/refresh with new AJAX framework
-  //   functionality.
-  if (!empty($captcha['response']['session_id'])) {
-    if ($cache = cache_get('form_state_' . $form_build_id, 'cache_form')) {
-      $form_state = $cache->data;
-      $form_state['mollom']['response']['session_id'] = $captcha['response']['session_id'];
-      cache_set('form_state_' . $form_build_id, $form_state, 'cache_form', REQUEST_TIME + 21600);
-      // After successfully updating the cache, replace the original session id.
-      $mollom_session_id = $captcha['response']['session_id'];
-    }
+function mollom_captcha_js($type, $form_build_id, $contentId = NULL) {
+  // Deny GET requests to make automated security audit tools not complain
+  // about a JSON Hijacking possibility.
+  // @see http://capec.mitre.org/data/definitions/111.html
+  // @see http://haacked.com/archive/2009/06/24/json-hijacking.aspx
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+    // A HTTP 405 response MUST specify allowed methods.
+    header('Allow: POST');
+    drupal_exit();
   }
 
-  // Return new content and new session_id via JSON.
-  $data = array(
-    'content' => $captcha['markup'],
-    'session_id' => $mollom_session_id,
-  );
-  drupal_json_output($data);
+  // Load $form_state from cache or create a dummy state.
+  $cid = 'form_state_' . $form_build_id;
+  if ($cache = cache_get($cid, 'cache_form')) {
+    $form_state = $cache->data;
+  }
+  else {
+    $form_state['mollom'] = array();
+    if (isset($contentId)) {
+      $form_state['mollom']['response']['content']['id'] = $contentId;
+    }
+  }
+  $form_state['mollom']['captcha_type'] = $type;
+  $captcha = mollom_get_captcha($form_state);
+
+  if (!empty($form_state['mollom']['response']['captcha']['id'])) {
+    // Update the CAPTCHA ID in the cached $form_state, since it might have
+    // changed.
+    // @todo Replace the entire CAPTCHA switch/refresh with new AJAX framework
+    //   functionality.
+    if ($cache) {
+      cache_set($cid, $form_state, 'cache_form', REQUEST_TIME + 21600);
+    }
+    // Return new content and CAPTCHA ID via JSON.
+    $data = array(
+      'content' => $captcha,
+      'captchaId' => $form_state['mollom']['response']['captcha']['id'],
+    );
+    drupal_json_output($data);
+  }
   drupal_exit();
 }
 
@@ -61,10 +72,9 @@ function mollom_captcha_js($type, $form_build_id, $mollom_session_id) {
  * @param $entity
  *   The entity type of the data to report, e.g. 'node' or 'comment'.
  * @param $id
- *   The entity id the data belongs to. If 'session' is passed as $entity, then
- *   $id is assumed to be a Mollom session_id, as returned by Mollom servers,
- *   which should only be used to report session data that was not stored for an
- *   entity in the database (such as contact form submissions).
+ *   The entity id the data belongs to.
+ *
+ * @see mollom_report_access()
  */
 function mollom_report_form($form, &$form_state, $entity, $id) {
   $form['entity'] = array(
@@ -99,17 +109,11 @@ function mollom_report_form_submit($form, &$form_state) {
     $id = $form_state['values']['id'];
 
     // Load the Mollom session data.
-    if ($entity == 'session') {
-      $data = new stdClass;
-      $data->session_id = $id;
-    }
-    else {
-      $data = mollom_data_load($entity, $id);
-    }
+    $data = mollom_data_load($entity, $id);
 
     // Send feedback to Mollom, if we have session data.
-    if (!empty($data->session_id) && !empty($form_state['values']['mollom']['feedback'])) {
-      if (_mollom_send_feedback($data->session_id, $form_state['values']['mollom']['feedback'])) {
+    if ((!empty($data->contentId) || !empty($data->captchaId)) && !empty($form_state['values']['mollom']['feedback'])) {
+      if (_mollom_send_feedback($data, $form_state['values']['mollom']['feedback'])) {
         drupal_set_message(t('The content was successfully reported as inappropriate.'));
       }
     }

@@ -2,17 +2,17 @@ name = Mollom
 description = Automatically moderates user-submitted content and protects your site from spam and profanity.
 core = 7.x
 configure = admin/config/content/mollom
-scripts[] = mollom.js
-stylesheets[all][] = mollom.css
-files[] = mollom.module
-files[] = mollom.admin.inc
-files[] = mollom.pages.inc
-files[] = mollom.install
-files[] = tests/mollom.test
 
-; Information added by drupal.org packaging script on 2011-07-09
-version = "7.x-1.1"
+stylesheets[all][] = mollom.css
+
+files[] = includes/mollom.class.inc
+files[] = mollom.drupal.inc
+files[] = tests/mollom.test
+files[] = tests/mollom.class.test
+
+; Information added by drupal.org packaging script on 2012-10-22
+version = "7.x-2.3"
 core = "7.x"
 project = "mollom"
-datestamp = "1310217720"
+datestamp = "1350934019"
 
