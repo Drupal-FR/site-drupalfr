@@ -46,6 +46,7 @@ drush en -y email link node_reference user_reference
 drush en -y flag 
 drush en -y rules rules_admin
 drush en -y phone
+drush en -y dfr_emploi
 
 drush cc all
 drush updatedb -y --verbose
