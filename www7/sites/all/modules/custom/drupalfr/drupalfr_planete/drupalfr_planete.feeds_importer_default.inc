@@ -42,28 +42,33 @@ function drupalfr_planete_feeds_importer_default() {
             'unique' => FALSE,
           ),
           1 => array(
-            'source' => 'url',
-            'target' => 'url',
-            'unique' => 0,
-          ),
-          2 => array(
             'source' => 'guid',
             'target' => 'guid',
             'unique' => 1,
           ),
-          3 => array(
+          2 => array(
             'source' => 'description',
             'target' => 'body',
             'unique' => FALSE,
           ),
-          4 => array(
+          3 => array(
             'source' => 'tags',
             'target' => 'field_planete_tags',
             'unique' => FALSE,
           ),
-          5 => array(
+          4 => array(
             'source' => 'timestamp',
             'target' => 'created',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'url',
+            'target' => 'field_planete_url:url',
+            'unique' => FALSE,
+          ),
+          6 => array(
+            'source' => 'title',
+            'target' => 'field_planete_url:title',
             'unique' => FALSE,
           ),
         ),
