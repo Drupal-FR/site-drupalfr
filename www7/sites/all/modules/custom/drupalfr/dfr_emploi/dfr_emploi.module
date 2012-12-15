@@ -23,3 +23,18 @@ function dfr_emploi_unpublishing_date_validate($form, &$form_state) {
     form_set_error('unpublish_on', 'On a dit 6 mois !');
   }
 }
+
+/**
+ * Implements hook_node_access().
+ */
+function dfr_emploi_node_access($node, $op, $account) {
+  if ($op == 'update' && $node->type == 'offre' && $node->status) {
+    if (!user_access('administer content', $account) && ($account->uid == $node->uid)) {
+      drupal_set_message('Cette offre est publiée et ne peut plus être modifiée.');
+      return NODE_ACCESS_DENY;
+    }
+  }
+
+  // Returning nothing from this function would have the same effect.
+  return NODE_ACCESS_IGNORE;
+}
