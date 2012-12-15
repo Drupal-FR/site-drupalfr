@@ -1,6 +1,6 @@
 
 .block {
-  margin-bottom:1em;
+  margin-bottom:2em;
 }
 .block .block-title {margin-bottom: 0;}
 
@@ -12,11 +12,17 @@
   list-style-type:none;
   background:url(../images/marker-2.gif) 0 7px no-repeat;
 }
-.block .content li a {
+.block a {
   color:#00c3dd;
 }
+.block .btn-link {color:#fff;}
 
-.block .more-link {display:block; text-align:left; margin-top:18px;}
+.block .more-link {
+  color:#fff;
+  display:block;
+  text-align:left;
+  margin-top:0.5em;
+}
 
 
 
@@ -64,6 +70,76 @@
 }
 
 
+
+/** ******************************************************* **/
+/** Content top                                             **/
+/** ******************************************************* **/
+
+.region-content-top .block {
+  position:relative;
+  margin:1em 0;
+  padding:1em 0 3.5em 0;
+  background:#036ba5;
+  border-radius:5px;
+  background-clip:padding-box;
+  -moz-border-radius:5px;
+  -moz-background-clip:padding-box;
+  -webkit-border-radius:5px;
+  -webkit-background-clip:padding-box;
+}
+
+.region-content-top .block-title {
+  font-size:18px;
+  line-height:22px;
+  color:#fff;
+  font-weight:normal;
+  letter-spacing:-1px;
+  padding:0 0 1em 1em;
+  margin-bottom:1em;
+  text-shadow:0 1px 0 #000;
+  background:url(../images/spacer-1.png) 0 100% repeat-x;
+}
+.region-content-top .block .content {
+  color:#fff;
+  padding:0 2em 0 1em;
+}
+.region-content-top .block .btn-link {
+  position:absolute;
+  bottom:1em;
+}
+.region-content-top .block .btn-link:hover {
+  color:#001D26;
+  background:#fff;
+}
+
+@media screen and (min-width:640px) {
+  .region-content-top .block {
+    display:inline-block;
+    vertical-align:top;
+    min-height:200px;
+    width:30%;
+    margin:2em 2.5% 1em;
+    background:url(../images/services-bg.png) 50% 0 no-repeat #036ba5;
+  }
+  .region-content-top .block-1 {margin-left:0;}
+  .region-content-top .block-3 {margin-right:0;}
+}
+
+
+
+
+/** ******************************************************* **/
+/** Content                                                 **/
+/** ******************************************************* **/
+
+/* Homepage */
+#block-views-drupalfr-block-1 {}
+#block-views-drupalfr-block-1 .block-title {
+  font-size:32px;
+  padding:0 0 1em 0;
+}
+
+
 /** ******************************************************* **/
 /** Sidebar                                                 **/
 /** ******************************************************* **/
@@ -107,6 +183,41 @@
 #block-user-login .form-item label {}
 #block-user-login .form-item input {}
 
+
+#twitter_block_results {}
+.tweet {}
+.tweet .profile_image {
+  float:left;
+  max-width:2.5em;
+  margin:0.25em 0.25em;
+}
+.tweet .profile_name {font-weight: bold;}
+.tweet .profile_name:after {content:":";}
+.block li .tweet span a {color:#444;}
+.block li .tweet span a:hover {color:#00C3DD;text-decoration: none;}
+
+/** ******************************************************* **/
+/** Footer Top                                              **/
+/** ******************************************************* **/
+
+.region-footer-top .block {}
+.region-footer-top .block-title {
+  font-size:18px;
+  line-height:22px;
+  font-weight:bold;
+  color:#fff;
+  text-shadow:0 1px 0 #000;
+  margin-bottom:1em;
+}
+
+#block-dfr-blocks-about-us {
+  display:inline-block;vertical-align: top;
+  width:33%;
+}
+#block-block-7 {
+  display:inline-block;vertical-align: top;
+  width:66%;
+}
 
 /** ******************************************************* **/
 /** Footer                                                  **/

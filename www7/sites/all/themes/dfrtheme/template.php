@@ -36,37 +36,6 @@ function dfrtheme_preprocess_html(&$vars) {
   $vars['doctype'] = _dfrtheme_doctype();
   $vars['rdf'] = _dfrtheme_rdf($vars);
 
-  // Since menu is rendered in preprocess_page we need to detect it here to add body classes
-  $has_main_menu = theme_get_setting('toggle_main_menu');
-  $has_secondary_menu = theme_get_setting('toggle_secondary_menu');
-
-  /* Add extra classes to body for more flexible theming */
-
-  if ($has_main_menu or $has_secondary_menu) {
-    $vars['classes_array'][] = 'with-navigation';
-  }
-
-  if ($has_secondary_menu) {
-    $vars['classes_array'][] = 'with-subnav';
-  }
-
-  if (!empty($vars['page']['featured'])) {
-    $vars['classes_array'][] = 'featured';
-  }
-
-  if (!empty($vars['page']['triptych_first'])
-    || !empty($vars['page']['triptych_middle'])
-    || !empty($vars['page']['triptych_last'])) {
-    $vars['classes_array'][] = 'triptych';
-  }
-
-  if (!empty($vars['page']['footer_firstcolumn'])
-    || !empty($vars['page']['footer_secondcolumn'])
-    || !empty($vars['page']['footer_thirdcolumn'])
-    || !empty($vars['page']['footer_fourthcolumn'])) {
-    $vars['classes_array'][] = 'footer-columns';
-  }
-
   if ($vars['is_admin']) {
     $vars['classes_array'][] = 'admin';
   }
@@ -165,46 +134,23 @@ function dfrtheme_preprocess_maintenance_page(&$vars) {
  * Adds extra classes to node container for advanced theming
  */
 function dfrtheme_preprocess_node(&$vars) {
-  // Striping class
-  $vars['classes_array'][] = 'node-' . $vars['zebra'];
-
-  // Node is published
-  $vars['classes_array'][] = ($vars['status']) ? 'published' : 'unpublished';
-
-  // Node has comments?
-  $vars['classes_array'][] = ($vars['comment']) ? 'with-comments' : 'no-comments';
-
-  if ($vars['sticky']) {
-    $vars['classes_array'][] = 'sticky'; // Node is sticky
-  }
-
-  if ($vars['promote']) {
-    $vars['classes_array'][] = 'promote'; // Node is promoted to front page
-  }
-
-  if ($vars['teaser']) {
-    $vars['classes_array'][] = 'node-teaser'; // Node is displayed as teaser.
-  }
-
-  if ($vars['uid'] && $vars['uid'] === $GLOBALS['user']->uid) {
-    $classes[] = 'node-mine'; // Node is authored by current user.
-  }
+  // Add view_mode classs
+  $vars['classes_array'][] = 'node-' . $vars['view_mode'];
   
   $vars['submitted'] = t('Submitted by !username on ', array('!username' => $vars['name']));
   $vars['submitted_date'] = t('!datetime', array('!datetime' => $vars['date']));
   $vars['submitted_pubdate'] = format_date($vars['created'], 'custom', 'Y-m-d\TH:i:s');
-  
-  if ($vars['view_mode'] == 'full' && node_is_page($vars['node'])) {
-    $vars['classes_array'][] = 'node-full';
-  }
+
 }
 
 /**
  * Implements template_preprocess_block().
  */
 function dfrtheme_preprocess_block(&$vars, $hook) {
-  // Add a striping class.
+
+  // Add a striping class & id
   $vars['classes_array'][] = 'block-' . $vars['zebra'];
+  $vars['classes_array'][] = 'block-' . $vars['block_id'];
 
   // Title class
   $vars['title_attributes_array']['class'][] = 'block-title';
