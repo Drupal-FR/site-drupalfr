@@ -27,14 +27,3 @@ function phone_field_alter(&$field_value, $instance_value) {
 function phone_migrate_api() {
   return array('api' => 2);
 }
-
-/**
- * Wrap Migrate's simple field handler for 'phone' fields.
- */
-class MigratePhoneFieldHandler extends MigrateSimpleFieldHandler {
-
-  public function __construct() {
-    $this->registerTypes(array('phone'));
-  }
-
-}
