@@ -28,16 +28,17 @@ function drupalfr_events_block_info() {
  * Implements hook_block_view().
  */
 function drupalfr_events_block_view($delta = '') {
+  $block = array();
   switch($delta) {
     case 'next_events':
-      $subject = t('5 prochains évènements meetup.com');
       $events = drupalfr_events_fetch_events(5);
-      $block['subject'] = $subject;
-      $block['content'] = array(
-        'events' => array('#markup' => drupalfr_events_display_events($events, 'teaser')),
-      )
-
-      $content;
+      $block = array(
+        'subject' => t('5 prochains évènements meetup.com'),
+        'content' => array(
+          'events' => drupalfr_events_display_events($events, 'teaser'),
+          'link' => array('#markup' => l(t("Détail des évènements"), 'prochains-evenements', array('attributes' => array('class'=>array('more-link')))))
+        )
+      );
       break;
   }
   return $block;
