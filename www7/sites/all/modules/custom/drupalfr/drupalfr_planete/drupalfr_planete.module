@@ -7,6 +7,18 @@
 include_once('drupalfr_planete.features.inc');
 
 /**
+ * Implements hook_entity_info_alter().
+ *
+ * Adds some view modes for the planet display user entity type.
+ */
+function drupalfr_planete_entity_info_alter(&$entity_info) {
+  $entity_info['user']['view modes']['planete_author'] = array(
+    'label' => t("Planete author block"),
+    'custom settings' => TRUE,
+  );
+}
+
+/**
  * Ensures that the feed exist.
  */
 function _drupalfr_planete_user_save($account) {
@@ -83,4 +95,25 @@ function drupalfr_planete_user_insert($edit, $account) {
  */
 function drupalfr_planete_user_update($edit, $account) {
   _drupalfr_planete_user_save($account);
+}
+
+/**
+ * Implements hook_feeds_presave().
+ *
+ * Ensures that newly create feed items will inherit from the original user
+ * reference so we can tune display easily later.
+ */
+function drupalfr_planete_feeds_presave(FeedsSource $source, $entity, $item) {
+  // It seems that Feeds is almost entity ready (meaning they don't need
+  // to be necessarily nodes) but UI can still work only with nodes. Checking
+  // for the 'type' property ensures we have a node, no PHP warnings in case
+  // some other modules messes up with Feeds, and that we are doing stuff with
+  // our own data.
+  // 'feeds_nid' is not part of the public API, but the FeedsConfigurable class
+  // from which FeedsSource inherits actually implement the __get magic method
+  // and will return us this property.
+  if (isset($entity->type) && 'planete' === $entity->type && ($node = node_load($source->feed_nid))) {
+    $entity->field_planete_user = array(LANGUAGE_NONE => array(0 => array('uid' => $node->uid)));
+    $entity->uid = $node->uid;
+  }
 }
