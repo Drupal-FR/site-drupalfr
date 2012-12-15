@@ -24,7 +24,6 @@ drush updatedb -y --verbose
 drush en -y pathologic
 drush en -y drupalfr_user
 drush en -y content_migrate
-drush en -y dfr_migration
 drush en -y markdown
 drush en -y dfr_documentation
 drush en -y toolbar
@@ -47,6 +46,8 @@ drush en -y flag
 drush en -y rules rules_admin
 drush en -y phone
 drush en -y dfr_emploi
+drush en -y userpoints userpoints_rules
+drush en -y drupalfr_edito
 
 drush cc all
 drush updatedb -y --verbose
@@ -55,6 +56,8 @@ drush cc all
 drush en -y migrate
 drush -y content-migrate-fields
 drush cc all
+
+drush en -y dfr_migration
 
 # Remove a useless redirection.
 drush php-eval "redirect_delete(1);"

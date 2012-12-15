@@ -1,0 +1,15 @@
+name = "DrupalFr Editorial components"
+description = "Editorial components (Rules, Content types, ...) for DrupalFr website"
+core = 7.x
+package = "DrupalFr"
+php = 5.2.4
+dependencies[] = comment
+dependencies[] = entity
+dependencies[] = flag
+dependencies[] = rules
+dependencies[] = userpoints_rules
+features[features_api][] = api:1
+features[rules_config][] = rules_comment_is_flagged
+features[rules_config][] = rules_comment_is_published
+features[rules_config][] = rules_comment_is_unflagged
+features[rules_config][] = rules_forum_post_is_published
