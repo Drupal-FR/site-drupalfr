@@ -27,11 +27,16 @@ ini_set('session.cookie_lifetime', 2000000);
 # ini_set('pcre.recursion_limit', 200000);
 
 // Necessary at least during the migration, to prevent Drush update-db from
-// failing.
+// failing. Also acts as a performance improvement, avoiding one extra SQL
+// query per page.
 $conf['blocked_ips'] = array();
+
+// Invoking hooks is unnecessary in our case, no modules implement them.
+$conf['page_cache_invoke_hooks'] = FALSE;
 
 /**
  * Local settings (databases password, domain configuration, ...).
  */
 require dirname(__FILE__) . '/settings.local.php';
 
+drupal_fast_404();
