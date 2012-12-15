@@ -1,12 +1,16 @@
 <?php
+/**
+ * @file
+ * drupalfr_user.features.field.inc
+ */
 
 /**
- * Implementation of hook_field_default_fields().
+ * Implements hook_field_default_fields().
  */
 function drupalfr_user_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'user-user-field_biography'
+  // Exported field: 'user-user-field_biography'.
   $fields['user-user-field_biography'] = array(
     'field_config' => array(
       'active' => '1',
@@ -24,9 +28,10 @@ function drupalfr_user_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(),
       'translatable' => '1',
@@ -43,7 +48,14 @@ function drupalfr_user_field_default_fields() {
           'module' => 'text',
           'settings' => array(),
           'type' => 'text_default',
-          'weight' => '0',
+          'weight' => '2',
+        ),
+        'planete_author' => array(
+          'label' => 'hidden',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => '1',
         ),
       ),
       'entity_type' => 'user',
@@ -61,12 +73,12 @@ function drupalfr_user_field_default_fields() {
           'rows' => '5',
         ),
         'type' => 'text_textarea',
-        'weight' => '7',
+        'weight' => '2',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_company'
+  // Exported field: 'user-user-field_company'.
   $fields['user-user-field_company'] = array(
     'field_config' => array(
       'active' => '1',
@@ -84,15 +96,21 @@ function drupalfr_user_field_default_fields() {
       ),
       'indexes' => array(
         'nid' => array(
-          '0' => 'nid',
+          0 => 'nid',
         ),
       ),
+      'locked' => '0',
       'module' => 'node_reference',
       'settings' => array(
         'referenceable_types' => array(
           'annuaire' => 'annuaire',
           'article' => 0,
           'page' => 0,
+        ),
+        'view' => array(
+          'args' => array(),
+          'display_name' => '',
+          'view_name' => '',
         ),
       ),
       'translatable' => '1',
@@ -109,6 +127,12 @@ function drupalfr_user_field_default_fields() {
           'module' => 'node_reference',
           'settings' => array(),
           'type' => 'node_reference_default',
+          'weight' => '5',
+        ),
+        'planete_author' => array(
+          'label' => 'inline',
+          'settings' => array(),
+          'type' => 'hidden',
           'weight' => '5',
         ),
       ),
@@ -128,12 +152,12 @@ function drupalfr_user_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'node_reference_autocomplete',
-        'weight' => '12',
+        'weight' => '8',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_events'
+  // Exported field: 'user-user-field_events'.
   $fields['user-user-field_events'] = array(
     'field_config' => array(
       'active' => '1',
@@ -144,9 +168,10 @@ function drupalfr_user_field_default_fields() {
       'foreign keys' => array(),
       'indexes' => array(
         'value' => array(
-          '0' => 'value',
+          0 => 'value',
         ),
       ),
+      'locked' => '0',
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
@@ -172,9 +197,14 @@ function drupalfr_user_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'inline',
-          'module' => 'list',
           'settings' => array(),
-          'type' => 'list_default',
+          'type' => 'hidden',
+          'weight' => '10',
+        ),
+        'planete_author' => array(
+          'label' => 'inline',
+          'settings' => array(),
+          'type' => 'hidden',
           'weight' => '9',
         ),
       ),
@@ -190,12 +220,12 @@ function drupalfr_user_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_buttons',
-        'weight' => '16',
+        'weight' => '12',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_icq'
+  // Exported field: 'user-user-field_icq'.
   $fields['user-user-field_icq'] = array(
     'field_config' => array(
       'active' => '1',
@@ -213,71 +243,10 @@ function drupalfr_user_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
-      'module' => 'text',
-      'settings' => array(
-        'max_length' => '255',
-      ),
-      'translatable' => '1',
-      'type' => 'text',
-    ),
-    'field_instance' => array(
-      'bundle' => 'user',
-      'default_value' => NULL,
-      'deleted' => '0',
-      'description' => '',
-      'display' => array(
-        'default' => array(
-          'label' => 'inline',
-          'module' => 'text',
-          'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '7',
-        ),
-      ),
-      'entity_type' => 'user',
-      'field_name' => 'field_icq',
-      'label' => 'ICQ',
-      'required' => 0,
-      'settings' => array(
-        'text_processing' => '0',
-        'user_register_form' => 0,
-      ),
-      'widget' => array(
-        'active' => 1,
-        'module' => 'text',
-        'settings' => array(
-          'size' => '60',
-        ),
-        'type' => 'text_textfield',
-        'weight' => '14',
-      ),
-    ),
-  );
-
-  // Exported field: 'user-user-field_jabber'
-  $fields['user-user-field_jabber'] = array(
-    'field_config' => array(
-      'active' => '1',
-      'cardinality' => '1',
-      'deleted' => '0',
-      'entity_types' => array(),
-      'field_name' => 'field_jabber',
-      'foreign keys' => array(
-        'format' => array(
-          'columns' => array(
-            'format' => 'format',
-          ),
-          'table' => 'filter_format',
-        ),
-      ),
-      'indexes' => array(
-        'format' => array(
-          '0' => 'format',
-        ),
-      ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(
         'max_length' => '255',
@@ -298,6 +267,81 @@ function drupalfr_user_field_default_fields() {
           'type' => 'text_default',
           'weight' => '8',
         ),
+        'planete_author' => array(
+          'label' => 'inline',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '7',
+        ),
+      ),
+      'entity_type' => 'user',
+      'field_name' => 'field_icq',
+      'label' => 'ICQ',
+      'required' => 0,
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => 0,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'size' => '60',
+        ),
+        'type' => 'text_textfield',
+        'weight' => '10',
+      ),
+    ),
+  );
+
+  // Exported field: 'user-user-field_jabber'.
+  $fields['user-user-field_jabber'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_jabber',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
+      ),
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'text',
+      'settings' => array(
+        'max_length' => '255',
+      ),
+      'translatable' => '1',
+      'type' => 'text',
+    ),
+    'field_instance' => array(
+      'bundle' => 'user',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'inline',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => '9',
+        ),
+        'planete_author' => array(
+          'label' => 'inline',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '8',
+        ),
       ),
       'entity_type' => 'user',
       'field_name' => 'field_jabber',
@@ -314,12 +358,12 @@ function drupalfr_user_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'text_textfield',
-        'weight' => '15',
+        'weight' => '11',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_msn'
+  // Exported field: 'user-user-field_msn'.
   $fields['user-user-field_msn'] = array(
     'field_config' => array(
       'active' => '1',
@@ -329,6 +373,7 @@ function drupalfr_user_field_default_fields() {
       'field_name' => 'field_msn',
       'foreign keys' => array(),
       'indexes' => array(),
+      'locked' => '0',
       'module' => 'email',
       'settings' => array(),
       'translatable' => '1',
@@ -345,6 +390,12 @@ function drupalfr_user_field_default_fields() {
           'module' => 'email',
           'settings' => array(),
           'type' => 'email_default',
+          'weight' => '7',
+        ),
+        'planete_author' => array(
+          'label' => 'inline',
+          'settings' => array(),
+          'type' => 'hidden',
           'weight' => '6',
         ),
       ),
@@ -362,12 +413,12 @@ function drupalfr_user_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'email_textfield',
-        'weight' => '13',
+        'weight' => '9',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_nickname'
+  // Exported field: 'user-user-field_nickname'.
   $fields['user-user-field_nickname'] = array(
     'field_config' => array(
       'active' => '1',
@@ -385,9 +436,10 @@ function drupalfr_user_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(
         'max_length' => '255',
@@ -406,6 +458,12 @@ function drupalfr_user_field_default_fields() {
           'module' => 'text',
           'settings' => array(),
           'type' => 'text_default',
+          'weight' => '6',
+        ),
+        'planete_author' => array(
+          'label' => 'inline',
+          'settings' => array(),
+          'type' => 'hidden',
           'weight' => '3',
         ),
       ),
@@ -424,12 +482,12 @@ function drupalfr_user_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'text_textfield',
-        'weight' => '10',
+        'weight' => '6',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_picture'
+  // Exported field: 'user-user-field_picture'.
   $fields['user-user-field_picture'] = array(
     'field_config' => array(
       'active' => '1',
@@ -447,9 +505,10 @@ function drupalfr_user_field_default_fields() {
       ),
       'indexes' => array(
         'fid' => array(
-          '0' => 'fid',
+          0 => 'fid',
         ),
       ),
+      'locked' => '0',
       'module' => 'image',
       'settings' => array(
         'default_image' => 0,
@@ -465,9 +524,19 @@ function drupalfr_user_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
+          'module' => 'image',
+          'settings' => array(
+            'image_link' => '',
+            'image_style' => '',
+          ),
+          'type' => 'image',
+          'weight' => '0',
+        ),
+        'planete_author' => array(
+          'label' => 'hidden',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '1',
+          'weight' => '11',
         ),
       ),
       'entity_type' => 'user',
@@ -476,6 +545,7 @@ function drupalfr_user_field_default_fields() {
       'required' => 0,
       'settings' => array(
         'alt_field' => 0,
+        'default_image' => 0,
         'file_directory' => 'pictures',
         'file_extensions' => 'png gif jpg jpeg',
         'max_filesize' => '',
@@ -492,12 +562,12 @@ function drupalfr_user_field_default_fields() {
           'progress_indicator' => 'throbber',
         ),
         'type' => 'image_image',
-        'weight' => '8',
+        'weight' => '4',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_realname'
+  // Exported field: 'user-user-field_realname'.
   $fields['user-user-field_realname'] = array(
     'field_config' => array(
       'active' => '1',
@@ -515,9 +585,10 @@ function drupalfr_user_field_default_fields() {
       ),
       'indexes' => array(
         'format' => array(
-          '0' => 'format',
+          0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(
         'max_length' => '255',
@@ -532,11 +603,18 @@ function drupalfr_user_field_default_fields() {
       'description' => 'Votre nom complet. Ce champ sera visible publiquement, ne le remplissez pas si vous ne souhaitez pas révéler cette information.',
       'display' => array(
         'default' => array(
-          'label' => 'inline',
+          'label' => 'hidden',
           'module' => 'text',
           'settings' => array(),
           'type' => 'text_default',
-          'weight' => '2',
+          'weight' => '1',
+        ),
+        'planete_author' => array(
+          'label' => 'hidden',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'user',
@@ -554,12 +632,12 @@ function drupalfr_user_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'text_textfield',
-        'weight' => '9',
+        'weight' => '5',
       ),
     ),
   );
 
-  // Exported field: 'user-user-field_website'
+  // Exported field: 'user-user-field_website'.
   $fields['user-user-field_website'] = array(
     'field_config' => array(
       'active' => '1',
@@ -569,6 +647,7 @@ function drupalfr_user_field_default_fields() {
       'field_name' => 'field_website',
       'foreign keys' => array(),
       'indexes' => array(),
+      'locked' => '0',
       'module' => 'link',
       'settings' => array(
         'attributes' => array(
@@ -584,6 +663,7 @@ function drupalfr_user_field_default_fields() {
         'rel' => '',
         'target' => 'default',
         'title' => 'none',
+        'title_maxlength' => 128,
         'title_value' => '',
         'url' => 0,
       ),
@@ -600,8 +680,15 @@ function drupalfr_user_field_default_fields() {
           'label' => 'inline',
           'module' => 'link',
           'settings' => array(),
-          'type' => 'default',
+          'type' => 'link_default',
           'weight' => '4',
+        ),
+        'planete_author' => array(
+          'label' => 'hidden',
+          'module' => 'link',
+          'settings' => array(),
+          'type' => 'link_default',
+          'weight' => '2',
         ),
       ),
       'entity_type' => 'user',
@@ -609,17 +696,47 @@ function drupalfr_user_field_default_fields() {
       'label' => 'Site Internet',
       'required' => 0,
       'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'rel' => '',
+          'target' => 'default',
+        ),
+        'display' => array(
+          'url_cutoff' => 80,
+        ),
+        'enable_tokens' => 1,
+        'title' => 'optional',
+        'title_maxlength' => 128,
+        'title_value' => '',
+        'url' => 0,
         'user_register_form' => 0,
+        'validate_url' => 1,
       ),
       'widget' => array(
         'active' => 0,
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_field',
-        'weight' => '11',
+        'weight' => '7',
       ),
     ),
   );
+
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Avatar');
+  t('Biographie');
+  t('Evénements');
+  t('ICQ');
+  t('ID Jabber');
+  t('MSN');
+  t('Nom réel');
+  t('Site Internet');
+  t('Société');
+  t('Surnom IRC');
+  t('Votre nom complet. Ce champ sera visible publiquement, ne le remplissez pas si vous ne souhaitez pas révéler cette information.');
+  t('Votre société doit être inscrite dans <a href="/annuaire-pro">notre annuaire</a> pour pouvoir être référencée ici.');
+  t('Votre surnom (nickname) sur notre canal IRC (<a href="irc://irc.freenode.net/#drupalfr.org">#drupalfr.org sur freenode</a>).');
 
   return $fields;
 }
