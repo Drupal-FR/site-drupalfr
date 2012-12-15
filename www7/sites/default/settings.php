@@ -34,6 +34,9 @@ $conf['blocked_ips'] = array();
 // Invoking hooks is unnecessary in our case, no modules implement them.
 $conf['page_cache_invoke_hooks'] = FALSE;
 
+// FIXME: Uncomment this once theme is finished
+// $conf['maintenance_theme'] = 'dfrtheme';
+
 /**
  * Local settings (databases password, domain configuration, ...).
  */
