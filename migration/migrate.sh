@@ -58,5 +58,7 @@ drush cc all
 # Remove a useless redirection.
 drush php-eval "redirect_delete(1);"
 
+# Add some bits of customizations
+drush vset admin_theme seven
 
 echo "aller sur la page admin/migration et lancer la migration\n";
