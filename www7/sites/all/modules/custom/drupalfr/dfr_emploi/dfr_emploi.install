@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function dfr_emploi_install() {
+  // Create the terms for type de contrat
+  $machine_name = 'type_contrat';
+  $vocabulary = taxonomy_vocabulary_machine_name_load($machine_name);
+  $terms = array(
+    'CDD',
+    'CDI',
+    'Stage',
+  );
+  foreach ($terms as $term_machine_name => $term_name) {
+    $term = (object) array(
+      'vid' => $vocabulary->vid,
+      'vocabulary_machine_name' => $machine_name,
+      'name' => $term_name,
+    );
+    taxonomy_term_save($term);
+  }
+
+  // Create the terms for nature du poste
+  $machine_name = 'nature_popste';
+  $vocabulary = taxonomy_vocabulary_machine_name_load($machine_name);
+  $terms = array(
+    'Chef de projet',
+    'Développeur',
+    'Développeur senior',
+    'Intégrateur / thémeur',
+    'Exploitant',
+    'Hors technique',
+  );
+  foreach ($terms as $term_machine_name => $term_name) {
+    $term = (object) array(
+      'vid' => $vocabulary->vid,
+      'vocabulary_machine_name' => $machine_name,
+      'name' => $term_name,
+    );
+    taxonomy_term_save($term);
+  }
+}
