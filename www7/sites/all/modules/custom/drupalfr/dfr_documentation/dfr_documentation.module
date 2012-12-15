@@ -20,26 +20,21 @@ function dfr_documentation_page() {
   $output = array(
     'books' => array(
       '#prefix' => '<div id="documentation">',
-      '#suffix' => '</div>' 
-    )
+      '#suffix' => '</div>',
+    ),
   );
 
   $books = node_load_multiple(array(4395, 5037, 56, 9619, 4));
   foreach ($books as $book) {
-    $body = field_get_items('node', $book, 'body');
-    $output['books']['book-'.$book->nid] = array(
-      '#prefix' => '<div class="book book-'.$book->nid.'">', '#suffix'=>'</div>',
-      'title' => array(
-        '#markup' => '<h2>'. l($book->title, 'node/'. $book->nid) .'</h2>'
-      ),
-      'summary' => array(
-        '#markup' => '<p>'. text_summary($body[0]['value']) .'</p>'
-      ),
+    $output['books'][] = array(
+      'book' => entity_view('node', array($book), 'teaser'),
+      // FIXME: This should be a in specific template instead
       'children' => array(
-        '#markup' => book_children($book->book)
-      )
+        '#markup' => book_children($book->book),
+      ),
     );
   }
+
   return $output;
 }
 
