@@ -97,3 +97,85 @@
   .node-annuaire .field-items {width:70%;}
 }
 
+
+
+
+/** ******************************************************* **/
+/** Planete                                                 **/
+/** ******************************************************* **/
+
+.page-planete {}
+
+.node-planete {margin-bottom:1em;}
+.node-planete .field-type-image {margin:0;}
+.node-planete .field-type-image .field-items {
+  padding:0;
+  border:0;
+  background:none;
+  border-radius:0;
+  -moz-border-radius:0;
+  -webkit-border-radius:0;
+}
+.node-planete > header,
+.node-planete > .content {
+  display:inline-block;vertical-align: top;
+}
+.node-planete > header {width:15%;}
+.node-planete > .content {width:84%;}
+
+
+.field-name-field-planete-user {position:relative;}
+.field-name-field-planete-user .field-name-field-picture {}
+.field-name-field-planete-user .content {
+  display:none;
+  position:absolute;z-index:1;
+  top:66%;
+  left:-11.5em;
+  width:30em;
+  padding:1em;
+
+  border:1px solid #E4EAEF;
+  background:#fff;
+  border-radius: 5px;
+}
+.field-name-field-planete-user .content:after,
+.field-name-field-planete-user .content:before {
+  bottom: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.field-name-field-planete-user .content:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #ffffff;
+  border-width: 20px;
+  left: 50%;
+  margin-left: -20px;
+}
+.field-name-field-planete-user .content:before {
+  border-color: rgba(228, 234, 239, 0);
+  border-bottom-color: #E4EAEF;
+  border-width: 21px;
+  left: 50%;
+  margin-left: -21px;
+}
+
+
+.field-name-field-planete-user.expanded .content {display:block;}
+.field-name-field-planete-user .field-name-field-realname {
+  font-size:18px;
+  font-weight: bold;
+  margin-bottom:1em;
+}
+.field-name-field-planete-user .field-name-field-website {
+  margin-top:1em;
+}
+
+
+
+
+
+

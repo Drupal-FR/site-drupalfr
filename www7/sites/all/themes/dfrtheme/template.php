@@ -193,6 +193,11 @@ function dfrtheme_field__taxonomy_term_reference($vars) {
   return $output;
 }
 
+function dfrtheme_preprocess_user_profile(&$vars) {
+  // dpm(array_keys($vars));
+  // $vars['classes_array'][] = 'user-profile-'.$vars['view_mode'];
+}
+
 /**
  *  Return a themed breadcrumb trail
  */
