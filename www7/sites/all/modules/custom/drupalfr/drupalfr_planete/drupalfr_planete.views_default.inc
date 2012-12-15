@@ -106,8 +106,9 @@ function drupalfr_planete_views_default_views() {
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Planète (latest block)';
+  $handler->display->display_options['use_more'] = TRUE;
   $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['use_more_text'] = 'plus';
+  $handler->display->display_options['use_more_text'] = 'Voir plus d\'articles';
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
@@ -130,7 +131,8 @@ function drupalfr_planete_views_default_views() {
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = '';
   $handler->display->display_options['fields']['created']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['created']['date_format'] = 'long';
+  $handler->display->display_options['fields']['created']['date_format'] = 'custom';
+  $handler->display->display_options['fields']['created']['custom_date_format'] = 'l j F Y';
   /* Sort criterion: Contenu: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -150,13 +152,14 @@ function drupalfr_planete_views_default_views() {
   $translatables['planete_block'] = array(
     t('Master'),
     t('Planète (latest block)'),
-    t('plus'),
+    t('Voir plus d\'articles'),
     t('Apply'),
     t('Réinitialiser'),
     t('Sort by'),
     t('Asc'),
     t('Desc'),
     t('Block'),
+    t('plus'),
   );
   $export['planete_block'] = $view;
 
