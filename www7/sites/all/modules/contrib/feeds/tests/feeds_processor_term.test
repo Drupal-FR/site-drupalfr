@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_processor_term.test,v 1.5.2.3 2010/10/06 14:12:43 alexb Exp $
 
 /**
  * @file
@@ -10,29 +9,12 @@
  * Test aggregating a feed as data records.
  */
 class FeedsCSVtoTermsTest extends FeedsWebTestCase {
-
-  /**
-   * Describe this test.
-   */
-  public function getInfo() {
+  public static function getInfo() {
     return array(
-      'name' => t('CSV import to taxonomy'),
-      'description' => t('Tests a standalone import configuration that uses file fetcher and CSV parser to import taxonomy terms from a CSV file.'),
-      'group' => t('Feeds'),
+      'name' => 'CSV import to taxonomy',
+      'description' => 'Tests a standalone import configuration that uses file fetcher and CSV parser to import taxonomy terms from a CSV file.',
+      'group' => 'Feeds',
     );
-  }
-
-  /**
-   * Set up test.
-   */
-  public function setUp() {
-    parent::setUp();
-
-    $this->drupalLogin($this->drupalCreateUser(array(
-      'access content',
-      'administer feeds',
-      'administer taxonomy',
-    )));
   }
 
   /**
@@ -48,7 +30,7 @@ class FeedsCSVtoTermsTest extends FeedsWebTestCase {
     $this->setPlugin('term_import', 'FeedsCSVParser');
     $this->setPlugin('term_import', 'FeedsTermProcessor');
     $mappings = array(
-      '0' => array(
+      0 => array(
         'source' => 'name',
         'target' => 'name',
         'unique' => 1,
@@ -60,7 +42,7 @@ class FeedsCSVtoTermsTest extends FeedsWebTestCase {
     $edit = array(
       'content_type' => '',
     );
-    $this->drupalPost('admin/structure/feeds/edit/term_import/settings', $edit, 'Save');
+    $this->drupalPost('admin/structure/feeds/term_import/settings', $edit, 'Save');
 
     $edit = array(
       'name' => 'Addams vocabulary',
@@ -71,10 +53,10 @@ class FeedsCSVtoTermsTest extends FeedsWebTestCase {
     $edit = array(
       'vocabulary' => 'addams',
     );
-    $this->drupalPost('admin/structure/feeds/edit/term_import/settings/FeedsTermProcessor', $edit, t('Save'));
+    $this->drupalPost('admin/structure/feeds/term_import/settings/FeedsTermProcessor', $edit, t('Save'));
 
     // Import and assert.
-    $this->importFile('term_import', $this->absolutePath() .'/tests/feeds/users.csv');
+    $this->importFile('term_import', $this->absolutePath() . '/tests/feeds/users.csv');
     $this->assertText('Created 5 terms');
     $this->drupalGet('admin/structure/taxonomy/addams');
     $this->assertText('Morticia');
@@ -83,8 +65,16 @@ class FeedsCSVtoTermsTest extends FeedsWebTestCase {
     $this->assertText('Pugsley');
 
     // Import again.
-    $this->importFile('term_import', $this->absolutePath() .'/tests/feeds/users.csv');
+    $this->importFile('term_import', $this->absolutePath() . '/tests/feeds/users.csv');
     $this->assertText('There are no new terms.');
+
+    // Force update.
+    $this->setSettings('term_import', 'FeedsTermProcessor', array(
+      'skip_hash_check' => TRUE,
+      'update_existing' => 2,
+    ));
+    $this->importFile('term_import', $this->absolutePath() . '/tests/feeds/users.csv');
+    $this->assertText('Updated 5 terms.');
 
     // Add a term manually, delete all terms, this term should still stand.
     $edit = array(

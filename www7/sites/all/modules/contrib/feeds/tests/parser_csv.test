@@ -1,5 +1,4 @@
 <?php
-// $Id: parser_csv.test,v 1.2.2.1 2010/09/29 23:56:10 alexb Exp $
 
 /**
  * @file
@@ -16,14 +15,11 @@
 class ParserCSVTest extends DrupalWebTestCase  {
   protected $profile = 'testing';
 
-  /**
-   * Describe this test.
-   */
-  public function getInfo() {
+  public static function getInfo() {
     return array(
-      'name' => t('CSV Parser unit tests'),
-      'description' => t('Base level test for Feeds\' built in CSV parser.'),
-      'group' => t('Feeds'),
+      'name' => 'CSV Parser unit tests',
+      'description' => 'Base level test for Feeds\' built in CSV parser.',
+      'group' => 'Feeds',
     );
   }
 
@@ -42,8 +38,8 @@ class ParserCSVTest extends DrupalWebTestCase  {
    * Simple test of parsing functionality.
    */
   protected function _testSimple() {
-    $file =  $this->absolutePath() .'/tests/feeds/nodes.csv';
-    include $this->absolutePath() .'/tests/feeds/nodes.csv.php';
+    $file =  $this->absolutePath() . '/tests/feeds/nodes.csv';
+    include $this->absolutePath() . '/tests/feeds/nodes.csv.php';
 
     $iterator = new ParserCSVIterator($file);
     $parser = new ParserCSV();
@@ -57,8 +53,8 @@ class ParserCSVTest extends DrupalWebTestCase  {
    * Test batching.
    */
   protected function _testBatching() {
-    $file =  $this->absolutePath() .'/tests/feeds/nodes.csv';
-    include $this->absolutePath() .'/tests/feeds/nodes.csv.php';
+    $file =  $this->absolutePath() . '/tests/feeds/nodes.csv';
+    include $this->absolutePath() . '/tests/feeds/nodes.csv.php';
 
     // Set up parser with 2 lines to parse per call.
     $iterator = new ParserCSVIterator($file);
@@ -84,6 +80,6 @@ class ParserCSVTest extends DrupalWebTestCase  {
    * Absolute path to feeds.
    */
   public function absolutePath() {
-    return DRUPAL_ROOT .'/'. drupal_get_path('module', 'feeds');
+    return DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
   }
 }

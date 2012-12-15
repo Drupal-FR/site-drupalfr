@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_date_time.test,v 1.1.4.2 2010/09/29 23:56:10 alexb Exp $
 
 /**
  * @file
@@ -13,25 +12,20 @@
  * Not inheriting from Feeds base class as ParserCSV should be moved out of
  * Feeds at some time.
  */
-class FeedsDateTimeTest extends DrupalWebTestCase  {
+class FeedsDateTimeTest extends FeedsWebTestCase {
   protected $profile = 'testing';
 
-  /**
-   * Describe this test.
-   */
-  public function getInfo() {
+  public static function getInfo() {
     return array(
-      'name' => t('FeedsDateTime unit tests'),
-      'description' => t('Unit tests for Feeds date handling.'),
-      'group' => t('Feeds'),
+      'name' => 'FeedsDateTime unit tests',
+      'description' => 'Unit tests for Feeds date handling.',
+      'group' => 'Feeds',
     );
   }
 
-  /**
-   * Set up.
-   */
   public function setUp() {
-    parent::setUp('feeds', 'feeds_ui', 'ctools', 'job_scheduler');
+    parent::setUp();
+    module_load_include('inc', 'feeds' , 'plugins/FeedsParser');
   }
 
   /**

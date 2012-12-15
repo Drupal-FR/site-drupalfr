@@ -1,5 +1,4 @@
 <?php
-// $Id: file.inc,v 1.1.2.3 2010/10/28 18:26:26 alexb Exp $
 
 /**
  * @file
@@ -22,7 +21,7 @@ function file_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_nam
 
     if (in_array($info['type'], array('file', 'image'))) {
       $targets[$name] = array(
-        'name' => $instance['label'],
+        'name' => check_plain($instance['label']),
         'callback' => 'file_feeds_set_target',
         'description' => t('The @label field of the node.', array('@label' => $instance['label'])),
       );
@@ -50,7 +49,7 @@ function file_feeds_set_target($source, $entity, $target, $value) {
   foreach ($value as $k => $v) {
     if (!($v instanceof FeedsEnclosure)) {
       if (is_string($v)) {
-        $value[$k] = new FeedsEnclosure($v, 'application/octet-stream');
+        $value[$k] = new FeedsEnclosure($v, file_get_mimetype($v));
       }
       else {
         unset($value[$k]);
@@ -66,14 +65,23 @@ function file_feeds_set_target($source, $entity, $target, $value) {
   list($entity_id, $vid, $bundle_name) = entity_extract_ids($entity->feeds_item->entity_type, $entity);
   $instance_info = field_info_instance($entity->feeds_item->entity_type, $target, $bundle_name);
   $info = field_info_field($target);
-  $account = !empty($entity->uid) ? user_load($entity->uid) : NULL;
-  $destination = file_field_widget_uri($info, $instance_info, $account);
+  $data = array();
+  if (!empty($entity->uid)) {
+    $data[$entity->feeds_item->entity_type] = $entity;
+  }
+  $destination = file_field_widget_uri($info, $instance_info, $data);
 
   // Populate entity.
   $i = 0;
   $field = isset($entity->$target) ? $entity->$target : array();
   foreach ($value as $v) {
-    if ($file = $v->getFile($destination)) {
+    try {
+      $file = $v->getFile($destination);
+    }
+    catch (Exception $e) {
+      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
+    }
+    if ($file) {
       $field['und'][$i] = (array)$file;
       $field['und'][$i]['display'] = 1; // @todo: Figure out how to properly populate this field.
       if ($info['cardinality'] == 1) {

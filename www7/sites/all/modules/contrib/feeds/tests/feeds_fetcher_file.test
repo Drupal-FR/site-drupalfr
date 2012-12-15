@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_fetcher_file.test,v 1.1.2.3 2010/10/27 22:33:32 alexb Exp $
 
 /**
  * @file
@@ -10,15 +9,11 @@
  * File fetcher test class.
  */
 class FeedsFileFetcherTestCase extends FeedsWebTestCase {
-
-  /**
-   * Describe this test.
-   */
-  public function getInfo() {
+  public static function getInfo() {
     return array(
-      'name' => t('File fetcher'),
-      'description' => t('Tests for file fetcher plugin.'),
-      'group' => t('Feeds'),
+      'name' => 'File fetcher',
+      'description' => 'Tests for file fetcher plugin.',
+      'group' => 'Feeds',
     );
   }
 
@@ -33,7 +28,7 @@ class FeedsFileFetcherTestCase extends FeedsWebTestCase {
     $edit = array(
       'content_type' => '',
     );
-    $this->drupalPost('admin/structure/feeds/edit/node/settings', $edit, 'Save');
+    $this->drupalPost('admin/structure/feeds/node/settings', $edit, 'Save');
     $this->setPlugin('node', 'FeedsFileFetcher');
     $this->setPlugin('node', 'FeedsCSVParser');
     $mappings = array(

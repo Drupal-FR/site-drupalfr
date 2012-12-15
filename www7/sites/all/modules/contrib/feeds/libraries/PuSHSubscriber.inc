@@ -85,7 +85,9 @@ class PuSHSubscriber {
           $self = (string) $self->attributes()->href;
         }
       }
-      catch (Exception $e) {}
+      catch (Exception $e) {
+        // Do nothing.
+      }
     }
     curl_close($request);
     // Fall back to $url if $self is not given.
@@ -215,14 +217,14 @@ class PuSHSubscriber {
         $verify = TRUE;
       }
       if ($verify) {
-        header('HTTP/1.1 200 "Found"', null, 200);
+        header('HTTP/1.1 200 "Found"', NULL, 200);
         print $_GET['hub_challenge'];
-        exit();
+        drupal_exit();
       }
     }
-    header('HTTP/1.1 404 "Not Found"', null, 404);
+    header('HTTP/1.1 404 "Not Found"', NULL, 404);
     $this->log('Could not verify subscription.', 'error');
-    exit();
+    drupal_exit();
   }
 
   /**
@@ -242,7 +244,7 @@ class PuSHSubscriber {
    * @todo Make concurrency safe.
    */
   protected function request($hub, $topic, $mode, $callback_url) {
-    $secret = hash('sha1', uniqid(rand(), true));
+    $secret = hash('sha1', uniqid(rand(), TRUE));
     $post_fields = array(
       'hub.callback' => $callback_url,
       'hub.mode' => $mode,
@@ -265,7 +267,7 @@ class PuSHSubscriber {
       $this->log("Positive response to \"$mode\" request ($code).");
     }
     else {
-      $sub->status = $mode .' failed';
+      $sub->status = $mode . ' failed';
       $sub->save();
       $this->log("Error issuing \"$mode\" request to $hub ($code).", 'error');
     }

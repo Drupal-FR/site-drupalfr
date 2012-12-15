@@ -1,5 +1,9 @@
 <?php
-// $Id: FeedsSyndicationParser.inc,v 1.18.2.2 2010/10/25 23:59:31 alexb Exp $
+
+/**
+ * @file
+ * Contains FeedsSyndicationParser and related classes.
+ */
 
 /**
  * Class definition for Common Syndication Parser.
@@ -72,6 +76,6 @@ class FeedsSyndicationParser extends FeedsParser {
         'name' => t('Geo Locations'),
         'description' => t('An array of geographic locations with a name and a position.'),
       ),
-     ) + parent::getMappingSources();
+    ) + parent::getMappingSources();
   }
 }

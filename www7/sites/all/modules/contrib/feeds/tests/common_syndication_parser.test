@@ -1,5 +1,9 @@
 <?php
-// $Id: common_syndication_parser.test,v 1.5 2010/09/15 19:27:42 alexb Exp $
+
+/**
+ * @file
+ * Tests for the common syndication parser.
+ */
 
 /**
  * Test cases for common syndication parser library.
@@ -8,22 +12,16 @@
  * @todo Could I use DrupalUnitTestCase here?
  */
 class CommonSyndicationParserTestCase extends DrupalWebTestCase {
-  /**
-   * Describe this test.
-   */
-  public function getInfo() {
+  public static function getInfo() {
     return array(
-      'name' => t('Common Syndication Parser'),
-      'description' => t('Unit tests for Common Syndication Parser.'),
-      'group' => t('Feeds'),
+      'name' => 'Common Syndication Parser',
+      'description' => 'Unit tests for Common Syndication Parser.',
+      'group' => 'Feeds',
     );
   }
 
-  /**
-   * Set up.
-   */
   public function setUp() {
-    parent::setUp('feeds', 'feeds_ui', 'ctools', 'job_scheduler');
+    parent::setUp(array('feeds', 'feeds_ui', 'ctools', 'job_scheduler'));
     feeds_include_library('common_syndication_parser.inc', 'common_syndication_parser');
   }
 
@@ -88,7 +86,7 @@ class CommonSyndicationParserTestCase extends DrupalWebTestCase {
    * Helper to read a feed.
    */
   protected function readFeed($filename) {
-    $feed = dirname(__FILE__) .'/feeds/'. $filename;
+    $feed = dirname(__FILE__) . '/feeds/' . $filename;
     $handle = fopen($feed, 'r');
     $string = fread($handle, filesize($feed));
     fclose($handle);

@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds.views.inc,v 1.4.2.3 2010/10/26 03:05:58 alexb Exp $
 
 /**
  * @file
@@ -199,7 +198,7 @@ function feeds_views_data() {
     'title' => 'Importer id',
     'help' => 'The id of an importer.',
     'field' => array(
-      'handler' => 'feeds_views_handler_field',
+      'handler' => 'views_handler_field',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -235,7 +234,7 @@ function feeds_views_data() {
     'title' => 'Feed node id',
     'help' => 'Contains the node id of a feed node if the feed\'s configuration is attached to a content type, otherwise contains 0.',
     'field' => array(
-      'handler' => 'feeds_views_handler_field_numeric',
+      'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
     ),
     'filter' => array(

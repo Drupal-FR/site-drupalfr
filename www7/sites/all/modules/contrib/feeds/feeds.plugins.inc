@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds.plugins.inc,v 1.7.2.1 2010/10/04 20:49:28 alexb Exp $
 
 /**
  * @file
@@ -10,7 +9,7 @@
  * Break out for feeds_feed_plugins().
  */
 function _feeds_feeds_plugins() {
-  $path = drupal_get_path('module', 'feeds') .'/plugins';
+  $path = drupal_get_path('module', 'feeds') . '/plugins';
 
   $info = array();
   $info['FeedsPlugin'] = array(
@@ -107,7 +106,7 @@ function _feeds_feeds_plugins() {
       'path' => $path,
     ),
   );
-  if (feeds_library_exists('simplepie.inc', 'simplepie')) {
+  if (feeds_simplepie_exists()) {
     $info['FeedsSimplePieParser'] = array(
       'name' => 'SimplePie parser',
       'description' => 'Parse RSS and Atom feeds.',

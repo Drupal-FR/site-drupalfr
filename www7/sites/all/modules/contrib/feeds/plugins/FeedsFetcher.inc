@@ -1,5 +1,9 @@
 <?php
-// $Id: FeedsFetcher.inc,v 1.7.4.3 2010/10/29 20:05:16 yhahn Exp $
+
+/**
+ * @file
+ * Contains the FeedsFetcher and related classes.
+ */
 
 /**
  * Base class for all fetcher results.
@@ -45,7 +49,7 @@ class FeedsFetcherResult extends FeedsResult {
         throw new Exception(t('Feeds directory either cannot be created or is not writable.'));
       }
       $this->file_path = FALSE;
-      if ($file = file_save_data($this->getRaw(), $destination . '/'. get_class($this) . REQUEST_TIME)) {
+      if ($file = file_save_data($this->getRaw(), $destination . '/' . get_class($this) . REQUEST_TIME)) {
         $file->status = 0;
         file_save($file);
         $this->file_path = $file->uri;
@@ -68,7 +72,7 @@ class FeedsFetcherResult extends FeedsResult {
    *   The sanitized content as a string.
    */
   public function sanitizeRaw($raw) {
-    if (substr($raw, 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
+    if (substr($raw, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
       $raw = substr($raw, 3);
     }
     return $raw;
@@ -90,7 +94,7 @@ class FeedsFetcherResult extends FeedsResult {
     fclose($handle);
     // If BOM header is present, read entire contents of file and overwrite
     // the file with corrected contents.
-    if (substr($line, 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
+    if (substr($line, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
       $contents = file_get_contents($filepath);
       $contents = substr($contents, 3);
       $status = file_put_contents($filepath, $contents);

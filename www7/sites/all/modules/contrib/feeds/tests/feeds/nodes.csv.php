@@ -1,5 +1,4 @@
 <?php
-// $Id: nodes.csv.php,v 1.1 2010/07/10 23:45:36 alexb Exp $
 /**
  * @file
  * Result of nodes.csv file parsed by ParserCSV.inc

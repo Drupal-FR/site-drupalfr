@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_mapper_field.test,v 1.1.2.2 2010/10/06 14:12:43 alexb Exp $
 
 /**
  * @file
@@ -10,41 +9,24 @@
  * Class for testing Feeds field mapper.
  */
 class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
-
   public static function getInfo() {
     return array(
-      'name' => t('Mapper: Fields'),
-      'description' => t('Test Feeds Mapper support for fields.'),
-      'group' => t('Feeds'),
+      'name' => 'Mapper: Fields',
+      'description' => 'Test Feeds Mapper support for fields.',
+      'group' => 'Feeds',
     );
   }
 
-  /**
-   * Set up the test.
-   */
-  function setUp() {
-    // Call parent setup with required modules.
-    parent::setUp();
-
-    // Create user and login.
-    $this->drupalLogin($this->drupalCreateUser(array(
-      'access content',
-      'administer content types',
-      'administer feeds',
-      'administer nodes',
-      'administer site configuration',
-      'administer permissions',
-      'bypass node access',
-    )));
+  public function setUp() {
+    parent::setUp(array('number'));
   }
 
   /**
    * Basic test loading a double entry CSV file.
    */
   function test() {
-
     // Create content type.
-    $typename = $this->createContentType(NULL, array(
+    $typename = $this->createContentType(array(), array(
       'alpha' => 'text',
       'beta' => 'number_integer',
       'gamma' => 'number_decimal',
@@ -53,43 +35,43 @@ class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
 
     // Create and configure importer.
     $this->createImporterConfiguration('Content CSV', 'csv');
-    $this->setSettings('csv', NULL, array('content_type' => '','import_period' => FEEDS_SCHEDULE_NEVER,));
+    $this->setSettings('csv', NULL, array('content_type' => '', 'import_period' => FEEDS_SCHEDULE_NEVER));
     $this->setPlugin('csv', 'FeedsFileFetcher');
     $this->setPlugin('csv', 'FeedsCSVParser');
     $this->setSettings('csv', 'FeedsNodeProcessor', array('content_type' => $typename));
     $this->addMappings('csv', array(
-      array(
+      0 => array(
         'source' => 'title',
         'target' => 'title',
       ),
-      array(
+      1 => array(
         'source' => 'created',
         'target' => 'created',
       ),
-      array(
+      2 => array(
         'source' => 'body',
         'target' => 'body',
       ),
-      array(
+      3 => array(
         'source' => 'alpha',
         'target' => 'field_alpha',
       ),
-      array(
+      4 => array(
         'source' => 'beta',
         'target' => 'field_beta',
       ),
-      array(
+      5 => array(
         'source' => 'gamma',
         'target' => 'field_gamma',
       ),
-      array(
+      6 => array(
         'source' => 'delta',
         'target' => 'field_delta',
       ),
     ));
 
     // Import CSV file.
-    $this->importFile('csv', $this->absolutePath() .'/tests/feeds/content.csv');
+    $this->importFile('csv', $this->absolutePath() . '/tests/feeds/content.csv');
     $this->assertText('Created 2 nodes');
 
     // Check the two imported files.

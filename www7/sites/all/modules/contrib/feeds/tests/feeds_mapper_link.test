@@ -1,42 +1,25 @@
 <?php
-// $Id: feeds_mapper_link.test,v 1.5.4.4 2010/11/01 19:08:59 tristanoneil Exp $
 
 /**
  * @file
  * Test case for CCK link mapper mappers/date.inc.
  */
 
-require_once(drupal_get_path('module', 'feeds') . '/tests/feeds_mapper_test.inc');
-
 /**
  * Class for testing Feeds <em>link</em> mapper.
  */
 class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
-
   public static function getInfo() {
     return array(
-      'name' => t('Mapper: Link'),
-      'description' => t('Test Feeds Mapper support for Link fields. <strong>Requires Link module</strong>.'),
-      'group' => t('Feeds'),
+      'name' => 'Mapper: Link',
+      'description' => 'Test Feeds Mapper support for Link fields.',
+      'group' => 'Feeds',
+      'dependencies' => array('link'),
     );
   }
 
-  /**
-   * Set up the test.
-   */
   public function setUp() {
-    // Call parent setup with the required module
     parent::setUp(array('link'));
-
-    // Create user and login
-    $this->drupalLogin($this->drupalCreateUser(
-        array(
-          'administer content types',
-          'administer feeds',
-          'bypass node access',
-          'administer site configuration',
-        )
-    ));
   }
 
   /**
@@ -46,30 +29,30 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
     $static_title = $this->randomName();
 
     // Create content type.
-    $typename = $this->createContentType(NULL, array(
+    $typename = $this->createContentType(array(), array(
       'alpha' => array(
         'type' => 'link_field',
-        'settings' => array(
-          'field[settings][title]' => 'required',
+        'instance_settings' => array(
+          'instance[settings][title]' => 'required',
         ),
       ),
       'beta' => array(
         'type' => 'link_field',
-        'settings' => array(
-          'field[settings][title]' => 'none',
+        'instance_settings' => array(
+          'instance[settings][title]' => 'none',
         ),
       ),
       'gamma' => array(
         'type' => 'link_field',
-        'settings' => array(
-          'field[settings][title]' => 'optional',
+        'instance_settings' => array(
+          'instance[settings][title]' => 'optional',
         ),
       ),
       'omega' => array(
       'type' => 'link_field',
-        'settings' => array(
-          'field[settings][title]' => 'value',
-          'field[settings][title_value]' => $static_title,
+        'instance_settings' => array(
+          'instance[settings][title]' => 'value',
+          'instance[settings][title_value]' => $static_title,
         ),
       ),
     ));
@@ -78,39 +61,39 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
     $this->createImporterConfiguration(); //Create a default importer configuration
     $this->setSettings('syndication', 'FeedsNodeProcessor', array('content_type' => $typename)); //Processor settings
     $this->addMappings('syndication', array(
-      array(
+      0 => array(
         'source' => 'title',
         'target' => 'title'
       ),
-      array(
+      1 => array(
         'source' => 'timestamp',
         'target' => 'created'
       ),
-      array(
+      2 => array(
         'source' => 'description',
         'target' => 'body'
       ),
-      array(
+      3 => array(
         'source' => 'url',
         'target' => 'field_alpha:url'
       ),
-      array(
+      4 => array(
         'source' => 'title',
         'target' => 'field_alpha:title'
       ),
-      array(
+      5 => array(
         'source' => 'url',
         'target' => 'field_beta:url'
       ),
-      array(
+      6 => array(
         'source' => 'url',
         'target' => 'field_gamma:url'
       ),
-      array(
+      7 => array(
         'source' => 'title',
         'target' => 'field_gamma:title'
       ),
-      array(
+      8 => array(
         'source' => 'url',
         'target' => 'field_omega:url'
       ),
@@ -141,7 +124,7 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
    * Override parent::getFormFieldsNames().
    */
   protected function getFormFieldsNames($field_name, $index) {
-    if(in_array($field_name, array('alpha', 'beta', 'gamma', 'omega'))) {
+    if (in_array($field_name, array('alpha', 'beta', 'gamma', 'omega'))) {
       $fields = array("field_{$field_name}[und][{$index}][url]");
       if (in_array($field_name, array('alpha', 'gamma'))) {
         $fields[] = "field_{$field_name}[und][{$index}][title]";

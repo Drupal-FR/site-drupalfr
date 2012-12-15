@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds.pages.inc,v 1.34.2.7 2010/10/27 00:13:24 alexb Exp $
 
 /**
  * @file
@@ -16,16 +15,19 @@ function feeds_page() {
       if ($importer->disabled) {
         continue;
       }
-      if (!(user_access('import '. $importer->id .' feeds') || user_access('administer feeds'))) {
+      if (!(user_access('import ' . $importer->id . ' feeds') || user_access('administer feeds'))) {
         continue;
       }
       if (empty($importer->config['content_type'])) {
-        $link = 'import/'. $importer->id;
+        $link = 'import/' . $importer->id;
         $title = $importer->config['name'];
       }
-      elseif (user_access('create '. $importer->config['content_type'] .' content')) {
-        $link = 'node/add/'. str_replace('_', '-', $importer->config['content_type']);
+      elseif (node_access('create', $importer->config['content_type'])) {
+        $link = 'node/add/' . str_replace('_', '-', $importer->config['content_type']);
         $title = node_type_get_name($importer->config['content_type']);
+      }
+      else {
+        continue;
       }
       $rows[] = array(
         l($title, $link),
@@ -34,7 +36,7 @@ function feeds_page() {
     }
   }
   if (empty($rows)) {
-    drupal_set_message(t('There are no importers, go to !importers to create one or enable an existing one.', array('!importers' => l(t('Feeds importers'), 'admin/structure/feeds'))));
+    drupal_set_message(t('There are no importers, go to <a href="@importers">Feed importers</a> to create one or enable an existing one.', array('@importers' => url('admin/structure/feeds'))));
   }
   $header = array(
     t('Import'),
@@ -59,12 +61,16 @@ function feeds_import_form($form, &$form_state, $importer_id) {
     '#tree' => TRUE,
     '#value' => feeds_source_status($source),
   );
-  $form['feeds'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Import'),
-    '#tree' => TRUE,
-  );
-  $form['feeds'] += $source->configForm($form_state);
+
+  $source_form = $source->configForm($form_state);
+  if (!empty($source_form)) {
+    $form['feeds'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Import'),
+      '#tree' => TRUE,
+    ) + $source_form;
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Import'),
@@ -90,11 +96,13 @@ function feeds_import_form_validate($form, &$form_state) {
  * Submit handler for feeds_import_form().
  */
 function feeds_import_form_submit($form, &$form_state) {
-
   // Save source and import.
   $source = feeds_source($form['#importer_id']);
-  $source->addConfig($form_state['values']['feeds']);
-  $source->save();
+
+  if (!empty($form_state['values']['feeds']) && is_array($form_state['values']['feeds'])) {
+    $source->addConfig($form_state['values']['feeds']);
+    $source->save();
+  }
 
   // Refresh feed if import on create is selected.
   if ($source->importer->config['import_on_create']) {
@@ -116,14 +124,14 @@ function feeds_import_tab_form($form, &$form_state, $node) {
   $form = array();
   $form['#feed_nid'] = $node->nid;
   $form['#importer_id'] = $importer_id;
-  $form['#redirect'] = 'node/'. $node->nid;
+  $form['#redirect'] = 'node/' . $node->nid;
   $form['source_status'] = array(
     '#type' => 'fieldset',
     '#title' => t('Status'),
     '#tree' => TRUE,
     '#value' => feeds_source_status($source),
   );
-  $form = confirm_form($form, t('Import all content from source?'), 'node/'. $node->nid, '', t('Import'), t('Cancel'), 'confirm feeds update');
+  $form = confirm_form($form, t('Import all content from source?'), 'node/' . $node->nid, '', t('Import'), t('Cancel'), 'confirm feeds update');
   $progress = $source->progressImporting();
   if ($progress !== FEEDS_BATCH_COMPLETE) {
     $form['actions']['submit']['#disabled'] = TRUE;
@@ -186,6 +194,65 @@ function feeds_delete_tab_form_submit($form, &$form_state) {
 }
 
 /**
+ * Render a feeds unlock form.
+ *
+ * Used on both node pages and configuration pages.
+ * Therefore $node may be missing.
+ */
+function feeds_unlock_tab_form($form, &$form_state, $importer_id, $node = NULL) {
+  if (empty($node)) {
+    $source = feeds_source($importer_id);
+    $form['#redirect'] = 'import/' . $source->id;
+  }
+  else {
+    $importer_id = feeds_get_importer_id($node->type);
+    $source = feeds_source($importer_id, $node->nid);
+    $form['#redirect'] = 'node/' . $source->feed_nid;
+  }
+  // Form cannot pass on source object.
+  $form['#importer_id'] = $source->id;
+  $form['#feed_nid'] = $source->feed_nid;
+  $form['source_status'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Status'),
+    '#tree' => TRUE,
+    '#value' => feeds_source_status($source),
+  );
+  $form = confirm_form($form, t('Unlock this importer?'), $form['#redirect'], '', t('Delete'), t('Cancel'), 'confirm feeds update');
+  if ($source->progressImporting() == FEEDS_BATCH_COMPLETE && $source->progressClearing() == FEEDS_BATCH_COMPLETE) {
+    $form['source_locked'] = array(
+      '#type' => 'markup',
+      '#title' => t('Not Locked'),
+      '#tree' => TRUE,
+      '#markup' => t('This importer is not locked, therefore it cannot be unlocked.'),
+    );
+    $form['actions']['submit']['#disabled'] = TRUE;
+    $form['actions']['submit']['#value'] = t('Unlock (disabled)');
+  }
+  else {
+    $form['actions']['submit']['#value'] = t('Unlock');
+  }
+  return $form;
+}
+
+/**
+ * Form submit handler. Resets all feeds state.
+ */
+function feeds_unlock_tab_form_submit($form, &$form_state) {
+  drupal_set_message(t('Import Unlocked'));
+  $form_state['redirect'] = $form['#redirect'];
+  $feed_nid = empty($form['#feed_nid']) ? 0 : $form['#feed_nid'];
+  $importer_id = $form['#importer_id'];
+
+  //Is there a more API-friendly way to set the state?
+  db_update('feeds_source')
+    ->condition('id', $importer_id)
+    ->condition('feed_nid', $feed_nid)
+    ->fields(array('state' => FALSE))
+    ->execute();
+}
+
+/**
  * Handle a fetcher callback.
  */
 function feeds_fetcher_callback($importer, $feed_nid = 0) {
@@ -193,7 +260,9 @@ function feeds_fetcher_callback($importer, $feed_nid = 0) {
     try {
       return $importer->fetcher->request($feed_nid);
     }
-    catch(Exception $e) {}
+    catch (Exception $e) {
+      // Do nothing.
+    }
   }
   drupal_access_denied();
 }
@@ -264,7 +333,7 @@ function theme_feeds_source_status($v) {
  */
 function theme_feeds_upload($variables) {
   $element = $variables['element'];
-  drupal_add_css(drupal_get_path('module', 'feeds') .'/feeds.css');
+  drupal_add_css(drupal_get_path('module', 'feeds') . '/feeds.css');
   _form_set_class($element, array('form-file'));
   $description = '';
   if (!empty($element['#file_info'])) {
@@ -283,7 +352,7 @@ function theme_feeds_upload($variables) {
     $description .= '</div>';
   }
   $description .= '<div class="file-upload">';
-  $description .= '<input type="file" name="'. $element['#name'] .'"'. ($element['#attributes'] ? ' '. drupal_attributes($element['#attributes']) : '') .' id="'. $element['#id'] .'" size="'. $element['#size'] ."\" />\n";
+  $description .= '<input type="file" name="' . $element['#name'] . '"' . ($element['#attributes'] ? ' ' . drupal_attributes($element['#attributes']) : '') . ' id="' . $element['#id'] . '" size="' . $element['#size'] . "\" />\n";
   $description .= '</div>';
   $element['#description'] = $description;
 

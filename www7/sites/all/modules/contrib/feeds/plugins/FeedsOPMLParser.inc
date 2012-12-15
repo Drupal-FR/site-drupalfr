@@ -1,5 +1,4 @@
 <?php
-// $Id: FeedsOPMLParser.inc,v 1.7.2.3 2010/10/25 23:59:31 alexb Exp $
 
 /**
  * @file

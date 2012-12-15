@@ -1,5 +1,4 @@
 <?php
-// $Id: FeedsSource.inc,v 1.26.2.9 2010/12/06 20:35:06 alexb Exp $
 
 /**
  * @file
@@ -55,12 +54,12 @@ interface FeedsSourceInterface {
   public function sourceFormValidate(&$source_config);
 
   /**
-   * A source is being deleted.
+   * A source is being saved.
    */
   public function sourceSave(FeedsSource $source);
 
   /**
-   * A source is being saved.
+   * A source is being deleted.
    */
   public function sourceDelete(FeedsSource $source);
 }
@@ -183,7 +182,7 @@ class FeedsSource extends FeedsConfigurable {
    * Instantiate a unique object per class/id/feed_nid. Don't use
    * directly, use feeds_source() instead.
    */
-  public static function instance($importer_id, $feed_nid = 0) {
+  public static function instance($importer_id, $feed_nid) {
     $class = variable_get('feeds_source_class', 'FeedsSource');
     static $instances = array();
     if (!isset($instances[$class][$importer_id][$feed_nid])) {
@@ -200,6 +199,13 @@ class FeedsSource extends FeedsConfigurable {
     $this->importer = feeds_importer($importer_id);
     parent::__construct($importer_id);
     $this->load();
+  }
+
+  /**
+   * Returns the FeedsImporter object that this source is expected to be used with.
+   */
+  public function importer() {
+    return $this->importer;
   }
 
   /**
@@ -299,18 +305,19 @@ class FeedsSource extends FeedsConfigurable {
    * Schedule background clearing tasks.
    */
   public function scheduleClear() {
-    // Schedule as soon as possible if batch is not complete.
-    if ($this->progressClearing() !== FEEDS_BATCH_COMPLETE) {
-      $job = array(
-        'type' => $this->id,
-        'id' => $this->feed_nid,
-        'period' => 0,
-        'periodic' => TRUE,
-      );
-      JobScheduler::get('feeds_source_clear')->set($job);
-    }
-    else {
+    $job = array(
+      'type' => $this->id,
+      'id' => $this->feed_nid,
+      'period' => 0,
+      'periodic' => TRUE,
+    );
+    // Remove job if batch is complete.
+    if ($this->progressClearing() === FEEDS_BATCH_COMPLETE) {
       JobScheduler::get('feeds_source_clear')->remove($job);
+    }
+    // Schedule as soon as possible if batch is not complete.
+    else {
+      JobScheduler::get('feeds_source_clear')->set($job);
     }
   }
 
@@ -349,15 +356,17 @@ class FeedsSource extends FeedsConfigurable {
       // Process.
       $this->importer->processor->process($this, $parser_result);
     }
-    catch (Exception $e) {}
+    catch (Exception $e) {
+      // Do nothing.
+    }
     $this->releaseLock();
 
     // Clean up.
     $result = $this->progressImporting();
     if ($result == FEEDS_BATCH_COMPLETE || isset($e)) {
-      module_invoke_all('feeds_after_import', $this);
       $this->imported = time();
       $this->log('import', 'Imported in !s s', array('!s' => $this->imported - $this->state[FEEDS_START]), WATCHDOG_INFO);
+      module_invoke_all('feeds_after_import', $this);
       unset($this->fetcher_result, $this->state);
     }
     $this->save();
@@ -388,7 +397,9 @@ class FeedsSource extends FeedsConfigurable {
       $this->importer->parser->clear($this);
       $this->importer->processor->clear($this);
     }
-    catch (Exception $e) {}
+    catch (Exception $e) {
+      // Do nothing.
+    }
     $this->releaseLock();
 
     // Clean up.
@@ -505,7 +516,7 @@ class FeedsSource extends FeedsConfigurable {
    * @todo Patch CTools to move constants from export.inc to ctools.module.
    */
   public function load() {
-    if ($record = db_query("SELECT imported, config, state, fetcher_result FROM {feeds_source} WHERE id = :id AND feed_nid = :nid", array(':id' => $this->id, ':nid' => $this->feed_nid))->fetch()) {
+    if ($record = db_query("SELECT imported, config, state, fetcher_result FROM {feeds_source} WHERE id = :id AND feed_nid = :nid", array(':id' => $this->id, ':nid' => $this->feed_nid))->fetchObject()) {
       // While FeedsSource cannot be exported, we still use CTool's export.inc
       // export definitions.
       ctools_include('export');
@@ -571,7 +582,8 @@ class FeedsSource extends FeedsConfigurable {
    *   An array stored for $client.
    */
   public function getConfigFor(FeedsSourceInterface $client) {
-    return $this->config[get_class($client)];
+    $class = get_class($client);
+    return isset($this->config[$class]) ? $this->config[$class] : $client->sourceDefaults();
   }
 
   /**

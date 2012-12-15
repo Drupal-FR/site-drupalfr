@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_ui.admin.inc,v 1.60.2.3 2010/09/30 19:16:27 alexb Exp $
 
 /**
  * @file
@@ -8,7 +7,7 @@
  */
 
 /**
- * Introductory help for admin/structure/feeds/edit/config page
+ * Introductory help for admin/structure/feeds/%feeds_importer page
  */
 function feeds_ui_edit_help() {
   return t('
@@ -69,10 +68,10 @@ function feeds_ui_overview_form($form, &$form_status) {
     }
     else {
       if (!$importer->disabled) {
-        $importer_form['attached']['#markup'] = l(node_type_get_name($importer->config['content_type']), 'node/add/'. str_replace('_', '-', $importer->config['content_type']));
+        $importer_form['attached']['#markup'] = l(node_type_get_name($importer->config['content_type']), 'node/add/' . str_replace('_', '-', $importer->config['content_type']));
       }
       else {
-        $importer_form['attached']['#markup'] = node_type_get_name($importer->config['content_type']);
+        $importer_form['attached']['#markup'] = check_plain(node_type_get_name($importer->config['content_type']));
       }
     }
 
@@ -81,12 +80,12 @@ function feeds_ui_overview_form($form, &$form_status) {
       $edit = t('Override');
       $delete = '';
     }
-    else if ($importer->export_type == EXPORT_IN_DATABASE) {
+    elseif ($importer->export_type == EXPORT_IN_DATABASE) {
       $status = t('Normal');
       $edit = t('Edit');
       $delete = t('Delete');
     }
-    else if ($importer->export_type == (EXPORT_IN_CODE | EXPORT_IN_DATABASE)) {
+    elseif ($importer->export_type == (EXPORT_IN_CODE | EXPORT_IN_DATABASE)) {
       $status = t('Overridden');
       $edit = t('Edit');
       $delete = t('Revert');
@@ -97,10 +96,10 @@ function feeds_ui_overview_form($form, &$form_status) {
     if (!$importer->disabled) {
       $importer_form['operations'] = array(
         '#markup' =>
-          l($edit, 'admin/structure/feeds/edit/'. $importer->id) .' | '.
-          l(t('Export'), 'admin/structure/feeds/export/'. $importer->id) .' | '.
-          l(t('Clone'), 'admin/structure/feeds/clone/'. $importer->id) .
-          (empty($delete) ? '' :  ' | '. l($delete, 'admin/structure/feeds/delete/'. $importer->id)),
+          l($edit, 'admin/structure/feeds/' . $importer->id) . ' | ' .
+          l(t('Export'), 'admin/structure/feeds/' . $importer->id . '/export') . ' | ' .
+          l(t('Clone'), 'admin/structure/feeds/' . $importer->id . '/clone') .
+          (empty($delete) ? '' :  ' | ' . l($delete, 'admin/structure/feeds/' . $importer->id . '/delete')),
       );
     }
     else {
@@ -151,8 +150,7 @@ function feeds_ui_overview_form_submit($form, &$form_state) {
  *   of $from_importer.
  */
 function feeds_ui_create_form($form, &$form_state, $from_importer = NULL) {
-  drupal_add_js(drupal_get_path('module', 'feeds_ui') .'/feeds_ui.js');
-  $form = array();
+  $form['#attached']['js'][] = drupal_get_path('module', 'feeds_ui') . '/feeds_ui.js';
   $form['#from_importer'] = $from_importer;
   $form['name'] = array(
     '#type' => 'textfield',
@@ -160,15 +158,14 @@ function feeds_ui_create_form($form, &$form_state, $from_importer = NULL) {
     '#description' => t('A natural name for this configuration. Example: RSS Feed. You can always change this name later.'),
     '#required' => TRUE,
     '#maxlength' => 128,
-    '#attributes' => array('class' => array('feed-name')),
   );
   $form['id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Machine name'),
-    '#description' => t('A unique identifier for this configuration. Example: rss_feed. Must only contain lower case characters, numbers and underscores.'),
+    '#type' => 'machine_name',
     '#required' => TRUE,
     '#maxlength' => 128,
-    '#attributes' => array('class' => array('feed-id')),
+    '#machine_name' => array(
+      'exists' => 'feeds_ui_importer_machine_name_exists',
+    ),
   );
   $form['description'] = array(
     '#type' => 'textfield',
@@ -183,15 +180,27 @@ function feeds_ui_create_form($form, &$form_state, $from_importer = NULL) {
 }
 
 /**
+ * Validation callback for the importer machine name field.
+ */
+function feeds_ui_importer_machine_name_exists($id) {
+  if ($id == 'create') {
+    // Create is a reserved path for the add importer form.
+    return TRUE;
+  }
+  ctools_include('export');
+  if (ctools_export_load_object('feeds_importer', 'conditions', array('id' => $id))) {
+    return TRUE;
+  }
+}
+
+/**
  * Validation handler for feeds_build_create_form().
  */
 function feeds_ui_create_form_validate($form, &$form_state) {
-  ctools_include('export');
-  $importer = feeds_importer($form_state['values']['id']);
-  if (ctools_export_load_object('feeds_importer', 'conditions', array('id' => $form_state['values']['id']))) {
-    form_set_error('id', t('Id is taken.'));
+  if (!empty($form_state['values']['id'])) {
+    $importer = feeds_importer($form_state['values']['id']);
+    $importer->configFormValidate($form_state['values']);
   }
-  $importer->configFormValidate($form_state['values']);
 }
 
 /**
@@ -213,9 +222,9 @@ function feeds_ui_create_form_submit($form, &$form_state) {
     drupal_set_message(t('Your configuration has been created with default settings. If they do not fit your use case you can adjust them here.'));
   }
   else {
-    drupal_set_message(t('A clone of the !name configuration has been created.', array('!name' => $form['#from_importer']->config['name'])));
+    drupal_set_message(t('A clone of the @name configuration has been created.', array('@name' => $form['#from_importer']->config['name'])));
   }
-  $form_state['redirect'] = 'admin/structure/feeds/edit/'. $importer->id;
+  $form_state['redirect'] = 'admin/structure/feeds/' . $importer->id;
   feeds_cache_clear();
 }
 
@@ -223,7 +232,7 @@ function feeds_ui_create_form_submit($form, &$form_state) {
  * Delete configuration form.
  */
 function feeds_ui_delete_form($form, &$form_state, $importer) {
-  $form['#importer'] = $importer;
+  $form['#importer'] = $importer->id;
   if ($importer->export_type & EXPORT_IN_CODE) {
     $title = t('Would you really like to revert the importer @importer?', array('@importer' => $importer->config['name']));
     $button_label = t('Revert');
@@ -232,7 +241,13 @@ function feeds_ui_delete_form($form, &$form_state, $importer) {
     $title = t('Would you really like to delete the importer @importer?', array('@importer' => $importer->config['name']));
     $button_label = t('Delete');
   }
-  return confirm_form($form, $title, 'admin/structure/feeds', t('This action cannot be undone.'), $button_label);
+  return confirm_form(
+    $form,
+    $title,
+    'admin/structure/feeds',
+    t('This action cannot be undone.'),
+    $button_label
+  );
 }
 
 /**
@@ -242,11 +257,10 @@ function feeds_ui_delete_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/structure/feeds';
 
   // Remove importer.
-  $form['#importer']->delete();
+  feeds_importer($form['#importer'])->delete();
 
   // Clear cache, deleting a configuration may have an affect on menu tree.
   feeds_cache_clear();
-
 }
 
 /**
@@ -273,7 +287,7 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
   $plugins = FeedsPlugin::all();
   $config = $importer->config;
   // Base path for changing the active container.
-  $path = 'admin/structure/feeds/edit/'. $importer->id;
+  $path = 'admin/structure/feeds/' . $importer->id;
 
   $active_container = array(
     'class' => array('active-container'),
@@ -282,7 +296,7 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
   switch ($active) {
     case 'help':
       $active_container['title'] = t('Getting started');
-      $active_container['body'] = '<div class="help feeds-admin-ui">'. feeds_ui_edit_help() .'</div>';
+      $active_container['body'] = '<div class="help feeds-admin-ui">' . feeds_ui_edit_help() . '</div>';
       unset($active_container['actions']);
       break;
     case 'fetcher':
@@ -292,7 +306,7 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
       $active_container['body'] = drupal_get_form('feeds_ui_plugin_form', $importer, $active);
       break;
     case 'settings':
-      drupal_add_js(drupal_get_path('module', 'ctools') .'/js/dependent.js');
+      drupal_add_js(drupal_get_path('module', 'ctools') . '/js/dependent.js');
       ctools_include('dependent');
       if (empty($plugin_key)) {
         $active_container['title'] = t('Basic settings');
@@ -334,7 +348,7 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
   $info['body'] = array(
     array(
       'body' => theme('item_list', array('items' => $items)),
-      'actions' => array(l(t('Settings'), $path .'/settings')),
+      'actions' => array(l(t('Settings'), $path . '/settings')),
     ),
   );
   $config_info[] = $info;
@@ -343,7 +357,7 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
   $fetcher = $plugins[$config['fetcher']['plugin_key']];
   $actions = array();
   if (feeds_get_form($importer->fetcher, 'configForm')) {
-    $actions = array(l(t('Settings'), $path .'/settings/'. $config['fetcher']['plugin_key']));
+    $actions = array(l(t('Settings'), $path . '/settings/' . $config['fetcher']['plugin_key']));
   }
   $info['title'] = t('Fetcher');
   $info['body'] = array(
@@ -353,14 +367,14 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
       'actions' => $actions,
     ),
   );
-  $info['actions'] = array(l(t('Change'), $path .'/fetcher'));
+  $info['actions'] = array(l(t('Change'), $path . '/fetcher'));
   $config_info[] = $info;
 
   // Parser.
   $parser = $plugins[$config['parser']['plugin_key']];
   $actions = array();
   if (feeds_get_form($importer->parser, 'configForm')) {
-    $actions = array(l(t('Settings'), $path .'/settings/'. $config['parser']['plugin_key']));
+    $actions = array(l(t('Settings'), $path . '/settings/' . $config['parser']['plugin_key']));
   }
   $info['title'] = t('Parser');
   $info['body'] = array(
@@ -370,16 +384,16 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
       'actions' => $actions,
     )
   );
-  $info['actions'] = array(l(t('Change'), $path .'/parser'));
+  $info['actions'] = array(l(t('Change'), $path . '/parser'));
   $config_info[] = $info;
 
   // Processor.
   $processor = $plugins[$config['processor']['plugin_key']];
   $actions = array();
   if (feeds_get_form($importer->processor, 'configForm')) {
-    $actions[] = l(t('Settings'), $path .'/settings/'. $config['processor']['plugin_key']);
+    $actions[] = l(t('Settings'), $path . '/settings/' . $config['processor']['plugin_key']);
   }
-  $actions[] = l(t('Mapping'), $path .'/mapping');
+  $actions[] = l(t('Mapping'), $path . '/mapping');
   $info['title'] = t('Processor');
   $info['body'] = array(
     array(
@@ -388,7 +402,7 @@ function feeds_ui_edit_page($importer, $active = 'help', $plugin_key = '') {
       'actions' => $actions,
     )
   );
-  $info['actions'] = array(l(t('Change'), $path .'/processor'));
+  $info['actions'] = array(l(t('Change'), $path . '/processor'));
   $config_info[] = $info;
 
   return theme('feeds_ui_edit_page', array(
@@ -414,15 +428,15 @@ function feeds_ui_plugin_form($form, &$form_state, $importer, $type) {
   $plugins = FeedsPlugin::byType($type);
 
   $form = array();
-  $form['#importer'] = $importer;
+  $form['#importer'] = $importer->id;
   $form['#plugin_type'] = $type;
 
   foreach ($plugins as $key => $plugin) {
     $form['plugin_key'][$key] = array(
       '#type' => 'radio',
       '#parents' => array('plugin_key'),
-      '#title' => $plugin['name'],
-      '#description' => isset($plugin['help']) ? $plugin['help'] : $plugin['description'],
+      '#title' => check_plain($plugin['name']),
+      '#description' => filter_xss(isset($plugin['help']) ? $plugin['help'] : $plugin['description']),
       '#return_value' => $key,
       '#default_value' => ($plugin['handler']['class'] == get_class($importer->$type)) ? $key : '',
     );
@@ -440,9 +454,10 @@ function feeds_ui_plugin_form($form, &$form_state, $importer, $type) {
  */
 function feeds_ui_plugin_form_submit($form, &$form_state) {
   // Set the plugin and save feed.
-  $form['#importer']->setPlugin($form_state['values']['plugin_key']);
-  $form['#importer']->save();
-  drupal_set_message(t('Changed !type plugin.', array('!type' => $form['#plugin_type'])));
+  $importer = feeds_importer($form['#importer']);
+  $importer->setPlugin($form_state['values']['plugin_key']);
+  $importer->save();
+  drupal_set_message(t('Changed @type plugin.', array('@type' => $form['#plugin_type'])));
 }
 
 /**
@@ -450,7 +465,7 @@ function feeds_ui_plugin_form_submit($form, &$form_state) {
  */
 function theme_feeds_ui_plugin_form($variables) {
   $form = $variables['form'];
-  drupal_add_js(drupal_get_path('module', 'feeds_ui') .'/feeds_ui.js');
+  drupal_add_js(drupal_get_path('module', 'feeds_ui') . '/feeds_ui.js');
   $output = '';
 
   foreach (element_children($form['plugin_key']) as $key) {
@@ -480,12 +495,14 @@ function theme_feeds_ui_plugin_form($variables) {
  *   FeedsProcessor, a flag can tell whether mapping is supported or not.
  */
 function feeds_ui_mapping_form($form, &$form_state, $importer) {
-  drupal_add_js(drupal_get_path('module', 'feeds_ui') .'/feeds_ui.js');
+  drupal_add_js(drupal_get_path('module', 'feeds_ui') . '/feeds_ui.js');
 
   $form = array();
-  $form['#importer'] = $importer;
+  $form['#importer'] = $importer->id;
   $form['#mappings'] = $mappings = $importer->processor->getMappings();
   $form['help']['#markup'] = feeds_ui_mapping_help();
+  $form['#prefix'] = '<div id="feeds-ui-mapping-form-wrapper">';
+  $form['#suffix'] = '</div>';
 
   // Get mapping sources from parsers and targets from processor, format them
   // for output.
@@ -502,6 +519,7 @@ function feeds_ui_mapping_form($form, &$form_state, $importer) {
   }
   $targets = $importer->processor->getMappingTargets();
   $target_options = _feeds_ui_format_options($targets);
+  $legend['targets'] = array();
   foreach ($targets as $k => $target) {
     $legend['targets'][$k]['name']['#markup'] = empty($target['name']) ? $k : $target['name'];
     $legend['targets'][$k]['description']['#markup'] = empty($target['description']) ? '' : $target['description'];
@@ -517,28 +535,36 @@ function feeds_ui_mapping_form($form, &$form_state, $importer) {
   );
   $form['legendset']['legend'] = $legend;
 
-  // Add unique and remove forms to mappings.
-  $form['unique_flags'] = $form['remove_flags'] = array(
+  // Add config forms and remove flags to mappings.
+  $form['config'] = $form['remove_flags'] = $form['mapping_weight'] = array(
     '#tree' => TRUE,
   );
   if (is_array($mappings)) {
+
+    $delta = count($mappings) + 2;
+
     foreach ($mappings as $i => $mapping) {
-      $param = array(
-        'processor' => $importer->processor,
-        'mapping' => $mapping,
-      );
-      if (isset($targets[$mapping['target']]['optional_unique']) && $targets[$mapping['target']]['optional_unique'] === TRUE) {
-        $form['unique_flags'][$i] = array(
-          '#type' => 'checkbox',
-          '#default_value' => !empty($mapping['unique']),
-          '#attributes' => array('class' => array('feeds-ui-trigger-submit')),
-        );
+      if (isset($targets[$mapping['target']])) {
+        $form['config'][$i] = feeds_ui_mapping_settings_form($form, $form_state, $i, $mapping, $targets[$mapping['target']]);
       }
+
       $form['remove_flags'][$i] = array(
         '#type' => 'checkbox',
         '#title' => t('Remove'),
         '#prefix' => '<div class="feeds-ui-checkbox-link">',
         '#suffix' => '</div>',
+      );
+
+      $form['mapping_weight'][$i] = array(
+        '#type' => 'weight',
+        '#title' => '',
+        '#default_value' => $i,
+        '#delta' => $delta,
+        '#attributes' => array(
+          'class' => array(
+            'feeds-ui-mapping-weight'
+          ),
+        ),
       );
     }
   }
@@ -565,6 +591,7 @@ function feeds_ui_mapping_form($form, &$form_state, $importer) {
     '#type' => 'submit',
     '#value' => t('Add'),
     '#submit' => array('feeds_ui_mapping_form_add_submit'),
+    '#validate' => array('feeds_ui_mapping_form_add_validate'),
   );
   $form['save'] = array(
     '#type' => 'submit',
@@ -575,10 +602,141 @@ function feeds_ui_mapping_form($form, &$form_state, $importer) {
 }
 
 /**
+ * Per mapper configuration form that is a part of feeds_ui_mapping_form().
+ */
+function feeds_ui_mapping_settings_form($form, $form_state, $i, $mapping, $target) {
+  $form_state += array(
+    'mapping_settings_edit' => NULL,
+    'mapping_settings' => array(),
+  );
+
+  $base_button = array(
+    '#submit' => array('feeds_ui_mapping_form_multistep_submit'),
+    '#ajax' => array(
+      'callback' => 'feeds_ui_mapping_settings_form_callback',
+      'wrapper' => 'feeds-ui-mapping-form-wrapper',
+      'effect' => 'fade',
+      'progress' => 'none',
+    ),
+    '#i' => $i,
+  );
+
+  if (isset($form_state['mapping_settings'][$i])) {
+    $mapping = $form_state['mapping_settings'][$i] + $mapping;
+  }
+
+  if ($form_state['mapping_settings_edit'] === $i) {
+    // Build the form.
+    if (isset($target['form_callback'])) {
+      $settings_form = call_user_func($target['form_callback'], $mapping, $target, $form, $form_state);
+    }
+    else {
+      $settings_form = array();
+    }
+
+    // Merge in the optional unique form.
+    $settings_form += feeds_ui_mapping_settings_optional_unique_form($mapping, $target, $form, $form_state);
+
+    return array(
+      '#type' => 'container',
+      'settings' => $settings_form,
+      'save_settings' => $base_button + array(
+        '#type' => 'submit',
+        '#name' => 'mapping_settings_update_' . $i,
+        '#value' => t('Update'),
+        '#op' => 'update',
+      ),
+      'cancel_settings' => $base_button + array(
+        '#type' => 'submit',
+        '#name' => 'mapping_settings_cancel_' . $i,
+        '#value' => t('Cancel'),
+        '#op' => 'cancel',
+      ),
+    );
+  }
+  else {
+    // Build the summary.
+    if (isset($target['summary_callback'])) {
+      $summary = call_user_func($target['summary_callback'], $mapping, $target, $form, $form_state);
+    }
+    else {
+      $summary = '';
+    }
+
+    // Append the optional unique summary.
+    if ($optional_unique_summary = feeds_ui_mapping_settings_optional_unique_summary($mapping, $target, $form, $form_state)) {
+      $summary .= ' ' . $optional_unique_summary;
+    }
+
+    if ($summary) {
+      return array(
+        'summary' => array(
+          '#prefix' => '<div>',
+          '#markup' => $summary,
+          '#suffix' => '</div>',
+        ),
+       'edit_settings' => $base_button + array(
+          '#type' => 'image_button',
+          '#name' => 'mapping_settings_edit_' . $i,
+          '#src' => 'misc/configure.png',
+          '#attributes' => array('alt' => t('Edit')),
+          '#op' => 'edit',
+        ),
+      );
+    }
+  }
+}
+
+/**
+ * Submit callback for a per mapper configuration form. Switches between edit
+ * and summary mode.
+ */
+function feeds_ui_mapping_form_multistep_submit($form, &$form_state) {
+  $trigger = $form_state['triggering_element'];
+
+  switch ($trigger['#op']) {
+    case 'edit':
+      $form_state['mapping_settings_edit'] = $trigger['#i'];
+      break;
+
+    case 'update':
+      $values = $form_state['values']['config'][$trigger['#i']]['settings'];
+      $form_state['mapping_settings'][$trigger['#i']] = $values;
+      unset($form_state['mapping_settings_edit']);
+      break;
+
+    case 'cancel':
+      unset($form_state['mapping_settings_edit']);
+      break;
+  }
+
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * AJAX callback that returns the whole feeds_ui_mapping_form().
+ */
+function feeds_ui_mapping_settings_form_callback($form, $form_state) {
+  return $form;
+}
+
+/**
+ * Validation for source and target selection.
+ */
+function feeds_ui_mapping_form_add_validate($form, &$form_state) {
+  if ($form_state['values']['source'] == '') {
+    form_set_error('source', t('You must select a mapping source.'));
+  }
+  if ($form_state['values']['target'] == '') {
+    form_set_error('target', t('You must select a mapping target.'));
+  }
+}
+
+/**
  * Submit handler for add button on feeds_ui_mapping_form().
  */
 function feeds_ui_mapping_form_add_submit($form, &$form_state) {
-  $importer = $form['#importer'];
+  $importer = feeds_importer($form['#importer']);
   try {
     $mappings = $form['#mappings'];
     $mappings[] = array(
@@ -587,7 +745,7 @@ function feeds_ui_mapping_form_add_submit($form, &$form_state) {
       'unique' => FALSE,
     );
     $importer->processor->addConfig(array('mappings' => $mappings));
-    $importer->processor->save();
+    $importer->save();
     drupal_set_message(t('Mapping has been added.'));
   }
   catch (Exception $e) {
@@ -599,25 +757,48 @@ function feeds_ui_mapping_form_add_submit($form, &$form_state) {
  * Submit handler for save button on feeds_ui_mapping_form().
  */
 function feeds_ui_mapping_form_submit($form, &$form_state) {
-  $processor = $form['#importer']->processor;
-  // We may set some unique flags to mappings that we remove in the subsequent
-  // step, that's fine.
+  $importer = feeds_importer($form['#importer']);
+  $processor = $importer->processor;
+
+  $form_state += array(
+    'mapping_settings' => array(),
+    'mapping_settings_edit' => NULL,
+  );
+
+  // If an item is in edit mode, prepare it for saving.
+  if ($form_state['mapping_settings_edit'] !== NULL) {
+    $values = $form_state['values']['config'][$form_state['mapping_settings_edit']]['settings'];
+    $form_state['mapping_settings'][$form_state['mapping_settings_edit']] = $values;
+  }
+
+  // We may set some settings to mappings that we remove in the subsequent step,
+  // that's fine.
   $mappings = $form['#mappings'];
-  if (isset($form_state['values']['unique_flags'])) {
-    foreach ($form_state['values']['unique_flags'] as $k => $v) {
-      $mappings[$k]['unique'] = $v;
+  foreach ($form_state['mapping_settings'] as $k => $v) {
+    $mappings[$k] = array(
+      'source' => $mappings[$k]['source'],
+      'target' => $mappings[$k]['target'],
+    ) + $v;
+  }
+
+  if (!empty($form_state['values']['remove_flags'])) {
+    $remove_flags = array_keys(array_filter($form_state['values']['remove_flags']));
+
+    foreach ($remove_flags as $k) {
+      unset($mappings[$k]);
+      unset($form_state['values']['mapping_weight'][$k]);
     }
   }
 
-  foreach ($form_state['values']['remove_flags'] as $k => $v) {
-    if ($v) {
-      unset($mappings[$k]);
-      // Keep our keys clean.
-      $mappings = array_values($mappings);
-    }
+  // Keep our keys clean.
+  $mappings = array_values($mappings);
+
+  if (!empty($mappings)) {
+    array_multisort($form_state['values']['mapping_weight'], $mappings);
   }
+
   $processor->addConfig(array('mappings' => $mappings));
-  $processor->save();
+  $importer->save();
   drupal_set_message(t('Your changes have been saved.'));
 }
 
@@ -639,7 +820,41 @@ function _feeds_ui_format_options($options) {
       $result[$k] = $v;
     }
   }
+  asort($result);
   return $result;
+}
+
+/**
+ * Per mapping settings summary callback. Shows whether a mapping is used as
+ * unique or not.
+ */
+function feeds_ui_mapping_settings_optional_unique_summary($mapping, $target, $form, $form_state) {
+  if (!empty($target['optional_unique'])) {
+    if ($mapping['unique']) {
+      return t('Used as <strong>unique</strong>.');
+    }
+    else {
+      return t('Not used as unique.');
+    }
+  }
+}
+
+/**
+ * Per mapping settings form callback. Lets the user choose if a target is as
+ * unique or not.
+ */
+function feeds_ui_mapping_settings_optional_unique_form($mapping, $target, $form, $form_state) {
+  $settings_form = array();
+
+  if (!empty($target['optional_unique'])) {
+    $settings_form['unique'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Unique'),
+      '#default_value' => !empty($mapping['unique']),
+    );
+  }
+
+  return $settings_form;
 }
 
 /**
@@ -647,8 +862,8 @@ function _feeds_ui_format_options($options) {
  */
 function theme_feeds_ui_overview_form($variables) {
   $form = $variables['form'];
-  drupal_add_js(drupal_get_path('module', 'feeds_ui') .'/feeds_ui.js');
-  drupal_add_css(drupal_get_path('module', 'feeds_ui') .'/feeds_ui.css');
+  drupal_add_js(drupal_get_path('module', 'feeds_ui') . '/feeds_ui.js');
+  drupal_add_css(drupal_get_path('module', 'feeds_ui') . '/feeds_ui.css');
 
   // Iterate through all importers and build a table.
   $rows = array();
@@ -669,11 +884,18 @@ function theme_feeds_ui_overview_form($variables) {
       }
     }
   }
-  $output = '';
-  if (count($rows)) {
-    $output .= theme('table', array('header' => $form['#header'], 'rows' => $rows, 'attributes' => array('class' => array('feeds-admin-importers'))));
+
+  $output = theme('table', array(
+    'header' => $form['#header'],
+    'rows' => $rows,
+    'attributes' => array('class' => array('feeds-admin-importers')),
+    'empty' => t('No importers available.'),
+  ));
+
+  if (!empty($rows)) {
+    $output .= drupal_render_children($form);
   }
-  $output .= drupal_render_children($form);
+
   return $output;
 }
 
@@ -683,7 +905,7 @@ function theme_feeds_ui_overview_form($variables) {
 function theme_feeds_ui_edit_page($variables) {
   $config_info = $variables['info'];
   $active_container = $variables['active'];
-  drupal_add_css(drupal_get_path('module', 'feeds_ui') .'/feeds_ui.css');
+  drupal_add_css(drupal_get_path('module', 'feeds_ui') . '/feeds_ui.css');
 
   // Outer wrapper.
   $output = '<div class="feeds-settings clear-block">';
@@ -728,13 +950,13 @@ function theme_feeds_ui_container($variables) {
   $container = $variables['container'];
 
   $class = array_merge(array('feeds-container'), empty($container['class']) ? array('plain') : $container['class']);
-  $id = empty($container['id']) ? '': ' id="'. $container['id'] .'"';
-  $output = '<div class="'. implode(' ', $class) .'"'. $id .'>';
+  $id = empty($container['id']) ? '': ' id="' . $container['id'] . '"';
+  $output = '<div class="' . implode(' ', $class) . '"' . $id . '>';
 
   if (isset($container['actions']) && count($container['actions'])) {
     $output .= '<ul class="container-actions">';
     foreach ($container['actions'] as $action) {
-      $output .= '<li>'. $action .'</li>';
+      $output .= '<li>' . $action . '</li>';
     }
     $output .= '</ul>';
   }
@@ -777,8 +999,9 @@ function theme_feeds_ui_mapping_form($variables) {
   $header = array(
     t('Source'),
     t('Target'),
-    t('Unique target'),
+    t('Target configuration'),
     '&nbsp;',
+    t('Weight'),
   );
   $rows = array();
   if (is_array($form['#mappings'])) {
@@ -787,17 +1010,21 @@ function theme_feeds_ui_mapping_form($variables) {
       $source = isset($form['source']['#options'][$mapping['source']]) ? $form['source']['#options'][$mapping['source']] : $mapping['source'];
       $target = isset($form['target']['#options'][$mapping['target']]) ? check_plain($form['target']['#options'][$mapping['target']]) : '<em>' . t('Missing') . '</em>';
       $rows[] = array(
-        check_plain($source),
-        $target,
-        drupal_render($form['unique_flags'][$i]),
-        drupal_render($form['remove_flags'][$i]),
+        'data' => array(
+          check_plain($source),
+          $target,
+          drupal_render($form['config'][$i]),
+          drupal_render($form['remove_flags'][$i]),
+          drupal_render($form['mapping_weight'][$i]),
+        ),
+        'class' => array('draggable', 'tabledrag-leaf'),
       );
     }
   }
   if (!count($rows)) {
     $rows[] = array(
       array(
-        'colspan' => 4,
+        'colspan' => 5,
         'data' => t('No mappings defined.'),
       ),
     );
@@ -807,9 +1034,10 @@ function theme_feeds_ui_mapping_form($variables) {
     drupal_render($form['target']),
     '',
     drupal_render($form['add']),
+    '',
   );
-  $output = '<div class="help feeds-admin-ui""'. drupal_render($form['help']) .'</div>';
-  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  $output = '<div class="help feeds-admin-ui">' . drupal_render($form['help']) . '</div>';
+  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'feeds-ui-mapping-overview')));
 
   // Build the help table that explains available sources.
   $legend = '';
@@ -821,7 +1049,7 @@ function theme_feeds_ui_mapping_form($variables) {
     );
   }
   if (count($rows)) {
-    $legend .= '<h4>'. t('Sources') .'</h4>';
+    $legend .= '<h4>' . t('Sources') . '</h4>';
     $legend .= theme('table', array('header' => array(t('Name'), t('Description')), 'rows' => $rows));
   }
 
@@ -833,16 +1061,17 @@ function theme_feeds_ui_mapping_form($variables) {
       check_plain(drupal_render($form['legendset']['legend']['targets'][$k]['description'])),
     );
   }
-  $legend .= '<h4>'. t('Targets') .'</h4>';
+  $legend .= '<h4>' . t('Targets') . '</h4>';
   $legend .= theme('table', array('header' => array(t('Name'), t('Description')), 'rows' => $rows));
 
   // Stick tables into collapsible fieldset.
   $form['legendset']['legend'] = array(
-    '#markup' => '<div>'. $legend .'</div>',
+    '#markup' => '<div>' . $legend . '</div>',
   );
 
   $output .= drupal_render($form['legendset']);
-
   $output .= drupal_render_children($form);
+
+  drupal_add_tabledrag('feeds-ui-mapping-overview', 'order', 'sibling', 'feeds-ui-mapping-weight');
   return $output;
 }

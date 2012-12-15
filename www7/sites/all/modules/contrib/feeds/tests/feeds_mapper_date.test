@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_mapper_date.test,v 1.5.4.3 2010/10/06 14:12:43 alexb Exp $
 
 /**
  * @file
@@ -13,20 +12,16 @@
  * @todo: Add test method for end date
  */
 class FeedsMapperDateTestCase extends FeedsMapperTestCase {
-
   public static function getInfo() {
     return array(
-      'name' => t('Mapper: Date'),
-      'description' => t('Test Feeds Mapper support for CCK Date fields. <strong>Requires CCK and Date module</strong>.'),
-      'group' => t('Feeds'),
+      'name' => 'Mapper: Date',
+      'description' => 'Test Feeds Mapper support for CCK Date fields.',
+      'group' => 'Feeds',
+      'dependencies' => array('date'),
     );
   }
 
-  /**
-   * Set up the test.
-   */
   public function setUp() {
-    // Call parent setup with the required module.
     parent::setUp(array('date_api', 'date'));
     variable_set('date_default_timezone', 'UTC');
   }
@@ -38,7 +33,7 @@ class FeedsMapperDateTestCase extends FeedsMapperTestCase {
     $this->drupalGet('admin/config/regional/settings');
 
     // Create content type.
-    $typename = $this->createContentType(NULL, array(
+    $typename = $this->createContentType(array(), array(
       'date' => 'date',
       'datestamp' => 'datestamp',
       //'datetime' => 'datetime', // REMOVED because the field is broken ATM.
@@ -46,24 +41,24 @@ class FeedsMapperDateTestCase extends FeedsMapperTestCase {
 
     // Create and configure importer.
     $this->createImporterConfiguration('Date RSS', 'daterss');
-    $this->setSettings('daterss', NULL, array('content_type' => '', 'import_period' => FEEDS_SCHEDULE_NEVER,));
+    $this->setSettings('daterss', NULL, array('content_type' => '', 'import_period' => FEEDS_SCHEDULE_NEVER));
     $this->setPlugin('daterss', 'FeedsFileFetcher');
     $this->setPlugin('daterss', 'FeedsSyndicationParser');
     $this->setSettings('daterss', 'FeedsNodeProcessor', array('content_type' => $typename));
     $this->addMappings('daterss', array(
-      array(
+      0 => array(
         'source' => 'title',
         'target' => 'title',
       ),
-      array(
+      1 => array(
         'source' => 'description',
         'target' => 'body',
       ),
-      array(
+      2 => array(
         'source' => 'timestamp',
         'target' => 'field_date:start',
       ),
-      array(
+      3 => array(
         'source' => 'timestamp',
         'target' => 'field_datestamp:start',
       ),
@@ -72,10 +67,10 @@ class FeedsMapperDateTestCase extends FeedsMapperTestCase {
     $edit = array(
       'allowed_extensions' => 'rss2',
     );
-    $this->drupalPost('admin/structure/feeds/edit/daterss/settings/FeedsFileFetcher', $edit, 'Save');
+    $this->drupalPost('admin/structure/feeds/daterss/settings/FeedsFileFetcher', $edit, 'Save');
 
     // Import CSV file.
-    $this->importFile('daterss', $this->absolutePath() .'/tests/feeds/googlenewstz.rss2');
+    $this->importFile('daterss', $this->absolutePath() . '/tests/feeds/googlenewstz.rss2');
     $this->assertText('Created 6 nodes');
 
     // Check the imported nodes.

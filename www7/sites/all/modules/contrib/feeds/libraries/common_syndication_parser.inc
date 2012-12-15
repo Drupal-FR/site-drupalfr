@@ -1,5 +1,4 @@
 <?php
-// $Id: common_syndication_parser.inc,v 1.15 2010/09/07 22:26:02 alexb Exp $
 
 /**
  * @file
@@ -48,7 +47,7 @@ function common_syndication_parser_parse($string) {
  * Get the cached version of the <var>$url</var>
  */
 function _parser_common_syndication_cache_get($url) {
-  $cache_file = _parser_common_syndication_sanitize_cache() .'/'. md5($url);
+  $cache_file = _parser_common_syndication_sanitize_cache() . '/' . md5($url);
   if (file_exists($cache_file)) {
     $file_content = file_get_contents($cache_file);
     return unserialize($file_content);
@@ -98,7 +97,8 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
     "georss" => "http://www.georss.org/georss",
   );
 
-  $base = (string) array_shift($feed_XML->xpath("@base"));
+  $base = $feed_XML->xpath("@base");
+  $base = (string) array_shift($base);
   if (!valid_url($base, TRUE)) {
     $base = FALSE;
   }
@@ -168,7 +168,7 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
       }
       $body .= "{$news->content}";
     }
-    else if (!empty($news->summary)) {
+    elseif (!empty($news->summary)) {
       foreach ($news->summary->children() as $child)  {
         $body .= $child->asXML();
       }
@@ -187,7 +187,7 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
       $original_author = "{$news->source->author->name}";
       $author_found = TRUE;
     }
-    else if (!empty($news->author->name)) {
+    elseif (!empty($news->author->name)) {
       $original_author = "{$news->author->name}";
       $author_found = TRUE;
     }
@@ -201,7 +201,19 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
     $item['title'] = _parser_common_syndication_title($title, $body);
     $item['description'] = $body;
     $item['author_name'] = $original_author;
-    $item['timestamp'] = _parser_common_syndication_parse_date(isset($news->published) ? "{$news->published}" : "{$news->issued}");
+
+    // Fall back to updated for timestamp if both published and issued are
+    // empty.
+    if (isset($news->published)) {
+      $item['timestamp'] = _parser_common_syndication_parse_date("{$news->published}");
+    }
+    elseif (isset($news->issued)) {
+       $item['timestamp'] = _parser_common_syndication_parse_date("{$news->issued}");
+    }
+    elseif (isset($news->updated)) {
+      $item['timestamp'] = _parser_common_syndication_parse_date("{$news->updated}");
+    }
+
     $item['url'] = trim($original_url);
     if (valid_url($item['url']) && !valid_url($item['url'], TRUE) && !empty($base)) {
       $item['url'] = $base . $item['url'];
@@ -257,9 +269,9 @@ function _parser_common_syndication_RDF10_parse($feed_XML) {
   // Process the <rss:channel> resource containing feed metadata:
   foreach ($feed_XML->children($canonical_namespaces['rss'])->channel as $rss_channel) {
     $parsed_source = array(
-      'title'       => _parser_common_syndication_title((string)$rss_channel->title),
-      'description' => (string)$rss_channel->description,
-      'link'        => (string)$rss_channel->link,
+      'title'       => _parser_common_syndication_title((string) $rss_channel->title),
+      'description' => (string) $rss_channel->description,
+      'link'        => (string) $rss_channel->link,
       'items'       => array(),
     );
     break;
@@ -279,11 +291,11 @@ function _parser_common_syndication_RDF10_parse($feed_XML) {
       // still be able to correctly handle it.
       foreach ($rss_item->attributes($ns_uri) as $attr_name => $attr_value) {
         $ns_prefix = ($ns_prefix = array_search($ns_uri, $canonical_namespaces)) ? $ns_prefix : $ns;
-        $rdf_data[$ns_prefix .':'. $attr_name][] = (string)$attr_value;
+        $rdf_data[$ns_prefix . ':' . $attr_name][] = (string) $attr_value;
       }
       foreach ($rss_item->children($ns_uri) as $rss_property) {
         $ns_prefix = ($ns_prefix = array_search($ns_uri, $canonical_namespaces)) ? $ns_prefix : $ns;
-        $rdf_data[$ns_prefix .':'. $rss_property->getName()][] = (string)$rss_property;
+        $rdf_data[$ns_prefix . ':' . $rss_property->getName()][] = (string) $rss_property;
       }
     }
 
@@ -292,7 +304,7 @@ function _parser_common_syndication_RDF10_parse($feed_XML) {
       'title'       => array('rss:title', 'dc:title'),
       'description' => array('rss:description', 'dc:description', 'content:encoded'),
       'url'         => array('rss:link', 'rdf:about'),
-      'author_name'      => array('dc:creator', 'dc:publisher'),
+      'author_name' => array('dc:creator', 'dc:publisher'),
       'guid'        => 'rdf:about',
       'timestamp'   => 'dc:date',
       'tags'        => 'dc:subject'
@@ -347,7 +359,7 @@ function _parser_common_syndication_RDF10_item($rdf_data, $mappings) {
  */
 function _parser_common_syndication_RSS20_parse($feed_XML) {
 
-  $ns = array (
+  $ns = array(
     "content" => "http://purl.org/rss/1.0/modules/content/",
      "dc" => "http://purl.org/dc/elements/1.1/",
      "georss" => "http://www.georss.org/georss",
@@ -401,7 +413,7 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
     if (!empty($news['author'])) {
       $original_author = "{$news['author']}";
     }
-    elseif (isset($dc["creator"])) {
+    elseif (!empty($dc["creator"])) {
       $original_author = (string)$dc["creator"];
     }
 
@@ -410,11 +422,11 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
       $guid = $original_url;
     }
 
-    if (isset($news['guid'])) {
+    if (!empty($news['guid'])) {
       $guid = "{$news['guid']}";
     }
 
-    if (isset($georss['featureName'])) {
+    if (!empty($georss['featureName'])) {
       $geoname = "{$georss['featureName']}";
     }
 
@@ -422,7 +434,7 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
     $lon =
     $latlon =
     $geoname = NULL;
-    if (isset($georss['point'])) {
+    if (!empty($georss['point'])) {
       $latlon = explode(' ', $georss['point']);
       $lat = "{$latlon[0]}";
       $lon = "{$latlon[1]}";
@@ -453,8 +465,11 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
     $item['title'] = _parser_common_syndication_title($title, $body);
     $item['description'] = $body;
     $item['author_name'] = $original_author;
-    if (isset($news['pubDate'])) {
+    if (!empty($news['pubDate'])) {
       $item['timestamp'] = _parser_common_syndication_parse_date($news['pubDate']);
+    }
+    elseif (!empty($dc['date'])) {
+      $item['timestamp'] = _parser_common_syndication_parse_date($dc['date']);
     }
     else {
       $item['timestamp'] = time();
@@ -568,8 +583,8 @@ function _parser_common_syndication_link($links) {
 function _parser_common_syndication_title($title, $body = FALSE) {
   if (empty($title) && !empty($body)) {
     // Explode to words and use the first 3 words.
-    $words = preg_split("/[\s,]+/", strip_tags($body));
-    $title = $words[0] .' '. $words[1] .' '. $words[2];
+    $words = preg_split('/[\s,]+/', strip_tags($body));
+    $title = implode(' ', array_slice($words, 0, 3));
   }
   return $title;
 }

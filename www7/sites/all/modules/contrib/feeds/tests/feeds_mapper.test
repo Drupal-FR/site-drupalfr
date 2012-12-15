@@ -1,13 +1,9 @@
 <?php
-// $Id: feeds_mapper_test.inc,v 1.2.4.2 2010/11/01 16:58:21 tristanoneil Exp $
 
 /**
  * @file
  * Helper class with auxiliary functions for feeds mapper module tests.
  */
-
-// Require FeedsWebTestCase class definition.
-require_once(dirname(__FILE__) .'/feeds.test.inc');
 
 /**
  * Base class for implementing Feeds Mapper test cases.
@@ -50,7 +46,7 @@ class FeedsMapperTestCase extends FeedsWebTestCase {
   protected function assertNodeFieldValue($field_name, $value, $index = 0) {
     $names = $this->getFormFieldsNames($field_name, $index);
     $values = $this->getFormFieldsValues($field_name, $value);
-    foreach($names as $k => $name){
+    foreach ($names as $k => $name) {
       $value = $values[$k];
       $this->assertFieldByName($name, $value, t('Found form field %name for %field_name with the expected value.', array('%name' => $name, '%field_name' => $field_name)));
     }
@@ -91,33 +87,27 @@ class FeedsMapperTestCase extends FeedsWebTestCase {
    * Create a new content-type, and add a field to it. Mostly copied from
    * cck/tests/content.crud.test ContentUICrud::testAddFieldUI
    *
-   * @param $typename
-   *   (Optional) the name of the content-type to create, defaults to a random name.
+   * @param $settings
+   *   (Optional) An array of settings to pass through to
+   *   drupalCreateContentType().
    * @param $fields
    *   (Optional) an keyed array of $field_name => $field_type used to add additional
    *   fields to the new content type.
    *
    * @return
-   *   The name of the new typename.
+   *   The machine name of the new content type.
+   *
+   * @see DrupalWebTestCase::drupalCreateContentType()
    */
-  final protected function createContentType($typename = NULL, $fields = array()) {
-    if ($typename == NULL) {
-      $typename = strtolower($this->randomName());
-    }
+  final protected function createContentType(array $settings = array(), array $fields = array()) {
+    $type = $this->drupalCreateContentType($settings);
+    $typename = $type->type;
 
-    // Create the content type.
-    $edit = array(
-      'type' => $typename,
-      'name' => $typename,
-    );
-    $this->drupalPost('admin/structure/types/add', $edit, 'Save content type');
-    $this->assertText('The content type ' . $typename . ' has been added', 'Content type created');
-
-    $admin_type_url = 'admin/structure/types/manage/'. str_replace('_', '-', $typename);
+    $admin_type_url = 'admin/structure/types/manage/' . str_replace('_', '-', $typename);
 
     // Create the fields
     foreach ($fields as $field_name => $options) {
-      if(is_string($options)) {
+      if (is_string($options)) {
         $options = array('type' => $options);
       }
       $field_type = isset($options['type']) ? $options['type'] : 'text';
@@ -135,7 +125,11 @@ class FeedsMapperTestCase extends FeedsWebTestCase {
       // (Default) Configure the field.
       $edit = isset($options['settings']) ? $options['settings'] : array();
       $this->drupalPost(NULL, $edit, 'Save field settings');
-      $this->assertText('Updated field ' . $label);
+      $this->assertText('Updated field ' . $label . ' field settings.');
+
+      $edit = isset($options['instance_settings']) ? $options['instance_settings'] : array();
+      $this->drupalPost(NULL, $edit, 'Save settings');
+      $this->assertText('Saved ' . $label . ' configuration.');
     }
 
     return $typename;

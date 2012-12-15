@@ -1,5 +1,4 @@
 <?php
-// $Id: feeds_views_handler_field_source.inc,v 1.3 2010/09/17 17:25:02 alexb Exp $
 
 /**
  * @file
@@ -18,7 +17,7 @@ class feeds_views_handler_field_source extends views_handler_field {
     }
     elseif (isset($value['FeedsFileFetcher']['feeds_source'])) {
       // @todo This is untested.
-      return $GLOBALS['base_url'] .'/'. check_plain($value['FeedsFileFetcher']['feeds_source']);
+      return $GLOBALS['base_url'] . '/' . check_plain($value['FeedsFileFetcher']['feeds_source']);
     }
     return '';
   }
