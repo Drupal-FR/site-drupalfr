@@ -67,6 +67,10 @@ drush php-eval "redirect_delete(1);"
 # Add some bits of customizations
 drush vset admin_theme seven
 
+# update site_name & site_slogan
+drush vset site_name "DrupalFR"
+drush vset site_slogan "Communauté Drupal France et francophonie"
+
 # Performance wise options
 drush sqlq "DELETE FROM system WHERE status = 0"
 drush vset locale_cache_length 65535
