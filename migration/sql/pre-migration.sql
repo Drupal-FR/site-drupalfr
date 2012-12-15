@@ -24,6 +24,8 @@ DROP TABLE tfiles;
 DELETE FROM `actions` WHERE CONVERT(`actions`.`aid` USING utf8) = 'userpoints_action_grant_points' LIMIT 1;
 DELETE FROM `actions` WHERE CONVERT(`actions`.`aid` USING utf8) = 'user_block_ip_action' LIMIT 1;
 
+TRUNCATE watchdog;
+
 -- Drop profiles tables (no more needed since we using content profile)
 -- DROP TABLE profile_fields;
 -- DROP TABLE profile_values;
