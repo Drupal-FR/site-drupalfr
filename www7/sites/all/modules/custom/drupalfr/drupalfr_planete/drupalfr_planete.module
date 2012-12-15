@@ -150,3 +150,19 @@ function drupalfr_planete_feeds_presave(FeedsSource $source, $entity, $item) {
     $entity->uid = $node->uid;
   }
 }
+
+/**
+ * Implements hook_preprocess_node().
+ *
+ * Rewrite the node URL to be the original post one, if possible.
+ */
+function drupalfr_planete_preprocess_node(&$variables) {
+  $node = $variables['node'];
+
+  if (isset($node->field_planete_url) &&
+      !empty($node->field_planete_url) &&
+      isset($node->field_planete_url[LANGUAGE_NONE][0]['url']))
+  {
+    $variables['node_url'] = $node->field_planete_url[LANGUAGE_NONE][0]['url'];
+  }
+}
