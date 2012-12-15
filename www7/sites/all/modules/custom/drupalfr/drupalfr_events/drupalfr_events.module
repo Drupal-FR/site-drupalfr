@@ -17,7 +17,7 @@ function drupalfr_events_theme() {
  */
 function drupalfr_events_block_info() {
   return array(
-    'drupalfr_next_events_meetup' => array(
+    'next_events' => array(
       'info' => t('Prochains évènements Meetup'),
       'cache' => DRUPAL_CACHE_GLOBAL,
     ),
@@ -29,12 +29,15 @@ function drupalfr_events_block_info() {
  */
 function drupalfr_events_block_view($delta = '') {
   switch($delta) {
-    case 'drupalfr_next_events_meetup':
-      $subject = t('5 prochains événements meetup.com');
+    case 'next_events':
+      $subject = t('5 prochains évènements meetup.com');
       $events = drupalfr_events_fetch_events(5);
-      $content = drupalfr_events_display_events($events, 'teaser');
       $block['subject'] = $subject;
-      $block['content'] = $content;
+      $block['content'] = array(
+        'events' => array('#markup' => drupalfr_events_display_events($events, 'teaser')),
+      )
+
+      $content;
       break;
   }
   return $block;
