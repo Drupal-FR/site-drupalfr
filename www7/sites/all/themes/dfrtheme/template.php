@@ -141,6 +141,7 @@ function dfrtheme_preprocess_node(&$vars) {
   $vars['submitted_date'] = t('!datetime', array('!datetime' => $vars['date']));
   $vars['submitted_pubdate'] = format_date($vars['created'], 'custom', 'Y-m-d\TH:i:s');
 
+  $vars['theme_hook_suggestions'][] = 'node__' . $vars['node']->type . '__' . $vars['view_mode'];
 }
 
 /**
