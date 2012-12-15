@@ -30,7 +30,7 @@ function dfr_documentation_page() {
     $output['books']['book-'.$book->nid] = array(
       '#prefix' => '<div class="book book-'.$book->nid.'">', '#suffix'=>'</div>',
       'title' => array(
-        '#markup' => '<h2>'. l($book->title, 'node/'. $nbook->nid) .'</h2>'
+        '#markup' => '<h2>'. l($book->title, 'node/'. $book->nid) .'</h2>'
       ),
       'summary' => array(
         '#markup' => '<p>'. text_summary($body[0]['value']) .'</p>'
