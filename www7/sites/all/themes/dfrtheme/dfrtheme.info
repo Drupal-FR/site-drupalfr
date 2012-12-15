@@ -1,0 +1,52 @@
+; $Id: theme673.info,v 1.9 Leo Exp $
+
+; Theme Info -----------------------------------------------------------------
+; required information about the theme
+
+name = dfrtheme
+description = Theme for drupalfr.org
+screenshot = screenshot.png
+core = 7.x
+engine = phptemplate
+
+; Stylesheets  ---------------------------------------------------------------
+; We use [screen] instead of [all] to avoid browser styles affecting 
+; other media types. IE stylesheets are loaded through template.php
+
+stylesheets[screen][] = css/boilerplate.css
+stylesheets[screen][] = css/layout.css
+stylesheets[screen][] = css/style.css
+stylesheets[screen][] = css/blocks.css
+stylesheets[screen][] = css/user.css
+stylesheets[screen][] = css/pages.css
+stylesheets[screen][] = css/maintenance-page.css
+
+
+;scripts[] = js/theme673.core.js
+;scripts[] = js/jquery.loader.js
+
+; Regions --------------------------------------------------------------------
+; these content regions are available for block placement
+; some are special hidden regions: page_top, page_bottom, and help
+
+; these are the stock regions
+;regions[header] = Header
+regions[header_bottom] = Header Bottom
+regions[menu] = Menu
+
+regions[help] = Help
+regions[highlighted] = Highlighted
+
+regions[content_top] = Content Top
+regions[content] = Content
+regions[content_right] = Content Right
+regions[content_bottom] = Content Bottom
+
+regions[sidebar_first] = Sidebar first
+
+regions[footer_top] = Footer Top
+regions[footer] = Footer
+
+regions[page_top] = Page top
+regions[page_bottom] = Page bottom
+

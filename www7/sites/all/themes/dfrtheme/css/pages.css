@@ -1,0 +1,91 @@
+
+/** ******************************************************* **/
+/** Homepage                                                **/
+/** ******************************************************* **/
+
+.front #page-title {display:none;}
+
+
+/** ******************************************************* **/
+/** Documentation                                           **/
+/** ******************************************************* **/
+
+#documentation {}
+#documentation .book {
+  border-bottom:1px solid #dee6ee;
+  padding-bottom:1em;
+  margin-bottom:1em;
+}
+#documentation .book:last-child {border-bottom:none;}
+
+#documentation .book a {color:#444;}
+#documentation .book a:hover {color:#00C3DD;}
+
+
+/** ******************************************************* **/
+/** Forum                                                   **/
+/** ******************************************************* **/
+
+#forum table {}
+#forum table .submitted,
+#forum table .submitted a {font-style:normal;color:#444;}
+
+#forum .container {border-top: 5px solid #E4EAEF;}
+#forum tr:first-child .container {border-top: 1px solid #E4EAEF;}
+#forum .container .name {
+  font-size:18px;
+  padding:0.5em 0 0 0.5em;
+}
+#forum .description
+#forum .title .submitted,
+#forum .title .submitted a {color:#898989;}
+
+
+/** ******************************************************* **/
+/** Ajouter du contenu                                      **/
+/** ******************************************************* **/
+
+/* node/add */
+.node-type-list {}
+.node-type-list dd {margin-left:0;}
+.node-type-list dd + dt {margin-top:1em;}
+
+
+
+/** ******************************************************* **/
+/** Annuaire                                                **/
+/** ******************************************************* **/
+
+.view-annuaire-prestataires {}
+.view-annuaire-prestataires.view-display-id-page_1 {}
+
+.node-annuaire {}
+.node-annuaire .field {margin-bottom: 1em;}
+.node-annuaire .field-items {background:#fff;}
+.node-annuaire .field-type-image .field-items{
+  padding:0;border:0;
+  border-radius:0;
+  -moz-border-radius:0;
+  -webkit-border-radius:0;
+}
+
+@media screen and (min-width:768px) {
+  .node-annuaire .field {
+    margin-bottom: 0;
+    display:table;
+    width:100%;
+    border-collapse:collapse;
+  }
+  .node-annuaire .field:last-child {border-bottom: 1px solid #E4EAEF;}
+  .node-annuaire .field-label,
+  .node-annuaire .field-items,
+  .node-annuaire .field-type-image .field-items{
+    display:table-cell;
+    vertical-align: top;
+    border-top: 1px solid #E4EAEF;
+    padding:0.5em;
+  }
+  .node-annuaire .field-label {width:30%;}
+  .node-annuaire .field-items {width:70%;}
+}
+

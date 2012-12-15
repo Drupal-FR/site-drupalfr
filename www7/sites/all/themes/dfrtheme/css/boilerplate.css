@@ -1,0 +1,376 @@
+/**
+* Reset CSS
+ */
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin:0;
+  padding:0;
+  border:0;
+  outline:0;
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}
+
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+li ul, li ol { margin:0; }
+ul, ol { margin:0; padding-left:0; list-style:none; list-style-image:none; list-style-type:none;}
+dl { margin: 0 0 1.5em 0; }
+dl dt { font-weight: bold; }
+dd { margin-left: 1.5em; }
+table { margin-bottom:1.5em; width:100%; }
+th, tr, td { padding: 0.1em 0.5em; vertical-align: middle; }
+hr { background:#666; border:none; clear:both; float:none; height:1px; margin: -1px 0 1.5em; width: 100%; }
+fieldset { border: 1px solid #ccc; margin: .5em 0; padding: 1em; }
+
+iframe { background:#fff !important;}
+
+/**
+ * Responsive images & medias
+ * Prevent max-width from affecting Google Maps
+ * From reset.less by Twitter Bootstrap
+ */
+img, table, td, blockquote, code, pre, textarea, input, 
+iframe, embed, object, img {
+  vertical-align: middle;
+  max-width: 100%;
+  height:auto;
+}
+#map_canvas img {max-width: none;}
+
+
+
+/**
+ * Normalize CSS
+ */
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+audio:not([controls]) { display: none; }
+[hidden] { display: none; }
+
+p {
+  padding:0 0 1em 0;
+}
+
+nav ul {
+  list-style:none;
+}
+
+blockquote, q {
+  quotes:none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content:'';
+  content:none;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+abbr[title], dfn[title] {
+  border-bottom:1px dotted;
+  cursor:help;
+}
+
+table {
+  border-collapse:collapse;
+  border-spacing:0;
+}
+
+/* change border colour to suit your needs */
+hr {
+  display:block;
+  height:1px;
+  border:0;   
+  border-top:1px solid #cccccc;
+  margin:1em 0;
+  padding:0;
+}
+
+
+/* END RESET CSS */
+
+
+/* fonts.css from the YUI Library: developer.yahoo.com/yui/
+   Refer to developer.yahoo.com/yui/3/cssfonts/ for font sizing percentages
+
+  There are three custom edits:
+   * remove arial, helvetica from explicit font stack
+   * we normalize monospace styles ourselves
+   * table font-size is reset in the HTML5 reset above so there is no need to repeat
+*/
+
+
+/* =============================================================================
+   Forms from normalize
+   ========================================================================== */
+   
+/*
+ * Corrects margin displayed oddly in IE6/7
+ */
+form {margin:0; padding:0;}
+
+/*
+ * 1. Corrects font size not being inherited in all browsers
+ * 2. Addresses margins set differently in IE6/7, F3/4, S5, Chrome
+ * 3. Improves appearance and consistency in all browsers
+ */
+
+button,
+input,
+select,
+textarea {
+  font-size: 100%; /* 1 */
+	font-family: sans-serif;
+  margin: 0; /* 2 */
+  vertical-align: baseline; /* 3 */
+  *vertical-align: middle; /* 3 */
+}
+
+/*
+ * 1. Addresses FF3/4 setting line-height using !important in the UA stylesheet
+ * 2. Corrects inner spacing displayed oddly in IE6/7
+ */
+
+button,
+input {
+  line-height: normal; /* 1 */
+  *overflow: visible;  /* 2 */
+}
+
+/*
+ * Corrects overlap and whitespace issue for buttons and inputs in IE6/7
+ * Known issue: reintroduces inner spacing
+ */
+
+table button,
+table input {
+  *overflow: auto;
+}
+
+/*
+ * 1. Improves usability and consistency of cursor style between image-type 'input' and others
+ * 2. Corrects inability to style clickable 'input' types in iOS
+ */
+
+button,
+html input[type="button"], 
+input[type="reset"], 
+input[type="submit"] {
+  cursor: pointer; /* 1 */
+  -webkit-appearance: button; /* 2 */
+}
+
+/*
+ * 1. Addresses box sizing set to content-box in IE8/9
+ * 2. Addresses excess padding in IE8/9
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/*
+ * 1. Addresses appearance set to searchfield in S5, Chrome
+ * 2. Addresses box sizing set to border-box in S5, Chrome (include -moz to future-proof)
+ */
+
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+
+/*
+ * Corrects inner padding displayed oddly in S5, Chrome on OSX
+ */
+
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/*
+ * Corrects inner padding and border displayed oddly in FF3/4
+ * www.sitepen.com/blog/2008/05/14/the-devils-in-the-details-fixing-dojos-toolbar-buttons/
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/*
+ * 1. Removes default vertical scrollbar in IE6/7/8/9
+ * 2. Improves readability and alignment in all browsers
+ */
+
+textarea {
+  overflow:auto; vertical-align:top; resize:vertical;
+}
+
+select:focus, input:focus, textarea:focus { outline:none;}
+
+
+
+/* normalize monospace sizing 
+ * en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome
+ */
+pre, code, kbd, samp { font-family: monospace, sans-serif; }
+ 
+
+/* 
+ * minimal base styles 
+ */
+
+
+body, select, input, textarea { 
+  /* #444 looks better than black */ 
+  color: #444; 
+}
+
+h1,h2,h3,h4,h5,h6 { 
+  line-height:1.25; 
+  color:#42494c;
+  font-weight:normal; 
+  letter-spacing:-1px;
+  margin-bottom: 0.5em; 
+}
+h1 {font-size:32px;}
+h2 {font-size:24px;}
+h3 {font-size:20px;}
+h4 {font-size:16px;}
+h5 {font-size:14px;}
+h6 {font-size:12px;font-weight:bold;}
+
+ 
+/* Accessible focus treatment */
+a:hover, a:active { outline:none; }
+
+ul, ol { margin-left:0; }
+ol { list-style-type:decimal; }
+
+/* Remove margins for navigation lists */
+
+small { font-size:85%; }
+strong, th { font-weight:bold; }
+
+img {vertical-align:top;}
+td, td img {vertical-align:top;}
+
+sub { vertical-align:sub; font-size:smaller; }
+sup { vertical-align:super; font-size:smaller; }
+
+pre { 
+  padding:15px; 
+  white-space:pre; /* CSS2 */
+  white-space:pre-wrap; /* CSS 2.1 */
+  white-space:pre-line; /* CSS 3 (and 2.1 as well, actually) */
+  word-wrap:break-word; /* IE */
+}
+ 
+legend { *margin-left:-7px; }
+
+input[type="radio"] { vertical-align:text-bottom; }
+input[type="checkbox"] { vertical-align:middle; *vertical-align:baseline;}
+
+/* hand cursor on clickable input elements */
+label, input[type=button], input[type=submit], button { cursor:pointer;}
+ 
+/*
+ * 1. Correct font-size not inheriting in all browsers
+ * 2. Remove margins in FF3/4 S5 Chrome
+ * 3. Define consistent vertical alignment display in all browsers
+ */
+
+button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline; *vertical-align: middle; }
+
+/*
+ * 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet)
+ * 2. Correct inner spacing displayed oddly in IE6/7
+ */
+
+button, input { line-height: normal; *overflow: visible; }
+
+table button, table input { *overflow: auto; }
+
+/* colors for form validity */
+input:valid, textarea:valid   {  }
+input:invalid, textarea:invalid { 
+  border-radius:1px;
+  box-shadow:0px 0px 5px red;
+}
+.no-boxshadow input:invalid, 
+.no-boxshadow textarea:invalid { background-color:#f0dddd; }
+
+
+/* These selection declarations have to be separate.*/
+::-moz-selection{ background:#46a7e2; color:#fff; text-shadow:none; }
+::selection { background:#46a7e2; color:#fff; text-shadow:none; } 
+
+/*  j.mp/webkit-tap-highlight-color */
+a:link { -webkit-tap-highlight-color: #46a7e2; } 
+
+/* make buttons play nice in IE:    
+button {  width: auto; overflow: visible; }
+ 
+/* bicubic resizing for non-native sized IMG */
+img { -ms-interpolation-mode: bicubic; }
+
+/*
+ * Correct overflow not hidden in IE9 
+ */
+
+svg:not(:root) { overflow: hidden; }
+
+
+#skip-link {
+  position: absolute;
+}
+
+/* 
+ * Non-semantic helper classes 
+ */
+
+/* for image replacement */
+.ir { display:block; border:0; text-indent:-999em; overflow:hidden; background-color:transparent; background-repeat:no-repeat; text-align:left; direction:ltr; }
+.ir br { display:none; }
+
+/* Hide from both screenreaders and browsers:h5bp.com/u */
+.hidden { display:none !important; visibility:hidden; }
+
+/* Hide only visually, but have it available for screenreaders:h5bp.com/v */
+.visuallyhidden { border:0; clip:rect(0 0 0 0); height:1px; margin:-1px; overflow:hidden; padding:0; position:absolute; width:1px; }
+
+/* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard:h5bp.com/p */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip:auto; height:auto; margin:0; overflow:visible; position:static; width:auto; }
+
+/* Hide visually and from screenreaders, but maintain layout */
+.invisible { visibility: hidden; }
+
+
+.clearfix:before, .clearfix:after { content:""; display:table; }
+.clearfix:after { clear:both;}
+.clearfix { zoom:1; }

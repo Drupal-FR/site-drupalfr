@@ -1,0 +1,45 @@
+
+body {}
+
+#page-wrapper {}
+	#page {}
+
+		#header {
+			position:relative;
+		}
+			#logo {
+				width:100px;
+				height:100px;
+			}
+			.branding,
+			.region-menu {
+				display:inline-block;
+				vertical-align: top;
+			}
+
+		#header-bottom {min-height:70px;}
+
+		#main-wrapper {}
+			#main {
+				padding:2em 0;
+			}
+				#sidebar-first {float:left;width:30%;margin-left:-100%;padding-right:3%;}
+				#content {width:100%;}
+				.sidebar-first #content {float:left;padding-left:30%;}
+
+		#footer {}
+
+.inner {
+	width:100%;
+	margin:0 auto;
+}
+
+@media screen and (max-width:980px) {
+	.inner {padding:0 1%;}
+}
+@media screen and (min-width:900px) {
+	.inner {max-width: 980px;}
+
+	.branding {width:30%;padding-right:3%;}
+	.region-menu {width:66%;}
+}
