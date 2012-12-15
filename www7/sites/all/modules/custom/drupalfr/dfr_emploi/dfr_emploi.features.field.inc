@@ -71,7 +71,7 @@ function dfr_emploi_field_default_fields() {
           'summary_rows' => 5,
         ),
         'type' => 'text_textarea_with_summary',
-        'weight' => '4',
+        'weight' => '5',
       ),
     ),
   );
@@ -138,7 +138,7 @@ function dfr_emploi_field_default_fields() {
           'rows' => '5',
         ),
         'type' => 'text_textarea',
-        'weight' => '7',
+        'weight' => '8',
       ),
     ),
   );
@@ -221,7 +221,7 @@ function dfr_emploi_field_default_fields() {
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_field',
-        'weight' => '8',
+        'weight' => '9',
       ),
     ),
   );
@@ -288,7 +288,7 @@ function dfr_emploi_field_default_fields() {
           'rows' => '5',
         ),
         'type' => 'text_textarea',
-        'weight' => '5',
+        'weight' => '6',
       ),
     ),
   );
@@ -359,7 +359,7 @@ function dfr_emploi_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_select',
-        'weight' => '1',
+        'weight' => '2',
       ),
     ),
   );
@@ -426,7 +426,7 @@ function dfr_emploi_field_default_fields() {
           'rows' => '5',
         ),
         'type' => 'text_textarea',
-        'weight' => '6',
+        'weight' => '7',
       ),
     ),
   );
@@ -498,7 +498,91 @@ function dfr_emploi_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_select',
-        'weight' => '3',
+        'weight' => '4',
+      ),
+    ),
+  );
+
+  // Exported field: 'node-offre-field_societe'.
+  $fields['node-offre-field_societe'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_societe',
+      'foreign keys' => array(
+        'nid' => array(
+          'columns' => array(
+            'nid' => 'nid',
+          ),
+          'table' => 'node',
+        ),
+      ),
+      'indexes' => array(
+        'nid' => array(
+          0 => 'nid',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'node_reference',
+      'settings' => array(
+        'referenceable_types' => array(
+          'annuaire' => 'annuaire',
+          'doc' => 0,
+          'faq' => 0,
+          'forum' => 0,
+          'offre' => 0,
+          'page' => 0,
+          'simplenews' => 0,
+          'story' => 0,
+        ),
+        'view' => array(
+          'args' => array(),
+          'display_name' => '',
+          'view_name' => '',
+        ),
+      ),
+      'translatable' => '0',
+      'type' => 'node_reference',
+    ),
+    'field_instance' => array(
+      'bundle' => 'offre',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'node_reference',
+          'settings' => array(),
+          'type' => 'node_reference_default',
+          'weight' => 8,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_societe',
+      'label' => 'Société',
+      'required' => 1,
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'node_reference',
+        'settings' => array(
+          'autocomplete_match' => 'contains',
+          'autocomplete_path' => 'node_reference/autocomplete',
+          'size' => '20',
+        ),
+        'type' => 'node_reference_autocomplete',
+        'weight' => '1',
       ),
     ),
   );
@@ -569,7 +653,7 @@ function dfr_emploi_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_select',
-        'weight' => '2',
+        'weight' => '3',
       ),
     ),
   );
@@ -586,6 +670,7 @@ function dfr_emploi_field_default_fields() {
   t('Profil candidat');
   t('Région');
   t('Région d\'affectation initiale. Attention, celà n\'indique pas que l\'offre soit à poste fixe: dans le monde du service, vous serez souvent amené à intervenir en clientèle.');
+  t('Société');
   t('Type de contrat');
 
   return $fields;
