@@ -64,9 +64,23 @@ function dfr_blocks_enable() {
       'title' => "", 'status' => 1,
     ),
     array(
-      'module' => 'views', 'delta' => 'drupalfr-block_1',
+      'module' => 'drupalfr_events', 'delta' => 'next_events',
       'theme' => 'dfrtheme', 'region' => 'content',
       'weight' => 10, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "5 prochains évènements", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+    array(
+      'module' => 'views', 'delta' => 'planete_block-block',
+      'theme' => 'dfrtheme', 'region' => 'content',
+      'weight' => 12, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "Planète", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+    array(
+      'module' => 'views', 'delta' => 'drupalfr-block_1',
+      'theme' => 'dfrtheme', 'region' => 'content',
+      'weight' => 14, 'cache' => DRUPAL_NO_CACHE,
       'title' => "", 'status' => 1,
       'visibility' => 1, 'pages' => '<front>'
     ),
