@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the twitter_block module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function twitter_block_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  $has_curl = function_exists('curl_init');
+
+  $requirements['curl'] = array(
+    'title' => $t('cURL'),
+    'value' => $has_curl ? $t('Enabled') : $t('Not found'),
+  );
+  if (!$has_curl) {
+    $requirements['curl']['severity'] = REQUIREMENT_ERROR;
+    $requirements['curl']['description'] = $t('The testing framework could not be installed because the PHP <a href="@curl_url">cURL</a> library is not available.', array('@curl_url' => 'http://php.net/manual/en/curl.setup.php'));
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_schema().
+ */
+function twitter_block_schema() {
+  $schema['twitter_block'] = array(
+    'description' => 'The table for storing twitter blocks.', 
+    'fields' => array(
+      'delta' => array(
+        'description' => 'The machine identifier for a twitter block.', 
+        'type' => 'varchar', 
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ), 
+      'search_type' => array(
+        'description' => 'The search type for this block. ie. mention, reply', 
+        'type' => 'varchar', 
+        'length' => 32, 
+        'not null' => TRUE, 
+        'default' => 'search',
+      ), 
+      'search_string' => array(
+        'description' => "The search string.",
+        'type' => 'varchar',
+        'length' => 140,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'default_title' => array(
+        'description' => 'The title of this block in plain text.', 
+        'type' => 'varchar', 
+        'length' => 140, 
+        'not null' => TRUE, 
+        'default' => '',
+      ),
+      'results_per_page' => array(
+        'description' => '"Returns per page" from the Twitter Search API.',
+        'type' => 'varchar',
+        'length' => 8,
+      ),
+      'lang' => array(
+        'description' => 'Optional Twitter language filter.',
+        'type' => 'varchar',
+        'length' => '8', // Technically we only need 2...
+      ),
+    ), 
+    'unique keys' => array(
+      'delta' => array('delta'),
+    ), 
+    'foreign keys' => array(
+      'block' => array(
+        'table' => 'block', 
+        'columns' => array('bid' => 'bid'),
+      ), 
+    ), 
+    'primary key' => array('delta'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function twitter_block_install() {
+  $id = db_insert('twitter_block')->fields(array(
+      'delta' => 'default',
+      'search_type' => 'searchHashtag',
+      'search_string' => 'Drupal',
+      'default_title' => st('Discussions on Twitter'),
+    ))
+    ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function twitter_block_uninstall() {
+  variable_del('twitter_block_default_results_per_page');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function twitter_block_update_7100() {
+  db_add_field('twitter_block', 'lang', array(
+    'description' => 'Optional Twitter language filter.',
+    'type' => 'varchar',
+    'length' => '6',
+  ));
+}

@@ -1,0 +1,304 @@
+<?php
+
+/**
+ * @file
+ * A module to provide simple Twitter blocks using the Twitter Search API.
+ */
+
+/**
+ * Implements hook_menu().
+ *
+ * Provides a page for configuring new blocks.
+ */
+function twitter_block_menu() {
+  $items['admin/config/services/twitter_block'] = array(
+    'title' => 'Configure Twitter Block(s)',
+    'description' => 'Create and configure Twitter search blocks.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('twitter_block_admin_form'),
+    'access arguments' => array('administer twitter blocks'),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function twitter_block_permission() {
+  return array(
+    'administer twitter blocks' => array(
+      'title' => t('Administer Twitter Blocks'),
+    ),
+  );
+}
+
+/**
+ * Retrieve the Twitter block configuration options from the db.
+ */
+function twitter_block_get_config($delta) {
+  static $config;
+  if (!isset($config[$delta])) {
+    $result = db_query("SELECT search_type, search_string, default_title, results_per_page, lang" .
+      " FROM {twitter_block} WHERE delta = :delta", array(':delta' => $delta));
+
+    // @todo There can be only one?
+    foreach ($result as $record) {
+      $config[$delta] = get_object_vars($record);
+    }
+  }
+  return isset($config[$delta]) ? $config[$delta] : FALSE;
+}
+
+/**
+ * The configuration form for Twitter blocks.
+ *
+ * @todo Finish this form so we can add and configure multiple blocks.
+ */
+function twitter_block_admin_form() {
+  $form = array();
+  $result = db_query("SELECT delta FROM {twitter_block}");
+
+  $form['Submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Blocks'),
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function twitter_block_block_info() {
+  $blocks = array();
+
+  $result = db_query("SELECT delta, default_title FROM {twitter_block}");
+  foreach ($result as $record) {
+    $blocks[$record->delta] = array(
+      'info' => t($record->default_title),
+      'cache' => DRUPAL_CACHE_GLOBAL,
+    );
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function twitter_block_block_configure($delta) {
+  $config = twitter_block_get_config($delta);
+  $form = array();
+
+  $form['twitter_block_' . $delta] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Twitter Block Configuration'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#element_validate' => array('twitter_block_form_validate'),
+  );
+
+  $form['twitter_block_' . $delta]['search_string'] = array(
+    '#type' => 'textfield',
+    '#title' => 'The string or username to search.',
+    '#size' => 32,
+    '#default_value' => $config['search_string'],
+  );
+
+  $form['twitter_block_' . $delta]['search_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose the type of Tweets to return.'),
+    '#options' => array(
+      'searchHashtag' => t('Tweets mentioning #hashtag or search string'),
+      'getTweetsFrom' => t('Tweets sent from the Twitter user'),
+      'getReplies' => t('Replies to the Twitter user'),
+      'getMentions' => t('Tweets mentioning the Twitter user'),
+    ),
+    '#default_value' => $config['search_type'],
+  );
+  $form['twitter_block_' . $delta]['lang'] = array(
+    '#type'  => 'textfield',
+    '#title' => 'Language',
+    '#description' => t('If you would like to limit the search by a language, ' .
+            'you can set it here. This should be the specific string expected by ' .
+            'twitter for your language. See the <a href="@language">twitter advanced search page</a> ' .
+            'for more information. (Hint: English is "en"). Leave blank if you don\'t ' .
+            'want to filter by language at all.', array(
+            '@language' => 'http://twitter.com/#!/search-advanced')),
+    '#size'  => 12,
+    '#default_value' => $config['lang'],
+  );
+  $form['twitter_block_' . $delta]['results_per_page'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Number of tweets to return',
+    '#description' => t('Please enter the number of tweets to return per page up to a maximum of 100.'),
+    '#size' => 12,
+    '#default_value' => $config['results_per_page'],
+  );
+
+  return $form;
+}
+
+/**
+ * Validates Twitter block configuration options before saving the form.
+ */
+function twitter_block_form_validate($element, &$form_state) {
+  if (!empty($element['results_per_page']['#value']) ) {
+    if (!ctype_digit($element['results_per_page']['#value']) ) {
+      form_set_error('results_per_page', t('The number of results must be an integer.'));
+    }
+    // Twitter doesn't like to return more than 100 tweets.
+    elseif ($element['results_per_page']['#value'] > 100) {
+      form_set_error('results_per_page', t("The Twitter API limits the number of tweets returned to 100 or less."));
+    }
+  }
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function twitter_block_block_save($delta = '', $edit = array()) {
+  db_update('twitter_block')
+    ->fields(array(
+      'search_type' => $edit['search_type'],
+      'search_string' => $edit['search_string'],
+      'results_per_page' => $edit['results_per_page'],
+      'lang' => $edit['lang'],
+      ))
+    ->condition('delta', $delta)
+    ->execute();
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function twitter_block_block_view($delta) {
+  // Load the configuration.
+  $config = twitter_block_get_config($delta);
+
+  // Define the configuration.
+  $block = array();
+  $block['subject'] = t($config['default_title']);
+  $block['content'] = twitter_block_load_tweets($config);
+
+  return $block;
+}
+
+/**
+ * Grab data from Twitter, store it for later.
+ * @param $config An array suitable for passing to the TwitterBlockSearch object.
+ * @return Themed output.
+ */
+function twitter_block_load_tweets($config) {
+  module_load_include('php', 'twitter_block', 'twitter_block.class');
+
+  // We use the MD5 of the block config as cache cid.
+  $cid = 'twitter_block_feed_' . md5(serialize($config));
+  $cache_bin = 'cache';
+
+  // Build the object.
+  $twitter = new TwitterBlockSearch($config);
+
+  // We cache response even if it's empty so an empty response cannot cause a
+  // performance problem by making us contact Twitter in every request
+  if ($cache = cache_get($cid, $cache_bin)) {
+    $results = $cache->data;
+  }
+  else {
+    $response = $twitter->getJSON();
+    $results = array();
+    if (empty($response) || !is_array($response) || !isset($response['status']) || $response['status'] !== TRUE) {
+      watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
+        'Perhaps just a fail whale?<br/>' .
+        'URL: url_query<br />' .
+        'response', array('url_query' => $twitter->url_query, 'response' => print_r($response, TRUE)),
+        WATCHDOG_NOTICE);
+    }
+    else {
+      $results = $response['results'];
+    }
+
+    // Save the data for later.
+    cache_set($cid, $results, $cache_bin, CACHE_TEMPORARY);
+  }
+
+  return theme('twitter_block', array('twitter_result' => $results, 'api' => $twitter->getApi()));
+}
+
+/**
+ * Implements hook_theme().
+ */
+function twitter_block_theme($existing, $type , $theme, $path) {
+  return array(
+    'twitter_block' => array(
+      'variables' => array('twitter_result' => NULL, 'api' => NULL),
+    ),
+    'twitter_block_tweet' =>array(
+      'variables' => array('tweet' => NULL, 'api' => NULL),
+      'path' => drupal_get_path('module', 'twitter_block'),
+      'template' => 'twitter-block-tweet'
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess().
+ */
+function twitter_block_preprocess_twitter_block_tweet(&$variables) {
+  $variables['text'] = twitter_block_linkify($variables['tweet']->text);
+  $variables['user_image'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->profile_image_url : $variables['tweet']->profile_image_url;
+  $variables['user_name'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->screen_name : $variables['tweet']->from_user;
+}
+
+/**
+ * Returns themed HTML for a Twitter block.
+ */
+function theme_twitter_block($variables) {
+  $twitter_result = $variables['twitter_result'];
+  foreach($twitter_result as $tweet) {  
+    $tweets[] = theme('twitter_block_tweet', array('tweet' => $tweet, 'api' => $variables['api'])); 
+  }
+
+  // Don't show an empty block.
+  if (count($twitter_result) > 0) {
+    $html = '<div id="twitter_block_results" class="twitter_block">';
+    $html .= theme('item_list', array('items' => $tweets));
+    $html .= '</div>';
+    return $html;
+  }
+}
+
+/**
+ * Convert nested URLs, account names and hash tags into links.
+ */
+function twitter_block_linkify($status_text) {
+  // Linkify URLs.
+  $status_text = preg_replace(
+    '/(https?:\/\/\S+)/',
+    '<a href="\1">\1</a>',
+    $status_text
+  );
+
+  // Linkify twitter users.
+  $status_text = preg_replace(
+    '/(^|\s)@(\w+)/',
+    '\1@<a href="http://twitter.com/\2">\2</a>',
+    $status_text
+  );
+
+  // Linkify tags.
+  $status_text = preg_replace(
+    '/(^|\s)#([\wåäöÅÄÖ]+)/',
+    '\1#<a href="http://search.twitter.com/search?q=%23\2">\2</a>',
+    $status_text
+  );
+
+  return $status_text;
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function twitter_block_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools') {
+    return 'plugins/' . $plugin;
+  }
+}

@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * @file
+ * Test case for testing the twitter_block module.
+ *
+ * @todo Finish Test Cases
+ * This is a work in progress. Many (if not all) of these tests will likely
+ * fail as I've only just started to write them.
+ */
+class TwitterBlockTestCase extends DrupalWebTestCase {
+  protected $privileged_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Twitter Block functionality',
+      'description' => 'Test the configuration options and block created by Twitter Block module.',
+      'group' => 'Twitter Block',
+    );
+  }
+
+  /**
+   * Enable modules and create user with specific permissions.
+   */
+  function setUp() {
+    parent::setUp('twitter_block');
+    // Create user. Search content permission granted for the search block to
+    // be shown.
+    $this->privileged_user = $this->drupalCreateUser(array('administer blocks'));
+    $this->drupalLogin($this->privileged_user);
+  }
+
+  /**
+   * Test block functionality through the admin interface.
+   */
+  function testTwitterBlockBasic() {
+
+    // Find the default block in the settings page.
+    $this->drupalGet('admin/structure/block');
+    $this->assertRaw(t('Default Twitter Block'), t('Default Twitter block found.'));
+
+    // Verify the default settings for block are processed.
+    $this->assertFieldByName('blocks[twitter_block_default_block][region]', 'sidebar_first', t('Default Twitter block is enabled in first sidebar successfully verified.') );
+
+    // Verify that blocks are not shown.
+    $this->drupalGet('/');
+    $this->assertNoRaw( t('Drupal Discussion on Twitter'), t('Default Twitter block test not found.'));
+
+    // Enable the Default block and verify.
+    $this->drupalPost('admin/structure/block', array('blocks[twitter_block_default_block][region]' => 'sidebar_first'), t('Save blocks'));
+    $this->drupalGet('/');
+    $this->assertRaw( t('Drupal Discussion on Twitter'), t('Default Twitter block text found.'));
+
+    // Add a new twitter block.
+    /*
+    $string = $this->randomName();
+    $delta = strtolower($string);
+    $this->drupalPost('admin/config/twitter_block', array(
+        'twitter_block_delta' => $delta,
+        'twitter_block_title' => $string,
+        // A commonly tweeted value so we know there will be content.
+        'twitter_block_search_string' => 'twitter',
+      ),
+      t('Save block'));
+
+    // Find new block on settings page.
+    $this->assertRaw($string, t('New Twitter block is configurable-String found.'));
+
+    // Verify new block is not shown.
+    $this->drupalGet('/');
+    $this->assertNoRaw($string, "New Twitter block isn't enabled yet. Not found.");
+
+    // Enable new block and verify.
+    $this->drupalPost('admin/structure/block', array("blocks[twitter_block_$delta][region]" => 'sidebar_first'), t('Save blocks'));
+    $this->assertRaw($string, "New Twitter block is displayed.");
+    // */
+  }
+}
