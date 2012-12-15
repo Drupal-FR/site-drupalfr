@@ -4,6 +4,18 @@
  * Implements hook_install().
  */
 function dfr_emploi_install() {
+  // Must execute after scheduler
+  $weight = db_select('system', 's')
+    ->fields('s', array('weight'))
+    ->condition('name', 'scheduler', '=')
+    ->execute()
+    ->fetchField();
+
+  db_update('system')
+    ->fields(array('weight' => $weight + 1))
+    ->condition('name', 'dfr_emploi', '=')
+    ->execute();
+
   // Create the terms for type de contrat
   $machine_name = 'type_contrat';
   $vocabulary = taxonomy_vocabulary_machine_name_load($machine_name);
@@ -22,7 +34,7 @@ function dfr_emploi_install() {
   }
 
   // Create the terms for nature du poste
-  $machine_name = 'nature_popste';
+  $machine_name = 'nature_poste';
   $vocabulary = taxonomy_vocabulary_machine_name_load($machine_name);
   $terms = array(
     'Chef de projet',

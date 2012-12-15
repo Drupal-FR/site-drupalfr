@@ -579,7 +579,7 @@ function dfr_emploi_field_default_fields() {
         'settings' => array(
           'autocomplete_match' => 'contains',
           'autocomplete_path' => 'node_reference/autocomplete',
-          'size' => '20',
+          'size' => '60',
         ),
         'type' => 'node_reference_autocomplete',
         'weight' => '1',
