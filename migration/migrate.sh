@@ -62,6 +62,9 @@ drush cc all
 
 drush en -y dfr_migration
 
+# Fix flag migration
+drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'forum'"
+
 # Remove a useless redirection.
 drush php-eval "redirect_delete(1);"
 
