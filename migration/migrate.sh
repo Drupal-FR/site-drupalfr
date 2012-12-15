@@ -61,4 +61,9 @@ drush php-eval "redirect_delete(1);"
 # Add some bits of customizations
 drush vset admin_theme seven
 
+# Performance wise options
+drush sqlq "DELETE FROM system WHERE status = 0"
+drush vset locale_cache_length 65535
+# Don't forget to disable views_ui and dblog in production
+
 echo "aller sur la page admin/migration et lancer la migration\n";
