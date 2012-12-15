@@ -1,0 +1,194 @@
+<?php
+
+
+/**
+ * Implements hook_install().
+ */
+function dfr_blocks_install() {
+
+}
+
+/**
+ * Implements hook_enable().
+ */
+function dfr_blocks_enable() {
+
+  // Update default twitter_block module
+  db_update('twitter_block')
+    ->fields(array(
+      'search_type' => 'searchHashtag',
+      'search_string' => 'drupalfr',
+      'default_title' => 'Twitter #drupalfr',
+      'results_per_page' => '6',
+      'lang' => 'fr',
+      ))
+    ->condition('delta', 'default')
+    ->execute();
+
+  // Disable all block for dfrtheme
+  db_query("DELETE FROM {block} WHERE theme = 'dfrtheme'");
+
+  // Set blocks
+  // DRUPAL_NO_CACHE : -1
+  // DRUPAL_CACHE_GLOBAL : 0x0008
+  // DRUPAL_CACHE_PER_PAGE : 0x0004
+  // DRUPAL_CACHE_PER_USER : 0X0002
+  // DRUPAL_CACHE_PER_ROLE : 0X0001
+
+  // BLOCK_VISIBILITY_NOTLISTED :0
+  // BLOCK_VISIBILITY_LISTED :1
+
+  $values = array(
+    // Header bottom
+    array(
+      'module' => 'dfr_blocks', 'delta' => 'download',
+      'theme' => 'dfrtheme', 'region' => 'header_bottom',
+      'weight' => 0, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+
+    // Menu
+    array(
+      'module' => 'system', 'delta' => 'main-menu',
+      'theme' => 'dfrtheme', 'region' => 'menu',
+      'weight' => 0, 'cache' => DRUPAL_CACHE_PER_PAGE,
+      'title' => "", 'status' => 1,
+    ),
+
+    // Content
+    array(
+      'module' => 'system', 'delta' => 'main',
+      'theme' => 'dfrtheme', 'region' => 'content',
+      'weight' => 0, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+    ),
+    array(
+      'module' => 'views', 'delta' => 'drupalfr-block_1',
+      'theme' => 'dfrtheme', 'region' => 'content',
+      'weight' => 10, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+
+
+    // Sidebar
+    array(
+      'module' => 'search', 'delta' => 'form',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -23, 'cache' => DRUPAL_CACHE_PER_PAGE,
+      'title' => "Rechercher", 'status' => 1,
+    ),
+    array(
+      'module' => 'system', 'delta' => 'user-menu',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -22, 'cache' => DRUPAL_CACHE_PER_PAGE,
+      'title' => "", 'status' => 1,
+    ),
+    array(
+      'module' => 'user', 'delta' => 'login',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -21, 'cache' => DRUPAL_CACHE_PER_PAGE,
+      'title' => "", 'status' => 1,
+    ),
+    array(
+      'module' => 'menu', 'delta' => 'menu-outils',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -20, 'cache' => DRUPAL_CACHE_PER_PAGE,
+      'title' => "", 'status' => 1,
+    ),
+    array(
+      'module' => 'twitter_block', 'delta' => 'default',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -18, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "Twitter #drupalfr", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+    array(
+      'module' => 'book', 'delta' => 'navigation',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -17, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "Documentation", 'status' => 1,
+      'visibility' => 1, 'pages' => 'documentation
+documentation/*'
+    ),
+    array(
+      'module' => 'forum', 'delta' => 'new',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -16, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => 'forum
+forum/*'
+    ),
+
+    // Content top
+    array(
+      'module' => 'dfr_blocks', 'delta' => 'home_events',
+      'theme' => 'dfrtheme', 'region' => 'content_top',
+      'weight' => -25, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+    array(
+      'module' => 'dfr_blocks', 'delta' => 'home_help',
+      'theme' => 'dfrtheme', 'region' => 'content_top',
+      'weight' => -24, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+    array(
+      'module' => 'dfr_blocks', 'delta' => 'home_trad',
+      'theme' => 'dfrtheme', 'region' => 'content_top',
+      'weight' => -23, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => '<front>'
+    ),
+
+    // Footer top
+    array(
+      'module' => 'dfr_blocks', 'delta' => 'about_us',
+      'theme' => 'dfrtheme', 'region' => 'footer_top',
+      'weight' => -23, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+    ),
+
+    // Footer
+    array(
+      'module' => 'block', 'delta' => '10',
+      'theme' => 'dfrtheme', 'region' => 'footer',
+      'weight' => -10, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+    ),
+
+  );
+
+  $query = db_insert('block')
+    ->fields(array(
+      'module', 'delta', 'theme', 'status', 'weight', 'region', 'pages', 'title', 'cache', 'visibility'
+      ));
+  foreach ($values as $record) {
+    // Default values
+    $record += array(
+      'title' => "",
+      'cache' => DRUPAL_CACHE_PER_ROLE,
+      'weight' => 0,
+      'status' => 0,
+      'visibility' => 0,
+      'pages' => '',
+      'region' => -1,
+      'theme' => 'dfrtheme',
+    );
+    $query->values($record);
+  }
+  $query->execute();
+
+
+
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function dfr_blocks_uninstall() {
+}
