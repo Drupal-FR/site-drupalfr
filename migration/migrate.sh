@@ -47,11 +47,11 @@ drush en -y rules rules_admin
 drush en -y phone
 drush en -y dfr_emploi
 drush en -y userpoints userpoints_rules
+drush en -y transliteration
 drush en -y drupalfr_edito
 drush en -y twitter_block
 drush en -y dfr_blocks
 drush en -y drupalfr_events
-drush en -y transliteration
 
 drush cc all
 drush updatedb -y --verbose
