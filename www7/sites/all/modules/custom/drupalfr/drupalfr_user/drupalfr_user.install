@@ -74,5 +74,24 @@ function drupalfr_user_install() {
    * >>> direct to field_data_field_events as seens in #1 
    */
 
+  // Add new alias
+  db_insert('url_alias')
+    ->fields(array(
+      'source' => 'tracker',
+      'alias' => 'dernieres-contributions',
+      'language' => LANGUAGE_NONE,
+    ))
+    ->execute();
+  // Add a redirect between tracker2 and the new alias
+  $redirect = new Stdclass();
+  redirect_object_prepare($redirect);
+  $redirect->source = 'tracker2';
+  $redirect->redirect = 'dernieres-contributions';
+  redirect_save($redirect);
+  // Remove tracker2 alias
+  $existing_path = path_load('tracker');
+  variable_set('redirect_auto_redirect', FALSE);
+  path_delete($existing_path);
+  variable_set('redirect_auto_redirect', TRUE);
 }
 
