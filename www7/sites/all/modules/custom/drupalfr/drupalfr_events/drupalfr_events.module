@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_events_theme() {
+  return array(
+    'dfr_events_listing' => array(
+      'variables' => array('display_mode' => NULL, 'events' => array()),
+      'template' => 'drupalfr-events-listing',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function drupalfr_events_block_info() {
+  return array(
+    'drupalfr_next_events_meetup' => array(
+      'info' => t('Prochains évènements Meetup'),
+      'cache' => DRUPAL_CACHE_GLOBAL,
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function drupalfr_events_block_view($delta = '') {
+  switch($delta) {
+    case 'drupalfr_next_events_meetup':
+      $subject = t('5 prochains événements meetup.com');
+      $events = drupalfr_events_fetch_events(5);
+      $content = drupalfr_events_display_events($events, 'teaser');
+      $block['subject'] = $subject;
+      $block['content'] = $content;
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Displays the upcoming events.
+ *
+ * @param $events
+ *   Array of events coming from the raw answer of meetup.com API response.
+ * @param $display_mode
+ *   Display mode to choose the render format. Can be either teaser of full.
+ *
+ * @return array
+ *   Returns a renderable array.
+ */
+function drupalfr_events_display_events($events, $display_mode = 'teaser') {
+  $content = array();
+  if ($events) {
+    $content['#theme'] = 'dfr_events_listing';
+    $content['#display_mode'] = $display_mode;
+    $content['#events'] = $events;
+  }
+  else {
+    $content['#markup'] = "<p>Aucun évènement n'est prévu pour le moment.</p>";
+  }
+  return $content;
+}
+
+/**
+ * Fetch the upcoming events from Meetup.com API.
+ *
+ * @param $items
+ *   Number of items to extract from the feed.
+ *
+ * @return mixed
+ *   Returns FALSE if the feed is down or doesn't have any upcoming event.
+ *   Returns the raw array of the upcoming events extracted from
+ *   meetup.com API response.
+ */
+function drupalfr_events_fetch_events($items = 5) {
+  $query_url = 'https://api.meetup.com/2/events?key=4051646f3d23a6114243d5834497d&sign=true&status=upcoming&group_urlname=drupal-france-francophonie&page=' . $items;
+  $response = drupal_http_request($query_url);
+  if ($response->code == 200) {
+    // Extract the response data.
+    $data = drupal_json_decode($response->data);
+    if (count($data['results']) > 0) {
+      return $data['results'];
+    }
+    else {
+      return FALSE;
+    }
+  }
+  else {
+    watchdog('events_meetup', 'Error parsing the meetup feed. @reponse', array('@response' => $response));
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Exposes the display mode as an extra class.
+ */
+function drupalfr_events_preprocess_dfr_events_listing($variables) {
+  $variables['classes'] = implode(' ', array('drupalfr-events-list', $variables['display_mode']));
+}
+
+/**
+ * Implements hook_menu().
+ */
+function drupalfr_events_menu() {
+  return array(
+    'prochains-evenements' => array(
+      'title' => 'Prochain évènements',
+      'page callback' => 'drupalfr_events_upcoming_events',
+      'access arguments' => array('access content'),
+    ),
+  );
+}
+
+/**
+ * Page callback for prochains-evenements.
+ */
+function drupalfr_events_upcoming_events() {
+  if ($content = cache_get('upcoming-events-full')) {
+    return $content->data;
+  }
+  else {
+    $events = drupalfr_events_fetch_events(5);
+    $content['events'] = drupalfr_events_display_events($events, 'full');
+    $content['infos'] = array('#markup' => '<p>' . l('Voir tous les évènements', 'http://www.meetup.com/drupal-france-francophonie') . '</p>');
+    cache_set('upcoming-events-full', $content, 'cache', 3600);
+    return $content;
+  }
+}

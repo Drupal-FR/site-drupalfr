@@ -50,6 +50,7 @@ drush en -y userpoints userpoints_rules
 drush en -y drupalfr_edito
 drush en -y twitter_block
 drush en -y dfr_blocks
+drush en -y drupalfr_events
 
 drush cc all
 drush updatedb -y --verbose
