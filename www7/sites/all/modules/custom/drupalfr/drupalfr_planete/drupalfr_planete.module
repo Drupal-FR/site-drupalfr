@@ -19,6 +19,39 @@ function drupalfr_planete_entity_info_alter(&$entity_info) {
 }
 
 /**
+ * Implements hook_block_info().
+ */
+function drupalfr_planete_block_info() {
+  return array(
+    'author' => array(
+      'info' => t("Planet node author"),
+      'cache' => DRUPAL_NO_CACHE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function drupalfr_planete_block_view($delta = '') {
+  switch ($delta) {
+
+    case 'author':
+      if (!($node = menu_get_object()) ||
+          'planete' !== $node->type ||
+          !isset($node->field_planete_user) ||
+          empty($node->field_planete_user) ||
+          !($uid = $node->field_planete_user[LANGUAGE_NONE][0]['uid']) ||
+          !($account = user_load($uid)))
+      {
+        return;
+      }
+
+      return array('content' => user_view($account, 'planete_author'));
+  }
+}
+
+/**
  * Ensures that the feed exist.
  */
 function _drupalfr_planete_user_save($account) {
