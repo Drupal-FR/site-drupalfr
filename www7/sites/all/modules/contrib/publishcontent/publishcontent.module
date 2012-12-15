@@ -1,0 +1,217 @@
+<?php
+
+/**
+ * @file
+ * Add link to publish or unpublish a node, with access control based on the
+ * node type
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function publishcontent_menu() {
+  $items = array();
+  $items['node/%node/publish/%publishcontent_security_token'] = array(
+    'title' => 'Publish',
+    'page callback' => 'publishcontent_toggle_status',
+    'page arguments' => array(1),
+    'access callback' => '_publishcontent_publish_access',
+    'access arguments' => array(1, 3),
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+    'options' => array('attributes' => array('class' => array('publishcontent-link', 'publishcontent-publish'))),
+  );
+  $items['node/%node/unpublish/%publishcontent_security_token'] = array(
+    'title' => 'Unpublish',
+    'page callback' => 'publishcontent_toggle_status',
+    'page arguments' => array(1),
+    'access callback' => '_publishcontent_unpublish_access',
+    'access arguments' => array(1, 3),
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+    'options' => array('attributes' => array('class' => array('publishcontent-link', 'publishcontent-unpublish'))),
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  return $items;
+}
+
+/**
+ * Used to append a security token to prevent XSS.
+ *
+ * @see Dynamic argument replacement (wildcard) for hook_menu at
+ *      http://drupal.org/node/109153
+ */
+function publishcontent_security_token_to_arg($arg, $map, $index) {
+  return drupal_get_token();
+}
+
+/**
+ * Access callback for publish action. Only allow access based on permissions 
+ * and current node status = unpublished
+ */
+function _publishcontent_publish_access($node, $token = FALSE) {
+  if ($token && !drupal_valid_token($token)) {
+    return FALSE;
+  }
+  if (!variable_get('publishcontent_' . $node->type, TRUE)) {
+    return FALSE;
+  }
+
+  global $user;
+  return !$node->status && 
+    (user_access('publish any content') 
+    || (user_access('publish own content') && $user->uid == $node->uid) 
+    || (user_access('publish editable content') && node_access('update', $node))
+    || (user_access('publish own '. check_plain($node->type) .' content', $user) && $user->uid == $node->uid) 
+    || user_access('publish any '. check_plain($node->type) .' content') 
+    || (user_access('publish editable '. check_plain($node->type) .' content') && node_access('update', $node))
+  );
+}
+
+/**
+ * Access callback for unpublish action. Only allow access based on permissions
+ * and current node status = published
+ */
+function _publishcontent_unpublish_access($node, $token = FALSE) {
+  if ($token && !drupal_valid_token($token)) {
+    return FALSE;
+  }
+  if (!variable_get('publishcontent_' . $node->type, TRUE)) {
+    return FALSE;
+  }
+
+  global $user;
+  return $node->status && 
+    (user_access('unpublish any content') 
+    || (user_access('unpublish own content') && $user->uid == $node->uid) 
+    || (user_access('unpublish editable content') && node_access('update', $node)) 
+    || (user_access('unpublish own '. check_plain($node->type) .' content', $user) && $user->uid == $node->uid) 
+    || user_access('unpublish any '. check_plain($node->type) .' content') 
+    || (user_access('unpublish editable '. check_plain($node->type) .' content') && node_access('update', $node))
+  );
+}
+
+/**
+ * Implementation of hook_permission().
+ */
+function publishcontent_permission() {
+  $perms = array(
+    'publish any content' => array(
+      'title' => t('Publish any content'),
+      ),
+    'unpublish any content' => array(
+      'title' => t('Unpublish any content'),
+    'publish editable content' => array(
+      'title' => t('Publish editable content'),
+    ),
+    'unpublish editable content',
+      'title' => t('Unpublish editable content'),
+    ));
+
+  foreach (node_type_get_types() as $type) {
+    if (!variable_get('publishcontent_' . $type->type, TRUE)) {
+      continue;
+    }
+    if (isset($type->type)) {
+      $perms['publish any ' . $type->type . ' content'] = array(
+        'title' => t('Publish any @type content', array('@type' => $type->name)));
+      $perms['publish own ' . $type->type . ' content'] = array(
+        'title' => t('Publish own @type content', array('@type' => $type->name)));
+      $perms['publish editable ' . $type->type . ' content'] = array(
+        'title' => t('Publish editable @type content', array('@type' => $type->name)));
+      $perms['unpublish any ' . $type->type . ' content'] = array(
+        'title' => t('Unpublish any @type content', array('@type' => $type->name)));
+      $perms['unpublish own ' . $type->type . ' content'] = array(
+        'title' => t('Unpublish own @type content', array('@type' => $type->name)));
+      $perms['unpublish editable ' . $type->type . ' content'] = array(
+        'title' => t('Unpublish editable @type content', array('@type' => $type->name)));
+    }
+  }
+  return $perms;
+}
+
+/**
+ * Helper function to generate change of status message.
+ */
+function _publishcontent_get_message($nid, $title, $status) {
+  return t($status ? '"@title" [@nid] has been published'
+                         : '"@title" [@nid] has been unpublished',
+           array('@title' => $title, '@nid' => $nid));
+}
+
+/**
+ * Menu callback for publish / unpublish content actions.
+ * @param $node a node object
+ */
+function publishcontent_toggle_status($node) {
+  // XOR the current status with 1 to get the opposite value.
+  $node->status = $node->status ^ 1;
+  // If this content type specifies that a new revision should be created on
+  // editing, then make sure to respect this option.
+  $node_options = variable_get('node_options_' . $node->type, array());
+  if (in_array('revision', $node_options)) {
+    $node->revision = 1;
+  }
+  node_save($node);
+  drupal_set_message(_publishcontent_get_message($node->nid, $node->title, $node->status));
+  drupal_goto($_SERVER['HTTP_REFERER']);
+}
+
+/**
+ * Implementation of hook_form_alter()
+ *
+ * allow to use the 'Publishing options' on the edit/add page
+ */
+function publishcontent_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'node_type_form') {
+    $form['workflow']['publishcontent'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable publishcontent permissions for this node type.'),
+      '#default_value' => variable_get('publishcontent_' . $form['#node_type']->type, TRUE),
+      '#description' => t('Unchecking this option will disable publish and unpublish links for this node type.'),
+    );
+  }
+  elseif (user_access('administer nodes')
+  || empty($form['#node']) || empty($form['#node']->type)
+  || $form['#node']->type . '_node_form' != $form_id
+  || (!_publishcontent_unpublish_access($form['#node'])
+      && !_publishcontent_publish_access($form['#node']))) {
+     return;
+  }
+  $form['options']['status']['#access'] = TRUE;
+  if (!empty($form['options']['#access'])) {
+    return;
+  }
+  else {
+    $form['options']['#access'] = TRUE;
+  }
+  foreach (element_children($form['options']) as $key) {
+    // If another form has afforded access to a particular option, do not
+    // override that access. Otherwise, disable it.
+    $form['options'][$key]['#access'] =
+     isset($form['options'][$key]['#access'])
+     ? $form['options'][$key]['#access'] : FALSE;
+  }
+}
+
+/**
+ * Implements hook_views_api()
+ */
+function publishcontent_views_api() {
+  return array('api' => 3);
+}
+
+/**
+ * Implements hook_views_data_alter() to add items to the node table that are
+ * relevant to publishcontent.
+ */
+function publishcontent_views_data_alter(&$data) {
+  // new comments
+  $data['node']['publishcontent'] = array(
+    'title' => t('Publish link'),
+    'help' => t('Display a link to publish the node.'),
+    'field' => array(
+      'handler' => 'publishcontent_views_handler_field_node_link',
+    ),
+  );
+}

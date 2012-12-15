@@ -1,0 +1,211 @@
+<?php
+
+/**
+ * @file
+ * Unit tests for Publish Content module.
+ * prerequesite: make sure that 'authenticated user' does not have any access like
+ *               'publish [content type] content' or 'unpublish [content type] content'
+ *
+ * @note: We test to ensure we are not messing up with the default Drupal access for view node
+ *        i.e. a owner of a node can view it even if unpublished.
+ */
+class PublishContentWebCaseTest extends DrupalWebTestCase {
+
+  /**
+   * Drupal SimpleTest method: return metadata about the test.
+   */
+  function getInfo() {
+    return array(
+      'name'  => t('Publish Content: access control'),
+      'description'  => t('Executes test suite for Publish Content module.'),
+      'group' => t('Publish Content'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('publishcontent');
+  }
+
+  function publishcontent_do_operation($nid, $op, $expected_status, $msg = NULL) {
+    $this->drupalGet("node/$nid/$op");
+    $node = node_load($nid, NULL, TRUE);
+    $this->assertEqual($node->status, $expected_status, $msg);
+  }
+
+  function assert_access_node($node, $msg = NULL) {
+    $this->drupalGet('node/'. $node->nid);
+    $this->assertResponse(200);
+    $this->assertTitle($node->title . ' | '. variable_get('site_name', 'Drupal'), $msg);
+  }
+
+  function assert_access_denied($url, $msg = NULL) {
+    $this->drupalGet($url);
+    $this->assertResponse(403);
+    $this->assertText('Access denied' . ' | '. variable_get('site_name', 'Drupal'), $msg);
+  }
+
+  function assert_node_status($nid, $status, $msg = 'node status mismatches') {
+    $result = node_load($nid, NULL, TRUE);
+    $this->assertEqual($result->status, $status, $msg);
+  }
+
+  function set_node_status(&$node, $status, $msg = 'unable to set correct node status') {
+    $node->status = $status;
+    node_save($node);
+    $this->assert_node_status($node->nid, $status, $msg);
+  }
+
+  function assert_current_user_cannot_publish_node(&$node) {
+    $this->assertEqual($node->status, 1, 'pre-requesite: status MUST be 1');
+    $this->assert_access_denied("node/{$node->nid}/publish", "no publish permission --> access denied");
+    $this->assert_node_status($node->nid, 1, 'node should be still published');
+    $this->assert_access_node($node, 'node MUST BE viewable');
+
+    $this->set_node_status($node, 0);
+
+    $this->assert_access_denied("node/{$node->nid}/publish", "no publish permission --> access denied");
+    $this->assert_node_status($node->nid, 0, 'node should be still unpublished');
+
+    $this->set_node_status($node, 1, 'post-requesite: status MUST be 1');
+  }
+
+  function assert_current_user_cannot_unpublish_node(&$node) {
+    $this->assertEqual($node->status, 1, 'pre-requesite: status MUST be 1');
+    $this->assert_access_denied("node/{$node->nid}/unpublish", "no unpublish permission --> access denied");
+    $this->assert_node_status($node->nid, 1, 'node should be still published');
+    $this->assert_access_node($node, 'node MUST BE viewable');
+
+    $this->set_node_status($node, 0);
+
+    $this->assert_access_denied("node/{$node->nid}/unpublish", "no unpublish permission --> access denied");
+    $this->assert_node_status($node->nid, 0, 'node should be still unpublished');
+
+    $this->set_node_status($node, 1, 'post-requesite: status MUST be 1');
+  }
+
+  function assert_current_user_can_publish_node(&$node) {
+    $this->assertEqual($node->status, 1, 'pre-requesite: status MUST be 1');
+    $this->publishcontent_do_operation($node->nid, 'publish', 1, 'node should be still published');
+    $this->assert_access_node($node, 'node MUST BE viewable');
+
+    $this->set_node_status($node, 0);
+
+    $this->assert_access_node($node, 'node MUST BE viewable even if unpublished');
+
+    $this->publishcontent_do_operation($node->nid, 'publish', 1, 'node should be now published');
+    $this->assertText(_publishcontent_get_message($node->nid, $node->title, TRUE),
+                      'drupal_set_message not working for publish.');
+
+    $this->set_node_status($node, 1, 'post-requesite: status MUST be 1');
+  }
+
+  function assert_current_user_can_unpublish_node(&$node) {
+    $this->assertEqual($node->status, 1, 'pre-requesite: status MUST be 1');
+    $this->publishcontent_do_operation($node->nid, 'unpublish', 0, 'node should be published');
+    $this->assertText(_publishcontent_get_message($node->nid, $node->title, FALSE),
+                      'drupal_set_message not working for unpublish.');
+
+    $this->assert_access_node($node, 'node MUST BE viewable even if unpublished');
+
+    $this->publishcontent_do_operation($node->nid, 'unpublish', 0, 'node should be still unpublished');
+
+    $this->set_node_status($node, 1, 'post-requesite: status MUST be 1');
+  }
+
+  /**
+   * Test the access for the owner of a node without the permission to
+   * publish or unpublish.
+   *
+   * @note: node's owner can see it even if unpublished by default in Drupal
+   */
+  function testNoPermissionByOwner() {
+    // Prepare a user to do the stuff
+    $web_user = $this->drupalCreateUser(array('access content'));
+    $this->drupalLogin($web_user);
+    $node = $this->drupalCreateNode(
+      array(
+        'type' => 'page',
+        'uid' => $web_user->uid,
+        'status' => 1,
+      )
+    );
+    $this->assert_current_user_cannot_publish_node($node);
+    $this->assert_current_user_cannot_unpublish_node($node);
+
+    $this->set_node_status($node, 0);
+    $this->assert_access_node($node, 'node MUST BE viewable if unpublished');
+  }
+
+  function testNoPermissionAndNotOwner() {
+    $node = $this->drupalCreateNode(
+      array(
+        'type' => 'page',
+        'uid' => 0,
+        'status' => 1,
+      )
+    );
+
+    $this->drupalLogin($this->drupalCreateUser(array('access content')));
+    $this->assert_current_user_cannot_publish_node($node);
+    $this->assert_current_user_cannot_unpublish_node($node);
+  }
+
+  function testDoPublishByNodeOwner() {
+    $type = 'page';
+    $web_user = $this->drupalCreateUser(array('publish any '. $type .' content'));
+    $this->drupalLogin($web_user);
+
+    $node = $this->drupalCreateNode(
+      array(
+        'type' => $type,
+        'uid' => $web_user->uid,
+        'status' => 1,
+      )
+    );
+    $this->assert_current_user_can_publish_node($node);
+    $this->assert_current_user_cannot_unpublish_node($node);
+  }
+
+  function testDoUnpublishByNodeOwner() {
+    $type = 'page';
+    $web_user = $this->drupalCreateUser(array('unpublish any '. $type .' content'));
+    $this->drupalLogin($web_user);
+
+    $node = $this->drupalCreateNode(
+      array(
+        'type' => $type,
+        'uid' => $web_user->uid,
+        'status' => 1,
+      )
+    );
+    $this->assert_current_user_cannot_publish_node($node);
+    $this->assert_current_user_can_unpublish_node($node);
+  }
+
+  function testDoPublishAndUnpublishNotByNodeOwner() {
+    $type = 'page';
+    $node = $this->drupalCreateNode(
+      array(
+        'type' => $type,
+        'uid' => 0,
+        'status' => 1,
+      )
+    );
+
+    $this->drupalLogin($this->drupalCreateUser(array('publish any '. $type .' content')));
+    $this->assert_current_user_can_publish_node($node);
+    $this->assert_current_user_cannot_unpublish_node($node);
+
+    $this->drupalLogin($this->drupalCreateUser(array('unpublish any '. $type .' content')));
+    $this->assert_current_user_cannot_publish_node($node);
+    $this->assert_current_user_can_unpublish_node($node);
+
+    $this->drupalLogin($this->drupalCreateUser(array('publish any content')));
+    $this->assert_current_user_can_publish_node($node);
+    $this->assert_current_user_cannot_unpublish_node($node);
+
+    $this->drupalLogin($this->drupalCreateUser(array('unpublish any content')));
+    $this->assert_current_user_cannot_publish_node($node);
+    $this->assert_current_user_can_unpublish_node($node);
+  }
+}
