@@ -86,6 +86,29 @@ function drupalfr_edito_default_rules_configuration() {
       ]
     }
   }');
+  $items['rules_comment_is_unpublished'] = entity_import('rules_config', '{ "rules_comment_is_unpublished" : {
+      "LABEL" : "Comment is unpublished",
+      "PLUGIN" : "reaction rule",
+      "REQUIRES" : [ "rules", "userpoints_rules", "comment" ],
+      "ON" : [ "comment_update" ],
+      "IF" : [
+        { "data_is" : { "data" : [ "comment:status" ], "value" : "0" } },
+        { "data_is" : { "data" : [ "comment-unchanged:status" ], "value" : "1" } }
+      ],
+      "DO" : [
+        { "userpoints_action_grant_points" : {
+            "user" : [ "comment:author" ],
+            "points" : "-1",
+            "tid" : "0",
+            "entity" : [ "comment" ],
+            "operation" : "Remove",
+            "display" : 0,
+            "moderate" : "approved"
+          }
+        }
+      ]
+    }
+  }');
   $items['rules_forum_post_is_published'] = entity_import('rules_config', '{ "rules_forum_post_is_published" : {
       "LABEL" : "Forum post is published",
       "PLUGIN" : "reaction rule",
