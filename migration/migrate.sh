@@ -81,7 +81,7 @@ drush php-eval "redirect_delete(1);"
 drush vset admin_theme seven
 
 # update site_name & site_slogan
-drush vset site_name "DrupalFR"
+drush vset site_name "Drupalfr.org"
 drush vset site_slogan "Communauté Drupal France et francophonie"
 
 # Performance wise options
