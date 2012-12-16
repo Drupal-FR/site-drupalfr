@@ -83,6 +83,13 @@ function drupalfr_edito_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_offre_pattern';
+  $strongarm->value = 'emploi/[node:title]';
+  $export['pathauto_node_offre_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_page_pattern';
   $strongarm->value = '';
   $export['pathauto_node_page_pattern'] = $strongarm;
@@ -93,6 +100,20 @@ function drupalfr_edito_strongarm() {
   $strongarm->name = 'pathauto_node_pattern';
   $strongarm->value = '';
   $export['pathauto_node_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_planete_feed_source_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_planete_feed_source_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_planete_pattern';
+  $strongarm->value = 'planete/article/[node:title]';
+  $export['pathauto_node_planete_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
