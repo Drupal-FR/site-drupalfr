@@ -84,6 +84,13 @@ function dfr_blocks_enable() {
       'title' => "", 'status' => 1,
       'visibility' => 1, 'pages' => '<front>'
     ),
+    array(
+      'module' => 'views', 'delta' => 'planete_user-block',
+      'theme' => 'dfrtheme', 'region' => 'content',
+      'weight' => 14, 'cache' => DRUPAL_NO_CACHE,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => 'profil/*>'
+    ),
 
 
     // Sidebar
