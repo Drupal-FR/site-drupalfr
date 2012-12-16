@@ -52,6 +52,7 @@ drush en -y drupalfr_edito
 drush en -y twitter_block
 drush en -y dfr_blocks
 drush en -y drupalfr_events
+drush en -y bueditor
 
 drush cc all
 drush updatedb -y --verbose
@@ -62,6 +63,10 @@ drush -y content-migrate-fields
 drush cc all
 
 drush en -y dfr_migration
+
+# Configure BUEditor
+drush vset --exact bueditor_user '1'
+drush eval "print json_encode(array(13=>array('weight'=>'0','editor'=>'0','alt'=>'0'),4=>array('weight'=>'0','editor'=>'0','alt'=>'0'),11=>array('weight'=>'0','editor'=>'0','alt'=>'0'),9=>array('weight'=>'0','editor'=>'0','alt'=>'0'),12=>array('weight'=>'0','editor'=>'0','alt'=>'0'),7=>array('weight'=>'0','editor'=>'0','alt'=>'0'),2=>array('editor'=>'1','alt'=>'0','weight'=>11),1=>array('weight'=>12,'editor'=>'0','alt'=>'0'),))" | drush --exact vset --format=json bueditor_roles -
 
 # Fix flag migration
 drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'forum'"
