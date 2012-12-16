@@ -20,6 +20,9 @@ drush sqlc < ../migration/sql/pre-migration.sql
 # Try a migration.
 drush updatedb -y --verbose
 
+# Disable some useless core modules
+drush dis -y rdf
+
 # enable modules
 drush en -y pathologic
 drush en -y drupalfr_user
