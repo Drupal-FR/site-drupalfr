@@ -178,7 +178,11 @@ function dfr_migration_migrate_profiles_batch(&$context) {
       );
     }
     else {
-      $user->field_picture = NULL;
+      $user->field_picture = array(
+        LANGUAGE_NONE => array(
+          'fid' => variable_get('drupalfr_user_default_picture', 0),
+        ),
+      );
     }
     // Fetch the events the user attended.
     $query_events = db_select('content_field_events', 'cfe');

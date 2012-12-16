@@ -93,5 +93,30 @@ function drupalfr_user_install() {
   variable_set('redirect_auto_redirect', FALSE);
   path_delete($existing_path);
   variable_set('redirect_auto_redirect', TRUE);
+
+  _drupalfr_user_install_ensure_default_user_picture();
 }
 
+/**
+ * Ensures the default user picture is set.
+ */
+function _drupalfr_user_install_ensure_default_user_picture() {
+  if (!variable_get('drupalfr_user_default_picture')) {
+
+    $file           = new stdClass;
+    $file->filename = 'public://drupalfr_user.png';
+    $file->uri      = drupal_get_path('module', 'drupalfr_user') . '/drupalfr_user.png';
+    $file->filemime = 'image/png';
+
+    $file = file_copy($file, 'public://drupalfr_user.png', FILE_EXISTS_REPLACE);
+
+    variable_set('drupalfr_user_default_picture', $file->fid);
+  }
+}
+
+/**
+ * Ensures the default user picture is set.
+ */
+function drupalfr_user_update_7000() {
+  _drupalfr_user_install_ensure_default_user_picture();
+}
