@@ -23,8 +23,9 @@ function dfr_emploi_views_default_views() {
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Offres d\'emploi';
+  $handler->display->display_options['use_more'] = TRUE;
   $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['use_more_text'] = 'plus';
+  $handler->display->display_options['use_more_text'] = 'Toutes les offres';
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
@@ -37,13 +38,36 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['pager']['options']['tags']['next'] = 'suivant ›';
   $handler->display->display_options['pager']['options']['tags']['last'] = 'dernier »';
   $handler->display->display_options['style_plugin'] = 'default';
-  $handler->display->display_options['row_plugin'] = 'node';
+  $handler->display->display_options['row_plugin'] = 'fields';
+  $handler->display->display_options['row_options']['inline'] = array(
+    'field_type_contrat' => 'field_type_contrat',
+    'field_societe' => 'field_societe',
+  );
+  $handler->display->display_options['row_options']['separator'] = ' - ';
+  $handler->display->display_options['row_options']['hide_empty'] = TRUE;
   /* Field: Contenu: Titre */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
-  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
-  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['alter']['max_length'] = '30';
+  $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
+  /* Field: Contenu: Type de contrat */
+  $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
+  $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
+  $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
+  $handler->display->display_options['fields']['field_type_contrat']['label'] = '';
+  $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Contenu: Société */
+  $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
+  $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
+  $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
+  $handler->display->display_options['fields']['field_societe']['label'] = '';
+  $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_societe']['type'] = 'node_reference_plain';
   /* Sort criterion: Contenu: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -132,12 +156,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['pager'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'some';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '5';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '3';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $translatables['offres'] = array(
     t('Master'),
     t('Offres d\'emploi'),
-    t('plus'),
+    t('Toutes les offres'),
     t('Apply'),
     t('Réinitialiser'),
     t('Sort by'),
@@ -150,8 +174,8 @@ function dfr_emploi_views_default_views() {
     t('‹ précédent'),
     t('suivant ›'),
     t('dernier »'),
-    t('Titre'),
     t('Page'),
+    t('plus'),
     t('Région'),
     t('Type de contrat'),
     t('Bloc'),

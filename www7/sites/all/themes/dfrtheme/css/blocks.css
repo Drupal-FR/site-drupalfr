@@ -221,6 +221,8 @@
 #block-views-drupalfr-block-1 .more-link a {color:#444;}
 #block-views-drupalfr-block-1 .more-link a:before {content:"» ";}
 
+
+
 /** ******************************************************* **/
 /** Sidebar                                                 **/
 /** ******************************************************* **/
@@ -277,6 +279,8 @@
 .block li .tweet span a {color:#444;}
 .block li .tweet span a:hover {color:#00C3DD;text-decoration: none;}
 
+
+
 /** ******************************************************* **/
 /** Footer Top                                              **/
 /** ******************************************************* **/
@@ -289,16 +293,54 @@
   color:#fff;
   text-shadow:0 1px 0 #000;
   margin-bottom:1em;
+  letter-spacing: 0;
 }
 
 #block-dfr-blocks-about-us {
   display:inline-block;vertical-align: top;
-  width:33%;
+  width:30%;
+  padding-right: 3%;
 }
-#block-block-7 {
+#block-views-offres-block-1 {
+  position:relative;
   display:inline-block;vertical-align: top;
-  width:66%;
+  width:69%;
 }
+#block-views-offres-block-1 .views-row {
+  display:inline-block;vertical-align: top;
+  width:31%;margin-left:3%;
+  min-height: 10em;
+  padding:1em;
+  font-size:13px;
+
+  background:url(../images/clients-bg.png) 0 0 repeat;
+  border-radius:5px;background-clip:padding-box;
+  -moz-border-radius:5px;-moz-background-clip:padding-box;
+  -webkit-border-radius:5px;-webkit-background-clip:padding-box;
+
+}
+#block-views-offres-block-1 .views-row:first-child {margin-left:0;}
+#block-views-offres-block-1 .views-row > span {
+  opacity: 0.6;
+  -moz-opacity: 0.6;
+  filter:alpha(opacity=6);
+}
+
+#block-views-offres-block-1 .views-field-title {
+  font-size:16px;
+  border-bottom:1px solid rgba(200, 200, 200, 0.6);
+}
+#block-views-offres-block-1 .views-field-title a {color:#fff;}
+#block-views-offres-block-1 .views-field-title a:hover {color:#00C3DD;text-decoration: none;}
+
+#block-views-offres-block-1 .more-link {position:absolute;top:-0.5em;right:0;}
+#block-views-offres-block-1 .more-link a:before {content:"» ";}
+
+
+
+
+
+
 
 /** ******************************************************* **/
 /** Footer                                                  **/
