@@ -43,7 +43,7 @@ function dfr_emploi_node_access($node, $op, $account) {
  * Implements hook_url_outbound_alter().
  */
 function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
-  if (variable_get('dfr_emploi_rewrite_urls', FALSE)) {
+  if (variable_get('dfr_emploi_rewrite_urls', TRUE)) {
     global $base_url;
     // On est sur emploi.*
     if (preg_match('|^(https?:\/\/)emploi\.(.+)|', $base_url, $matches) && !$options['external']) {
@@ -69,7 +69,7 @@ function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
  * Implements hook_url_inbound_alter().
  */
 function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
-  if (variable_get('dfr_emploi_rewrite_urls', FALSE)) {
+  if (variable_get('dfr_emploi_rewrite_urls', TRUE)) {
     global $base_url;
     // On arrive sur emploi.*
     if (preg_match('|^https?:\/\/emploi\.(.+)|', $base_url)) {
