@@ -87,6 +87,14 @@ DirectoryIndex index.php index.html index.htm
   # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   # RewriteRule ^ http://%1%{REQUEST_URI} [L,R=301]
 
+  # Redirect emploi.drupalfr.org to drupalfr.org/emploi internally
+  RewriteCond %{HTTP_HOST} ^emploi\.(.+)$ [NC]
+  RewriteRule - http://%1/emploi%{REQUEST_URI} [L,P]
+
+  # Redirect drupalfr.org/emploi to emploi.drupalfr.org explicitly
+  RewriteCond %{REQUEST_URI} ^/emploi(.+)$ [NC]
+  RewriteRule ^ http://emploi.%{HTTP_HOST}%1 [L,R=301]
+
   # Modify the RewriteBase if you are using Drupal in a subdirectory or in a
   # VirtualDocumentRoot and the rewrite rules are not working properly.
   # For example if your site is at http://example.com/drupal uncomment and
