@@ -141,7 +141,13 @@ documentation/*'
       'visibility' => 1, 'pages' => 'forum
 forum/*'
     ),
-
+    array(
+      'module' => 'dfr_emploi', 'delta' => 'creer-offre',
+      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
+      'weight' => -15, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+      'visibility' => 1, 'pages' => 'emploi*',
+    ),
     // Content top
     array(
       'module' => 'dfr_blocks', 'delta' => 'home_events',

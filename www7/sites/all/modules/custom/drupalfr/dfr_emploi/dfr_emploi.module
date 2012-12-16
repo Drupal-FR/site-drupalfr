@@ -101,3 +101,29 @@ function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
     }
   }
 }
+
+/**
+ * Implements hook_block_info().
+ */
+function dfr_emploi_block_info() {
+  $blocks['creer-offre'] = array(
+    'info' => t('Lien création offre d\'emploi'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function dfr_emploi_block_view($delta = '') {
+  $block = array();
+
+  $block['subject'] = '';
+  $block['content'] = l('Créer une offre', 'node/add/offre', array(
+    'attributes' => array('class' => 'btn-link'),
+  ));
+  $block['content'] .= '<p><em>Vous devez être connecté pour pouvoir créer une offre.</em></p>';
+  return $block;
+}
