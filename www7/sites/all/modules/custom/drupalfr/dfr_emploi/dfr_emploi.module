@@ -127,3 +127,24 @@ function dfr_emploi_block_view($delta = '') {
   $block['content'] .= '<p><em>Vous devez être connecté pour pouvoir créer une offre.</em></p>';
   return $block;
 }
+
+/**
+ * Implements hook_cron().
+ */
+function dfr_emploi_cron() {
+  // Unpublish expired offres
+  $results = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('status', 1)
+    ->condition('type', 'offre')
+    ->execute()
+    ->fetchAllKeyed();
+  $nodes = node_load_multiple(array_keys($results));
+  foreach ($nodes as $node) {
+    $lifetime = (int)$node->field_temps_publication['und'][0]['value'] * 30 * 24 * 3600;
+    if(REQUEST_TIME > $node->changed + $lifetime) {
+      $node->status = 0;
+      node_save($node);
+    }
+  }
+}

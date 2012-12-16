@@ -96,10 +96,10 @@ function dfr_emploi_strongarm() {
           'weight' => '0',
         ),
         'path' => array(
-          'weight' => '11',
+          'weight' => '10',
         ),
         'redirect' => array(
-          'weight' => '10',
+          'weight' => '9',
         ),
       ),
       'display' => array(),
@@ -148,20 +148,6 @@ function dfr_emploi_strongarm() {
   $strongarm->name = 'node_submitted_offre';
   $strongarm->value = 0;
   $export['node_submitted_offre'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'scheduler_unpublish_enable_offre';
-  $strongarm->value = 1;
-  $export['scheduler_unpublish_enable_offre'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'scheduler_unpublish_required_offre';
-  $strongarm->value = 1;
-  $export['scheduler_unpublish_required_offre'] = $strongarm;
 
   return $export;
 }

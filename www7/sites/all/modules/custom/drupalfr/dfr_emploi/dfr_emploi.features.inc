@@ -32,7 +32,7 @@ function dfr_emploi_node_info() {
       'description' => t('Une offre d\'emploi ou un stage Drupal pour les francophones.'),
       'has_title' => '1',
       'title_label' => t('Intitulé'),
-      'help' => t('Totalement facultatif'),
+      'help' => '',
     ),
   );
   return $items;

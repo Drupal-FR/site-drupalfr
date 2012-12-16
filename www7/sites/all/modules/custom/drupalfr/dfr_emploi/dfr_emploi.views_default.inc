@@ -107,7 +107,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Filter criterion: Contenu: Implantation géographique (field_region) */
+  /* Filter criterion: Contenu: Région (field_region) */
   $handler->display->display_options['filters']['field_region_value']['id'] = 'field_region_value';
   $handler->display->display_options['filters']['field_region_value']['table'] = 'field_data_field_region';
   $handler->display->display_options['filters']['field_region_value']['field'] = 'field_region_value';

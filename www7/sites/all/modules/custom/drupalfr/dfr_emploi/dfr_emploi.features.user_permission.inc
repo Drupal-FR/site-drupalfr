@@ -28,15 +28,6 @@ function dfr_emploi_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: schedule (un)publishing of nodes.
-  $permissions['schedule (un)publishing of nodes'] = array(
-    'name' => 'schedule (un)publishing of nodes',
-    'roles' => array(
-      0 => 'authenticated user',
-    ),
-    'module' => 'scheduler',
-  );
-
   // Exported permission: unpublish own offre content.
   $permissions['unpublish own offre content'] = array(
     'name' => 'unpublish own offre content',
