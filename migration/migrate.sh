@@ -56,6 +56,7 @@ drush en -y twitter_block
 drush en -y dfr_blocks
 drush en -y drupalfr_events
 drush en -y bueditor
+drush en -y drupalfr_forums
 
 drush cc all
 drush updatedb -y --verbose
