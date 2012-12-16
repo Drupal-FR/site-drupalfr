@@ -38,6 +38,14 @@ function drupalfr_planete_node_info() {
       'title_label' => t('Titre'),
       'help' => '',
     ),
+    'planete_feed_source' => array(
+      'name' => t('Planete Feed Source'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Titre'),
+      'help' => '',
+    ),
   );
   return $items;
 }
