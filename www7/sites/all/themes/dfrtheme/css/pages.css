@@ -19,15 +19,14 @@
 /** ******************************************************* **/
 
 #documentation {}
-#documentation .book {
+#documentation .node-doc {
   border-bottom:1px solid #dee6ee;
-  padding-bottom:1em;
   margin-bottom:1em;
 }
-#documentation .book:last-child {border-bottom:none;}
+#documentation .node-doc:last-child {border-bottom:none;}
 
-#documentation .book a {color:#444;}
-#documentation .book a:hover {color:#00C3DD;}
+#documentation .node-doc .menu a {color:#444;}
+#documentation .node-doc .menu a:hover {color:#00C3DD;}
 
 
 /** ******************************************************* **/
@@ -125,7 +124,7 @@
 
 
 .field-name-field-planete-user {position:relative;}
-.field-name-field-planete-user .field-name-field-picture {}
+.field-name-field-planete-user .field-name-field-picture {float:none;}
 .field-name-field-planete-user .content {
   display:none;
   position:absolute;z-index:1;
@@ -136,7 +135,13 @@
 
   border:1px solid #E4EAEF;
   background:#fff;
-  border-radius: 5px;
+  -webkit-border-radius: 5px;-webkit-background-clip:padding-box;
+  -moz-border-radius: 5px;-moz-background-clip:padding-box;
+  border-radius: 5px;background-clip:padding-box;
+
+  -webkit-box-shadow: 2px 2px 2px rgba(50, 50, 50, 0.4);
+  -moz-box-shadow:    2px 2px 2px rgba(50, 50, 50, 0.4);
+  box-shadow:         2px 2px 2px rgba(50, 50, 50, 0.4);
 }
 .field-name-field-planete-user .content:after,
 .field-name-field-planete-user .content:before {
@@ -165,14 +170,6 @@
 
 
 .field-name-field-planete-user.expanded .content {display:block;}
-.field-name-field-planete-user .field-name-field-realname {
-  font-size:18px;
-  font-weight: bold;
-  margin-bottom:1em;
-}
-.field-name-field-planete-user .field-name-field-website {
-  margin-top:1em;
-}
 
 
 
