@@ -169,29 +169,6 @@ function dfrtheme_menu_tree($vars) {
   return '<ul class="menu clearfix">' . $vars['tree'] . '</ul>';
 }
 
-/**
- * Implements theme_field__field_type().
- */
-function dfrtheme_field__taxonomy_term_reference($vars) {
-  $output = '';
-
-  // Render the label, if it's not hidden.
-  if (!$vars['label_hidden']) {
-    $output .= '<h3 class="field-label">' . $vars['label'] . ': </h3>';
-  }
-
-  // Render the items.
-  $output .= ( $vars['element']['#label_display'] == 'inline') ? '<ul class="links inline">' : '<ul class="links">';
-  foreach ($vars['items'] as $delta => $item) {
-    $output .= '<li class="taxonomy-term-reference-' . $delta . '"' . $vars['item_attributes'][$delta] . '>' . drupal_render($item) . '</li>';
-  }
-  $output .= '</ul>';
-
-  // Render the top-level DIV.
-  $output = '<div class="' . $vars['classes'] . (!in_array('clearfix', $vars['classes_array']) ? ' clearfix' : '') . '">' . $output . '</div>';
-
-  return $output;
-}
 
 function dfrtheme_preprocess_user_profile(&$vars) {
   // dpm(array_keys($vars));
