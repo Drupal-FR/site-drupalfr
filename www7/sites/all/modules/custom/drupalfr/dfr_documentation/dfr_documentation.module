@@ -59,8 +59,7 @@ function dfr_documentation_field_extra_fields() {
  * Implements hook_node_view().
  */
 function dfr_documentation_node_view($node, $view_mode, $langcode) {
-  if ($node->type == 'doc') {
-    // Add extra field render array to node content
+  if ($node->type == 'doc' && !empty($node->book)) {
     $node->content['book_children'] = array(
       '#markup' => book_children($node->book),
     );
