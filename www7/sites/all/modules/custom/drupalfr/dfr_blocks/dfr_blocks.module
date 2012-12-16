@@ -73,7 +73,7 @@ function dfr_blocks_block_configure($delta = '') {
       '#title' => t('Content'),
       '#default_value' => variable_get(
         'home_events_content',
-        array('value' => "", 'format' => filter_fallback_format())
+        array('value' => '', 'format' => filter_fallback_format())
       ),
     );
   }
@@ -123,7 +123,7 @@ function dfr_blocks_block_save($delta = '', $edit = array()) {
 function dfr_blocks_block_home_events() {
   $content = variable_get(
     'home_events_content',
-    array('value' => "Evenements ...", 'format' => NULL)
+    array('value' => "Trouvez la date du prochain évènement durant lequel vous pourrez rencontrer les membres de la communauté proches de chez vous.", 'format' => NULL)
   );
   return array(
     'subject' => "Évènements",
@@ -132,7 +132,7 @@ function dfr_blocks_block_home_events() {
       'link' => array(
         '#theme' => 'link',
         '#text' => "Voir les évènements",
-        '#path' => 'http://www.meetup.com/drupal-france-francophonie/',
+        '#path' => 'prochains-evenements',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
           'html' => FALSE
@@ -145,7 +145,7 @@ function dfr_blocks_block_home_events() {
 function dfr_blocks_block_home_help() {
   $content = variable_get(
     'home_help_content',
-    array('value' => "Aide ...", 'format' => NULL)
+    array('value' => "Trouvez comment obtenir de l'information sur le fonctionnement de Drupal et demander de l'aide via nos moyens de communication.", 'format' => NULL)
   );
   return array(
     'subject' => "Aide",
@@ -167,7 +167,7 @@ function dfr_blocks_block_home_help() {
 function dfr_blocks_block_home_trad() {
   $content = variable_get(
     'home_trad_content',
-    array('value' => "Traduction ...", 'format' => NULL)
+    array('value' => "Découvez comment installer et traduire Drupal en français grâce à la traduction maintenue par l'équipe de Drupalfr.org.", 'format' => NULL)
   );
   return array(
     'subject' => "Traduction",
