@@ -52,6 +52,22 @@ function drupalfr_planete_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_url_outbound_alter().
+ */
+function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) {
+  if (preg_match('@^node/(\d+)$@', $path, $matches) &&
+      ($node = node_load($matches[1])) &&
+      'planete' === $node->type &&
+      isset($account->field_planete_url) &&
+      !empty($account->field_planete_url) &&
+      isset($account->field_planete_url[LANGUAGE_NONE][0]['url']))
+  {
+    $path = $account->field_planete_url[LANGUAGE_NONE][0]['url'];
+  }
+  time();
+}
+
+/**
  * Ensures that the feed exist.
  */
 function _drupalfr_planete_user_save($account) {
