@@ -58,13 +58,14 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
   if (preg_match('@^node/(\d+)$@', $path, $matches) &&
       ($node = node_load($matches[1])) &&
       'planete' === $node->type &&
-      isset($account->field_planete_url) &&
-      !empty($account->field_planete_url) &&
-      isset($account->field_planete_url[LANGUAGE_NONE][0]['url']))
+      isset($node->field_planete_url) &&
+      !empty($node->field_planete_url) &&
+      isset($node->field_planete_url[LANGUAGE_NONE][0]['url']))
   {
-    $path = $account->field_planete_url[LANGUAGE_NONE][0]['url'];
+    $path = $node->field_planete_url[LANGUAGE_NONE][0]['url'];
+    $options['absolute'] = TRUE;
+    $options['external'] = TRUE;
   }
-  time();
 }
 
 /**
