@@ -139,18 +139,9 @@
 /** ******************************************************* **/
 
 /* Homepage */
-#block-views-drupalfr-block-1 {}
-#block-views-drupalfr-block-1 .block-title {
-  font-size:32px;
-  padding:0 0 1em 0;
-}
 
 #block-drupalfr-events-next-events,
-#block-views-planete-block-1 {
-  display:inline-block;vertical-align: top;
-  width:45%;margin-right:9%;
-}
-#block-views-planete-block-1 {margin-right:0;}
+#block-views-planete-block-1 {}
 
 #block-drupalfr-events-next-events .content,
 #block-views-planete-block-1 .content {padding-top:1em;}
@@ -190,6 +181,15 @@
 #block-drupalfr-events-next-events .more-link:before,
 #block-views-planete-block-1 .more-link a:before {content:"» ";}
 
+@media screen and (min-width:768px) {
+  #block-drupalfr-events-next-events,
+  #block-views-planete-block-1 {
+    display:inline-block;vertical-align: top;
+    width:45%;margin-right:9%;
+  }
+  #block-views-planete-block-1 {margin-right:0;}
+}
+
 
 
 #block-views-drupalfr-block-1 {
@@ -197,7 +197,10 @@
   padding-top:2em;
   border-top:1px solid #dee6ee;
 }
-
+#block-views-drupalfr-block-1 .block-title {
+  font-size:32px;
+  padding:0 0 1em 0;
+}
 
 /** ******************************************************* **/
 /** Sidebar                                                 **/

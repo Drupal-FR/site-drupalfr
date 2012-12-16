@@ -23,9 +23,9 @@ body {}
 			#main {
 				padding:2em 0;
 			}
-				#sidebar-first {float:left;width:30%;margin-left:-100%;padding-right:3%;}
-				#content {width:100%;}
-				.sidebar-first #content {float:left;padding-left:30%;}
+				#sidebar-first {}
+				#content {}
+				.sidebar-first #content {}
 
 		#footer {}
 
@@ -33,6 +33,13 @@ body {}
 	width:100%;
 	margin:0 auto;
 }
+
+@media screen and (min-width:768px) {
+	#sidebar-first {float:left;width:30%;margin-left:-100%;padding-right:3%;}
+	#content {width:100%;}
+	.sidebar-first #content {float:left;padding-left:30%;}
+}
+
 
 @media screen and (max-width:980px) {
 	.inner {padding:0 1%;}
