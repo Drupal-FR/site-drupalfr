@@ -11,6 +11,12 @@
   list-style-image:none;
   list-style-type:none;
   background:url(../images/marker-2.gif) 0 7px no-repeat;
+  transition:background-position 0.1s linear;
+  -moz-transition:background-position 0.1s linear;
+  -webkit-transition:background-position 0.1s linear;
+}
+.block .content li:hover {
+  background-position:3px 7px;
 }
 .block a {
   color:#00c3dd;
@@ -23,7 +29,7 @@
   text-align:left;
   margin-top:0.5em;
 }
-
+.block .more-link a {color:#fff;}
 
 
 
@@ -140,39 +146,49 @@
 }
 
 #block-drupalfr-events-next-events,
-#block-views-planete-block-block {
+#block-views-planete-block-1 {
   display:inline-block;vertical-align: top;
   width:45%;margin-right:9%;
 }
-#block-views-planete-block-block {margin-right:0;}
+#block-views-planete-block-1 {margin-right:0;}
 
 #block-drupalfr-events-next-events .content,
-#block-views-planete-block-block .content {padding-top:1em;}
+#block-views-planete-block-1 .content {padding-top:1em;}
 
 .block .drupalfr-event-details,
-#block-views-planete-block-block .views-row {padding-bottom: 0.5em;}
+#block-views-planete-block-1 .views-row {padding-bottom: 0.5em;}
 
 .block .drupalfr-event-details p {padding-bottom:0;}
 .block .drupalfr-event-details .event-name,
-#block-views-planete-block-block .views-field-title {
+#block-views-planete-block-1 .views-field-title span {
+  display: inline-block;
   padding:0 0 0 16px;
-  background:url(../images/marker-2.gif) 0 5px no-repeat;
+  background:url(../images/marker-2.gif) 0 7px no-repeat;
+  transition:background-position 0.1s linear;
+  -moz-transition:background-position 0.1s linear;
+  -webkit-transition:background-position 0.1s linear;
 }
+.block .drupalfr-event-details .event-name:hover,
+#block-views-planete-block-1 .views-field-title span:hover {background-position:3px 7px;}
+
+
+
 .block .drupalfr-event-details .event-date,
-#block-views-planete-block-block .views-field-created {
+#block-views-planete-block-1 .views-field-created {
   padding:0 0 0 16px;
   color:#898989;
 }
 
 #block-drupalfr-events-next-events .more-link,
-#block-views-planete-block-block .more-link {
+#block-views-planete-block-1 .more-link {
   text-align:right;
   color:#444;
   font-weight: bold;
   margin-right:1em;
 }
+#block-views-planete-block-1 .more-link a {color:#444;}
 #block-drupalfr-events-next-events .more-link:before,
-#block-views-planete-block-block .more-link:before {content:"» ";}
+#block-views-planete-block-1 .more-link a:before {content:"» ";}
 
 
 
