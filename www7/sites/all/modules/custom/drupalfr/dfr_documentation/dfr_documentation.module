@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * @file
+ * Code for the dfr_emploi feature.
+ */
+
+include_once 'dfr_documentation.features.inc';
+
+/**
  * Implements hook_menu().
  */
 function dfr_documentation_menu() {
@@ -16,25 +23,47 @@ function dfr_documentation_menu() {
   return $items;
 }
 
+/**
+ * Callback for documentation page
+ */
 function dfr_documentation_page() {
-  $output = array(
+  $books = node_load_multiple(array(4395, 5037, 56, 9619, 4));
+  return array(
     'books' => array(
       '#prefix' => '<div id="documentation">',
       '#suffix' => '</div>',
+      'nodes' => entity_view('node', $books, 'teaser')
     ),
   );
+}
 
-  $books = node_load_multiple(array(4395, 5037, 56, 9619, 4));
-  foreach ($books as $book) {
-    $output['books'][] = array(
-      'book' => entity_view('node', array($book), 'teaser'),
-      // FIXME: This should be a in specific template instead
-      'children' => array(
-        '#markup' => book_children($book->book),
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function dfr_documentation_field_extra_fields() {
+  $extra['node']['doc'] = array(
+    'display' => array(
+      'book_children' => array(
+        'label' => t("Book children"),
+        'description' => t("Links to book children."),
+        'weight' => 10, // Default weight
       ),
+    )
+  );
+  return $extra;
+}
+ 
+ 
+/**
+ * Implements hook_node_view().
+ */
+function dfr_documentation_node_view($node, $view_mode, $langcode) {
+  if ($node->type == 'doc') {
+    // Add extra field render array to node content
+    $node->content['book_children'] = array(
+      '#markup' => book_children($node->book),
     );
   }
-
-  return $output;
 }
 
