@@ -53,8 +53,113 @@ function drupalfr_planete_block_view($delta = '') {
 
 /**
  * Implements hook_url_outbound_alter().
+ *
+function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
+  if (variable_get('dfr_emploi_rewrite_urls', FALSE)) {
+    global $base_url;
+    // On est sur emploi.*
+    if (preg_match('|^(https?:\/\/)emploi\.(.+)|', $base_url, $matches) && !$options['external']) {
+      if ($alias = drupal_lookup_path('alias', $original_path)) {
+        $path = $alias;
+        // We already retrieved the alias, this will prevent another lookup
+        $options['alias'] = TRUE;
+      }
+      if (0 !== strpos($path, 'emploi/')) {
+        // On veut que les paths normaux redirigent vers dfr
+        $options['absolute'] = TRUE;
+        $options['base_url'] = $matches[1] . $matches[2];
+      }
+      else {
+        // Et les autres soit tronqués d'"emploi"
+        $path = substr($path, strlen('emploi/'));
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_url_inbound_alter().
+ *
+function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
+  if (variable_get('dfr_emploi_rewrite_urls', FALSE)) {
+    global $base_url;
+    // On arrive sur emploi.*
+    if (preg_match('|^https?:\/\/emploi\.(.+)|', $base_url)) {
+      // On veut que le path interne remette emploi en front, sauf s'il y est déjà
+      if (0 !== strpos($original_path, 'emploi')) {
+        if (!$original_path || $original_path == variable_get('site_frontpage', 'node')) {
+          $path = 'emploi/tous';
+        }
+        else {
+          $path = 'emploi/' . $original_path;
+        }
+        if ($source = drupal_lookup_path('source', $path, $path_language)) {
+          $path = $source;
+        }
+      }
+    }
+    elseif (0 === strpos($original_path, 'emploi') ||
+        (($alias = drupal_lookup_path('alias', $path, $path_language)) &&
+            0 === strpos($alias, 'emploi'))
+    ) {
+      // Quand on est pas sur emploi.*, on regarde si notre path interne ou son
+      // alias commence par emploi, si oui, on tronque et on redirige sur emploi.*
+      if (!isset($alias)) {
+        $alias = drupal_lookup_path('alias', $path, $path_language);
+      }
+      $alias = substr($alias, strlen('emploi/'));
+      list($scheme, $url) = explode('://', $base_url, 2);
+      drupal_goto($alias, array('base_url' => $scheme . '://emploi.' . $url), 301);
+    }
+  }
+}
+ */
+
+/**
+ * Implements hook_url_inbound_alter().
+ */
+function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_language) {
+
+  global $base_url;
+
+  list($scheme, $url) = explode('://', $base_url, 2);
+
+  if (0 === strpos($url, 'planete.')) {
+    if ('planete' === $path) {
+      // Quand l'utilisateur est sur l'URL en planete.URL, on doit s'assurer
+      // que les chemins / et /planete ne soit pas dupliqués, on rediregera
+      // donc sur /.
+      drupal_goto($base_url, array(), 301);
+    }
+    else if (empty($path) || $path === variable_get('site_frontpage', 'node')) {
+      // Chemin vide ou front page, on est bon, on doit alors changer le chemin
+      // interne à Drupal pour le feinter et lui faire croire qu'on est dans
+      // la page /planete.
+      $path = 'planete';
+    }
+    else {
+      // Tout autre tentative doit retourner sur le site principal.
+      drupal_goto($scheme . '://' . substr($url, strlen('planete.')), array(), 301);
+    }
+  }
+  else if ('planete' === $path) {
+    drupal_goto($scheme . '://planete.' . $url, array(), 301);
+  }
+}
+
+/**
+ * Implements hook_url_outbound_alter().
  */
 function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) {
+
+  global $base_url;
+
+  if ($options['external']) {
+    return;
+  }
+
+  list($scheme, $url) = explode('://', $base_url, 2);
+
   if (preg_match('@^node/(\d+)$@', $path, $matches) &&
       ($node = node_load($matches[1])) &&
       'planete' === $node->type &&
@@ -62,7 +167,26 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
       !empty($node->field_planete_url) &&
       isset($node->field_planete_url[LANGUAGE_NONE][0]['url']))
   {
-    $path = $node->field_planete_url[LANGUAGE_NONE][0]['url'];
+    $path                = $node->field_planete_url[LANGUAGE_NONE][0]['url'];
+    $options['absolute'] = TRUE;
+    $options['external'] = TRUE;
+  }
+  // Dans le cas du outbound, la seule URL valable pour accéder au planete
+  // est /planete, cas dans leque on va gentillement réécrire la requête,
+  // tout autre path sera renvoyé vers le site d'origine.
+  else if ('planete' === $path) {
+    if (0 === strpos($url, 'planete.')) {
+      $path                = $scheme . '://' . $url;
+      $options['absolute'] = TRUE;
+      $options['external'] = TRUE;
+    } else {
+      $path                = $scheme . '://planete.' . $url;
+      $options['absolute'] = TRUE;
+      $options['external'] = TRUE;
+    }
+  }
+  else if (0 === strpos($url, 'planete.')) {
+    $path                = $scheme . '://' . substr($url, strlen('planete.')) . '/' . $path;
     $options['absolute'] = TRUE;
     $options['external'] = TRUE;
   }
