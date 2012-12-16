@@ -141,7 +141,7 @@
 /* Homepage */
 
 #block-drupalfr-events-next-events,
-#block-views-planete-block-1 {}
+#block-views-planete-block-1 {position: relative;min-height: 400px;}
 
 #block-drupalfr-events-next-events .content,
 #block-views-planete-block-1 .content {padding-top:1em;}
@@ -172,10 +172,12 @@
 
 #block-drupalfr-events-next-events .more-link,
 #block-views-planete-block-1 .more-link {
-  text-align:right;
+  /*text-align:right;*/
   color:#444;
   font-weight: bold;
-  margin-right:1em;
+  /*margin-right:1em;*/
+  position:absolute;bottom: 0;right: 1em;
+
 }
 #block-views-planete-block-1 .more-link a {color:#444;}
 #block-drupalfr-events-next-events .more-link:before,
@@ -193,14 +195,30 @@
 
 
 #block-views-drupalfr-block-1 {
+  position:relative;
   margin-top:1em;
   padding-top:2em;
   border-top:1px solid #dee6ee;
 }
-#block-views-drupalfr-block-1 .block-title {
-  font-size:32px;
-  padding:0 0 1em 0;
+#block-views-drupalfr-block-1 .feed-icon {
+  position:absolute;
+  top:1.2em;
+  right:1em;
 }
+
+#block-views-drupalfr-block-1 .block-title {padding:0 0 1em 0;}
+#block-views-drupalfr-block-1 .node {margin-bottom:2em;}
+#block-views-drupalfr-block-1 .node h3 {margin-bottom: 0;}
+#block-views-drupalfr-block-1 .node .submitted {padding-bottom:0.5em;}
+
+#block-views-drupalfr-block-1 .more-link {
+  text-align:right;
+  color:#444;
+  font-weight: bold;
+  margin-right:1em;
+}
+#block-views-drupalfr-block-1 .more-link a {color:#444;}
+#block-views-drupalfr-block-1 .more-link a:before {content:"» ";}
 
 /** ******************************************************* **/
 /** Sidebar                                                 **/

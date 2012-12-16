@@ -31,12 +31,12 @@ function drupalfr_events_block_view($delta = '') {
   $block = array();
   switch($delta) {
     case 'next_events':
-      $events = drupalfr_events_fetch_events(5);
+      $events = drupalfr_events_fetch_events(6);
       $block = array(
-        'subject' => t('5 prochains évènements meetup.com'),
+        'subject' => t('6 prochains évènements meetup.com'),
         'content' => array(
           'events' => drupalfr_events_display_events($events, 'teaser'),
-          'link' => array('#markup' => l(t("Détail des évènements"), 'prochains-evenements', array('attributes' => array('class'=>array('more-link')))))
+          'link' => array('#markup' => l(t("Programme détaillé"), 'prochains-evenements', array('attributes' => array('class'=>array('more-link')))))
         )
       );
       break;
