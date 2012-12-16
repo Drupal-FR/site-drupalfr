@@ -17,6 +17,11 @@ $update_free_access = FALSE;
 $drupal_hash_salt = '';
 
 /**
+ * Shared base domain
+ */
+$cookie_domain = '.drupalfr.org';
+
+/**
  * PHP settings:
  */
 ini_set('session.gc_probability', 1);
