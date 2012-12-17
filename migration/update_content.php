@@ -84,6 +84,55 @@ foreach ($feed_informations as $feed_information) {
   _migration_create_planet_feed($feed_information);
 }
 
+
+// Update the site mission block content.
+$block_content = <<<EOF
+<p>Ce site est réalisé par l'<a href="/contact">équipe de Drupalfr.org</a>, son contenu est mis à disposition selon le contrat <a href="http://creativecommons.org/licenses/by-sa/2.0/fr/">Paternité-ShareAlike 2.0 France</a>.</p>
+<p>
+Drupal est <a href="http://buytaert.net/drupal-trademark-policy-forthcoming">une marque déposée</a> de Dries Buytaert. - Consulter les <a href="/mentions-legales">mentions légales</a>.
+</p>
+EOF;
+
+db_query("UPDATE {block_custom} SET body = :value WHERE bid = 10", array(':value' => $block_content));
+db_query("UPDATE {block} SET cache = :value WHERE delta = 10 AND module = 'block' AND theme = 'dfrtheme' ", array(':value' => DRUPAL_CACHE_GLOBAL));
+
+// Create the mentions legales page.
+
+$legal_mentions_content = <<<EOF
+<p>
+Les informations recueillies sont nécessaires pour votre adhésion.
+</p>
+<p>
+Elles font l’objet d’un traitement informatique et sont destinées au secrétariat de l’association. En application des articles 39 et suivants de la loi du 6 janvier 1978 modifiée, vous bénéficiez d’un droit d’accès et de rectification aux informations qui vous concernent.
+</p>
+<p>
+Si vous souhaitez exercer ce droit et obtenir communication des informations vous concernant, veuillez <a href="/contact">vous adresser à nous</a>.
+</p>
+EOF;
+
+$node = new stdClass();
+$node->nid = NULL;
+$node->uid = 1;
+$node->language = LANGUAGE_NONE;
+$node->created = time();
+$node->type = 'page';
+$node->title = 'Mentions légales';
+$node->cid = 0;
+$node->body = array(
+  LANGUAGE_NONE => array(
+    array(
+      'value' => $legal_mentions_content,
+      'format' => 1,
+    ),
+  ),
+);
+node_save($node);
+$path = array(
+  'source' => 'node/' . $node->nid,
+  'alias' => 'mentions-legales',
+); 
+path_save($path);
+
 function _migration_create_planet_feed ($feed_information) {
   $user_profile = user_load_by_name($feed_information['user_id']);
   $user_profile->field_planete_rss['und'][0]['url'] = $feed_information['url'];
