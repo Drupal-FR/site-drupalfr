@@ -154,7 +154,7 @@ function _drupalfr_planete_user_save($account) {
       // Node might be updated from here.
       $node = node_load($nid);
 
-      if ($feed_url !== $node->feeds['FeedsHTTPFetcher']['source']) {
+      if (isset($node->feeds['FeedsHTTPFetcher']['source']) && $feed_url !== $node->feeds['FeedsHTTPFetcher']['source']) {
         // URL changed, update the node.
         $node->feeds = array(
           'FeedsHTTPFetcher' => array(
@@ -163,21 +163,24 @@ function _drupalfr_planete_user_save($account) {
         );
         node_save($node);
       }
-    } else {
+    }
+    else {
       // Create new node.
       $node = new stdClass;
-      $node->title = "Planète pour l'utilisateur " . $account->uid;
+      $node->title = "Planète " . $account->name;
       $node->type = 'planete_feed_source';
       $node->feeds = array(
         'FeedsHTTPFetcher' => array(
           'source' => $feed_url,
         ),
       );
+      $node->language = LANGUAGE_NONE;
       $node->status = 1;
       $node->uid = $account->uid;
       node_save($node);
     }
-  } else {
+  }
+  else {
     // No feed set or has been removed.
     $nid_list = db_select('node', 'n')
       ->fields('n', array('nid'))

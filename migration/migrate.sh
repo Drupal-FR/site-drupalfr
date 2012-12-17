@@ -106,4 +106,7 @@ drush vset locale_cache_length 65535
 # disable UI modules
 drush dis -y rules_admin views_ui
 
+# Trigger whatever cron has to do.
+drush cron
+
 # TODO: disable dblog
