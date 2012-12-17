@@ -5,3 +5,11 @@
  */
 
 include_once 'drupalfr_general.features.inc';
+
+
+/**
+ * Implements hook_menu_alter().
+ */
+function drupalfr_general_menu_alter(&$items) {
+  $items['admin/people/people']['access callback'] = FALSE;
+}
