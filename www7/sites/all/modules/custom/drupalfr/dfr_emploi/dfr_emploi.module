@@ -7,24 +7,6 @@
 include_once 'dfr_emploi.features.inc';
 
 /**
- * Implements hook_form_alter().
- */
-function dfr_emploi_form_offre_node_form_alter(&$form, &$form_state) {
-  $form['scheduler_settings']['unpublish_on']['#description'] .= " La limite de publication d'une offre est fixée à 6 mois maximum.";
-  $form['#validate'][] = 'dfr_emploi_unpublishing_date_validate';
-}
-
-/**
- * Validate handler to check for unpublishing date on offre
- */
-function dfr_emploi_unpublishing_date_validate($form, &$form_state) {
-  $unpublish_time = _scheduler_strtotime($form_state['values']['unpublish_on']);
-  if ($unpublish_time > REQUEST_TIME + 3600 * 24 * 30 * 6) {
-    form_set_error('unpublish_on', 'On a dit 6 mois !');
-  }
-}
-
-/**
  * Implements hook_node_access().
  */
 function dfr_emploi_node_access($node, $op, $account) {
@@ -121,7 +103,7 @@ function dfr_emploi_block_view($delta = '') {
   $block = array();
 
   $block['subject'] = '';
-  $block['content'] = l('Créer une offre', 'node/add/offre', array(
+  $block['content'] = l('Déposer une offre', 'node/add/offre', array(
     'attributes' => array('class' => 'btn-link'),
   ));
   $block['content'] .= '<p><em>Vous devez être connecté pour pouvoir créer une offre.</em></p>';
