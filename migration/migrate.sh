@@ -90,6 +90,11 @@ drush php-eval '$view = views_ui_cache_load("admin_content"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("Moderation_commentaires"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("Documentation"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("Comment_admin"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_simple"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_details"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_delta"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_details_si"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_realisa"); $view->delete();'
 
 # Configure BUEditor.
 drush vset --exact bueditor_user '1'
