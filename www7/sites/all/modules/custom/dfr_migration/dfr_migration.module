@@ -74,7 +74,7 @@ function dfr_migration_migrate_profiles_batch(&$context) {
     watchdog('migration dfr7', 'Range: ' . $context['sandbox']['progress'] . ' - ' . $limit, WATCHDOG_ERROR);
   }
   // Load the users and extract the old profiles data.
-  $users = entity_load('user', array(array_keys($user_ids)));
+  $users = entity_load('user', array_keys($user_ids));
   foreach ($users as $user) {
     $query_profile = db_select('content_type_profile', 'ctp');
     $query_profile->condition('ctp.nid', $user_ids[$user->uid]->nid, '=')
@@ -169,8 +169,9 @@ function dfr_migration_migrate_profiles_batch(&$context) {
     );
 
     // Handle the special structure of the picture field.
-    $profile_picture = file_load($content_profile_user->field_picture_fid);
-    if ($profile_picture) {
+    if ($content_profile_user->field_picture_fid &&
+        ($profile_picture = file_load($content_profile_user->field_picture_fid)))
+    {
       $user->field_picture = array(
         LANGUAGE_NONE => array(
           (array)$profile_picture,
