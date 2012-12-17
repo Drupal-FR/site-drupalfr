@@ -111,7 +111,7 @@ function dfr_emploi_field_default_fields() {
           'module' => 'text',
           'settings' => array(),
           'type' => 'text_default',
-          'weight' => '6',
+          'weight' => '5',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -335,11 +335,13 @@ function dfr_emploi_field_default_fields() {
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'inline',
+          'label' => 'hidden',
           'module' => 'node_reference',
-          'settings' => array(),
-          'type' => 'node_reference_default',
-          'weight' => '5',
+          'settings' => array(
+            'node_reference_view_mode' => 'teaser',
+          ),
+          'type' => 'node_reference_node',
+          'weight' => '6',
         ),
         'teaser' => array(
           'label' => 'inline',

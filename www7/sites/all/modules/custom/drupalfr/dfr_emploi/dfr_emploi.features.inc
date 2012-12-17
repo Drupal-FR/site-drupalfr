@@ -29,10 +29,11 @@ function dfr_emploi_node_info() {
     'offre' => array(
       'name' => t('Offre d\'emploi'),
       'base' => 'node_content',
-      'description' => t('Une offre d\'emploi ou un stage Drupal pour les francophones.'),
+      'description' => t('Offre d\'emploi ou de stage pour les sociétés.'),
       'has_title' => '1',
-      'title_label' => t('Intitulé'),
-      'help' => '',
+      'title_label' => t('Intitulé de l\'offre'),
+      'help' => t('Décrivez votre offre d\'emploi afin qu\'elle soit publiée sur Drupalfr.org, prenez note que les offres sont systématiquement relues avant publication, cela peut entraîner un délai de quelques jours avant que votre offre ne soit publiée.
+Si après une semaine votre offre n\'est pas en ligne, merci de nous le signaler via le formulaire de contact.'),
     ),
   );
   return $items;
