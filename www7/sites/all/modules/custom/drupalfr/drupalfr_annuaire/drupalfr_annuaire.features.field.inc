@@ -367,7 +367,7 @@ function drupalfr_annuaire_field_default_fields() {
       'locked' => '0',
       'module' => 'image',
       'settings' => array(
-        'default_image' => variable_get('drupalfr_annuaire_default_picture', 0),
+        'default_image' => 0,
         'description_field' => '0',
         'list_default' => '1',
         'list_field' => '0',
@@ -437,29 +437,25 @@ function drupalfr_annuaire_field_default_fields() {
       'entity_type' => 'node',
       'field_name' => 'field_logo',
       'label' => 'Logo',
-      'required' => FALSE,
+      'required' => 0,
       'settings' => array(
         'alt_field' => 0,
-        'default_image' => 0,
+        'default_image' => variable_get('drupalfr_annuaire_default_picture', 0),
         'file_directory' => 'annuaire-pro/logo',
         'file_extensions' => 'jpg jpeg png gif',
-        'max_filesize' => 0,
+        'max_filesize' => '0',
         'max_resolution' => '150x150',
-        'min_resolution' => 0,
+        'min_resolution' => '',
         'title_field' => 0,
         'user_register_form' => FALSE,
       ),
       'weight' => '-4',
       'widget' => array(
-        'active' => '1',
+        'active' => 1,
         'module' => 'image',
         'settings' => array(
-          'image_path' => 'annuaire-pro/logo',
-          'max_filesize' => '1024',
-          'max_number_images' => '0',
           'preview_image_style' => 'thumbnail',
           'progress_indicator' => 'throbber',
-          'use_default_image' => 0,
         ),
         'type' => 'image_image',
         'weight' => '-4',
@@ -614,6 +610,79 @@ function drupalfr_annuaire_field_default_fields() {
         'weight' => '10',
       ),
       'widget_type' => 'optionwidgets_buttons',
+    ),
+  );
+
+  // Exported field: 'node-annuaire-field_region'.
+  $fields['node-annuaire-field_region'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '-1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_region',
+      'foreign keys' => array(),
+      'indexes' => array(
+        'value' => array(
+          0 => 'value',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'list',
+      'settings' => array(
+        'allowed_values' => array(
+          '01 Île de France' => '01 Île de France',
+          '02 Nord Ouest' => '02 Nord Ouest',
+          '03 Nord Est' => '03 Nord Est',
+          '04 Sud Est' => '04 Sud Est',
+          '05 Sud Ouest' => '05 Sud Ouest',
+          'Outre mer' => 'Outre mer',
+          'Belgique' => 'Belgique',
+          'Suisse' => 'Suisse',
+          'Autre' => 'Autre',
+        ),
+        'allowed_values_function' => '',
+        'allowed_values_php' => '',
+        'text_processing' => '0',
+      ),
+      'translatable' => '0',
+      'type' => 'list_text',
+      'type_name' => 'annuaire',
+    ),
+    'field_instance' => array(
+      'bundle' => 'annuaire',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'list',
+          'settings' => array(),
+          'type' => 'list_default',
+          'weight' => 11,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_region',
+      'label' => 'Région',
+      'required' => 0,
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'options',
+        'settings' => array(),
+        'type' => 'options_buttons',
+        'weight' => '101',
+      ),
     ),
   );
 
@@ -1151,6 +1220,7 @@ function drupalfr_annuaire_field_default_fields() {
   t('Précisez l\'adresse de votre site Internet.');
   t('Présentation');
   t('Présenter votre structure en quelques lignes. Vous êtes limité à 500 caractères.');
+  t('Région');
   t('Showcase');
   t('Siren');
   t('Site Internet');

@@ -31,7 +31,10 @@ function drupalfr_annuaire_views_default_views() {
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['exposed_form']['options']['reset_button_label'] = 'Réinitialiser';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '50';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '25';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '6';
   $handler->display->display_options['pager']['options']['tags']['first'] = '« premier';
   $handler->display->display_options['pager']['options']['tags']['previous'] = '‹ précédent';
   $handler->display->display_options['pager']['options']['tags']['next'] = 'suivant ›';
@@ -66,11 +69,10 @@ function drupalfr_annuaire_views_default_views() {
   ';
   $handler->display->display_options['header']['text']['format'] = '2';
   /* Pied de page: Global: Text area */
-  $handler->display->display_options['footer']['text']['id'] = 'area';
+  $handler->display->display_options['footer']['text']['id'] = 'text';
   $handler->display->display_options['footer']['text']['table'] = 'views';
   $handler->display->display_options['footer']['text']['field'] = 'area';
   $handler->display->display_options['footer']['text']['content'] = 'Vous êtes un prestataire de service Drupal et vous voulez apparaître dans l\'annuaire ?
-
 <a href="node/add/annuaire">Ajoutez votre fiche</a> dès aujourd\'hui ! (vous devrez vous identifier pour cela)';
   $handler->display->display_options['footer']['text']['format'] = '1';
   /* Field: Contenu: Titre */
@@ -78,26 +80,6 @@ function drupalfr_annuaire_views_default_views() {
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = 'Société';
-  /* Field: Broken/missing handler */
-  $handler->display->display_options['fields']['field_type_de_service_value']['id'] = 'field_type_de_service_value';
-  $handler->display->display_options['fields']['field_type_de_service_value']['table'] = 'node_data_field_type_de_service';
-  $handler->display->display_options['fields']['field_type_de_service_value']['field'] = 'field_type_de_service_value';
-  $handler->display->display_options['fields']['field_type_de_service_value']['label'] = 'Type de service';
-  /* Field: Broken/missing handler */
-  $handler->display->display_options['fields']['field_region_value']['id'] = 'field_region_value';
-  $handler->display->display_options['fields']['field_region_value']['table'] = 'node_data_field_region';
-  $handler->display->display_options['fields']['field_region_value']['field'] = 'field_region_value';
-  $handler->display->display_options['fields']['field_region_value']['label'] = 'Implantation géographique';
-  /* Field: Broken/missing handler */
-  $handler->display->display_options['fields']['field_forme_juridique_value']['id'] = 'field_forme_juridique_value';
-  $handler->display->display_options['fields']['field_forme_juridique_value']['table'] = 'node_data_field_forme_juridique';
-  $handler->display->display_options['fields']['field_forme_juridique_value']['field'] = 'field_forme_juridique_value';
-  $handler->display->display_options['fields']['field_forme_juridique_value']['label'] = 'Forme juridique';
-  /* Field: Broken/missing handler */
-  $handler->display->display_options['fields']['field_taille_value']['id'] = 'field_taille_value';
-  $handler->display->display_options['fields']['field_taille_value']['table'] = 'node_data_field_taille';
-  $handler->display->display_options['fields']['field_taille_value']['field'] = 'field_taille_value';
-  $handler->display->display_options['fields']['field_taille_value']['label'] = 'Effectif';
   /* Sort criterion: Global: Random */
   $handler->display->display_options['sorts']['random']['id'] = 'random';
   $handler->display->display_options['sorts']['random']['table'] = 'views';
@@ -111,74 +93,36 @@ function drupalfr_annuaire_views_default_views() {
   );
   $handler->display->display_options['filters']['type']['group'] = '0';
   $handler->display->display_options['filters']['type']['expose']['operator'] = FALSE;
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['id'] = 'field_type_de_service_value_many_to_one';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['table'] = 'node_data_field_type_de_service';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['field'] = 'field_type_de_service_value_many_to_one';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['group'] = '0';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['expose']['operator_id'] = 'field_type_de_service_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['expose']['label'] = 'Type de service';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['expose']['operator'] = 'field_type_de_service_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_type_de_service_value_many_to_one']['expose']['identifier'] = 'field_type_de_service_value_many_to_one';
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['id'] = 'field_region_value_many_to_one';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['table'] = 'node_data_field_region';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['field'] = 'field_region_value_many_to_one';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['group'] = '0';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['expose']['operator_id'] = 'field_region_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['expose']['label'] = 'Implantation géographique';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['expose']['operator'] = 'field_region_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['expose']['identifier'] = 'field_region_value_many_to_one';
-  $handler->display->display_options['filters']['field_region_value_many_to_one']['expose']['remember'] = TRUE;
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['id'] = 'field_forme_juridique_value_many_to_one';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['table'] = 'node_data_field_forme_juridique';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['field'] = 'field_forme_juridique_value_many_to_one';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['group'] = '0';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['expose']['operator_id'] = 'field_forme_juridique_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['expose']['label'] = 'Forme juridique';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['expose']['operator'] = 'field_forme_juridique_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_forme_juridique_value_many_to_one']['expose']['identifier'] = 'field_forme_juridique_value_many_to_one';
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['id'] = 'field_taille_value_many_to_one';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['table'] = 'node_data_field_taille';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['field'] = 'field_taille_value_many_to_one';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['group'] = '0';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['expose']['operator_id'] = 'field_taille_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['expose']['label'] = 'Effectif';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['expose']['operator'] = 'field_taille_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_taille_value_many_to_one']['expose']['identifier'] = 'field_taille_value_many_to_one';
-
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page_1');
-  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
-  $handler->display->display_options['path'] = 'annuaire-pro';
-  $handler->display->display_options['menu']['type'] = 'normal';
-  $handler->display->display_options['menu']['title'] = 'Annuaire';
-  $handler->display->display_options['menu']['weight'] = '0';
-  $handler->display->display_options['tab_options']['weight'] = '0';
 
   /* Display: Annuaire */
   $handler = $view->new_display('page', 'Annuaire', 'page_2');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Contenu: Logo */
+  $handler->display->display_options['fields']['field_logo']['id'] = 'field_logo';
+  $handler->display->display_options['fields']['field_logo']['table'] = 'field_data_field_logo';
+  $handler->display->display_options['fields']['field_logo']['field'] = 'field_logo';
   /* Field: Contenu: Titre */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = 'Société';
+  /* Field: Contenu: Type de service */
+  $handler->display->display_options['fields']['field_type_de_service']['id'] = 'field_type_de_service';
+  $handler->display->display_options['fields']['field_type_de_service']['table'] = 'field_data_field_type_de_service';
+  $handler->display->display_options['fields']['field_type_de_service']['field'] = 'field_type_de_service';
+  /* Field: Contenu: Région */
+  $handler->display->display_options['fields']['field_region']['id'] = 'field_region';
+  $handler->display->display_options['fields']['field_region']['table'] = 'field_data_field_region';
+  $handler->display->display_options['fields']['field_region']['field'] = 'field_region';
+  /* Field: Contenu: Effectif */
+  $handler->display->display_options['fields']['field_taille']['id'] = 'field_taille';
+  $handler->display->display_options['fields']['field_taille']['table'] = 'field_data_field_taille';
+  $handler->display->display_options['fields']['field_taille']['field'] = 'field_taille';
+  /* Field: Contenu: Forme juridique */
+  $handler->display->display_options['fields']['field_forme_juridique']['id'] = 'field_forme_juridique';
+  $handler->display->display_options['fields']['field_forme_juridique']['table'] = 'field_data_field_forme_juridique';
+  $handler->display->display_options['fields']['field_forme_juridique']['field'] = 'field_forme_juridique';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
   /* Filter criterion: Contenu: Type */
@@ -190,7 +134,87 @@ function drupalfr_annuaire_views_default_views() {
   );
   $handler->display->display_options['filters']['type']['group'] = '0';
   $handler->display->display_options['filters']['type']['expose']['operator'] = FALSE;
-  $handler->display->display_options['path'] = 'annuairelogo';
+  /* Filter criterion: Contenu: Effectif (field_taille) */
+  $handler->display->display_options['filters']['field_taille_value']['id'] = 'field_taille_value';
+  $handler->display->display_options['filters']['field_taille_value']['table'] = 'field_data_field_taille';
+  $handler->display->display_options['filters']['field_taille_value']['field'] = 'field_taille_value';
+  $handler->display->display_options['filters']['field_taille_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_taille_value']['expose']['operator_id'] = 'field_taille_value_op';
+  $handler->display->display_options['filters']['field_taille_value']['expose']['label'] = 'Effectif';
+  $handler->display->display_options['filters']['field_taille_value']['expose']['operator'] = 'field_taille_value_op';
+  $handler->display->display_options['filters']['field_taille_value']['expose']['identifier'] = 'field_taille_value';
+  $handler->display->display_options['filters']['field_taille_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    4 => 0,
+    1 => 0,
+    13 => 0,
+    9 => 0,
+    11 => 0,
+    7 => 0,
+    12 => 0,
+  );
+  /* Filter criterion: Contenu: Forme juridique (field_forme_juridique) */
+  $handler->display->display_options['filters']['field_forme_juridique_value']['id'] = 'field_forme_juridique_value';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['table'] = 'field_data_field_forme_juridique';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['field'] = 'field_forme_juridique_value';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_forme_juridique_value']['expose']['operator_id'] = 'field_forme_juridique_value_op';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['expose']['label'] = 'Forme juridique';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['expose']['operator'] = 'field_forme_juridique_value_op';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['expose']['identifier'] = 'field_forme_juridique_value';
+  $handler->display->display_options['filters']['field_forme_juridique_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    4 => 0,
+    1 => 0,
+    13 => 0,
+    9 => 0,
+    11 => 0,
+    7 => 0,
+    12 => 0,
+  );
+  /* Filter criterion: Contenu: Région (field_region) */
+  $handler->display->display_options['filters']['field_region_value']['id'] = 'field_region_value';
+  $handler->display->display_options['filters']['field_region_value']['table'] = 'field_data_field_region';
+  $handler->display->display_options['filters']['field_region_value']['field'] = 'field_region_value';
+  $handler->display->display_options['filters']['field_region_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_region_value']['expose']['operator_id'] = 'field_region_value_op';
+  $handler->display->display_options['filters']['field_region_value']['expose']['label'] = 'Région';
+  $handler->display->display_options['filters']['field_region_value']['expose']['operator'] = 'field_region_value_op';
+  $handler->display->display_options['filters']['field_region_value']['expose']['identifier'] = 'field_region_value';
+  $handler->display->display_options['filters']['field_region_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    4 => 0,
+    1 => 0,
+    13 => 0,
+    9 => 0,
+    11 => 0,
+    7 => 0,
+    12 => 0,
+  );
+  /* Filter criterion: Contenu: Type de service (field_type_de_service) */
+  $handler->display->display_options['filters']['field_type_de_service_value']['id'] = 'field_type_de_service_value';
+  $handler->display->display_options['filters']['field_type_de_service_value']['table'] = 'field_data_field_type_de_service';
+  $handler->display->display_options['filters']['field_type_de_service_value']['field'] = 'field_type_de_service_value';
+  $handler->display->display_options['filters']['field_type_de_service_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_type_de_service_value']['expose']['operator_id'] = 'field_type_de_service_value_op';
+  $handler->display->display_options['filters']['field_type_de_service_value']['expose']['label'] = 'Type de service';
+  $handler->display->display_options['filters']['field_type_de_service_value']['expose']['operator'] = 'field_type_de_service_value_op';
+  $handler->display->display_options['filters']['field_type_de_service_value']['expose']['identifier'] = 'field_type_de_service_value';
+  $handler->display->display_options['filters']['field_type_de_service_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    4 => 0,
+    1 => 0,
+    13 => 0,
+    9 => 0,
+    11 => 0,
+    7 => 0,
+    12 => 0,
+  );
+  $handler->display->display_options['path'] = 'annuaire-pro';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'Annuaire';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['context'] = 0;
   $translatables['annuaire_prestataires'] = array(
     t('Defaults'),
     t('L\'annuaire des prestataires Drupal en France '),
@@ -215,15 +239,14 @@ function drupalfr_annuaire_views_default_views() {
   
   '),
     t('Vous êtes un prestataire de service Drupal et vous voulez apparaître dans l\'annuaire ?
-
 <a href="node/add/annuaire">Ajoutez votre fiche</a> dès aujourd\'hui ! (vous devrez vous identifier pour cela)'),
     t('Société'),
-    t('Type de service'),
-    t('Implantation géographique'),
-    t('Forme juridique'),
-    t('Effectif'),
-    t('Page'),
     t('Annuaire'),
+    t('Logo'),
+    t('Type de service'),
+    t('Région'),
+    t('Effectif'),
+    t('Forme juridique'),
   );
   $export['annuaire_prestataires'] = $view;
 
