@@ -53,6 +53,9 @@ drush en -y drupalfr_events
 drush en -y bueditor
 drush en -y drupalfr_forums
 
+# Revert the feature to remove the DB stored version of the view and use the new one from the export. 
+drush fr -y drupalfr_forums
+
 drush cc all
 drush updatedb -y --verbose
 drush en -y dfr_format
