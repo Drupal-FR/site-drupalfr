@@ -20,7 +20,7 @@ drush sqlc < ../migration/sql/pre-migration.sql
 # Try a migration.
 drush updatedb -y --verbose
 
-# enable modules
+# Enable modules.
 drush en -y pathologic
 drush en -y drupalfr_user
 drush en -y content_migrate
@@ -71,21 +71,29 @@ drush cc all
 
 drush en -y dfr_migration
 
-# Lancer la  migration des utilisateurs
+# Migrate user profiles.
 drush dfrum
 
 ###
 ### The site is now in D7.
 ###
 
-# disable useless modules
+# Disable useless modules and delete unused views.
 drush dis -y dfr_migration content_migrate aggregator rdf
+drush php-eval '$view = views_ui_cache_load("liste_user"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("user_quota"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("drupal_news"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("content_admin"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("admin_content"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("Moderation_commentaires"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("Documentation"); $view->delete();'
+drush php-eval '$view = views_ui_cache_load("Comment_admin"); $view->delete();'
 
-# Configure BUEditor
+# Configure BUEditor.
 drush vset --exact bueditor_user '1'
 drush eval "print json_encode(array(13=>array('weight'=>'0','editor'=>'0','alt'=>'0'),4=>array('weight'=>'0','editor'=>'0','alt'=>'0'),11=>array('weight'=>'0','editor'=>'0','alt'=>'0'),9=>array('weight'=>'0','editor'=>'0','alt'=>'0'),12=>array('weight'=>'0','editor'=>'0','alt'=>'0'),7=>array('weight'=>'0','editor'=>'0','alt'=>'0'),2=>array('editor'=>'1','alt'=>'0','weight'=>11),1=>array('weight'=>12,'editor'=>'0','alt'=>'0'),))" | drush --exact vset --format=json bueditor_roles -
 
-# Fix flag migration
+# Fix flag migration.
 drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'forum'"
 
 # Remove a useless redirection.
@@ -94,21 +102,21 @@ drush php-eval "redirect_delete(1);"
 # Update the homepage node content.
 drush php-script ../migration/update_content.php
 
-# Add some bits of customizations
+# Add some bits of customizations.
 drush vset admin_theme seven
 drush php-eval "theme_enable(array('dfrtheme'));"
 drush vset theme_default dfrtheme
 drush php-eval "theme_disable(array('garland'));"
 
-# update site_name & site_slogan
+# Update site_name & site_slogan.
 drush vset site_name "Drupalfr.org"
 drush vset site_slogan "Communauté Drupal France et francophonie"
 
-# Performance wise options
+# Performance wise options.
 drush sqlq "DELETE FROM system WHERE status = 0"
 drush vset locale_cache_length 65535
 
-# disable UI modules
+# Disable UI modules.
 drush dis -y rules_admin views_ui
 
 # Trigger whatever cron has to do.
