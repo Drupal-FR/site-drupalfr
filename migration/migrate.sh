@@ -81,6 +81,9 @@ drush php-eval "redirect_delete(1);"
 
 # Add some bits of customizations
 drush vset admin_theme seven
+drush php-eval "theme_enable(array('dfrtheme'));"
+drush vset theme_default dfrtheme
+drush php-eval "theme_disable(array('garland'));"
 
 # update site_name & site_slogan
 drush vset site_name "Drupalfr.org"
