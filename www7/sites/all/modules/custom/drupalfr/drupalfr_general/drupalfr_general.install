@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function drupalfr_general_install() {
+  db_query('UPDATE {system} SET weight = 11 WHERE name = "drupalfr_general"');
+}
