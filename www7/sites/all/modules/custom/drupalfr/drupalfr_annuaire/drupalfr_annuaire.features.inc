@@ -5,7 +5,7 @@
  */
 
 /**
- * Implementation of hook_ctools_plugin_api().
+ * Implements hook_ctools_plugin_api().
  */
 function drupalfr_annuaire_ctools_plugin_api() {
   list($module, $api) = func_get_args();
@@ -15,17 +15,14 @@ function drupalfr_annuaire_ctools_plugin_api() {
 }
 
 /**
- * Implementation of hook_views_api().
+ * Implements hook_views_api().
  */
 function drupalfr_annuaire_views_api() {
-  list($module, $api) = func_get_args();
-  if ($module == "views" && $api == "views_default") {
-    return array("version" => "3.0");
-  }
+  return array("version" => "3.0");
 }
 
 /**
- * Implementation of hook_node_info().
+ * Implements hook_node_info().
  */
 function drupalfr_annuaire_node_info() {
   $items = array(

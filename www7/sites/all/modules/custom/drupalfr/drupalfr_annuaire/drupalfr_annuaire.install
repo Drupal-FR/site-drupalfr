@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function drupalfr_annuaire_install() {
+  if (!variable_get('drupalfr_annuaire_default_picture')) {
+    $file = new stdClass;
+    $file->filename = 'public://drupalfr_annuaire.png';
+    $file->uri = drupal_get_path('module', 'drupalfr_annuaire') . '/drupalfr_annuaire.png';
+    $file->filemime = 'image/png';
+
+    $file = file_copy($file, 'public://drupalfr_annuaire.png', FILE_EXISTS_REPLACE);
+
+    variable_set('drupalfr_annuaire_default_picture', $file->fid);
+  }
+}
