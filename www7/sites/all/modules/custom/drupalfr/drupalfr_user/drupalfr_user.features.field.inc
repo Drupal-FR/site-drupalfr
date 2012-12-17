@@ -53,8 +53,10 @@ function drupalfr_user_field_default_fields() {
         'planete_author' => array(
           'label' => 'hidden',
           'module' => 'text',
-          'settings' => array(),
-          'type' => 'text_default',
+          'settings' => array(
+            'trim_length' => '400',
+          ),
+          'type' => 'text_trimmed',
           'weight' => '2',
         ),
       ),
@@ -511,7 +513,7 @@ function drupalfr_user_field_default_fields() {
       'locked' => '0',
       'module' => 'image',
       'settings' => array(
-        'default_image' => variable_get('drupalfr_user_default_picture', 0),
+        'default_image' => '3666',
         'uri_scheme' => 'public',
       ),
       'translatable' => '1',
@@ -549,7 +551,7 @@ function drupalfr_user_field_default_fields() {
       'required' => 0,
       'settings' => array(
         'alt_field' => 0,
-        'default_image' => variable_get('drupalfr_user_default_picture', 0),
+        'default_image' => '3666',
         'file_directory' => 'pictures',
         'file_extensions' => 'png gif jpg jpeg',
         'max_filesize' => '',
