@@ -102,7 +102,6 @@ function drupalfr_user_install() {
  */
 function _drupalfr_user_install_ensure_default_user_picture() {
   if (!variable_get('drupalfr_user_default_picture')) {
-
     $file           = new stdClass;
     $file->filename = 'public://drupalfr_user.png';
     $file->uri      = drupal_get_path('module', 'drupalfr_user') . '/drupalfr_user.png';
