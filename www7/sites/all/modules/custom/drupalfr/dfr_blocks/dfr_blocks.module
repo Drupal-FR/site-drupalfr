@@ -9,7 +9,7 @@ function dfr_blocks_block_info() {
 
   $blocks['home_events'] = array(
     'info' => "DrupalFR : Home Evenements",
-    'cache' => DRUPAL_CACHE_PER_PAGE,
+    'cache' => DRUPAL_CACHE_GLOBAL,
   );
   $blocks['home_help'] = array(
     'info' => "DrupalFR : Home Aide",
@@ -189,7 +189,7 @@ function dfr_blocks_block_home_trad() {
 
 function dfr_blocks_block_download() {
   $items = array(
-    'drupal7' => 'Drupal 7' . l("Télécharger", file_create_url('public://drupal-7.latest.tar.gz'), array('attributes'=>array('class'=>'btn-link'))),
+    'drupal7' => 'Drupal 7' . l("Télécharger", file_create_url('public://drupal-7.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
     'drupal6' => 'Drupal 6' . l("Télécharger", file_create_url('public://drupal-6.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
   );
   return array(
@@ -203,19 +203,19 @@ function dfr_blocks_block_download() {
 
 
 function dfr_blocks_block_about_us() {
-  // Load 'association' node
-  $asso = node_load(8135);
-
+  $content = '<p>';
+  $content .= 'Drupalfr.org offre des services à la communauté Drupal française et francophone. Notre site est opéré et géré par une petite équipe de bénévoles.';
+  $content .= '</p>';
   return array(
     'subject' => "Qui sommes nous ?",
     'content' => array(
       'text' => array(
-        '#markup' => $asso->body[LANGUAGE_NONE][0]['summary']
+        '#markup' => $content,
       ),
       'link' => array(
         '#theme' => 'link',
         '#text' => "En savoir plus",
-        '#path' => 'node/'.$asso->nid,
+        '#path' => 'association',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
           'html' => FALSE

@@ -69,6 +69,10 @@ drush en -y dfr_migration
 # Lancer la  migration des utilisateurs
 drush dfrum
 
+###
+### The site is now in D7.
+###
+
 # disable useless modules
 drush dis -y dfr_migration content_migrate aggregator rdf
 
@@ -81,6 +85,9 @@ drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'foru
 
 # Remove a useless redirection.
 drush php-eval "redirect_delete(1);"
+
+# Update the homepage node content.
+drush php-script ../migration/update_content.php
 
 # Add some bits of customizations
 drush vset admin_theme seven
