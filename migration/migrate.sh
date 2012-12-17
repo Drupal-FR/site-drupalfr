@@ -20,9 +20,6 @@ drush sqlc < ../migration/sql/pre-migration.sql
 # Try a migration.
 drush updatedb -y --verbose
 
-# Disable some useless core modules
-drush dis -y rdf
-
 # enable modules
 drush en -y pathologic
 drush en -y drupalfr_user
@@ -33,8 +30,6 @@ drush en -y toolbar
 drush en -y token
 drush en -y contextual
 drush en -y image
-drush en -y rdf
-drush en -y shortcut
 drush en -y codefilter
 drush en -y entity
 drush en -y diff
@@ -71,6 +66,9 @@ drush en -y dfr_migration
 # Lancer la  migration des utilisateurs
 drush dfrum
 
+# disable useless modules
+drush dis -y dfr_migration content_migrate aggregator rdf
+
 # Configure BUEditor
 drush vset --exact bueditor_user '1'
 drush eval "print json_encode(array(13=>array('weight'=>'0','editor'=>'0','alt'=>'0'),4=>array('weight'=>'0','editor'=>'0','alt'=>'0'),11=>array('weight'=>'0','editor'=>'0','alt'=>'0'),9=>array('weight'=>'0','editor'=>'0','alt'=>'0'),12=>array('weight'=>'0','editor'=>'0','alt'=>'0'),7=>array('weight'=>'0','editor'=>'0','alt'=>'0'),2=>array('editor'=>'1','alt'=>'0','weight'=>11),1=>array('weight'=>12,'editor'=>'0','alt'=>'0'),))" | drush --exact vset --format=json bueditor_roles -
@@ -91,6 +89,8 @@ drush vset site_slogan "Communauté Drupal France et francophonie"
 # Performance wise options
 drush sqlq "DELETE FROM system WHERE status = 0"
 drush vset locale_cache_length 65535
-# Don't forget to disable views_ui and dblog in production
 
-echo "aller sur la page admin/migration et lancer la migration\n";
+# disable UI modules
+drush dis -y rules_admin views_ui
+
+# TODO: disable dblog
