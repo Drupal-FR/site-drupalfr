@@ -108,6 +108,7 @@ drush sqlq "UPDATE bueditor_editors SET iconpath = '%THEME/bueditor-icons'"
 
 # Fix flag migration.
 drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'forum'"
+drush php-eval "\$flag = flag_get_flag('annuaire_validation'); \$flag->delete(); \$flag->disable();"
 
 # Remove a useless redirection.
 drush php-eval "redirect_delete(1);"
@@ -131,6 +132,8 @@ drush vset locale_cache_length 65535
 
 # Disable UI modules.
 drush dis -y rules_admin views_ui
+
+drush cc all
 
 # Trigger whatever cron has to do.
 drush cron
