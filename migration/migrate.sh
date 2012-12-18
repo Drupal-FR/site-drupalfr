@@ -134,6 +134,10 @@ drush vset locale_cache_length 65535
 # Disable UI modules.
 drush dis -y rules_admin views_ui
 
+# Revert permissions to code defined version.
+drush en -y drupalfr_permissions
+drush fr -y drupalfr_permissions
+
 drush cc all
 
 # Trigger whatever cron has to do.
