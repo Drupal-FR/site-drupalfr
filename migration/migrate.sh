@@ -62,12 +62,8 @@ drush fr -y drupalfr_general
 drush fr -y drupalfr_edito
 #drush fr -y drupalfr_annuaire
 
-# Remove the fantom link about user listing and unwanted links.
-drush php-eval '_menu_delete_item(menu_link_load(1209), 1);'
-# Remove D7 port node menu entry.
-drush php-eval '_menu_delete_item(menu_link_load(1954), 1);'
-# Move the ressources link in the navigation menu.
-drush php-eval '$ressouces_mlid = db_query("SELECT mlid FROM menu_links WHERE router_path = \"Ressources\" ")->fetchAssoc(); $item = menu_link_load($ressouces_mlid["mlid"]); $item["menu_name"] = "navigation"; $item["p1"] = $ressouces_mlid["mlid"]; menu_link_save($item);'
+# Clean menu entries.
+drush php-script ../migration/menu_cleanup.php
 
 drush cc all
 drush updatedb -y --verbose
