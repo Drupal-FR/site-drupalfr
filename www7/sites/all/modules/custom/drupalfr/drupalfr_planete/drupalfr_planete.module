@@ -55,31 +55,32 @@ function drupalfr_planete_block_view($delta = '') {
  * Implements hook_url_inbound_alter().
  */
 function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_language) {
+  if (variable_get('drupalfr_planete_rewrite_urls', TRUE)) {
+    global $base_url;
 
-  global $base_url;
+    list($scheme, $url) = explode('://', $base_url, 2);
 
-  list($scheme, $url) = explode('://', $base_url, 2);
-
-  if (0 === strpos($url, 'planete.')) {
-    if ('planete' === $path) {
-      // Quand l'utilisateur est sur l'URL en planete.URL, on doit s'assurer
-      // que les chemins / et /planete ne soit pas dupliqués, on rediregera
-      // donc sur /.
-      drupal_goto($base_url, array(), 301);
+    if (0 === strpos($url, 'planete.')) {
+      if ('planete' === $path) {
+        // Quand l'utilisateur est sur l'URL en planete.URL, on doit s'assurer
+        // que les chemins / et /planete ne soit pas dupliqués, on rediregera
+        // donc sur /.
+        drupal_goto($base_url, array(), 301);
+      }
+      else if (empty($path) || $path === variable_get('site_frontpage', 'node')) {
+        // Chemin vide ou front page, on est bon, on doit alors changer le chemin
+        // interne à Drupal pour le feinter et lui faire croire qu'on est dans
+        // la page /planete.
+        $path = 'planete';
+      }
+      else {
+        // Tout autre tentative doit retourner sur le site principal.
+        drupal_goto($scheme . '://' . substr($url, strlen('planete.')), array(), 301);
+      }
     }
-    else if (empty($path) || $path === variable_get('site_frontpage', 'node')) {
-      // Chemin vide ou front page, on est bon, on doit alors changer le chemin
-      // interne à Drupal pour le feinter et lui faire croire qu'on est dans
-      // la page /planete.
-      $path = 'planete';
+    else if ('planete' === $path) {
+      drupal_goto($scheme . '://planete.' . $url, array(), 301);
     }
-    else {
-      // Tout autre tentative doit retourner sur le site principal.
-      drupal_goto($scheme . '://' . substr($url, strlen('planete.')), array(), 301);
-    }
-  }
-  else if ('planete' === $path) {
-    drupal_goto($scheme . '://planete.' . $url, array(), 301);
   }
 }
 
@@ -87,44 +88,46 @@ function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_langua
  * Implements hook_url_outbound_alter().
  */
 function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) {
+  if (variable_get('drupalfr_planete_rewrite_urls', TRUE)) {
+    global $base_url;
 
-  global $base_url;
+    if ($options['external']) {
+      return;
+    }
 
-  if ($options['external']) {
-    return;
-  }
+    list($scheme, $url) = explode('://', $base_url, 2);
 
-  list($scheme, $url) = explode('://', $base_url, 2);
-
-  if (preg_match('@^node/(\d+)$@', $path, $matches) &&
+    if (preg_match('@^node/(\d+)$@', $path, $matches) &&
       ($node = node_load($matches[1])) &&
       'planete' === $node->type &&
       isset($node->field_planete_url) &&
       !empty($node->field_planete_url) &&
-      isset($node->field_planete_url[LANGUAGE_NONE][0]['url']))
-  {
-    $path                = $node->field_planete_url[LANGUAGE_NONE][0]['url'];
-    $options['absolute'] = TRUE;
-    $options['external'] = TRUE;
-  }
-  // Dans le cas du outbound, la seule URL valable pour accéder au planete
-  // est /planete, cas dans leque on va gentillement réécrire la requête,
-  // tout autre path sera renvoyé vers le site d'origine.
-  else if ('planete' === $path) {
-    if (0 === strpos($url, 'planete.')) {
-      $path                = $scheme . '://' . $url;
-      $options['absolute'] = TRUE;
-      $options['external'] = TRUE;
-    } else {
-      $path                = $scheme . '://planete.' . $url;
+      isset($node->field_planete_url[LANGUAGE_NONE][0]['url'])
+    ) {
+      $path = $node->field_planete_url[LANGUAGE_NONE][0]['url'];
       $options['absolute'] = TRUE;
       $options['external'] = TRUE;
     }
-  }
-  else if (0 === strpos($url, 'planete.')) {
-    $path                = $scheme . '://' . substr($url, strlen('planete.')) . '/' . $path;
-    $options['absolute'] = TRUE;
-    $options['external'] = TRUE;
+    // Dans le cas du outbound, la seule URL valable pour accéder au planete
+    // est /planete, cas dans leque on va gentillement réécrire la requête,
+    // tout autre path sera renvoyé vers le site d'origine.
+    else if ('planete' === $path) {
+      if (0 === strpos($url, 'planete.')) {
+        $path = $scheme . '://' . $url;
+        $options['absolute'] = TRUE;
+        $options['external'] = TRUE;
+      }
+      else {
+        $path = $scheme . '://planete.' . $url;
+        $options['absolute'] = TRUE;
+        $options['external'] = TRUE;
+      }
+    }
+    else if (0 === strpos($url, 'planete.')) {
+      $path = $scheme . '://' . substr($url, strlen('planete.')) . '/' . $path;
+      $options['absolute'] = TRUE;
+      $options['external'] = TRUE;
+    }
   }
 }
 

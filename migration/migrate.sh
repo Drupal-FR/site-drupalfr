@@ -81,7 +81,7 @@ drush dfrum
 ###
 
 # Disable useless modules and delete unused views.
-drush dis -y dfr_migration content_migrate aggregator rdf
+#drush dis -y dfr_migration content_migrate aggregator rdf
 drush php-eval '$view = views_ui_cache_load("liste_user"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("user_quota"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("drupal_news"); $view->delete();'
