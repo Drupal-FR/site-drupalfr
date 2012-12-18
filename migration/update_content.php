@@ -89,7 +89,7 @@ foreach ($feed_informations as $feed_information) {
 $block_content = <<<EOF
 <p>Ce site est réalisé par l'<a href="/contact">équipe de Drupalfr.org</a>, son contenu est mis à disposition selon le contrat <a href="http://creativecommons.org/licenses/by-sa/2.0/fr/">Paternité-ShareAlike 2.0 France</a>.</p>
 <p>
-Drupal est <a href="http://buytaert.net/drupal-trademark-policy-forthcoming">une marque déposée</a> de Dries Buytaert. - Consulter les <a href="/mentions-legales">mentions légales</a> - Icones BUEditor fournies par <a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam</a>.
+Drupal est <a href="http://buytaert.net/drupal-trademark-policy-forthcoming">une marque déposée</a> de Dries Buytaert - Consulter les <a href="/mentions-legales">mentions légales</a> - Icones BUEditor fournies par <a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam</a>.
 </p>
 EOF;
 

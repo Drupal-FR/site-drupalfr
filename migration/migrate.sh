@@ -100,7 +100,7 @@ drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_realisa"); $v
 # Configure BUEditor.
 drush vset --exact bueditor_user '1'
 drush eval "print json_encode(array(13=>array('weight'=>'0','editor'=>'0','alt'=>'0'),4=>array('weight'=>'0','editor'=>'0','alt'=>'0'),11=>array('weight'=>'0','editor'=>'0','alt'=>'0'),9=>array('weight'=>'0','editor'=>'0','alt'=>'0'),12=>array('weight'=>'0','editor'=>'0','alt'=>'0'),7=>array('weight'=>'0','editor'=>'0','alt'=>'0'),2=>array('editor'=>'1','alt'=>'0','weight'=>11),1=>array('weight'=>12,'editor'=>'0','alt'=>'0'),))" | drush --exact vset --format=json bueditor_roles -
-drush sqlq "UPDATE {bueditor_editors} SET iconpath = '%THEME/bueditor-icons' WHERE name = 'Default'"
+drush sqlq "UPDATE bueditor_editors SET iconpath = '%THEME/bueditor-icons' WHERE name = 'Default'"
 
 # Fix flag migration.
 drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'forum'"
