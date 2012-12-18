@@ -52,6 +52,7 @@ drush en -y dfr_blocks
 drush en -y drupalfr_events
 drush en -y bueditor
 drush en -y drupalfr_forums
+drush en -y l10n_update
 drush en -y drupalfr_general
 drush en -y drupalfr_annuaire
 
