@@ -1,45 +1,5 @@
 <?php
 
-/**
- * Implements hook_menu().
- */
-function dfr_migration_menu() {
-  return array(
-    'admin/migration' => array(
-      'title' => 'Migration User',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('dfr_migration_admin_migrate_users'),
-      'access arguments' => array('administer users'),
-    ),
-  );
-}
-
-/**
- * Display a form to migrate users.
- */
-function dfr_migration_admin_migrate_users($form, $form_state) {
-  $form['submit']['#type'] = 'submit';
-  $form['submit']['#value'] = t('Migrer les profils utilisateurs');
-  return $form;
-}
-
-/**
- * Submit callback settings the batch.
- */
-function dfr_migration_admin_migrate_users_submit($form, $form_state) {
-  $batch = array(
-    'operations' => array(
-      array('dfr_migration_migrate_profiles_batch', array()),
-    ),
-    'finished' => 'dfr_migration_migrate_profiles_batch_finished',
-    'title' => t('Migrating users'),
-    'init_message' => t('Préparation de la migration des profils.'),
-    'progress_message' => t('Traitement @current sur @total.'),
-    'error_message' => t('Le batch de migraiton des profils a échoué.'),
-  );
-  batch_set($batch);
-  batch_process('admin/migration');
-}
 function dfr_migration_migrate_profiles_batch_finished() {
   drupal_set_message('Migration des utilisateurs terminée.');
   return '';

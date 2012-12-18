@@ -59,7 +59,7 @@ drush en -y drupalfr_annuaire
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
 drush fr -y drupalfr_forums
 drush fr -y drupalfr_general
-drush fr -y drupalfr_annuaire
+#drush fr -y drupalfr_annuaire
 
 # Remove the fantom link about user listing.
 drush php-eval '_menu_delete_item(menu_link_load(1209), 1);'
@@ -82,7 +82,7 @@ drush dfrum
 ###
 
 # Disable useless modules and delete unused views.
-#drush dis -y dfr_migration content_migrate aggregator rdf
+drush dis -y dfr_migration content_migrate aggregator rdf
 drush php-eval '$view = views_ui_cache_load("liste_user"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("user_quota"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("drupal_news"); $view->delete();'
