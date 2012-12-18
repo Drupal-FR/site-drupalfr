@@ -59,6 +59,7 @@ drush en -y drupalfr_annuaire
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
 drush fr -y drupalfr_forums
 drush fr -y drupalfr_general
+drush fr -y drupalfr_edito
 #drush fr -y drupalfr_annuaire
 
 # Remove the fantom link about user listing and unwanted links.
