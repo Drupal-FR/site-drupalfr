@@ -61,8 +61,12 @@ drush fr -y drupalfr_forums
 drush fr -y drupalfr_general
 #drush fr -y drupalfr_annuaire
 
-# Remove the fantom link about user listing.
+# Remove the fantom link about user listing and unwanted links.
 drush php-eval '_menu_delete_item(menu_link_load(1209), 1);'
+# Remove D7 port node menu entry.
+drush php-eval '_menu_delete_item(menu_link_load(1954), 1);'
+# Move the ressources link in the navigation menu.
+drush php-eval '$item = menu_link_load(1945); $item["menu_name"] = "navigation"; $item["p1"] = 1945; menu_link_save($item);'
 
 drush cc all
 drush updatedb -y --verbose
@@ -100,7 +104,7 @@ drush php-eval '$view = views_ui_cache_load("annuaire_prestataires_realisa"); $v
 # Configure BUEditor.
 drush vset --exact bueditor_user '1'
 drush eval "print json_encode(array(13=>array('weight'=>'0','editor'=>'0','alt'=>'0'),4=>array('weight'=>'0','editor'=>'0','alt'=>'0'),11=>array('weight'=>'0','editor'=>'0','alt'=>'0'),9=>array('weight'=>'0','editor'=>'0','alt'=>'0'),12=>array('weight'=>'0','editor'=>'0','alt'=>'0'),7=>array('weight'=>'0','editor'=>'0','alt'=>'0'),2=>array('editor'=>'1','alt'=>'0','weight'=>11),1=>array('weight'=>12,'editor'=>'0','alt'=>'0'),))" | drush --exact vset --format=json bueditor_roles -
-drush sqlq "UPDATE bueditor_editors SET iconpath = '%THEME/bueditor-icons' WHERE name = 'Default'"
+drush sqlq "UPDATE bueditor_editors SET iconpath = '%THEME/bueditor-icons'"
 
 # Fix flag migration.
 drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'forum'"
@@ -108,7 +112,7 @@ drush sqlq "UPDATE flag_types SET type = 'comment_node_forum' WHERE type = 'foru
 # Remove a useless redirection.
 drush php-eval "redirect_delete(1);"
 
-# Update the homepage node content.
+# Update the homepage node content, blocks and menu entries.
 drush php-script ../migration/update_content.php
 
 # Add some bits of customizations.
