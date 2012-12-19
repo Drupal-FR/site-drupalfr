@@ -69,15 +69,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'contextual',
   );
 
-  // Exported permission: access devel information.
-  $permissions['access devel information'] = array(
-    'name' => 'access devel information',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'devel',
-  );
-
   // Exported permission: access printer-friendly version.
   $permissions['access printer-friendly version'] = array(
     'name' => 'access printer-friendly version',
@@ -1018,15 +1009,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'userpoints',
   );
 
-  // Exported permission: execute php code.
-  $permissions['execute php code'] = array(
-    'name' => 'execute php code',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'devel',
-  );
-
   // Exported permission: import planet feeds.
   $permissions['import planet feeds'] = array(
     'name' => 'import planet feeds',
@@ -1227,15 +1209,6 @@ function drupalfr_permissions_user_default_permissions() {
       0 => 'authenticated user',
     ),
     'module' => 'comment',
-  );
-
-  // Exported permission: switch users.
-  $permissions['switch users'] = array(
-    'name' => 'switch users',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'devel',
   );
 
   // Exported permission: translate interface.
