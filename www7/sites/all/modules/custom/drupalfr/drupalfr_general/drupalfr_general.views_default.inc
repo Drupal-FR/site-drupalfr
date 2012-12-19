@@ -308,14 +308,24 @@ function drupalfr_general_views_default_views() {
         13 => '13',
       ),
     ),
-    4 => array(
-      'title' => 'Modérateurs',
+    5 => array(
+      'title' => 'Modérateurs documentation',
       'operator' => 'or',
       'value' => array(
-        13 => '13',
-        9 => '9',
         11 => '11',
+      ),
+    ),
+    6 => array(
+      'title' => 'Modérateurs forum',
+      'operator' => 'or',
+      'value' => array(
         7 => '7',
+      ),
+    ),
+    7 => array(
+      'title' => 'Node admin',
+      'operator' => 'or',
+      'value' => array(
         12 => '12',
       ),
     ),

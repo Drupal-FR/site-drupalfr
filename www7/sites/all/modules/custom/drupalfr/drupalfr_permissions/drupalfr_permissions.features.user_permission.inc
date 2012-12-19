@@ -584,8 +584,7 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'delete any annuaire content',
     'roles' => array(
       0 => 'admin',
-      1 => 'modérateur annuaire',
-      2 => 'node administrateurs',
+      1 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -803,8 +802,7 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'edit any annuaire content',
     'roles' => array(
       0 => 'admin',
-      1 => 'modérateur annuaire',
-      2 => 'node administrateurs',
+      1 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -1402,10 +1400,9 @@ function drupalfr_permissions_user_default_permissions() {
       1 => 'anonymous user',
       2 => 'authenticated user',
       3 => 'contributeur annonces',
-      4 => 'modérateur annuaire',
-      5 => 'modérateur documentation',
-      6 => 'modérateur forum',
-      7 => 'node administrateurs',
+      4 => 'modérateur documentation',
+      5 => 'modérateur forum',
+      6 => 'node administrateurs',
     ),
     'module' => 'filter',
   );
