@@ -48,6 +48,8 @@ drush en -y userpoints userpoints_rules
 drush en -y transliteration
 drush en -y drupalfr_edito
 drush en -y twitter_block
+drush en -y drupalfr_search
+drush en -y facetapi
 drush en -y dfr_blocks
 drush en -y drupalfr_events
 drush en -y bueditor

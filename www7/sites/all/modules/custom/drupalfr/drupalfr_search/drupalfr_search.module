@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * Code for the Drupalfr search feature.
+ */
+
+include_once 'drupalfr_search.features.inc';
+
+/**
+ * Implements hook_block_info().
+ */
+function drupalfr_search_block_info() {
+  $blocks = array();
+  $blocks['solr-search'] = array(
+    'info' => t('Recherche solr'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function drupalfr_search_block_view($delta) {
+  $block = array();
+  $block['subject'] = t('Rechercher');
+  $block['content'] = drupal_get_form('drupalfr_search_form');
+  return $block;
+}
+
+
+/**
+ * Display a search form.
+ */
+function drupalfr_search_form(array $form, array &$form_state) {
+  $form['keys'] = array(
+    '#type' => 'textfield',
+    '#size' => 15,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Search'),
+  );
+  return $form;
+}
+
+/**
+ * Validation callback for drupalfr_search_form().
+ */
+function drupalfr_search_form_validate(array $form, array &$form_state) {
+  if (!trim($form_state['values']['keys'])) {
+    form_set_error('keys', t('Please enter at least one keyword.'));
+  }
+}
+
+/**
+ * Submit callback for drupalfr_search_form().
+ */
+function drupalfr_search_form_submit(array $form, array &$form_state) {
+  $keys = trim($form_state['values']['keys']);
+  $q = array('search_api_views_fulltext' => $keys);
+  $q += drupal_get_query_parameters();
+  drupal_goto('recherche', array('query' => $q));
+}
