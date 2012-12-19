@@ -244,5 +244,19 @@ function drupalfr_planete_strongarm() {
   $strongarm->value = 0;
   $export['node_submitted_planete_feed_source'] = $strongarm;
 
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'publishcontent_planete';
+  $strongarm->value = 0;
+  $export['publishcontent_planete'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'publishcontent_planete_feed_source';
+  $strongarm->value = 0;
+  $export['publishcontent_planete_feed_source'] = $strongarm;
+
   return $export;
 }
