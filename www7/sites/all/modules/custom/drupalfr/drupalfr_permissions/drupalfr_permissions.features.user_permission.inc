@@ -530,17 +530,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: create faq content.
-  $permissions['create faq content'] = array(
-    'name' => 'create faq content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'modérateur forum',
-      2 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
   // Exported permission: create forum content.
   $permissions['create forum content'] = array(
     'name' => 'create forum content',
@@ -566,15 +555,6 @@ function drupalfr_permissions_user_default_permissions() {
     'roles' => array(
       0 => 'admin',
       1 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
-  // Exported permission: create simplenews content.
-  $permissions['create simplenews content'] = array(
-    'name' => 'create simplenews content',
-    'roles' => array(
-      0 => 'admin',
     ),
     'module' => 'node',
   );
@@ -620,17 +600,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: delete any faq content.
-  $permissions['delete any faq content'] = array(
-    'name' => 'delete any faq content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'modérateur forum',
-      2 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
   // Exported permission: delete any forum content.
   $permissions['delete any forum content'] = array(
     'name' => 'delete any forum content',
@@ -655,16 +624,6 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: delete any page content.
   $permissions['delete any page content'] = array(
     'name' => 'delete any page content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
-  // Exported permission: delete any simplenews content.
-  $permissions['delete any simplenews content'] = array(
-    'name' => 'delete any simplenews content',
     'roles' => array(
       0 => 'admin',
       1 => 'node administrateurs',
@@ -701,16 +660,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: delete own faq content.
-  $permissions['delete own faq content'] = array(
-    'name' => 'delete own faq content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'modérateur forum',
-    ),
-    'module' => 'node',
-  );
-
   // Exported permission: delete own forum content.
   $permissions['delete own forum content'] = array(
     'name' => 'delete own forum content',
@@ -733,15 +682,6 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: delete own page content.
   $permissions['delete own page content'] = array(
     'name' => 'delete own page content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'node',
-  );
-
-  // Exported permission: delete own simplenews content.
-  $permissions['delete own simplenews content'] = array(
-    'name' => 'delete own simplenews content',
     'roles' => array(
       0 => 'admin',
     ),
@@ -880,17 +820,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: edit any faq content.
-  $permissions['edit any faq content'] = array(
-    'name' => 'edit any faq content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'modérateur forum',
-      2 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
   // Exported permission: edit any forum content.
   $permissions['edit any forum content'] = array(
     'name' => 'edit any forum content',
@@ -915,16 +844,6 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: edit any page content.
   $permissions['edit any page content'] = array(
     'name' => 'edit any page content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
-  // Exported permission: edit any simplenews content.
-  $permissions['edit any simplenews content'] = array(
-    'name' => 'edit any simplenews content',
     'roles' => array(
       0 => 'admin',
       1 => 'node administrateurs',
@@ -972,17 +891,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: edit own faq content.
-  $permissions['edit own faq content'] = array(
-    'name' => 'edit own faq content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'modérateur forum',
-      2 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
   // Exported permission: edit own forum content.
   $permissions['edit own forum content'] = array(
     'name' => 'edit own forum content',
@@ -995,16 +903,6 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: edit own page content.
   $permissions['edit own page content'] = array(
     'name' => 'edit own page content',
-    'roles' => array(
-      0 => 'admin',
-      1 => 'node administrateurs',
-    ),
-    'module' => 'node',
-  );
-
-  // Exported permission: edit own simplenews content.
-  $permissions['edit own simplenews content'] = array(
-    'name' => 'edit own simplenews content',
     'roles' => array(
       0 => 'admin',
       1 => 'node administrateurs',
@@ -1194,15 +1092,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
-  // Exported permission: publish any faq content.
-  $permissions['publish any faq content'] = array(
-    'name' => 'publish any faq content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'publishcontent',
-  );
-
   // Exported permission: publish any offre content.
   $permissions['publish any offre content'] = array(
     'name' => 'publish any offre content',
@@ -1239,15 +1128,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
-  // Exported permission: publish editable faq content.
-  $permissions['publish editable faq content'] = array(
-    'name' => 'publish editable faq content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'publishcontent',
-  );
-
   // Exported permission: publish editable offre content.
   $permissions['publish editable offre content'] = array(
     'name' => 'publish editable offre content',
@@ -1278,15 +1158,6 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: publish own doc content.
   $permissions['publish own doc content'] = array(
     'name' => 'publish own doc content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'publishcontent',
-  );
-
-  // Exported permission: publish own faq content.
-  $permissions['publish own faq content'] = array(
-    'name' => 'publish own faq content',
     'roles' => array(
       0 => 'admin',
     ),
@@ -1405,15 +1276,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
-  // Exported permission: unpublish any faq content.
-  $permissions['unpublish any faq content'] = array(
-    'name' => 'unpublish any faq content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'publishcontent',
-  );
-
   // Exported permission: unpublish any offre content.
   $permissions['unpublish any offre content'] = array(
     'name' => 'unpublish any offre content',
@@ -1450,15 +1312,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
-  // Exported permission: unpublish editable faq content.
-  $permissions['unpublish editable faq content'] = array(
-    'name' => 'unpublish editable faq content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'publishcontent',
-  );
-
   // Exported permission: unpublish editable offre content.
   $permissions['unpublish editable offre content'] = array(
     'name' => 'unpublish editable offre content',
@@ -1489,15 +1342,6 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: unpublish own doc content.
   $permissions['unpublish own doc content'] = array(
     'name' => 'unpublish own doc content',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'publishcontent',
-  );
-
-  // Exported permission: unpublish own faq content.
-  $permissions['unpublish own faq content'] = array(
-    'name' => 'unpublish own faq content',
     'roles' => array(
       0 => 'admin',
     ),

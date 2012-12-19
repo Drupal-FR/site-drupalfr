@@ -62,13 +62,6 @@ function drupalfr_edito_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'pathauto_node_faq_pattern';
-  $strongarm->value = '';
-  $export['pathauto_node_faq_pattern'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_forum_pattern';
   $strongarm->value = 'forum/[node:taxonomy-forums:parents:join-path]/[node:taxonomy-forums:name]/[node:nid]-[node:title]';
   $export['pathauto_node_forum_pattern'] = $strongarm;
@@ -128,13 +121,6 @@ function drupalfr_edito_strongarm() {
   $strongarm->name = 'pathauto_node_profile_pattern';
   $strongarm->value = '';
   $export['pathauto_node_profile_pattern'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'pathauto_node_simplenews_pattern';
-  $strongarm->value = '';
-  $export['pathauto_node_simplenews_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

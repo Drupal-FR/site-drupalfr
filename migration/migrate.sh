@@ -73,6 +73,11 @@ drush en -y migrate
 drush -y content-migrate-fields
 drush cc all
 
+# Delete unused content types and the 3 nodes of those types.
+drush php-eval 'node_delete_multiple(array(1396, 4411, 4417));'
+drush php-eval 'node_type_delete("faq"); variable_del("node_preview_faq"); node_types_rebuild();'
+drush php-eval 'node_type_delete("simplenews"); variable_del("node_preview_simplenews"); node_types_rebuild();'
+
 drush en -y dfr_migration
 
 # Migrate user profiles.
