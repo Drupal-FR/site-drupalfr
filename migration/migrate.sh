@@ -54,6 +54,9 @@ drush en -y bueditor
 drush en -y drupalfr_forums
 drush en -y l10n_update
 drush en -y drupalfr_general
+drush en -y search_api
+drush en -y search_api_solr
+drush en -y search_api_views
 
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
 drush fr -y drupalfr_forums
@@ -71,9 +74,9 @@ drush en -y migrate
 drush -y content-migrate-fields
 drush cc all
 
+# Enable the annuaire and revert it to benefit from the code defined view.
 drush en -y drupalfr_annuaire
 drush fr -y drupalfr_annuaire
-
 
 # Delete unused content types and the 3 nodes of those types.
 drush php-eval 'node_delete_multiple(array(1396, 4411, 4417));'
@@ -145,6 +148,9 @@ drush en -y drupalfr_permissions
 drush fr -y drupalfr_permissions
 
 drush cc all
+
+# Fetch the latest translations.
+drush l10n_update
 
 # Trigger whatever cron has to do.
 drush cron

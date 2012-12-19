@@ -1,0 +1,140 @@
+<?php
+/**
+ * @file
+ * Provides a Solr-based service class for the Search API.
+ */
+
+/**
+ * Implements hook_init().
+ */
+function search_api_solr_init() {
+  spl_autoload_register('_search_api_solr_autoload');
+}
+
+/**
+ * Return path to SolrPhpClient library path, or FALSE if not found.
+ */
+function _search_api_solr_solrphpclient_path() {
+  static $path = NULL;
+
+  if (!isset($path)) {
+    $path = FALSE;
+    // If Libraries API is installed, we first use that to try and find the
+    // library. Otherwise we manually check a few locations.
+    $search_dirs = array();
+    if (function_exists('libraries_get_path')) {
+      $dir = libraries_get_path('SolrPhpClient');
+      // Confusingly, Libraries API 1.x will return sites/all/libraries/NAME on
+      // failure, while Libraries API 2.x returns FALSE in that case.
+      if ($dir) {
+        $search_dirs[] = $dir;
+      }
+    }
+    else {
+      // Include libraries + current profile folders in searched directories.
+      $search_dirs[] = 'sites/all/libraries/SolrPhpClient';
+      $search_dirs[] = 'profiles/' . drupal_get_profile() . '/libraries/SolrPhpClient';
+    }
+    $search_dirs[] = drupal_get_path('module', 'search_api_solr') . '/SolrPhpClient';
+    foreach ($search_dirs as $dir) {
+      $dir = DRUPAL_ROOT . '/' . $dir;
+      if (is_dir($dir)) {
+        $path = $dir;
+        break;
+      }
+    }
+  }
+
+  if ($path == FALSE) {
+    throw new Exception('SolrPhpClient library not found! Please follow the instructions in search_api_solr/INSTALL.txt for installing the Solr search module.');
+  }
+
+  return $path;
+}
+
+/**
+ * Autoloader for the SolrPhpClient classes.
+ */
+function _search_api_solr_autoload($name) {
+  static $lookup_cache = array();
+
+  if (isset($lookup_cache[$name])) {
+    return $lookup_cache[$name];
+  }
+  elseif (substr($name, 0, 11) == 'Apache_Solr') {
+    $path = _search_api_solr_solrphpclient_path();
+    if (file_exists($file_path = $path . '/' . str_replace('_', '/', $name) . '.php')) {
+      require_once $file_path;
+      $lookup_cache[$name] = TRUE;
+      return TRUE;
+    }
+  }
+  $lookup_cache[$name] = FALSE;
+  return FALSE;
+}
+
+/**
+ * Implements hook_search_api_service_info().
+ */
+function search_api_solr_search_api_service_info() {
+  $services['search_api_solr_service'] = array(
+    'name' => t('Solr service'),
+    'description' => t('<p>Index items using an Apache Solr search server.</p>' .
+        '<ul>' . '<li>All field types are supported and indexed in a special way, with URI/String and Integer/Duration being equivalent.</li>' .
+        '<li>See <a href="@url">the Solr wiki</a> for information about the "direct" parse mode.</li>' .
+        '<li>Supports the search_api_facets and search_api_multi features.</li>' .
+        '<li>Will use internal Solr preprocessors, so Search API preprocessors should for the most part be deactivated.</li>' .
+        '<li>See the README.txt file provided with this module for details.</li>' . '</ul>',
+        array('@url' => url('http://wiki.apache.org/solr/SolrQuerySyntax'))),
+    'class' => 'SearchApiSolrService',
+  );
+  return $services;
+}
+
+/**
+ * Implements hook_help().
+ */
+function search_api_solr_help($path, array $arg = array()) {
+  if ($path == 'admin/config/search/search_api') {
+    // Included because we need the REQUIREMENT_* constants.
+    include_once(DRUPAL_ROOT . '/includes/install.inc');
+    module_load_include('install', 'search_api_solr');
+    $reqs = search_api_solr_requirements('runtime');
+    foreach ($reqs as $req) {
+      if (isset($req['description'])) {
+        $type = $req['severity'] == REQUIREMENT_ERROR ? 'error' : ($req['severity'] == REQUIREMENT_WARNING ? 'warning' : 'status');
+        drupal_set_message($req['description'], $type);
+      }
+    }
+  }
+  elseif ($path == 'admin/config/search/search_api/server/%' && !empty($arg[5])) {
+    $server = search_api_server_load($arg[5]);
+    if ($server && $server->enabled && $server->class == 'search_api_solr_service') {
+      $ping = $server->ping();
+      $type = $ping ? 'status' : 'error';
+      if ($ping) {
+        $msg = t('The Solr server could be reached (latency: @millisecs ms).', array('@millisecs' => $ping * 1000));
+      }
+      else {
+        $msg = t('The Solr server could not be reached.');
+      }
+      drupal_set_message($msg, $type);
+    }
+  }
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Used to execute an optimization operation on all enabled Solr servers once a
+ * day.
+ */
+function search_api_solr_cron() {
+  if (REQUEST_TIME - variable_get('search_api_solr_last_optimize', 0) > 86400) {
+    variable_set('search_api_solr_last_optimize', REQUEST_TIME);
+    $conditions = array('class' => 'search_api_solr_service', 'enabled' => TRUE);
+    foreach (search_api_server_load_multiple(FALSE, $conditions) as $server) {
+      $server->getSolrConnection()->optimize(FALSE, FALSE);
+    }
+  }
+}

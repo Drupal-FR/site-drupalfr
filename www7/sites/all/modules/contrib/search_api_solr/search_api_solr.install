@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function search_api_solr_requirements($phase) {
+  if ($phase == 'install') {
+    $t = get_t();
+    module_load_include('module', 'search_api_solr');
+    spl_autoload_register('_search_api_solr_autoload');
+    if (class_exists('Apache_Solr_Service')) {
+      $version = trim(Apache_Solr_Service::SVN_REVISION, '$ :A..Za..z');
+      if ($version < 59) {
+        return array(
+          'search_api_solr' => array(
+            'title' => $t('Solr PHP library'),
+            'value' => $t('The library is correctly installed, but out of date'),
+            'description' => $t('It is suggested to install the newest version (@version).', array('@version' => 'r60')),
+            'severity' => REQUIREMENT_WARNING,
+          ),
+        );
+      }
+      return array(
+        'search_api_solr' => array(
+          'title' => $t('Solr PHP library'),
+          'value' => $t('The library was correctly installed'),
+          'severity' => REQUIREMENT_OK,
+        ),
+      );
+    }
+    else {
+      return array(
+        'search_api_solr' => array(
+          'title' => $t('Solr PHP library'),
+          'value' => $t('The library was not correctly installed. Please see INSTALL.txt for instructions.'),
+          'severity' => REQUIREMENT_ERROR,
+        ),
+      );
+    }
+  }
+  elseif ($phase == 'runtime') {
+    $servers = search_api_server_load_multiple(FALSE, array('class' => 'search_api_solr_service', 'enabled' => TRUE));
+    $count = 0;
+    $unavailable = 0;
+    $last = NULL;
+    foreach ($servers as $server) {
+      if (!$server->ping()) {
+        ++$unavailable;
+        $last = $server;
+      }
+      ++$count;
+    }
+    if (!$count) {
+      return array();
+    }
+    $ret['search_api_solr'] = array(
+      'title' => t('Solr servers'),
+      'value' => format_plural($count, '1 server', '@count servers'),
+    );
+    if ($unavailable) {
+      if ($unavailable == 1) {
+        $ret['search_api_solr']['description'] = t('The Solr server of <a href="!url">%name</a> could not be reached.',
+            array('!url' => url('admin/config/search/search_api/server/' . $last->machine_name), '%name' => $last->name));
+      }
+      else {
+        $ret['search_api_solr']['description'] = t('@count Solr servers could not be reached.', array('@count' => $unavailable));
+      }
+      $ret['search_api_solr']['severity'] = REQUIREMENT_ERROR;
+    }
+    else {
+      $ret['search_api_solr']['description'] = format_plural($count, 'The Solr server could be reached.', 'All @count Solr servers could be reached.');
+      $ret['search_api_solr']['severity'] = REQUIREMENT_OK;
+    }
+
+    // Check version of the SolrPhpClient library.
+    $version = trim(Apache_Solr_Service::SVN_REVISION, '$ :A..Za..z');
+    if ($version < 59) {
+      $ret['search_api_solr_client'] = array(
+        'title' => t('Solr PHP library'),
+        'value' => t('Version @version', array('@version' => "r$version")),
+        'description' => t('The library is correctly installed, but out of date. ' .
+            'It is suggested to install the <a href="@url">newest version</a> (@version).',
+            array('@url' => 'http://code.google.com/p/solr-php-client/downloads/list', '@version' => 'r60')),
+        'severity' => REQUIREMENT_WARNING,
+      );
+    }
+    return $ret;
+  }
+}
+
+/**
+ * Implements hook_install().
+ *
+ * We register our autoloader here because our hook_init() won't get called
+ * until the next bootstrap (it registers the autoloader too.)
+ */
+function search_api_solr_install() {
+  spl_autoload_register('_search_api_solr_autoload');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function search_api_solr_uninstall() {
+  if (module_exists('search_api')) {
+    db_delete('search_api_server')
+      ->condition('class', 'search_api_solr_service')
+      ->execute();
+  }
+  variable_del('search_api_solr_last_optimize');
+}
+
+/**
+ * Implements hook_update_dependencies().
+ */
+function search_api_solr_update_dependencies() {
+  // This update should run after primary IDs have been changed to machine names in the framework.
+  $dependencies['search_api_solr'][7101] = array(
+    'search_api' => 7102,
+  );
+  return $dependencies;
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Implements transition from using the index IDs to using machine names.
+ */
+function search_api_solr_update_7101() {
+  foreach (search_api_server_load_multiple(FALSE, array('class' => 'search_api_solr_service')) as $server) {
+    if ($server->enabled) {
+      $server->deleteItems('all');
+    }
+    else {
+      $tasks = variable_get('search_api_tasks', array());
+      $tasks[$server->machine_name][''] = array('clear all');
+      variable_set('search_api_tasks', $tasks);
+    }
+    $query = db_select('search_api_index', 'i')
+      ->fields('i', array('machine_name'))
+      ->condition('server', $server->machine_name);
+    db_update('search_api_item')
+      ->fields(array(
+        'changed' => REQUEST_TIME,
+      ))
+      ->condition('index_id', $query, 'IN')
+      ->execute();
+  }
+
+  return t('The Solr search module was updated. ' .
+      'Please stop your Solr servers, replace their schema.xml with the new version and then start them again. ' .
+      'All data indexed on Solr servers will have to be reindexed.');
+}

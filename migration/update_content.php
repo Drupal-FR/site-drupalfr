@@ -133,6 +133,13 @@ $path = array(
 ); 
 path_save($path);
 
+// Create alias for the homepage.
+$path = array(
+  'source' => 'node/2895',
+  'alias' => 'accueil',
+);
+path_save($path);
+
 // Create the emploi link.
 $emploi_item = array(
   'link_title' => 'Emploi',

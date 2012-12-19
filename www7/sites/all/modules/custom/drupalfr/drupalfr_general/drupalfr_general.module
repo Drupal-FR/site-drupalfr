@@ -20,3 +20,28 @@ function drupalfr_general_menu_alter(&$items) {
   $items['admin/people']['access callback'] = $items['admin/people/advanced']['access callback'];
   $items['admin/people']['access arguments'] = $items['admin/people/advanced']['access arguments'];
 }
+
+/**
+ * Implements hook_default_search_api_server().
+ */
+function drupalfr_general_default_search_api_server() {
+  $items = array();
+  $items['solr'] = entity_create('search_api_server', array(
+    'name' => 'Solr',
+    'machine_name' => 'solr',
+    'description' => '',
+    'class' => 'search_api_solr_service',
+    'options' => variable_get('drupalfr_solr_server_options', array()) + array(
+      'host' => 'localhost',
+      'port' => '8983',
+      'path' => '/solr',
+      'http_user' => '',
+      'http_pass' => '',
+      'excerpt' => 0,
+      'retrieve_data' => 1,
+      'highlight_data' => 0
+    ),
+    'enabled' => 1,
+  ));
+  return $items;
+}
