@@ -150,7 +150,7 @@ drush fr -y drupalfr_permissions
 drush cc all
 
 # Fetch the latest translations.
-drush l10n_update
+drush l10n-update
 
 # Trigger whatever cron has to do.
 drush cron
