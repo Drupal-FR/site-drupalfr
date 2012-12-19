@@ -13,6 +13,13 @@ function drupalfr_forums_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_forum';
+  $strongarm->value = 0;
+  $export['diff_enable_revisions_page_node_forum'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'forum_block_num_active';
   $strongarm->value = '15';
   $export['forum_block_num_active'] = $strongarm;
@@ -82,7 +89,7 @@ function drupalfr_forums_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_forum';
-  $strongarm->value = 1;
+  $strongarm->value = '1';
   $export['node_preview_forum'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -98,6 +105,13 @@ function drupalfr_forums_strongarm() {
   $strongarm->name = 'notifications_content_type_forum';
   $strongarm->value = array();
   $export['notifications_content_type_forum'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'publishcontent_forum';
+  $strongarm->value = 0;
+  $export['publishcontent_forum'] = $strongarm;
 
   return $export;
 }
