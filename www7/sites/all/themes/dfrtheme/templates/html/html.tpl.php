@@ -46,6 +46,7 @@
     </div>
   <![endif]-->
   <title><?php print $head_title; ?></title>
+  <meta name="viewport" content="width=device-width">
   <!--[if LT IE 9]>
   <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
