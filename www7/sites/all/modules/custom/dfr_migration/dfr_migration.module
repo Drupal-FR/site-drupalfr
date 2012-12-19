@@ -165,8 +165,8 @@ function dfr_migration_migrate_profiles_batch(&$context) {
 
     // Update the batch progression.
     $context['sandbox']['progress']++;
-    $context['message'] = $context['sandbox']['progress'] . ' sur ' . $context['sandbox']['max'];
   }
+  $context['message'] = $context['sandbox']['progress'] . ' sur ' . $context['sandbox']['max'];
   $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
 }
 
