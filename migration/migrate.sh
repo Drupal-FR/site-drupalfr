@@ -54,8 +54,8 @@ drush en -y bueditor
 drush en -y drupalfr_forums
 drush en -y l10n_update
 drush en -y drupalfr_general
-drush en -y search_api
 drush en -y search_api_solr
+drush en -y search_api
 drush en -y search_api_views
 
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
