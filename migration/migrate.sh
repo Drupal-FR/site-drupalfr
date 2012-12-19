@@ -54,13 +54,11 @@ drush en -y bueditor
 drush en -y drupalfr_forums
 drush en -y l10n_update
 drush en -y drupalfr_general
-#drush en -y drupalfr_annuaire
 
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
 drush fr -y drupalfr_forums
 drush fr -y drupalfr_general
 drush fr -y drupalfr_edito
-#drush fr -y drupalfr_annuaire
 
 # Clean menu entries.
 drush php-script ../migration/menu_cleanup.php
@@ -74,6 +72,7 @@ drush -y content-migrate-fields
 drush cc all
 
 drush en -y drupalfr_annuaire
+drush fr -y drupalfr_annuaire
 
 
 # Delete unused content types and the 3 nodes of those types.
