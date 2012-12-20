@@ -68,12 +68,10 @@ drush fr -y drupalfr_edito
 # Clean menu entries.
 # drush php-script ../migration/menu_cleanup.php
 
-
 drush cc all
 drush updatedb -y --verbose
 drush en -y dfr_format
 drush cc all
-drush en -y migrate
 drush -y content-migrate-fields
 drush cc all
 
@@ -131,7 +129,7 @@ drush php-eval "\$flag = flag_get_flag('annuaire_validation'); \$flag->delete();
 drush php-eval "redirect_delete(1);"
 
 # Update the homepage node content, blocks and menu entries.
-drush php-script ../migration/update_content.php
+# drush php-script ../migration/update_content.php
 
 # Add some bits of customizations.
 drush vset admin_theme seven
