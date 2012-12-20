@@ -1,5 +1,4 @@
 <?php
-// $Id: googleanalytics.tokens.inc,v 1.1.2.3 2011/01/16 22:50:16 hass Exp $
 
 /**
  * @file
@@ -31,11 +30,11 @@ function googleanalytics_token_info() {
  */
 function googleanalytics_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $sanitize = !empty($options['sanitize']);
-
   $replacements = array();
 
-  if ($type == 'user' && !empty($data['user'])) {
+  if ($type == 'user' && !empty($data['user']->roles)) {
     $account = $data['user'];
+
     foreach ($tokens as $name => $original) {
       switch ($name) {
         // Basic user account information.

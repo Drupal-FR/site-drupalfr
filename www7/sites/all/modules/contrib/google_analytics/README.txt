@@ -1,4 +1,3 @@
-// $Id: README.txt,v 1.10.2.3 2011/01/16 22:50:16 hass Exp $
 
 Module: Google Analytics
 Author: Alexander Hass <http://drupal.org/user/85918>
@@ -39,9 +38,10 @@ default the following pages are listed for exclusion:
 
 admin
 admin/*
-user/*/*
+batch
 node/add*
 node/*/*
+user/*/*
 
 These defaults are changeable by the website administrator or any other
 user with 'administer google analytics' permission.
@@ -50,9 +50,6 @@ Like the blocks visibility settings in Drupal core, there is now a
 choice for "Add if the following PHP code returns TRUE." Sample PHP snippets
 that can be used in this textarea can be found on the handbook page
 "Overview-approach to block visibility" at http://drupal.org/node/64135.
-
-A code snippet that creates opt-out by role functionality for unchecked roles
-can be found in the Google Analytics handbook at http://drupal.org/node/261997.
 
 Custom variables
 =================

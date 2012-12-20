@@ -1,5 +1,4 @@
 <?php
-// $Id: googleanalytics.install,v 1.22.2.5 2011/01/16 22:50:16 hass Exp $
 
 /**
  * @file
@@ -10,18 +9,6 @@
  * Implements hook_install().
  */
 function googleanalytics_install() {
-  variable_set('googleanalytics_visibility', 0);
-
-  // Remove tracking from all administrative pages, see http://drupal.org/node/34970.
-  $pages = array(
-    'admin',
-    'admin/*',
-    'user/*/*',
-    'node/add*',
-    'node/*/*',
-  );
-  variable_set('googleanalytics_pages', implode("\n", $pages));
-
   // By German laws it's always best to enable the anonymizing of IP addresses.
   // NOTE: If this is also an important default setting in other countries, please let us know!
   $countries = array(
@@ -37,29 +24,33 @@ function googleanalytics_install() {
  */
 function googleanalytics_uninstall() {
   variable_del('googleanalytics_account');
-  variable_del('googleanalytics_custom_vars');
+  variable_del('googleanalytics_cache');
   variable_del('googleanalytics_codesnippet_before');
   variable_del('googleanalytics_codesnippet_after');
-  variable_del('googleanalytics_segmentation');
-  variable_del('googleanalytics_trackoutgoing');
-  variable_del('googleanalytics_trackmailto');
-  variable_del('googleanalytics_trackfiles');
-  variable_del('googleanalytics_trackfiles_extensions');
-  variable_del('googleanalytics_cache');
+  variable_del('googleanalytics_cross_domains');
+  variable_del('googleanalytics_custom');
+  variable_del('googleanalytics_custom_var');
+  variable_del('googleanalytics_domain_mode');
+  variable_del('googleanalytics_js_scope');
   variable_del('googleanalytics_last_cache');
+  variable_del('googleanalytics_pages');
+  variable_del('googleanalytics_roles');
   variable_del('googleanalytics_site_search');
   variable_del('googleanalytics_trackadsense');
-  variable_del('googleanalytics_js_scope');
-  variable_del('googleanalytics_custom');
-  variable_del('googleanalytics_roles');
-  variable_del('googleanalytics_visibility');
-  variable_del('googleanalytics_pages');
+  variable_del('googleanalytics_trackdoubleclick');
   variable_del('googleanalytics_tracker_anonymizeip');
+  variable_del('googleanalytics_trackfiles');
+  variable_del('googleanalytics_trackfiles_extensions');
+  variable_del('googleanalytics_trackmailto');
+  variable_del('googleanalytics_trackoutbound');
   variable_del('googleanalytics_translation_set');
+  variable_del('googleanalytics_visibility_pages');
+  variable_del('googleanalytics_visibility_roles');
 
-  // Remove backup variables if exits. Remove this code in D8.
-  variable_del('googleanalytics_codesnippet_before_backup_6300');
+  // Remove backup variables if exist. Remove this code in D8.
   variable_del('googleanalytics_codesnippet_after_backup_6300');
+  variable_del('googleanalytics_codesnippet_before_backup_6300');
+  variable_del('googleanalytics_segmentation');
 }
 
 /**
@@ -84,7 +75,7 @@ function googleanalytics_requirements($phase) {
       $requirements['googleanalytics'] = array(
         'title' => $t('Google Analytics module'),
         'description' => $t('Google Analytics module has not been configured yet. Please configure its settings from the <a href="@url">Google Analytics settings page</a>.', array('@url' => url('admin/config/system/googleanalytics'))),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => REQUIREMENT_WARNING,
         'value' => $t('Not configured'),
       );
     }
@@ -143,9 +134,9 @@ function googleanalytics_update_6002() {
   if (!$track_user1 = variable_get('googleanalytics_track__user1', 1)) {
     variable_set('googleanalytics_custom', 1);
 
-    // Load user 1 object, set appropiate value and save new user settings back.
+    // Load user 1 object, set appropriate value and save new user settings back.
     $account = user_load(1);
-    $account = user_save($account, array('googleanalytics' => array('custom' => 0)), 'account');
+    $account = user_save($account, array('data' => array('googleanalytics' => array('custom' => 0))), 'account');
     $messages[] = t('Disabled user specific page tracking for site administrator.');
   }
 
@@ -277,6 +268,8 @@ function googleanalytics_update_6201() {
  * Try to update Google Analytics custom code snippet to async version.
  */
 function googleanalytics_update_6300() {
+  $messages = array();
+
   // TODO: Backup synchronous code snippets. Remove variables in D8.
   variable_set('googleanalytics_codesnippet_before_backup_6300', variable_get('googleanalytics_codesnippet_before', ''));
   variable_set('googleanalytics_codesnippet_after_backup_6300', variable_get('googleanalytics_codesnippet_after', ''));
@@ -293,8 +286,8 @@ function googleanalytics_update_6300() {
 
     variable_set('googleanalytics_codesnippet_before', $code_before);
 
-    drupal_set_message(Database::getConnection()->prefixTables("<strong>Attempted</strong> to upgrade Google Analytics custom 'before' code snippet. Backup of previous code snippet has been saved in database table '{variable}' as 'googleanalytics_codesnippet_before_backup_6300'. Please consult Google's <a href='http://code.google.com/intl/de-DE/apis/analytics/docs/tracking/asyncUsageGuide.html'>Asynchronous Tracking Usage Guide</a> if the upgrade was successfully."), 'warning');
-    return t('Upgraded custom "before" code snippet.');
+    drupal_set_message(Database::getConnection()->prefixTables("<strong>Attempted</strong> to upgrade Google Analytics custom 'before' code snippet. Backup of previous code snippet has been saved in database table '{variable}' as 'googleanalytics_codesnippet_before_backup_6300'. Please consult Google's <a href='https://developers.google.com/analytics/devguides/collection/gajs/'>Asynchronous Tracking Usage Guide</a> if the upgrade was successfully."), 'warning');
+    $messages[] = t('Upgraded custom "before" code snippet.');
   }
 
   // Upgrade of AFTER code snippet.
@@ -302,8 +295,10 @@ function googleanalytics_update_6300() {
   $code_after = variable_get('googleanalytics_codesnippet_after', '');
   if (!empty($code_after)) {
     drupal_set_message(Database::getConnection()->prefixTables("Automatic upgrade of Google Analytics custom 'after' code snippet has been skipped. Backup of previous code snippet has been saved in database table '{variable}' as 'googleanalytics_codesnippet_after_backup_6300'. You need to manually upgrade the custom 'after' code snippet."), 'error');
-    return t('Skipped custom "after" code snippet.');
+    $messages[] = t('Skipped custom "after" code snippet.');
   }
+
+  return empty($messages) ? t('No custom code snipped found. Nothing to do.') : implode(' ', $messages);
 }
 
 /**
@@ -361,9 +356,79 @@ function googleanalytics_update_7002() {
     $googleanalytics_custom_vars['slots'][1]['scope'] = 1; // Sets the scope to visitor-level.
 
     variable_set('googleanalytics_custom_var', $googleanalytics_custom_vars);
-    return t('The deprecated profile segmentation setting for "User roles" has been upgraded to custom variables. You need to upgrade other profile fields manually or you may loose tracking data in future!');
+    return t('The deprecated profile segmentation setting for "User roles" has been added to custom variables. You need to deselect all selected profile fields in <a href="@admin">Google Analytics settings</a> and upgrade other profile fields manually or you may loose tracking data in future! See Google Analytics <a href="@customvar">Custom Variables</a> for more information.', array('@customvar' => 'https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingCustomVariables', '@admin' => url('admin/config/system/googleanalytics')));
   }
   else {
-    return t('You need to upgrade the deprecated profile segmentation settings to custom variables manually or you may loose tracking data in future!');
+    return t('You need to deselect all selected profile fields in <a href="@admin">Google Analytics settings</a> and upgrade other profile fields manually or you may loose tracking data in future! See Google Analytics <a href="@customvar">Custom Variables</a> for more information.', array('@customvar' => 'https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingCustomVariables', '@admin' => url('admin/config/system/googleanalytics')));
   }
+}
+
+/**
+ * Rename googleanalytics_trackoutgoing variable to googleanalytics_trackoutbound.
+ */
+function googleanalytics_update_7003() {
+  variable_set('googleanalytics_trackoutbound', variable_get('googleanalytics_trackoutgoing', 1));
+  variable_del('googleanalytics_trackoutgoing');
+
+  return t('Renamed "googleanalytics_trackoutgoing" settings variable to googleanalytics_trackoutbound.');
+}
+
+/**
+ * Rename googleanalytics_visibility variable to googleanalytics_visibility_pages for consistency.
+ */
+function googleanalytics_update_7004() {
+  variable_set('googleanalytics_visibility_pages', variable_get('googleanalytics_visibility', 1));
+  variable_del('googleanalytics_visibility');
+
+  return t('Renamed "googleanalytics_visibility" settings variable to googleanalytics_visibility_pages.');
+}
+
+/**
+ * Path visibility filter setting should hide "batch" path.
+ */
+function googleanalytics_update_7005() {
+  // Current pages setting.
+  $pages = array(
+    'admin',
+    'admin/*',
+    'user/*/*',
+    'node/add*',
+    'node/*/*',
+  );
+
+  $diff = array_diff($pages, preg_split('/(\r\n?|\n)/', variable_get('googleanalytics_pages', implode("\n", $pages))));
+  if (empty($diff)) {
+    // No diff to previous settings found. Update with new settings.
+    $pages = array(
+      'admin',
+      'admin/*',
+      'batch',
+      'node/add*',
+      'node/*/*',
+      'user/*/*',
+    );
+    variable_set('googleanalytics_pages', implode("\n", $pages));
+    return t('Added "batch" to path visibility filter setting.');
+  }
+  else {
+    return t('Custom path visibility filter setting found. Update skipped!');
+  }
+}
+
+/**
+ * Delete obsolete trackOutboundAsPageview variable.
+ */
+function googleanalytics_update_7006() {
+  variable_del('googleanalytics_trackoutboundaspageview');
+
+  return t('Deleted obsolete trackOutboundAsPageview variable.');
+}
+
+/**
+* Delete obsolete googleanalytics_trackpageloadtime variable.
+*/
+function googleanalytics_update_7007() {
+  variable_del('googleanalytics_trackpageloadtime');
+
+  return t('Deleted obsolete googleanalytics_trackpageloadtime variable.');
 }
