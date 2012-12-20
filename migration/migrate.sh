@@ -48,9 +48,6 @@ drush en -y userpoints userpoints_rules
 drush en -y transliteration
 drush en -y drupalfr_edito
 drush en -y twitter_block
-drush en -y drupalfr_search
-drush en -y facetapi
-drush en -y dfr_blocks
 drush en -y drupalfr_events
 drush en -y bueditor
 drush en -y drupalfr_forums
@@ -59,6 +56,9 @@ drush en -y drupalfr_general
 drush en -y search_api_solr
 drush en -y search_api
 drush en -y search_api_views
+drush en -y drupalfr_search
+drush en -y facetapi
+drush en -y dfr_blocks
 
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
 drush fr -y drupalfr_forums
