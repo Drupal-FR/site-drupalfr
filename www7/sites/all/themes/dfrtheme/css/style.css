@@ -191,14 +191,15 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 }
 #block-system-main-menu > h2 {display: none;}
 #block-system-main-menu .menu {
-	text-align: center;
 }
 #block-system-main-menu .menu li {
 	display: inline-block;
+	width:45%;
+	margin:2%;
 	padding:0;
 	font-size:14px;
 	line-height:18px;
-	margin:0 0.25em 0.25em 0;
+	text-align: center;
 	background:none;
 }
 #block-system-main-menu .menu a {
@@ -220,6 +221,24 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 #block-system-main-menu .menu .active-trail a {
 	background:#00090c;
 	background:rgba(0, 178, 215, 0.9);
+}
+
+@media screen and (min-width:480px) {
+	#block-system-main-menu .menu {
+	}
+	#block-system-main-menu .menu li {
+		width:30%;
+		margin:2% 1%;
+	}
+}
+@media screen and (min-width:640px) {
+	#block-system-main-menu .menu {
+		text-align: center;
+	}
+	#block-system-main-menu .menu li {
+		width:auto;
+		margin:0 0.25em 0.25em 0;
+	}
 }
 
 @media screen and (min-width:900px) {
