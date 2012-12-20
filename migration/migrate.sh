@@ -21,6 +21,7 @@ drush sqlc < ../migration/sql/pre-migration.sql
 drush updatedb -y --verbose
 
 # Enable modules.
+drush en -y admin_menu
 drush en -y pathologic
 drush en -y drupalfr_user
 drush en -y content_migrate
