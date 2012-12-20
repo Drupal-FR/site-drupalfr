@@ -1,0 +1,299 @@
+<?php
+
+/**
+ * @file
+ *   Publishes RSS feeds for comments.
+ */
+
+/**
+ * Disable site comment feed.
+ */
+define('COMMENTRSS_SITE_DISABLED', 0);
+
+/**
+ * Expose site feed on front page only.
+ */
+define('COMMENTRSS_SITE_FRONT_PAGE', 1);
+
+/**
+ * Expose site feed on front page and main content (/node) page too.
+ */
+define('COMMENTRSS_SITE_FRONT_AND_NODE_PAGE', 2);
+
+/**
+ * Expose site feed on all pages.
+ */
+define('COMMENTRSS_SITE_ALL_PAGES', 3);
+
+// == Core hooks ===============================================================
+
+/**
+ * Implements hook_help().
+ */
+function commentrss_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/help#commentrss':
+      $output = '<p>' . t('The commentrss module provides RSS feeds for comments. Comment feeds are published on pages which often also provide a feed of nodes. Some types of comment feeds may be disabled if they are not needed.') . '</p>';
+      $output .= '<p>' . t('If comment feeds are enabled for individual nodes then a "wfw:commentRss" element is added to node feeds (based on <a href="@wfw">the Well Formed Web Comment API</a> specification) so that aggregators may discover the corresponding comment feed.', array('@wfw' => 'http://wellformedweb.org/CommentAPI/')) . '</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function commentrss_menu() {
+  // Copy of menu item from system.module.
+  $items['admin/config/services/rss-publishing/default'] = array(
+    'title' => 'General settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  // New local task on the RSS publishing settings page.
+  $items['admin/config/services/rss-publishing/commentrss'] = array(
+    'title' => 'Comment RSS settings',
+    'description' => 'Configure RSS feeds for comments.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commentrss_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'weight' => 10,
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'commentrss.admin.inc',
+  );
+
+  // RSS callback handlers
+  $items['crss'] = array(
+    'page callback' => 'commentrss_feed',
+    'page arguments' => array(NULL, array()),
+    'access arguments' => array('access comments'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['crss/node/%node'] = array(
+    'page callback' => 'commentrss_node_feed',
+    'page arguments' => array(2),
+    'access callback' => 'commentrss_node_feed_access',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+    'file' => 'commentrss.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function commentrss_entity_info_alter(&$info) {
+  $info['comment']['view modes']['rss'] = array(
+    'label' => t('RSS'),
+    'custom settings' => FALSE,
+  );
+}
+
+/**
+ * Access callback; determines if the user can access a node's comment RSS.
+ */
+function commentrss_node_feed_access($node, $check_view_access = TRUE) {
+  return $node->comment != COMMENT_NODE_HIDDEN && variable_get('commentrss_node', TRUE) && user_access('access comments') && (!$check_view_access || node_access('view', $node));
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function commentrss_preprocess_page(&$variables) {
+  // This hook gets called for offline pages and breaks the theme, so
+  // skip running in that case to avoid interfering with that operation.
+  // We no longer need to check if !variable_get('site_offline', 0) since
+  // this preprocess functions is never called for offline pages.
+  if (!user_access('access comments') || path_is_admin(current_path())) {
+    return;
+  }
+
+  // Expose site feed based on settings.
+  switch (variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
+    case COMMENTRSS_SITE_DISABLED:
+      // No comment RSS feed for site.
+      break;
+    case COMMENTRSS_SITE_FRONT_PAGE:
+      if (!drupal_is_front_page()) {
+        // Only break if not front page.
+        break;
+      }
+    case COMMENTRSS_SITE_FRONT_AND_NODE_PAGE:
+      if (!drupal_is_front_page() || (current_path() != 'node')) {
+        // Only break if not front page and not node page.
+        break;
+      }
+    case COMMENTRSS_SITE_ALL_PAGES:
+      // Either we need to expose for all pages, or code was falling through
+      // to this point. We should expose the feed in any case.
+      drupal_add_feed(
+        url('crss', array('absolute' => TRUE)),
+        t('@site - All comments', array('@site' => variable_get('site_name', 'Drupal')))
+      );
+
+      // Replace the feed icons variable with our new feeds.
+      $variables['feed_icons'] = drupal_get_feeds();
+      break;
+  }
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function commentrss_node_view($node, $view_mode = 'full', $langcode = NULL) {
+  if ($view_mode == 'full' && node_is_page($node) && commentrss_node_feed_access($node, FALSE)) {
+    // Expose node's comment feed on node view page.
+    drupal_add_feed(
+      url('crss/node/' . $node->nid, array('absolute' => TRUE)),
+      t('Comments for "@title"', array('@title' => $node->title))
+    );
+  }
+  elseif ($view_mode == 'rss' && commentrss_node_feed_access($node, FALSE)) {
+    // Add a wfw:commentRss element to the node when viewed in a node RSS feed.
+    $node->rss_elements[] = array(
+      'key' => 'wfw:commentRss',
+      'value' => url('crss/node/' . $node->nid, array('absolute' => TRUE)),
+    );
+    $node->rss_namespaces['xmlns:wfw'] = 'http://wellformedweb.org/CommentAPI/';
+  }
+}
+
+/**
+ * Implements hook_comment_view().
+ */
+function commentrss_comment_view($comment, $view_mode, $langcode) {
+  if ($view_mode == 'rss') {
+    if (!empty($comment->pid)) {
+      $parent = comment_load($comment->pid);
+      $parent->entity_type = 'comment';
+    }
+    else {
+      $parent = node_load($comment->nid);
+      $parent->entity_type = 'node';
+    }
+    $parent_uri = entity_uri($parent->entity_type, $parent);
+    $comment->content['in_reply_to'] = array(
+      '#markup' => '<p><em>' . t('In reply to <a href="@url">@title</a>', array('@url' => url($parent_uri['path'], $parent_uri['options'] + array('absolute' => TRUE)), '@title' => entity_label($parent->entity_type, $parent))) . "</em></p>\n",
+      '#weight' => -10,
+    );
+  }
+}
+
+/**
+ * Generates and prints a comment RSS feed.
+ *
+ * Generates an RSS feed from an array of comment IDs, and prints it with an
+ * HTTP header, with Content Type set to RSS/XML.
+ *
+ * @param $cids
+ *   (optional) An array of comment IDs (cid). Defaults to NULL so empty feeds
+ *   can be generated with passing an empty array, if no items are to be added
+ *   to the feed. The default parameter of NULL will default to use the latest
+ *   comments across the entire site.
+ * @param $channel
+ *   (optional) An associative array containing title, link, description and
+ *   other keys, to be parsed by format_rss_channel() and format_xml_elements().
+ *   A list of channel elements can be found at the RSS 2.0 Specification. The
+ *   link should be an absolute URL.
+ *
+ * @todo Handle the 'In reply to <a href="@url">@title</a>' text via comment_view().
+ *
+ */
+function commentrss_feed(array $cids = NULL, array $channel = array()) {
+  global $base_url, $language_content;
+
+  if (!isset($cids)) {
+    // @see comment_get_recent()
+    $query = db_select('comment', 'c');
+    $query->fields('c', array('cid'));
+    $query->innerJoin('node', 'n', 'c.nid = n.nid');
+    $query->condition('n.status', NODE_PUBLISHED);
+    $query->condition('c.status', COMMENT_PUBLISHED);
+    $query->addTag('node_access');
+    $query->addMetaData('base_table', 'comment');
+    $query->addTag('comment_access');
+    $query->orderBy('c.created', 'DESC');
+    $query->orderBy('c.cid', 'DESC');
+    $query->range(0, variable_get('feed_default_items', 10));
+    $cids = $query->execute()->fetchCol();
+  }
+
+  $namespaces = array('xmlns:dc' => 'http://purl.org/dc/elements/1.1/');
+
+  // Load all comments to be rendered.
+  $comments = comment_load_multiple($cids);
+
+  // Pre-load all nodes and users used in comment rendering.
+  $nids = array();
+  $uids = array();
+  foreach ($comments as $comment) {
+    $nids[$comment->nid] = $comment->nid;
+    $uids[$comment->uid] = $comment->uid;
+  }
+  $nodes = node_load_multiple($nids);
+  $accounts = user_load_multiple($uids);
+
+  $items = '';
+  foreach ($comments as $comment) {
+    $item_text = '';
+
+    $comment_uri = entity_uri('comment', $comment);
+    $comment->link = url($comment_uri['path'], $comment_uri['options'] + array('absolute' => TRUE));
+
+    $comment->rss_namespaces = array();
+    $comment->rss_elements = array(
+      array(
+        'key' => 'pubDate',
+        'value' => gmdate(DATE_RSS, $comment->created),
+      ),
+      array(
+        'key' => 'dc:creator',
+        // Ensure that anonymous comments use the proper name by not using the
+        // loaded anonymous user account and pass in $comment instead.
+        'value' => format_username($comment->uid ? $accounts[$comment->uid] : $comment),
+      ),
+      array(
+        'key' => 'guid',
+        'value' => 'comment ' . $comment->cid . ' at ' . $base_url,
+        'attributes' => array('isPermaLink' => 'false'),
+      ),
+    );
+
+    // The comment gets built and modules add to or modify
+    // $comment->rss_elements and $comment->rss_namespaces.
+    $build = comment_view($comment, $nodes[$comment->nid], 'rss');
+    unset($build['#theme']);
+
+    if (!empty($comment->rss_namespaces)) {
+      $namespaces = array_merge($namespaces, $comment->rss_namespaces);
+    }
+
+    // We render comment contents and force links to be last.
+    $build['links']['#weight'] = 1000;
+    $item_text .= drupal_render($build); // @todo should this respect $item_length like node_feed()?
+
+    $items .= format_rss_item($comment->subject, $comment->link, $item_text, $comment->rss_elements);
+  }
+
+  $channel_defaults = array(
+    'version' => '2.0',
+    'title' => t('Comments for @site_name', array('@site_name' => variable_get('site_name', 'Drupal'))),
+    'link' => $base_url,
+    'description' => t('Comments'),
+    'language' => $language_content->language,
+    'generator' => 'http://drupal.org/',
+  );
+  $channel_extras = array_diff_key($channel, $channel_defaults);
+  $channel = array_merge($channel_defaults, $channel);
+
+  $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+  $output .= "<rss version=\"" . $channel["version"] . "\" xml:base=\"" . $base_url . "\"" . drupal_attributes($namespaces) . ">\n";
+  $output .= format_rss_channel($channel['title'], $channel['link'], $channel['description'], $items, $channel['language'], $channel_extras);
+  $output .= "</rss>\n";
+
+  drupal_add_http_header('Content-Type', 'application/rss+xml; charset=utf-8');
+  print $output;
+}

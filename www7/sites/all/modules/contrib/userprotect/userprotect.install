@@ -1,0 +1,189 @@
+<?php
+
+// $Id: userprotect.install,v 1.18 2010/12/30 06:03:47 thehunmonkgroup Exp $
+
+/**
+ * @file
+ * Install, update and uninstall functions for the userprotect module.
+ */
+
+/**
+ * Implement hook_update_last_removed().
+ */
+function userprotect_update_last_removed() {
+  return 6001;
+}
+
+/**
+ * Implement hook_install().
+ */
+function userprotect_install() {
+
+  // Default protections.
+  db_insert('userprotect')
+    ->fields(array(
+      'uid' => 0,
+      'up_name' => 0,
+      'up_mail' => 0,
+      'up_pass' => 0,
+      'up_status' => 0,
+      'up_roles' => 0,
+      'up_cancel' => 1,
+      'up_edit' => 1,
+      'up_type' => 'user',
+      'up_openid' => 1,
+    ))->execute();
+  db_insert('userprotect')
+    ->fields(array(
+      'uid' => 1,
+      'up_name' => 0,
+      'up_mail' => 0,
+      'up_pass' => 0,
+      'up_status' => 0,
+      'up_roles' => 0,
+      'up_cancel' => 1,
+      'up_edit' => 1,
+      'up_type' => 'user',
+      'up_openid' => 1,
+    ))->execute();
+
+  // Default administrator bypass.
+  db_insert('userprotect')
+    ->fields(array(
+      'uid' => 1,
+      'up_name' => 1,
+      'up_mail' => 1,
+      'up_pass' => 1,
+      'up_status' => 1,
+      'up_roles' => 1,
+      'up_cancel' => 1,
+      'up_edit' => 1,
+      'up_type' => 'admin',
+      'up_openid' => 1,
+    ))->execute();
+
+  //Default permissions for authenticated users.
+  $permissions = array(
+    'change own e-mail',
+    'change own password',
+    'change own openid',
+  );
+  user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, $permissions);
+}
+
+/**
+ * Implement hook_schema().
+ */
+function userprotect_schema() {
+  $schema['userprotect'] = array(
+    'description' => 'Stores information about administer protections for users.',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'User ID.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'up_name' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Name protection.',
+      ),
+      'up_mail' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'E-mail protection.',
+      ),
+      'up_pass' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Password protection.',
+      ),
+      'up_status' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Status protection.',
+      ),
+      'up_roles' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Role protection.',
+      ),
+      'up_cancel' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Cancellation protection.',
+      ),
+      'up_edit' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'All edits protection.',
+      ),
+      'up_type' => array(
+        'type' => 'char',
+        'length' => 20,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Protection type.',
+      ),
+      'up_openid' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'OpenID protection.',
+      ),
+    ),
+    'unique keys' => array('uid_up_type' => array('uid', 'up_type')),
+    'foreign keys' => array(
+      'uid' => array('user' => 'uid'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Change up_delete to up_cancel, in line with core's change from user delete
+ * to user cancel.
+ */
+function userprotect_update_7000() {
+  $spec = array(
+    'type' => 'int',
+    'size' => 'small',
+    'not null' => TRUE,
+    'default' => 0,
+    'description' => 'Cancellation protection.',
+  );
+  db_change_field('userprotect', 'up_delete', 'up_cancel', $spec);
+}
+/**
+ * Implement hook_uninstall().
+ */
+function userprotect_uninstall() {
+
+  // Drop variables.
+  $variables = array(
+    'userprotect_protection_defaults',
+    'userprotect_autoprotect',
+    'userprotect_administrator_bypass_defaults',
+    'userprotect_role_protections',
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}
