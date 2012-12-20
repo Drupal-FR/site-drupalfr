@@ -279,7 +279,7 @@ function dfr_emploi_field_default_fields() {
         'active' => 1,
         'module' => 'options',
         'settings' => array(),
-        'type' => 'options_select',
+        'type' => 'options_buttons',
         'weight' => '5',
       ),
     ),
@@ -400,7 +400,11 @@ function dfr_emploi_field_default_fields() {
     ),
     'field_instance' => array(
       'bundle' => 'offre',
-      'default_value' => NULL,
+      'default_value' => array(
+        0 => array(
+          'value' => '1',
+        ),
+      ),
       'deleted' => '0',
       'description' => '',
       'display' => array(

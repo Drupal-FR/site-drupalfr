@@ -22,7 +22,7 @@ function dfr_emploi_views_default_views() {
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Offres d\'emploi';
+  $handler->display->display_options['title'] = 'Nos offres d\'emploi';
   $handler->display->display_options['use_more'] = TRUE;
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['use_more_text'] = 'Toutes les offres';
@@ -102,6 +102,13 @@ function dfr_emploi_views_default_views() {
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'node';
+  $handler->display->display_options['row_options']['links'] = FALSE;
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
   /* Comportement en l'absence de résultats: Global : Zone de texte */
   $handler->display->display_options['empty']['area']['id'] = 'area';
@@ -168,8 +175,8 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['filters']['field_type_contrat_tid']['vocabulary'] = 'type_contrat';
   $handler->display->display_options['path'] = 'emploi';
 
-  /* Display: Bloc */
-  $handler = $view->new_display('block', 'Bloc', 'block_1');
+  /* Display: Dernières offres */
+  $handler = $view->new_display('block', 'Dernières offres', 'block_1');
   $handler->display->display_options['defaults']['title'] = FALSE;
   $handler->display->display_options['title'] = 'Dernières offres d\'emploi';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
@@ -439,9 +446,52 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['menu']['title'] = 'Modération des offres';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['context'] = 0;
+
+  /* Display: Offres d'une boite */
+  $handler = $view->new_display('block', 'Offres d\'une boite', 'block_2');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'node';
+  $handler->display->display_options['row_options']['links'] = FALSE;
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
+  $handler->display->display_options['defaults']['header'] = FALSE;
+  /* Entête: Global : Résumé des résultats */
+  $handler->display->display_options['header']['result']['id'] = 'result';
+  $handler->display->display_options['header']['result']['table'] = 'views';
+  $handler->display->display_options['header']['result']['field'] = 'result';
+  $handler->display->display_options['header']['result']['content'] = 'Nous avons actuellement @total poste(s) à pourvoir';
+  $handler->display->display_options['defaults']['empty'] = FALSE;
+  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'Cette société n\'a aucune offre d\'emploi disponible pour le moment. <a href="internal:emploi">Consultez les autres offres</a>';
+  $handler->display->display_options['empty']['area']['format'] = '1';
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Filtre contextuel: Contenu : Société (field_societe) */
+  $handler->display->display_options['arguments']['field_societe_nid']['id'] = 'field_societe_nid';
+  $handler->display->display_options['arguments']['field_societe_nid']['table'] = 'field_data_field_societe';
+  $handler->display->display_options['arguments']['field_societe_nid']['field'] = 'field_societe_nid';
+  $handler->display->display_options['arguments']['field_societe_nid']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['field_societe_nid']['exception']['title'] = 'Tout';
+  $handler->display->display_options['arguments']['field_societe_nid']['title_enable'] = TRUE;
+  $handler->display->display_options['arguments']['field_societe_nid']['title'] = '%1 recrute';
+  $handler->display->display_options['arguments']['field_societe_nid']['default_argument_type'] = 'node';
+  $handler->display->display_options['arguments']['field_societe_nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_societe_nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_societe_nid']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['field_societe_nid']['specify_validation'] = TRUE;
+  $handler->display->display_options['arguments']['field_societe_nid']['validate']['type'] = 'node';
+  $handler->display->display_options['arguments']['field_societe_nid']['validate_options']['types'] = array(
+    'annuaire' => 'annuaire',
+  );
   $translatables['offres'] = array(
     t('Master'),
-    t('Offres d\'emploi'),
+    t('Nos offres d\'emploi'),
     t('Toutes les offres'),
     t('Appliquer'),
     t('Réinitialiser'),
@@ -461,7 +511,7 @@ function dfr_emploi_views_default_views() {
     t('Aucune offre d\'emploi n\'est disponible selon vos critères de sélection, essayez de les élargir pour voir plus de résultats.'),
     t('Région'),
     t('Type de contrat'),
-    t('Bloc'),
+    t('Dernières offres'),
     t('Dernières offres d\'emploi'),
     t('Aucune n\'offre n\'est en ligne encore, pourquoi ne pas <a href="/node/add/offre">proposer la votre</a> ?'),
     t('Moderation des offres'),
@@ -475,6 +525,11 @@ function dfr_emploi_views_default_views() {
     t('Détails de l\'offre'),
     t('Voir l\'offre'),
     t('Publié'),
+    t('Offres d\'une boite'),
+    t('Nous avons actuellement @total poste(s) à pourvoir'),
+    t('Cette société n\'a aucune offre d\'emploi disponible pour le moment. <a href="internal:emploi">Consultez les autres offres</a>'),
+    t('Tout'),
+    t('%1 recrute'),
   );
   $export['offres'] = $view;
 
