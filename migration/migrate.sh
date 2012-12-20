@@ -55,6 +55,7 @@ drush en -y drupalfr_general
 drush en -y search_api_solr
 drush en -y search_api
 drush en -y search_api_views
+drush en -y search_api_facetapi
 drush en -y drupalfr_search
 drush en -y facetapi
 drush en -y dfr_blocks
