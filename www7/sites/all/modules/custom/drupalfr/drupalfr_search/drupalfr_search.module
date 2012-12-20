@@ -10,7 +10,7 @@ include_once 'drupalfr_search.features.inc';
 /**
  * Implements hook_default_search_api_server().
  */
-function drupalfr_general_default_search_api_server() {
+function drupalfr_search_default_search_api_server() {
   $items = array();
   $items['solr'] = entity_create('search_api_server', array(
     'name' => 'Solr',
