@@ -95,12 +95,6 @@ function dfr_blocks_enable() {
 
     // Sidebar
     array(
-      'module' => 'search', 'delta' => 'form',
-      'theme' => 'dfrtheme', 'region' => 'sidebar_first',
-      'weight' => -23, 'cache' => DRUPAL_CACHE_PER_PAGE,
-      'title' => "Rechercher", 'status' => 1,
-    ),
-    array(
       'module' => 'drupalfr_search', 'delta' => 'solr-search',
       'theme' => 'dfrtheme', 'region' => 'sidebar_first',
       'weight' => -23, 'cache' => DRUPAL_CACHE_GLOBAL,

@@ -65,7 +65,8 @@ drush fr -y drupalfr_general
 drush fr -y drupalfr_edito
 
 # Clean menu entries.
-drush php-script ../migration/menu_cleanup.php
+# drush php-script ../migration/menu_cleanup.php
+
 
 drush cc all
 drush updatedb -y --verbose
