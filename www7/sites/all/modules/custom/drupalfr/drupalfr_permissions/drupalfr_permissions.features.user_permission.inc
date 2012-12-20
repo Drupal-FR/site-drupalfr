@@ -115,15 +115,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'contact',
   );
 
-  // Exported permission: access toolbar.
-  $permissions['access toolbar'] = array(
-    'name' => 'access toolbar',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'toolbar',
-  );
-
   // Exported permission: access user contact forms.
   $permissions['access user contact forms'] = array(
     'name' => 'access user contact forms',

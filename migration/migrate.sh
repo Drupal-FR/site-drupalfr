@@ -22,6 +22,7 @@ drush updatedb -y --verbose
 
 # Enable modules.
 drush en -y admin_menu
+drush en -y admin_menu_toolbar
 drush en -y pathologic
 drush en -y drupalfr_user
 drush en -y content_migrate
@@ -67,7 +68,7 @@ drush fr -y drupalfr_general
 drush fr -y drupalfr_edito
 
 # Clean menu entries.
-# drush php-script ../migration/menu_cleanup.php
+drush php-script ../migration/menu_cleanup.php
 
 drush cc all
 drush updatedb -y --verbose
@@ -102,7 +103,7 @@ drush dfrum
 ###
 
 # Disable useless modules and delete unused views.
-drush dis -y dfr_migration content_migrate aggregator rdf
+drush dis -y dfr_migration content_migrate aggregator rdf toolbar
 drush php-eval '$view = views_ui_cache_load("liste_user"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("user_quota"); $view->delete();'
 drush php-eval '$view = views_ui_cache_load("drupal_news"); $view->delete();'
@@ -130,7 +131,7 @@ drush php-eval "\$flag = flag_get_flag('annuaire_validation'); \$flag->delete();
 drush php-eval "redirect_delete(1);"
 
 # Update the homepage node content, blocks and menu entries.
-# drush php-script ../migration/update_content.php
+drush php-script ../migration/update_content.php
 
 # Add some bits of customizations.
 drush vset admin_theme seven
