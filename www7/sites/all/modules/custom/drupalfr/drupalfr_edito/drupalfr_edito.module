@@ -10,18 +10,18 @@ include_once('drupalfr_edito.features.inc');
  * Implements hook_field_widget_properties_alter().
  */
 function drupalfr_edito_field_widget_properties_alter(&$widget, $context) {
-//  $field = $context['field'];
-//  if ($context['entity_type'] == 'node' && $field['field_name'] == 'field_region') {
-//    $field['settings']['allowed_values'] = array(
-//      '01 Île de France' => '01 Île de France',
-//      '02 Nord Ouest' => '02 Nord Ouest',
-//      '03 Nord Est' => '03 Nord Est',
-//      '04 Sud Est' => '04 Sud Est',
-//      '05 Sud Ouest' => '05 Sud Ouest',
-//      'Outre mer' => 'Outre mer',
-//      'Belgique' => 'Belgique',
-//      'Suisse' => 'Suisse',
-//      'Autre' => 'Autre',
-//    );
-//  }
+  $field = $context['field'];
+  if ($context['entity_type'] == 'node' && $field['field_name'] == 'field_region') {
+    $field['settings']['allowed_values'] = array(
+      '01 Île de France' => '01 Île de France',
+      '02 Nord Ouest' => '02 Nord Ouest',
+      '03 Nord Est' => '03 Nord Est',
+      '04 Sud Est' => '04 Sud Est',
+      '05 Sud Ouest' => '05 Sud Ouest',
+      'Outre mer' => 'Outre mer',
+      'Belgique' => 'Belgique',
+      'Suisse' => 'Suisse',
+      'Autre' => 'Autre',
+    );
+  }
 }

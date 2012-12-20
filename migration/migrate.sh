@@ -43,7 +43,6 @@ drush en -y email link node_reference user_reference
 drush en -y flag 
 drush en -y rules rules_admin
 drush en -y phone
-drush en -y dfr_emploi
 drush en -y userpoints userpoints_rules
 drush en -y transliteration
 drush en -y drupalfr_edito
@@ -79,6 +78,10 @@ drush cc all
 # Enable the annuaire and revert it to benefit from the code defined view.
 drush en -y drupalfr_annuaire
 drush fr -y drupalfr_annuaire
+
+# Only enable emploi feature after having the region field migrated (among others).
+drush en -y dfr_emploi
+drush fr -y dfr_emploi
 
 # Delete unused content types and the 3 nodes of those types.
 drush php-eval 'node_delete_multiple(array(1396, 4411, 4417));'
