@@ -31,12 +31,12 @@
  * @see template_preprocess_html()
  * @see template_process()
  */
-  $html_attributes = "lang=\"{$language->language}\" dir=\"{$language->dir}\" {$rdf->version}{$rdf->namespaces}";
+  $html_attributes = "lang=\"{$language->language}\" dir=\"{$language->dir}\"";
 ?><?php print $doctype; ?>
 <!--[if IE 8 ]><html <?php print $html_attributes; ?> class="no-js ie8"><![endif]-->
 <!--[if IE 9 ]><html <?php print $html_attributes; ?> class="no-js ie9"><![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--><html <?php print $html_attributes; ?> class="no-js"><!--<![endif]-->
-<head<?php print $rdf->profile; ?>>
+<head>
   <?php print $head; ?>
   <!--[if lte IE 8]>
     <div style=' text-align:center; clear: both; padding:0 0 0 15px; position: relative;'>

@@ -15,32 +15,44 @@ function dfrtheme_html_head_alter(&$head_elements) {
 /**
  * Implements template_proprocess_search_block_form().
  *
- * Changes the search form to use the HTML5 "search" input attribute
+ * Changes the search form to use the HTML5 "search" input attribute.
+ * This is mostly duplicated from template_preprocess_search_block_form().
+ * 
+ * @see template_preprocess_search_block_form()
  */
-function dfrtheme_preprocess_search_block_form(&$vars) {
-  $vars['search_form'] = str_replace('type="text"', 'type="search"', $vars['search_form']);
-}
+function dfrtheme_preprocess_drupalfr_search_form(&$variables) {
+  $variables['search'] = array();
+  $hidden = array();
 
-/**
- * Implements template_preprocess().
- */
-function dfrtheme_preprocess(&$vars, $hook) {
-  // $vars['dfrtheme_path'] = base_path() . path_to_theme();
+  // Provide variables named after form keys so themers can print each element independently.
+  foreach (element_children($variables['form']) as $key) {
+    $type = $variables['form'][$key]['#type'];
+    if ($type == 'hidden' || $type == 'token') {
+      $hidden[] = drupal_render($variables['form'][$key]);
+    }
+    else {
+      $variables['search'][$key] = drupal_render($variables['form'][$key]);
+    }
+  }
+  // Hidden form elements have no value to themers. No need for separation.
+  $variables['search']['hidden'] = implode($hidden);
+
+  // Collect all form elements to make it easier to print the whole form.
+  $variables['drupalfr_search_form'] = implode($variables['search']);
+  $variables['drupalfr_search_form'] = str_replace('type="text"', 'type="search"', $variables['drupalfr_search_form']);
 }
 
 /**
  * Implements template_preprocess_html().
  */
-function dfrtheme_preprocess_html(&$vars) {
-  
-  $vars['doctype'] = _dfrtheme_doctype();
-  $vars['rdf'] = _dfrtheme_rdf($vars);
+function dfrtheme_preprocess_html(&$variables) {
+  $variables['doctype'] = _dfrtheme_doctype();
 
-  if ($vars['is_admin']) {
-    $vars['classes_array'][] = 'admin';
+  if ($variables['is_admin']) {
+    $variables['classes_array'][] = 'admin';
   }
 
-  if (!$vars['is_front']) {
+  if (!$variables['is_front']) {
     // Add unique classes for each page and website section
     $path = drupal_get_path_alias($_GET['q']);
     $temp = explode('/', $path, 2);
@@ -48,24 +60,24 @@ function dfrtheme_preprocess_html(&$vars) {
     $page_name = array_shift($temp);
 
     if (isset($page_name)) {
-      $vars['classes_array'][] = dfrtheme_id_safe('page-' . $page_name);
+      $variables['classes_array'][] = dfrtheme_id_safe('page-' . $page_name);
     }
 
-    $vars['classes_array'][] = dfrtheme_id_safe('section-' . $section);
+    $variables['classes_array'][] = dfrtheme_id_safe('section-' . $section);
 
     // add template suggestions
-    $vars['theme_hook_suggestions'][] = "page__section__" . $section;
-    $vars['theme_hook_suggestions'][] = "page__" . $page_name;
+    $variables['theme_hook_suggestions'][] = "page__section__" . $section;
+    $variables['theme_hook_suggestions'][] = "page__" . $page_name;
 
     if (arg(0) == 'node') {
       if (arg(1) == 'add') {
         if ($section == 'node') {
-          array_pop($vars['classes_array']); // Remove 'section-node'
+          array_pop($variables['classes_array']); // Remove 'section-node'
         }
         $body_classes[] = 'section-node-add'; // Add 'section-node-add'
       } elseif (is_numeric(arg(1)) && (arg(2) == 'edit' || arg(2) == 'delete')) {
         if ($section == 'node') {
-          array_pop($vars['classes_array']); // Remove 'section-node'
+          array_pop($variables['classes_array']); // Remove 'section-node'
         }
         $body_classes[] = 'section-node-' . arg(2); // Add 'section-node-edit' or 'section-node-delete'
       }
@@ -76,55 +88,50 @@ function dfrtheme_preprocess_html(&$vars) {
 /**
  * Implements template_preprocess_page().
  */
-function dfrtheme_preprocess_page(&$vars) {
-  
-  if (isset($vars['node_title'])) {
-    $vars['title'] = $vars['node_title'];
+function dfrtheme_preprocess_page(&$variables) {
+  if (isset($variables['node_title'])) {
+    $variables['title'] = $variables['node_title'];
   }
 
   // Adding classes wether #navigation is here or not
-  if (!empty($vars['main_menu']) or !empty($vars['sub_menu'])) {
-    $vars['classes_array'][] = 'with-navigation';
+  if (!empty($variables['main_menu']) or !empty($variables['sub_menu'])) {
+    $variables['classes_array'][] = 'with-navigation';
   }
 
-  if (!empty($vars['secondary_menu'])) {
-    $vars['classes_array'][] = 'with-subnav';
+  if (!empty($variables['secondary_menu'])) {
+    $variables['classes_array'][] = 'with-subnav';
   }
 
   // Since the title and the shortcut link are both block level elements,
   // positioning them next to each other is much simpler with a wrapper div.
-  if (!empty($vars['title_suffix']['add_or_remove_shortcut']) && $vars['title']) {
+  if (!empty($variables['title_suffix']['add_or_remove_shortcut']) && $variables['title']) {
     // Add a wrapper div using the title_prefix and title_suffix render elements.
-    $vars['title_prefix']['shortcut_wrapper'] = array(
+    $variables['title_prefix']['shortcut_wrapper'] = array(
       '#markup' => '<div class="shortcut-wrapper clearfix">',
       '#weight' => 100,
     );
-    $vars['title_suffix']['shortcut_wrapper'] = array(
+    $variables['title_suffix']['shortcut_wrapper'] = array(
       '#markup' => '</div>',
       '#weight' => -99,
     );
     // Make sure the shortcut link is the first item in title_suffix.
-    $vars['title_suffix']['add_or_remove_shortcut']['#weight'] = -100;
+    $variables['title_suffix']['add_or_remove_shortcut']['#weight'] = -100;
   }
-
-  $vars['site_slogan'] = variable_get('site_slogan', FALSE);
+  $variables['site_slogan'] = variable_get('site_slogan', FALSE);
 }
 
 /**
  * Implements template_preprocess_maintenance_page().
  */
-function dfrtheme_preprocess_maintenance_page(&$vars) {
+function dfrtheme_preprocess_maintenance_page(&$variables) {
   // Manually include these as they're not available outside template_preprocess_page().
-  $vars['rdf_namespaces'] = drupal_get_rdf_namespaces();
-  $vars['grddl_profile'] = 'http://www.w3.org/1999/xhtml/vocab';
+  $variables['grddl_profile'] = 'http://www.w3.org/1999/xhtml/vocab';
 
-  $vars['doctype'] = _dfrtheme_doctype();
-  $vars['rdf'] = _dfrtheme_rdf($vars);
+  $variables['doctype'] = _dfrtheme_doctype();
 
-  if (!$vars['db_is_active']) {
-    unset($vars['site_name']);
+  if (!$variables['db_is_active']) {
+    unset($variables['site_name']);
   }
-
   drupal_add_css(drupal_get_path('theme', 'dfrtheme') . '/css/maintenance-page.css');
 }
 
@@ -133,60 +140,52 @@ function dfrtheme_preprocess_maintenance_page(&$vars) {
  *
  * Adds extra classes to node container for advanced theming
  */
-function dfrtheme_preprocess_node(&$vars) {
+function dfrtheme_preprocess_node(&$variables) {
   // Add view_mode classs
-  $vars['classes_array'][] = 'node-' . $vars['view_mode'];
+  $variables['classes_array'][] = 'node-' . $variables['view_mode'];
   
-  $vars['submitted'] = t('Submitted by !username on ', array('!username' => $vars['name']));
-  $vars['submitted_date'] = t('!datetime', array('!datetime' => $vars['date']));
-  $vars['submitted_pubdate'] = format_date($vars['created'], 'custom', 'Y-m-d\TH:i:s');
+  $variables['submitted'] = t('Submitted by !username on ', array('!username' => $variables['name']));
+  $variables['submitted_date'] = t('!datetime', array('!datetime' => $variables['date']));
+  $variables['submitted_pubdate'] = format_date($variables['created'], 'custom', 'Y-m-d\TH:i:s');
 
-  $vars['theme_hook_suggestions'][] = 'node__' . $vars['node']->type . '__' . $vars['view_mode'];
+  $variables['theme_hook_suggestions'][] = 'node__' . $variables['node']->type . '__' . $variables['view_mode'];
 }
 
 /**
  * Implements template_preprocess_block().
  */
-function dfrtheme_preprocess_block(&$vars, $hook) {
-
+function dfrtheme_preprocess_block(&$variables, $hook) {
   // Add a striping class & id
-  $vars['classes_array'][] = 'block-' . $vars['zebra'];
-  $vars['classes_array'][] = 'block-' . $vars['block_id'];
+  $variables['classes_array'][] = 'block-' . $variables['zebra'];
+  $variables['classes_array'][] = 'block-' . $variables['block_id'];
 
   // Title class
-  $vars['title_attributes_array']['class'][] = 'block-title';
+  $variables['title_attributes_array']['class'][] = 'block-title';
 
   // In the header region visually hide block titles.
-   if (in_array($vars['block']->region, array('menu'))) {
-    $vars['title_attributes_array']['class'][] = 'element-invisible';
+   if (in_array($variables['block']->region, array('menu'))) {
+    $variables['title_attributes_array']['class'][] = 'element-invisible';
   } 
 }
 
 /**
  * Implements theme_menu_tree().
  */
-function dfrtheme_menu_tree($vars) {
-  return '<ul class="menu clearfix">' . $vars['tree'] . '</ul>';
-}
-
-
-function dfrtheme_preprocess_user_profile(&$vars) {
-  // dpm(array_keys($vars));
-  // $vars['classes_array'][] = 'user-profile-'.$vars['view_mode'];
+function dfrtheme_menu_tree($variables) {
+  return '<ul class="menu clearfix">' . $variables['tree'] . '</ul>';
 }
 
 /**
  *  Return a themed breadcrumb trail
  */
-function dfrtheme_breadcrumb($vars) {
-  $breadcrumb = isset($vars['breadcrumb']) ? $vars['breadcrumb'] : array();
+function dfrtheme_breadcrumb($variables) {
+  $breadcrumb = isset($variables['breadcrumb']) ? $variables['breadcrumb'] : array();
 
   // Append title to breadcrumb  
 	$title = drupal_get_title();
 	if(!empty($title)) {
 	  $breadcrumb[] = '<span class="current" title="Vous êtes ici">'.$title.'</span>';
 	}
-  
 	return implode(' &raquo; ', $breadcrumb);
 }
 
@@ -204,11 +203,10 @@ function dfrtheme_tabs_float() {
   if ($float) {
     return ($float_node) ? $is_node : TRUE;
   }
-
   return FALSE;
 }
 
-/*
+/**
  * 	Converts a string to a suitable html ID attribute.
  *  Taken from "basic"
  *
@@ -246,34 +244,9 @@ function _dfrtheme_doctype() {
 }
 
 /**
- * Generate RDF object for templates
- *
- * Uses RDFa attributes if the RDF module is enabled
- * Lifted from Adaptivetheme for D7, full credit to Jeff Burnz
- * ref: http://drupal.org/node/887600
- *
- * @param array $vars
- */
-function _dfrtheme_rdf($vars) {
-  $rdf = new stdClass();
-
-  if (module_exists('rdf')) {
-    $rdf->version = 'version="HTML+RDFa 1.1"';
-    $rdf->namespaces = $vars['rdf_namespaces'];
-    $rdf->profile = ' profile="' . $vars['grddl_profile'] . '"';
-  } else {
-    $rdf->version = '';
-    $rdf->namespaces = '';
-    $rdf->profile = '';
-  }
-
-  return $rdf;
-}
-
-/**
  * Generate the HTML output for a menu link and submenu.
  *
- * @param $vars
+ * @param $variables
  *   An associative array containing:
  *   - element: Structured array data for a menu link.
  *
@@ -282,8 +255,8 @@ function _dfrtheme_rdf($vars) {
  *
  * @ingroup themeable
  */
-function dfrtheme_menu_link(array $vars) {
-  $element = $vars['element'];
+function dfrtheme_menu_link(array $variables) {
+  $element = $variables['element'];
   $sub_menu = '';
 
   if ($element['#below']) {
@@ -301,8 +274,8 @@ function dfrtheme_menu_link(array $vars) {
 /**
  * Override or insert variables into theme_menu_local_task().
  */
-function dfrtheme_preprocess_menu_local_task(&$vars) {
-  $link = & $vars['element']['#link'];
+function dfrtheme_preprocess_menu_local_task(&$variables) {
+  $link = & $variables['element']['#link'];
 
   // If the link does not contain HTML already, check_plain() it now.
   // After we set 'html'=TRUE the link will not be sanitized by l().
@@ -317,23 +290,22 @@ function dfrtheme_preprocess_menu_local_task(&$vars) {
 /**
  *  Duplicate of theme_menu_local_tasks() but adds clearfix to tabs.
  */
-function dfrtheme_menu_local_tasks(&$vars) {
+function dfrtheme_menu_local_tasks(&$variables) {
   $output = '';
 
-  if (!empty($vars['primary'])) {
-    $vars['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
-    $vars['primary']['#prefix'] .= '<ul class="tabs primary clearfix">';
-    $vars['primary']['#suffix'] = '</ul>';
-    $output .= drupal_render($vars['primary']);
+  if (!empty($variables['primary'])) {
+    $variables['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
+    $variables['primary']['#prefix'] .= '<ul class="tabs primary clearfix">';
+    $variables['primary']['#suffix'] = '</ul>';
+    $output .= drupal_render($variables['primary']);
   }
 
-  if (!empty($vars['secondary'])) {
-    $vars['secondary']['#prefix'] = '<h2 class="element-invisible">' . t('Secondary tabs') . '</h2>';
-    $vars['secondary']['#prefix'] .= '<ul class="tabs secondary clearfix">';
-    $vars['secondary']['#suffix'] = '</ul>';
-    $output .= drupal_render($vars['secondary']);
+  if (!empty($variables['secondary'])) {
+    $variables['secondary']['#prefix'] = '<h2 class="element-invisible">' . t('Secondary tabs') . '</h2>';
+    $variables['secondary']['#prefix'] .= '<ul class="tabs secondary clearfix">';
+    $variables['secondary']['#suffix'] = '</ul>';
+    $output .= drupal_render($variables['secondary']);
   }
-
   return $output;
 }
 
@@ -344,7 +316,6 @@ function dfrtheme_menu_local_tasks(&$vars) {
 function dfrtheme_form_alter(&$form, &$form_state, $form_id) {
   // User login form (block & page)
   if ($form_id == 'user_login_block' || $form_id == 'user_login') {
-
     // Re-order fields
     $form['openid_identifier']['#weight'] = 0;
     $form['name']['#weight'] = 0;
@@ -353,7 +324,6 @@ function dfrtheme_form_alter(&$form, &$form_state, $form_id) {
     $form['openid_links']['#weight'] = 3;
     $form['links']['#weight'] = 4;
   }
-
 } // dfrtheme_form_alter
 
 

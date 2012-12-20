@@ -6,6 +6,44 @@
 
 include_once 'drupalfr_search.features.inc';
 
+
+/**
+ * Implements hook_default_search_api_server().
+ */
+function drupalfr_general_default_search_api_server() {
+  $items = array();
+  $items['solr'] = entity_create('search_api_server', array(
+    'name' => 'Solr',
+    'machine_name' => 'solr',
+    'description' => '',
+    'class' => 'search_api_solr_service',
+    'options' => variable_get('drupalfr_solr_server_options', array()) + array(
+      'host' => 'localhost',
+      'port' => '8983',
+      'path' => '/solr',
+      'http_user' => '',
+      'http_pass' => '',
+      'excerpt' => 1,
+      'retrieve_data' => 1,
+      'highlight_data' => 0
+    ),
+    'enabled' => 1,
+  ));
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_search_theme() {
+  return array(
+    'drupalfr_search_form' => array(
+      'render element' => 'form',
+      'template' => 'search-block-form',
+    ),
+  );
+}
+
 /**
  * Implements hook_block_info().
  */
