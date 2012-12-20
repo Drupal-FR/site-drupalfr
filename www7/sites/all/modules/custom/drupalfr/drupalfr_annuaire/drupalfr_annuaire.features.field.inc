@@ -54,7 +54,7 @@ function drupalfr_annuaire_field_default_fields() {
           'module' => 'text',
           'settings' => array(),
           'type' => 'text_default',
-          'weight' => '4',
+          'weight' => '11',
         ),
         'full' => array(
           'label' => 'above',
@@ -88,7 +88,7 @@ function drupalfr_annuaire_field_default_fields() {
           'rows' => '3',
         ),
         'type' => 'text_textarea',
-        'weight' => '4',
+        'weight' => '12',
       ),
       'widget_type' => 'text_textarea',
     ),
@@ -134,11 +134,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'above',
-          'module' => 'text',
+          'label' => 'inline',
+          'module' => 'list',
           'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '9',
+          'type' => 'list_default',
+          'weight' => '12',
         ),
         'full' => array(
           'label' => 'above',
@@ -168,7 +168,7 @@ function drupalfr_annuaire_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_buttons',
-        'weight' => '9',
+        'weight' => '13',
       ),
       'widget_type' => 'optionwidgets_buttons',
     ),
@@ -222,7 +222,7 @@ function drupalfr_annuaire_field_default_fields() {
           'module' => 'text',
           'settings' => array(),
           'type' => 'text_default',
-          'weight' => '-3',
+          'weight' => '1',
         ),
         'full' => array(
           'label' => 'above',
@@ -255,7 +255,7 @@ function drupalfr_annuaire_field_default_fields() {
           'rows' => '6',
         ),
         'type' => 'text_textarea',
-        'weight' => '-3',
+        'weight' => '2',
       ),
       'widget_type' => 'text_textarea',
     ),
@@ -301,11 +301,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'La forme juridique de votre structure.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
-          'module' => 'text',
+          'label' => 'inline',
+          'module' => 'list',
           'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '0',
+          'type' => 'list_default',
+          'weight' => '6',
         ),
         'full' => array(
           'label' => 'above',
@@ -337,7 +337,7 @@ function drupalfr_annuaire_field_default_fields() {
           'default_value' => NULL,
         ),
         'type' => 'options_select',
-        'weight' => '0',
+        'weight' => '7',
       ),
       'widget_type' => 'optionwidgets_select',
     ),
@@ -367,7 +367,7 @@ function drupalfr_annuaire_field_default_fields() {
       'locked' => '0',
       'module' => 'image',
       'settings' => array(
-        'default_image' => 0,
+        'default_image' => NULL,
         'description_field' => '0',
         'list_default' => '1',
         'list_field' => '0',
@@ -404,14 +404,14 @@ function drupalfr_annuaire_field_default_fields() {
           'weight' => '-4',
         ),
         'default' => array(
-          'label' => 'above',
+          'label' => 'hidden',
           'module' => 'image',
           'settings' => array(
             'image_link' => '',
             'image_style' => '',
           ),
           'type' => 'image',
-          'weight' => '-4',
+          'weight' => '0',
         ),
         'full' => array(
           'label' => 'above',
@@ -458,7 +458,7 @@ function drupalfr_annuaire_field_default_fields() {
           'progress_indicator' => 'throbber',
         ),
         'type' => 'image_image',
-        'weight' => '-4',
+        'weight' => '1',
       ),
       'widget_type' => 'imagefield_widget',
     ),
@@ -492,11 +492,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'L\'adresse e-mail à laquelle il est possible de contacter la/les personne(s) responsables des projets Drupal.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
+          'label' => 'inline',
           'module' => 'email',
           'settings' => array(),
           'type' => 'email_default',
-          'weight' => '3',
+          'weight' => '9',
         ),
         'full' => array(
           'label' => 'above',
@@ -527,7 +527,7 @@ function drupalfr_annuaire_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'email_textfield',
-        'weight' => '3',
+        'weight' => '11',
       ),
       'widget_type' => 'email_textfield',
     ),
@@ -573,11 +573,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => '<a href="http://association.drupal.org/" title="Site de l\'association Drupal">L\'association Drupal</a> est une organisation dédiée au développement du  <a href="http://drupal.org/" title="Site du CMS Drupal">CMS Drupal</a>. Elle aide la communauté à organiser des événements autour de Drupal partout dans le monde.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
-          'module' => 'text',
+          'label' => 'inline',
+          'module' => 'list',
           'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '10',
+          'type' => 'list_default',
+          'weight' => '13',
         ),
         'full' => array(
           'label' => 'above',
@@ -607,7 +607,7 @@ function drupalfr_annuaire_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_buttons',
-        'weight' => '10',
+        'weight' => '14',
       ),
       'widget_type' => 'optionwidgets_buttons',
     ),
@@ -656,11 +656,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'above',
+          'label' => 'inline',
           'module' => 'list',
           'settings' => array(),
           'type' => 'list_default',
-          'weight' => 11,
+          'weight' => '3',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -681,7 +681,7 @@ function drupalfr_annuaire_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_buttons',
-        'weight' => '101',
+        'weight' => '4',
       ),
     ),
   );
@@ -734,7 +734,7 @@ function drupalfr_annuaire_field_default_fields() {
           'module' => 'link',
           'settings' => array(),
           'type' => 'link_default',
-          'weight' => '0',
+          'weight' => '5',
         ),
         'full' => array(
           'label' => 'above',
@@ -777,7 +777,7 @@ function drupalfr_annuaire_field_default_fields() {
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_field',
-        'weight' => '0',
+        'weight' => '6',
       ),
       'widget_type' => 'link',
     ),
@@ -815,7 +815,7 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'Votre numéro d\'identification SIREN tel qu\'il apparaît sur votre K-bis.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
+          'label' => 'inline',
           'module' => 'number',
           'settings' => array(
             'decimal_separator' => '.',
@@ -824,7 +824,7 @@ function drupalfr_annuaire_field_default_fields() {
             'thousand_separator' => '',
           ),
           'type' => 'number_integer',
-          'weight' => '1',
+          'weight' => '7',
         ),
         'full' => array(
           'label' => 'above',
@@ -864,7 +864,7 @@ function drupalfr_annuaire_field_default_fields() {
           'default_value' => NULL,
         ),
         'type' => 'number',
-        'weight' => '1',
+        'weight' => '8',
       ),
       'widget_type' => 'number',
     ),
@@ -910,11 +910,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'Nombre d\'employés dans l\'entreprise ou la structure.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
-          'module' => 'text',
+          'label' => 'inline',
+          'module' => 'list',
           'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '5',
+          'type' => 'list_default',
+          'weight' => '4',
         ),
         'full' => array(
           'label' => 'above',
@@ -980,11 +980,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'Merci de préciser le numéro de téléphone de votre structure. Si une personne en particulier s\'occupe des projets Drupal, merci d\'indiquer son numéro.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
+          'label' => 'inline',
           'module' => 'phone',
           'settings' => array(),
           'type' => 'phone',
-          'weight' => '3',
+          'weight' => '10',
         ),
         'full' => array(
           'label' => 'above',
@@ -1020,7 +1020,7 @@ function drupalfr_annuaire_field_default_fields() {
           'default_value' => NULL,
         ),
         'type' => 'phone_textfield',
-        'weight' => '3',
+        'weight' => '10',
       ),
       'widget_type' => 'phone_textfield',
     ),
@@ -1067,11 +1067,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'Sélectionnez les prestations que votre société propose. Merci de garder à l\'esprit que les services que présentez ici doivent être en rapport direct avec Drupal.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
-          'module' => 'text',
+          'label' => 'inline',
+          'module' => 'list',
           'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '-2',
+          'type' => 'list_default',
+          'weight' => '2',
         ),
         'full' => array(
           'label' => 'above',
@@ -1104,7 +1104,7 @@ function drupalfr_annuaire_field_default_fields() {
           'default_value' => NULL,
         ),
         'type' => 'options_buttons',
-        'weight' => '-2',
+        'weight' => '3',
       ),
       'widget_type' => 'optionwidgets_buttons',
     ),
@@ -1148,11 +1148,11 @@ function drupalfr_annuaire_field_default_fields() {
       'description' => 'Précisez l\'adresse de votre site Internet.',
       'display' => array(
         'default' => array(
-          'label' => 'above',
+          'label' => 'inline',
           'module' => 'link',
           'settings' => array(),
           'type' => 'link_default',
-          'weight' => '2',
+          'weight' => '8',
         ),
         'full' => array(
           'label' => 'above',
@@ -1198,7 +1198,7 @@ function drupalfr_annuaire_field_default_fields() {
           'default_value' => NULL,
         ),
         'type' => 'link_field',
-        'weight' => '2',
+        'weight' => '9',
       ),
       'widget_type' => 'link',
     ),
