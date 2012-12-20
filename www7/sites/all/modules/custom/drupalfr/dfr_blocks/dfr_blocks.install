@@ -104,13 +104,13 @@ function dfr_blocks_enable() {
       'module' => 'facetapi', 'delta' => facetapi_hash_delta(facetapi_build_delta('search_api@node_content', 'block', 'type')),
       'theme' => 'dfrtheme', 'region' => 'sidebar_first',
       'weight' => -23, 'cache' => DRUPAL_CACHE_GLOBAL,
-      'title' => "Rechercher", 'status' => 1,
+      'title' => "Type de contenu", 'status' => 1,
     ),
     array(
       'module' => 'facetapi', 'delta' => facetapi_hash_delta(facetapi_build_delta('search_api@node_content', 'block', 'author')),
       'theme' => 'dfrtheme', 'region' => 'sidebar_first',
       'weight' => -23, 'cache' => DRUPAL_CACHE_GLOBAL,
-      'title' => "Rechercher", 'status' => 1,
+      'title' => "Auteur", 'status' => 1,
     ),
     array(
       'module' => 'system', 'delta' => 'navigation',

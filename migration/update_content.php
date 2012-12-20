@@ -139,11 +139,11 @@ $path = array(
   'alias' => 'accueil',
 );
 path_save($path);
-/**
+
 // Create the emploi link.
 $emploi_item = array(
   'link_title' => 'Emploi',
-  'link_path' => 'http://emploi.portd7.drupalfr.org',
+  'link_path' => 'emploi',
   'module' => 'menu',
   'menu_name' => 'main-menu',
 );
@@ -157,7 +157,7 @@ foreach (array(457, 27, $planete_mlid['mlid'], 3660, 1125, 17, $emploi_item['mli
   $item['weight'] = $i++;
   menu_link_save($item);
 }
-*/
+
 
 function _migration_create_planet_feed ($feed_information) {
   $user_profile = user_load_by_name($feed_information['user_id']);

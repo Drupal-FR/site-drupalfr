@@ -22,7 +22,6 @@ drush updatedb -y --verbose
 
 # Enable modules.
 drush en -y admin_menu
-drush en -y admin_menu_toolbar
 drush en -y pathologic
 drush en -y drupalfr_user
 drush en -y content_migrate
@@ -157,6 +156,8 @@ drush dis -y rules_admin views_ui
 # Revert permissions to code defined version.
 drush en -y drupalfr_permissions
 drush fr -y drupalfr_permissions
+
+drush en -y admin_menu_toolbar
 
 drush cc all
 
