@@ -58,7 +58,7 @@ function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
       // On veut que le path interne remette emploi en front, sauf s'il y est déjà
       if (0 !== strpos($original_path, 'emploi')) {
         if (!$original_path || $original_path == variable_get('site_frontpage', 'node')) {
-          $path = 'emploi/tous';
+          $path = 'emploi';
         }
         else {
           $path = 'emploi/' . $original_path;
