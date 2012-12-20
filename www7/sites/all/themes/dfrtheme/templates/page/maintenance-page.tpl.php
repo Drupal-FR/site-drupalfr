@@ -1,89 +1,85 @@
 <?php
 /**
  * @file
- * Implementation to display a single Drupal page while offline.
+ * Default theme implementation to display the basic html structure of a single
+ * Drupal page.
  *
- * All the available variables are mirrored in page.tpl.php.
+ * Variables:
+ * - $css: An array of CSS files for the current page.
+ * - $language: (object) The language the site is being displayed in.
+ *   $language->language contains its textual representation.
+ *   $language->dir contains the language direction. It will either be 'ltr' or 'rtl'.
+ * - $rdf_namespaces: All the RDF namespace prefixes used in the HTML document.
+ * - $grddl_profile: A GRDDL profile allowing agents to extract the RDF data.
+ * - $head_title: A modified version of the page title, for use in the TITLE tag.
+ * - $head: Markup for the HEAD section (including meta tags, keyword tags, and
+ *   so on).
+ * - $styles: Style tags necessary to import all CSS files for the page.
+ * - $scripts: Script tags necessary to load the JavaScript files and settings
+ *   for the page.
+ * - $page_top: Initial markup from any modules that have altered the
+ *   page. This variable should always be output first, before all other dynamic
+ *   content.
+ * - $page: The rendered page content.
+ * - $page_bottom: Final closing markup from any modules that have altered the
+ *   page. This variable should always be output last, after all other dynamic
+ *   content.
+ * - $classes String of classes that can be used to style contextually through
+ *   CSS.
  *
  * @see template_preprocess()
- * @see template_preprocess_maintenance_page()
- * @see theme673_process_maintenance_page()
+ * @see template_preprocess_html()
+ * @see template_process()
  */
-$html_attributes = "lang=\"{$language->language}\" dir=\"{$language->dir}\" {$rdf->version}{$rdf->namespaces}";
-?>
-<?php print $doctype; ?>
-
-<!--[if IE 8 ]><html <?php print $html_attributes; ?> class="no-js ie8"><![endif]-->
-<!--[if IE 9 ]><html <?php print $html_attributes; ?> class="no-js ie9"><![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--><html <?php print $html_attributes; ?> class="no-js"><!--<![endif]-->
-<head<?php print $rdf->profile; ?>>
-
+  $html_attributes = "lang=\"{$language->language}\" dir=\"{$language->dir}\" ";
+?><?php print $doctype; ?>
+<html <?php print $html_attributes; ?> class="no-js">
+<head>
   <?php print $head; ?>
-  
-  <!--  Mobile viewport optimized: j.mp/bplateviewport -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
+  <!--[if lte IE 8]>
+    <div style=' text-align:center; clear: both; padding:0 0 0 15px; position: relative;'>
+      <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+        <img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." />
+      </a>
+    </div>
+  <![endif]-->
   <title><?php print $head_title; ?></title>
-  <?php print $styles; ?>
-  
-  <?php print $scripts; ?>
-
+  <style type="text/css">
+    body {
+      color:#444;
+      background:#f6fafd;
+      font:normal 14px/21px 'Trebuchet MS', Arial, Helvetica, sans-serif;
+      text-align: center;
+    }
+  </style>
 </head>
 <body class="<?php print $classes; ?>" <?php print $attributes;?>>
-
-  <div id="skip-link">
-    <a href="#main-content" class="element-invisible element-focusable"><?php print t('Skip to main content'); ?></a>
-  </div>
-
   <?php print $page_top; ?>
 
-  <div id="page-wrapper"><div id="page">
+  <div id="page-wrapper">
 
-      <header id="header" role="banner">
-        <div class="section clearfix">
-          <?php if ($site_name || $site_slogan): ?>
-            <div id="name-and-slogan"<?php if ($hide_site_name && $hide_site_slogan) { print ' class="element-invisible"'; } ?>>
-              <?php if ($site_name): ?>
-                <div id="site-name"<?php if ($hide_site_name) { print ' class="element-invisible"'; } ?>>
-                  <strong>
-                    <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home"><span><?php print $site_name; ?></span></a>
-                  </strong>
-                </div>
-              <?php endif; ?>
-              <?php if ($site_slogan): ?>
-                <div id="site-slogan"<?php if ($hide_site_slogan) { print ' class="element-invisible"'; } ?>>
-                  <?php print $site_slogan; ?>
-                </div>
-              <?php endif; ?>
-            </div> <!-- /#name-and-slogan -->
-          <?php endif; ?>
-        </div><!-- /.section -->
-      </header><!-- /#header -->
+    <?php if ($logo): ?>
+      <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" id="logo">
+        <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" />
+      </a>
+    <?php endif; ?>
 
-      <div id="main-wrapper">
-        <div id="main" class="clearfix">
-          <div id="content" class="column" role="main">
-            <div class="section">
-              <a id="main-content"></a>
-              <?php if ($title): ?><h1 class="title" id="page-title"><?php print $title; ?></h1><?php endif; ?>
-              <?php print $content; ?>
-              <?php if ($messages): ?>
-                <div id="messages">
-                  <div class="section clearfix">
-                    <?php print $messages; ?>
-                  </div><!-- /.section -->
-                </div><!-- /#messages -->
-              <?php endif; ?>
-            </div><!-- /.section -->
-          </div><!-- /#content -->
-        </div><!-- /#main -->
-      </div><!-- /#main-wrapper -->
+    <?php if ($messages): ?>
+      <div id="messages"><div class="section clearfix">
+        <?php print $messages; ?>
+      </div></div> <!-- /.section, /#messages -->
+    <?php endif; ?>
 
-      </div><!-- /#page -->
-    </div><!-- /#page-wrapper -->
+    <?php print render($title_prefix); ?>
+    <?php if ($title): ?>
+      <h1 class="title" id="page-title"><?php print $title; ?></h1>
+    <?php endif; ?>
+    <?php print render($title_suffix); ?>
+
+    <?php print $content; ?>
+
+  </div><!-- /#page-wrapper -->
 
   <?php print $page_bottom; ?>
-
 </body>
 </html>
