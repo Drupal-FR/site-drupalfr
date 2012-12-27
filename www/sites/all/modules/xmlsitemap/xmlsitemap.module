@@ -700,8 +700,8 @@ function xmlsitemap_link_delete_multiple(array $conditions) {
  */
 function _xmlsitemap_check_changed_links(array $conditions = array(), array $updates = array(), $flag = FALSE) {
   // If we are changing status or access, check for negative current values.
-  $conditions['status'] = (!empty($updates['status']) && empty($condition['status'])) ? 0 : 1;
-  $conditions['access'] = (!empty($updates['access']) && empty($condition['access'])) ? 0 : 1;
+  $conditions['status'] = (!empty($updates['status']) && empty($conditions['status'])) ? 0 : 1;
+  $conditions['access'] = (!empty($updates['access']) && empty($conditions['access'])) ? 0 : 1;
 
   module_load_include('inc', 'xmlsitemap');
   $args = _xmlsitemap_build_conditions($conditions);

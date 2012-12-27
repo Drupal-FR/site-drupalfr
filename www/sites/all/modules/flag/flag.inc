@@ -16,16 +16,11 @@
  *   should point to the PHP class implementing this flag.
  */
 function flag_flag_definitions() {
-  return array(
+  $definitions = array(
     'node' => array(
       'title' => t('Nodes'),
       'description' => t("Nodes are a Drupal site's primary content."),
       'handler' => 'flag_node',
-    ),
-    'comment' => array(
-      'title' => t('Comments'),
-      'description' => t('Comments are responses to node content.'),
-      'handler' => 'flag_comment',
     ),
     'user' => array(
       'title' => t('Users'),
@@ -33,6 +28,16 @@ function flag_flag_definitions() {
       'handler' => 'flag_user',
     ),
   );
+
+  if (module_exists('comment')) {
+    $definitions['comment'] = array(
+      'title' => t('Comments'),
+      'description' => t('Comments are responses to node content.'),
+      'handler' => 'flag_comment',
+    );
+  }
+
+  return $definitions;
 }
 
 /**
@@ -1323,7 +1328,7 @@ class flag_node extends flag_flag {
     return FALSE;
   }
 
-  function type_access_multiple($content_ids, $account = NULL) {
+  function type_access_multiple($content_ids, $account) {
     $access = array();
 
     // Ensure that only flaggable node types are granted access. This avoids a

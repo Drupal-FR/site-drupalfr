@@ -79,8 +79,8 @@ function googleanalytics_init() {
 
     // Add link tracking.
     $link_settings = array();
-    if ($track_outgoing = variable_get('googleanalytics_trackoutgoing', 1)) {
-      $link_settings['trackOutgoing'] = $track_outgoing;
+    if ($track_outbound = variable_get('googleanalytics_trackoutgoing', 1)) {
+      $link_settings['trackOutbound'] = $track_outbound;
     }
     if ($track_mailto = variable_get('googleanalytics_trackmailto', 1)) {
       $link_settings['trackMailto'] = $track_mailto;
@@ -88,9 +88,6 @@ function googleanalytics_init() {
     if (($track_download = variable_get('googleanalytics_trackfiles', 1)) && ($trackfiles_extensions = variable_get('googleanalytics_trackfiles_extensions', GOOGLEANALYTICS_TRACKFILES_EXTENSIONS))) {
       $link_settings['trackDownload'] = $track_download;
       $link_settings['trackDownloadExtensions'] = $trackfiles_extensions;
-    }
-    if ($track_outbound_as_pageview = variable_get('googleanalytics_trackoutboundaspageview', 0)) {
-      $link_settings['trackOutboundAsPageview'] = $track_outbound_as_pageview;
     }
     if (!empty($link_settings)) {
       drupal_add_js(array('googleanalytics' => $link_settings), 'setting', 'header');
@@ -111,27 +108,6 @@ function googleanalytics_footer($main = 0) {
   // 2. Track page views based on visibility value.
   // 3. Check if we should track the currently active user's role.
   if (!empty($id) && _googleanalytics_visibility_pages() && _googleanalytics_visibility_user($user)) {
-
-    // Add User profile segmentation values.
-    $profile_fields = variable_get('googleanalytics_segmentation', array());
-    if (!empty($profile_fields)) {
-
-      if (module_exists('profile')) {
-        // Extend the $user object with profile data. Otherwise only 'User roles' can be tracked.
-        profile_load_profile($user);
-      }
-
-      $fields = array();
-      foreach ($profile_fields as $field => $title) {
-        $fields[$field] = is_array($user->$field) ? implode(',', $user->$field) : $user->$field;
-      }
-
-      // Only show segmentation variable if there are specified fields.
-      $segmentation = '';
-      if (count($fields) > 0) {
-        $segmentation = '_gaq.push(["_setVar", ' . drupal_to_js(implode(':', $fields)) . ']);';
-      }
-    }
 
     // Site search tracking support.
     $url_custom = '';
@@ -176,23 +152,28 @@ function googleanalytics_footer($main = 0) {
         $custom_var_scope = !empty($googleanalytics_custom_vars['slots'][$i]['scope']) ? $googleanalytics_custom_vars['slots'][$i]['scope'] : 3;
 
         if (module_exists('token')) {
+          $types = array('global' => NULL, 'user' => $user);
           $node = menu_get_object();
-          $custom_var_value = token_replace_multiple($custom_var_value, array('global' => NULL, 'user' => $user, 'node' => $node), '[', ']', array('clear' => TRUE));
+          if (is_object($node)) {
+            $types += array('node' => $node);
+          }
+          $custom_var_name = token_replace_multiple($custom_var_name, $types, '[', ']', array('clear' => TRUE));
+          $custom_var_value = token_replace_multiple($custom_var_value, $types, '[', ']', array('clear' => TRUE));
         }
 
-        // Suppress empty custom variables.
-        if (!is_numeric($custom_var_value) && empty($custom_var_value)) {
+        // Suppress empty custom names and/or variables.
+        if (!drupal_strlen(trim($custom_var_name)) || !drupal_strlen(trim($custom_var_value))) {
           continue;
         }
 
         // The length of the string used for the 'name' and the length of the
-        // string used for the 'value' must not exceed 64 bytes after url encoding.
+        // string used for the 'value' must not exceed 128 bytes after url encoding.
         $name_length = drupal_strlen(rawurlencode($custom_var_name));
         $tmp_value = rawurlencode($custom_var_value);
         $value_length = drupal_strlen($tmp_value);
-        if ($name_length + $value_length > 64) {
+        if ($name_length + $value_length > 128) {
           // Trim value and remove fragments of url encoding.
-          $tmp_value = rtrim(substr($tmp_value, 0, 63 - $name_length), '%0..9A..F');
+          $tmp_value = rtrim(substr($tmp_value, 0, 127 - $name_length), '%0..9A..F');
           $custom_var_value = urldecode($tmp_value);
         }
 
@@ -221,9 +202,6 @@ function googleanalytics_footer($main = 0) {
       $script .= '_gaq.push(["_setDomainName", ' . drupal_to_js($cookie_domain) . ']);';
     }
 
-    if (!empty($segmentation)) {
-      $script .= $segmentation;
-    }
     if (!empty($custom_var)) {
       $script .= $custom_var;
     }
@@ -537,31 +515,27 @@ function _googleanalytics_visibility_header($account) {
 }
 
 /**
- * Implementation of hook_token_values().
- */
-function googleanalytics_token_values($type, $object = NULL, $options = array()) {
-  if ($type == 'user') {
-    if (!empty($object->roles)) {
-      $account = $object;
-    }
-    else {
-      $account = user_load(array('uid' => $GLOBALS['user']->uid));
-    }
-
-    $tokens['user-role-names'] = implode(',', $account->roles);
-    $tokens['user-role-ids'] = implode(',', array_keys($account->roles));
-
-    return $tokens;
-  }
-}
-
-/**
  * Implementation of hook_token_list().
  */
 function googleanalytics_token_list($type = 'all') {
   if ($type == 'user' || $type == 'all') {
     $tokens['user']['user-role-names'] = t('The role names the user account is a member of as comma separated list.');
     $tokens['user']['user-role-ids'] = t('The role ids the user account is a member of as comma separated list.');
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function googleanalytics_token_values($type, $object = NULL, $options = array()) {
+  if ($type == 'user' && !empty($object->roles)) {
+    $account = $object;
+
+    // Basic user account information.
+    $tokens['user-role-names'] = implode(',', $account->roles);
+    $tokens['user-role-ids'] = implode(',', array_keys($account->roles));
+
     return $tokens;
   }
 }

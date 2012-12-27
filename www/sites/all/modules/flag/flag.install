@@ -665,6 +665,8 @@ function flag_update_6208() {
  * Clean up orphaned flags due to node and comment deletion.
  */
 function flag_update_6209() {
+  $ret = array();
+
   // Clean-up for nodes.
   db_query("DELETE FROM {flag_content} WHERE content_type = 'node' AND NOT EXISTS (SELECT 1 FROM {node} n WHERE content_id = n.nid)");
   db_query("DELETE FROM {flag_counts} WHERE content_type = 'node' AND NOT EXISTS (SELECT 1 FROM {node} n WHERE content_id = n.nid)");
@@ -675,6 +677,8 @@ function flag_update_6209() {
     db_query("DELETE FROM {flag_content} WHERE content_type = 'comment' AND NOT EXISTS (SELECT 1 FROM {comment} c WHERE content_id = c.cid)");
     db_query("DELETE FROM {flag_counts} WHERE content_type = 'comment' AND NOT EXISTS (SELECT 1 FROM {comment} c WHERE content_id = c.cid)");
   }
+
+  return $ret;
 }
 
 /**

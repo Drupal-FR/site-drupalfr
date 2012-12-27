@@ -123,7 +123,7 @@ function email_field_formatter_info() {
  * Theme function for 'default' email field formatter.
  */
 function theme_email_formatter_default($element) {
-  return !empty($element['#item']['safe']) ? '<a href="mailto:'. $element['#item']['email'] .'">'. $element['#item']['safe'] .'</a>' : '';
+  return !empty($element['#item']['safe']) ? l($element['#item']['email'], "mailto:" . $element['#item']['email']) : '';
 }
 
 /**
@@ -137,7 +137,7 @@ function theme_email_formatter_spamspan($element) {
     return spamspan($element['#item']['email']);
   }
   else {
-    return '<a href="mailto:'. $element['#item']['email'] .'">'. $element['#item']['safe'] .'</a>';
+    return l($element['#item']['email'], "mailto:" . $element['#item']['email']);
   }
 }
 
@@ -201,7 +201,7 @@ function email_widget_settings($op, $widget) {
         '#required' => TRUE,
       );
       return $form;
-      
+
     case 'save':
       return array('size');
   }
@@ -287,30 +287,27 @@ function email_menu() {
  *  Rendered page output containing either the contact form or a flood warning.
  */
 function email_mail_page($node, $field_name) {
-  if (module_exists('content_permissions')) {
-    if (!user_access('view '. $field_name)) {
-      drupal_not_found();
-      return;
-    }
-  }
-  if (!$node) {
-    drupal_not_found();
-    return;
-  }
-  $field = $node->$field_name;
-  $email = $field[0]['email'];
-  $types = content_types($node->type);
-  // Validate field name
-  $types = content_types($node->type);
-  if (empty($email) ||
-      !isset($types['fields'][$field_name]) ||
-      $types['fields'][$field_name]['type'] != 'email' ||
-      ($types['fields'][$field_name]['display_settings']['teaser']['format'] != 'contact' &&
-      $types['fields'][$field_name]['display_settings']['full']['format'] != 'contact')) {
-    drupal_not_found();
-    return;
+  $field_info = content_fields($field_name, $node->type);
+  if (empty($field_info) || $field_info['type'] != 'email') {
+    return MENU_NOT_FOUND;
   }
 
+  // Check the field access using CCK's content_access function.
+  if (!content_access('view', $field_info, NULL, $node)) {
+    return MENU_ACCESS_DENIED;
+  }
+
+  // Check if the node has an email address.
+  $email = isset($node->{$field_name}[0]['email']) ? $node->{$field_name}[0]['email'] : '';
+  if (empty($email)) {
+    return MENU_NOT_FOUND;
+  }
+
+  // Check the formatters.
+  if ($field_info['display_settings']['teaser']['format'] != 'contact' &&
+      $field_info['display_settings']['full']['format'] != 'contact') {
+    return MENU_NOT_FOUND;
+  }
 
   if (!flood_is_allowed('email', variable_get('email_hourly_threshold', 3))) {
     $output = t("You cannot send more than %number messages per hour. Please try again later.", array('%number' => variable_get('email_hourly_threshold', 3)));
@@ -394,28 +391,28 @@ function email_mail_page_form_submit($form, &$form_state) {
   $node = $form_state['values']['node'];
   $field_name = $form_state['values']['field_name'];
   $email = $form_state['values']['email'];
-  
+
   // E-mail address of the sender: as the form field is a text field,
   // all instances of \r and \n have been automatically stripped from it.
 
   $from = $form_state['values']['mail'];
- 
+
   $params['node'] = $node;
   $params['subject'] = $form_state['values']['subject'];
   $params['name'] = $form_state['values']['name'];
   $params['message'] = $form_state['values']['message'];
   $params['url'] = url('node/' . $node->nid, array('absolute' => TRUE));
-   
+
   // Send the e-mail to the recipients:
   drupal_mail('email', 'contact', $email, language_default(), $params, $from);
- 
+
   // Log the operation:
   flood_register_event('email');
   watchdog('mail', t('%name-from sent an e-mail at %form.', array('%name-from' => theme('placeholder', $form_state['values']['name'] ." <$from>"), '%form' => url($_GET['q'], array('absolute' => TRUE)))));
- 
+
   // Update user:
   drupal_set_message(t('Your message has been sent.'));
- 
+
   // Jump to home page rather than back to contact page to avoid contradictory messages if flood control has been activated.
   $form_state['redirect'] = 'node/'. $node->nid;
 }
@@ -439,7 +436,7 @@ function email_mail($key, &$message, $params) {
 
       // Prepare the body:
       $message['body'] = implode("\n\n", $msg);
-      
+
       $message['subject'] = t('[@title] @subject', array('@title' => preg_replace("/\r|\n/",'', $node->title), '@subject' => $params['subject']), $language->language);
       break;
   }
@@ -459,7 +456,7 @@ function email_token_list($type = 'all') {
 
 /**
  * Implementation of hook token_values
- */ 
+ */
 function email_token_values($type, $object = NULL, $options = array()) {
   if ($type == 'field') {
     $item = $object[0];

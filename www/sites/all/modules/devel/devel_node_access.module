@@ -1,5 +1,4 @@
 <?php
-// $Id: devel_node_access.module,v 1.15.2.31 2010/07/13 19:50:10 salvis Exp $
 /**
  * @file
  *
@@ -75,7 +74,11 @@ function devel_node_access_form_alter(&$form, $form_state, $form_id) {
       '#type'          => 'checkbox',
       '#title'         => t('Devel Node Access debug mode'),
       '#default_value' => variable_get('devel_node_access_debug_mode', FALSE),
-      '#description'   => t('Debug mode verifies the grant records in the node_access table against those that would be set by running !Rebuild_permissions, and displays them all; this can cause considerable overhead.', array('!Rebuild_permissions' => l('['. $tr('Rebuild permissions') .']', 'admin/content/node-settings'))),
+      '#description'   => t('Debug mode verifies the grant records in the node_access table against those that would be set by running !Rebuild_permissions, and displays them all; this can cause considerable overhead.<br />For even more information enable the <a href="@link">%DNAbU block</a>, too.', array(
+        '!Rebuild_permissions' => l('[' . $tr('Rebuild permissions') . ']', 'admin/content/node-settings'),
+        '%DNAbU' => t('Devel Node Access by User'),
+        '@link' => url('admin/build/block/list'),
+      )),
     );
     // push these down:
     $form['devel_error_handler']['#weight'] = 1;
@@ -217,7 +220,7 @@ function devel_node_access_block($op = 'list', $delta = 0) {
   if (!isset($block1_visible)) {
     $block1_visible = db_result(db_query("SELECT status FROM {blocks} WHERE module = 'devel_node_access' AND delta = '1' AND theme = '%s'", $theme_key));
     if (!$block1_visible) {
-      $hint = t('For per-user access permissions enable the second DNA <a href="@block">block</a>.', array('@block' => url('admin/build/block')));
+      $hint = t('For per-user access permissions enable the second DNA <a href="@link">block</a>.', array('@link' => url('admin/build/block')));
     }
   }
 
@@ -302,7 +305,7 @@ function devel_node_access_block($op = 'list', $delta = 0) {
                 }
                 // check node_access_grants()
                 $checked_status[$nid] = $node->status;
-                if ($node->nid && $node->status) {
+                if ($node->nid) {
                   foreach (array('view', 'update', 'delete') as $op) {
                     $checked_grants[$nid][$op] = array_merge(
                       array('all' => array(0)),
@@ -441,17 +444,20 @@ function devel_node_access_block($op = 'list', $delta = 0) {
             }
             $output = theme('table', $headers, $rows, array('class' => 'system-status-report', 'style' => 'text-align: left'));
 
-            $output .= theme_item(array('#value' => '', '#description' => '(Some of the table elements provide additional information if you hover your mouse over them.)'));
+            $output .= theme('item', array('#value' => '', '#description' => '(Some of the table elements provide additional information if you hover your mouse over them.)'));
 
             if ($error_count > 0) {
               $variables['!Rebuild_permissions'] = '<a href="'. url('admin/content/node-settings/rebuild') .'">'. $tr('Rebuild permissions') .'</a>';
-              $output .= theme_item(array('#value' => '<div class="error">'. t("You have errors in your !na table! You may be able to fix these for now by running !Rebuild_permissions, but this is likely to destroy the evidence and make it impossible to identify the underlying issues. If you don't fix those, the errors will probably come back again. <br /> DON'T do this just yet if you intend to ask for help with this situation.", $variables) .'</div>'));
+              $output .= theme('item', array('#value' => '<div class="error">'. t("You have errors in your !na table! You may be able to fix these for now by running !Rebuild_permissions, but this is likely to destroy the evidence and make it impossible to identify the underlying issues. If you don't fix those, the errors will probably come back again. <br /> DON'T do this just yet if you intend to ask for help with this situation.", $variables) .'</div>'));
             }
 
             // Explain whether access is granted or denied, and why (using code from node_access()).
             $tr = 't';
             array_shift($nids);  // remove the 0
             $accounts = array();
+            if (!isset($user->name)) {
+              $user->name = '';
+            }
             $variables += array(
               '!username' => theme('username', $user),
               '%uid' => $user->uid,
@@ -496,7 +502,7 @@ function devel_node_access_block($op = 'list', $delta = 0) {
           }
 
           if (!empty($hint)) {
-            $output .= theme_item(array('#value' => '', '#description' => '('. $hint .')'));
+            $output .= theme('item', array('#value' => '', '#description' => '('. $hint .')'));
           }
           $subject = t('node_access entries for nodes shown on this page');
           return array('subject' => $subject, 'content' => $output .'<br /><br />');
@@ -510,7 +516,7 @@ function devel_node_access_block($op = 'list', $delta = 0) {
             // limit the number of users returned.  It would be better to make a
             // pager query, or at least make the number of users configurable.  If
             // anyone is up for that please submit a patch.
-            $result = db_query_range('SELECT DISTINCT u.* FROM {users} u ORDER BY u.access DESC', 0, 10);
+            $result = db_query_range('SELECT DISTINCT u.uid, u.*, (u.uid <> 0) AS authorized FROM {users} u ORDER BY authorized ASC, u.access DESC', 0, 10);
             while ($data = db_fetch_object($result)) {
               $account = user_load($data->uid);
               $username = theme('username', $data);
@@ -526,7 +532,7 @@ function devel_node_access_block($op = 'list', $delta = 0) {
             }
             if (count($rows)) {
               $output = theme('table', $headers, $rows, array('style' => 'text-align: left'));
-              $output .= theme_item(array('#value' => '', '#description' => t('(This table lists the most-recently active users. Hover your mouse over each result for more details.)')));
+              $output .= theme('item', array('#value' => '', '#description' => t('(This table lists the most-recently active users. Hover your mouse over each result for more details.)')));
               return array('subject' => t('Access permissions by user'),
                            'content' => $output);
             }
@@ -570,7 +576,7 @@ function _devel_node_access_explain_access($op, $node, $account = NULL) {
     session_save_session(TRUE);
     $second_opinion = node_access($op, $node, $account);
     if ($second_opinion != $result[0]) {
-      $result[1] .= '<span class="'. ($second_opinion ? 'ok' : 'error') .'" title="DNA and Core seem to disagree on this item. This is a bug in either one of them and should be fixed! Try to look at this node as this user and check whether there is still disagreement.">*</span>';
+      $result[1] .= '<span class="'. ($second_opinion ? 'ok' : 'error') .'" title="Core seems to disagree on this item. This is a bug in either DNA or Core and should be fixed! Try to look at this node as this user and check whether there is still disagreement.">*</span>';
     }
     return $result;
   }
@@ -628,9 +634,10 @@ function _devel_node_access_explain_access($op, $node, $account = NULL) {
 
   if ($op != 'create' && $node->nid && $node->status) {
     if (node_access($op, $node, $user)) {  // delegate this part
+      $variables['@node_access_table'] = '{node_access}';
       return array( TRUE,
-        t('!YES: node access', $variables),
-        t('!YES: Node access allows this.', $variables),
+        t('!YES: @node_access_table', $variables),
+        t('!YES: Node access allows this based on one or more records in the @node_access_table table (see the other DNA block!).', $variables),
       );
     }
     else {
@@ -736,6 +743,16 @@ function _devel_node_access_get_grant_list($nid, $checked_status, $checked_grant
 
 /**
  * Implementation of hook_node_access_explain().
+ *
+ * Provide a (short!) textual explanation of this module's grant records.
+ *
+ * @param $row
+ *   Array with a row from the {node_access} table.
+ *   The keys are: nid, gid, realm, grant_view, grant_update, grant_delete.
+ *
+ * @return
+ *   A (short!) HTML explanation of the given {node_access} row, to be
+ *   displayed in DNA's 'Devel Node Access' block.
  */
 function devel_node_access_node_access_explain($row) {
   if ($row->gid == 0 && $row->realm == 'all') {
