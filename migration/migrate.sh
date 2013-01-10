@@ -100,6 +100,8 @@ drush en -y dfr_migration
 
 # Migrate user profiles.
 drush dfrum
+# Remove bad redirects
+drush dfrrar
 
 ###
 ### The site is now in D7.
