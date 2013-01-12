@@ -42,8 +42,25 @@ function drush_dfr_migration_dfr_user_migration() {
 }
 
 function drush_dfr_migration_dfr_remove_alias_redirect() {
+  // Delete Redirect that are aliases
   $query = db_select('redirect', 'r');
   $query->join('url_alias', 'u', 'r.redirect = u.source AND r.source = u.alias');
+  $query->fields('r', array('rid'));
+  $results = $query->execute();
+  foreach($results as $redirect) {
+    redirect_delete($redirect->rid);
+  }
+  // Delete Redirect that are anti-aliases
+  $query = db_select('redirect', 'r');
+  $query->join('url_alias', 'u', 'r.redirect = u.alias AND r.source = u.source');
+  $query->fields('r', array('rid'));
+  $results = $query->execute();
+  foreach($results as $redirect) {
+    redirect_delete($redirect->rid);
+  }
+  // Delete redirects that are redirecting to another anti-redirect
+  $query = db_select('redirect', 'r');
+  $query->join('redirect', 'r2', 'r.source = r2.redirect AND r.redirect = r2.source AND r.rid <> r2.rid');
   $query->fields('r', array('rid'));
   $results = $query->execute();
   foreach($results as $redirect) {
