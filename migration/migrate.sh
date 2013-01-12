@@ -102,6 +102,8 @@ drush en -y dfr_migration
 drush dfrum
 # Remove bad redirects
 drush dfrrar
+# Create missing aliases
+drush dfrupa
 
 ###
 ### The site is now in D7.

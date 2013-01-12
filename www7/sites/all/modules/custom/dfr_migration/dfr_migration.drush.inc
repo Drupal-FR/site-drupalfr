@@ -15,6 +15,10 @@ function dfr_migration_drush_command() {
     'description' => "Remove redirects that are aliases",
     'aliases' => array('dfrrar'),
   );
+  $items['dfr-update-pathauto-aliases'] = array(
+    'description' => "Create mmissing pathauto aliases",
+    'aliases' => array('dfrupa'),
+  );
 
   return $items;
 }
@@ -66,4 +70,13 @@ function drush_dfr_migration_dfr_remove_alias_redirect() {
   foreach($results as $redirect) {
     redirect_delete($redirect->rid);
   }
+}
+
+function drush_dfr_migration_dfr_update_pathauto_aliases() {
+  $nids = db_select('node', 'n')
+   ->fields('n', array('nid'))
+   ->condition('type', array('annuaire','doc'), 'IN')
+   ->execute()
+   ->fetchAllAssoc('nid');
+  pathauto_node_update_alias_multiple(array_keys($nids), 'update');
 }
