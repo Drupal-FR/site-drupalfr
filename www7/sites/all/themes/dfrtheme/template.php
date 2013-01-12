@@ -181,6 +181,18 @@ function dfrtheme_menu_tree($variables) {
 function dfrtheme_breadcrumb($variables) {
   $breadcrumb = isset($variables['breadcrumb']) ? $variables['breadcrumb'] : array();
 
+  // Eventually add 'Documentation' to the breadcrumb
+  // FIXME: The menu trail should be added too...
+  $item = menu_get_object();
+  if (!empty($item) && !empty($item->type) && ($item->type == 'doc')) {
+    $documentation = l('Documentation', 'documentation');
+    $breadcrumb = array_reverse($breadcrumb);
+    $home = array_pop($breadcrumb);
+    $breadcrumb[] = $documentation;
+    $breadcrumb[] = $home;
+    $breadcrumb = array_reverse($breadcrumb);
+  }
+
   // Append title to breadcrumb  
 	$title = drupal_get_title();
 	if(!empty($title)) {
