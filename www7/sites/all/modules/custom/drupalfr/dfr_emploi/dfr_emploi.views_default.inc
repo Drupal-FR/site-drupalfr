@@ -190,7 +190,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'Aucune n\'offre n\'est en ligne encore, pourquoi ne pas <a href="/node/add/offre">proposer la votre</a> ?';
+  $handler->display->display_options['empty']['area']['content'] = 'Il n\'y a aucune offre pour le moment, pourquoi ne pas <a href="/node/add/offre">proposer la vôtre</a> ?';
   $handler->display->display_options['empty']['area']['format'] = '1';
 
   /* Display: Moderation des offres */
