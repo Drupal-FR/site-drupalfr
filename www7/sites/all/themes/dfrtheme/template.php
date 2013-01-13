@@ -193,6 +193,18 @@ function dfrtheme_breadcrumb($variables) {
     $breadcrumb = array_reverse($breadcrumb);
   }
 
+  // Eventually add 'Emploi' to the breadcrumb
+  // FIXME: The menu trail should be added too...
+  $item = menu_get_object();
+  if (!empty($item) && !empty($item->type) && ($item->type == 'offre')) {
+    $emploi = l('Emploi', 'emploi');
+    $breadcrumb = array_reverse($breadcrumb);
+    $home = array_pop($breadcrumb);
+    $breadcrumb[] = $emploi;
+    $breadcrumb[] = $home;
+    $breadcrumb = array_reverse($breadcrumb);
+  }
+
   // Append title to breadcrumb  
 	$title = drupal_get_title();
 	if(!empty($title)) {
