@@ -1072,10 +1072,12 @@ function &search_api_index_specific_items_delayed(SearchApiIndex $index = NULL, 
   // We cannot use drupal_static() here because the static cache is reset during
   // batch processing, which breaks batch handling.
   static $queue = array();
+  static $registered = FALSE;
 
   // Only register the shutdown function once.
-  if (empty($queue)) {
+  if (empty($registered)) {
     drupal_register_shutdown_function('_search_api_index_queued_items');
+    $registered = TRUE;
   }
 
   // Allow for empty call to just retrieve the queue.

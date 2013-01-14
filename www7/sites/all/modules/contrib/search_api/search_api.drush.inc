@@ -202,7 +202,7 @@ function drush_search_api_index($index_id = NULL, $limit = NULL, $batch_size = N
 
     // Create the batch.
     if (!_search_api_batch_indexing_create($index, $batch_size, $limit, $remaining, TRUE)) {
-      drush_log(dt("Couldn't create a batch, please check the batch_sise and limit parameters."), 'error');
+      drush_log(dt("Couldn't create a batch, please check the batch size and limit parameters."), 'error');
     }
     else {
       // Launch the batch process.

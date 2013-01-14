@@ -39,7 +39,9 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
     $this->adapter->addFacet($this->facet, $query);
     // Change limit to "unlimited" (-1).
     $options = &$query->getOptions();
-    $options['search_api_facets'][$this->facet['name']]['limit'] = -1;
+    if (!empty($options['search_api_facets'][$this->facet['name']])) {
+      $options['search_api_facets'][$this->facet['name']]['limit'] = -1;
+    }
 
     if ($active = $this->adapter->getActiveItems($this->facet)) {
       $item = end($active);
