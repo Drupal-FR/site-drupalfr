@@ -1,17 +1,9 @@
 <?php
-// $Id: userpoints.admin.inc,v 1.1.2.11 2010/12/01 10:15:03 berdir Exp $
 
 /**
  * @file
  * Admin menu callbacks for userpoints.module.
  */
-
-/**
- * Approves moderated points.
- */
-function userpoints_admin_approve($operation, $txn_id) {
-  return drupal_get_form('userpoints_confirm_approve', $operation, (int)$txn_id);
-}
 
 function userpoints_confirm_approve_submit($form, &$form_state) {
   global $user;
@@ -29,35 +21,27 @@ function userpoints_confirm_approve_submit($form, &$form_state) {
 /**
  * Form builder for add/edit userpoints transaction form.
  */
-function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
-  global $user;
+function userpoints_admin_txn($form, &$form_state, $mode, $txn = NULL) {
+
+  drupal_add_css(drupal_get_path('module', 'userpoints') . '/userpoints.css');
 
   $timestamp = format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i O');
-  if ($mode == 'edit' && $txn_id) {
-    $txn = db_query('SELECT * FROM {userpoints_txn} WHERE txn_id = :txn_id', array(':txn_id' => $txn_id))->fetch();
-
-    if (!$txn) {
-      // Failed to load transaction, display not found page.
-      drupal_not_found();
-      drupal_exit();
-    }
-
+  if ($mode == 'edit') {
+    drupal_set_title(t('Edit !points transaction', userpoints_translation()));
     $timestamp = format_date($txn->time_stamp, 'custom', 'Y-m-d H:i:s O');
-    $txn_user = user_load($txn->uid);
+    $txn_user = $txn->user;
 
     $form['txn'] = array(
       '#type' => 'value',
       '#value' => $txn,
     );
   }
-  elseif ($mode == 'add' && $txn_id) {
-    $txn_user = user_load($txn_id);
-  } elseif ($mode == 'edit') {
-    // Edit but now transaction id given, display not found page.
-    drupal_not_found();
-    drupal_exit();
+  elseif ($mode == 'add') {
+    drupal_set_title(t('Add !points', userpoints_translation()));
+    if ($txn) {
+      $txn_user = user_load($txn);
+    }
   }
-
   $form['txn_user'] = array(
       '#type' => 'textfield',
       '#title' => t('User Name'),
@@ -82,8 +66,32 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
       '#weight' => -15,
   );
 
+  if (module_exists('taxonomy')) {
+    $options = userpoints_get_categories();
+    $form['tid'] = array(
+      '#type' => 'select',
+      '#title' => t('Category'),
+      '#default_value' => isset($txn->tid) ? $txn->tid : userpoints_get_default_tid(),
+      '#options' => $options,
+      '#description' => t('The !points category that should apply to this transaction.', userpoints_translation()),
+      '#weight' => 0,
+      // Only show the category if there are actually categories to choose from.
+      '#access' => count($options) > 1,
+    );
+  }
+
+  $form['additional_settings'] = array(
+    '#type' => 'vertical_tabs',
+  );
+
+  $form['status'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Status'),
+    '#group' => 'additional_settings',
+  );
+
   if ($mode == 'add') {
-    $form['moderate'] = array(
+    $form['status']['moderate'] = array(
       '#title' => t('Moderated'),
       '#type' => 'checkbox',
       '#description' => t('If checked, this !points transaction must be approved, through the moderation process.', userpoints_translation()),
@@ -93,7 +101,7 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
     );
   }
   else {
-    $form['status'] = array(
+    $form['status']['status'] = array(
       '#title' => t('Approval status'),
       '#type' => 'radios',
       '#options' => userpoints_txn_status(),
@@ -104,7 +112,7 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
     );
   }
 
-  $form['time_stamp'] = array(
+  $form['status']['time_stamp'] = array(
     '#type' => 'textfield',
     '#title' => t('Date/Time'),
     '#default_value' => $timestamp,
@@ -129,7 +137,7 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
       $expirydate = format_date($expirydate, 'custom', 'Y-m-d H:i:s O');
     }
   }
-  $form['expirydate'] = array(
+  $form['status']['expirydate'] = array(
       '#type' => 'textfield',
       '#title' => t('Expiration date'),
       '#default_value' => $expirydate ? $expirydate : '',
@@ -138,32 +146,25 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
       '#description' => t('The date and time that the !points should expire. Use this format: YYYY-MM-DD HH:MM +ZZZZ. Leave this field blank if the !points should never expire.', userpoints_translation()),
       '#weight' => 25,
   );
-  if (module_exists('taxonomy')) {
-    $options = userpoints_get_categories();
-    $form['tid'] = array(
-      '#type' => 'select',
-      '#title' => t('Category'),
-      '#default_value' => isset($txn->tid) ? $txn->tid : userpoints_get_default_tid(),
-      '#options' => $options,
-      '#description' => t('The !points category that should apply to this transaction.', userpoints_translation()),
-      '#weight' => 0,
-      // Only show the category if there are actually categories to choose from.
-      '#access' => count($options) > 1,
-    );
-  }
-  
-  $form['operation'] = array(
+
+  $form['reason'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Reason'),
+    '#group' => 'additional_settings',
+  );
+
+  $form['reason']['operation'] = array(
       '#type' => 'textfield',
       '#title' => t('Operation'),
       '#default_value' => isset($txn->operation) ? $txn->operation : t('admin'),
-      '#size' => 32,
       '#maxlength' => 48,
-      '#description' => t('The operation type for this transaction (default is %admin).', array('%admin' => t('admin'))),
+      '#description' => t('The operation type for this transaction (default is %admin). Any value is valid but using a defined operation will cause an auto-generated description (specific to the chosen operation) to be included. This description can be translated into multiple languages.', array('%admin' => t('admin'))),
       '#weight' => 5,
       '#required' => FALSE,
+      '#autocomplete_path' => 'userpoints/operation-autocomplete',
   );
 
-  $form['description'] = array(
+  $form['reason']['description'] = array(
       '#type' => 'textarea',
       '#title' => t('Description'),
       '#default_value' => isset($txn->description) ? $txn->description : '',
@@ -174,18 +175,47 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
   );
 
   $form['reference'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Reference'),
+    '#group' => 'additional_settings',
+  );
+
+  $options = array('' => '< ' . t('None') . ' >');
+  foreach (entity_get_info() as $type => $info) {
+    $options[$type] = $info['label'];
+  }
+  $form['reference']['entity_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Linked entity'),
+    '#weight' => 0,
+    '#options' => $options,
+    '#default_value' => isset($txn->entity_type) ? $txn->entity_type : '',
+  );
+
+  $form['reference']['entity_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Entity ID'),
+    '#title_display' => 'invisible',
+    '#weight' => 5,
+    '#size' => 5,
+    '#maxlength' => 20,
+    '#default_value' => isset($txn->entity_id) ? $txn->entity_id : '',
+    '#description' => t('Choose the entity type and ID to be referenced. A link to the entity will be shown.'),
+  );
+
+  $form['reference']['reference'] = array(
       '#type' => 'textfield',
-      '#title' => t('Reference'),
+      '#title' => t('Internal reference'),
       '#default_value' => isset($txn->reference) ? $txn->reference : '',
       '#size' => 30,
       '#maxlength' => 128,
       '#description' => t('Enter an optional reference code for this transaction. This is for internal tracking and is not shown to the end user.', userpoints_translation()),
-      '#weight' => 15,
+      '#weight' => 10,
   );
 
   $approved_by = !empty($txn->approver_uid) ? user_load($txn->approver_uid) : NULL;
   if ($approved_by) {
-    $form['approver'] = array(
+    $form['status']['approver'] = array(
       '#type' => 'textfield',
       '#title' => t('Moderator'),
       '#default_value' => $approved_by->name,
@@ -207,6 +237,51 @@ function userpoints_admin_txn($form, &$form_state, $mode, $txn_id = NULL) {
       '#weight' => 50,
   );
   return $form;
+}
+/**
+ * Autocomplete callback for search an operation.
+ *
+ * @param $search
+ *   Search string.
+ */
+function userpoints_operation_autocomplete($search) {
+  $results = array();
+  if (!empty($search)) {
+    foreach (userpoints_get_info() as $operation => $info) {
+      if (strpos($operation, $search) !== FALSE) {
+        $results[$operation] = userpoints_create_operation_autocomplete_label($operation, $info, $search);
+      }
+      elseif (isset($info['admin description']) && strpos($info['admin description'], $search) !== FALSE) {
+        $results[$operation] = userpoints_create_operation_autocomplete_label($operation, $info, $search);
+      }
+      elseif (isset($info['description']) && strpos($info['description'], $search) !== FALSE) {
+        $results[$operation] = userpoints_create_operation_autocomplete_label($operation, $info, $search);
+      }
+    }
+  }
+  drupal_json_output((object)$results);
+}
+
+/**
+ * Create a autocomplete label with highlighted search text.
+ *
+ * @param $operation
+ *   Operation string.
+ * @param $info
+ *   Operation info array.
+ * @param $search
+ *   Search text that will be highlighted if found.
+ *
+ * @return
+ *   Highlighted label. If existing, the admin description is used and if not,
+ *   the operation string.
+ */
+function userpoints_create_operation_autocomplete_label($operation, $info, $search) {
+  $label = $operation;
+  if (!empty($info['admin description'])) {
+    $label = $info['admin description'];
+  }
+  return preg_replace("/(" . preg_quote($search) . ")/i","<strong>$1</strong>", $label);
 }
 
 /**
@@ -252,6 +327,10 @@ function userpoints_admin_txn_submit($form, &$form_state) {
       // Check for the existence of an expirydate.
       $params['expirydate'] = strtotime($form_state['values']['expirydate']);
     }
+    if (!empty($form_state['values']['entity_id']) && !empty($form_state['values']['entity_type'])) {
+      $params['entity_type'] = $form_state['values']['entity_type'];
+      $params['entity_id'] = (int)$form_state['values']['entity_id'];
+    }
   }
   else {
     $expirydate = 0;
@@ -282,6 +361,10 @@ function userpoints_admin_txn_submit($form, &$form_state) {
       'txn_id' => $form_state['values']['txn']->txn_id,
       'display' => FALSE,
     );
+    if (!empty($form_state['values']['entity_id']) && !empty($form_state['values']['entity_type'])) {
+      $params['entity_type'] = $form_state['values']['entity_type'];
+      $params['entity_id'] = (int)$form_state['values']['entity_id'];
+    }
     drupal_set_message(t('Changes to the !points transaction have been saved.', userpoints_translation()));
   }
   userpoints_userpointsapi($params);
@@ -292,38 +375,33 @@ function userpoints_admin_txn_submit($form, &$form_state) {
 /**
  * Provides an administrative interface for managing points.
  */
-function userpoints_admin_points($tid = NULL) {
-  $categories = userpoints_get_categories();
-  $show_category = count($categories) > 1;
+function userpoints_admin_points($form, &$form_state) {
 
-  $header = array(
-      array('data' => t('User'), 'field' => 'u.name'),
-      array('data' => t('Category'), 'field' => 't.name'),
-      array('data' => t('!Points', userpoints_translation()), 'field' => 'p.points', 'sort' => 'desc'),
-  );
+  // If this is an AJAX request, update $_GET['q'] so that table sorting and
+  // similar links are using the correct base path.
+  if ($_GET['q'] == 'system/ajax') {
+    $_GET['q'] = 'admin/config/people/userpoints';
+  }
 
+  $header = userpoints_get_list_header();
   $query = db_select('userpoints', 'p')->extend('PagerDefault')->extend('TableSort')
-                  ->fields('p', array('uid', 'points', 'tid'))
-                  ->fields('u', array('name'))
-                  ->groupBy('p.uid')
-                  ->groupBy('u.name')
-                  ->groupBy('p.points')
-                  ->groupBy('p.tid')
-                  ->groupBy('t.name')
-                  ->orderByHeader($header)
-                  ->limit(variable_get(USERPOINTS_REPORT_USERCOUNT, 30));
+    ->fields('p', array('uid', 'points', 'tid'))
+    ->fields('u', array('name'))
+    ->groupBy('p.uid')
+    ->groupBy('u.name')
+    ->groupBy('p.points')
+    ->groupBy('p.tid')
+    ->orderByHeader($header)
+    ->limit(variable_get(USERPOINTS_REPORT_USERCOUNT, 30));
 
   $query->join('users', 'u', 'p.uid = u.uid');
-  $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
-
-  // Check for filtering. isset() is used because 0 is a valid value
-  // (Uncategorized).
-  if (isset($tid)) {
-    // If a category is selected, limit both the default query and the query
-    // that displays pending points to this category.
-    $query->condition('p.tid', (int)$tid);
-    $active_category = $categories[$tid];
+  if (module_exists('taxonomy')) {
+    $query->groupBy('t.name');
+    $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
   }
+
+  $values = userpoints_filter_parse_input($form_state);
+  $active_category = userpoints_filter_query($query, $values);
 
   if (isset($active_category)) {
     drupal_set_title(t('Totals (%category category)', userpoints_translation() + array('%category' => $active_category)), PASS_THROUGH);
@@ -339,25 +417,21 @@ function userpoints_admin_points($tid = NULL) {
 
   $rows = array();
   foreach ($query->execute() as $data) {
-    $link = userpoints_admin_access('edit') ? l(t("(details)"), "myuserpoints/$data->uid") : '';
-    $rows[] = array(
-        array('data' => trim(theme('username', array('account' => $data)) . ' ' . $link)),
-        array('data' => isset($categories[$data->tid]) ? $categories[$data->tid] : $categories[0], 'align' => 'right'),
-        array('data' => $data->points, 'align' => 'right'),
-    );
+    $rows[] = userpoints_get_list_row($data);
   }
 
-  // If there is only one category there is no sense in display the category filter dropdown.
   $output = array();
-  if ($categories > 1) {
-    $output['filter'] = drupal_get_form('userpoints_filter_cat_select', 'admin/config/people/userpoints/', $tid);
-  }
-  $output['table'] = array(
+  $output['form'] = userpoints_filter_form(NULL, $values);
+  $output['list'] = array(
+    '#type' => 'container',
+    '#id' => 'userpoints_list_wrapper',
+  );
+  $output['list']['table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
   );
-  $output['pager'] = array(
+  $output['list']['pager'] = array(
     '#theme' => 'pager',
   );
   return $output;
@@ -368,32 +442,16 @@ function userpoints_admin_points($tid = NULL) {
  * Displays a list of transactions.
  *
  */
-function userpoints_admin_transactions($tid = NULL) {
+function userpoints_admin_transactions($form, &$form_state, $moderate) {
 
-  // Load the categories and check if there are multiples or only a single one.
-  $categories = userpoints_get_categories();
-  $show_category = count($categories) > 1;
-
-  // Store context in the output array so that modules have access to it.
-  $output = array(
-    '#tid' => $tid,
-    '#attached' => array(
-      'css' => array(
-        drupal_get_path('module', 'userpoints') . '/userpoints.css',
-      ),
-    ),
-  );
-
-  // Only display the category selection if there is more than one category
-  // to select from. This check is specific to the categories the user has
-  // points in.
-  if ($show_category) {
-    $output['form'] = drupal_get_form('userpoints_filter_cat_select', 'admin/config/people/userpoints/list/transactions/', $tid);
-    $output['form']['#weight'] = -10;
+  // If this is an AJAX request, update $_GET['q'] so that table sorting and
+  // similar links are using the correct base path.
+  if ($_GET['q'] == 'system/ajax') {
+    $_GET['q'] = $moderate ? 'admin/config/people/userpoints/moderate' : 'admin/config/people/userpoints/transaction';
   }
 
   $settings = array(
-    'show_category' => $show_category,
+    'show_status' => !$moderate,
   );
   $header = userpoints_get_transaction_header($settings);
   $query = db_select('userpoints_txn', 'p')->extend('PagerDefault')->extend('TableSort')
@@ -403,22 +461,32 @@ function userpoints_admin_transactions($tid = NULL) {
     ->orderBy('p.txn_id', 'DESC')
     ->limit(variable_get(USERPOINTS_REPORT_USERCOUNT, 30));
 
-  $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
-
-  // Check for filtering. isset() is used because 0 is a valid value
-  // (Uncategorized).
-  if (isset($tid)) {
-    // If a category is selected, limit both the default query and the query
-    // that displays pending points to this category.
-    $query->condition('p.tid', (int)$tid);
-    $active_category = $categories[$tid];
+  if ($moderate) {
+    $query->condition('p.status', USERPOINTS_TXN_STATUS_PENDING);
   }
 
-  if (isset($active_category)) {
-    drupal_set_title(t('Transactions (%category category)', userpoints_translation() + array('%category' => $active_category)), PASS_THROUGH);
+  if (module_exists('taxonomy')) {
+    $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
+  }
+
+  $values = userpoints_filter_parse_input($form_state);
+  $active_category = userpoints_filter_query($query, $values);
+
+  if ($moderate) {
+    if (isset($active_category)) {
+      drupal_set_title(t('Moderation (%category category)', userpoints_translation() + array('%category' => $active_category)), PASS_THROUGH);
+    }
+    else {
+      drupal_set_title(t('Moderation'));
+    }
   }
   else {
-    drupal_set_title(t('Transactions'));
+    if (isset($active_category)) {
+      drupal_set_title(t('Transactions (%category category)', userpoints_translation() + array('%category' => $active_category)), PASS_THROUGH);
+    }
+    else {
+      drupal_set_title(t('Transactions'));
+    }
   }
 
   $rows = array();
@@ -426,15 +494,30 @@ function userpoints_admin_transactions($tid = NULL) {
     $rows[] = userpoints_get_transaction_row($transaction, $settings);
   }
 
-  $output['table'] = array(
+  // Store context in the output array so that modules have access to it.
+  $output = array(
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'userpoints') . '/userpoints.css',
+      ),
+    ),
+  );
+  $output['form'] = userpoints_filter_form(NULL, $values);
+
+  $output['list'] = array(
+    '#type' => 'container',
+    '#id' => 'userpoints_list_wrapper',
+  );
+
+  $output['list']['table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
-    '#empty' => t('No !Points earned', userpoints_translation()),
+    '#empty' => $moderate ? t('No !points awaiting moderation', userpoints_translation()) : t('No !Points earned', userpoints_translation()),
     '#weight' => -5,
-    '#attributes' => array('class' => array('userpoints-transactions-list')),
+    '#attributes' => array('class' => array($moderate ? 'userpoints-moderation-list' : 'userpoints-transactions-list')),
   );
-  $output['pager'] = array(
+  $output['list']['pager'] = array(
     '#theme' => 'pager',
     '#weight' => 0,
   );
@@ -442,103 +525,40 @@ function userpoints_admin_transactions($tid = NULL) {
   return $output;
 }
 
-function userpoints_admin_manage($tid = NULL) {
-  $categories = userpoints_get_categories();
-  $show_category = count($categories) > 1;
-
-  // Store context in the output array so that modules have access to it.
-  $output = array(
-    '#tid' => $tid,
-    '#attached' => array(
-      'css' => array(
-        drupal_get_path('module', 'userpoints') . '/userpoints.css',
-      ),
-    ),
-  );
-
-  $settings = array(
-    'show_category' => $show_category,
-    'show_status' => FALSE,
-  );
-  $header = userpoints_get_transaction_header($settings);
-
-  $query = db_select('userpoints_txn', 'p')->extend('PagerDefault')->extend('TableSort')
-    ->fields('p', array('txn_id', 'uid', 'time_stamp', 'points', 'operation', 'status', 'entity_type', 'entity_id', 'tid'))
-    ->condition('p.status', USERPOINTS_TXN_STATUS_PENDING)
-    ->orderByHeader($header)
-    // Enforce consistent sort order.
-    ->orderBy('p.txn_id', 'DESC')
-    ->limit(variable_get(USERPOINTS_REPORT_USERCOUNT, 30));
-
-  $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
-
-  // Check for filtering. isset() is used because 0 is a valid value
-  // (Uncategorized).
-  if (isset($tid)) {
-    // If a category is selected, limit both the default query and the query
-    // that displays pending points to this category.
-    $query->condition('p.tid', (int)$tid);
-    $active_category = $categories[$tid];
-  }
-
-  if (isset($active_category)) {
-    drupal_set_title(t('Moderation (%category category)', userpoints_translation() + array('%category' => $active_category)), PASS_THROUGH);
-  }
-  else {
-    drupal_set_title(t('Moderation'));
-  }
-  $rows = array();
-  foreach ($query->execute() as $data) {
-    $rows[] = userpoints_get_transaction_row($data, $settings);
-  }
-
-  if ($show_category) {
-    $output['filter'] = drupal_get_form('userpoints_filter_cat_select', 'admin/config/people/userpoints/moderate/', $tid);
-  }
-  $output['table'] = array(
-    '#theme' => 'table',
-    '#header' => $header,
-    '#rows' => $rows,
-    '#empty' => t('No !points awaiting moderation', userpoints_translation()),
-    '#attributes' => array('class' => array('userpoints-moderation-list')),
-  );
-  $output['pager'] = array(
-    '#theme' => 'pager',
-  );
-  return $output;
-}
-
-
-function userpoints_confirm_approve($form, $form_state, $operation, $txn_id) {
+function userpoints_confirm_approve($form, $form_state, $operation, $transaction) {
   $form = array(
     'txn_id' => array(
         '#type' => 'value',
-        '#value' => $txn_id,
+        '#value' => $transaction->txn_id,
     ),
   );
 
-  $transaction = userpoints_transaction_load($txn_id);
   $arguments = array(
     '!user' => theme('username', array('account' => $transaction->user)),
     '%category' => $transaction->category,
   ) + userpoints_translation();
 
   if ($operation == 'approve') {
-    $question = format_plural($transaction->points, 'Do you want to approve @count !point for !user in the %category category?', 'Do you want to approve @count !points for !user in the %category category?', $arguments);
+    $question = t('Approve transaction');
+    $description = format_plural($transaction->points, 'Do you want to approve @count !point for !user in the %category category?', 'Do you want to approve @count !points for !user in the %category category?', $arguments);
     $form['operation'] = array(
       '#type' => 'value',
       '#value' => USERPOINTS_TXN_STATUS_APPROVED,
     );
   }
   else {
-    $question = format_plural($transaction->points, 'Do you want to decline @count !point for !user in the %category category?', 'Do you want to decline @count !points for !user in the %category category?', $arguments);
+    $question = t('Decline transaction');
+    $description = format_plural($transaction->points, 'Do you want to decline @count !point for !user in the %category category?', 'Do you want to decline @count !points for !user in the %category category?', $arguments);
     $form['operation'] = array(
       '#type' => 'value',
       '#value' => USERPOINTS_TXN_STATUS_DECLINED,
     );
   }
 
-  return confirm_form($form, $question, 'admin/config/people/userpoints/moderate', t('Reason: !reason', array('!reason' => userpoints_create_description($transaction))));
+  $description = '<p><strong>' . $description . '</strong></p>';
+  $description .= '<p>' . t('Reason: !reason', array('!reason' => userpoints_create_description($transaction))) . '</p>';
+
+  return confirm_form($form, $question, 'admin/config/people/userpoints/moderate', $description);
 }
 /**
  * Menu callback for settings form.
@@ -625,7 +645,7 @@ function userpoints_admin_settings($form, &$form_state) {
       '#title' => t('Expire !points after', userpoints_translation()),
       '#description' => t('Once !points have been obtained by the user
                           they will expire according to this setting', userpoints_translation()),
-      '#options' => expiry_dates(),
+      '#options' => userpoints_expiry_dates(),
       '#default_value' => variable_get(USERPOINTS_EXPIREAFTER_DATE, NULL),
   );
 
@@ -675,7 +695,7 @@ function userpoints_admin_settings($form, &$form_state) {
       '#title' => t('Display message'),
       '#default_value' => variable_get(USERPOINTS_DISPLAY_MESSAGE, 1),
       '#options' => array(0 => t('No'), 1 => t('Yes')),
-      '#description' => t('Determines if a message should be displayed whenever !points are awarded/substracted.', userpoints_translation()),
+      '#description' => t('Determines if a message should be displayed whenever !points are awarded/subtracted.', userpoints_translation()),
   );
   $group = "reports";
   $form[$group] = array(
@@ -708,6 +728,14 @@ function userpoints_admin_settings($form, &$form_state) {
       '#description' => t('When listing !points by user limit how many users are displayed on a single page', userpoints_translation()),
   );
 
+  $form[$group]['userpoints_truncate'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Truncation length for the "Reason" column in transaction listings'),
+    '#description'   => t('Choose the truncation length in characters for the "Reason" column in transaction listings. The reason is not truncated on the transaction details page.'),
+    '#default_value' => variable_get('userpoints_truncate', 30),
+    '#size'          => 5,
+    '#maxlength'     => 5,
+  );
 
   // Categories will only appear if the taxonomy module is enabled as
   // the module is required for this functionality but not necessarily
@@ -750,7 +778,7 @@ function userpoints_admin_settings($form, &$form_state) {
       '#maxlength' => 20,
     );
   }
-  // New configuration options to overide current timestamp.
+  // New configuration options to override current timestamp.
   $group = "stamping";
   $form[$group] = array(
       '#type' => 'fieldset',
@@ -763,7 +791,7 @@ function userpoints_admin_settings($form, &$form_state) {
       '#type' => 'checkbox',
       '#title' => t('Always use system time'),
       '#default_value' => variable_get(USERPOINTS_TRANSACTION_TIMESTAMP, 1),
-      '#description' => t('Sets if the transaction timestamp should obey current time, or can be modified by the API operations. Unchecking this option will allow customization of timetamp for the transactions.'),
+      '#description' => t('Sets if the transaction timestamp should obey current time, or can be modified by the API operations. Unchecking this option will allow customization of timestamp for the transactions.'),
   );
 
   $form['settings_additional'] = array(

@@ -1,5 +1,4 @@
 <?php
-// $Id: userpoints_service.module,v 1.1.6.1 2010/07/30 11:20:22 berdir Exp $
 
 /**
  * Implementation of hook_help().
@@ -14,118 +13,139 @@ function userpoints_service_help($section) {
 }
 
 /**
- * Implementation of hook_service().
+ * Implementation of hook_services_resources().
  */
- 
-function userpoints_service_service() {
+function userpoints_service_services_resources() {
   return array(
-
-    array(
-      '#method'   => 'userpoints.get',
-      '#callback' => 'userpoints_service_get',
-      '#args'     => array(
-        array(
-          '#name' => 'uid',
-          '#type' => 'int',
-          '#description' => t('A valid Drupal User ID.'),
-        ), 
-        array(
-          '#name'        => 'tid',
-          '#type'        => 'int',
-          '#optional'    => TRUE,
-          '#description' => t('An optional Term ID for the category.'),
-        ), 
+    'userpoints' => array(
+      'retrieve' => array(
+        'help' => 'Retrieve the amount of points a user has',
+        'file' => array('file' => 'inc', 'module' => 'userpoints_service'),
+        'callback' => 'userpoints_service_get',
+        'access callback' => 'userpoints_service_view_access',
+        'access arguments append' => TRUE,
+        'args' => array(
+          array(
+            'name' => 'uid',
+            'type' => 'int',
+            'description' => 'The User ID for which the points should be loaded. Defaults to the .',
+            'source' => array('path' => 0),
+          ),
+          array(
+            'name' => 'tid',
+            'type' => 'all',
+            'optional' => TRUE,
+            'source' => array('param' => 'tid'),
+            'description' => t('An optional Term ID for the category.'),
+          ),
+          array(
+            'name' => 'type',
+            'type' => 'string',
+            'optional' => TRUE,
+            'source' => array('param' => 'type'),
+            'description' => t('The type of points, either max or current, to which it defaults.'),
+          ),
+        ),
       ),
-      '#return'   => 'struct',
-      '#help'     => t('Retrieves the number of points the user has.')),
-    
-    array(
-      '#method'   => 'userpoints.points',
-      '#callback' => 'userpoints_service_points',
-      '#args'     => array(
-        array(
-          '#name'        => 'uid',
-          '#type'        => 'int',
-          '#description' => t('A valid Drupal User ID.'),
-        ), 
-        array(
-          '#name'        => 'points',
-          '#type'        => 'int',
-          '#description' => t('Number of points to add/subtract.'),
-        ), 
-        array(
-          '#name'        => 'tid',
-          '#type'        => 'int',
-          '#optional'    => TRUE,
-          '#description' => t('An optional Term ID for the category.'),
-        ), 
-        array(
-          '#name'        => 'event',
-          '#type'        => 'string',
-          '#optional'    => TRUE,
-          '#description' => t('An optional event ID for this transaction.'),
-        ), 
-        array(
-          '#name'        => 'description',
-          '#type'        => 'string',
-          '#optional'    => TRUE,
-          '#description' => t('An optional description of this transaction.'),
-        ), 
+      'index' => array(
+        'help' => 'Index of all users with points',
+        'file' => array('file' => 'inc', 'module' => 'userpoints_service'),
+        'callback' => 'userpoints_service_index',
+        'access callback' => 'userpoints_service_view_access',
+        'args' => array(
+          array(
+            'name' => 'page',
+            'optional' => TRUE,
+            'type' => 'int',
+            'description' => 'The zero-based index of the page to get, defaults to 0.',
+            'default value' => 0,
+            'source' => array('param' => 'page'),
+          ),
+          array(
+            'name' => 'tid',
+            'type' => 'string',
+            'optional' => TRUE,
+            'source' => array('param' => 'tid'),
+            'description' => t('An optional Term ID for the category.'),
+          ),
+          array(
+            'name' => 'sort',
+            'type' => 'string',
+            'optional' => TRUE,
+            'default value' => 'points',
+            'source' => array('param' => 'sort'),
+            'description' => t('Sort field'),
+          ),
+          array(
+            'name' => 'dir',
+            'type' => 'string',
+            'optional' => TRUE,
+            'default value' => 'DESC',
+            'source' => array('param' => 'dir'),
+            'description' => t('Sort direction'),
+          ),
+        ),
       ),
-      '#return'   => 'struct',
-      '#help'     => t('Adds/subtracts points to a user.')),
+      'actions' => array(
+        'add' => array(
+          'help' => 'Add or subtract a given amount of points for a user',
+          'file' => array('file' => 'inc', 'module' => 'userpoints_service'),
+          'callback' => 'userpoints_service_add',
+          'access callback' => 'userpoints_admin_access',
+          'access arguments' => array('add'),
+          'args' => array(
+            array(
+              'name' => 'uid',
+              'type' => 'int',
+              'optional' => FALSE,
+              'description' => 'A valid Drupal User ID.',
+              'source' => array('data' => 'uid'),
+            ),
+            array(
+              'name' => 'points',
+              'type' => 'int',
+              'optional' => FALSE,
+              'source' => array('data' => 'points'),
+              'description' => 'Number of points to add/subtract.',
+            ),
+            array(
+              'name' => 'tid',
+              'type' => 'int',
+              'optional' => TRUE,
+              'source' => array('data' => 'tid'),
+              'description' => t('An optional Term ID for the category.'),
+            ),
+            array(
+              'name' => 'operation',
+              'type' => 'string',
+              'optional' => TRUE,
+              'source' => array('data' => 'operation'),
+              'description' => t('An operation string for this transaction.'),
+            ),
+            array(
+              'name' => 'description',
+              'type' => 'string',
+              'optional' => TRUE,
+              'source' => array('data' => 'description'),
+              'description' => t('An optional description of this transaction.'),
+            ),
+            array(
+              'name' => 'entity_type',
+              'type' => 'string',
+              'optional' => TRUE,
+              'source' => array('data' => 'entity_type'),
+              'description' => t('An optional description of this transaction.'),
+            ),
+            array(
+              'name' => 'entity_id',
+              'type' => 'int',
+              'optional' => TRUE,
+              'source' => array('data' => 'entity_id'),
+              'description' => t('An optional description of this transaction.'),
+            ),
+          ),
+        ),
+      ),
+    ),
   );
-}
-
-/**
- * Get the number of points
- */
-function userpoints_service_get($uid, $tid = NULL) {
-  if (!$uid) {
-    return services_error(t('User ID parameter is required.'));
-  }
-
-  $points = userpoints_get_current_points($uid, $tid);
-
-  $return = new stdClass();
-  $return->points = $points;
-
-  return $return;
-}
-
-/**
- * Logout user
- */
-function userpoints_service_points($uid, $points, $tid = NULL, $event = 'userpoints service', $description = NULL) {
-  if (!$uid) {
-    return services_error(t('User ID parameter is required.'));
-  }
-
-  if (!$points) {
-    return services_error(t('Points parameter must be a negative or positive number.'));
-  }
-
-  $params = array (
-    'uid'         => $uid,
-    'points'      => $points,
-    'tid'         => $tid,
-    'event'       => $event,
-    'description' => $description,
-    'display'     => FALSE,
-    'moderate'    => FALSE,
-  );
-
-  $result = userpoints_userpointsapi($params);
-
-  $return = new stdClass();
-
-  if (!$result['status']) {
-    $return->reason = $result['reason'];
-    $return->status = FALSE;
-  }
-  else {
-    $return->status = TRUE;
-  }
-
-  return $return;
 }

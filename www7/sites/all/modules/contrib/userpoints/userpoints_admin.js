@@ -1,4 +1,3 @@
-// $Id: userpoints_admin.js,v 1.1.2.2 2010/10/20 23:18:41 berdir Exp $
 (function ($) {
   Drupal.behaviors.userpointsAdminFieldsetSummaries = {
     attach: function (context) {
@@ -72,7 +71,6 @@
         else {
           return Drupal.t('Allow customization of transaction time.');
         }
-        return Drupal.t('Default category %category, %display_category displayed.', {'%category' : category, '%display_category' : display_category});
       });
 
       // Expiration.

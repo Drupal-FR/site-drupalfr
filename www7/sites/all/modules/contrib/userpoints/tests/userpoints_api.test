@@ -1,5 +1,4 @@
 <?php
-// $Id: userpoints_api.test,v 1.1.4.3 2010/10/10 13:30:20 berdir Exp $
 // Author: Jacob Redding
 // additional tests added by Zhao ning (nzhao, user/96328)
 
@@ -7,7 +6,82 @@
  * @file
  * Contains test classes for userpoints module.
  */
-class UserpointsTestCase extends DrupalWebTestCase {
+
+
+/**
+ * Userpoints base test class with various helper functions.
+ */
+class UserpointsBaseTestCase extends DrupalWebTestCase {
+
+  /**
+   * Add points through the admin form.
+   *
+   * @param $points
+   *   Amount of points to add.
+   * @param $user
+   *   User object for which to grant points for.
+   * @param $total
+   *   Amount of points the user should have after the points have been added.
+   *   If not NULL, the confirmation string is checked and so is
+   *   userpoints_get_current_points().
+   *
+   * @return
+   *   The most recent transaction id, assuming that this belongs to this
+   *   transaction.
+   */
+  function addPoints($points, $user, $total = NULL) {
+    $edit = array(
+      'txn_user' => $user->name,
+      'points' => $points,
+    );
+    $this->drupalPost('admin/config/people/userpoints/add', $edit, t('Save'));
+    if ($total !== NULL) {
+      $categories = userpoints_get_categories();
+      $tid = userpoints_get_default_tid();
+      $category = $categories[$tid];
+      $this->assertText(t('@name just earned @points points and now has @total points in the @category category.', array('@name' => $user->name, '@points' => $points, '@total' => $total, '@category' => $category)), t('Correct confirmation message displayed.'));
+      $this->assertEqual($total, userpoints_get_current_points($user->uid, $tid), t('User has the correct total amount of points.'));
+    }
+    return db_query('SELECT MAX(txn_id) FROM {userpoints_txn} WHERE uid = :uid', array(':uid' => $user->uid))->fetchField();
+  }
+
+  /**
+   * Verify the current and optionally max points in a specific category.
+   *
+   * @param $uid
+   *   User uid for the user that needs to be tested.
+   * @param $current
+   *   The amount of points the user is currently supposed to have.
+   * @param $max
+   *   The amount of max points of the user. Only tested if not NULL.
+   * @param $tid
+   *   The category that needs to be checked. Default is used is none is
+   *   provided.
+   */
+  function verifyPoints($uid, $current, $max = NULL, $tid = NULL) {
+
+    // Check if a term id is passed as a parameter.
+    if (!$tid) {
+      // It is not, so get the default term id.
+      $tid = userpoints_get_default_tid();
+    }
+
+    $api_current = userpoints_get_current_points($uid, $tid);
+    $this->assertEqual($current, $api_current, t('Current points for tid %tid are correct (expected: %expected, actual: %actual).', array('%expected' => $current, '%actual' => $api_current, '%tid' => $tid)));
+    if ($max !== NULL) {
+      // Hijack static cache, delete this item from it.
+      $max_cache = &drupal_static('userpoints_get_max_points', array());
+      unset($max_cache[$uid][$tid]);
+      $api_max = userpoints_get_max_points($uid, $tid);
+      $this->assertEqual($max, $api_max, t('Max points for tid %tid are correct (expected: %expected, actual: %actual).', array('%expected' => $max, '%actual' => $api_max, '%tid' => $tid)));
+    }
+  }
+}
+
+/**
+ * API Tests.
+ */
+class UserpointsAPITestCase extends UserpointsBaseTestCase {
 
   private $admin_user;
   private $non_admin_user;
@@ -99,7 +173,7 @@ class UserpointsTestCase extends DrupalWebTestCase {
    */
   function testBasicCall() {
     global $user;
-    
+
     $points = (int) rand(1, 500);
     $sumpoints = $points;
 
@@ -131,10 +205,10 @@ class UserpointsTestCase extends DrupalWebTestCase {
       if (rand() & 1) {
         $points = - $points;
       }
-      if ($points > 0) {
-        $maxpoints = $maxpoints + $points;
-      }
       $sumpoints = $sumpoints + $points;
+      if ($sumpoints > $maxpoints) {
+        $maxpoints = $sumpoints;
+      }
       userpoints_userpointsapi($points);
     }
 
@@ -507,5 +581,222 @@ class UserpointsTestCase extends DrupalWebTestCase {
     $this->assertTrue(is_array($cats), 'Successfully verified userpoints_get_categories() returned an array');
   }
 
+
+  /**
+   * Test that editing points correctly updates the current and max points.
+   */
+  function testEditingTransactions() {
+    // First, add some points to two different categories.
+    $uid = $this->non_admin_user->uid;
+    $params = array(
+      'points' => 100,
+      'tid' => 0,
+      'uid' => $uid,
+    );
+    userpoints_userpointsapi($params);
+
+    $params = array(
+      'points' => 50,
+      'tid' => 1,
+      'uid' => $uid,
+    );
+    userpoints_userpointsapi($params);
+
+    // Add a third transaction that can be edited.
+    $params = array(
+      'points' => 5,
+      'tid' => 0,
+      'uid' => $uid,
+    );
+    $return = userpoints_userpointsapi($params);
+    $txn_id = $return['transaction']['txn_id'];
+
+    // Verify points up to this point.
+    $this->verifyPoints($uid, 105, 105, 0);
+    $this->verifyPoints($uid, 50, 50, 1);
+
+    // Now, edit the transaction. Mix any combination of point, category and
+    // status changes. After the change, verify current and max points.
+
+    // Points change.
+    $params = array(
+      'txn_id' => $txn_id,
+      'points' => -5,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 95, 105, 0);
+
+    // Change status to pending.
+    $params = array(
+      'txn_id' => $txn_id,
+      'status' => USERPOINTS_TXN_STATUS_PENDING,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 100, 105, 0);
+
+    // Change status back to approved.
+    $params = array(
+      'txn_id' => $txn_id,
+      'status' => USERPOINTS_TXN_STATUS_APPROVED,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 95, 105, 0);
+
+    // Change category.
+    $params = array(
+      'txn_id' => $txn_id,
+      'tid' => 1,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 100, 105, 0);
+    $this->verifyPoints($uid, 45, 50, 1);
+
+    // Change points and status.
+    $params = array(
+      'txn_id' => $txn_id,
+      'points' => 3,
+      'status' => USERPOINTS_TXN_STATUS_PENDING,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 100, 105, 0);
+    $this->verifyPoints($uid, 50, 50, 1);
+
+    // Change status back to approved.
+    $params = array(
+      'txn_id' => $txn_id,
+      'status' => USERPOINTS_TXN_STATUS_APPROVED,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 53, 53, 1);
+
+    // Change points and category.
+    $params = array(
+      'txn_id' => $txn_id,
+      'points' => 9,
+      'tid' => 0,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 109, 109, 0);
+    $this->verifyPoints($uid, 50, 53, 1);
+
+    // Change points and status and category.
+    $params = array(
+      'txn_id' => $txn_id,
+      'points' => 10,
+      'tid' => 1,
+      'status' => USERPOINTS_TXN_STATUS_DECLINED,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 100, 109, 0);
+    $this->verifyPoints($uid, 50, 53, 1);
+
+    // Change points and status back to approved.
+    $params = array(
+      'txn_id' => $txn_id,
+      'points' => 4,
+      'status' => USERPOINTS_TXN_STATUS_APPROVED,
+    );
+    userpoints_userpointsapi($params);
+    $this->verifyPoints($uid, 100, 109, 0);
+    $this->verifyPoints($uid, 54, 54, 1);
+
+    $this->verifyPoints($uid, 154, 159, 'all');
+  }
+
 }
 
+/**
+ * Administration UI tests
+ */
+class UserpointsAdminTestCase extends UserpointsBaseTestCase {
+
+  private $admin_user;
+  private $non_admin_user;
+
+  /**
+   * Implements getInfo().
+   */
+  function getInfo() {
+    return array(
+        'name' => t('Userpoints Admin'),
+        'description' => t('Test various userpoints administration forms and listings.'),
+        'group' => t('Userpoints'),
+    );
+  }
+
+  /**
+   * Install userpoints module and create users.
+   */
+  function setUp() {
+    parent::setUp('userpoints');
+
+    // Create an administrator account and log in with that.
+    $this->admin_user = $this->drupalCreateUser(array('administer userpoints'));
+    $this->drupalLogin($this->admin_user);
+  }
+
+
+  function testAddEditPoints() {
+    $user = $this->drupalCreateUser();
+
+    $categories = userpoints_get_categories();
+    $tid = userpoints_get_default_tid();
+    $category = $categories[$tid];
+
+    // Grant some points with admin user.
+    $txn_id = $this->addPoints(10, $user, 10);
+
+    // Go to the listing page, verify that the user is shown.
+    $row = $this->xpath('//table/tbody/tr');
+    //$this->assertEqual(strip_tags((string)$row[0]->td[0]), t('@name (details)', array('@name' => $user->name)), t('User name with details link displayed.'));
+    $this->assertEqual((string)$row[0]->td[1], 10, t('Points correctly displayed.'));
+
+    // Go to the transaction listing page, verify that the transaction is shown.
+    $this->clickLink(t('Transactions'));
+    $row = $this->xpath('//table/tbody/tr');
+    $transaction = userpoints_transaction_load($txn_id);
+    //$this->assertEqual(strip_tags((string)$row[0]->td[0]), $user->name, t('User correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[1], 10, t('Points correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[2], format_date($transaction->time_stamp, 'small'), t('Date correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[3], 'admin', t('Reason correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[4], t('Approved'), t('Status correctly displayed.'));
+
+    $this->clickLink(t('edit'));
+
+    // Verify default values.
+    $this->assertFieldByName('points', 10);
+    $value = $this->xpath("//input[@name=:name and @disabled=:disabled]/@value", array(':name' => 'txn_user', ':disabled' => 'disabled'));
+    $this->assertEqual($value[0]['value'], $user->name, t('User field has the correct value and is disabled.'));
+    $this->assertFieldByName('approver', $this->admin_user->name);
+
+    $edit = array(
+      'points' => 7,
+      'operation' => $this->randomName(),
+      'description' => $this->randomName(),
+      'reference' => $this->randomName(),
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Verify that the transaction has been updated.
+    $this->assertEqual(7, userpoints_get_current_points($user->uid));
+    $row = $this->xpath('//table/tbody/tr');
+    $transaction = userpoints_transaction_load($transaction->txn_id);
+    //$this->assertEqual(strip_tags((string)$row[0]->td[0]), $user->name, t('User correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[1], 7, t('Points correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[2], format_date($transaction->time_stamp, 'small'), t('Date correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[3], $edit['description'], t('Reason correctly displayed.'));
+    $this->assertEqual((string)$row[0]->td[4], t('Approved'), t('Status correctly displayed.'));
+
+    // Go to the listing page, verify that the total points have been updated.
+    $this->clickLink(t('Totals'));
+    $row = $this->xpath('//table/tbody/tr');
+    //$this->assertEqual(strip_tags((string)$row[0]->td[0]), t('@name (details)', array('@name' => $user->name)), t('User name with details link displayed.'));
+    $this->assertEqual((string)$row[0]->td[1], 7, t('Points correctly displayed.'));
+
+    // View transaction details.
+    $this->clickLink(t('Transactions'));
+    $this->clickLink('view');
+
+
+  }
+}

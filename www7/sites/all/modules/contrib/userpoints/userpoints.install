@@ -1,5 +1,4 @@
 <?php
-// $Id: userpoints.install,v 1.15.4.7 2010/12/25 11:27:21 berdir Exp $
 
 /**
  * @file
@@ -57,6 +56,40 @@ function userpoints_schema() {
     ),
     'unique keys' => array(
       'uid_tid' => array('uid', 'tid'),
+    ),
+  );
+
+  $schema['userpoints_total'] = array(
+    'description' => 'Holds the total user points',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'points' => array(
+        'description' => 'Current Points',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'max_points' => array(
+        'description' => 'Out of a maximum points',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'last_update' => array(
+        'description' => 'Timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('uid'),
+    'indexes' => array(
+      'last_update' => array('last_update'),
+      'points' => array('points'),
     ),
   );
 
@@ -181,7 +214,7 @@ function userpoints_uninstall() {
     ->execute();
 
   $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE module='userpoints'")->fetchField();
-  if ($vid) {
+  if ($vid && function_exists('taxonomy_vocabulary_delete')) {
     taxonomy_vocabulary_delete($vid);
   }
 }
@@ -199,12 +232,23 @@ function userpoints_update_7000() {
  * Add index on points columns in userpoints and userpoints_txn, as well as on the two
  * uid columns in userpoints_txn. No need to add a uid index in userpoints, as the
  * compound uid_tid index is used instead when needed.
+ *
+ * Since these indexes are added in a 6.x update as well, they need to be conditional
+ * in this update. Otherwise users get errors, which is bad.
  */
 function userpoints_update_7001() {
-  db_add_index('userpoints', 'points', array('points'));
-  db_add_index('userpoints_txn', 'uid', array('uid'));
-  db_add_index('userpoints_txn', 'approver_uid', array('approver_uid'));
-  db_add_index('userpoints_txn', 'points', array('points'));
+  if (!db_index_exists('userpoints', 'points')) {
+    db_add_index('userpoints', 'points', array('points'));
+  }
+  if (!db_index_exists('userpoints_txn', 'uid')) {
+    db_add_index('userpoints_txn', 'uid', array('uid'));
+  }
+  if (!db_index_exists('userpoints_txn', 'approver_uid')) {
+    db_add_index('userpoints_txn', 'approver_uid', array('approver_uid'));
+  }
+  if (!db_index_exists('userpoints_txn', 'points')) {
+    db_add_index('userpoints_txn', 'points', array('points'));
+  }
 }
 
 /**
@@ -222,4 +266,69 @@ function userpoints_update_7002() {
     'type' => 'varchar',
     'length' => 128,
   ));
+}
+
+/**
+ * Create the {userpoints_total} table.
+ */
+function userpoints_update_7003() {
+  db_create_table('userpoints_total', array(
+    'description' => 'Holds the total user points',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'points' => array(
+        'description' => 'Current Points',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'max_points' => array(
+        'description' => 'Out of a maximum points',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'last_update' => array(
+        'description' => 'Timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('uid'),
+    'indexes' => array(
+      'last_update' => array('last_update'),
+      'points' => array('points'),
+    ),
+  ));
+}
+
+/**
+ * Filling the {userpoints_total} table.
+ */
+function userpoints_update_7004(&$sandbox) {
+  // First run, initialize sandbox and check if we are ready to run.
+  if (!isset($sandbox['current_uid'])) {
+    $sandbox['current_uid'] = 0;
+    // Assume that the uid's are distributed more or less equally over the
+    // whole data set. This allows us to calculate the approximate progress.
+    $sandbox['max'] = db_query('SELECT MAX(uid) FROM {userpoints}')->fetchField();
+  }
+
+  // Fetch the next 10 thread_ids.
+  $result = db_query_range('SELECT uid, SUM(points) AS points, SUM(max_points) AS max_points, MAX(last_update) AS last_update FROM {userpoints} WHERE uid > :uid GROUP BY uid ORDER BY uid ASC', 0, 10, array(':uid' => $sandbox['current_uid']), array('fetch' => PDO::FETCH_ASSOC));
+  $insert = db_insert('userpoints_total')->fields(array('uid', 'points', 'max_points', 'last_update'));
+  $last_uid = 0;
+  foreach ($result as $row) {
+    $insert->values($row);
+    $last_uid = $row['uid'];
+  }
+  $insert->execute();
+  $sandbox['current_uid'] = $last_uid;
+  // Set #finished based on sandbox.
+  $sandbox['#finished'] = (empty($sandbox['max']) || $last_uid == 0) ? 1 : ($sandbox['current_uid'] / $sandbox['max']);
 }

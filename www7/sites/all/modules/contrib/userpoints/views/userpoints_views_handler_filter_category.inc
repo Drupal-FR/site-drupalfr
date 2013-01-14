@@ -1,5 +1,4 @@
 <?php
-// $Id: userpoints_views_handler_filter_category.inc,v 1.1.2.1 2010/12/10 09:58:03 berdir Exp $
 /**
  * Filter by category
  */

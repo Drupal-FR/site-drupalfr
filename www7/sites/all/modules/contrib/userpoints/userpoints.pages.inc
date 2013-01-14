@@ -1,5 +1,4 @@
 <?php
-// $Id: userpoints.pages.inc,v 1.1.2.7 2010/11/19 00:47:21 berdir Exp $
 
 /**
  * @file
@@ -11,34 +10,26 @@
  * Displays a detailed transaction report for an individual user.
  *
  * @param $account
- *   For which account to display.
+ *   For which account to display. Defaults to the current user.
  */
-function userpoints_list_my_userpoints($account, $tid = NULL) {
+function userpoints_list_transactions($form, &$form_state, $account = NULL, $tid = NULL) {
 
-  // Load the categories and check if there are multiples or only a single one.
-  $categories = userpoints_get_categories();
-  $show_category = count($categories) > 1;
-
-  // Store context in the output array so that modules have access to it.
-  $output = array(
-    '#account' => $account,
-    '#tid' => $tid,
-    '#attached' => array(
-      'css' => array(
-        drupal_get_path('module', 'userpoints') . '/userpoints.css',
-      ),
-    ),
-  );
-
-  // Only display the category selection if there is more than one category
-  // to select from. This check is specific to the categories the user has
-  // points in.
-  if ($show_category) {
-    $output['form'] = drupal_get_form('userpoints_filter_cat_select', 'myuserpoints/' . $account->uid . '/', $tid, $account);
-    $output['form']['#weight'] = -10;
+  // If this is an AJAX request, update $_GET['q'] so that table sorting and
+  // similar links are using the correct base path.
+  if ($_GET['q'] == 'system/ajax') {
+    $q = 'myuserpoints';
+    if (!empty($account)) {
+      $q = 'user/' . $account->uid . '/points';
+    }
+    $_GET['q'] = $q;
   }
+
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+
   $settings = array(
-    'show_category' => $show_category,
     'show_user' => FALSE,
   );
   $header = userpoints_get_transaction_header($settings);
@@ -51,22 +42,18 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
     ->orderBy('p.txn_id', 'DESC')
     ->limit(variable_get(USERPOINTS_REPORT_LIMIT, 10));
 
-  $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
+  if (module_exists('taxonomy')) {
+    $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
+  }
 
-  $unapproved_query = db_select('userpoints_txn')
+  $unapproved_query = db_select('userpoints_txn', 'p')
     ->condition('uid', $account->uid)
     ->condition('status', USERPOINTS_TXN_STATUS_PENDING);
   $unapproved_query->addExpression('SUM(points)');
 
-  // Check for filtering. isset() is used because 0 is a valid value
-  // (Uncategorized).
-  if (isset($tid)) {
-    // If a category is selected, limit both the default query and the query
-    // that displays pending points to this category.
-    $query->condition('p.tid', (int)$tid);
-    $active_category = $categories[$tid];
-    $unapproved_query->condition('tid', (int)$tid);
-  }
+  $values = userpoints_filter_parse_input($form_state, $tid);
+  $active_category = userpoints_filter_query($query, $values);
+  userpoints_filter_query($unapproved_query, $values);
 
   if (isset($active_category)) {
     drupal_set_title(t('!Points for @username (%category category)', userpoints_translation() + array('%category' => $active_category, '@username' => format_username($account))), PASS_THROUGH);
@@ -82,7 +69,23 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
     $rows[] = userpoints_get_transaction_row($transaction, $settings);
   }
 
-  $output['table'] = array(
+  // Store context in the output array so that modules have access to it.
+  $output = array(
+    '#account' => $account,
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'userpoints') . '/userpoints.css',
+      ),
+    ),
+  );
+
+  $output['form'] = userpoints_filter_form($account, $values);
+
+  $output['list'] = array(
+    '#type' => 'container',
+    '#id' => 'userpoints_list_wrapper',
+  );
+  $output['list']['table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
@@ -90,7 +93,7 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
     '#weight' => -5,
     '#attributes' => array('class' => array('userpoints-myuserpoints-list')),
   );
-  $output['pager'] = array(
+  $output['list']['pager'] = array(
     '#markup' => theme('pager'),
     '#weight' => 0,
   );
@@ -101,7 +104,7 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
     ->fetchField();
 
   // Display both pending and approved points in a simple table.
-  $output['summary_table'] = array(
+  $output['list']['summary_table'] = array(
     '#theme' => 'table',
     '#header' => array(
       array(
@@ -111,7 +114,7 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
     ),
     '#rows' => array(
       array(
-        'data' => array(t('Approved !points', userpoints_translation()), userpoints_get_current_points($account->uid, isset($tid) ? $tid : 'all')),
+        'data' => array(t('Approved !points', userpoints_translation()), userpoints_get_current_points($account->uid, isset($values['tid']) ? $values['tid'] : 'all')),
         'class' => array('userpoints-myuserpoints-total-approved'),
       ),
       array(
@@ -126,7 +129,7 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
   // For simplicity, the generated output is passed to a custom alter function.
   // This would also be possible through hook_page_alter(), but that hook is
   // hard to use.
-  drupal_alter('userpoints_myuserpoints', $output);
+  drupal_alter('userpoints_list_transactions', $output);
 
   return $output;
 }
@@ -135,37 +138,41 @@ function userpoints_list_my_userpoints($account, $tid = NULL) {
 /**
  * Lists the users and their point totals by all or by category.
  */
-function userpoints_list_users($tid = NULL) {
+function userpoints_list_users($form, &$form_state, $tid = NULL) {
 
-  $header = theme('userpoints_list_users_header');
-  $query = db_select('userpoints', 'p')->extend('PagerDefault')->extend('TableSort')
-                  ->fields('p', array('uid', 'points', 'tid'))
-                  ->fields('u', array('name'))
-                  ->groupBy('p.uid')
-                  ->groupBy('u.name')
-                  ->groupBy('p.points')
-                  ->groupBy('p.tid')
-                  ->groupBy('t.name')
-                  ->orderByHeader($header)
-                  ->limit(variable_get(USERPOINTS_REPORT_USERCOUNT, 30));
-
-  $query->join('users', 'u', 'p.uid = u.uid AND u.status = 1');
-  $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
-  $query->addField('t', 'name', 'cat');
-
-  // Check for filtering.
-  if (!is_null($tid) && $tid == 0) {
-    $query->condition('p.tid', 0);
-    $cat = t('!Uncategorized', userpoints_translation());
+  // If this is an AJAX request, update $_GET['q'] so that table sorting and
+  // similar links are using the correct base path.
+  if ($_GET['q'] == 'system/ajax') {
+    $_GET['q'] = 'userpoints';
   }
-  elseif ($tid > 0) {
-    $query->condition('p.tid', $tid);
-    $cat = db_query("SELECT name from {taxonomy_term_data} WHERE tid = :tid", array(':tid' => $tid))->fetchField();
+
+  $header = userpoints_get_list_header();
+
+  $query = db_select('userpoints', 'p')->extend('PagerDefault')->extend('TableSort')
+    ->fields('p', array('uid', 'points', 'tid'))
+    ->fields('u', array('name'))
+    ->groupBy('p.uid')
+    ->groupBy('u.name')
+    ->groupBy('p.points')
+    ->groupBy('p.tid')
+    ->orderByHeader($header)
+    ->limit(variable_get(USERPOINTS_REPORT_USERCOUNT, 30));
+
+  $query->join('users', 'u', 'p.uid = u.uid');
+  if (module_exists('taxonomy')) {
+    $query->groupBy('t.name');
+    $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
+  }
+
+  $values = userpoints_filter_parse_input($form_state, $tid);
+  $active_category = userpoints_filter_query($query, $values);
+
+  if (isset($active_category)) {
+    drupal_set_title(t('All points (%category category)', userpoints_translation() + array('%category' => $active_category)), PASS_THROUGH);
   }
   else {
-    $cat = t('All');
+    drupal_set_title(t('All points'));
   }
-  drupal_set_title(t("@category !points", userpoints_translation() + array('@category' => $cat)));
 
   if (variable_get(USERPOINTS_REPORT_DISPLAYZERO, 1) == 0) {
     // The user would NOT like to see users with zero points.
@@ -174,9 +181,28 @@ function userpoints_list_users($tid = NULL) {
 
   $rows = array();
   foreach ($query->execute() as $data) {
-    $rows[] = theme('userpoints_list_users_row', array('row' => $data));
+    $rows[] = userpoints_get_list_row($data);
   }
-  return theme('userpoints_list_users', array('header' => $header, 'rows' => $rows, 'tid' => $tid));
+
+  $output = array();
+  $output['form'] = userpoints_filter_form(NULL, $values);
+  $output['list'] = array(
+    '#type' => 'container',
+    '#id' => 'userpoints_list_wrapper',
+  );
+  $output['list']['table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+  $output['list']['pager'] = array(
+    '#theme' => 'pager',
+  );
+
+  // Allow other modules and themes to customize the result.
+  drupal_alter('userpoints_list', $output);
+
+  return $output;
 }
 
 /**
@@ -189,6 +215,8 @@ function userpoints_list_users($tid = NULL) {
  */
 function userpoints_view_transaction($transaction) {
   drupal_add_css(drupal_get_path('module', 'userpoints') . '/userpoints.css');
+
+  drupal_set_title(t('View transaction #@txn_id', array('@txn_id' => $transaction->txn_id)));
 
   $css_stati = array(
     USERPOINTS_TXN_STATUS_APPROVED => 'approved',
@@ -212,11 +240,19 @@ function userpoints_view_transaction($transaction) {
     '#attributes' => array('class' => array('userpoints-group-details')),
   );
 
+  $content['details']['user'] = array(
+    '#theme' => 'userpoints_view_item',
+    '#title' => t('User'),
+    '#value' => theme('username', array('account' => $transaction->user)),
+    '#weight' => 0,
+    '#attributes' => array('class' => array('userpoints-item-user')),
+  );
+
   $content['details']['points'] = array(
     '#theme' => 'userpoints_view_item',
     '#title' => t('!Points', userpoints_translation()),
     '#value' => $transaction->points,
-    '#weight' => 0,
+    '#weight' => 10,
     '#attributes' => array('class' => array('userpoints-item-points')),
   );
 
@@ -224,31 +260,15 @@ function userpoints_view_transaction($transaction) {
     '#theme' => 'userpoints_view_item',
     '#title' => t('Category'),
     '#value' => $transaction->category,
-    '#weight' => 10,
-    '#attributes' => array('class' => array('userpoints-item-category')),
-  );
-
-  $content['details']['user'] = array(
-    '#theme' => 'userpoints_view_item',
-    '#title' => t('User'),
-    '#value' => theme('username', array('account' => $transaction->user)),
     '#weight' => 20,
-    '#attributes' => array('class' => array('userpoints-item-user')),
-  );
-
-  $content['details']['date'] = array(
-    '#theme' => 'userpoints_view_item',
-    '#title' => t('Date'),
-    '#value' => format_date($transaction->time_stamp),
-    '#weight' => 30,
-    '#attributes' => array('class' => array('userpoints-item-date')),
+    '#attributes' => array('class' => array('userpoints-item-category')),
   );
 
   $content['details']['reason'] = array(
     '#theme' => 'userpoints_view_item',
     '#title' => t('Reason'),
-    '#value' => userpoints_create_description($transaction),
-    '#weight' => 40,
+    '#value' => userpoints_create_description($transaction, array('truncate' => FALSE)),
+    '#weight' => 30,
     '#attributes' => array('class' => array('userpoints-item-reason')),
   );
 
@@ -256,7 +276,7 @@ function userpoints_view_transaction($transaction) {
     '#theme' => 'userpoints_view_item',
     '#title' => t('Transaction ID'),
     '#value' => $transaction->txn_id,
-    '#weight' => 50,
+    '#weight' => 40,
     '#attributes' => array('class' => array('userpoints-item-transaction')),
   );
 
@@ -276,11 +296,19 @@ function userpoints_view_transaction($transaction) {
     '#attributes' => array('class' => array('userpoints-item-status')),
   );
 
+  $content['status']['date'] = array(
+    '#theme' => 'userpoints_view_item',
+    '#title' => t('Creation date'),
+    '#value' => format_date($transaction->time_stamp),
+    '#weight' => 10,
+    '#attributes' => array('class' => array('userpoints-item-date')),
+  );
+
   $content['status']['changed'] = array(
     '#theme' => 'userpoints_view_item',
     '#title' => t('Last modified'),
     '#value' => format_date($transaction->changed),
-    '#weight' => 10,
+    '#weight' => 20,
     '#attributes' => array('class' => array('userpoints-item-changed')),
   );
 
@@ -373,7 +401,7 @@ function userpoints_view_transaction($transaction) {
       $content['admin']['description_generated'] = array(
         '#theme' => 'userpoints_view_item',
         '#title' => t('Description (auto generated)'),
-        '#value' => userpoints_create_description($transaction, array('skip_description' => TRUE)),
+        '#value' => userpoints_create_description($transaction, array('skip_description' => TRUE, 'truncate' => FALSE)),
         '#weight' => 20,
         '#attributes' => array('class' => array('userpoints-item-description-generated')),
       );
@@ -390,7 +418,7 @@ function userpoints_view_transaction($transaction) {
     if (!empty($transaction->reference)) {
       $content['admin']['reference'] = array(
         '#theme' => 'userpoints_view_item',
-        '#title' => t('Reference'),
+        '#title' => t('Internal reference'),
         '#value' => $transaction->reference,
         '#weight' => 40,
         '#attributes' => array('class' => array('userpoints-item-reference')),

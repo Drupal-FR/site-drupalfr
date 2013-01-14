@@ -1,5 +1,4 @@
 <?php
-// $Id: userpoints_rules.rules.inc,v 1.1.4.2 2010/10/30 08:27:57 berdir Exp $
 
 /**
  * @file
@@ -105,7 +104,7 @@ function userpoints_rules_rules_action_info() {
  * Wrapper function for userpoints_get_categories().
  *
  * Rules.module uses different arguments for option list callbacks than
- * userpoints_get_categories expectes.
+ * userpoints_get_categories expects.
  */
 function userpoints_rules_get_categories() {
   return userpoints_get_categories();
@@ -119,7 +118,7 @@ function userpoints_rules_get_all_categories() {
 }
 
 /**
- * Simple callback that liss the possible moderate values.
+ * Simple callback that lists the possible moderate values.
  */
 function userpoints_rules_moderate() {
   return array(
@@ -137,91 +136,7 @@ function userpoints_rules_rules_data_info() {
     'userpoints_transaction' => array(
       'label' => t('!Points transaction', userpoints_translation()),
       'wrap' => TRUE,
-      'property info' => _userpoints_rules_userpoints_transaction_properties(),
-    ),
-  );
-}
-
-/**
- * Returns properties of userpoints_transaction data object.
- */
-function _userpoints_rules_userpoints_transaction_properties() {
-  return array(
-    'user' => array(
-      'type' => 'user',
-      'label' => t('User'),
-      'description' => t('The user that will receive the !points', userpoints_translation()),
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'points' => array(
-      'type' => 'integer',
-      'label' => t('!Points', userpoints_translation()),
-      'description' => t('Amount of !points to give or take.', userpoints_translation()),
-      'restriction' => 'input',
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'tid' => array(
-      'label' => t('!Points category', userpoints_translation()),
-      'type' => 'integer',
-      'options list' => 'userpoints_rules_get_categories',
-      'restriction' => 'input',
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'entity' => array(
-      'label' => t('Entity'),
-      'type' => 'entity',
-      'description' => t('The entity to which this transaction refers.'),
-      'restriction' => 'input',
-      'optional' => TRUE,
-      'getter callback' => 'entity_metadata_verbatim_get',
-     ),
-    'description' => array(
-      'label' => t('Description'),
-      'type' => 'text',
-      'description' => t('Can contain the reason why the points have been given.'),
-      'restriction' => 'input',
-      'optional' => TRUE,
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'reference' => array(
-      'label' => t('Reference'),
-      'type' => 'text',
-      'description' => t('Can contain a reference for this transaction.'),
-      'optional' => TRUE,
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'operation' => array(
-      'label' => t('Operation'),
-      'type' => 'text',
-      'description' => t('Describes the operation (Insert/Remove/...).'),
-      'restriction' => 'input',
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'time-stamp' => array(
-      'label' => t('Timestamp'),
-      'type' => 'date',
-      'description' => t('Time when the points were given.'),
-      'setter callback' => 'entity_metadata_verbatim_set',
-      'getter callback' => 'entity_metadata_verbatim_get',
-    ),
-    'expirydate' => array(
-      'label' => t('Expiry date'),
-      'type' => 'date',
-      'description' => t('Time when the points will expire.'),
-      'setter callback' => 'entity_metadata_verbatim_set',
-      'getter callback' => 'entity_metadata_verbatim_get',
-    ),
-    'display' => array(
-      'label' => t('Display'),
-      'type' => 'boolean',
-      'description' => t('Wether to show a message to the user for this transaction or not.'),
-      'setter callback' => 'entity_metadata_verbatim_set',
-    ),
-    'status' => array(
-      'label' => t('Status'),
-      'type' => 'integer',
-      'description' => t('Status of this transaction.'),
-      'options list' => 'userpoints_txn_status',
+      'property info' => _userpoints_userpoints_transaction_properties(),
     ),
   );
 }
@@ -262,7 +177,7 @@ function userpoints_action_grant_points($params) {
   // the wrapped version of it.
   $state = $params['state'];
   $entity = $state->currentArguments['entity'];
-  
+
   // Map $moderate value to the actual value used by the API.
   $moderate_mapping = array(
     'default' => NULL,
@@ -284,7 +199,7 @@ function userpoints_action_grant_points($params) {
   unset($params['user']);
   unset($params['entity']);
   unset($params['settings']);
-  $result = userpoints_userpointsapi($params);
+  userpoints_userpointsapi($params);
 }
 
 function userpoints_action_grant_points_form_alter(&$form, &$form_state) {
