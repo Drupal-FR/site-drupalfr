@@ -10,8 +10,8 @@ Drupal est un logiciel qui permet aux individus comme aux communautés d'utilisa
 <h3>En savoir plus</h3>
 <ul>
 <li class="fbl1"><a href="internal:apropos">A propos de Drupal</a></li>
-<li class="fbl2"><a href="internal:traduction">La traduction</a></li>
-<li class="fbl1"><a href="internal:support">Aide et assistance</a></li>
+<li class="fbl2"><a href="internal:documentation/traduction-drupal-français">La traduction</a></li>
+<li class="fbl1"><a href="internal:documentation/support">Aide et assistance</a></li>
 <li class="fbl2"><a href="internal:communaute">La communauté</a></li>
 </ul>
 EOF;
