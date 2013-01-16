@@ -12,15 +12,6 @@
    * FUNCTIONS
    ** ***************************************************************** */
 
-  Drupal.dfrtheme.externalLinks = function(){
-    $('a').each(function() {
-     var a = new RegExp('/' + window.location.host + '/');
-     if(!a.test(this.href)) {
-         $(this).attr('target', '_blank');
-      }
-    });
-  } 
-
   // Enlarge Your Click Zone : allow link'parent element to be clickable too
   Drupal.dfrtheme.enlargeYourClick = function(selector){
     $(selector).once('enlargeYourClick').click(function(e){
@@ -58,9 +49,6 @@
 
       // <html> js class
       $('html').removeClass('no-js') // addClass('js') is already done in misc/drupal.js
-
-      // Open external links in a new window
-      Drupal.dfrtheme.externalLinks();
 
       Drupal.dfrtheme.expandPlanetUser($('.field-name-field-planete-user'));
 
