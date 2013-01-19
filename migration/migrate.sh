@@ -64,6 +64,7 @@ drush en -y googleanalytics
 drush en -y commentrss
 drush en -y menu_breadcrumb
 drush en -y userprotect
+drush en -y menu_trail_by_path
 
 # Revert the feature to remove the DB stored version of the view and use the new one from the export. 
 drush fr -y drupalfr_forums
