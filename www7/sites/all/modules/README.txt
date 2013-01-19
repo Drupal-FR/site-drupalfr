@@ -1,4 +1,3 @@
-// $Id: README.txt,v 1.1 2009/01/22 04:33:38 webchick Exp $
 Place downloaded and custom modules that extend your site functionality beyond
 Drupal core in this directory to ensure clean separation from core modules and
 to facilitate safe, self-contained code updates. Contributed modules from the

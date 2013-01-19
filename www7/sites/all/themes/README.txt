@@ -1,4 +1,3 @@
-// $Id: README.txt,v 1.1 2009/01/22 04:33:38 webchick Exp $
 Place downloaded and custom themes that modify your site's appearance in this
 directory to ensure clean separation from Drupal core and to facilitate safe,
 self-contained code updates. Contributed themes from the Drupal community may
