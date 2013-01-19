@@ -16,7 +16,7 @@ function dfr_migration_drush_command() {
     'aliases' => array('dfrrar'),
   );
   $items['dfr-update-pathauto-aliases'] = array(
-    'description' => "Create mmissing pathauto aliases",
+    'description' => "Create missing pathauto aliases",
     'aliases' => array('dfrupa'),
   );
 
