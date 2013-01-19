@@ -81,10 +81,6 @@ drush cc all
 drush -y content-migrate-fields
 drush cc all
 
-# Enable the annuaire and revert it to benefit from the code defined view.
-drush en -y drupalfr_annuaire
-drush fr -y drupalfr_annuaire
-
 # Only enable emploi feature after having the region field migrated (among others).
 drush en -y dfr_emploi
 drush fr -y dfr_emploi
@@ -96,6 +92,10 @@ drush php-eval 'node_type_delete("simplenews"); variable_del("node_preview_simpl
 
 # Remove useless role.
 drush php-eval 'user_role_delete(9);'
+
+# Enable the annuaire and revert it to benefit from the code defined view.
+drush en -y drupalfr_annuaire
+drush fr -y drupalfr_annuaire
 
 drush en -y dfr_migration
 
