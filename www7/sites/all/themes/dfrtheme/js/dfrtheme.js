@@ -39,6 +39,50 @@
     });
   }
 
+
+  Drupal.dfrtheme.emploiCarousel = function(wrapper){
+
+    // Var
+    var pos = 0,
+        container = wrapper.find('.view-content').css('position', 'relative'),
+        eltNum = container.children().length,
+        eltVisible=3,
+        posUpdate = function(p) {
+          $('.nav', wrapper).removeClass('inactive');
+          if (p<=0) {
+            p = 0;
+            $('.nav-prev', wrapper).addClass('inactive');
+          }
+          if (p>=(eltNum-eltVisible)) {
+            p = eltNum-eltVisible;
+            $('.nav-next', wrapper).addClass('inactive');
+          }
+          return p;
+        }
+    Drupal.settings.dfrtheme.emploiCarouselEltWidth = container.children().eq(1).outerWidth(1);
+
+    if (eltNum <= eltVisible) return;
+
+    // Add nav links
+    wrapper.prepend('<div class="nav-links"><span class="nav nav-prev"></span><span class="nav nav-next"></span></div>')
+
+    // Init
+    posUpdate(pos);
+
+    // Handle nav click
+    $('.nav', wrapper).click(function(){
+      // Get direction
+      ($(this).hasClass('nav-prev')) ? pos-- : pos++;
+      // Update position index
+      pos = posUpdate(pos);
+      // Animate content
+      container.animate({marginLeft: -(pos * Drupal.settings.dfrtheme.emploiCarouselEltWidth)})
+    })
+
+  }
+
+
+
   /** ********************************************************************
    * BEHAVIORS
    ** ***************************************************************** */
@@ -51,6 +95,16 @@
       $('html').removeClass('no-js') // addClass('js') is already done in misc/drupal.js
 
       Drupal.dfrtheme.expandPlanetUser($('.field-name-field-planete-user'));
+
+      // Emploi carousel
+      $('#block-views-offres-block-1').once('emploi-carousel', function(){
+        Drupal.dfrtheme.emploiCarousel($(this));
+      })
+      $(window).resize(function(){
+        // Because item width is fluid, we need to
+        // recalculate on widow resize.
+        Drupal.settings.dfrtheme.emploiCarouselEltWidth = $('#block-views-offres-block-1 .view-content').children().eq(1).outerWidth(1)
+      })
 
     }
   } // Drupal.behaviors.dfrtheme
