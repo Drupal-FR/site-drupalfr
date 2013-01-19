@@ -1,6 +1,25 @@
 Search API Solr search 1.x, dev (xx/xx/xxxx):
 ---------------------------------------------
 
+Search API Solr search 1.0, RC 3 (01/06/2013):
+----------------------------------------------
+- #1828260 by drunken monkey: Fixed filtering by index in multi-index searches.
+- #1509380 by drunken monkey: Adopt common config files.
+- #1815348 by drunken monkey: Fixed queryMultiple() to not use item ID as the
+  array key.
+- #1789204 by Steven Jones: Added way to easily alter the fl parameter.
+- #1744250 by mollux, dasjo: Added support for location based search.
+- #1813670 by guillaumev: Fixed check for autocomplete configuration in form.
+- #1425910 by drunken monkey, mh86: Added setting for maximum occurence
+  threshold in autocomplete.
+- #1691132 by drunken monkey, David Stosik: Fixed calls to watchdog().
+- #1588130 by regilero, David Stosik, drunken monkey: Fixed error handling.
+- #1805720 by drunken monkey: Added additional options and improvements for the
+  autocomplete functionality.
+- #1276970 by derhasi, moonray: Fixed large queries break Solr search.
+- #1299940 by drunken monkey: Fixed handling of empty response.
+- #1507818 by larowlan: Fixed field boosts for standard request handler.
+
 Search API Solr search 1.0, RC 2 (05/23/2012):
 ----------------------------------------------
 - Fixed escaping of error messages.

@@ -108,6 +108,7 @@ function search_api_solr_uninstall() {
       ->execute();
   }
   variable_del('search_api_solr_last_optimize');
+  variable_del('search_api_solr_autocomplete_max_occurrences');
 }
 
 /**
