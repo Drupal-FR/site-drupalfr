@@ -116,7 +116,7 @@ function dfr_emploi_block_view($delta = '') {
 function dfr_emploi_cron() {
   // Unpublish expired offres
   $results = db_select('node', 'n')
-    ->fields('n', array('nid'))
+    ->fields('n', array('nid', 'title'))
     ->condition('status', 1)
     ->condition('type', 'offre')
     ->execute()
@@ -127,6 +127,7 @@ function dfr_emploi_cron() {
     if(REQUEST_TIME > $node->changed + $lifetime) {
       $node->status = 0;
       node_save($node);
+      watchdog('emploi', "Dépublication de l'offre %nid - %title", array('%nid' => $node->nid, '%title' => $node->title));
     }
   }
 }
