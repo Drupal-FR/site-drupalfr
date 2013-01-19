@@ -12,3 +12,9 @@ if ($ressources_mlid) {
   $item["p1"] = $ressources_mlid["mlid"];
   menu_link_save($item);
 }
+
+// Reset some menu_items to have them translated
+menu_reset_item(menu_link_load(22));
+menu_reset_item(menu_link_load(39));
+menu_reset_item(menu_link_load(1213));
+menu_reset_item(menu_link_load(1214));
