@@ -91,6 +91,12 @@ function dfr_blocks_enable() {
       'title' => "", 'status' => 1,
       'visibility' => 1, 'pages' => 'profil/*>'
     ),
+    array(
+      'module' => 'views', 'delta' => 'offres-block_2',
+      'theme' => 'dfrtheme', 'region' => 'content',
+      'weight' => 15, 'cache' => DRUPAL_CACHE_GLOBAL,
+      'title' => "", 'status' => 1,
+    ),
 
 
     // Sidebar
@@ -227,7 +233,15 @@ forum/*'
   }
   $query->execute();
 
-
+  // Save the visibility setting for the job offers visible on a company page.
+  $query = db_insert('block_node_type')
+    ->fields(array(
+      'module',
+      'delta',
+      'type',
+    ));
+  $query->values(array('views', 'offres-block_2', 'annuaire'));
+  $query->execute();
 
 }
 
