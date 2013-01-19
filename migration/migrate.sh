@@ -147,6 +147,7 @@ drush vset admin_theme seven
 drush php-eval "theme_enable(array('dfrtheme'));"
 drush vset theme_default dfrtheme
 drush php-eval "theme_disable(array('garland'));"
+drush php-eval '$ts=variable_get("theme_dfrtheme_settings");$ts["favicon_path"] = "sites/all/themes/dfrtheme/favicon.png";variable_set("theme_dfrtheme_settings", $ts);'
 
 # Update site_name & site_slogan.
 drush vset site_name "Drupalfr.org"
