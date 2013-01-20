@@ -414,13 +414,16 @@ ul.pager li {
 	font-family:'Trebuchet MS', Arial, Helvetica, sans-serif;
 }
 .pager li:first-child {margin:0 !important;}
-.pager li.pager-current {
+.pager li.pager-current,
+.pager li.pager-ellipsis {
 	padding:9px 14px !important;
 	zoom:1;
 	cursor:default !important;
 	background:#00b2d7 !important;
 }
 .pager li:hover {background:#00b2d7 !important; cursor:pointer;}
+.pager li.pager-current {background:#00b2d7 !important;}
+.pager li.pager-ellipsis {background:none !important;color:#001d26 !important;}
 .pager li a {
 	color:#fff !important; 
 	display:block;
