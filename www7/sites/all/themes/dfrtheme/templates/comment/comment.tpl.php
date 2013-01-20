@@ -71,7 +71,7 @@
     <p class="submitted">
       <?php print $permalink; ?>
       <?php
-        print t('Submitted by !username on !datetime.',
+        print t('Submitted by !username on !datetime',
           array('!username' => $author, '!datetime' => $created));
       ?>
     </p>

@@ -173,6 +173,7 @@ drush l10n-update
 
 # Import missing translation
 drush php-eval "\$report = array();_locale_import_one_string_db(\$report,'fr',NULL,'Submitted by !username on ','Soumis par !username le ','default','',LOCALE_IMPORT_OVERWRITE);"
+drush php-eval "\$report = array();_locale_import_one_string_db(\$report,'fr',NULL,'Submitted by !username on','Soumis par !username le','default','',LOCALE_IMPORT_OVERWRITE);"
 
 drush cc all
 
