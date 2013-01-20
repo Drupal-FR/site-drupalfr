@@ -50,6 +50,10 @@ function dfr_emploi_views_default_views() {
   );
   $handler->display->display_options['row_options']['separator'] = ' - ';
   $handler->display->display_options['row_options']['hide_empty'] = TRUE;
+  /* Pied de page: Global : Zone de texte */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
   /* Comportement en l'absence de résultats: Global : Zone de texte */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
@@ -184,6 +188,13 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'some';
   $handler->display->display_options['pager']['options']['items_per_page'] = '9';
   $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['defaults']['footer'] = FALSE;
+  /* Pied de page: Global : Zone de texte */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/offre" class="btn-link">Publier une offre</a><a href="/emploi" class="btn-link">Voir toutes les offres</a>';
+  $handler->display->display_options['footer']['area']['format'] = '1';
   $handler->display->display_options['defaults']['empty'] = FALSE;
   /* Comportement en l'absence de résultats: Global : Zone de texte */
   $handler->display->display_options['empty']['area']['id'] = 'area';
@@ -513,7 +524,8 @@ function dfr_emploi_views_default_views() {
     t('Type de contrat'),
     t('Dernières offres'),
     t('Dernières offres d\'emploi'),
-    t('Aucune n\'offre n\'est en ligne encore, pourquoi ne pas <a href="/node/add/offre">proposer la votre</a> ?'),
+    t('<a href="/node/add/offre" class="btn-link">Publier une offre</a><a href="/emploi" class="btn-link">Voir toutes les offres</a>'),
+    t('Il n\'y a aucune offre pour le moment, pourquoi ne pas <a href="/node/add/offre">proposer la vôtre</a> ?'),
     t('Moderation des offres'),
     t('auteur'),
     t('Contenu'),
