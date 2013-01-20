@@ -174,9 +174,11 @@ drush l10n-update
 # Import missing translation
 drush php-eval "\$report = array();_locale_import_one_string_db(\$report,'fr','','Submitted by !username on ','Soumis par !username le ','default','',LOCALE_IMPORT_OVERWRITE);"
 
-drush cc all
-
 # Trigger whatever cron has to do.
 drush cron
+
+# Remove maintenance mode
+drush vset --exact maintenance_mode FALSE
+drush cc all
 
 # TODO: disable dblog

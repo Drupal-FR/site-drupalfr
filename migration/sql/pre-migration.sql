@@ -26,6 +26,9 @@ DELETE FROM `actions` WHERE CONVERT(`actions`.`aid` USING utf8) = 'user_block_ip
 
 TRUNCATE watchdog;
 
+-- Site is now in migration mode
+INSERT INTO variable(name, value) VALUES('maintenance_mode', 'b:1;');
+
 -- Drop profiles tables (no more needed since we using content profile)
 -- DROP TABLE profile_fields;
 -- DROP TABLE profile_values;
