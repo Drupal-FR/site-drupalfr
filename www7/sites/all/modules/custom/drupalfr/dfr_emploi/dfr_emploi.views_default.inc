@@ -465,8 +465,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['defaults']['style_options'] = FALSE;
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
-  $handler->display->display_options['row_plugin'] = 'node';
-  $handler->display->display_options['row_options']['links'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'fields';
+  $handler->display->display_options['row_options']['inline'] = array(
+    'title' => 'title',
+    'field_type_contrat' => 'field_type_contrat',
+  );
+  $handler->display->display_options['row_options']['hide_empty'] = TRUE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['header'] = FALSE;
   /* Entête: Global : Résumé des résultats */
@@ -482,6 +486,25 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'Cette société n\'a aucune offre d\'emploi disponible pour le moment. <a href="internal:emploi">Consultez les autres offres</a>';
   $handler->display->display_options['empty']['area']['format'] = '1';
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Champ: Contenu : Titre */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['alter']['max_length'] = '30';
+  $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
+  /* Champ: Contenu : Type de contrat */
+  $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
+  $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
+  $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
+  $handler->display->display_options['fields']['field_type_contrat']['label'] = '';
+  $handler->display->display_options['fields']['field_type_contrat']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_type_contrat']['alter']['text'] = '([field_type_contrat])';
+  $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   /* Filtre contextuel: Contenu : Société (field_societe) */
   $handler->display->display_options['arguments']['field_societe_nid']['id'] = 'field_societe_nid';
@@ -540,6 +563,7 @@ function dfr_emploi_views_default_views() {
     t('Offres d\'une boite'),
     t('Nous avons actuellement @total poste(s) à pourvoir'),
     t('Cette société n\'a aucune offre d\'emploi disponible pour le moment. <a href="internal:emploi">Consultez les autres offres</a>'),
+    t('([field_type_contrat])'),
     t('Tout'),
     t('%1 recrute'),
   );

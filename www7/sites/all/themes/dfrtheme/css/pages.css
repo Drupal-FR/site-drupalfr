@@ -67,6 +67,7 @@
 .view-annuaire-prestataires.view-display-id-page_1 {}
 
 .node-annuaire {}
+.node-annuaire > footer {margin:0;padding:0;border-top:0;}
 .node-annuaire .field {margin-bottom: 1em;}
 .node-annuaire .field-items {background:#fff;}
 .node-annuaire .field-type-image .field-items{
@@ -75,6 +76,19 @@
   -moz-border-radius:0;
   -webkit-border-radius:0;
 }
+
+#block-views-offres-block-2 {}
+#block-views-offres-block-2 > h2 {margin-bottom:0.5em;}
+#block-views-offres-block-2 .view-content {}
+#block-views-offres-block-2 .views-row {
+  background:url(../images/marker-2.gif) 0 8px no-repeat;
+  padding:0 16px;
+  margin:0.5em 0;
+}
+#block-views-offres-block-2 .views-field {display:inline-block;line-height:20px;}
+#block-views-offres-block-2 h3 {margin-bottom:0;letter-spacing: 0;font-weight: normal;}
+#block-views-offres-block-2 .views-field-field-type-contrat {color:#999;}
+
 
 @media screen and (min-width:768px) {
   .node-annuaire .field {
@@ -94,6 +108,8 @@
   }
   .node-annuaire .field-label {width:30%;}
   .node-annuaire .field-items {width:70%;}
+
+  #block-views-offres-block-2 .views-row {display:inline-block;vertical-align: top;width:49%;}
 }
 
 
