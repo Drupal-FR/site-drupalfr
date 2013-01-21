@@ -143,12 +143,26 @@ function dfrtheme_preprocess_maintenance_page(&$variables) {
 function dfrtheme_preprocess_node(&$variables) {
   // Add view_mode classs
   $variables['classes_array'][] = 'node-' . $variables['view_mode'];
-  
+
   $variables['submitted'] = t('Submitted by !username on ', array('!username' => $variables['name']));
   $variables['submitted_date'] = t('!datetime', array('!datetime' => $variables['date']));
   $variables['submitted_pubdate'] = format_date($variables['created'], 'custom', 'Y-m-d\TH:i:s');
 
+  // Change the date format for the planet.
+  if ($variables['type'] == 'planete' && $variables['view_mode'] == 'teaser') {
+    $variables['submitted_pubdate'] = format_date($variables['created'], 'custom', 'l j F Y');
+  }
+
   $variables['theme_hook_suggestions'][] = 'node__' . $variables['node']->type . '__' . $variables['view_mode'];
+}
+
+/**
+ * Implements template_preprocess_user().
+ *
+ * Adds extra classes to users profiles container for advanced theming.
+ */
+function dfrtheme_preprocess_user_profile(&$variables) {
+  $variables['theme_hook_suggestions'][] = 'user_profile__' . $variables['elements']['#view_mode'];
 }
 
 /**
