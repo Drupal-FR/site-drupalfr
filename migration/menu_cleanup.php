@@ -7,7 +7,7 @@ _menu_delete_item(menu_link_load(1954), 1);
 // Reorder the main menu items. Extract the planete mlid first.
 $planete_mlid = db_query("SELECT mlid FROM menu_links WHERE router_path = 'Planète' AND menu_name = 'main-menu';")->fetchAssoc();
 $i = 0;
-foreach (array(457, 27, $planete_mlid['mlid'], 3660, 1125, 17, $emploi_item['mlid']) as $mlid) {
+foreach (array(457, 27, $planete_mlid['mlid'], 1125, 17) as $mlid) {
   $item = menu_link_load($mlid);
   $item['weight'] = $i++;
   menu_link_save($item);
