@@ -159,12 +159,14 @@ function dfrtheme_preprocess_node(&$variables) {
 /**
  * Implements template_preprocess_user().
  *
- * Adds extra classes to users profiles container for advanced theming.
+ * Adds extra classes to node container for advanced theming
  */
 function dfrtheme_preprocess_user_profile(&$variables) {
-  $variables['theme_hook_suggestions'][] = 'user_profile__' . $variables['elements']['#view_mode'];
+  if ($variables['elements']['#view_mode'] == 'planete_author') {
+    $variables['user_link'] = l($variables['elements']['#account']->name, 'user/' . $variables['elements']['#account']->uid);
+    $variables['theme_hook_suggestions'][] = 'user_profile__' . $variables['elements']['#view_mode'];
+  }
 }
-
 /**
  * Implements template_preprocess_block().
  */

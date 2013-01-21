@@ -39,7 +39,7 @@
   <?php hide($user_profile['summary']); ?>
   <?php print render($user_profile['field_picture']); ?>
   <div class="content">
-    Par <?php print l($account->name, 'user/' . $account->uid); ?>
+    Par <?php print $user_link; ?>
     <?php print render($user_profile); ?>
   </div>
 </div>
