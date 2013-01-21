@@ -348,3 +348,30 @@ function dfrtheme_field($variables) {
   return $output;
 }
 
+/**
+ * Implements hook_preprocess_views_view().
+ */
+function dfrtheme_preprocess_views_view(&$variables) {
+  if ($variables['view']->name == 'offres' && $variables['view']->current_display == 'block_1') {
+    $path = 'node/add/offre';
+    $options = array();
+
+    // Force users to login first and then bring them back to the form.
+    if (user_is_anonymous()) {
+      $path = 'user/login';
+      $options['query'] = array('destination' => 'node/add/offre');
+    }
+    $variables['empty'] = "<p>Il n'y a aucune offre pour le moment, pourquoi ne pas " . l('proposer la vôtre', $path, $options) . " ?</p>";
+
+    // Update link path if you are logged in or not.
+    if ($variables['view']->total_rows > 0) {
+      $link_create_offer = l('Déposer une offre', 'node/add/offre', array('attributes' => array('class' => array('btn-link'))));
+      $link_see_offers = l('Voir toutes les offres', 'emploi', array('attributes' => array('class' => array('btn-link'))));
+
+      if (user_is_anonymous()) {
+        $link_create_offer = l('Déposer une offre', 'user/login', array('query' => array('destination' => 'node/add/offre'), 'attributes' => array('class' => array('btn-link'))));
+      }
+      $variables['footer'] = $link_create_offer . ' ' . $link_see_offers;
+    }
+  }
+}
