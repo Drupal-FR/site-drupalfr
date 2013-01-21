@@ -4,10 +4,14 @@
 _menu_delete_item(menu_link_load(1209), 1);
 _menu_delete_item(menu_link_load(1954), 1);
 
-// Remove the emploi link from the main menu.
-$result = db_query("SELECT mlid FROM menu_links WHERE menu_links.link_title = 'Emploi' AND menu_links.menu_name = 'main-menu'");
-$record = $result->fetch();
-_menu_delete_item(menu_link_load($record->mlid), 1);
+// Reorder the main menu items. Extract the planete mlid first.
+$planete_mlid = db_query("SELECT mlid FROM menu_links WHERE router_path = 'Planète' AND menu_name = 'main-menu';")->fetchAssoc();
+$i = 0;
+foreach (array(457, 27, $planete_mlid['mlid'], 3660, 1125, 17, $emploi_item['mlid']) as $mlid) {
+  $item = menu_link_load($mlid);
+  $item['weight'] = $i++;
+  menu_link_save($item);
+}
 
 // Move the ressources link in the navigation menu.
 $ressources_mlid = db_query("SELECT mlid FROM menu_links WHERE link_title = 'Ressources'")->fetchAssoc();
@@ -32,6 +36,9 @@ menu_reset_item(menu_link_load(22));
 menu_reset_item(menu_link_load(39));
 menu_reset_item(menu_link_load(1213));
 menu_reset_item(menu_link_load(1214));
+
+// Clear the menu caches.
+menu_cache_clear_all();
 
 // Resort the menu items in the navigation menu.
 // Logout link.

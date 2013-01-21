@@ -140,25 +140,6 @@ $path = array(
 );
 path_save($path);
 
-// Create the emploi link.
-$emploi_item = array(
-  'link_title' => 'Emploi',
-  'link_path' => 'emploi',
-  'module' => 'menu',
-  'menu_name' => 'main-menu',
-);
-menu_link_save($emploi_item);
-
-// Reorder the main menu items. Extract the planete mlid first.
-$planete_mlid = db_query("SELECT mlid FROM menu_links WHERE router_path = 'Planète' AND menu_name = 'main-menu';")->fetchAssoc();
-$i = 0;
-foreach (array(457, 27, $planete_mlid['mlid'], 3660, 1125, 17, $emploi_item['mlid']) as $mlid) {
-  $item = menu_link_load($mlid);
-  $item['weight'] = $i++;
-  menu_link_save($item);
-}
-
-
 function _migration_create_planet_feed ($feed_information) {
   $user_profile = user_load_by_name($feed_information['user_id']);
   $user_profile->field_planete_rss['und'][0]['url'] = $feed_information['url'];
