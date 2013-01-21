@@ -189,7 +189,20 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '9';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['defaults']['footer'] = FALSE;
+  /* Pied de page: Global : Zone de texte */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['content'] = 'Voir template.php pour configuration du texte.';
+  $handler->display->display_options['footer']['area']['format'] = '1';
   $handler->display->display_options['defaults']['empty'] = FALSE;
+  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'Voir template.php pour configuration du texte.';
+  $handler->display->display_options['empty']['area']['format'] = '1';
 
   /* Display: Moderation des offres */
   $handler = $view->new_display('page', 'Moderation des offres', 'page_1');
@@ -534,6 +547,7 @@ function dfr_emploi_views_default_views() {
     t('Type de contrat'),
     t('Dernières offres'),
     t('Dernières offres d\'emploi'),
+    t('Voir template.php pour configuration du texte.'),
     t('Moderation des offres'),
     t('auteur'),
     t('Contenu'),
