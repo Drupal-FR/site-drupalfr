@@ -117,6 +117,7 @@ function drupalfr_events_menu() {
       'title' => 'Prochains évènements',
       'page callback' => 'drupalfr_events_upcoming_events',
       'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
     ),
   );
 }
