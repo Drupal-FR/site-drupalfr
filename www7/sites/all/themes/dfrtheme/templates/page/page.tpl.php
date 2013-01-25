@@ -82,6 +82,7 @@
 					<?php endif; ?>
 				
 					<?php if ($site_name || $site_slogan): ?>
+						<div id="site-name-and-slogan">
 						<?php if ($site_name): ?>
 							<div id="site-name">
 								<a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home">
@@ -93,6 +94,7 @@
 						<?php if ($site_slogan): ?>
 							<p id="site-slogan"><?php print $site_slogan; ?></p>
 						<?php endif; ?>
+					</div>
 					<?php endif; ?>
 				</div><!-- /.branding -->
 

@@ -162,26 +162,42 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 	padding: 1em 0;
 	text-align: center;
 }
+	.branding,
+	.region-menu {
+		display:inline-block;
+		vertical-align: middle;
+	}
+	.branding {}
+	.region-menu {}
+
+	#logo,
+	#site-name-and-slogan {
+		display:inline-block;
+		vertical-align: middle;
+	}
 	#logo {
-		display:block;
 		margin:1em auto;
 		text-decoration:none;
 	}
-	#site-name {
-		color:#fff;
-		font-size:32px;
-		padding:10px 0;
-		padding-left:0.15em;
+	#site-name-and-slogan {
+		max-width: 190px;
 	}
-		#site-name a {color:#fff;}
-		#site-name a:hover {text-decoration: none;}
+		#site-name {
+			color:#fff;
+			font-size:32px;
+			padding:10px 0;
+			padding-left:0.15em;
+		}
+			#site-name a {color:#fff;}
+			#site-name a:hover {text-decoration: none;}
 
-	#site-slogan {
-		margin:0;
-		color:#a7b2b8;
-		font-size: 14px;
-		font-style: italic;
-	}
+		#site-slogan {
+			margin:0;padding:0;
+			color:#a7b2b8;
+			font-size: 14px;
+			font-style: italic;
+		}
+
 
 /*****************Main menu*****************/
 #block-system-main-menu {
@@ -226,7 +242,9 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 	#block-system-main-menu .menu {
 	}
 	#block-system-main-menu .menu li {
-		width:22%;
+/*		width:22%;
+		margin:1%;*/
+		width:30%;
 		margin:1%;
 	}
 }
@@ -241,6 +259,8 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 }
 
 @media screen and (min-width:900px) {
+	.branding {min-width:30%;padding-right:3%;}
+	.region-menu {min-width:66%;}
 	#block-system-main-menu {margin:1em 0;}
 }
 
