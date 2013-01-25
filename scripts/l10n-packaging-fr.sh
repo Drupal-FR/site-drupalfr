@@ -55,7 +55,7 @@ tar cpzf drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
 # Stockage du numéro de version dans une variable pour affichage sur le site.
-/usr/bin/drush -r $DIR/www7 vset drupalfr_version_d6 --yes --exact --format="string" "$VERSION"
+/usr/bin/drush -r $DIR/www7 vset drupalfr_version_d6 -q --yes --exact --format="string" "$VERSION"
 
 exit
 
