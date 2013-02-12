@@ -148,8 +148,9 @@ background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
 
 /* Homepage */
 
+#block-views-planete-block-1 {border-top:1px solid #e4eaef;padding-top:2em;}
 #block-drupalfr-events-next-events,
-#block-views-planete-block-1 {position: relative;min-height: 400px;}
+#block-views-planete-block-1 {position: relative;}
 
 #block-drupalfr-events-next-events .content,
 #block-views-planete-block-1 .content {padding-top:1em;}
@@ -196,10 +197,13 @@ background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
 #block-views-planete-block-1 .more-link a:before {content:"» ";}
 
 @media screen and (min-width:768px) {
+
+  #block-views-planete-block-1 {border-top:0;padding-top:0;}
   #block-drupalfr-events-next-events,
   #block-views-planete-block-1 {
     display:inline-block;vertical-align: top;
     width:45%;margin-right:9%;
+    min-height: 400px;
   }
   #block-views-planete-block-1 {margin-right:0;}
 }
@@ -237,6 +241,21 @@ background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
 /** ******************************************************* **/
 /** Sidebar                                                 **/
 /** ******************************************************* **/
+
+.region-sidebar-first .block {
+  border-top:1px solid #e4eaef;
+  margin:2em 0 0 0;
+  padding:2em 0 0 0;
+}
+/*.region-sidebar-first .block.block-1 {border-top:0;padding-top:0;}*/
+
+@media screen and (min-width: 768px) {
+  .region-sidebar-first .block {
+    border-top:0;
+    margin:0 0 2em 0;
+    padding:0;
+  }
+}
 
 /* block-search-form */
 #drupalfr-search-form .form-item,
