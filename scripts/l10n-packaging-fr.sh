@@ -20,11 +20,6 @@ mv $DIR/drupal7 $DIR/drupal-$VERSION
 tar cpzf drupal-7.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
-# Stockage du numéro de version dans une variable pour affichage sur le site.
-cd ../www7
-drush vset drupalfr_version_d7 VERSION
-cd ../
-
 #############
 # Version 6
 #############
@@ -42,10 +37,5 @@ mv $DIR/drupal6 $DIR/drupal-$VERSION
 # Tarball
 tar cpzf drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
-
-# Stockage du numéro de version dans une variable pour affichage sur le site.
-cd ../www7
-drush vset drupalfr_version_d6 VERSION
-cd ../
 
 exit
