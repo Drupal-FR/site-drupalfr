@@ -13,7 +13,8 @@ body {
 
 /* Links */
 a {
-	color:#00c3dd;
+	/*color:#00c3dd;*/
+	color:#036ba5;
 	outline:none;
 	text-decoration:none;
 }
@@ -162,26 +163,42 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 	padding: 1em 0;
 	text-align: center;
 }
+	.branding,
+	.region-menu {
+		display:inline-block;
+		vertical-align: middle;
+	}
+	.branding {}
+	.region-menu {}
+
+	#logo,
+	#site-name-and-slogan {
+		display:inline-block;
+		vertical-align: middle;
+	}
 	#logo {
-		display:block;
 		margin:1em auto;
 		text-decoration:none;
 	}
-	#site-name {
-		color:#fff;
-		font-size:32px;
-		padding:10px 0;
-		padding-left:0.15em;
+	#site-name-and-slogan {
+		max-width: 190px;
 	}
-		#site-name a {color:#fff;}
-		#site-name a:hover {text-decoration: none;}
+		#site-name {
+			color:#fff;
+			font-size:32px;
+			padding:10px 0;
+			padding-left:0.15em;
+		}
+			#site-name a {color:#fff;}
+			#site-name a:hover {text-decoration: none;}
 
-	#site-slogan {
-		margin:0;
-		color:#a7b2b8;
-		font-size: 14px;
-		font-style: italic;
-	}
+		#site-slogan {
+			margin:0;padding:0;
+			color:#a7b2b8;
+			font-size: 14px;
+			font-style: italic;
+		}
+
 
 /*****************Main menu*****************/
 #block-system-main-menu {
@@ -226,7 +243,9 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 	#block-system-main-menu .menu {
 	}
 	#block-system-main-menu .menu li {
-		width:22%;
+/*		width:22%;
+		margin:1%;*/
+		width:30%;
 		margin:1%;
 	}
 }
@@ -241,6 +260,8 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 }
 
 @media screen and (min-width:900px) {
+	.branding {min-width:30%;padding-right:3%;}
+	.region-menu {min-width:66%;}
 	#block-system-main-menu {margin:1em 0;}
 }
 
@@ -311,7 +332,7 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 	display: inline-block;
 	background: none;
 	padding: 0;
-	color:#00C3DD
+	/*color:#00c3dd;*/color:#036ba5;
 }
 .field-type-taxonomy-term-reference ul.links li:before {content:", ";}
 .field-type-taxonomy-term-reference ul.links li:first-child:before {content:"";}
@@ -443,12 +464,20 @@ ul.pager li {
 #footer-top {
 	border-top:1px solid #024f7b;
 	border-bottom:1px solid #024f7b;
-	background:url(../images/content-bottom-tail.jpg) 50% top repeat-x #03649E;
+	/*background:url(../images/content-bottom-tail.jpg) 50% top repeat-x #03649E;*/
 	color:#f6fafd;
+
+  background:#036ba5;
+background-image: -moz-radial-gradient(50% 75%, circle cover, #01a5ca, #036ba5 90%);
+background-image: -webkit-radial-gradient(50% 75%, circle cover, #01a5ca, #036ba5 90%);
+background-image: -o-radial-gradient(50% 75%, circle cover, #01a5ca, #036ba5 90%);
+background-image: -ms-radial-gradient(50% 75%, circle cover, #01a5ca, #036ba5 90%);
+background-image: radial-gradient(50% 75%, circle cover, #01a5ca, #036ba5 90%);
+
 }
 #footer-top .inner {
 	padding:2em 0;
-	background:url(../images/content-bottom-bg.jpg) 50% top no-repeat #03649E;
+	/*background:url(../images/content-bottom-bg.jpg) 50% top no-repeat #03649E;*/
 }
 .region-footer-top a {color:#f6fafd;}
 
@@ -456,7 +485,8 @@ ul.pager li {
 	position:relative;
 	padding:1em 0;
 	border-top:1px solid #035a8c;
-	background:url(../images/footer-bg.png) 0 0 repeat #03649E;
+	/*background:url(../images/footer-bg.png) 0 0 repeat #03649E;*/
+	background:#001d26;
 	font-size:11px;
 	color:#f6fafd;
 	text-transform:uppercase;

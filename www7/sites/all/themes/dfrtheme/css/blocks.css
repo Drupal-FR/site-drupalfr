@@ -19,7 +19,8 @@
   background-position:3px 8px;
 }
 .block a {
-  color:#00c3dd;
+  /*color:#00c3dd;*/
+  color:#036ba5;
 }
 .block .btn-link {color:#fff;}
 
@@ -87,6 +88,11 @@
   margin:1em 0;
   padding:1em 0 3.5em 0;
   background:#036ba5;
+background-image: -moz-radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
+background-image: -webkit-radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
+background-image: -o-radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
+background-image: -ms-radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
+background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
   border-radius:5px;
   background-clip:padding-box;
   -moz-border-radius:5px;
@@ -102,13 +108,15 @@
   font-weight:normal;
   letter-spacing:-1px;
   padding:0 0 1em 1em;
-  margin-bottom:1em;
+  /*margin-bottom:1em;*/
   text-shadow:0 1px 0 #000;
-  background:url(../images/spacer-1.png) 0 100% repeat-x;
+  /*background:url(../images/spacer-1.png) 0 100% repeat-x;*/
+  border-bottom:1px solid rgba(0, 0, 0, 0.3);
 }
 .region-content-top .block .content {
   color:#fff;
-  padding:0 2em 0 1em;
+  padding:1em 2em 0 1em;
+  border-top:1px solid rgba(255, 255, 255, 0.3);
 }
 .region-content-top .block .btn-link {
   position:absolute;
@@ -123,10 +131,9 @@
   .region-content-top .block {
     display:inline-block;
     vertical-align:top;
-    min-height:170px;
+    min-height:200px;
     width:30%;
     margin:2em 2.5% 1em;
-    background:url(../images/services-bg.png) 50% 0 no-repeat #036ba5;
   }
   .region-content-top .block-1 {margin-left:0;}
   .region-content-top .block-3 {margin-right:0;}
@@ -141,8 +148,9 @@
 
 /* Homepage */
 
+#block-views-planete-block-1 {border-top:1px solid #e4eaef;padding-top:2em;}
 #block-drupalfr-events-next-events,
-#block-views-planete-block-1 {position: relative;min-height: 400px;}
+#block-views-planete-block-1 {position: relative;}
 
 #block-drupalfr-events-next-events .content,
 #block-views-planete-block-1 .content {padding-top:1em;}
@@ -189,10 +197,13 @@
 #block-views-planete-block-1 .more-link a:before {content:"» ";}
 
 @media screen and (min-width:768px) {
+
+  #block-views-planete-block-1 {border-top:0;padding-top:0;}
   #block-drupalfr-events-next-events,
   #block-views-planete-block-1 {
     display:inline-block;vertical-align: top;
     width:45%;margin-right:9%;
+    min-height: 400px;
   }
   #block-views-planete-block-1 {margin-right:0;}
 }
@@ -230,6 +241,21 @@
 /** ******************************************************* **/
 /** Sidebar                                                 **/
 /** ******************************************************* **/
+
+.region-sidebar-first .block {
+  border-top:1px solid #e4eaef;
+  margin:2em 0 0 0;
+  padding:2em 0 0 0;
+}
+/*.region-sidebar-first .block.block-1 {border-top:0;padding-top:0;}*/
+
+@media screen and (min-width: 768px) {
+  .region-sidebar-first .block {
+    border-top:0;
+    margin:0 0 2em 0;
+    padding:0;
+  }
+}
 
 /* block-search-form */
 #drupalfr-search-form .form-item,
@@ -281,7 +307,7 @@
 .tweet .profile_name {font-weight: bold;}
 .tweet .profile_name:after {content:":";}
 .block li .tweet span a {color:#444;}
-.block li .tweet span a:hover {color:#00C3DD;text-decoration: none;}
+.block li .tweet span a:hover {/*color:#00c3dd;*/color:#036ba5;text-decoration: none;}
 
 
 #block-dfr-emploi-creer-offre {text-align: center;}
@@ -338,7 +364,7 @@
   border-bottom:1px solid rgba(200, 200, 200, 0.6);
 }
 #block-views-offres-block-1 .views-field-title a {color:#fff;}
-#block-views-offres-block-1 .views-field-title a:hover {color:#00C3DD;text-decoration: none;}
+#block-views-offres-block-1 .views-field-title a:hover {/*color:#00c3dd;*/color:#036ba5;text-decoration: none;}
 
 #block-views-offres-block-1 .view-empty a {color:#fff;text-decoration: underline;}
 #block-views-offres-block-1 .more-link a:before {content:"» ";}
@@ -487,7 +513,7 @@
   display:block;
   padding:20px 0 20px 21px;
   text-decoration:none;
-  color:#00c3dd;
+  /*color:#00c3dd;*/color:#036ba5;
   background:url(../images/marker-1.png) 100% -104px no-repeat;
 }
 .view-features-overview .view-content .views-row .views-field-title:hover a {color:#fff; background-position:100% 18px;}

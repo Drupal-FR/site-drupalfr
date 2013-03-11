@@ -1,5 +1,17 @@
+currentscriptpath ()
+{
+local fullpath=`echo "$(readlink -f $0)"`
+local fullpath_length=`echo ${#fullpath}`
+local scriptname="$(basename $0)"
+local scriptname_length=`echo ${#scriptname}`
+local result_length=`echo $fullpath_length - $scriptname_length - 1 | bc`
+local result=`echo $fullpath | head -c $result_length`
+echo $result
+}
+
 # Dossier de travail
-DIR="/home/drupalfr/scripts"
+RESULT=$(currentscriptpath)
+DIR="$RESULT/.."
 
 #############
 # Version 7
@@ -20,6 +32,9 @@ mv $DIR/drupal7 $DIR/drupal-$VERSION
 tar cpzf drupal-7.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
+# Stockage du numéro de version dans une variable pour affichage sur le site.
+/usr/bin/drush -r $DIR/www7 vset drupalfr_version_d7 -q --yes --exact --format="string" "$VERSION"
+
 #############
 # Version 6
 #############
@@ -27,6 +42,7 @@ rm -r $DIR/drupal-$VERSION
 /usr/bin/drush dl drupal-6 -q --drupal-project-rename=drupal6 --destination=$DIR
 # Detection de version
 VERSION=`drush status drupal-version --pipe -r $DIR/drupal6`
+
 # Recuperation + copie de la trad de la version
 wget http://ftp.drupal.org/files/translations/6.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
 mkdir $DIR/drupal6/profiles/default/translations
@@ -38,4 +54,8 @@ mv $DIR/drupal6 $DIR/drupal-$VERSION
 tar cpzf drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
+# Stockage du numéro de version dans une variable pour affichage sur le site.
+/usr/bin/drush -r $DIR/www7 vset drupalfr_version_d6 -q --yes --exact --format="string" "$VERSION"
+
 exit
+
