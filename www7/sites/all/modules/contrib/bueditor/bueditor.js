@@ -132,7 +132,7 @@ BUE.text = BUE.processText = BUE.mode < 2 ? function (s) {return s.toString()} :
 
 // Create selection in a textarea
 BUE.selMake = BUE.mode == 2 ? function (T, start, end) {
-  range = T.createTextRange();
+  var range = T.createTextRange();
   range.collapse();
   range.moveEnd('character', end);
   range.moveStart('character', start);

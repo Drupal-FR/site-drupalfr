@@ -1,4 +1,3 @@
-
 //Register button accesskeys as Ctrl shortcuts.
 //Requires: none
 BUE.preprocess.ctrl = function(E, $) {
@@ -20,8 +19,6 @@ BUE.preprocess.ctrl = function(E, $) {
   $(E.textArea).bind('keydown.bue', function(e) {
     if (e.ctrlKey && !e.shiftKey && !e.originalEvent.altKey && E.ctrlKeys[e.keyCode]) {
       E.ctrlKeys[e.keyCode].click();
-      //Opera needs supression of keypress.
-      $.browser.opera && $(this).one('keypress', function() {return false});
       return false;
     }
   });
