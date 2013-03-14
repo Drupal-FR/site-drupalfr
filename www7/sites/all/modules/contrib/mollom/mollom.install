@@ -53,6 +53,13 @@ function mollom_requirements($phase = 'runtime', $check = TRUE) {
         '!admin-message' => $admin_message,
       ));
     }
+    // Bad request: Invalid client system time: Too large offset from UTC.
+    elseif ($status['keys valid'] === Mollom::REQUEST_ERROR) {
+      $requirements['mollom']['value'] = t('Client error');
+      $requirements['mollom']['description'] = t('The server time of this site is incorrect. The time of the operating system is not synchronized with the Coordinated Universal Time (UTC), which prevents a successful authentication with Mollom. The maximum allowed offset is @minutes minutes. Please consult your hosting provider or server operator to correct the server time.', array(
+        '@minutes' => Mollom::TIME_OFFSET_MAX / 60,
+      ));
+    }
     // Invalid API keys.
     elseif ($status['keys valid'] === Mollom::AUTH_ERROR) {
       $requirements['mollom']['value'] = t('Invalid');

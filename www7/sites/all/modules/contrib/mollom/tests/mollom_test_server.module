@@ -172,6 +172,14 @@ function mollom_test_server_rest_validate_auth() {
   $header = mollom_test_server_rest_get_auth_header();
   $sites = variable_get('mollom_test_server_site', array());
 
+  // Validate the timestamp.
+  $client_time = $header['oauth_timestamp'];
+  $time = REQUEST_TIME;
+  $offset = abs($time - $client_time);
+  if ($offset > Mollom::TIME_OFFSET_MAX) {
+    return FALSE;
+  }
+
   $sent_signature = $header['oauth_signature'];
   unset($header['oauth_signature']);
 
@@ -180,7 +188,6 @@ function mollom_test_server_rest_validate_auth() {
     Mollom::rawurlencode($GLOBALS['base_url'] . '/' . $_GET['q']),
     Mollom::rawurlencode(Mollom::httpBuildQuery($data + $header)),
   ));
-  $time = $header['oauth_timestamp'];
   $nonce = $header['oauth_nonce'];
 
   if (!isset($sites[$header['oauth_consumer_key']]['privateKey'])) {
@@ -452,7 +459,16 @@ function mollom_test_server_check_content($data) {
   // Fetch blacklist.
   $blacklist = variable_get('mollom_test_server_blacklist_' . $publicKey, array());
 
-  $post = implode('\n', array_intersect_key($data, array('postTitle' => 1, 'postBody' => 1)));
+  // Determine content keys to analyze.
+  $post_keys = array('postTitle' => 1, 'postBody' => 1);
+  $type = FALSE;
+  if (isset($data['type']) && in_array($data['type'], array('user'))) {
+    $type = $data['type'];
+    if ($type == 'user') {
+      $post_keys += array('authorName' => 1, 'authorMail' => 1);
+    }
+  }
+  $post = implode('\n', array_intersect_key($data, $post_keys));
 
   $update = isset($data['stored']);
 
@@ -470,8 +486,15 @@ function mollom_test_server_check_content($data) {
     }
     // Lastly, take a forced 'unsure' into account.
     elseif (strpos($post, 'unsure') !== FALSE) {
-      $spam = TRUE;
-      $ham = TRUE;
+      // Differentiate between binary unsure mode.
+      if (!isset($data['unsure']) || $data['unsure']) {
+        $spam = TRUE;
+        $ham = TRUE;
+      }
+      else {
+        $spam = TRUE;
+        $ham = FALSE;
+      }
     }
     // Check blacklist.
     if ($matches = mollom_test_server_check_content_blacklist($post, $blacklist, 'spam')) {
