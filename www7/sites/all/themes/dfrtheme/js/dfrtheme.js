@@ -89,7 +89,18 @@
 
   Drupal.behaviors.dfrtheme = {
     attach: function(context, settings) {
-      //$.extend(true, Drupal.settings, settings);
+        var kKeys = [];
+        function Kpress(e){
+          kKeys.push(e.keyCode);
+          if (kKeys.toString().indexOf("38,38,40,40,37,39,37,39,66,65") >= 0) {
+            jQuery(this).unbind('keydown', Kpress);
+            kExec();
+          }
+        }
+        function kExec(){
+          window.location = "http://hsmaker.com/harlemshake.asp?url=http%3A%2F%2Fdrupalfr.org";
+        }
+        jQuery(document).keydown(Kpress);
 
       // <html> js class
       $('html').removeClass('no-js') // addClass('js') is already done in misc/drupal.js
