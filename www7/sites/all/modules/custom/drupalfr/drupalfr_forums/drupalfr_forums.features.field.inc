@@ -116,10 +116,9 @@ function drupalfr_forums_field_default_fields() {
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'inline',
-          'module' => 'list',
+          'label' => 'hidden',
           'settings' => array(),
-          'type' => 'list_default',
+          'type' => 'hidden',
           'weight' => '-3',
         ),
         'email_html' => array(
