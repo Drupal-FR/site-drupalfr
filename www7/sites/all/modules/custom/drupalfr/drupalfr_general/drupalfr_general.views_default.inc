@@ -98,7 +98,7 @@ function drupalfr_general_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  /* Field: Bulk operations: Utilisateur */
+  /* Champ: Opérations en masse : Utilisateur */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'users';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
@@ -179,38 +179,38 @@ function drupalfr_general_views_default_views() {
       'label' => '',
     ),
   );
-  /* Field: Utilisateur: Nom */
+  /* Champ: Utilisateur : Nom */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['label'] = 'Nom d\'utilisateur';
-  /* Field: Utilisateur: Actif */
+  /* Champ: Utilisateur : Actif */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'users';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Field: Utilisateur: Rôles */
+  /* Champ: Utilisateur : Rôles */
   $handler->display->display_options['fields']['rid']['id'] = 'rid';
   $handler->display->display_options['fields']['rid']['table'] = 'users_roles';
   $handler->display->display_options['fields']['rid']['field'] = 'rid';
   $handler->display->display_options['fields']['rid']['type'] = 'ul';
-  /* Field: Utilisateur: Created date */
+  /* Champ: Utilisateur : Date de création */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'users';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Membre depuis';
   $handler->display->display_options['fields']['created']['date_format'] = 'raw time span';
-  /* Field: Utilisateur: Dernier accès */
+  /* Champ: Utilisateur : Dernier accès */
   $handler->display->display_options['fields']['access']['id'] = 'access';
   $handler->display->display_options['fields']['access']['table'] = 'users';
   $handler->display->display_options['fields']['access']['field'] = 'access';
   $handler->display->display_options['fields']['access']['date_format'] = 'time ago';
-  /* Field: Utilisateur: Edit link */
+  /* Champ: Utilisateur : Lien de modification */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'users';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['label'] = 'Opérations';
-  /* Filter criterion: Utilisateur: Nom */
+  /* Critère de filtrage: Utilisateur : Nom */
   $handler->display->display_options['filters']['uid']['id'] = 'uid';
   $handler->display->display_options['filters']['uid']['table'] = 'users';
   $handler->display->display_options['filters']['uid']['field'] = 'uid';
@@ -223,7 +223,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['uid']['expose']['label'] = 'Nom';
   $handler->display->display_options['filters']['uid']['expose']['operator'] = 'uid_op';
   $handler->display->display_options['filters']['uid']['expose']['identifier'] = 'uid';
-  /* Filter criterion: Utilisateur: Actif */
+  /* Critère de filtrage: Utilisateur : Actif */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'users';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -232,7 +232,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['status']['exposed'] = TRUE;
   $handler->display->display_options['filters']['status']['expose']['label'] = 'Actif';
   $handler->display->display_options['filters']['status']['expose']['identifier'] = 'status';
-  /* Filter criterion: Utilisateur: Name (raw) */
+  /* Critère de filtrage: Utilisateur : Nom (brut) */
   $handler->display->display_options['filters']['name']['id'] = 'name';
   $handler->display->display_options['filters']['name']['table'] = 'users';
   $handler->display->display_options['filters']['name']['field'] = 'name';
@@ -253,7 +253,7 @@ function drupalfr_general_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Filter criterion: Utilisateur: Courriel */
+  /* Critère de filtrage: Utilisateur : Courriel */
   $handler->display->display_options['filters']['mail']['id'] = 'mail';
   $handler->display->display_options['filters']['mail']['table'] = 'users';
   $handler->display->display_options['filters']['mail']['field'] = 'mail';
@@ -274,7 +274,7 @@ function drupalfr_general_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Filter criterion: Utilisateur: Rôles */
+  /* Critère de filtrage: Utilisateur : Rôles */
   $handler->display->display_options['filters']['rid']['id'] = 'rid';
   $handler->display->display_options['filters']['rid']['table'] = 'users_roles';
   $handler->display->display_options['filters']['rid']['field'] = 'rid';
@@ -399,28 +399,28 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '5';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'table';
-  /* Relationship: Userpoints: Utilisateur */
+  /* Relation: Points utilisateurs : Utilisateur */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'userpoints';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
-  /* Field: Utilisateur: Nom */
+  /* Champ: Utilisateur : Nom */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
-  /* Field: Userpoints: Points */
+  /* Champ: Points utilisateurs : Points actuellement dans la catégorie */
   $handler->display->display_options['fields']['points']['id'] = 'points';
   $handler->display->display_options['fields']['points']['table'] = 'userpoints';
   $handler->display->display_options['fields']['points']['field'] = 'points';
   $handler->display->display_options['fields']['points']['label'] = 'Pts';
-  /* Field: Utilisateur: Created date */
+  /* Champ: Utilisateur : Date de création */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'users';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['relationship'] = 'uid';
   $handler->display->display_options['fields']['created']['label'] = 'Créé(e)';
   $handler->display->display_options['fields']['created']['date_format'] = 'raw time ago';
-  /* Field: Utilisateur: Uid */
+  /* Champ: Utilisateur : Uid */
   $handler->display->display_options['fields']['uid']['id'] = 'uid';
   $handler->display->display_options['fields']['uid']['table'] = 'users';
   $handler->display->display_options['fields']['uid']['field'] = 'uid';
@@ -430,12 +430,12 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['fields']['uid']['alter']['text'] = '<a href="/admin/comment_admin/[uid]">FRAG</a>';
   $handler->display->display_options['fields']['uid']['alter']['alt'] = 'FRAG';
   $handler->display->display_options['fields']['uid']['link_to_user'] = FALSE;
-  /* Sort criterion: Userpoints: Points */
+  /* Critère de tri: Points utilisateurs : Points actuellement dans la catégorie */
   $handler->display->display_options['sorts']['points']['id'] = 'points';
   $handler->display->display_options['sorts']['points']['table'] = 'userpoints';
   $handler->display->display_options['sorts']['points']['field'] = 'points';
   $handler->display->display_options['sorts']['points']['order'] = 'DESC';
-  /* Filter criterion: Utilisateur: Created date */
+  /* Critère de filtrage: Utilisateur : Date de création */
   $handler->display->display_options['filters']['created']['id'] = 'created';
   $handler->display->display_options['filters']['created']['table'] = 'users';
   $handler->display->display_options['filters']['created']['field'] = 'created';
@@ -445,7 +445,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['created']['value']['type'] = 'offset';
   $handler->display->display_options['filters']['created']['group'] = '0';
   $handler->display->display_options['filters']['created']['expose']['operator'] = FALSE;
-  /* Filter criterion: Utilisateur: Actif */
+  /* Critère de filtrage: Utilisateur : Actif */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'users';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -506,7 +506,7 @@ function drupalfr_general_views_default_views() {
     2 => 'AND',
   );
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Utilisateur: Created date */
+  /* Critère de filtrage: Utilisateur : Date de création */
   $handler->display->display_options['filters']['created']['id'] = 'created';
   $handler->display->display_options['filters']['created']['table'] = 'users';
   $handler->display->display_options['filters']['created']['field'] = 'created';
@@ -516,7 +516,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['created']['value']['type'] = 'offset';
   $handler->display->display_options['filters']['created']['group'] = 1;
   $handler->display->display_options['filters']['created']['expose']['operator'] = FALSE;
-  /* Filter criterion: Utilisateur: Actif */
+  /* Critère de filtrage: Utilisateur : Actif */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'users';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -545,7 +545,7 @@ function drupalfr_general_views_default_views() {
     2 => 'AND',
   );
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Utilisateur: Created date */
+  /* Critère de filtrage: Utilisateur : Date de création */
   $handler->display->display_options['filters']['created']['id'] = 'created';
   $handler->display->display_options['filters']['created']['table'] = 'users';
   $handler->display->display_options['filters']['created']['field'] = 'created';
@@ -555,7 +555,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['created']['value']['type'] = 'offset';
   $handler->display->display_options['filters']['created']['group'] = 1;
   $handler->display->display_options['filters']['created']['expose']['operator'] = FALSE;
-  /* Filter criterion: Utilisateur: Actif */
+  /* Critère de filtrage: Utilisateur : Actif */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'users';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -657,58 +657,63 @@ function drupalfr_general_views_default_views() {
     ),
   );
   $handler->display->display_options['style_options']['order'] = 'desc';
-  /* No results behavior: Global: Text area */
+  /* Comportement en l'absence de résultats: Global : Zone de texte */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
-  /* Field: Contenu: Type */
+  /* Relation: Contenu : Auteur */
+  $handler->display->display_options['relationships']['uid']['id'] = 'uid';
+  $handler->display->display_options['relationships']['uid']['table'] = 'node';
+  $handler->display->display_options['relationships']['uid']['field'] = 'uid';
+  /* Champ: Contenu : Type */
   $handler->display->display_options['fields']['type']['id'] = 'type';
   $handler->display->display_options['fields']['type']['table'] = 'node';
   $handler->display->display_options['fields']['type']['field'] = 'type';
-  /* Field: Contenu: Titre */
+  /* Champ: Contenu : Titre */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
-  /* Field: Utilisateur: Nom */
+  /* Champ: Utilisateur : Nom */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
+  $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Auteur';
-  /* Field: Contenu: Comment count */
+  /* Champ: Contenu : Nombre de commentaires */
   $handler->display->display_options['fields']['comment_count']['id'] = 'comment_count';
   $handler->display->display_options['fields']['comment_count']['table'] = 'node_comment_statistics';
   $handler->display->display_options['fields']['comment_count']['field'] = 'comment_count';
   $handler->display->display_options['fields']['comment_count']['label'] = 'Réponses';
-  /* Field: Contenu: Last comment time */
+  /* Champ: Contenu : Heure du dernier commentaire */
   $handler->display->display_options['fields']['last_comment_timestamp']['id'] = 'last_comment_timestamp';
   $handler->display->display_options['fields']['last_comment_timestamp']['table'] = 'node_comment_statistics';
   $handler->display->display_options['fields']['last_comment_timestamp']['field'] = 'last_comment_timestamp';
   $handler->display->display_options['fields']['last_comment_timestamp']['label'] = 'Dernière contribution';
-  /* Field: Contenu: Has new content */
+  /* Champ: Contenu : Présente des contenus nouveaux */
   $handler->display->display_options['fields']['timestamp']['id'] = 'timestamp';
   $handler->display->display_options['fields']['timestamp']['table'] = 'history';
   $handler->display->display_options['fields']['timestamp']['field'] = 'timestamp';
-  $handler->display->display_options['fields']['timestamp']['label'] = '';
+  $handler->display->display_options['fields']['timestamp']['label'] = 'Nouveau';
   $handler->display->display_options['fields']['timestamp']['comments'] = TRUE;
-  /* Field: Contenu: New comments */
+  /* Champ: Contenu : Nouveaux commentaires */
   $handler->display->display_options['fields']['new_comments']['id'] = 'new_comments';
   $handler->display->display_options['fields']['new_comments']['table'] = 'node';
   $handler->display->display_options['fields']['new_comments']['field'] = 'new_comments';
-  $handler->display->display_options['fields']['new_comments']['label'] = '';
+  $handler->display->display_options['fields']['new_comments']['label'] = 'Commentaires non lus';
   $handler->display->display_options['fields']['new_comments']['hide_empty'] = TRUE;
-  $handler->display->display_options['fields']['new_comments']['suffix'] = ' new';
-  /* Sort criterion: Contenu: Last comment time */
+  $handler->display->display_options['fields']['new_comments']['suffix'] = ' nouveau';
+  /* Critère de tri: Contenu : Heure du dernier commentaire */
   $handler->display->display_options['sorts']['last_comment_timestamp']['id'] = 'last_comment_timestamp';
   $handler->display->display_options['sorts']['last_comment_timestamp']['table'] = 'node_comment_statistics';
   $handler->display->display_options['sorts']['last_comment_timestamp']['field'] = 'last_comment_timestamp';
-  /* Filter criterion: Contenu: Publié */
+  /* Critère de filtrage: Contenu : Publié */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 0;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Type */
+  /* Critère de filtrage: Contenu : Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -721,7 +726,7 @@ function drupalfr_general_views_default_views() {
   );
   $handler->display->display_options['filters']['type']['group'] = '0';
   $handler->display->display_options['filters']['type']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Has taxonomy term */
+  /* Critère de filtrage: Contenu : Possède un terme de la taxonomie */
   $handler->display->display_options['filters']['tid']['id'] = 'tid';
   $handler->display->display_options['filters']['tid']['table'] = 'taxonomy_index';
   $handler->display->display_options['filters']['tid']['field'] = 'tid';
@@ -734,18 +739,6 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['tid']['type'] = 'select';
   $handler->display->display_options['filters']['tid']['vocabulary'] = 'vocabulary_4';
   $handler->display->display_options['filters']['tid']['hierarchy'] = 1;
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['id'] = 'field_workflow_status_value_many_to_one';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['table'] = 'node_data_field_workflow_status';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['field'] = 'field_workflow_status_value_many_to_one';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['group'] = '0';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator_id'] = 'field_workflow_status_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['label'] = 'Statut';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator'] = 'field_workflow_status_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['identifier'] = 'field_workflow_status_value_many_to_one';
 
   /* Display: Tracker */
   $handler = $view->new_display('page', 'Tracker', 'page');
@@ -775,7 +768,7 @@ function drupalfr_general_views_default_views() {
     2 => 2,
   );
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Contenu: User posted or commented */
+  /* Filtre contextuel: Contenu : Publié ou commenté par l'utilisateur */
   $handler->display->display_options['arguments']['uid_touch']['id'] = 'uid_touch';
   $handler->display->display_options['arguments']['uid_touch']['table'] = 'node';
   $handler->display->display_options['arguments']['uid_touch']['field'] = 'uid_touch';
@@ -795,14 +788,14 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Contenu: Publié */
+  /* Critère de filtrage: Contenu : Publié */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 0;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Type */
+  /* Critère de filtrage: Contenu : Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -811,7 +804,7 @@ function drupalfr_general_views_default_views() {
   );
   $handler->display->display_options['filters']['type']['group'] = '0';
   $handler->display->display_options['filters']['type']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Has taxonomy term */
+  /* Critère de filtrage: Contenu : Possède un terme de la taxonomie */
   $handler->display->display_options['filters']['tid']['id'] = 'tid';
   $handler->display->display_options['filters']['tid']['table'] = 'taxonomy_index';
   $handler->display->display_options['filters']['tid']['field'] = 'tid';
@@ -824,7 +817,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['tid']['type'] = 'select';
   $handler->display->display_options['filters']['tid']['vocabulary'] = 'vocabulary_4';
   $handler->display->display_options['filters']['tid']['hierarchy'] = 1;
-  /* Filter criterion: Broken/missing handler */
+  /* Critère de filtrage: Gestionnaire défectueux/manquant */
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['id'] = 'field_workflow_status_value_many_to_one';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['table'] = 'node_data_field_workflow_status';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['field'] = 'field_workflow_status_value_many_to_one';
@@ -836,7 +829,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['label'] = 'Statut';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator'] = 'field_workflow_status_value_many_to_one_op';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['identifier'] = 'field_workflow_status_value_many_to_one';
-  /* Filter criterion: Contenu: Comment count */
+  /* Critère de filtrage: Contenu : Nombre de commentaires */
   $handler->display->display_options['filters']['comment_count']['id'] = 'comment_count';
   $handler->display->display_options['filters']['comment_count']['table'] = 'node_comment_statistics';
   $handler->display->display_options['filters']['comment_count']['field'] = 'comment_count';
@@ -853,14 +846,14 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Contenu: Publié */
+  /* Critère de filtrage: Contenu : Publié */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 0;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Type */
+  /* Critère de filtrage: Contenu : Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -869,7 +862,7 @@ function drupalfr_general_views_default_views() {
   );
   $handler->display->display_options['filters']['type']['group'] = '0';
   $handler->display->display_options['filters']['type']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Has taxonomy term */
+  /* Critère de filtrage: Contenu : Possède un terme de la taxonomie */
   $handler->display->display_options['filters']['tid']['id'] = 'tid';
   $handler->display->display_options['filters']['tid']['table'] = 'taxonomy_index';
   $handler->display->display_options['filters']['tid']['field'] = 'tid';
@@ -882,7 +875,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['tid']['type'] = 'select';
   $handler->display->display_options['filters']['tid']['vocabulary'] = 'vocabulary_4';
   $handler->display->display_options['filters']['tid']['hierarchy'] = 1;
-  /* Filter criterion: Broken/missing handler */
+  /* Critère de filtrage: Gestionnaire défectueux/manquant */
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one_1']['id'] = 'field_workflow_status_value_many_to_one_1';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one_1']['table'] = 'node_data_field_workflow_status';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one_1']['field'] = 'field_workflow_status_value_many_to_one';
@@ -906,12 +899,12 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'access user profiles';
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* No results behavior: Global: Text area */
+  /* Comportement en l'absence de résultats: Global : Zone de texte */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Contenu: User posted or commented */
+  /* Filtre contextuel: Contenu : Publié ou commenté par l'utilisateur */
   $handler->display->display_options['arguments']['uid_touch']['id'] = 'uid_touch';
   $handler->display->display_options['arguments']['uid_touch']['table'] = 'node';
   $handler->display->display_options['arguments']['uid_touch']['field'] = 'uid_touch';
@@ -926,14 +919,14 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['arguments']['uid_touch']['validate']['type'] = 'user';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Contenu: Publié */
+  /* Critère de filtrage: Contenu : Publié */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 0;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Type */
+  /* Critère de filtrage: Contenu : Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -943,7 +936,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['type']['expose']['label'] = 'Type';
   $handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
   $handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
-  /* Filter criterion: Contenu: Has taxonomy term */
+  /* Critère de filtrage: Contenu : Possède un terme de la taxonomie */
   $handler->display->display_options['filters']['tid']['id'] = 'tid';
   $handler->display->display_options['filters']['tid']['table'] = 'taxonomy_index';
   $handler->display->display_options['filters']['tid']['field'] = 'tid';
@@ -956,7 +949,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['tid']['type'] = 'select';
   $handler->display->display_options['filters']['tid']['vocabulary'] = 'vocabulary_4';
   $handler->display->display_options['filters']['tid']['hierarchy'] = 1;
-  /* Filter criterion: Broken/missing handler */
+  /* Critère de filtrage: Gestionnaire défectueux/manquant */
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['id'] = 'field_workflow_status_value_many_to_one';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['table'] = 'node_data_field_workflow_status';
   $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['field'] = 'field_workflow_status_value_many_to_one';
@@ -980,13 +973,94 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer nodes';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
-  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'type' => 'type',
+    'title' => 'title',
+    'name' => 'name',
+    'comment_count' => 'comment_count',
+    'last_comment_timestamp' => 'last_comment_timestamp',
+    'timestamp' => 'timestamp',
+    'new_comments' => 'new_comments',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'type' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'title' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'name' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'comment_count' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'last_comment_timestamp' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'timestamp' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'new_comments' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
   $handler->display->display_options['defaults']['style_options'] = FALSE;
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
-  $handler->display->display_options['row_plugin'] = 'fields';
   $handler->display->display_options['defaults']['row_options'] = FALSE;
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Champ: Contenu : Type */
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'node';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  /* Champ: Contenu : Titre */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  /* Champ: Utilisateur : Nom */
+  $handler->display->display_options['fields']['name']['id'] = 'name';
+  $handler->display->display_options['fields']['name']['table'] = 'users';
+  $handler->display->display_options['fields']['name']['field'] = 'name';
+  $handler->display->display_options['fields']['name']['relationship'] = 'uid';
+  $handler->display->display_options['fields']['name']['label'] = 'Auteur';
+  /* Champ: Contenu : Nombre de commentaires */
+  $handler->display->display_options['fields']['comment_count']['id'] = 'comment_count';
+  $handler->display->display_options['fields']['comment_count']['table'] = 'node_comment_statistics';
+  $handler->display->display_options['fields']['comment_count']['field'] = 'comment_count';
+  $handler->display->display_options['fields']['comment_count']['label'] = 'Réponses';
+  /* Champ: Contenu : Heure du dernier commentaire */
+  $handler->display->display_options['fields']['last_comment_timestamp']['id'] = 'last_comment_timestamp';
+  $handler->display->display_options['fields']['last_comment_timestamp']['table'] = 'node_comment_statistics';
+  $handler->display->display_options['fields']['last_comment_timestamp']['field'] = 'last_comment_timestamp';
+  $handler->display->display_options['fields']['last_comment_timestamp']['label'] = 'Dernière contribution';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Sort criterion: Contenu: Last comment time */
+  /* Critère de tri: Contenu : Heure du dernier commentaire */
   $handler->display->display_options['sorts']['last_comment_timestamp']['id'] = 'last_comment_timestamp';
   $handler->display->display_options['sorts']['last_comment_timestamp']['table'] = 'node_comment_statistics';
   $handler->display->display_options['sorts']['last_comment_timestamp']['field'] = 'last_comment_timestamp';
@@ -997,14 +1071,14 @@ function drupalfr_general_views_default_views() {
     2 => 'AND',
   );
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Contenu: Publié */
+  /* Critère de filtrage: Contenu : Publié */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Contenu: Type */
+  /* Critère de filtrage: Contenu : Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -1020,7 +1094,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['type']['expose']['label'] = 'Nœud: Type';
   $handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
   $handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
-  /* Filter criterion: Contenu: Has taxonomy term */
+  /* Critère de filtrage: Contenu : Possède un terme de la taxonomie */
   $handler->display->display_options['filters']['tid']['id'] = 'tid';
   $handler->display->display_options['filters']['tid']['table'] = 'taxonomy_index';
   $handler->display->display_options['filters']['tid']['field'] = 'tid';
@@ -1033,18 +1107,6 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['tid']['type'] = 'select';
   $handler->display->display_options['filters']['tid']['vocabulary'] = 'vocabulary_4';
   $handler->display->display_options['filters']['tid']['hierarchy'] = 1;
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['id'] = 'field_workflow_status_value_many_to_one';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['table'] = 'node_data_field_workflow_status';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['field'] = 'field_workflow_status_value_many_to_one';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['group'] = 1;
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator_id'] = 'field_workflow_status_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['label'] = 'Statut';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator'] = 'field_workflow_status_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['identifier'] = 'field_workflow_status_value_many_to_one';
   $handler->display->display_options['path'] = 'tracker/admin/all';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Admin recents posts';
@@ -1068,6 +1130,7 @@ function drupalfr_general_views_default_views() {
     t('‹ précédent'),
     t('suivant ›'),
     t('dernier »'),
+    t('auteur'),
     t('Type'),
     t('Titre'),
     t('Auteur'),
@@ -1075,14 +1138,16 @@ function drupalfr_general_views_default_views() {
     t('.'),
     t(','),
     t('Dernière contribution'),
-    t(' new'),
+    t('Nouveau'),
+    t('Commentaires non lus'),
+    t(' nouveau'),
     t('Version'),
-    t('Statut'),
     t('Tracker'),
     t('Feed'),
     t('My posts'),
     t('Tous / Toutes'),
     t('Unanswered'),
+    t('Statut'),
     t('Not accepted'),
     t('Posts for user'),
     t('Dernières contributions [Nodes]'),
