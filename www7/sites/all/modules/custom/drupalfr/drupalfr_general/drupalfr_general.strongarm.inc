@@ -118,7 +118,7 @@ Avancé<br/>
   $strongarm->name = 'mollom_status';
   $strongarm->value = array(
     'keys' => TRUE,
-    'keys valid' => 900,
+    'keys valid' => TRUE,
   );
   $export['mollom_status'] = $strongarm;
 
