@@ -52,34 +52,40 @@ function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
  */
 function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
   if (variable_get('dfr_emploi_rewrite_urls', TRUE)) {
+    // drupal_get_normal_path() is calling this hook, so we need only to alter
+    // the first hit, all others are worthless
+    static $executed = FALSE;
     global $base_url;
     // On arrive sur emploi.*
-    if (preg_match('|^https?:\/\/emploi\.(.+)|', $base_url)) {
-      // On veut que le path interne remette emploi en front, sauf s'il y est déjà
-      if (0 !== strpos($original_path, 'emploi')) {
-        if (!$original_path || $original_path == variable_get('site_frontpage', 'node')) {
-          $path = 'emploi';
-        }
-        else {
-          $path = 'emploi/' . $original_path;
-        }
-        if ($source = drupal_lookup_path('source', $path, $path_language)) {
-          $path = $source;
+    if (!$executed) {
+      if (preg_match('|^https?:\/\/emploi\.(.+)|', $base_url)) {
+        // On veut que le path interne remette emploi en front, sauf s'il y est déjà
+        if (0 !== strpos($original_path, 'emploi')) {
+          if (!$original_path || $original_path == variable_get('site_frontpage', 'node')) {
+            $path = 'emploi';
+          }
+          else {
+            $path = 'emploi/' . $original_path;
+          }
+          if ($source = drupal_lookup_path('source', $path, $path_language)) {
+            $path = $source;
+          }
         }
       }
-    }
-    elseif (0 === strpos($original_path, 'emploi') ||
-      (($alias = drupal_lookup_path('alias', $path, $path_language)) &&
-        0 === strpos($alias, 'emploi'))
-    ) {
-      // Quand on est pas sur emploi.*, on regarde si notre path interne ou son
-      // alias commence par emploi, si oui, on tronque et on redirige sur emploi.*
-      if (!isset($alias)) {
-        $alias = drupal_lookup_path('alias', $path, $path_language);
+      elseif (0 === strpos($original_path, 'emploi') ||
+        (($alias = drupal_lookup_path('alias', $path, $path_language)) &&
+          0 === strpos($alias, 'emploi'))
+      ) {
+        // Quand on est pas sur emploi.*, on regarde si notre path interne ou son
+        // alias commence par emploi, si oui, on tronque et on redirige sur emploi.*
+        if (!isset($alias)) {
+          $alias = drupal_lookup_path('alias', $path, $path_language);
+        }
+        $alias = substr($alias, strlen('emploi/'));
+        list($scheme, $url) = explode('://', $base_url, 2);
+        drupal_goto($alias, array('base_url' => $scheme . '://emploi.' . $url), 301);
       }
-      $alias = substr($alias, strlen('emploi/'));
-      list($scheme, $url) = explode('://', $base_url, 2);
-      drupal_goto($alias, array('base_url' => $scheme . '://emploi.' . $url), 301);
+      $executed = TRUE;
     }
   }
 }

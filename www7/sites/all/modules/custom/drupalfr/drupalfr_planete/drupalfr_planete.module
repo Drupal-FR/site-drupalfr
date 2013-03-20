@@ -56,30 +56,40 @@ function drupalfr_planete_block_view($delta = '') {
  */
 function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_language) {
   if (variable_get('drupalfr_planete_rewrite_urls', TRUE)) {
+    // drupal_get_normal_path() is calling this hook, so we need only to alter
+    // the first hit, all others are worthless
+    static $executed = FALSE;
     global $base_url;
 
-    list($scheme, $url) = explode('://', $base_url, 2);
+    if (!$executed) {
+      list($scheme, $url) = explode('://', $base_url, 2);
 
-    if (0 === strpos($url, 'planete.')) {
-      if ('planete' === $path) {
-        // Quand l'utilisateur est sur l'URL en planete.URL, on doit s'assurer
-        // que les chemins / et /planete ne soit pas dupliqués, on rediregera
-        // donc sur /.
-        drupal_goto($base_url, array(), 301);
-      }
-      else if (empty($path) || $path === variable_get('site_frontpage', 'node')) {
-        // Chemin vide ou front page, on est bon, on doit alors changer le chemin
-        // interne à Drupal pour le feinter et lui faire croire qu'on est dans
-        // la page /planete.
-        $path = 'planete';
+      if (0 === strpos($url, 'planete.')) {
+        if ('planete' === $path) {
+          // Quand l'utilisateur est sur l'URL en planete.URL, on doit s'assurer
+          // que les chemins / et /planete ne soit pas dupliqués, on rediregera
+          // donc sur /.
+          drupal_goto($base_url, array(), 301);
+        }
+        else {
+          if (empty($path) || $path === variable_get('site_frontpage', 'node')) {
+            // Chemin vide ou front page, on est bon, on doit alors changer le chemin
+            // interne à Drupal pour le feinter et lui faire croire qu'on est dans
+            // la page /planete.
+            $path = 'planete';
+          }
+          else {
+            // Tout autre tentative doit retourner sur le site principal.
+            drupal_goto($scheme . '://' . substr($url, strlen('planete.')), array(), 301);
+          }
+        }
       }
       else {
-        // Tout autre tentative doit retourner sur le site principal.
-        drupal_goto($scheme . '://' . substr($url, strlen('planete.')), array(), 301);
+        if ('planete' === $path) {
+          drupal_goto($scheme . '://planete.' . $url, array(), 301);
+        }
       }
-    }
-    else if ('planete' === $path) {
-      drupal_goto($scheme . '://planete.' . $url, array(), 301);
+      $executed = TRUE;
     }
   }
 }
