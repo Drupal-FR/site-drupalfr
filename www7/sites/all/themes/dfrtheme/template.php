@@ -92,6 +92,14 @@ function dfrtheme_preprocess_page(&$variables) {
   if (isset($variables['node_title'])) {
     $variables['title'] = $variables['node_title'];
   }
+  // Replace page title by a link to the original article on full page of
+  // planet's articles.
+  if (isset($variables['node'])) {
+    $node = $variables['node'];
+    if ($node->type == 'planete') {
+      $variables['title'] = l($node->title, $node->field_planete_url[LANGUAGE_NONE][0]['url']);
+    }
+  }
 
   // Adding classes wether #navigation is here or not
   if (!empty($variables['main_menu']) or !empty($variables['sub_menu'])) {
@@ -152,7 +160,6 @@ function dfrtheme_preprocess_node(&$variables) {
   if ($variables['type'] == 'planete' && $variables['view_mode'] == 'teaser') {
     $variables['submitted_pubdate'] = format_date($variables['created'], 'custom', 'l j F Y');
   }
-
   $variables['theme_hook_suggestions'][] = 'node__' . $variables['node']->type . '__' . $variables['view_mode'];
 }
 
