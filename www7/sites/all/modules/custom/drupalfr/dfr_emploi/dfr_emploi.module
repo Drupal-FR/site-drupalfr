@@ -52,8 +52,9 @@ function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
  */
 function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
   if (variable_get('dfr_emploi_rewrite_urls', TRUE)) {
-    // Ne travailler que sur le chemin courant, pas sur les autres appels à ce hook
-    if(current_path() !== $original_path) {
+    // Ne travailler que sur le chemin courant, pas sur les autres appels à ce
+    // hook, also: don't mess with the form
+    if (current_path() !== $original_path || $_SERVER['REQUEST_METHOD'] == 'POST') {
       return;
     }
 
