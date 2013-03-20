@@ -56,6 +56,11 @@ function drupalfr_planete_block_view($delta = '') {
  */
 function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_language) {
   if (variable_get('drupalfr_planete_rewrite_urls', TRUE)) {
+    // Ne travailler que sur le chemin courant, pas sur les autres appels à ce hook
+    if (current_path() !== $original_path) {
+      return;
+    }
+
     global $base_url;
 
     list($scheme, $url) = explode('://', $base_url, 2);
