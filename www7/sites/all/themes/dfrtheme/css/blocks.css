@@ -385,6 +385,7 @@ background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
     display:inline-block;vertical-align: top;
     width:10%; /* 30% / 3 */
     margin-left:1%; /* 3% / 3 */
+    min-height: 10em;
     margin-bottom:0;
   }
 
@@ -416,7 +417,6 @@ background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
 }
 
 
-
 @media screen and (min-width:900px) {
   #block-dfr-blocks-about-us,
   #block-views-offres-block-1 {padding:0;}
@@ -429,7 +429,13 @@ background-image: radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
     display:inline-block;vertical-align: top;
     width:69%;
   }
+  #block-views-offres-block-1 .views-row { min-height: 8em; }
   #block-views-offres-block-1 .more-link {position:absolute;top:-0.5em;right:3%;}
+}
+
+
+@media screen and (min-width:1280px) {
+  #block-views-offres-block-1 .views-row { min-height: 0; }
 }
 
 
