@@ -112,7 +112,9 @@ function dfr_emploi_block_view($delta = '') {
   $block['content'] = l('Déposer une offre', 'node/add/offre', array(
     'attributes' => array('class' => 'btn-link'),
   ));
-  $block['content'] .= '<p><em>Vous devez être connecté pour pouvoir créer une offre.</em></p>';
+  if (user_is_anonymous()) {
+    $block['content'] .= '<p><em>Vous devez être connecté pour pouvoir créer une offre.</em></p>';
+  }
   return $block;
 }
 
