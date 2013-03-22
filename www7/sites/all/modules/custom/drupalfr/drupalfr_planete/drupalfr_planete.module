@@ -125,9 +125,9 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
       }
     }
     else if (0 === strpos($url, 'planete.')) {
-      $path = $scheme . '://' . substr($url, strlen('planete.')) . '/' . $path;
+      // On est pas sur le planete on enleve notre sous-domaine
+      $options['base_url'] = $scheme . '://' . substr($url, strlen('planete.'));
       $options['absolute'] = TRUE;
-      $options['external'] = TRUE;
     }
   }
 }

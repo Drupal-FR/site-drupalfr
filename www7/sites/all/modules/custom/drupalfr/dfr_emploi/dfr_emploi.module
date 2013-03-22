@@ -27,13 +27,21 @@ function dfr_emploi_node_access($node, $op, $account) {
 function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
   if (variable_get('dfr_emploi_rewrite_urls', TRUE)) {
     global $base_url;
+
+    // Osef des autres urls
+    if ($options['external']) {
+      return;
+    }
+
+    // Ça, c'est un peu global redirect en soi
+    if ($alias = drupal_lookup_path('alias', $original_path)) {
+      $path = $alias;
+      // We already retrieved the alias, this will prevent another lookup
+      $options['alias'] = TRUE;
+    }
+
     // On est sur emploi.*
-    if (preg_match('|^(https?:\/\/)emploi\.(.+)|', $base_url, $matches) && !$options['external']) {
-      if ($alias = drupal_lookup_path('alias', $original_path)) {
-        $path = $alias;
-        // We already retrieved the alias, this will prevent another lookup
-        $options['alias'] = TRUE;
-      }
+    if (preg_match('|^(https?:\/\/)emploi\.(.+)|', $base_url, $matches)) {
       if (0 !== strpos($path, 'emploi/')) {
         // On veut que les paths normaux redirigent vers dfr
         $options['absolute'] = TRUE;
@@ -41,6 +49,22 @@ function dfr_emploi_url_outbound_alter(&$path, &$options, $original_path) {
       }
       else {
         // Et les autres soit tronqués d'"emploi"
+        $path = substr($path, strlen('emploi/'));
+      }
+    }
+    else {
+      // Ça c'est pour que google retienne les bons liens
+      if (0 === strpos($path, 'emploi/')) {
+        list($scheme, $url) = explode('://', $base_url, 2);
+        // Verifions qu'on est pas dans un autre sous-domaine, genre emploi
+        if (substr_count($url, '.') == 2) {
+          // Si oui on ne prend que les deux derniers élément de base url
+          $url = substr($url, strpos($url, '.') + 1);
+        }
+        // On change de base et on passe en absolute
+        $options['absolute'] = TRUE;
+        $options['base_url'] = $scheme . '://emploi.' . $url;
+        // On tronque "emploi" et on change la base url
         $path = substr($path, strlen('emploi/'));
       }
     }
