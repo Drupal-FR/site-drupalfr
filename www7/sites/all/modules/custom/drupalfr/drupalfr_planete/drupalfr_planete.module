@@ -117,7 +117,7 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
       }
       else {
         // Verifions qu'on est pas dans un autre sous-domaine, genre emploi
-        if (substr_count($url, '.')) {
+        if (substr_count($url, '.') == 2) {
           // Si oui on ne prend que les deux derniers élément de base url
           $url = substr($url, strpos($url, '.') + 1);
         }
