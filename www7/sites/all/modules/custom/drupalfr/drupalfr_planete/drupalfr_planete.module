@@ -56,35 +56,28 @@ function drupalfr_planete_block_view($delta = '') {
  */
 function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_language) {
   if (variable_get('drupalfr_planete_rewrite_urls', TRUE)) {
-    // Ne travailler que sur le chemin courant, pas sur les autres appels à ce hook
-    if (current_path() !== $original_path) {
+    // Ne travailler que sur le chemin courant, pas sur les autres appels à ce
+    // hook, also: don't mess with the form
+    if (current_path() !== $original_path || $_SERVER['REQUEST_METHOD'] == 'POST') {
       return;
     }
 
     global $base_url;
 
-    list($scheme, $url) = explode('://', $base_url, 2);
-
-    if (0 === strpos($url, 'planete.')) {
-      if ('planete' === $path) {
-        // Quand l'utilisateur est sur l'URL en planete.URL, on doit s'assurer
-        // que les chemins / et /planete ne soit pas dupliqués, on rediregera
-        // donc sur /.
-        drupal_goto($base_url, array(), 301);
+    // On arrive sur planete.*
+    if (preg_match('|^https?:\/\/planete\.(.+)|', $base_url)) {
+      // On veut que le path interne remette emploi en front, sauf s'il y est déjà
+      if (0 !== strpos($original_path, 'planete')) {
+        if (!$original_path || $original_path == variable_get('site_frontpage', 'node')) {
+          $path = 'planete';
+        }
+        else {
+          $path = 'planete/' . $original_path;
+        }
+        if ($source = drupal_lookup_path('source', $path, $path_language)) {
+          $path = $source;
+        }
       }
-      else if (empty($path) || $path === variable_get('site_frontpage', 'node')) {
-        // Chemin vide ou front page, on est bon, on doit alors changer le chemin
-        // interne à Drupal pour le feinter et lui faire croire qu'on est dans
-        // la page /planete.
-        $path = 'planete';
-      }
-      else {
-        // Tout autre tentative doit retourner sur le site principal.
-        drupal_goto($scheme . '://' . substr($url, strlen('planete.')), array(), 301);
-      }
-    }
-    else if ('planete' === $path) {
-      drupal_goto($scheme . '://planete.' . $url, array(), 301);
     }
   }
 }
