@@ -387,7 +387,7 @@ function dfrtheme_preprocess_views_view(&$variables) {
 
     $variables['empty'] = "<p>Il n'y a aucune offre pour le moment, pourquoi ne pas " . l('proposer la vôtre', $path, $options) . " ?</p>";
     $link_create_offer = l('Déposer une offre', 'node/add/offre', array('attributes' => array('class' => array('btn-link'))));
-    $link_see_offers = l('Voir toutes les offres', 'emploi', array('attributes' => array('class' => array('btn-link'))));
+    $link_see_offers = l('Voir toutes les offres', 'emploi/', array('attributes' => array('class' => array('btn-link'))));
 
     // Update link path if you are logged in or not.
     if ($variables['view']->total_rows > 0) {
