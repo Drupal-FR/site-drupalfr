@@ -110,15 +110,18 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
     // est /planete, cas dans leque on va gentillement réécrire la requête,
     // tout autre path sera renvoyé vers le site d'origine.
     else if ('planete' === $path) {
+      $options['absolute'] = TRUE;
+      $options['external'] = TRUE;
       if (0 === strpos($url, 'planete.')) {
         $path = $scheme . '://' . $url;
-        $options['absolute'] = TRUE;
-        $options['external'] = TRUE;
       }
       else {
+        // Verifions qu'on est pas dans un autre sous-domaine, genre emploi
+        if (substr_count($url, '.')) {
+          // Si oui on ne prend que les deux derniers élément de base url
+          $url = substr($url, strpos($url, '.') + 1);
+        }
         $path = $scheme . '://planete.' . $url;
-        $options['absolute'] = TRUE;
-        $options['external'] = TRUE;
       }
     }
     else if (0 === strpos($url, 'planete.')) {
