@@ -220,5 +220,34 @@
 
 
 
+/** ******************************************************* **/
+/** Solr search                                             **/
+/** ******************************************************* **/
+
+.view-solr-search {}
+  .view-solr-search .view-filters {}
+  .view-solr-search .view-content {}
+
+  .view-solr-search .views-row {
+    border-bottom: 1px solid #dee6ee;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+  }
+  .view-solr-search .views-field-title {font-size:24px;line-height:1.4;}
+  .view-solr-search .views-field-search-api-excerpt {}
+
+  .view-solr-search .views-field-type,
+  .view-solr-search .views-field-author,
+  .view-solr-search .views-field-created,
+  .view-solr-search .views-field-comment-count {
+    display: inline-block;
+  }
+
+  .view-solr-search .views-field-author:before,
+  .view-solr-search .views-field-created:before,
+  .view-solr-search .views-field-comment-count:before {
+    content:"-";
+    display: inline-block;
+  }
 
 
