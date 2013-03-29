@@ -111,13 +111,14 @@ input[type="text"],
 input[type="password"],
 input[type="search"],
 input[type="email"],
+select,
 textarea {
 	margin:0;
 	color:#444;
-	padding:0.25em 0.5em;
+	padding:0.5em 0.5em;
 	position:relative;
 	background:#fff;
-	border:1px solid #e4eaef;
+	border:1px solid #42494c;
 	outline:none;
 	font-family:'Trebuchet MS', Arial, Helvetica, sans-serif;
 	border-radius:5px;
@@ -131,13 +132,26 @@ input[type="search"],
 input[type="email"] {
 	/*width:260px;*/
 }
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="email"]:focus,
+select:focus,
+option:focus,
+textarea:focus {
+	-moz-box-shadow: 0px 0px 3px 0px rgba(0, 178, 215, 0.7);
+	-webkit-box-shadow: 0px 0px 3px 0px rgba(0, 178, 215, 0.7);
+	-o-box-shadow: 0px 0px 3px 0px rgba(0, 178, 215, 0.7);
+	box-shadow: 0px 0px 3px 0px rgba(0, 178, 215, 0.7);
+}
+
 form label {display:table; color:#42494C; font-weight:400; vertical-align:middle;}
 form .form-type-item {overflow:hidden;}
 form .form-type-item label {float:left; margin-right:15px;}
 .marker,
 .form-required {color:#a7b2b8;}
-html.js input.form-autocomplete {background-position: 100% 6px;}
-html.js input.form-autocomplete.throbbing {background-position: 100% -14px;}
+html.js input.form-autocomplete {background-position: 100% -40px;}
+html.js input.form-autocomplete.throbbing {background-position: 100% -13px;}
 form .description {color:#898989;}
 
 fieldset {border-color:#E4EAEF;}
