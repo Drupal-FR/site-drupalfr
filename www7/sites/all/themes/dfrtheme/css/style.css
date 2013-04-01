@@ -253,6 +253,18 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 	background:rgba(0, 178, 215, 0.9);
 }
 
+.push-drupalcamp {
+  padding-top: 1em;
+}
+.push-drupalcamp a {
+  background: transparent no-repeat 0px 0px url("../images/push-dc-small.png");
+  display: block;
+  height: 104px;
+  margin:auto;
+  text-indent: -1000px;
+  width: 434px;
+}
+
 @media screen and (min-width:480px) {
 	#block-system-main-menu .menu {
 	}
@@ -274,11 +286,22 @@ div.vertical-tabs .vertical-tabs-list li {background:transparent;}
 }
 
 @media screen and (min-width:900px) {
+  .push-drupalcamp a {
+    background-image: url("../images/push-dc-medium.png");
+    height: 126px;
+    width: 890px;
+  }
 	.branding {min-width:30%;padding-right:3%;}
 	.region-menu {min-width:66%;}
 	#block-system-main-menu {margin:1em 0;}
 }
-
+@media screen and (min-width:1200px) {
+  .push-drupalcamp a {
+    background-image: url("../images/push-dc-large.png");
+    height: 90px;
+    width: 1201px;
+  }
+}
 
 #header-bottom {
 	border-top:1px solid #3461a2;
