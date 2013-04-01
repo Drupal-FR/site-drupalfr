@@ -22,6 +22,8 @@ and set the various permissions:
 - "publish 'nodetype' content": you can publish any node whose type is 'nodetype'
 - "unpublish all content": you can unpublish any node
 - "publish 'nodetype' content": you can publish any node whose type is 'nodetype'
+- "un/publish editable content": publish or unpublish nodes where the user has
+    full edit permissions of the node concerned (note: check text formats access)
 
 
 USAGE
@@ -29,3 +31,8 @@ USAGE
 A tab button (like Edit and View) 'Publish' or 'Unpublish' should appear on the
 node edit and view pages.
 Click on 'Publish' to publish and 'Unpublish' to unpublish, it's that simple!
+
+CONFIGURATION
+
+admin/config/content/publishcontent
+Here you can disable the display of Publish/Unpublish tabs.

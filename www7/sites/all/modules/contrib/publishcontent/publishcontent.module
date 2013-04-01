@@ -11,7 +11,17 @@
  */
 function publishcontent_menu() {
   $items = array();
-  $items['node/%node/publish/%publishcontent_security_token'] = array(
+  $items['admin/config/content/publishcontent'] = array(
+    'title' => 'Publish content settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('publishcontent_config_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Configure settings.',
+    'file' => 'publishcontent.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['node/%publishcontent_tab/publish/%publishcontent_security_token'] = array(
     'title' => 'Publish',
     'page callback' => 'publishcontent_toggle_status',
     'page arguments' => array(1),
@@ -20,8 +30,9 @@ function publishcontent_menu() {
     'weight' => 5,
     'type' => MENU_LOCAL_TASK,
     'options' => array('attributes' => array('class' => array('publishcontent-link', 'publishcontent-publish'))),
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
-  $items['node/%node/unpublish/%publishcontent_security_token'] = array(
+  $items['node/%publishcontent_tab/unpublish/%publishcontent_security_token'] = array(
     'title' => 'Unpublish',
     'page callback' => 'publishcontent_toggle_status',
     'page arguments' => array(1),
@@ -33,6 +44,19 @@ function publishcontent_menu() {
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   return $items;
+}
+
+/**
+ * Decide to show the (un)publish tab or not.
+ */
+function publishcontent_tab_load($nid) {
+  if (is_numeric($nid)) {
+    $node = node_load($nid);
+    if (variable_get('publishcontent_tabs', TRUE)) {
+      return $node;
+    }
+  }
+  return FALSE;
 }
 
 /**
@@ -50,6 +74,9 @@ function publishcontent_security_token_to_arg($arg, $map, $index) {
  * and current node status = unpublished
  */
 function _publishcontent_publish_access($node, $token = FALSE) {
+  if (!is_object($node)) {
+    return FALSE;
+  }
   if ($token && !drupal_valid_token($token)) {
     return FALSE;
   }
@@ -59,7 +86,8 @@ function _publishcontent_publish_access($node, $token = FALSE) {
 
   global $user;
   return !$node->status && 
-    (user_access('publish any content') 
+    (user_access('administer nodes')
+    || user_access('publish any content')
     || (user_access('publish own content') && $user->uid == $node->uid) 
     || (user_access('publish editable content') && node_access('update', $node))
     || (user_access('publish own '. check_plain($node->type) .' content', $user) && $user->uid == $node->uid) 
@@ -73,6 +101,9 @@ function _publishcontent_publish_access($node, $token = FALSE) {
  * and current node status = published
  */
 function _publishcontent_unpublish_access($node, $token = FALSE) {
+  if (!is_object($node)) {
+    return FALSE;
+  }
   if ($token && !drupal_valid_token($token)) {
     return FALSE;
   }
@@ -82,7 +113,8 @@ function _publishcontent_unpublish_access($node, $token = FALSE) {
 
   global $user;
   return $node->status && 
-    (user_access('unpublish any content') 
+    (user_access('administer nodes')
+    || user_access('unpublish any content')
     || (user_access('unpublish own content') && $user->uid == $node->uid) 
     || (user_access('unpublish editable content') && node_access('update', $node)) 
     || (user_access('unpublish own '. check_plain($node->type) .' content', $user) && $user->uid == $node->uid) 
@@ -98,15 +130,17 @@ function publishcontent_permission() {
   $perms = array(
     'publish any content' => array(
       'title' => t('Publish any content'),
-      ),
+    ),
     'unpublish any content' => array(
       'title' => t('Unpublish any content'),
+    ),
     'publish editable content' => array(
       'title' => t('Publish editable content'),
     ),
-    'unpublish editable content',
+    'unpublish editable content' => array(
       'title' => t('Unpublish editable content'),
-    ));
+    ),
+  );
 
   foreach (node_type_get_types() as $type) {
     if (!variable_get('publishcontent_' . $type->type, TRUE)) {
@@ -166,9 +200,9 @@ function publishcontent_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'node_type_form') {
     $form['workflow']['publishcontent'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Enable publishcontent permissions for this node type.'),
+      '#title' => t('Enable publishcontent'),
       '#default_value' => variable_get('publishcontent_' . $form['#node_type']->type, TRUE),
-      '#description' => t('Unchecking this option will disable publish and unpublish links for this node type.'),
+      '#description' => t('Display publish or unpublish link for nodes of this type.'),
     );
   }
   elseif (user_access('administer nodes')
