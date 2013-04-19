@@ -114,6 +114,9 @@ class FacetapiWidgetLinks extends FacetapiWidget {
         $variables['options']['attributes']['class'][] = 'facetapi-zero-results';
       }
 
+      // Add an ID to identify this link.
+      $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
+
       // If the item has no children, it is a leaf.
       if (empty($item['#item_children'])) {
         $row['class'][] = 'leaf';

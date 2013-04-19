@@ -124,9 +124,9 @@ function facetapi_token_info() {
 function facetapi_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
 
-  if ('facetapi_results' == $type && !empty($data['facetapi_adapter'])) {
+  if ('facetapi_results' == $type && !empty($data['facetapi_results']['facetapi_adapter'])) {
 
-    $adapter = $data['facetapi_adapter'];
+    $adapter = $data['facetapi_results']['facetapi_adapter'];
     foreach ($tokens as $name => $original) {
       switch ($name) {
 

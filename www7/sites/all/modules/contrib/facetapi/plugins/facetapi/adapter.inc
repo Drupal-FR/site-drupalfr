@@ -211,8 +211,19 @@ abstract class FacetapiAdapter {
     // Get the url processor plugin class. If the class for the passed plugin
     // cannot be retrieved, log the error and load the standard plugin.
     if (!$class = ctools_plugin_load_class('facetapi', 'url_processors', $id, 'handler')) {
-      watchdog('facetapi', 'Url processor plugin "@id" not valid, loading standard plugin.', array('@id' => $id), WATCHDOG_ERROR);
-      $class = ctools_plugin_load_class('facetapi', 'url_processors', 'standard', 'handler');
+      if ('standard' != $id) {
+        watchdog('facetapi', 'Url processor plugin "@id" not valid, loading standard plugin.', array('@id' => $id), WATCHDOG_ERROR);
+        $class = ctools_plugin_load_class('facetapi', 'url_processors', 'standard', 'handler');
+      }
+      else {
+        // The plugins are not registered, probably because CTools is weighted
+        // heavier than Facet API. It is still unclear why this even matters.
+        // Let's raise a call to action and explicitly set the class to prevent
+        // fatal errors.
+        // @see http://drupal.org/node/1816110
+        watchdog('facetapi', 'Url processor plugins are not yet registered, loading standard plugin. Please visit <a href="@url">@url</a> for more information.', array('@id' => $id, '@url' => 'http://drupal.org/node/1816110'), WATCHDOG_ERROR);
+        $class = 'FacetapiUrlProcessorStandard';
+      }
     }
 
     // Instantiates and initializes plugin.
@@ -1044,7 +1055,6 @@ abstract class FacetapiAdapter {
     $this->processFacets();
 
     // Add JavaScript, initializes the realm specific render array.
-    drupal_add_js(drupal_get_path('module', 'facetapi') . '/facetapi.js');
     $build = array(
       '#adapter' => $this,
       '#realm' => $realm,
@@ -1053,7 +1063,7 @@ abstract class FacetapiAdapter {
     // Iterate over the realm's enabled facets and build their render arrays.
     foreach ($this->getEnabledFacets($realm['name']) as $facet) {
       // Continue to the next facet if this one failed its dependencies.
-      if (!$this->dependenciesPassed[$facet['name']]) {
+      if (empty($this->dependenciesPassed[$facet['name']])) {
         continue;
       }
 

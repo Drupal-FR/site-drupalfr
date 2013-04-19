@@ -141,3 +141,39 @@ function theme_current_search_keys($variables) {
 function theme_current_search_deactivate_widget($variables) {
   return ' [X]';
 }
+
+/**
+ * Returns the sort table.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - element: A render element representing the form.
+ *
+ * @ingroup themeable
+ */
+function theme_current_search_sort_settings_table($variables) {
+  $output = '';
+
+  // Builds table rows.
+  $rows = array();
+  foreach ($variables['element']['#current_search']['items'] as $name => $settings) {
+    $rows[$name] = array(
+      'class' => array('draggable'),
+      'data' => array(
+        drupal_render($variables['element'][$name]['item']),
+        drupal_render($variables['element'][$name]['weight']),
+        array(
+          'data' => drupal_render($variables['element'][$name]['remove']),
+          'class' => 'current-search-remove-link',
+        ),
+      ),
+    );
+  }
+
+  // Builds table with drabble rows, returns output.
+  $table_id = 'current-search-sort-settings';
+  drupal_add_tabledrag($table_id, 'order', 'sibling', 'current-search-sort-weight');
+  $output .= drupal_render_children($variables['element']);
+  $output .= theme('table', array('rows' => $rows, 'attributes' => array('id' => $table_id)));
+  return $output;
+}

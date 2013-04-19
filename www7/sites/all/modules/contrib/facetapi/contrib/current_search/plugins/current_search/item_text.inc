@@ -19,7 +19,7 @@ class CurrentSearchItemText extends CurrentSearchItem {
    * Implements CurrentSearchItem::execute().
    */
   public function execute(FacetapiAdapter $adapter) {
-    $data = array('facetapi_adapter' => $adapter);
+    $data = array('facetapi_results' => array('facetapi_adapter' => $adapter));
 
     // Determines plurality of string.
     if ($this->settings['plural']) {

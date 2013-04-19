@@ -117,7 +117,7 @@ function facetapi_test_facetapi_facet_info($searcher_info) {
 
     $facets['colon:test'] = array(
       'label' => t('Colon test'),
-      'description' => t('Test facets names with colonss.'),
+      'description' => t('Test facets names with colons.'),
       'dependency plugins' => array('role'),
     );
 
@@ -134,8 +134,8 @@ function facetapi_test_facetapi_facet_info($searcher_info) {
     );
 
     $facets['hierarchical'] = array(
-      'label' => t('Colon test'),
-      'description' => t('Test facets names with colonss.'),
+      'label' => t('Hierarchical test'),
+      'description' => t('Test hierarchical facets.'),
       'dependency plugins' => array('role'),
       'hierarchy callback' => 'facetapi_test_process_hierarchy',
     );

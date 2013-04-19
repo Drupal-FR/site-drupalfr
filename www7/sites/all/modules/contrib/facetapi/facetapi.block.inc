@@ -195,7 +195,7 @@ function facetapi_check_block_visibility($delta) {
 function facetapi_get_delta_map() {
   $map = &drupal_static(__FUNCTION__);
   if (NULL === $map) {
-    if ($data = cache_get('facetapi:delta_map')) {
+    if ($data = cache_get('facetapi:delta_map') && !empty($data->data)) {
       $map = $data->data;
     }
     else {

@@ -330,6 +330,13 @@ function current_search_settings_form(&$form, &$form_state) {
   ////
   ////
 
+  // Ensure the theme function is available after upgrading to 7.x-1.3. A cache
+  // clear is all that is needed to fix the broken sort table, however this hack
+  // ensures that the theme function is available without having to do so.
+  // @todo Remove this in later versions of the module.
+  // @see http://drupal.org/node/1795556
+  module_load_include('inc', 'current_search', 'current_search.theme');
+
   $form['plugin_sort'] = array(
     '#type' => 'item',
     '#access' => !empty($item->settings['items']),
@@ -447,41 +454,7 @@ function current_search_settings_form(&$form, &$form_state) {
 
 }
 
-/**
- * Returns the sort table.
- *
- * @param $variables
- *   An associative array containing:
- *   - element: A render element representing the form.
- *
- * @ingroup themeable
- */
-function theme_current_search_sort_settings_table($variables) {
-  $output = '';
 
-  // Builds table rows.
-  $rows = array();
-  foreach ($variables['element']['#current_search']['items'] as $name => $settings) {
-    $rows[$name] = array(
-      'class' => array('draggable'),
-      'data' => array(
-        drupal_render($variables['element'][$name]['item']),
-        drupal_render($variables['element'][$name]['weight']),
-        array(
-          'data' => drupal_render($variables['element'][$name]['remove']),
-          'class' => 'current-search-remove-link',
-        ),
-      ),
-    );
-  }
-
-  // Builds table with drabble rows, returns output.
-  $table_id = 'current-search-sort-settings';
-  drupal_add_tabledrag($table_id, 'order', 'sibling', 'current-search-sort-weight');
-  $output .= drupal_render_children($variables['element']);
-  $output .= theme('table', array('rows' => $rows, 'attributes' => array('id' => $table_id)));
-  return $output;
-}
 
 /**
  * Form validation handler for current_search_settings_form().

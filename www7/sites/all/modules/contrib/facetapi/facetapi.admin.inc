@@ -384,7 +384,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
-  drupal_set_title(t('Configure facet display'));
+  drupal_set_title(t('Configure facet display for @label', array('@label' => $facet['label'])));
 
   // Captures variables and settings for code readability.
   $searcher = $adapter->getSearcher();
@@ -807,13 +807,13 @@ function facetapi_facet_display_form_submit($form, &$form_state) {
  */
 function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapter, array $realm, array $filters) {
 
-  // We have to set the title due to contextual link magic.
-  // @see http://drupal.org/node/1147588#comment-4428940
-  drupal_set_title(t('Configure facet filters'));
-
   // Loads variables for code readability.
   $facet = $filters['facet'];
   $settings = $adapter->getFacet($facet)->getSettings($realm);
+
+  // We have to set the title due to contextual link magic.
+  // @see http://drupal.org/node/1147588#comment-4428940
+  drupal_set_title(t('Configure facet filters for @label', array('@label' => $facet['label'])));
 
   // Adds Facet API settings, excluded values aren't saved.
   $form['#facetapi'] = array(
@@ -1053,7 +1053,8 @@ function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
-  drupal_set_title(t('Configure facet dependencies'));
+  $facet = facetapi_facet_load(arg(6), $adapter->getSearcher());
+  drupal_set_title(t('Configure facet dependencies for @label', array('@label' => $facet['label'])));
 
   // Adds Facet API settings, excluded values aren't saved.
   $form['#facetapi'] = array(
