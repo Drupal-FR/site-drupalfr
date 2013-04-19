@@ -46,6 +46,11 @@ function mollom_test_menu() {
     'page arguments' => array('mollom_test_delete_form', 2),
     'access callback' => TRUE,
   );
+  $items['mollom-test/form/views/reset'] = array(
+    'page callback' => 'mollom_test_views_reset',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
@@ -115,6 +120,15 @@ function mollom_test_mollom_form_info($form_id) {
 }
 
 /**
+ * Page callback; Resets the mollom_test_form() [page] view counter.
+ */
+function mollom_test_views_reset() {
+  variable_del('mollom_test.form.views');
+  cache_clear_all();
+  drupal_goto();
+}
+
+/**
  * Form builder for Mollom test form.
  */
 function mollom_test_form($form, &$form_state, $mid = NULL) {
@@ -136,6 +150,19 @@ function mollom_test_form($form, &$form_state, $mid = NULL) {
   );
   // Always add an empty field the user can submit.
   $form_state['storage']['field']['new'] = '';
+
+  // Output a page view counter for page/form cache testing purposes.
+  $count = variable_get('mollom_test.form.views', 1);
+  $reset_link = l('Reset', 'mollom-test/form/views/reset', array('query' => drupal_get_destination()));
+  $form['views'] = array(
+    '#markup' => '<p>' . 'Views: ' . $count++ . ' ' . $reset_link . '</p>',
+  );
+  variable_set('mollom_test.form.views', $count);
+
+  // Conditionally enable form caching.
+  if (variable_get('mollom_test.form.cache', FALSE)) {
+    $form_state['cache'] = TRUE;
+  }
 
   $form['#tree'] = TRUE;
   $form['mid'] = array(

@@ -97,6 +97,9 @@ function mollom_test_server_rest_get_auth_header() {
  * Delivery callback for REST API endpoints.
  */
 function mollom_test_server_rest_deliver($page_callback_result) {
+  // All fake-server responses are not cached.
+  drupal_page_is_cacheable(FALSE);
+
   drupal_add_http_header('Content-Type', 'application/xml; charset=utf-8');
 
   $xml = new DOMDocument('1.0', 'utf-8');
@@ -486,14 +489,15 @@ function mollom_test_server_check_content($data) {
     }
     // Lastly, take a forced 'unsure' into account.
     elseif (strpos($post, 'unsure') !== FALSE) {
-      // Differentiate between binary unsure mode.
+      // Enabled unsure mode.
       if (!isset($data['unsure']) || $data['unsure']) {
         $spam = TRUE;
         $ham = TRUE;
       }
+      // Binary mode.
       else {
-        $spam = TRUE;
-        $ham = FALSE;
+        $spam = FALSE;
+        $ham = TRUE;
       }
     }
     // Check blacklist.
@@ -525,11 +529,13 @@ function mollom_test_server_check_content($data) {
       $qualityScore = NULL;
     }
     // In case a previous spam check was unsure and a CAPTCHA was solved, the
-    // result is supposed to be ham.
-    $captcha_sessions = variable_get('mollom_test_server_check_captcha_sessions', array());
-    if (!empty($data['captchaId']) && !empty($captcha_sessions[$data['captchaId']])) {
-      $response['spamScore'] = 0.0;
-      $response['spamClassification'] = 'ham';
+    // result is supposed to be ham - unless the new content is spam.
+    if (!empty($data['id']) && $response['spamClassification'] == 'unsure') {
+      $content_captchas = variable_get('mollom_test_server_content_captcha', array());
+      if (!empty($content_captchas[$data['id']])) {
+        $response['spamScore'] = 0.0;
+        $response['spamClassification'] = 'ham';
+      }
     }
   }
 
@@ -626,22 +632,23 @@ function mollom_test_server_check_content_blacklist($string, $blacklist, $reason
 }
 
 /**
- * API callback for mollom.getImageCaptcha to fetch a CATPCHA image.
+ * API callback for mollom.getImageCaptcha to fetch a CAPTCHA image.
  */
 function mollom_test_server_get_captcha($data) {
-  $response = array();
+  $captchaId = (!empty($data['id']) ? $data['id'] : md5(mt_rand()));
+  $response = array(
+    'id' => $captchaId,
+  );
 
   // Return a HTTPS URL if 'ssl' parameter was passed.
   $base_url = $GLOBALS['base_url'];
   if (!empty($data['ssl'])) {
     $base_url = str_replace('http', 'https', $base_url);
   }
-  $response['url'] = $base_url . '/' . drupal_get_path('module', 'mollom') . '/images/powered-by-mollom-2.gif';
+  $response['url'] = $base_url . '/' . drupal_get_path('module', 'mollom') . '/images/powered-by-mollom-2.gif?captchaId=' . $captchaId;
 
   $storage = variable_get('mollom_test_server_captcha', array());
-  $captchaId = (!empty($data['id']) ? $data['id'] : md5(mt_rand()));
   $storage[$captchaId] = $data;
-  $response['id'] = $captchaId;
   variable_set('mollom_test_server_captcha', $storage);
 
   return $response;
@@ -649,8 +656,6 @@ function mollom_test_server_get_captcha($data) {
 
 /**
  * API callback for mollom.checkCaptcha to validate a CAPTCHA response.
- *
- * @todo Add support for 'redirect' and 'refresh' values.
  */
 function mollom_test_server_check_captcha($data) {
   $response = array();
@@ -668,13 +673,16 @@ function mollom_test_server_check_captcha($data) {
   if (!isset($storage[$captchaId])) {
     return MENU_NOT_FOUND;
   }
-  $storage[$captchaId] = $data;
+  $storage[$captchaId] = array_merge($storage[$captchaId], $data);
   $response['id'] = $captchaId;
   variable_set('mollom_test_server_captcha', $storage);
 
-  $captcha_sessions = variable_get('mollom_test_server_check_captcha_sessions', array());
-  $captcha_sessions[$captchaId] = $response['solved'];
-  variable_set('mollom_test_server_check_captcha_sessions', $captcha_sessions);
+  if (isset($storage[$captchaId]['contentId'])) {
+    $contentId = $storage[$captchaId]['contentId'];
+    $content_captchas = variable_get('mollom_test_server_content_captcha', array());
+    $content_captchas[$contentId] = $response['solved'];
+    variable_set('mollom_test_server_content_captcha', $content_captchas);
+  }
 
   return $response;
 }

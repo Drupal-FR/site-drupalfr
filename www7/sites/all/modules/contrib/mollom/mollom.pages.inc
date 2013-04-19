@@ -42,7 +42,7 @@ function mollom_captcha_js($type, $form_build_id, $contentId = NULL) {
   else {
     $form_state['mollom'] = array();
     if (isset($contentId)) {
-      $form_state['mollom']['response']['content']['id'] = $contentId;
+      $form_state['values']['mollom']['contentId'] = $contentId;
     }
   }
   $form_state['mollom']['captcha_type'] = $type;
