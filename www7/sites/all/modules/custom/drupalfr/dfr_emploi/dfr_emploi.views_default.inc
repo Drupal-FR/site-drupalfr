@@ -27,7 +27,11 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['use_more_text'] = 'Toutes les offres';
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'time';
+  $handler->display->display_options['cache']['results_lifespan'] = '1800';
+  $handler->display->display_options['cache']['results_lifespan_custom'] = '0';
+  $handler->display->display_options['cache']['output_lifespan'] = '1800';
+  $handler->display->display_options['cache']['output_lifespan_custom'] = '0';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Appliquer';
@@ -121,6 +125,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre d\'emploi n\'est disponible selon vos critères de sélection, essayez de les élargir pour voir plus de résultats.';
   $handler->display->display_options['empty']['area']['format'] = '1';
+  $handler->display->display_options['defaults']['sorts'] = FALSE;
+  /* Sort criterion: Content: Post date */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'node';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
   /* Critère de filtrage: Contenu : Publié */
@@ -178,6 +188,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['filters']['field_type_contrat_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_type_contrat_tid']['vocabulary'] = 'type_contrat';
   $handler->display->display_options['path'] = 'emploi';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'Nos offres d\'emploi';
+  $handler->display->display_options['menu']['description'] = 'Consulter toutes nos offres d\'emploi';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['context'] = 0;
+  $handler->display->display_options['menu']['context_only_inline'] = 0;
 
   /* Display: Dernières offres */
   $handler = $view->new_display('block', 'Dernières offres', 'block_1');
@@ -209,6 +225,11 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'Voir template.php pour configuration du texte.';
   $handler->display->display_options['empty']['area']['format'] = '1';
+  $handler->display->display_options['defaults']['sorts'] = FALSE;
+  /* Sort criterion: Global: Random */
+  $handler->display->display_options['sorts']['random']['id'] = 'random';
+  $handler->display->display_options['sorts']['random']['table'] = 'views';
+  $handler->display->display_options['sorts']['random']['field'] = 'random';
 
   /* Display: Moderation des offres */
   $handler = $view->new_display('page', 'Moderation des offres', 'page_1');
@@ -217,6 +238,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['access']['type'] = 'role';
   $handler->display->display_options['access']['role'] = array(
     4 => '4',
+    14 => '14',
     12 => '12',
   );
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
@@ -422,12 +444,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: Contenu : Lien */
-  $handler->display->display_options['fields']['view_node']['id'] = 'view_node';
-  $handler->display->display_options['fields']['view_node']['table'] = 'views_entity_node';
-  $handler->display->display_options['fields']['view_node']['field'] = 'view_node';
-  $handler->display->display_options['fields']['view_node']['label'] = 'Détails de l\'offre';
-  $handler->display->display_options['fields']['view_node']['text'] = 'Voir l\'offre';
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['label'] = 'Page d\'édition';
+  $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
   /* Critère de filtrage: Contenu : Type */
@@ -555,15 +577,14 @@ function dfr_emploi_views_default_views() {
     t('Dernières offres d\'emploi'),
     t('Voir template.php pour configuration du texte.'),
     t('Moderation des offres'),
-    t('auteur'),
-    t('Contenu'),
+    t('author'),
+    t('Content'),
     t('Aucune offre en attente de modération.'),
     t('Intitulé de l\'offre'),
     t('Date de création'),
     t('Société'),
     t('Rédigé par'),
-    t('Détails de l\'offre'),
-    t('Voir l\'offre'),
+    t('Page d\'édition'),
     t('Publié'),
     t('Offres d\'une boite'),
     t('Nous avons actuellement @total poste(s) à pourvoir'),
