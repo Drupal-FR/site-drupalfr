@@ -123,7 +123,11 @@ function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
       }
       $alias = substr($alias, strlen('emploi/'));
       list($scheme, $url) = explode('://', $base_url, 2);
-      drupal_goto($alias, array('base_url' => $scheme . '://emploi.' . $url), 301);
+      $query = $_GET;
+      if (isset($query['q'])) {
+        unset($query['q']);
+      }
+      drupal_goto($alias, array('base_url' => $scheme . '://emploi.' . $url, 'query' => $query), 301);
     }
   }
 }
