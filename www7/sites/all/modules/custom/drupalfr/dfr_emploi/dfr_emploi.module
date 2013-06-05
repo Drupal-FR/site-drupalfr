@@ -7,6 +7,20 @@
 include_once 'dfr_emploi.features.inc';
 
 /**
+ * Implements hook_entity_view_alter().
+ */
+function dfr_emploi_entity_view_alter(&$build, $type) {
+  // Inject the publication date + expiration date for the offers.
+  if ($type == 'node' && $build['#bundle'] == 'offre') {
+    $output = '<strong>Publiée le :</strong> ' . format_date($build['#node']->created, 'custom', 'd/m/Y') . ' <em>(Valable : ' . $build['#node']->field_temps_publication[LANGUAGE_NONE][0]['value'] . ' mois)</em>';
+    $build['created'] = array(
+      '#weight' => -10,
+      array('#markup' => $output),
+    );
+  }
+}
+
+/**
  * Implements hook_node_access().
  */
 function dfr_emploi_node_access($node, $op, $account) {
