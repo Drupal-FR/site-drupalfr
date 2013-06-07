@@ -1,0 +1,120 @@
+<?php
+/**
+ * Class for testing notifications lite.
+ *
+ */
+
+require_once drupal_get_path('module', 'notifications') . '/tests/notifications_test_case.inc';
+
+class NotificationsLiteTests extends NotificationsTestCase {
+
+  function getInfo() {
+    return array(
+      'name' => 'Notifications Lite',
+      'group' => 'Notifications',
+      'description' => 'Notifications Lite message sending and composition' );
+  }
+
+  function setUp() {
+    parent::setUp('messaging_simple', 'notifications_digest', 'notifications_lite');
+    // Set some defaults: method simple, interval immediate
+    variable_set('notifications_default_send_interval', 0);
+    variable_set('notifications_default_send_method', 'simple');
+    // Set fake site name for comparison after token replacement
+    variable_set('site_name', 'Test Site');
+  }
+
+  /**
+   * Test simple sending cases
+   */
+  function testNotificationsLite() {
+    $user = $this->drupalCreateUser();
+    $send_interval = 0;
+    $send_method = 'simple';
+    // Test immediate sending
+    foreach (array(1, 2) as $index) {
+      notifications_lite_send($user->uid, "Subject $index", "Body $index");
+    }
+    // There should be two queued rows and two queued events
+    $this->assertUserRows('notifications_queue', 2, $user->uid, 'Two queued notifications');
+    $this->assertTableRows('notifications_event', 2, NULL, 'Two queued events');
+    //$this->dumpTable('notifications_queue');
+    //$this->dumpTable('notifications_event');
+    //$this->dumpTable('messaging_destination');
+    // Send, and check again
+    $sqid = notifications_queue()->process_prepare();
+    $count = notifications_queue()->process_queue($send_interval, $sqid);
+    $this->assertEqual($count, 2, "Processed two rows in queue ($count)");
+    // After processing, events must be gone from the table
+    $this->assertTableRows('notifications_event', 0);
+    //$this->dumpTable('notifications_event');
+    $this->assertUserRows('notifications_queue', 0, $user->uid, 'No queued notifications');
+    // Retrieve messages and check formatting
+    //$messages = messaging_store('get', array('method' => $send_method, 'uid' => $user->uid));
+    $messages = messaging_simple_get_messages(array('uid' => $user->uid));
+    $this->assertEqual(count($messages), 2, 'Retrieved two messages from store');
+    foreach (array(1, 2) as $index) {
+      $message = array_shift($messages);
+      $this->assertEqual("Subject $index", $message->subject, "Right subject for message $index: $message->subject");
+    }
+
+    // Now test short digesting for notifications lite messages. Set digests and refresh cache.
+    db_query("DELETE FROM {messaging_simple}");
+    variable_set('notifications_digest_methods', array($send_interval => 'short'));
+    notifications_build_method(0, TRUE);
+    // Again, send two messages but this time check they're digested into one.
+    //messaging_log_start();
+    $sent = $this->sendLiteMessages($user->uid, 4);
+    //$this->dumpLogs();
+    // Get messages and compare
+    //$messages = messaging_store('get', array('method' => $send_method, 'uid' => $user->uid));
+    $messages = messaging_simple_get_messages(array('uid' => $user->uid));
+    $this->assertEqual($count = count($messages), 1, "Retrieved just one message from store ($count)");
+    $message = array_shift($messages);
+    // Check that all messages are in the message body
+    foreach ($sent as $index => $msg) {
+      $this->assertTrue(strpos($message->body, $msg->subject), "The message $index is contained in the digest");
+    }
+
+    // Same for long digesting, both subject and body should be there
+    db_query("DELETE FROM {messaging_simple}");
+    variable_set('notifications_digest_methods', array($send_interval => 'long'));
+    notifications_build_method($send_interval, TRUE);
+    // We try three messages this time
+    $sent = $this->sendLiteMessages($user->uid, 2);
+
+    //$messages = messaging_store('get', array('method' => $send_method, 'uid' => $user->uid));
+    $messages = messaging_simple_get_messages(array('uid' => $user->uid));
+    $this->assertEqual($count = count($messages), 1, "Retrieved one sent message from store ($count)");
+    // Check that all messages are in the message body
+    $message = array_shift($messages);
+    foreach ($sent as $index => $msg) {
+      $this->assertTrue(strpos($message->body, $msg->subject), "The message $index subject is contained in the digest");
+      $this->assertTrue(strpos($message->body, $msg->body), "The message $index body is contained in the digest");
+    }
+    // Dump for test debugging
+    //$this->printDebug($message, 'Message');
+    //$this->dumpTable('messaging_store');
+    //$this->dumpLogs();
+  }
+
+  /**
+   *  Helper function to send messages and do queue processing
+   */
+  function sendLiteMessages($uid, $count) {
+    $messages = array();
+    for($i=1; $i<=$count; $i++) {
+      $msg = new Stdclass();
+      $msg->subject = "Lite Subject $i";
+      $msg->body = "Body for message $i";
+      notifications_lite_send($uid, $msg->subject, $msg->body);
+      $messages[$i] = $msg;
+    }
+    // There should be one queued notification and one event for each message
+    $this->assertUserRows('notifications_queue', $count, $uid, "We have $count notifications in queue");
+    $rows = notifications_queue()->process_rows(array('uid' => $uid));
+    $this->assertEqual($count, $rows, "Processed all rows in queue ($rows)");
+    return $messages;
+  }
+
+}

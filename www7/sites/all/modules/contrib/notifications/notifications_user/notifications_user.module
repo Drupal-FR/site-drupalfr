@@ -1,0 +1,191 @@
+<?php
+
+/**
+ * @file
+ * Notifications module - User subscriptions tabs
+ */
+
+/**
+ * Implementation of hook_menu()
+ */
+function notifications_user_menu() {
+  $items = array();
+  // User pages for each subscription type, will be disabled by default
+  foreach (array('user_content') as $type) {
+    if (notifications_subscription_type_enabled($type)) {
+      $items['user/%user/notifications/' . $type] = array(
+        'type' => MENU_LOCAL_TASK,
+        'access callback' => 'notifications_user_account_access',
+        'access arguments' => array(1, $type),
+        'title' => notifications_subscription_type($type, 'title'),
+        'page callback' => 'notifications_account_subscription_list_page',
+        'page arguments' => array($type, 1),
+        'weight' => 10,
+      );
+    }
+  }
+  return $items;
+}
+
+/**
+ * Check access to user account tab
+ */
+function notifications_user_account_access($account, $type) {
+  return module_exists('notifications_account') && notifications_account_tab_access($account, $type);
+}
+
+/**
+ * Implements hook_permission()
+ */
+function notifications_user_permission() {
+  return array(
+    'subscribe to author' =>  array(
+      'title' => t('Subscribe to author'),
+      'description' => t('Subscribe to content posted by a given user.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_notifications()
+ */
+function notifications_user_notifications($op) {
+  switch ($op) {
+    case 'subscription types':
+      $types['user_content'] = array(
+        'title' => t('Author'),
+        'class' => 'Notifications_User_Content_Subscription',
+        'field_types' => array('node:uid'),
+        'object_types' => array('node', 'user'),
+        'access' => array('subscribe to author'),
+        'description' => t('Subscribe to all content submitted by a user.'),
+        'display_options' => array('user_links', 'account_tabs'),
+      );
+      // This is a complex type, combining two fields
+      $types['user_content_type'] = array(
+        'title' => t('Content type by author'),
+        'class' => 'Notifications_User_Content_Subscription',
+        'field_types' => array('node:type', 'node:uid'),
+        'object_types' => array('node', 'node_type', 'user'),
+        'access' => array('subscribe to content', 'subscribe to author'),
+        'description' => t('Subscribe to all content of a given type submitted by a user.'),
+      );
+      return $types;
+
+    case 'field types':
+      $fields['node:uid'] = array(
+        'title' => t('Author'),
+        'class' => 'Notifications_User_Field',
+      );
+      return $fields;
+
+    case 'display options':
+      // All types can be in block
+      $types['user_links'] = array(
+        '#title' => t('User links'),
+        '#description' => t('Display subscription links on user account page.'),
+      );
+      return $types;
+  }
+}
+
+/**
+ * Implementation of hook notifications_subscription()
+ */
+function notifications_user_notifications_subscription($op, $subscription = NULL) {
+  switch ($op) {
+    case 'page objects':
+      $objects = array();
+      // Return objects on current page to which we can subscribe
+      if (arg(0) == 'user' && is_numeric(arg(1)) && ($user = menu_get_object('user'))) {
+        $objects[] = notifications_object('user', $user);
+      }
+      return $objects;
+  }
+}
+
+/**
+ * Implementation of hook_notifications_object_user()
+ */
+function notifications_user_notifications_object_user($op, $user, $account = NULL) {
+  switch ($op) {
+    case 'conditions':
+      // Condition fields for subscriptions to this object type (user)
+      return array(
+        'uid' => $user->uid,
+        'author' => $user->uid,
+      );
+    case 'subscriptions':
+      // Option subscriptions to user account. Checking permissions here will save some processing.
+      $options = array();
+      // All posts by author
+      if (!$account || user_access('subscribe to author', $account)) {
+        $options[] = notifications_subscription('content_author')
+           ->add_field('node:uid', $user->uid)
+           ->set_name(t('All posts by @name', array('@name' => $user->name)));
+      }
+      // Content types with author subscriptions
+      if (!$account || user_access('subscribe to content type', $account) && user_access('subscribe to author', $account)) {
+        foreach (notifications_content_types('content_type_author') as $type => $type_name) {
+          $options[] = notifications_subscription('content_type_author')
+            ->add_field('node:uid', $user->uid)
+            ->add_field('node:type', $type)
+            ->set_name(t('@type posts by @name', array('@name' => $user->name, '@type' => node_type_get_name($type))));
+        }
+      }
+      return $options;
+  }
+}
+
+/**
+ * Implementation of hook_notifications_object_node()
+ */
+function notifications_user_notifications_object_node($op, $node, $account = NULL) {
+  switch ($op) {
+    case 'subscription types':
+      return array('user_content', 'user_content_type');
+    case 'subscriptions':
+      // Return available subscription options for this node and this user account
+      $options = array();
+      $author = user_load($node->uid);
+      $author_name = check_plain(format_username($author));
+      // Node author subscriptions
+      if (notifications_content_type_enabled($node->type, 'user_content')) {
+        $options[] = notifications_subscription('user_content')
+          ->set_author($node->uid)
+          ->set_name(t('Posts by @name', array('@name' => $author_name)));
+      }
+      // Subscribe to content type by author
+      if (notifications_content_type_enabled($node->type, 'user_content_type')) {
+        $options[] = notifications_subscription('user_content_type')
+          ->set_node($node)
+          ->set_name(t('@type posts by @name', array('@name' => $author_name, '@type' => node_type_get_name($node))));
+      }
+      return $options;
+      break;
+  }
+}
+
+/**
+ * Implements hook_user_view().
+ */
+function notifications_user_user_view($account) {
+  $list = new Notifications_Subscription_List();
+  if (user_access('subscribe to author')) {
+    if (notifications_subscription_type('user_content', 'user_links') && notifications_subscription_type_enabled('user_content')) {
+      $list->add(notifications_subscription('user_content')
+        ->set_author($account)
+      );
+    }
+    // @todo Add here subscriptions to content type x author if enabled
+  }
+  if ($list->count()) {
+    $list->set_user($GLOBALS['user']);
+    $account->content['summary']['notifications'] =  array(
+      '#type' => 'user_profile_item',
+      '#title' => t('Subscriptions'),
+      '#markup' => theme('item_list', array('items' => $list->get_links())),
+      '#attributes' => array('class' => array('notifications')),
+    );
+  }
+}

@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function notifications_content_install() {
+  // Set node actions for triggers
+  notifications_content_install_trigger_action('node_publish', 'notifications_content_node_post_action');
+  notifications_content_install_trigger_action('node_update', 'notifications_content_node_update_action');
+
+  // Set comment actions for triggers
+  notifications_content_install_trigger_action('comment_insert', 'notifications_content_comment_action');
+  notifications_content_install_trigger_action('comment_update', 'notifications_content_comment_action');
+
+  // Commented out for D7, not sure it is needed anymore
+  // Module weight. It must run after most modules, to make sure they've done
+  // their work before we add the notifications queries.
+  //db_query("UPDATE {system} SET weight = 100 WHERE name = 'notifications_content' AND type = 'module'");
+  // Enable the most common subscription types
+  //variable_set('notifications_content_type', array('thread' => 'thread', 'node_type' => 'node_type', 'author' => 'author'));
+}
+
+/**
+ * Create trigger assignement
+ */
+function notifications_content_install_trigger_action($trigger, $action) {
+  $check = db_select('trigger_assignments', 'ta')
+    ->fields('ta', array('hook', 'aid'))
+    ->condition('hook', $trigger)
+    ->condition('aid', $action)
+    ->execute()
+    ->fetchObject();
+
+  if (!$check) {
+    db_insert('trigger_assignments')
+    ->fields(array(
+      'hook' => $trigger,
+      'aid' => $action,
+    ))
+    ->execute();
+  }
+}
+/**
+ * Implementation of hook_uninstall().
+ */
+function notifications_content_uninstall() {
+  // Delete global variables
+  variable_del('notifications_content_types');
+  variable_del('notifications_content_per_type');
+  // Delete per content type variables
+  foreach (array_keys(node_type_get_types()) as $type) {
+    variable_del('notifications_content_type_' . $type);
+  }
+}
+
+/**
+ * Update module weight
+ */
+function notifications_content_update_6000() {
+  notifications_content_install();
+  return array();
+}
+
+/**
+ * Update enabled options
+ */
+function notifications_content_update_6001() {
+  // All options will be messed up so we better do manual review
+  drupal_set_message(t('Please, check all your Notifications content settings and note the new options.'));
+  return array();
+}
+
+/**
+ * Update enabled options (again)
+ */
+function notifications_content_update_6002() {
+  if ($events = variable_get('notifications_events', array())) {
+    $enabled = array();
+    foreach ($events as $type => $type_info) {
+      foreach ($type_info as $action => $status) {
+        $enabled[$type . '-' . $action] = 1;
+      }
+    }
+    variable_set('notifications_event_enabled', $enabled);
+    variable_del('notifications_events');
+  }
+  return array();
+}

@@ -1,0 +1,25 @@
+name = Notifications
+description = The basic notifications framework
+package = "Notifications"
+version = VERSION
+core = 7.x
+php = 5.3
+dependencies[] = messaging
+dependencies[] = trigger
+dependencies[] = messaging_template
+files[] = 'notifications.object.inc'
+files[] = 'notifications.field.inc'
+files[] = 'notifications.message.inc'
+files[] = 'notifications.template.inc'
+files[] = 'notifications.subscription.inc'
+files[] = 'notifications.event.inc'
+files[] = notifications.list.inc
+files[] = tests/notifications_subscribe.test
+configure = admin/config/messaging
+
+; Information added by drupal.org packaging script on 2011-12-04
+version = "7.x-1.0-alpha2"
+core = "7.x"
+project = "notifications"
+datestamp = "1323032143"
+

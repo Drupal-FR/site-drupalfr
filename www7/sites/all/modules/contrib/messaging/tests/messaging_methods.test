@@ -1,0 +1,104 @@
+<?php
+/**
+ * Class for testing messaging module.
+ *
+ * Tests basic API functions
+ */
+ 
+require_once 'messaging_test_case.inc';
+
+class Messaging_Methods_Tests extends MessagingTestCase {
+  
+  function getInfo() {
+    return array(
+      'name' => 'Sending methods', 
+      'group' => 'Messaging', 
+      'description' => 'API compatibility for sending method plug-ins'
+    );
+  }
+
+  function setUp() {
+    // We can only test the plugins that don't require other modules
+    parent::setUp('messaging_simple', 'messaging_mail', 'messaging_mime_mail', 'messaging_phpmailer', 'messaging_privatemsg', 'messaging_sms');
+  }
+
+  /**
+   * Test message sending callbacks for enabled plug-ins
+   */
+  function testMessagingMethods() {
+    $user = $this->drupalCreateUser();
+    $user->sms_user[0] = array('status' => 2, 'number' => 1234);
+    // Check sending method properties
+    foreach (messaging_method_info() as $method => $info) {
+      // Instantiate every send method
+      $send_method = messaging_send_method($method, $info);
+      // Check for some sending method properties
+      $this->assertTrue(!empty($send_method->name) && isset($send_method->type) , 'Send method properties seem to be ok for method: ' . $method);
+      // Check existing callback functions
+      foreach (array('send', 'user', 'prepare', 'render', 'presend', 'aftersend', 'multisend') as $key) {
+        if ($function = _messaging_callback_get($info, $key)) {
+          $this->assertTrue(function_exists($function), "Function callback of type $key exists for method $method");
+        }
+      }
+      // Try preparing and rendering a message for each
+      $message = $this->randomMessage();
+      $message->method = $method;
+      $message->prepare();
+      $message->render();
+      $this->assertTrue($message->rendered && $message->prepared, 'A message has been prepared and rendered for method: ' . $method);
+    }
+    
+    // Now we try sending messages with queue = 1, so messages are not actually sent and create user for testing
+    foreach (messaging_method_info(NULL, NULL, NULL, TRUE) as $method => $info) {
+      $count = 0;
+      $name = $info['name'];
+      // This should create 3 messages for each method
+      $message = $this->randomMessage($method);
+      $message->log = 1; // All messages will be logged
+      if (messaging_user_destination($user, $method, $message)) {
+        $this->assertEqual(messaging_message_send_user($user, $message, $method, TRUE), TRUE, 'Message sent for user using: '.$name);
+        $count++;
+      }
+      // Try these fake destinations, it should work as they're finally send through debug
+      $message = $this->randomMessage($method);
+      $message->log = 1; // All messages will be logged
+      $message->account = $user;
+      $result = messaging_message_send(array('foo1', 'foo2'), $message, $method, TRUE);
+      $this->assertEqual($result, TRUE, 'Bulk messages sent using: '.$name);
+      $count++;
+      $queued = messaging_store()->get_messages(array('uid' => $user->uid, 'method' => $method));
+      $this->assertEqual(count($queued), $count, 'The right number of messages have been queued for method: '.$method.' (Expected=' . $count . ' Real= ' . count($queued).')');    
+    }
+    // Create one more user and a few destinations for each sending method
+   
+    $user2 = $this->drupalCreateUser();
+    $user2->sms_user[0] = array('status' => 2, 'number' => 3456);
+    $users = array($user, $user2);
+   
+    foreach (messaging_method_info() as $method => $info) {
+      $send_method = messaging_send_method($method);
+      foreach ($users as $account) {
+        $dest = messaging_account_build_destination($account, $method);
+        $destinations[$dest->type][$dest->mdid] = $dest;
+      }
+    }
+    // We should have also two destinations of each type
+    foreach (messaging_address_info() as $type => $info) {
+      $this->assertTableRows('messaging_destination', 2, array('type' => $send_method->address_type));
+      $this->assertEqual(count($destinations[$type]), 2, "We have two destinations of type $type");
+    }
+    // Check deleting destinations and getting them back after method replace
+    foreach (array('mail' => 'simple', 'simple' => 'mail') as $method => $replace) {
+      $type = messaging_send_method($replace)->address_type;
+      foreach ($destinations[$type] as $dest) {
+        $dest->delete();
+      }
+      $this->assertTableRows('messaging_destination', 0, array('type' => $type), "We have successfully deleted destinations of type $type");
+      // After replacing a mail method by a user one, we should have the destinations again
+      Messaging_Method::method_disable($method, $replace);
+      $old_type = messaging_method_info($method, 'address_type');
+      $new_type = messaging_method_info($replace, 'address_type');
+      $this->assertTableRows('messaging_destination', 2, array('type' => $type), "We got back destinations of type $type after method replace: from $method($old_type) to $replace($new_type)");
+    }
+  }  
+}

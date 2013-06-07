@@ -1,0 +1,234 @@
+<?php
+
+/**
+ * Test and report Drupal installation requirements.
+ *
+ * @param $phase
+ *   The current system installation phase.
+ * @return
+ *   An array of system requirements.
+ */
+function notifications_requirements($phase) {
+  global $base_url;
+  $requirements = array();
+  // Ensure translations don't break at install time
+  $t = get_t();
+
+  if ($phase == 'runtime') {
+    if ($disabled = !variable_get('notifications_event_dispatch', TRUE)) {
+      $message[] = $t('Notifications are disabled so no new notifications will be sent.');
+    }
+    $values[] = $disabled ? t('Disabled.') : t('Enabled.');
+    $queued = DrupalQueue::get('notifications_event')->numberOfItems();
+    $message[] = format_plural($queued, 'There is one notification event in queue.', 'There are @count notification events in queue.');
+    $values[] = $t('@count queued.', array('@count' => $queued));
+    $sent_last = db_query('SELECT MAX(send_end) FROM {notifications_event} WHERE notif_success > 0')->fetchField();
+    $sent_ago =  REQUEST_TIME - $sent_last;
+    $message[] = $sent_last ? t('Last successful notification was sent !time ago.', array('!time' => format_interval($sent_ago))) : t('No successful notifications have been sent.');
+    $message[] = t('View full <a href="@dblog">notifications logs</a>.', array('@dblog' => url('admin/reports/dblog')));
+    $values[] = t('Last: !date', array('!date' => $sent_last ? format_date($sent_last, 'long') : t('never')));
+    $requirements['notifications'] = array(
+      'title' => $t('Notifications status'),
+      'value' =>  implode(' ', $values),
+      'description' => implode(' ', $message),
+      'severity' => (!$disabled && $sent_ago <= variable_get('notifications_last_sent_warning', 86400)) ? REQUIREMENT_OK : REQUIREMENT_WARNING, // $sent_last ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+    );
+  }
+  return $requirements;
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function notifications_schema() {
+  $schema['notifications_subscription'] = array(
+    'description' => 'The base table for subscriptions',
+    'fields' => array(
+      'sid' => array(
+        'description' => 'Unique Subscription id',
+        'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'
+      ),
+      'uid' => array(
+        'description' => 'User id this subscription belongs to.',
+        'type' => 'int', 'not null' => TRUE, 'disp-width' => '11'
+      ),
+      'mdid'    => array(
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE,
+        'description' => 'Unique destination id.',
+      ),
+      'type' => array(
+        'description' => 'Subscription type, will depend on subscription modules enabled.',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '',
+      ),
+      'event_type' => array(
+        'description' => 'Type of event that triggers this subscription.',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '',
+      ),
+      'conditions' => array(
+        'description' => 'Number of conditions this subscription has, for query convenience.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10',
+      ),
+      'send_interval' => array(
+        'description' => 'Sending interval for notifications of this subscription.',
+        'type' => 'int', 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'language' => array(
+        'description' => 'Language',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''
+      ),
+      'send_method' => array(
+        'description' => 'Sending method key, see Messaging module.',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '',
+      ),
+      'cron' => array(
+        'description' => '1 if this subscription will generate notifications to be processed on cron.',
+        'type' => 'int', 'unsigned' => TRUE, 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '3'
+      ),
+      'module' => array(
+        'description' => 'Alternate module name to handle notifications from this subscription',
+        'type' => 'varchar', 'length' => '255', 'not null' => FALSE
+      ),
+      'status' => array(
+        'description' => 'Subscription status: 0 = blocked, 1 = active, 2 = inactive',
+        'type' => 'int', 'not null' => TRUE, 'default' => 1, 'disp-width' => '11'
+      ),
+      'destination' => array(
+        'description' => 'Alternate destination field for anonymous subscriptions, may be an email',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '',
+      ),
+      'created' => array(
+        'description' => 'Unix timestamp, when it was created.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'updated' => array(
+        'description' => 'Unix timestamp, when it was created.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+    ),
+    'primary key' => array('sid'),
+  );
+
+  $schema['notifications_subscription_fields'] = array(
+    'description' => 'Conditions for subscriptions, there may be none or many for each subscription.',
+    'fields' => array(
+      'sid' => array(
+        'description' => 'The {notifications_subscription}.sid, subscription this condition belongs to.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'
+      ),
+      'type' => array(
+        'description' => 'The field type for this condition, will depend on subscription type and defined fields.',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE
+      ),
+      'position' => array(
+        'description' => 'Position of this field in this subscription',
+        'type' => 'int', 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'value' => array(
+        'description' => 'Matching value for the field, just for string values',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE
+      ),
+      'intval' => array(
+        'description' => 'Matching value for the field, just for integer values',
+        'type' => 'int', 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+    ),
+    'primary key' => array('sid', 'type', 'position'),
+  );
+
+  $schema['notifications_event'] = array(
+    'description' => 'Storage table for event parameters.',
+    'fields' => array(
+      'eid' => array(
+        'description' => 'Unique event id',
+        'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '11',
+      ),
+      'type' => array(
+        'description' => 'Event type: node-insert, feed-refresh, etc..',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '',
+      ),
+      'action' => array(
+        'description' => 'Event type: node, feed, etc..',
+        'type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '',
+      ),
+      'created' => array(
+        'description' => 'Unix timestamp, when it was created.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'updated' => array(
+        'description' => 'Unix timestamp, when it was created.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'counter' => array(
+        'description' => 'Keeps a count of the notifications queued for this event.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'send_start' => array(
+        'description' => 'Unix timestamp, when sending started.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'send_end' => array(
+        'description' => 'Unix timestamp, when sending finished.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'send_time' => array(
+        'description' => 'Time lapse, sending time, seconds.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'notif_count' => array(
+        'description' => 'Counter for notifications to be sent.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'notif_errors' => array(
+        'description' => 'Number of sending errors.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'notif_sent' => array(
+        'description' => 'Number of notifications actually sent.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'notif_success' => array(
+        'description' => 'Number of messages sent successfully.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'log' => array(
+        'description' => 'Mark rows that are just logs, to be deleted.',
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '11'
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'The full event object.',
+      ),
+    ),
+    'primary key' => array('eid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function notifications_uninstall() {
+  foreach (array('event_enabled', 'send_intervals', 'sender', 'sendself', 'send_immediate') as $name) {
+    variable_del("notifications_$name");
+  }
+}
+
+/**
+ * Update schema: add stats fields for events
+ */
+function notifications_update_7001() {
+  foreach (array('send_start', 'send_end', 'send_time', 'notif_count', 'notif_errors', 'notif_sent', 'notif_success', 'log') as $field) {
+    db_add_field('notifications_event', $field, array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0));
+  }
+}
+
+/**
+ * Update from 6.x to 7.x
+ */
+// Rename table: notifications to notifications_subscription
+// Moved table notifications_queue and notifications_sent to notifications_queue module
+// Option 'notifications_send_immediate' converted into 'notifications_event_queue'

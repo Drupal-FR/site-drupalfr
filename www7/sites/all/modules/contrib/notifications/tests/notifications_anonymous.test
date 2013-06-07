@@ -1,0 +1,81 @@
+<?php
+/**
+ * Class for testing anonymous subscriptions
+ */
+
+require_once drupal_get_path('module', 'notifications') . '/tests/notifications_test_case.inc';
+
+class NotificationsAnonymousTests extends NotificationsTestCase {
+
+  function getInfo() {
+    return array(
+      'name' => 'Anonymous Subscriptions',
+      'group' => 'Notifications',
+      'description' => 'Subscriptions and Notifications for anonymous users.' );
+  }
+
+  function setUp() {
+    parent::setUp('messaging_mail', 'notifications_content', 'notifications_ui', 'notifications_anonymous');
+    $this->anonymousCreatePermissions(array('access content', 'access comments', 'maintain own subscriptions', 'subscribe to author', 'subscribe to content', 'subscribe to content type'));
+    // Set some defaults
+    variable_set('notifications_default_send_interval', 0); // Immediately
+    variable_set('notifications_default_send_method', 'mail'); // Mail for everybody
+    variable_set('messaging_method_mail', array('queue' => 1, 'log' => 1)); // Enable queue, log for mail
+    // This send interval (0) and method (mail) are defaults enabled for anonymous
+  }
+
+  function testAnonymousSubscriptions() {
+    // Create a new content-type for subscribing to
+    $ctype = $this->drupalCreateContentType();
+    // Enable this content type for thread/author/type subscriptions
+    variable_set('notifications_content_type', array('thread', 'nodetype', 'author'));
+    // Enable all UI pages
+    $this->enableUIPages();
+    $this->enableSubscriptionTypes();
+    // Create user and email address
+    $anonymous = drupal_anonymous_user();
+    $mail = $this->createMail();
+    // Create a content type subscription
+    $subscription = $this->anonymousCreateSubscription($mail, 'nodetype', array('type' => $ctype->type));
+
+    // Create a node and a comment and check the subscription has worked
+    $author = $this->drupalCreateUser(array("create $ctype->type content", 'post comments'));
+    $node = $this->drupalCreateNode(array('type' => $ctype->type, 'uid' => $author->uid));
+    $comment = $this->drupalCreateComment($node);
+    // There should be two queued notifications that will be gone after processing
+    $this->assertUserRows('notifications_queue', 2, 0);
+    $this->notificationsProcessQueue(2, 0);
+    // We should have two messages sent and queued using mail
+    $messages = messaging_store()->get_messages(array('uid' => 0, 'method' => 'mail', 'queue' => 1), array('sent'));
+    $this->assertEqual(count($messages), 2, "Retrieved 2 queued messages from store.");
+    $message1 = array_shift($messages);
+    $message2 = array_shift($messages);
+    $this->assertTrue(strpos($message1->body, $node->body), "One message sent for the node post.");
+    $this->assertTrue(strpos($message2->body, $comment->subject), "One message sent for the comment.");
+
+    // Unsubscribe with a signed link
+    $link = notifications_subscription_get_link('unsubscribe', $subscription, array('absolute' => TRUE, 'destination' => ''));
+    $this->drupalGet(url($link['href'], $link['options']));
+    $this->assertText('Are you sure you want to delete this subscription?');
+    $this->drupalPost(NULL, array(), t('Unsubscribe'));
+    $this->assertText('Your subscription has been removed.');
+  }
+
+  function anonymousCreateSubscription($mail, $type, $fields, $messages = array()) {
+    $anonymous = drupal_anonymous_user();
+    $post["destination_address[mail]"] = $mail;
+    return $this->contentCreateSubscription($anonymous, $type, $fields, $messages, $post);
+  }
+
+  function createMail() {
+    return $this->randomName() . '@example.com';
+  }
+  function anonymousCreatePermissions($perms) {
+    $data = array(
+      'rid' => 1,
+      'tid' => 0,
+      'perm' => implode(', ', $perms),
+    );
+    return drupal_write_record('permission', $data);
+  }
+}

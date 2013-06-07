@@ -1,0 +1,209 @@
+<?php
+/**
+ * @file 
+ * Messaging Template
+ * Drupal Messaging Framework
+ */
+
+/**
+ * Implements hook_element_info()
+ */
+function messaging_template_element_info() {
+  $types['messaging_template_text'] = array(
+    '#theme' => 'messaging_template_text',
+    '#options' => array(),
+    '#format' => MESSAGING_FORMAT,
+    '#markup' => '',
+    '#pre_render' => array('messaging_template_pre_render_text'),
+    '#post_render' => array('messaging_template_post_render_text'),
+  );
+  $types['messaging_template_subject'] = array(
+    '#markup' => '',
+    '#separator' => ' ',
+    '#plaintext' => TRUE, // This element can render itself as plain text
+    '#theme' => 'messaging_template_subject',
+    '#pre_render' => array('drupal_pre_render_markup'),
+    '#post_render' => array('messaging_template_post_render_text'),
+  );
+  $types['messaging_template_body'] = array(
+    '#theme' => 'messaging_template_body',
+    '#pre_render' => array('messaging_template_pre_render_body'),
+  );
+  $types['messaging_link'] = array(
+    '#plaintext' => TRUE, // This element can render itself as plain text
+    '#options' => array(),
+    '#pre_render' => array('messaging_template_pre_render_link', 'drupal_pre_render_markup'),
+  );
+  $types['messaging_list'] = array(
+    '#theme' => 'item_list',
+    '#title' => '', '#options' => array(),
+    '#pre_render' => array('messaging_template_pre_render_list'),
+  );
+  return $types;
+}
+
+/**
+ * Implements hook_theme()
+ */
+function messaging_template_theme() {
+  return array(
+    'messaging_template_text' => array(
+      'render element' => 'element',
+      'file' => 'messaging_template.inc',
+    ),
+    'messaging_template_subject' => array(
+      'render element' => 'element',
+      'file' => 'messaging_template.inc',
+    ),
+    'messaging_template_body' => array(
+      'render element' => 'element',
+      'file' => 'messaging_template.inc',
+    ),
+    'messaging_template_body_html' => array(
+      'variables' => array('element' => NULL, 'header' => NULL, 'content' => NULL, 'footer' => NULL),
+      'template' => 'messaging_template_body_html',
+    ),
+    'messaging_template_body_plain' => array(
+      'variables' => array('element' => NULL, 'header' => NULL, 'content' => NULL, 'footer' => NULL),
+      'template' => 'messaging_template_body_plain',
+    ),
+  );
+}
+
+/**
+ * Prepare body elements
+ */
+function messaging_template_pre_render_body($element) {
+  return messaging_template_pre_render_element($element);
+}
+
+/**
+ * Prepare text
+ */
+function messaging_template_pre_render_text($element) {
+  $options = $element['#options'];
+  if ($element['#format'] == MESSAGING_FORMAT_HTML) {
+    $element += array('#linebreak' => '<br />');
+  }
+  else {
+    //$element = messaging_template_pre_render_text_plain($element);
+    $element += array('#linebreak' => "\n");
+    // If it is the base element, add text wrapper. We just want to run it once for each part
+    //$element['#post_render'][] = 'messaging_template_html_to_text';
+  }
+  // Propagate properties
+  $element = messaging_template_pre_render_element($element);
+  return $element;
+}
+
+/**
+ * Post render message text (header, content, footer)
+ * - Token replacement if needed
+ * - Final text plain formatting
+ */
+function messaging_template_post_render_text($string, $element) {
+  if (!empty($element['#tokens']) && !empty($element['#options']['replace']) && $element['#template']) {
+    $string = $element['#template']->token_replace($string);
+  }
+  if ($string && $element['#format'] == MESSAGING_FORMAT_PLAIN && empty($element['#plaintext'])) {  
+    $string = drupal_html_to_text($string);
+  }
+  return $string;
+}
+
+/**
+ * Prepare element (add format, method properties recursively)
+ */
+function messaging_template_pre_render_element($element) {
+    // Add properties to all the tree
+  $properties = array(
+    '#format' => $element['#format'],
+    '#method' => $element['#method'],
+  );
+  foreach (element_children($element) as $index) {
+    $element[$index] = $properties + $element[$index];
+    $element[$index] = messaging_template_pre_render_element($element[$index]);
+  }
+  return $element;
+}
+/**
+ * Prepare list for theme_item_list
+ */
+function messaging_template_pre_render_list($element) {
+  foreach (element_children($element) as $index) {
+    $element['#items'][] = drupal_render($element[$index]);
+  }
+  // Remove element type, that will clash with item_list parameter
+  unset($element['#type']);
+  return $element;
+}
+
+/**
+ * Preprocess message text
+ */
+function template_preprocess_messaging_template_body(&$variables) {
+  $element = $variables['element'];
+  // Add default template tokens
+  $variables['tokens'] = $element['#template']->get_tokens();
+  // Render all body parts, not only 'header', 'content', 'footer'
+  foreach (element_children($element) as $index) {
+    $variables[$index] = isset($element[$index]) ? drupal_render($element[$index]) : '';
+  }
+}
+
+/**
+ * Render links (txt or html)
+ * 
+ * Element properties
+ * - #text, plain text to prefix the link
+ * - #title, link title, will default to the url itself if not available
+ * - #url, Full url, when we don't want to run it through url()
+ */
+function messaging_template_pre_render_link($element) {
+  // Fill some default options we are using later
+  $element['#options'] += array('attributes' => array(), 'html' => FALSE);
+  $element += array('#title' => '', '#prefix' => '', '#text' => '');
+
+  // However, within the scope of renderable elements, #attributes is a valid
+  // way to specify attributes, too. Take them into account, but do not override
+  // attributes from #options.
+  if (isset($element['#attributes'])) {    
+    $element['#options']['attributes'] += $element['#attributes'];
+  }
+  
+  if ($element['#format'] == MESSAGING_FORMAT_HTML && !empty($element['#href']) && $element['#title']) {
+    if ($element['#text']) {
+      $element['#prefix'] .= $element['#text'] . ' ';
+    }
+    // If its a regular link, render with default function
+    return drupal_pre_render_link($element);
+  }
+  else {  
+    $url = !empty($element['#url']) ? $element['#url'] : url($element['#href'], $element['#options']);
+    $text = !empty($element['#text']) ? check_plain($element['#text']) . ' ' : '';
+    if ($element['#format'] == MESSAGING_FORMAT_HTML) {
+      if ($element['#title']) {
+        $title = $element['#options']['html'] ? $element['#title'] : check_plain($element['#title']);
+      }
+      else {
+        $title = $url;
+      } 
+      $element['#markup'] = $text . '<a href="' . $url . '"' . drupal_attributes($element['#options']['attributes']) . '>' . $title . '</a>';
+    }
+    else {
+      // The text will be the title if no text available
+      $text = $text ? $text : $element['#title'] . ' ';
+      $element['#markup'] = $text . $url;
+    }
+    return $element;
+  }
+}
+
+/**
+ * Format as plaintext
+ * @param $string
+ * @param $elements
+ */
+function messaging_template_html_to_text($string, $elements){
+  return $string ? drupal_html_to_text($string) : $string;
+}

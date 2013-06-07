@@ -1,0 +1,158 @@
+<?php
+require_once drupal_get_path('module', 'notifications') . '/tests/notifications_test_case.inc';
+/**
+ * Class for testing notifications module.
+ * Tests basic API functions
+ */
+class NotificationsBasicTests extends NotificationsTestCase {
+
+  function getInfo() {
+    return array(
+      'name' => 'Notifications Basics',
+      'group' => 'Notifications',
+      'description' => 'Notifications API functions and administration pages');
+  }
+
+  function setUp() {
+    parent::setUp('messaging_mail', 'messaging_simple', 'notifications_tools', 'notifications_lite');
+  }
+
+  /**
+   * Play with creating, retrieving, deleting a pair subscriptions
+   */
+  function testNotificationsBasicAPI() {
+    $test_type = 'test';
+    $test_event_type = 'test event';
+    // Any user will do for exercising the API
+    $user = $this->drupalCreateUser();
+    // Create sample subscription object
+    $s1 = notifications_build_subscription(array(
+      'type' => $test_type,
+      'event_type' => $test_event_type,
+      'send_method' => 'mail',
+      'fields' => array('field1' => 1, 'field2' => 2),
+      'conditions' => 2,
+    ));
+    // Fill in other parameters
+    $s1->set_account($user);
+    $s1->check_destination();
+
+    $s2 = clone $s1;
+    // Create the subscription and check assigned sid (do not check, we don't have this type defined)
+    $result = notifications_save_subscription($s1, FALSE);
+    $this->assertEqual($result == SAVED_NEW && is_numeric($s1->sid) && $s1->sid > 0, TRUE, 'The subscription has been created');
+    // Check a destination has been created
+    $dest = $s1->get_destination();
+    $this->assertEqual(array($s1->mdid, $user->uid, 'mail', $user->mail), array($dest->mdid, $dest->uid, $dest->type, $dest->address), "A messaging destination has been created. $dest->mdid, $dest->uid, $dest->type, $dest->address");
+    // Retrieve the subscription and check values
+    $s = notifications_load_subscription($s1->sid, TRUE);
+    $this->assertEqual(array($s->sid, $s->uid, $s->fields), array($s1->sid, $s1->uid, $s1->fields), 'The subscription has been retrieved and values are ok');
+    // Attempt to create a second one with the same values
+    $result = notifications_save_subscription($s2, FALSE);
+    $this->assertTrue($result == SAVED_UPDATED && $s1->sid == $s2->sid, 'A duplicate subscription has been detected and updated: ' . $result);
+    // Now change some field, try again with a different send method
+    unset($s2->sid);
+    $s2->send_method = 'simple';
+    $s2->check_destination();
+    $result = notifications_save_subscription($s2, FALSE);
+    $this->assertTrue($result == SAVED_NEW && is_numeric($s2->sid) && $s2->sid > $s1->sid, 'Another subscription has been created');
+
+    // Now change values for the second one
+    unset($s2->send_method);
+    $s2->check_destination();
+    $fields = $s2->get_fields();
+    $fields[1]->value = 3; // As fields are objects (byref) we can just change the value
+    $result = notifications_save_subscription($s2, FALSE);
+    $this->assertEqual($result, SAVED_UPDATED, 'The second subscription has been updated');
+
+    // Trying several recovery options
+    $subs = notifications_get_subscriptions(array('type' => $test_type));
+    $this->assertEqual(count($subs), 2, 'Retrieved subscriptions by type');
+    $subs = notifications_get_subscriptions(array('type' => $test_type), array('field1' => $s1->fields['field1']), TRUE);
+    $this->assertEqual(count($subs), 0, 'Retrieved subscriptions by type and limited field');
+    $subs = notifications_get_subscriptions(array('type' => $test_type), array('field1' => $s1->fields['field1']), FALSE);
+    $this->assertEqual(count($subs), 2, 'Retrieved subscriptions by type and general field, single field: ' . count($subs));
+    $subs = notifications_get_subscriptions(array('type' => $test_type), array('field1' => $s1->fields['field1'], 'field2' => $s1->fields['field2']), FALSE);
+    $this->assertEqual(count($subs), 1, 'Retrieved subscriptions by type and general field, two fields: ' . count($subs));
+
+    // Delete the subscriptions and check
+    notifications_delete_subscriptions(array('type' => $test_type));
+    $subs = notifications_get_subscriptions(array('type' => $test_type));
+    $this->assertEqual(count($subs), 0, 'The subscriptions have been deleted');
+
+    // Try notifications_lite API
+    notifications_lite_send($user->uid, 'Test Subject', 'Test body');
+    $this->assertEqual($this->countQueued(array('uid' => $user->uid)), 1, 'Notification queued with notifications_lite');
+  }
+
+  /**
+   * Log in as administrator and test page loading
+   */
+  function testNotificationsBasicPages() {
+    // Log in with administrator permissions
+    $user = $this->drupalCreateUser(array('administer notifications', 'maintain own subscriptions', 'administer site configuration'));
+    $this->drupalLogin($user);
+
+    $this->drupalGet('admin/messaging/notifications');
+    $this->assertText('General settings', 'General settings page showing up');
+    $this->drupalGet('admin/messaging/notifications/events');
+    $this->assertText('Event type', 'Enabled events page showing up');
+    $this->drupalGet('admin/messaging/notifications/intervals');
+    $this->assertText('Send intervals', 'Intervals page showing up');
+    $this->drupalGet('admin/messaging/subscriptions/status');
+    $this->assertText('Subscriptions by type', 'Subscriptions overview page showing up');
+    $this->drupalGet('admin/messaging/subscriptions');
+    $this->assertText('Manage subscriptions', 'Subscriptions administration page showing up');
+    $this->drupalGet('admin/messaging/notifications/queue/operations');
+    $this->assertText('Notifications in queue', 'Notifications queue page showing up');
+  }
+
+  /**
+   * Test query builder
+   */
+  function testNotificationsQueryBuilder() {
+    notifications_include('query.inc');
+    // Test query builder, first basic query, then add some fields
+    $query = notifications_query_build(array('select' => 'field1', 'from' => 'table1', 'join' => 'JOIN table2'));
+    list($sql, $args) = notifications_query_sql($query);
+    $this->assertEqual($sql, 'SELECT field1 FROM table1 JOIN table2', 'Build basic query with SELECT and JOIN.');
+
+    $fields = array(
+      'f1' => 1,
+      'f2' => 'value2',
+    );
+    $query = notifications_query_build(array('fields' => $fields), $query);
+    list($sql, $args) = notifications_query_sql($query);
+    $fields_sql = "(f.field = '%s' AND f.value = '%s') OR (f.field = '%s' AND f.value = '%s')";
+    $target = "SELECT field1 FROM table1 JOIN table2 WHERE ($fields_sql)";
+    $this->assertEqual($sql, $target, 'Build basic query with simple fields.' .$sql);
+    $this->assertEqual($args, array('f1', 1, 'f2', 'value2'), 'Arguments for basic query with simple fields.');
+
+    $fields = array(
+      'f3' => array(1, 2),
+      'f4' => array('value3', 'value4'),
+    );
+    $query = notifications_query_build(array('fields' => $fields), $query);
+    list($sql, $args) = notifications_query_sql($query);
+    $fields_sql .= " OR (f.field = '%s' AND f.value IN ('%s','%s'))";
+    $fields_sql .= " OR (f.field = '%s' AND f.value IN ('%s','%s'))";
+    $target = "SELECT field1 FROM table1 JOIN table2 WHERE ($fields_sql)";
+    $target_args = array('f1', 1, 'f2', 'value2', 'f3', 1, 2, 'f4', 'value3', 'value4');
+    $this->assertEqual($sql, $target, 'Build basic query with array fields, conditions match.');
+    $this->assertEqual($args, $target_args, 'Build basic query with array fields, arguments match.');
+
+    // Test update/done/delete queries with two fake rows
+    foreach (array(1,2) as $i) {
+      db_query("INSERT INTO {notifications_queue}(eid, sid, uid, type, send_interval, send_method, sent, cron) VALUES(%d, %d, %d, 'test', 0 , 'test', 0, 1)", $i, $i, $i);
+    }
+    // We should have two rows, try a few things with them
+    $this->assertEqual($this->countQueued(), 2, 'We have two rows in queue' );
+    variable_set('notifications_log', 1);
+    notifications_queue()->queue_done(array('type' => 'test'));
+    $this->assertEqual($this->countQueued(array('cron' => 0)), 2, 'Both rows have been marked as done' );
+    variable_del('notifications_log');
+    notifications_queue()->queue_done(array('type' => 'test'));
+    $this->assertEqual($this->countQueued(array('cron' => 0)), 0, 'Both rows have been deleted' );
+  }
+
+}

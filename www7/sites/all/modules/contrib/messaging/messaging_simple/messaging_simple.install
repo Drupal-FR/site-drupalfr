@@ -1,0 +1,64 @@
+<?php
+
+/**
+* Implementation of hook_schema().
+*/
+function messaging_simple_schema() {
+  $schema['messaging_simple'] = array(
+    'description' => 'Stores messages sent among site users.',
+    'fields' => array(
+      'mgid'    => array(      
+        'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE,
+        'description' => 'Unique simple message id.',
+      ),
+      'msid'    => array(      
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => 'Unique system message id.',
+      ),
+      'language' => array(
+        'type' => 'varchar', 'length' => 12, 'not null' => TRUE, 'default' => '',
+        'description' => 'Language code.',
+      ),
+      'uid'    => array(
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => 'The {user}.uid for destination if it is a unique destination.',        
+      ),
+      'sender' => array(
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => 'The {user}.uid who sent the message if any.',     
+      ),     
+      'subject' => array(
+        'type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'default' => '',
+        'description' => 'Message subject, single text line.',
+      ),
+      'body' => array(
+        'type' => 'text', 'not null' => TRUE, 'size' => 'big',
+        'description' => 'Message body, multiple text line.',
+      ),
+      'sent' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 0,
+        'description' => 'Unix timestamp, when the message was sent.',
+      ),
+      'timeread' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 0,
+        'description' => 'Unix timestamp, when the message was read the first time.',
+      ),
+    ),    
+    'primary key' => array('mgid'),
+    'indexes' => array(
+      'uid' => array('uid'),
+    ),
+  );
+  return $schema;
+} 
+
+/**
+ * Update: Create table and move messages from messaging_store
+ */
+function messaging_simple_update_6001() {
+  $ret = array();
+  drupal_install_schema('messaging_simple');
+  $ret[] = update_sql("INSERT INTO {messaging_simple}(mqid, language, uid, sender, subject, body, sent) SELECT mqid, language, uid, sender, subject, body, created FROM {messaging_store} WHERE method = 'simple'");
+  $ret[] = update_sql("DELETE FROM {messaging_store} WHERE method = 'simple'");
+  return $ret;
+}

@@ -1,0 +1,122 @@
+<?php
+/**
+ * Testing Custom subscriptions
+ */
+
+require_once drupal_get_path('module', 'notifications') . '/tests/notifications_test_case.inc';
+
+class NotificationsCustomTests extends NotificationsTestCase {
+
+  function getInfo() {
+    return array(
+      'name' => 'Custom Subscriptions',
+      'group' => 'Notifications',
+      'description' => 'Creates some custom subscription types.' );
+  }
+
+  function setUp() {
+    parent::setUp('notifications_content', 'notifications_custom', 'messaging_simple');
+  }
+
+  function testCustomSubscriptions() {
+    // Create regular user and admin user who will create some custom subscription
+    $author = $this->drupalCreateUser(array('create story content', 'create page content'));
+    //$user2 = $this->drupalCreateUser('subscribe to author', 'subscribe to content', 'subscribe to content type')
+    $admin = $this->drupalCreateUser(array('administer notifications'));
+    $this->drupalLogin($admin);
+    // Subscription to story/author visible for user registration
+    $data = array(
+      'event_type' => 'node',
+      'visibility' => 1,
+      'register' => 1,
+    );
+    $fields = array(
+      array('type' => 'type', 'value' => 'story'),
+      array('type' => 'author', 'value' => $author->name),
+    );
+    $subs1 = $this->createCustomSubscription($data, $fields);
+    // Subscription to all node creations, not visible for registration
+    $data['register'] = FALSE;
+    $fields = array(array('type' => 'event-action', 'value' => 'insert'));
+    $subs2 = $this->createCustomSubscription($data, $fields);
+    $this->drupalLogout();
+    $this->drupalGet('user/register');
+    $this->assertText($subs1->name, 'First subscription is available for user registration.');
+    $this->assertNoText($subs2->name, 'Second subscription not available for user registration.');
+
+    // Create a third user and subscribe to both
+    $user = $this->drupalCreateUser(array('maintain own subscriptions'));
+    $this->drupalLogin($user);
+    $edit = array(
+      "notifications_custom[$subs1->type]" => 1,
+      "notifications_custom[$subs2->type]" => 1,
+    );
+    $this->drupalPost("user/$user->uid/notifications", $edit, t('Update'));
+    $this->assertText("Your subscriptions have been updated");
+    $this->assertUserRows('notifications', 2, $user->uid);
+
+    // Create story and page node and check the user gets just two notifications (3 rows in queue though)
+    // Enable this content type for thread/author/type subscriptions
+    //variable_set('notifications_content_type', array('thread', 'nodetype', 'author'));
+    $story = $this->drupalCreateNode(array('type' => 'story', 'uid' => $author->uid));
+    $page = $this->drupalCreateNode(array('type' => 'page', 'uid' => $author->uid));
+    $this->assertUserRows('notifications_queue', 3, $user->uid);
+    $this->notificationsProcessQueue(3, 0);
+    $this->assertUserRows('notifications_queue', 0, $user->uid, 'All rows in queue have been processed');
+    $messages = messaging_simple_get_messages(array('uid' => $user->uid));
+    $this->assertTrue(count($messages), 2, 'Two messages have been sent to the user.');
+    $this->drupalGet("user/$user->uid/messages");
+    $this->assertText("New Story: $story->title", 'A notification for the story has been received.');
+    $this->assertText("New Page: $page->title", 'A notification for the page has been received.');
+  }
+
+  /**
+   * Create custom subscription through admin form
+   */
+  function createCustomSubscription($data, $fields = array()) {
+    $data += array(
+      'newtype' => 'custom_' . $this->randomName(10),
+      'title' => $this->randomName(20),
+      'name' => $this->randomName(40),
+      'description' => $this->randomName(80),
+    );
+    foreach ($data as $field => $value) {
+      $edit["subscription[$field]"] = $value;
+    }
+    $this->drupalPost('admin/messaging/customsubs/new', $edit, t('Save'));
+    $this->assertText('The subscription type has been created.');
+    $subscription = notifications_custom_load($data['newtype']);
+    $this->assertTrue($subscription, 'A new custom subscription type has been created');
+    if ($fields) {
+       $subscription = $this->createCustomFields($subscription, $fields);
+    }
+    return $subscription;
+  }
+
+  /**
+   * Add fields to custom subscription
+   *
+   * Fields are arrays with 'type' and 'value'. The value must be the one entered in the form (i.e. user name)
+   */
+  function createCustomFields($subscription, $fields) {
+    $path = "admin/messaging/customsubs/csid/$subscription->csid/fields";
+    $this->drupalGet($path);
+    $this->assertText('Fields', 'The Fields page for this subscription type shows up.');
+    $index = count($subscription->fields);
+    $this->drupalGet($path);
+    // Note we are posting to NULL path, this is for multi-stage forms
+    foreach ($fields as $field) {
+      $edit = array('fields[name][new]' => $field['type']);
+      $this->drupalPost(NULL, $edit, t(t('Add new field')));
+      $edit = array("fields[edit][$index]" => $field['value']);
+      $index ++;
+    }
+    $this->drupalPost(NULL, $edit, t(t('Save fields')));
+    $this->assertText('The fields for this subscription have been updated.');
+    // Reload subscription
+    messaging_static_reset('notifications_custom_load');
+    $saved = notifications_custom_load($subscription->csid);
+    $this->assertEqual(count($saved->fields), $index, "The right number of fields have been added for this subscription. ($index)");
+    return $subscription;
+  }
+}

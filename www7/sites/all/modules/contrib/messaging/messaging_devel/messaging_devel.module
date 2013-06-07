@@ -1,0 +1,438 @@
+<?php
+/**
+ * @file
+ * Simple messaging using html page. Messaging method plug-in
+ * 
+ * This is a really simple message viewer and also an illustration of pulling messaging methods
+ */
+
+// Number of messages to display per page
+define('MESSAGING_DEBUG_PAGER', 10);
+
+/**
+ * Implementation of hook_init
+ */
+function messaging_devel_init() {
+  if (user_access('administer_messaging') && variable_get('messaging_debug', 0)) messaging_log_start();
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function messaging_devel_menu() {
+  $items['user/%user/messagelog'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Message log',
+    'page callback' => 'messaging_devel_user_page',
+    'page arguments' => array(1),
+    'access callback' => 'messaging_devel_access',
+    'access arguments' => array(1),
+  );
+  return $items;
+}
+
+/**
+ * Access calback
+ */
+function messaging_devel_access($account) {
+  global $user;
+  return $account->uid && (($account->uid == $user->uid) || user_access('administer messaging'));
+}
+
+/**
+ * Implementation of hook_block()
+ */
+function messaging_devel_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0]['info'] = t('Debug: Post message');
+      $blocks[1]['info'] = t('Debug: Message log');
+      return $blocks;
+    case 'view':
+      switch ($delta) {
+        case 0:
+          module_load_include('admin.inc', 'messaging');
+          $block['subject'] = t('Post message');
+          $block['content'] = drupal_get_form('messaging_admin_test_post_form');
+          return $block;
+        case 1:
+          if ($messages = messaging_devel_store_msg()) {
+            $block['subject'] = t('Message log');
+            foreach ($messages as $index => $message) {
+              list($text, $variables) = _messaging_devel_log_text($message);
+              $description = t($text, $variables);
+              $form[$index]= array('#type' => 'fieldset', 
+                '#title' => truncate_utf8($description, 20),
+                '#description' => $description,
+                '#collapsible' => TRUE, '#collapsed' => TRUE);
+              $form[$index][] = array('#type' => 'item', '#title' => t('Subject'), '#value' => check_plain($message->subject));
+              $form[$index][] = array('#type' => 'item', '#title' => t('Body'), '#value' => check_plain($message->body));
+            }
+            $block['content'] = drupal_render($form);
+            return $block;
+          }
+          break;
+      }
+      break; 
+  }
+}
+
+/**
+ * Implementation of hook_form_alter()
+ */
+function messaging_devel_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'messaging_admin_settings') {
+    $form['messaging_debug'] = array(
+      '#title' => t('Debug mode'),
+      '#type' => 'radios',
+      '#options' => array(t('Disabled'), t('Enabled')),
+      '#default_value' => variable_get('messaging_debug', 0),
+      '#description' => t('If enabled, messages wont be sent out but logged to watchdog, and displayed in the page footer.')
+    );    
+  }
+}
+
+/**
+ * Menu callback. Display pending messages to the user
+ * 
+ * Sample Implementation of messaging pull methods
+ */
+function messaging_devel_user_page($account) {
+  drupal_set_title(t('Messages for %name', array('%name' => $account->name)));
+  // Fetch all pending messages.
+  $output = '';
+  
+  // Use this method's info for all the messages
+  $messages = messaging_store('get', array('uid' => $account->uid), array('mqid DESC'), MESSAGING_DEBUG_PAGER, 0);
+  if ($messages) {
+    $header = array(t('Method'), t('Subject'), t('Body'));
+    foreach ($messages as $message) {
+      // Check plain everything so we can actually see the mark up if any
+      $rows[] = array($message->method, check_plain($message->subject), check_plain($message->body));
+    }
+    $output .= theme('table', $header, $rows);
+    $output .= theme('pager', array(), MESSAGING_DEBUG_PAGER); 
+  } else {
+    $output .=  t('No logged messages');
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_messaging
+ */
+function messaging_devel_messaging($op = 'info', $type = NULL) {
+  switch($op) {
+    case 'send methods':
+      $info['debug'] = array(
+        'title' => t('Debug'),
+        'name' => t('Debug'),
+        'destination' => 'name',
+        'type' => MESSAGING_TYPE_PUSH,
+        'glue' => '<br />',
+        'description' => t('The messages will be just logged (And printed on page if Devel module enabled).'),
+        'send callback' => 'messaging_devel_send_msg',
+        'address_type' => 'user', // Type of address for this method
+      );
+      return $info;
+  }        
+}
+
+/**
+ * Implementation of hook_action_info().
+ */
+function messaging_devel_action_info() {
+  return array(
+    'messaging_devel_watchdog_msg' => array(
+      'type' => 'messaging',
+      'description' => t('Log message to watchdog'),
+      'configurable' => FALSE,
+      'hooks' => array(
+        'messaging' => array('incoming', 'outgoing'),
+      ),
+    ),
+    'messaging_devel_devlog_msg' => array(
+      'description' => t('Log message through devel module'),
+      'type' => 'messaging',
+      'configurable' => FALSE,
+      'hooks' => array(
+        'messaging' => array('incoming', 'outgoing'),
+      )
+    ),
+    'messaging_devel_block_msg' => array(
+      'description' => t('Display message in block'),
+      'type' => 'messaging',
+      'configurable' => FALSE,
+      'hooks' => array(
+        'messaging' => array('incoming', 'outgoing'),
+      )
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_messaging_methods_alter()
+ */
+function messaging_devel_messaging_methods_alter(&$info) {
+  // If debug enabled, replace all send callbacks
+  if (variable_get('messaging_debug', 0)) {
+    foreach (array_keys($info) as $method) {
+      $info[$method]['send callback'] = _messaging_callback('messaging_devel_send_msg');
+      //$info[$method]['user callback'] = _messaging_callback('messaging_devel_send_user');
+    }
+  }
+}
+
+/**
+ * Messaging processor
+ */
+function messaging_devel_watchdog_msg($message, $context) {
+  list($text, $variables) = _messaging_devel_log_text($message);
+  watchdog('messaging', $text, $variables);
+
+  // Return message without changes for further processing
+  return $message;
+}
+
+/**
+ * Message processor, just log incoming messages
+ */
+function messaging_devel_devlog_msg($message, $context) {
+  if (module_exists('devel')) {
+    list($text, $variables) = _messaging_devel_log_text($message);
+    dsm($message, t($text, $variables));
+  }
+
+  // Return message without changes for further processing
+  return $message;
+}
+
+/**
+ * Message processor, store for display in a block
+ */
+function messaging_devel_block_msg($message, $context) {
+  messaging_devel_store_msg($message);
+  return $message;
+}
+
+/**
+ * Message processor, store for display in a block
+ */
+function messaging_devel_store_msg($message = NULL) {
+  if ($message) {
+    $_SESSION['messaging_devel_store'][] = $message;
+    return $message;
+  }
+  elseif (isset($_SESSION['messaging_devel_store'])) {
+    $messages = $_SESSION['messaging_devel_store'];
+    unset($_SESSION['messaging_devel_store']);
+    return $messages;
+  }
+}
+/**
+ * Format message as loggable text
+ */
+function _messaging_devel_log_text($message) {
+  $source = $message->source;
+  $variables = array(
+    '%subject' => $message->subject,
+  );
+  if ($source['type'] == 'incoming') {
+    $text = 'Incoming message, method %method, channel %channel: %subject';
+    $variables +=  array('%method' => $source['method'], '%channel' => $source['channel']);  
+  } elseif ($source['type'] == 'outgoing') {
+    $text = 'Outgoing message, method %method: %subject';
+    $variables += array('%method' => $message->method);  
+  } else {
+    $text = 'Unknown message type, full dump: %message';
+    $variables['%message'] = print_r($message, TRUE);
+  }
+  return array($text, $variables);
+}
+
+/**
+ * Messaging debug logs
+ */
+function messaging_devel_log($txt = NULL, $variables = NULL) {
+  // Sometimes we are passing objects as variables, we need to make sure they are not by reference
+  // We can let this be for normal logs but for debugging we want accurate unique data on each stage
+  if ($variables) {
+    foreach ($variables as $key => $value) {
+      if (is_object($value)) {
+        $variables[$key] = (object)$value;
+      }
+    }
+  }
+  return _messaging_log('debug', $txt, $variables);
+}
+
+/**
+ * Format complex log as collapsible fieldset
+ */
+function _messaging_devel_format_log($type, $string, $append, $objects) {
+  $content = '';
+  foreach ($objects as $key => $value) {
+    $content .= _messaging_devel_format_object($value, $key);
+  }
+  // Build collapsible fieldset
+  $field['object'] = array(
+    '#type' => 'fieldset',
+    '#title' => $string,
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => $append ? implode(' ', $append) : '',
+  );
+
+  $field['object']['content']['#value'] = $content;
+  
+  return drupal_render($field);    
+}
+
+/**
+ * Format objects/array in logs
+ */
+function _messaging_devel_format_object($data, $name) {
+  $rows = array();
+  foreach ($data as $key => $value) {
+    if (is_numeric($value) || is_string($value)) {
+      // Make line endings visible
+      $content = str_replace("\n", '\n<br />', check_plain($value));      
+    }
+    elseif (is_object($value) || is_array($value)) {
+      $content = _messaging_devel_format_object($value, $key);
+    }
+    if (isset($content)) {
+      $rows[] = array(
+        check_plain($key),
+        $content, 
+      );
+    }
+  }
+  $header = array(check_plain($name), is_object($data) ? t('Object') : t('Array'));
+  return theme('table', $header, $rows);
+}
+
+/**
+ * Just show message title to the user. 
+ * 
+ * This is a pull method though, so this is mainly intended for testing options
+ */
+function messaging_devel_send_msg($destination, $message) {
+  // Just logs everything and mark the message for logging too.
+  $message->log = 1;
+  $text = '';
+  $watchdog = array();
+  $variables = array('%name' => $destination, '%key' => $message->type, '%subject' => $message->subject, '@body' => $message->body);
+  messaging_log('Message %key for %name: %subject', $variables);
+  // Just log message body at the end
+  watchdog('messaging', 'Message %key for %name: %subject <br /> Message body: <br /><pre>@body</pre>', $variables);
+  return TRUE;
+}
+
+/**
+ * Get logs without formatting
+ */
+function messaging_log_get() {
+  if ($logs = _messaging_log('return')) {
+    _messaging_log('reset');
+    return $logs;
+  }
+}
+
+/**
+ * Init logging system so logs are saved from now on
+ */
+function messaging_log_start() {
+  return _messaging_log('start');
+}
+
+/**
+ * Format logs
+ */
+function messaging_log_format($logs) {
+  $rows = array();
+  foreach ($logs as $log) {
+    list($type, $string, $append, $objects) = _messaging_log_format($log);     
+    // Full objects/arrays are only rendered when debug module is enabled
+    if ($objects && function_exists('_messaging_debug_format_log')) {
+      $text = _messaging_debug_format_log($type, $string, $append, $objects);
+    }
+    else {
+      $text = $string;
+      if ($append) {
+        $text .= '<br />' . implode(' ', $append);
+      }
+    }
+    $rows[] = array(
+      $type,
+      $text,
+    );
+  }
+  $header = array(t('Type'), t('Message'));
+  return theme('table', array('header' => $header, 'rows' =>$rows));  
+}
+
+/**
+ * Quick logging for debugging and manual queue processing
+ */
+function _messaging_log($type, $txt = NULL, $variables = NULL, $severity = WATCHDOG_NOTICE) {
+  static $enabled = FALSE;
+  switch ($type) {
+    case 'info':
+    case 'debug':
+      if ($enabled) {
+        $_SESSION['messaging_log'][] = array($type, $txt, $variables, $severity);
+      }
+      break;
+    case 'return':
+      return isset($_SESSION['messaging_log']) ? $_SESSION['messaging_log'] : NULL;
+      break;
+    case 'reset':
+      unset($_SESSION['messaging_log']);
+      break;
+    case 'start':
+      $enabled = TRUE;
+      break;
+    case 'stop':
+      $enabled = FALSE;
+      break;
+  }
+}
+
+/**
+ * Format messaging / notifications log as single text line
+ */
+function _messaging_log_format($log) {
+  list($type, $string, $args, $severity) = $log;
+  $append = $replace = $objects = array();
+  if ($args) {
+    // Transform arguments before inserting them.
+    foreach ($args as $key => $value) {
+      if (is_numeric($value) || is_string($value)) {
+        switch ($key[0]) {
+          case '@':
+            // Escaped only.
+            $replace[$key] = check_plain($value);
+            break;
+          case '%':
+            $replace[$key] = drupal_placeholder($value);
+            break;
+          case '!':
+            // Pass-through.
+            $replace[$key] = $value;
+            break;
+          default:
+            // Append to string a key value pair, different from watchdog format
+            $append[$key] = '<strong>' . $key . '</strong>= ' . check_plain($value);
+            break;
+        }
+      }
+      elseif (is_array($value) || is_object($value)) {
+        $objects[$key] = $value;
+      }
+    }
+    $string = strtr($string, $replace);
+  }
+
+  return array($type, $string, $append, $objects);
+}

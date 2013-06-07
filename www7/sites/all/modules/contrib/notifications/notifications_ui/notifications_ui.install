@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function notifications_ui_uninstall() {
+  // Some global variables
+  variable_del('notifications_ui_per_type');
+  variable_del('notifications_ui_user_options');
+  variable_del('notifications_ui_node_options');
+  variable_del('notifications_ui_account_options');
+  // Just delete variables for subscription types and node types
+  variable_del('notifications_ui_types');
+  foreach (array_keys(node_type_get_types()) as $type) {
+    variable_del('notifications_node_ui_' . $type);
+  }
+}
+
+/**
+ * Drupal 7 updates
+ */
+// Renamed variable notifications_ui_subscribe_links to notifications_option_subscribe_links
+// Renamed variable 'notifications ui unsubscribe_links' to notifications_option_unsubscribe_links
+// Deleted notifications_ui_types

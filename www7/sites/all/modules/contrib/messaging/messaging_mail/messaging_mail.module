@@ -1,0 +1,102 @@
+<?php
+/**
+ * @file
+ * Simple mail using Drupal API. Messaging method plug-in
+ * 
+ * This is also the base module for mail sending methods.
+ */
+
+/**
+ * Implementation of hook_menu()
+ */
+function messaging_mail_menu() {
+  $items['admin/config/messaging/method/mail'] = array(
+    'title' => 'Mail',
+    'description' => 'Common options for mail methods',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('messaging_mail_admin_settings'),
+    'access arguments' => array('administer messaging'),
+    'file' => 'messaging_mail.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;  
+}
+
+/**
+ * Implementation of hook_messaging()
+ * 
+ * Currently the only operation supported is 'send methods' that will retrieve and array
+ * with information fo the sending methods provided by this module.
+ * 
+ * @param $op
+ *   Type of information to retrieve.
+ * @return mixed
+ *   Depending on $op   
+ */
+function messaging_mail_messaging($op, $type = NULL) {
+  switch($op) {
+    case 'send methods':
+      $info['mail'] = array(
+        'title' => t('Drupal mail'),
+        'class' => 'Messaging_Mail_Method',
+        'name' => t('Mail'),
+        'description' => t('Get messages as plain text e-mail.'),
+      );
+      return $info;
+
+    case 'address types':
+      // Get some built in address types
+      $types['mail'] = array(
+        'name' => t('E-mail address'), // Name for display
+        'class' => 'Messaging_Mail_Address',
+      );
+      return $types;
+  }
+}
+
+/**
+ * Implements hook_user_insert().
+ */
+function messaging_mail_user_insert(&$edit, $account, $category) {
+  messaging_mail_update_user($account);
+}
+/**
+ * Implements hook_user_update().
+ */
+function messaging_mail_user_update(&$edit, $account, $category) {
+  messaging_mail_update_user($account);
+}
+
+/**
+ * Get list of mail methods
+ */
+function messaging_mail_methods() {
+  $mail_methods = array();
+  foreach (messaging_method_info() as $method => $info) {
+    if (!empty($info['group']) && $info['group'] == 'mail') {
+      $mail_methods[] = $method;
+    }
+  }
+  return $mail_methods;
+}
+
+/**
+ * Update destinations when a user account is updated, created
+ * 
+ * The destinations for that mail account will be assigned to the user
+ */
+function messaging_mail_update_user($account) {
+  if ($account->status) {
+    // Update mail for destinations of this user
+    db_query("UPDATE {messaging_destination} SET address = :address WHERE uid = :uid AND type = 'mail'", array(':address' => $account->mail, ':uid' => $account->uid));
+    // Update uid for destinations with this mail
+    db_query("UPDATE {messaging_destination} SET uid = :uid WHERE uid = 0 AND type = 'mail' AND address = :address", array(':address' => $account->mail, ':uid' => $account->uid));
+  }
+}
+
+/**
+ * Implementation of hook_disable()
+ */
+function messaging_mail_disable() {
+  Messaging_Method::method_disable('mail');
+}

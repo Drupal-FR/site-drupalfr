@@ -1,0 +1,720 @@
+<?php
+/**
+ * Drupal Messaging Framework
+ *
+ * This is a messaging framework to allow message sending in a channel independent way
+ * It will provide a common API for sending while allowing plugins for multiple channels
+ * 
+ * If enabled the html_to_text module, a new filter will be available
+ * 
+ * By Development Seed, http://wwww.developmentseed.org
+ */
+
+// Format as plaintext. Note it evaluates to false.
+define('MESSAGING_FORMAT_PLAIN', 0);
+// Format as html. Note it evaluates to true
+define('MESSAGING_FORMAT_HTML', 1);
+// Default messaging format, will be plaintext. Add a variable?
+define('MESSAGING_FORMAT', MESSAGING_FORMAT_PLAIN);
+
+// Special string for empty text part
+define('MESSAGING_EMPTY', '<none>');
+
+// Limit the size of static caches
+define('MESSAGING_CACHE_LIMIT', variable_get('messaging_cache_limit', 1000));
+
+// Limit the max % of cron time this module can use (this can be overridden by some modules)
+define('MESSAGING_DEFAULT_CRON_PERCENT', variable_get('messaging_default_cron_percent', 80));
+
+/**
+ * Base class for all Notifications objects
+ */
+abstract class Messaging_Object {
+  /**
+   * Constructor
+   */
+  public function __construct($template = NULL) {
+    if ($template) {
+      $properties = (array)$template;
+      foreach ($properties as $key => $value) {
+        $this->$key = $value;
+      }
+    }    
+  }
+
+  /**
+   * They need a build function
+   */
+  public static function build_object($object) {
+    return new Messaging_Object($object);
+  }
+}
+
+/**
+ * Default entity controller for notifications objects
+ */
+class MessagingEntityController extends DrupalDefaultEntityController {
+  /**
+   * Builds objects of specific classes upon loading.
+   * 
+   * The class will be in 'base class' parameter
+   *
+   * @param $queried_entities
+   *   Associative array of query results, keyed on the entity ID.
+   * @param $revision_id
+   *   ID of the revision that was loaded, or FALSE if teh most current revision
+   *   was loaded.
+   */
+  protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
+    $class = $this->entityInfo['base class'];
+    foreach ($queried_entities as $id => $entity) {
+      $queried_entities[$id] = call_user_func(array($class, 'build_object'), $entity); 
+    }
+    return parent::attachLoad($queried_entities, $revision_id);
+  }
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function messaging_entity_info() {
+  // Notifications_Event
+  $info['messaging_message'] = array(
+    'label' => t('Message'),
+    'controller class' => 'MessagingEntityController',
+    'base class' => 'Messaging_Message',
+    'base table' => 'messaging_message',
+    'entity keys' => array(
+      'id' => 'msid',
+    ),
+    
+  );
+  // Notifications_Subscription
+  $info['messaging_destination'] = array(
+    'label' => t('Destination'),
+    'controller class' => 'MessagingEntityController',
+    'base class' => 'Messaging_Destination',
+    'base table' => 'messaging_destination',
+    'entity keys' => array(
+      'id' => 'mdid',
+    ),
+    'view modes' => array(
+      // @todo View mode for display as a field (when attached to nodes etc).
+      'full' => array(
+        'label' => t('Destinations page'),
+        'custom settings' => FALSE,
+      ),
+    ),
+  );  
+  return $info;
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function messaging_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#messaging':
+      $output = '<p>' . t('The messaging module is the engine that handles outgoing messages and message queueing for different sending methods.') . '</p>';
+      $output .= '<p>' . t('You need to enable one or more of the included plug-ins to be able to actually take advantage of it.') . '</p>';
+      return $output;
+    case 'admin/messaging/settings/method/filters':
+      $output = '<p>' . t('These are the filters for the message body. They should depend on the content and the tokens you are using for messages. This is important for getting the right formatting and also for security.') . '</p>';
+      $oubput .= t('If using raw tokens for templates, possibly you\'ll need some additional formatting here.');
+      $items[] = t('You can set up Input formats for specific message parts on the <a href="@message_templates">Message templates pages</a>. These will be run first on each piece of text.', array('@message_templates' => url('admin/messaging/template')));     
+      $items[] = t('Once the message body is built you can set a <strong>Format filter</strong> on this page to format and filter it. Set up the filters you need using the <a href="@input_formats">Input formats</a> page', array('@input_formats' => url('admin/settings/filters')));
+      $items[] = t('Last, the <strong>Final filter</strong> will be run for adjusting the text to the format required by each Send method.');
+      $output .= theme('item_list', $items);
+      return $output;
+  }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function messaging_menu() {
+  $items['admin/config/messaging'] = array(
+    'title' => 'Messaging & Notifications',
+    'description' => 'Administer and configure messaging',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/messaging/settings'] = array(
+    'title' => 'Messaging settings',
+    'description' => 'Configuration of messaging framework',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('messaging_admin_settings'),
+    'access arguments' => array('administer messaging'),
+    'file' => 'messaging.admin.inc',
+  );
+  $items['admin/config/messaging/settings/overview'] = array(
+    'title' => 'Messaging',
+    'description' => 'Configuration of sending methods',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/config/messaging/settings/test'] = array(
+    'title' => 'Test',
+    'description' => 'Test message sending',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('messaging_admin_test_post_form'),
+    'access arguments' => array('administer messaging'),
+    'file' => 'messaging.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/config/messaging/method'] = array(
+    'title' => 'Send methods',
+    'description' => 'Configuration of sending methods',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('messaging_admin_method_settings'),
+    'access arguments' => array('administer messaging'),
+    'file' => 'messaging.admin.inc',
+  );
+  $items['admin/config/messaging/method/overview'] = array(
+    'title' => 'Options',
+    'description' => 'General settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  /*
+  $items['admin/config/messaging/method/filters'] = array(
+    'title' => 'Filters',
+    'description' => 'Filters and formatting',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('messaging_admin_method_filters'),
+    'access arguments' => array('administer filters'),
+    'file' => 'messaging.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  */
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm()
+ */
+function messaging_permission() {
+  return array(
+    'administer messaging' =>  array(
+      'title' => t('Administer messaging'),
+      'description' => t('Administer messaging.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_user_delete().
+ */
+function messaging_user_delete($user) {
+  // Delete user data from tables
+  Messaging_Destination::delete_multiple(array('uid' => $user->uid));
+}
+
+/** Messaging API **/
+
+/**
+ * Get send method object
+ * 
+ * @param $method
+ *   Method name or Messaging_Method object
+ * @param $method_info
+ *   Array of properties to build a custom send method or override existing ones
+ */
+function messaging_send_method($method, $method_info = array()) {
+  $send_methods = &drupal_static(__FUNCTION__);
+  
+  if (is_object($method)) {
+    return $method;
+  }
+  if (!isset($send_methods[$method])) {
+    // This will init the method list if not done before
+    if ($info = messaging_method_info($method)) {
+      $class = !empty($info['class']) ? $info['class'] : 'Messaging_Send_Method';
+      $send_methods[$method] = new $class($method, $method_info + $info);
+    }
+    else {
+      // No info available from modules. This is a custom method or a disabled one
+      $send_methods[$method] = new Messaging_Send_Method($method, $method_info);
+      // Add to static cache so it can be found later
+      $static_info = &messaging_info('send methods');
+      $static_info[$method] = $method_info;
+    }
+  }
+  
+  return $send_methods[$method];
+}
+
+/**
+ * Build message object from object or array
+ */
+function messaging_message_build($message) {
+  if (is_object($message) && is_a($message, 'Messaging_Message')) {
+    return $message;
+  }
+  elseif (is_array($message)) {
+    $message = (object)$message;
+  }
+  return Messaging_Message::build_template($message);
+}
+
+/**
+ * Build destination object from user account (and create destination if not exists)
+ */
+function messaging_account_build_destination($account, $method = NULL, $address = NULL) {
+  if ($account->uid) {
+    if ($method && !$address) {
+      $address = messaging_user_destination($account, $method);
+    }
+    if ($method && $address) {
+      return Messaging_Destination::create_method($method, $address, $account->uid);
+    }
+    elseif (($fallback = messaging_method_default($account)) && $fallback != $method) {
+      // Retry with new method
+      return messaging_account_build_destination($account, $fallback);
+    }
+  }
+  elseif ($method && $address) { // Anonymous users
+    // @todo check the address doesn't belong to any user ???
+    return Messaging_Destination::create_method($method, $address, 0);
+  }
+}
+
+/**
+ * Get destination from user account.
+ * 
+ */
+function messaging_user_destination($account, $method) {
+  return messaging_send_method($method)->user_destination($account);
+}
+
+/**
+ * Test sending, just log message
+ */
+function messaging_message_test($message, $destinations = array()) {
+  $message->prepare();
+  $message->render();
+  messaging_log('Emulating message sending (test run)', array('summary' => (string)$message, 'message' => $message, 'destinations' => $destinations));
+  return $message->success = TRUE;
+}
+
+/**
+ * Implementation of hook_cron()
+ * 
+ * Process queued messages for delivery, update, do clean up...
+ */
+function messaging_cron() {
+  if (variable_get('messaging_queue_process_cron', TRUE)) {
+    if ($store = messaging_store('cron')) {
+      $store->cron_process();
+    }
+  }
+}
+
+/**
+ * Returns list of messaging methods for a type
+ *
+ * I.e. all messaging methods of pull type
+ */
+function messaging_method_type($type) {
+  $result = array();
+  foreach (messaging_method_info() as $method => $info) {
+    if ($info['type'] & $type) {
+      $result[$method] = $info;
+    }
+  }
+  return $result;
+}
+
+/**
+ * List sending methods
+ *
+ * @param $account
+ *   Optional user account, for checking permissions against this account
+ *   If no account passed it is a list for the administrator
+ */
+function messaging_method_list($account = NULL) {
+  $info = messaging_method_info(NULL, 'name');
+  if ($account) {
+    foreach (array_keys($info) as $method) {
+      // Check access for each method and check destination
+      if (!messaging_method_permission($method, $account) || !messaging_user_destination($account, $method)) {
+        unset($info[$method]);
+      }
+      else {
+        $info[$method] = messaging_translate("method:$method:name", $info[$method]);
+      }
+    }
+  }
+  return $info;
+}
+
+/**
+ * Check permission for method and account
+ *
+ * @param $method
+ *   Sending method id
+ * @param $account
+ *   User account to check permission
+ */
+function messaging_method_permission($method, $account = NULL) {
+  return messaging_method_info($method, 'enabled') && messaging_send_method($method)->user_access($account);
+}
+
+/**
+ * Returns default messaging method
+ */
+function messaging_method_default($account = NULL) {
+  if ($account && !empty($account->messaging_default) && messaging_method_permission($account->messaging_default, $account)) {
+    return $account->messaging_default;
+  }
+  elseif ($method = variable_get('messaging_default_method', '')) {
+    return $method;
+  }
+  else {
+    return key(messaging_method_info());
+  }
+}
+
+/**
+ * Get setting from user account or get default setting if not available
+ * 
+ * If first checks for a 'messaging_$name' property in the user account
+ * and returns the value of the variable 'messaging_default_$name' if not set
+ * 
+ * There's an optional variable 'messaging_peruser_$name' that if true will block
+ * per user settings and use only global settings.
+ * 
+ * @param $name
+ *   Option name
+ * @param $account
+ *   Optional account to check setting for
+ * @param $default
+ *   Default value if no option set
+ */
+function messaging_user_setting($name, $account = NULL, $default = NULL) {
+  $variable = 'messaging_' . $name;
+  if ($account && isset($account->$variable) && variable_get('messaging_peruser_' . $name, 1)) {
+    return $account->$variable;
+  }
+  else {
+    return variable_get('messaging_default_' . $name, $default);
+  }
+}
+
+/**
+ * Returns messaging methods properties
+ *
+ * @param $method
+ *   Optional, Method to get properties for, none or NULL for all methods
+ * @param $property
+ *   Optional, Property to get, none or NULL for all properties
+ * @param $default
+ *   Optional default value to return when there's not that property for the method
+ */
+function messaging_method_info($method = NULL, $property = NULL, $default = NULL) {
+  static $info;
+
+  if (!isset($info)) {
+    // Collect method info without 'alter', we do it later
+    $info = &messaging_info('send methods', NULL, FALSE, FALSE);
+    // Get list of enabled methods. All will be enabled by default.
+    $enabled = variable_get('messaging_method_enabled', array());
+   
+    // Merge settings from variable for each enabled method
+    foreach (array_keys($info) as $name) {
+      $info[$name] = array_merge(
+        $info[$name],
+        variable_get('messaging_method_' . $name, array()), 
+        variable_get('messaging_filters_' . $name, array())
+      );
+      // If not set enabled flag, the method will be enabled by default
+      $info[$name]['enabled'] = isset($enabled[$name]) ? $enabled[$name] : TRUE;
+    }
+    // Allow altering by other modules after we've set the variables
+    drupal_alter('messaging_send_methods', $info);
+  }
+
+  return messaging_array_info($info, $method, $property, $default);
+}
+
+/**
+ * Returns messaging address properties
+ */
+function messaging_address_info($type = NULL, $property = NULL, $default = NULL) {
+  $info = &messaging_info('address types');
+  return messaging_array_info($info, $type, $property, $default);
+}
+
+/**
+ * Implements hook_messaging().
+ */
+function messaging_messaging($op, $type = NULL) {
+  switch ($op) {
+    case 'address types':
+      // Get some built in address types
+      $types['user'] = array(
+        'name' => t('User name'), // Name of the address for this method
+        'class' => 'Messaging_User_Destination',
+      );
+      return $types;
+  }
+}
+
+/**
+ * Entry point for the storage and queueing API
+ * 
+ * Default methods are implemented by Messaging_Store class
+ */
+function messaging_store($name = 'queue') {
+  $messaging_store = &drupal_static(__FUNCTION__);
+  if (!isset($messaging_store[$name])) {
+    $class = variable_get('messaging_store_' . $name);
+    $messaging_store[$name] = $class ? new $class($name) : FALSE;
+  }
+  return $messaging_store[$name];
+}
+
+/**
+ * Implementation of hook_requirements()
+ */
+function messaging_requirements($phase) {
+  $requirements = array();
+  // Ensure translations don't break at install time
+  $t = get_t();
+  if ($phase == 'runtime') {
+    $methods = messaging_method_list();
+    // Ensure that we have some sending methods available
+    if (!$methods) {
+      $requirements['messaging']  = array(
+         'title' => $t('Messaging sending methods'),
+         'value' => $t('No sending method plug-ins available. Please enable some Sending Method on the !admin-modules page.', array('!admin-modules' => l($t('Modules administration'), 'admin/modules'))),
+         'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Process incoming message. This is the entry point for plug-in modules
+ * 
+ * This is just a wrapper for handling incoming in messaging_incoming module
+ */
+function messaging_message_in($method, $channel, $message, $params = array()) {
+  if (function_exists('messaging_incoming_post')) {
+    return messaging_incoming_post($method, $channel, $message, $params);
+  } else {
+    return FALSE;
+  }
+}
+
+/**
+ * Check that a parameter is an instance of a given class
+ */
+function messaging_check_object($object, $class, $create = FALSE) {
+  if ($object && is_object($object) && is_a($object, $class)) {
+    return $object;
+  }
+  elseif ($create) {
+    return new $class($object);
+  }
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function messaging_theme() {
+  return array(
+    'messaging_text' => array(
+      'render element' => 'element',
+      'file' => 'messaging.text.inc',
+    ),
+    'messaging_admin_methods_table'  => array(
+      'render element' => 'elements',
+      'file' => 'messaging.admin.inc',
+    ),
+    'messaging_admin_settings_table'  => array(
+      'render element' => 'elements',
+      'file' => 'messaging.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Get information from an array of data
+ * 
+ * @param $data
+ *   Array of data indexed by type
+ * @param $type
+ *   Type to return out of the array, none to return all types
+ * @param $property
+ *   Property to return, none to return all properties
+ * @param $default
+ *   Default value to return if not property set
+ */
+function messaging_array_info($data, $type = NULL, $property = NULL, $default = NULL) {
+  if ($type && $property) {
+    return isset($data[$type][$property]) ? $data[$type][$property] : $default;
+  }
+  elseif ($type) {
+    return isset($data[$type]) ? $data[$type] : array();
+  }
+  elseif ($property) {
+    return messaging_array_list($data, $property, FALSE, $default);
+  }
+  else {
+    return $data;
+  }  
+}
+
+/**
+ * Get a list of properties as $type => $value
+ * 
+ * @param $field
+ *   Field to retrieve
+ * @param $filter
+ *   Whether to filter out types without value
+ * @param $default
+ *   Default value to return if no value
+ */
+function messaging_array_list($data, $property, $filter = TRUE, $default = NULL) {
+  $return = array();
+  foreach ($data as $type => $info) {
+    if (isset($info[$property])) {
+      $return[$type] = $info[$property];
+    }
+    elseif (!$filter) {
+      $return[$type] = $default;
+    }
+  }
+  return $return;  
+}
+
+/**
+ * Short hand for info logs
+ */
+function messaging_log($txt = NULL, $variables = array()) {
+  $variables += array('type' => 'log');
+  messaging_debug($txt, $variables);
+}
+
+/**
+ * Short hand for debug logs
+ */
+function messaging_debug($txt = NULL, $variables = array()) {
+  if (function_exists('messaging_debug_log')) {
+    $variables+= array('type' => 'debug');
+    return messaging_debug_log($txt, $variables);
+  }
+}
+
+/**   
+ * Wrapper function for 1i8nstrings() if i18nstrings enabled.   
+ */   
+function messaging_translate($name, $string, $langcode = NULL, $textgroup = 'messaging') {
+  return function_exists('i18nstrings') ? i18nstrings($textgroup . ':' . $name, $string, $langcode) : $string;  
+}
+
+/**
+ * Set data on static cache, checking whether the cache is under limits.
+ */
+function messaging_static_cache_set($cache_name, $key, $value) {
+  $cache = &drupal_static($cache_name);
+  if ($cache && MESSAGING_CACHE_LIMIT && count($cache) > MESSAGING_CACHE_LIMIT) {
+    $cache = array();
+  }
+  $cache[$key] = $value;
+}
+
+/**
+ * Get data from static cache
+ */
+function messaging_static_cache_get($cache_name, $key) {
+  $cache = &drupal_static($cache_name);
+  return isset($cache[$key]) ? $cache[$key] : NULL;
+}
+
+/**
+ * Include module files as necessary.
+ * 
+ * The files must be in an 'includes' subfolder inside the module folder. 
+ */
+function messaging_include($file, $module = 'messaging') {
+  static $included = array();
+  if (!isset($included[$module][$file])) {
+    require_once './' . drupal_get_path('module', $module) . '/includes/' . $file;
+    $included[$module][$file] = TRUE;
+  }
+}
+
+/**
+ * Get language object from language code or from language
+ */
+function messaging_language($language) {
+  if (is_object($language)) {
+    return $language;
+  }
+  else {
+    $list = language_list();
+    return $language && isset($list[$language]) ? $list[$language] : language_default();
+  }
+}
+
+/**
+ * Invoke hook_messaging($name) on all modules
+ * 
+ * This is like module_invoke all with some differences:
+ * - The results are just merged (not recursively)
+ * - The module name is added to each resulting array
+ * - We cache all the results 
+ */
+function &messaging_info($name, $param = NULL, $refresh = FALSE, $alter = TRUE) {
+  $info = &drupal_static('messaging_info_' . $name);
+  if (!isset($info) || $refresh) {
+    $info = module_invoke_all('messaging', $name, $param);
+    // Provide alter hook
+    if ($alter) {
+      drupal_alter('messaging_' . strtr($name, ' ', '_'), $info);
+    }
+  }      
+  return $info;
+}
+
+/**
+ * Helper function, get uid from account parameter (object or uid)
+ */
+function messaging_user_uid($account) {
+  return is_object($account) ? $account->uid : (int)$account;
+}
+
+/**
+ * Helper function, get object from account parameter (object or uid)
+ */
+function messaging_user_object($account) {
+  return is_object($account) ? $account : user_load((int)$account);
+}
+
+/**
+ * Callback for printing user names
+ */
+function messaging_user_format_name($account, $format = MESSAGING_FORMAT_PLAIN) {
+  $account = messaging_user_object($account);
+  return ($format & MESSAGING_FORMAT_HTML) ? theme('username', array('account' => $account)) : check_plain($account->name);
+}
+
+/**
+ * Implements hook_element_info()
+ */
+function messaging_element_info() {
+  $types['messaging_text'] = array(
+    '#theme' => 'messaging_text',
+    '#options' => array(),
+    '#format' => MESSAGING_FORMAT,
+    '#markup' => '',
+    '#pre_render' => array('drupal_pre_render_markup'),
+  );
+  return $types;
+}

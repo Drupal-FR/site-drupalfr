@@ -1,0 +1,51 @@
+<?php
+/**
+ * @file
+ * HTML Mail using Mime-Mail. Messaging method plug-in
+ * 
+ * Will be replaced by some Mime-Mail integration
+ */
+
+/**
+ * Implementation of hook_messaging()
+ * 
+ * Currently the only operation supported is 'send methods' that will retrieve and array
+ * with information fo the sending methods provided by this module.
+ * 
+ * @param $op
+ *   Type of information to retrieve.
+ * @return mixed
+ *   Depending on $op   
+ */
+function messaging_htmlmail_messaging($op, $type = NULL) {
+  switch($op) {
+    case 'send methods':
+      $info['htmlmail'] = array(
+        'title' => t('HTML mail'),
+        'class' => 'Messaging_HTML_Mail_Method',
+        'name' => t('HTML mail'),
+        'description' => t('Get messages as HTML e-mail.'),
+      );
+      return $info;
+  }
+}
+
+/**
+ * Implements hook_theme()
+ */
+function messaging_htmlmail_theme() {
+  return array(
+    'messaging_htmlmail' => array(
+      'variables' => array('header' => NULL, 'content' => NULL, 'footer' => NULL, 'css' => NULL),
+      'template' => 'messaging_htmlmail',
+    ),
+  );
+}
+
+
+/**
+ * Implementation of hook_disable()
+ */
+function messaging_htmlmail_disable() {
+  Messaging_Method::method_disable('htmlmail');
+}

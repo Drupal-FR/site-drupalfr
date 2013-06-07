@@ -1,0 +1,244 @@
+<?php
+
+/**
+ * @file
+ * Notifications scheduler module
+ *
+ * Send scheduled notifications depending on timely triggers
+ *
+ * Hidden variables (can be set programatically, have no UI):
+ *
+ * - 'notifications_scheduler_last'
+ *   Timestamp from which content will be considered 'new' for the first time a scheduler runs (notifications for new content)
+ *   After an initial import, set this value to current time so no 'new content' notifications are sent for this content
+ *
+ * This is based on the previous subscriptions module
+ *
+ * Development Seed, http://www.developmentseed.org, 2007
+ *
+ */
+
+/**
+ * Implements hook_help().
+ */
+function notifications_scheduler_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/messaging/notifications/events':
+    case 'admin/config/messaging/notifications/scheduler':
+      $output = '<p>' . t('Scheduled notifications are an special type of events that are triggered on a timely basis instead of responding to system events. To configure scheduled notifications:');
+      $output .= '<ul><li>' . t('Create timed triggers using the <a href="@url">Job Scheduler configuration</a> page.', array('@url' => url('admin/config/system/job_scheduler'))) . '</li>';
+      $output .= '<li>' . t('Configure the Notifications on the <a href="@url">Actions settings page</a>.', array('@url' => url('admin/config/system/actions'))) . '</li>';
+      $output .= '</ul></p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function notifications_scheduler_menu() {
+  $items['admin/config/messaging/notifications/scheduler'] = array(
+    'title' => 'Scheduled',
+    'description' => 'View scheduled notifications',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('notifications_scheduler_admin_form'),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer site configuration'),
+    'file' => 'notifications_scheduler.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_notifications().
+ */
+function notifications_scheduler_notifications($op) {
+  switch ($op) {
+    case 'event types':
+      $types['notifications_scheduler_latest_posts'] = array(
+        'object' => 'node_list',
+        'scheduler' => TRUE,
+        'title' => t('Latest posts'),
+        'class' => 'Notifications_Scheduler_Latest_Posts',
+        'template' => 'notifications_content-node_list',
+        // Type of trigger that throws these events
+        'triggers' => array('job_scheduler' => array('any')),
+        'actions' => array('notifications_scheduler_latest_posts_action'),
+        'configurable' => TRUE,
+      );
+      $types['notifications_scheduler_new_posts'] = array(
+        'object' => 'node_list',
+        'scheduler' => TRUE,
+        'title' => t('New posts'),
+        'class' => 'Notifications_Scheduler_New_Posts',
+        'template' => 'notifications_content-node_list',
+        // Type of trigger that throws these events
+        'triggers' => array('job_scheduler' => array('any')),
+        'actions' => array('notifications_scheduler_new_posts_action'),
+        'configurable' => TRUE,
+      );
+      return $types;
+  }
+}
+
+/**
+ * Implementation of hook_action_info()
+ *
+ * Automatically creates actions for scheduled notifications.
+ */
+function notifications_scheduler_action_info() {
+  $actions = array();
+  foreach (notifications_info('event types') as $key => $info) {
+    if (isset($info['triggers']['job_scheduler']) && !empty($info['actions'])) {
+      // Does it make sense for these events to have more than one action?
+      foreach ($info['actions'] as $action_name) {
+        $actions[$action_name] = array(
+          'type' => 'notifications',
+          'label' => t('Scheduled notification: @name', array('@name' => $info['title'])),
+          'configurable' => !empty($info['configurable']),
+          'behavior' => array('sends_notification'),
+          'triggers' => array('any'),
+        );
+      }
+    }
+  }
+  return $actions;
+}
+
+/**
+ * Default action handlers
+ */
+function notifications_scheduler_default_action($job, $context, $a1, $a2) {
+  $event_type = $context['event_type'];
+  notifications_event($event_type)
+    ->set_action($job, $context)
+    ->trigger();
+}
+
+/**
+ * Action: Configuration form
+ *
+ * @param $context
+ *   Regular action context plus 'event_type' element
+ */
+function notifications_scheduler_default_action_form($context, $event_type) {
+  $context += array('event_type' => $event_type);
+  $form['event_type'] = array('#type' => 'value', '#value' => $context['event_type']);
+  // Configurable template
+  $template_list = array();
+  foreach (notifications_info('message templates') as $key => $template) {
+    if ($template['object'] == 'node_list') {
+      $template_list[$key] = $template['title'];
+    }
+  }
+  $form['template'] = array(
+    '#title' => t('Template'),
+    '#type' => 'select',
+    '#options' => $template_list,
+    '#default_value' => isset($context['template']) ? $context['template'] : notifications_event_type($context['event_type'], 'template'),
+    '#required' => TRUE,
+  );
+  return $form;
+}
+
+/**
+ * Action: Configuration form submit
+ */
+function notifications_scheduler_default_action_submit($form, &$form_state) {
+  $params['event_type'] = $form_state['values']['event_type'];
+  $params['template'] = $form_state['values']['template'];
+  return $params;
+}
+
+/**
+ * Action callback
+ *
+ * @param $job,
+ *   Job object from job_scheduler
+ */
+function notifications_scheduler_latest_posts_action($job, $context, $a1, $a2) {
+  return notifications_scheduler_default_action($job, $context, $a1, $a2);
+}
+
+/**
+ * Action callback
+ *
+ * @param $job,
+ *   Job object from job_scheduler
+ */
+function notifications_scheduler_new_posts_action($job, $context, $a1, $a2) {
+  return notifications_scheduler_default_action($job, $context, $a1, $a2);
+}
+
+/**
+ * Action: Configuration form
+ */
+function notifications_scheduler_latest_posts_action_form($context) {
+  $context += array('event_type' => 'notifications_scheduler_latest_posts');
+  $form = notifications_scheduler_new_posts_action_form($context);
+  $form['node_number'] = array(
+    '#title' => t('Number of items to send'),
+    '#type' => 'select',
+    '#default_value' => isset($context['node_number']) ? $context['node_number'] : variable_get('default_nodes_main', 10),
+    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30)),
+  );
+  return $form;
+}
+
+/**
+ * Action: Configuration form submit
+ */
+function notifications_scheduler_latest_posts_action_submit($form, &$form_state) {
+  // Process the HTML form to store configuration. The keyed array that
+  // we return will be serialized to the database.
+  $params = notifications_scheduler_new_posts_action_submit($form, $form_state);
+  $params['node_number'] = $form_state['values']['node_number'];
+  return $params;
+}
+
+/**
+ * Action: Configuration form
+ */
+function notifications_scheduler_new_posts_action_form($context) {
+  $form = notifications_scheduler_default_action_form($context, 'notifications_scheduler_new_posts');
+  $form['node_type'] = array(
+    '#title' => t('Content type'),
+    '#type' => 'select',
+    '#options' => array('' => t('All types')) + node_type_get_names(),
+    '#default_value' => isset($context['node_type']) ? $context['node_type'] : '',
+  );
+  // Terms is an array of tids, map to names for autocomplete field
+  if (!empty($context['taxonomy_term']) && $term = taxonomy_term_load($context['taxonomy_term'])) {
+    $terms = taxonomy_term_title($term);
+  }
+  else {
+    $terms = '';
+  }
+  // If we have the tags module enabled, allow tag condition too
+  if (module_exists('notifications_tags')) {
+    $form['taxonomy_term'] = array(
+      '#title' => t('Taxonomy term'),
+      '#type' => 'textfield',
+      '#default_value' => $terms,
+      '#autocomplete_path' => 'notifications_tags/autocomplete/simple',
+      '#element_validate' => array('notifications_tags_autocomplete_validate'),
+      '#disabled' => !(bool)notifications_tags_vocabulary_enabled(),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Action: Configuration form submit
+ */
+function notifications_scheduler_new_posts_action_submit($form, &$form_state) {
+  // Process the HTML form to store configuration. The keyed array that
+  // we return will be serialized to the database.
+  $params = notifications_scheduler_default_action_submit($form, $form_state);
+  $params['node_type'] = $form_state['values']['node_type'];
+  if (isset($form_state['values']['taxonomy_term'])) {
+    $params['taxonomy_term'] = $form_state['values']['taxonomy_term'];
+  }
+  return $params;
+}

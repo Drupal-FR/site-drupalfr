@@ -1,0 +1,160 @@
+<?php
+
+/**
+* Implementation of hook_schema().
+*/
+function messaging_schema() {
+  $schema['messaging_message'] = array(
+    'description' => 'Stores message destination for users and non users.',
+    'fields' => array(
+      'msid'    => array(      
+        'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE,
+        'description' => 'Unique message id.',
+      ),
+      'method' => array(
+        'type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'default' => '',
+        'description' => 'Messaging send method key.',
+      ),
+      'store' => array(
+        'type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'default' => '',
+        'description' => 'Where the message is stored.',
+      ),
+      'mqid'  => array(      
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => 'Queue id if any.',
+      ),
+      'language' => array(
+        'type' => 'varchar', 'length' => 12, 'not null' => TRUE, 'default' => '',
+        'description' => 'Language code.',
+      ),
+      'status' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 1, 'size' => 'tiny',
+        'description' => 'Message status.',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp when the item was created.',
+      ),
+      'updated' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp when the item was created.',
+      ),
+      'sent' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 0,
+        'description' => 'Unix timestamp, when the last message was sent to this address.',
+      ),
+      'error' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 0, 'size' => 'tiny',
+        'description' => 'Error code if any.',
+      ),
+    ),
+    'primary key' => array('msid'),
+    'indexes' => array(
+      'method' => array('method'),
+    ),  
+  );
+  $schema['messaging_destination'] = array(
+    'description' => 'Stores message destination for users and non users.',
+    'fields' => array(
+      'mdid'    => array(      
+        'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE,
+        'description' => 'Unique destination id.',
+      ),
+      'uid'    => array(
+        'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => 'The {user}.uid for destination if it belongs to a registered user.',        
+      ),
+      'type' => array(
+        'type' => 'varchar', 'length' => 60, 'not null' => TRUE, 'default' => '',
+        'description' => 'Destination type: mail, xmpp, etc.',
+      ),
+      'address' => array(
+        'type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'default' => '',
+        'description' => 'Destination identifier, it may be an email address.',
+      ),
+      'status' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 1, 'size' => 'tiny',
+        'description' => 'Destination status: 1= active, 0 = inactive.',
+      ),
+      'sent' => array(
+        'type' => 'int', 'not null' => TRUE, 'default' => 0,
+        'description' => 'Unix timestamp, when the last message was sent to this address.',
+      ),
+    ),
+    'primary key' => array('mdid'),
+    'indexes' => array(
+      'uid' => array('uid'),
+      'address' => array('address'),
+    ),
+  );
+  return $schema;
+}
+
+
+/**
+ * Disable a sending method and return an alternative one
+ */
+function messaging_update_method_disable($method, $replace) {
+  // Check that we are not getting rid of the default method
+  if ($method == messaging_method_default()) {
+    variable_set('messaging_default_method', $replace);   
+  }
+  messaging_update_method_update($method, $replace);
+  
+  return $replace;
+}
+
+/**
+ * Find a suitable replacement for a sending method
+ * 
+ * @param $method
+ *   Method key, the one to find a replacement for
+ * @param $default
+ *   Whether to try default remaining method if we cannot find one of the same type
+ */
+function messaging_update_method_replace($method, $default = TRUE) {
+  $replace = NULL;
+  // Find an alternative one within the same group, i.e. 'mail'
+  if ($method_group = messaging_method_info($method, 'group')) {
+    foreach (messaging_method_info(NULL, 'group') as $index => $group) {
+      if ($group == $method_group && $method != $index) {
+        $replace = $index;
+        break;
+      }
+    }
+  }
+  // If still not replacement, go for the default
+  if (empty($replace) && $default) {
+    if ($method == messaging_method_default()) {
+      $info = messaging_method_info();
+      unset($info[$method]);
+      $replace = key($info);
+    } else {
+      $replace = messaging_method_default();
+    }    
+  }
+  return $replace;
+}
+
+/**
+ * Udate sending method, change for a new one
+ */
+function messaging_update_method_update($old, $new) {
+  // Replace some variables
+  if ($old ==  variable_get('messaging_default_method', NULL)) {
+    if ($new) {
+      variable_set('messaging_default_method', $new);
+    }
+    else {
+      variable_del('messaging_default_method');
+    }
+  }
+  // Inform all modules this method is being replaced
+  module_invoke_all('messaging_method', 'replace', $old, $new);
+  // Now inform all that old method is being disabled
+  module_invoke_all('messaging_method', 'disable', $old);
+}
