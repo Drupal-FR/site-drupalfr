@@ -418,7 +418,7 @@ function drupalfr_planete_field_default_fields() {
       'bundle' => 'user',
       'default_value' => NULL,
       'deleted' => '0',
-      'description' => 'Saisissez ici si vous le souhaitez l\'URL du flux de votre site personnel ou blog, afin qu\'il soit agrégé dans le planète drupalfr.',
+      'description' => 'Saisissez ici si vous le souhaitez l\'URL du flux de votre site personnel ou blog, afin qu\'il soit agrégé dans le planète drupalfr. Il doit s\'agir de contenus parlant de Drupal et en français. L\'équipe se réserve le droit de supprimer tout contenu non adéquat',
       'display' => array(
         'default' => array(
           'label' => 'above',
