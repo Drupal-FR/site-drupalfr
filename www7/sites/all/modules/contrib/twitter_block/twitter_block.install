@@ -6,113 +6,86 @@
  */
 
 /**
- * Implements hook_requirements().
- */
-function twitter_block_requirements($phase) {
-  $requirements = array();
-  $t = get_t();
-
-  $has_curl = function_exists('curl_init');
-
-  $requirements['curl'] = array(
-    'title' => $t('cURL'),
-    'value' => $has_curl ? $t('Enabled') : $t('Not found'),
-  );
-  if (!$has_curl) {
-    $requirements['curl']['severity'] = REQUIREMENT_ERROR;
-    $requirements['curl']['description'] = $t('The testing framework could not be installed because the PHP <a href="@curl_url">cURL</a> library is not available.', array('@curl_url' => 'http://php.net/manual/en/curl.setup.php'));
-  }
-
-  return $requirements;
-}
-
-/**
  * Implements hook_schema().
  */
 function twitter_block_schema() {
   $schema['twitter_block'] = array(
-    'description' => 'The table for storing twitter blocks.', 
+    'description' => 'The table for storing twitter blocks.',
     'fields' => array(
-      'delta' => array(
-        'description' => 'The machine identifier for a twitter block.', 
-        'type' => 'varchar', 
-        'length' => 32,
+      'bid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The block's {block}.bid.",
+      ),
+      'info' => array(
+        'type' => 'varchar',
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
-      ), 
-      'search_type' => array(
-        'description' => 'The search type for this block. ie. mention, reply', 
-        'type' => 'varchar', 
-        'length' => 32, 
-        'not null' => TRUE, 
-        'default' => 'search',
-      ), 
-      'search_string' => array(
-        'description' => "The search string.",
+        'description' => 'Block description.',
+      ),
+      'widget_id' => array(
         'type' => 'varchar',
-        'length' => 140,
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
+        'description' => 'Widget ID.',
       ),
-      'default_title' => array(
-        'description' => 'The title of this block in plain text.', 
-        'type' => 'varchar', 
-        'length' => 140, 
-        'not null' => TRUE, 
-        'default' => '',
+      'data' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'description' => 'Serialized data containing the timeline properties.',
       ),
-      'results_per_page' => array(
-        'description' => '"Returns per page" from the Twitter Search API.',
-        'type' => 'varchar',
-        'length' => 8,
-      ),
-      'lang' => array(
-        'description' => 'Optional Twitter language filter.',
-        'type' => 'varchar',
-        'length' => '8', // Technically we only need 2...
-      ),
-    ), 
+    ),
     'unique keys' => array(
-      'delta' => array('delta'),
-    ), 
-    'foreign keys' => array(
-      'block' => array(
-        'table' => 'block', 
-        'columns' => array('bid' => 'bid'),
-      ), 
-    ), 
-    'primary key' => array('delta'),
+      'info' => array('info'),
+      'widget_id' => array('widget_id'),
+    ),
+    'primary key' => array('bid'),
   );
-  return $schema;
-}
 
-/**
- * Implements hook_install().
- */
-function twitter_block_install() {
-  $id = db_insert('twitter_block')->fields(array(
-      'delta' => 'default',
-      'search_type' => 'searchHashtag',
-      'search_string' => 'Drupal',
-      'default_title' => st('Discussions on Twitter'),
-    ))
-    ->execute();
+  return $schema;
 }
 
 /**
  * Implements hook_uninstall().
  */
 function twitter_block_uninstall() {
-  variable_del('twitter_block_default_results_per_page');
+  // Remove blocks
+  db_delete('block')
+    ->condition('module', 'twitter_block')
+    ->execute();
+  db_delete('block_role')
+    ->condition('module', 'twitter_block')
+    ->execute();
+
+  // Clear the site cache
+  cache_clear_all();
 }
 
 /**
- * Implements hook_update_N().
+ * Remove any old Twitter Block blocks and install the new Twitter Block schema.
  */
-function twitter_block_update_7100() {
-  db_add_field('twitter_block', 'lang', array(
-    'description' => 'Optional Twitter language filter.',
-    'type' => 'varchar',
-    'length' => '6',
-  ));
+function twitter_block_update_7200() {
+  // Remove old Twitter Block schema
+  drupal_uninstall_schema('twitter_block');
+
+  // Remove any old Twitter Block blocks
+  db_delete('block')
+    ->condition('module', 'twitter_block')
+    ->execute();
+  db_delete('block_role')
+    ->condition('module', 'twitter_block')
+    ->execute();
+
+  // Clear the site cache
+  cache_clear_all();
+
+  // Install the new Twitter Block schema
+  drupal_install_schema('twitter_block');
+
+  return t('Removed any old Twitter Block blocks and installed the new Twitter Block schema.');
 }
