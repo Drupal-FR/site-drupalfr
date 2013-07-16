@@ -1,0 +1,268 @@
+diff --git a/twitter_pull.admin.inc b/twitter_pull.admin.inc
+new file mode 100644
+index 0000000..db0bb34
+--- /dev/null
++++ b/twitter_pull.admin.inc
+@@ -0,0 +1,62 @@
++<?php
++
++/**
++ * @file twitter_pull.admin.inc
++ * 
++ * Configuration settings page for twitter_pull module.
++ */
++
++function twitter_pull_config_page() {
++  
++  // check for twitter-api-php library
++  $lib = libraries_get_path('twitter-api-php');
++  if (!$lib) {
++    drupal_set_message(t('Please install TwitterAPIExchange as a library.  http://github.com/j7mbo/twitter-api-php'), 'error');
++  }
++  
++  $desc =<<<EOF
++Using twitter_pull with v1.1 of the Twitter api requires you register your site as a twitter app.  To do this, please
++visit https://dev.twitter.com/apps/new and create an application.  Click "Create my access token" at the bottom of the
++page.  Then copy the Consumer key, Consumer secret, Access token, and Access token secret into the fields below.
++EOF;
++  
++  $form = array(
++    'twitter_api_key' => array(
++      '#type' => 'fieldset',
++      '#collapsible' => FALSE,
++      '#description' => t($desc),
++      '#title' => t('Twitter v1.1 API keys'),
++
++      'twitter_pull_consumer_key' => array(
++        '#type' => 'textfield',
++        '#required' => TRUE,
++        '#default_value' => variable_get('twitter_pull_consumer_key', ''),
++        '#title' => t('Consumer Key'),     
++      ),
++
++      'twitter_pull_consumer_secret' => array(
++        '#type' => 'textfield',
++        '#required' => TRUE,
++        '#default_value' => variable_get('twitter_pull_consumer_secret', ''),
++        '#title' => t('Consumer Secret'),
++      ),
++        
++      'twitter_pull_oauth_access_token' => array(
++        '#type' => 'textfield',
++        '#required' => TRUE,
++        '#default_value' => variable_get('twitter_pull_oauth_access_token', ''),
++        '#title' => t('Access Token'),
++      ),
++        
++      'twitter_pull_oauth_access_token_secret' => array(
++        '#type' => 'textfield',
++        '#required' => TRUE,
++        '#default_value' => variable_get('twitter_pull_oauth_access_token_secret', ''),
++        '#title' => t('Access Token Secret'),
++      ),   
++    ) 
++  );
++  
++  
++  return system_settings_form($form);
++}
+\ No newline at end of file
+diff --git a/twitter_pull.class.inc b/twitter_pull.class.inc
+index 623fdc3..49d9e4c 100644
+--- a/twitter_pull.class.inc
++++ b/twitter_pull.class.inc
+@@ -49,46 +49,67 @@ class twitter_puller {
+     if ($prefix == '@' && $slash !== FALSE) {
+       $username = drupal_substr($this->twitkey, 1, $slash - 1);
+       $listname = drupal_substr($this->twitkey, $slash + 1);
+-      $url = 'http://api.twitter.com/1/' . urlencode($username) . '/lists/' . urlencode($listname) . '/statuses.json?per_page=' . $num;
++      $url = 'https://api.twitter.com/1.1/lists/statuses.json';
++      $query = '?slug=' . urlencode($listname)
++        . '&owner_screen_name=' . urlencode($username);
++
+     }
+     // if the first character is @, then consider the key a username
+     elseif ($prefix == "@") {
+       $key = drupal_substr($this->twitkey, 1);
+-      $url = 'http://api.twitter.com/1/statuses/user_timeline.json?screen_name='. urlencode($key) .'&include_rts=true&count='. $num;
++      $url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
++      $query = "?screen_name=${key}&count=${num}&include_rts=1";
+     }
+     // if the first character is ~, then consider the key a favorites feed
+     elseif ($prefix == "~") {
+       $key = drupal_substr($this->twitkey, 1);
+-      $url = 'http://api.twitter.com/1/favorites/'.urlencode($key).'.json?count='.$num;
++      $url = 'https://api.twitter.com/1.1/favorites/list.json';
++      $query = "?screen_name=${key}&count=${num}";
+     }
+     // otherwise, use the key as a search term
+     else {
+       if ($num > 100) {
+         $num = 100;
+       }
+-      $url = 'http://search.twitter.com/search.json?q=' . urlencode($this->twitkey) . '&rpp=' . $num;
++      $url = 'https://api.twitter.com/1.1/search/tweets.json';
++      $query = '?q=' . rawurlencode($this->twitkey) ."&include_entities=true&count=${num}";
+     }
+ 
+-    $ret = drupal_http_request($url, array('timeout' => 2));
++    // Look for the twitter-api-lib, using libraries module if possible
++    // http://github.com/j7mbo/twitter-api-php
++    if (module_exists('libraries')) {
++      $lib = libraries_get_path('twitter-api-php');
++    }
++    //If libraries module is not available, try a common default location:
++    else {
++      $path_default = DRUPAL_ROOT . '/sites/all/libraries/twitter-api-php';
++      $lib = is_dir($path_default) ? $path_default : FALSE;
++    }
+ 
+-    if ($ret->code < 200 || $ret->code > 399) {
+-      $errmsg = t('An unknown error occurred.');
+-      if (isset($ret->error) && !empty($ret->error)) {
+-        $errmsg = check_plain($ret->error);
+-      }
+-      elseif (isset($ret->data) && !empty($ret->data)) {
+-        $errdata = json_decode($ret->data);
+-        if (isset($errdata->error) && !empty($errdata->error)) {
+-          $errmsg = check_plain($errmsg->error);
+-        }
+-      }
+-      if ($ret->code == 400) {
+-        $errmsg .= ' ' . t('This site may be subject to rate limiting. For more information, see: http://apiwiki.twitter.com/Rate-limiting');
+-      }
+-      throw new Exception(t('Could not retrieve data from Twitter.') . ' ' . $errmsg);
++    if (!$lib) {
++      drupal_set_message(t('Please install TwitterAPIExchange as a library.  http://github.com/j7mbo/twitter-api-php'), 'error');
++      return;
++    }
++    require_once($lib . '/TwitterAPIExchange.php');
++    
++    $settings = array();
++    foreach (array('consumer_key', 'consumer_secret', 'oauth_access_token', 'oauth_access_token_secret') as $var) {
++      $settings[$var] = variable_get('twitter_pull_'.$var, FALSE);
+     }
++    
++    if (in_array(FALSE, $settings, TRUE)) {
++      drupal_set_message('Twitter has not been configured yet.  Please contact your admin.', 'error');
++      return;
++    }
++
++    $url = '' . $url;
++    
++    $twitter = new TwitterAPIExchange($settings);
++    $req = $twitter->setGetfield($query)
++      ->buildOauth($url, 'GET')
++      ->performRequest();
++    $items = json_decode($req);
+ 
+-    $items = json_decode($ret->data);
+     $this->parse_items($items);
+ 
+   }
+@@ -97,8 +118,8 @@ class twitter_puller {
+     $tweets = array();
+ 
+     //-- If search response then items are one level lower.
+-    if (isset($items->results) && is_array($items->results)) {
+-      $items = $items->results;
++    if (isset($items->statuses) && is_array($items->statuses)) {
++      $items = $items->statuses;
+     }
+ 
+     if (is_array($items)) {
+diff --git a/twitter_pull.drush.inc b/twitter_pull.drush.inc
+new file mode 100644
+index 0000000..d0a36f8
+--- /dev/null
++++ b/twitter_pull.drush.inc
+@@ -0,0 +1,56 @@
++<?php
++
++/**
++ * @file
++ * Drush integration for the devel module.
++ */
++
++/**
++ * Implements hook_drush_command().
++ */
++function twitter_pull_drush_command() {
++  $items['twitter-pull-download'] = array(
++    'callback' => 'twitter_pull_drush_download',
++    'description' => dt('Downloads the Twitter API PHP wrapper from https://github.com/J7mbo/twitter-api-php.'),
++    'arguments' => array(
++      'path' => dt('Optional. A path to the download folder. If omitted Drush will use the default location (sites/all/libraries/twitter-api-php).'),
++    ),
++  );
++
++  return $items;
++}
++
++/**
++ * A command callback.
++ */
++function twitter_pull_drush_download() {
++  $args = func_get_args();
++
++  //If an argument was supplied, use it as the download path
++  if (isset($args[0])) {
++    $path = $args[0];
++  }
++  //Search using libraries or our default location in sites/all/libraries
++  else {
++    $path = drush_get_context('DRUSH_DRUPAL_ROOT');
++    if (module_exists('libraries')) {
++      $path .= '/' . libraries_get_path('twitter-api-php');
++    }
++    else {
++      $path .= '/sites/all/libraries/twitter-api-php';
++    }
++  }
++
++  //See if the lib is already present
++  if (is_dir($path)) {
++    drush_log('twitter-api-php already present. No download required.', 'ok');
++  }
++  //Else, clone from github and then remove the extraneous git files
++  elseif (drush_shell_exec('git clone git://github.com/J7mbo/twitter-api-php.git ' . $path . ' && rm -rf ' . $path . '/.git')) {
++    drush_log(dt('twitter-api-php has downloaded to @path.', array('@path' => $path)), 'success');
++  }
++  //Otherwise, there was a problem
++  else {
++    drush_log(dt('Drush was unable to export twitter-api-php to @path.', array('@path' => $path)), 'warning');
++  }
++}
+diff --git a/twitter_pull.info b/twitter_pull.info
+index cedfb77..83fae1f 100644
+--- a/twitter_pull.info
++++ b/twitter_pull.info
+@@ -2,6 +2,7 @@ name = Twitter Pull
+ description = Pull Info from Twitter and Create Contextual Insets
+ package = Other
+ core = 7.x
++dependencies[] = libraries
+ files[] = twitter_pull.module
+ files[] = twitter_pull.install
+ files[] = plugins/twitter_pull_box.inc
+diff --git a/twitter_pull.module b/twitter_pull.module
+index e6889fc..79c2438 100644
+--- a/twitter_pull.module
++++ b/twitter_pull.module
+@@ -34,6 +34,16 @@ function twitter_pull_menu() {
+     'access arguments' => array('access content'),
+   );
+ 
++  $items['admin/config/services/twitter_pull'] = array(
++    'page callback' => 'drupal_get_form',
++    'page arguments' => array('twitter_pull_config_page'),
++    'access arguments' => array('administer site configuration'),
++    'file' => 'twitter_pull.admin.inc',
++    'type' => MENU_NORMAL_ITEM,
++    'description' => t('Configure twitter_pull module.'),
++    'title' => 'Twitter Pull',
++  );
++
+   return $items;
+ }
+ 

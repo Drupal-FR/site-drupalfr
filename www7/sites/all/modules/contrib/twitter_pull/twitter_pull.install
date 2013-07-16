@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Installation routines for the Twitter Pull module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function twitter_pull_schema() {
+  $schema['cache_pulled_tweets'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_pulled_tweets']['description'] = 'Cache table for the tweets pulled by Twitter Pull module';
+  return $schema;
+}
+
+
+function twitter_pull__update_7101() {
+  cache_clear_all('cache_pulled_tweets');
+}
