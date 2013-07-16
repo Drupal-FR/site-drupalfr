@@ -164,7 +164,7 @@ class PathologicTestCase extends DrupalWebTestCase {
     $this->assertEqual(
       _pathologic_filter('<a href="//example.com/foo">bar</a>', $filter, NULL, LANGUAGE_NONE, NULL, NULL),
       '<a href="//example.com/foo">bar</a>',
-      t('Schemeless URLs (//example.com/foo) ignored')
+      t('Off-site schemeless URLs (//example.com/foo) ignored')
     );
 
     // Test internal: and all base paths
@@ -173,6 +173,13 @@ class PathologicTestCase extends DrupalWebTestCase {
       'local_paths' => "http://example.com/qux\nhttp://example.org\n/bananas",
     );
     $filter->format++;
+
+    // @see https://drupal.org/node/2030789
+    $this->assertEqual(
+      _pathologic_filter('<a href="//example.org/foo">bar</a>', $filter, NULL, LANGUAGE_NONE, NULL, NULL),
+      '<a href="' . _pathologic_content_url('foo', array('absolute' => TRUE)) . '">bar</a>',
+      t('On-site schemeless URLs processed')
+    );
     $this->assertEqual(
       _pathologic_filter('<a href="internal:foo">', $filter, NULL, LANGUAGE_NONE, NULL, NULL),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => TRUE)) . '">',
@@ -193,7 +200,6 @@ class PathologicTestCase extends DrupalWebTestCase {
       '<a href="webcal:foo">bar</a>',
       t('URLs with likely protocols are ignored')
     );
-
     // Test hook_pathologic_alter() implementation.
     $this->assertEqual(
       _pathologic_filter('<a href="foo?test=add_foo_qpart">', $filter, NULL, LANGUAGE_NONE, NULL, NULL),

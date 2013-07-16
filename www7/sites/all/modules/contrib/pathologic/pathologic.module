@@ -103,12 +103,23 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
         // make sure we aren't about to add a path to our array of exploded
         // local paths which matches the current "local" path. We consider it
         // not a match, if…
+        // @todo: This is pretty horrible. Can this be simplified?
         if (
           (
             // If this URI has a host, and…
             isset($parts['host']) &&
-            // The host is different from the current host…
-            $parts['host'] !== $base_url_parts['host']
+            (
+              // Either the host is different from the current host…
+              $parts['host'] !== $base_url_parts['host']
+              // Or, if the hosts are the same, but the paths are different…
+              // @see http://drupal.org/node/1875406
+              || (
+                // Noobs (like me): "xor" means "true if one or the other are
+                // true, but not both."
+                (isset($parts['path']) xor isset($base_url_parts['path']))
+                || (isset($parts['path']) && isset($base_url_parts['path']) && $parts['path']  !== $base_url_parts['path'])
+              )
+            )
           ) ||
           // Or…
           (
@@ -133,15 +144,6 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
     $filter->settings['local_paths_exploded'][] = array('path' => $base_url_parts['path'], 'host' => $base_url_parts['host']);
     // We'll also just store the host part separately for easy access.
     $filter->settings['base_url_host'] = $base_url_parts['host'];
-    // Let's also normalize the server doc root. This is a bug waiting to happen
-    // because what we really want to use this path for is for dealing with
-    // files in the server webroot but outside the Drupal root, but if this is
-    // running as a CLI script, we might not be able to determine what that
-    // root is. In that case, we'll use the Drupal root.
-    // @see http://drupal.org/node/1780398
-    $filter->settings['docroot'] = (drupal_is_cli() || !isset($_SERVER) || !isset($_SERVER['DOCUMENT_ROOT']))
-      ? DRUPAL_ROOT
-      : $_SERVER['DOCUMENT_ROOT'];
 
     $settings[$filter->format] = $filter->settings;
   }
@@ -169,13 +171,20 @@ function _pathologic_replace($matches) {
   // guess… Note that we don't do the & thing here so that we can modify
   // $settings later and not have the changes be "permanent."
   $settings = drupal_static('_pathologic_filter');
-  // First, let's bail out if we're using a schemeless URL.
-  // @see http://drupal.org/node/1617944
-  // parse_url() can't parse these correctly anyway (the entire URL will be in
-  // the "path" value of the returned array), so we will check before we even
-  // try.
+  // If it appears the path is a scheme-less URL, prepend a scheme to it.
+  // parse_url() cannot properly parse scheme-less URLs. Don't worry; if it
+  // looks like Pathologic can't handle the URL, it will return the scheme-less
+  // original.
+  
+  // @see https://drupal.org/node/1617944
+  // @see https://drupal.org/node/2030789
   if (strpos($matches[2], '//') === 0) {
-    return $matches[0];
+    if (isset($_SERVER['https']) && strtolower($_SERVER['https']) === 'on') {
+      $matches[2] = 'https:' . $matches[2];
+    }
+    else {
+      $matches[2] = 'http:' . $matches[2];
+    }
   }
   // Now parse the URL after reverting HTML character encoding.
   // @see http://drupal.org/node/1672932
@@ -186,9 +195,17 @@ function _pathologic_replace($matches) {
   if (
     // If parse_url() failed, give up.
     $parts === FALSE
-    // If there's a scheme part and it doesn't look useful, bail out.
-    // "files" and "internal" are for Path Filter compatibility.
-    || (isset($parts['scheme']) && !in_array($parts['scheme'], array('http', 'https', 'files', 'internal')))
+    || (
+      // If there's a scheme part and it doesn't look useful, bail out.
+      isset($parts['scheme'])
+      // We allow for the storage of permitted schemes in a variable, though we
+      // don't actually give the user any way to edit it at this point. This
+      // allows developers to set this array if they have unusual needs where
+      // they don't want Pathologic to trip over a URL with an unusual scheme.
+      // @see http://drupal.org/node/1834308
+      // "files" and "internal" are for Path Filter compatibility.
+      && !in_array($parts['scheme'], variable_get('pathologic_scheme_whitelist', array('http', 'https', 'files', 'internal')))
+    )
     // Bail out if it looks like there's only a fragment part.
     || (isset($parts['fragment']) && count($parts) === 1)
   ) {
@@ -205,24 +222,9 @@ function _pathologic_replace($matches) {
     $parts['path'] = '';
   }
 
-  // Check to see if we're dealing with a file. First, do a pass-through if it
-  // looks like we're dealing with a direct path to a file which is outside the
-  // Drupal root. Use realpath() and the server's (?) docroot to iron out
-  // wrinkles to the file's actual path.
-  // @see http://drupal.org/node/1763696
+  // Check to see if we're dealing with a file.
   // @todo Should we still try to do path correction on these files too?
-  $filepath = realpath($settings['current_settings']['docroot'] . '/' . $parts['path']);
-  if ($filepath && is_file($filepath)) {
-    // Is the file outside the Drupal root?
-    if (strpos($filepath, DRUPAL_ROOT) !== 0) {
-      return $matches[0];
-    }
-    else {
-      // Linking to a file inside the Drupal root. Okay.
-      $settings['is_file'] = TRUE;
-    }
-  }
-  elseif (isset($parts['scheme']) && $parts['scheme'] === 'files') {
+  if (isset($parts['scheme']) && $parts['scheme'] === 'files') {
     // Path Filter "files:" support. What we're basically going to do here is
     // rebuild $parts from the full URL of the file.
     $new_parts = parse_url(file_create_url(file_default_scheme() . '://' . $parts['path']));
@@ -274,15 +276,26 @@ function _pathologic_replace($matches) {
       // Break out of foreach loop
       break;
     }
+    // Is this is a root-relative url (no host) that didn't match above?
+    // Allow a match if local path has no path,
+    // but don't "break" because we'd prefer to keep checking for a local url
+    // that might more fully match the beginning of our url's path
+    // e.g.: if our url is /foo/bar we'll mark this as a match for
+    // http://example.com but want to keep searching and would prefer a match
+    // to http://example.com/foo if that's configured as a local path
+    elseif (!isset($parts['host']) && (!isset($exploded['path']) || $exploded['path'] == '/')) {
+      $found = TRUE;
+    }
   }
 
-  // Okay, if here, we either found something, or we hit the end of the loop. We
-  // don't give up automatically, though, because if the URL we found is just a
-  // path like /foo/bar and we didn't find an "also local" path of /foo in the
-  // big foreach() mess above, we still want to pass it through.
-  if (!$found && !(isset($parts['path']) && !isset($parts['host']))) {
+  // If the path is not within the drupal root return original url, unchanged
+  if (!$found) {
     return $matches[0];
   }
+
+  // Okay, format the URL.
+  // If there's still a slash lingering at the start of the path, chop it off.
+  $parts['path'] = ltrim($parts['path'],'/');
 
   // Examine the query part of the URL. Break it up and look through it; if it
   // has a value for "q", we want to use that as our trimmed path, and remove it
@@ -311,8 +324,21 @@ function _pathologic_replace($matches) {
     return $matches[0];
   }
 
-  // Let's see if we can split off a language prefix from the path.
-  if (!$settings['is_file']) {
+  // If we didn't previously identify this as a file, check to see if the file
+  // exists now that we have the correct path relative to DRUPAL_ROOT
+  if (!$settings['is_file']){
+    $settings['is_file'] = !empty($parts['path']) && is_file(DRUPAL_ROOT . '/'. $parts['path']);
+  }
+
+  // Okay, deal with language stuff.
+  if ($settings['is_file']) {
+    // If we're linking to a file, use a fake LANGUAGE_NONE language object.
+    // Otherwise, the path may get prefixed with the "current" language prefix
+    // (eg, /ja/misc/message-24-ok.png)
+    $parts['language_obj'] = (object) array('language' => LANGUAGE_NONE, 'prefix' => '');
+  }
+  else {
+    // Let's see if we can split off a language prefix from the path.
     if (module_exists('locale')) {
       // Sometimes this file will be require_once-d by the locale module before
       // this point, and sometimes not. We require_once it ourselves to be sure.
@@ -323,20 +349,6 @@ function _pathologic_replace($matches) {
         $parts['language_obj'] = $language_obj;
       }
     }
-  }
-  else {
-    // If we're linking to a file, use a fake LANGUAGE_NONE language object.
-    // Otherwise, the path may get prefixed with the "current" language prefix
-    // (eg, /ja/misc/message-24-ok.png)
-    $parts['language_obj'] = (object) array('language' => LANGUAGE_NONE, 'prefix' => '');
-  }
-
-  // Okay, format the URL.
-  // If there's still a slash lingering at the start of the path, chop it off.
-  // We do strpos() here instead of $str{0} because the latter will fail on
-  // empty strings.
-  if (strpos($parts['path'], '/') === 0) {
-    $parts['path'] = substr($parts['path'], 1);
   }
 
   // If we get to this point and $parts['path'] is now an empty string (which
@@ -377,7 +389,7 @@ function _pathologic_replace($matches) {
     return $matches[0];
   }
 
-  // If the path is for a file and clean URLs are enabled, then the path that
+  // If the path is for a file and clean URLs are disabled, then the path that
   // url() will create will have a q= query fragment, which won't work for
   // files. To avoid that, we use this trick to temporarily turn clean URLs on.
   // This is horrible, but it seems to be the sanest way to do this.
