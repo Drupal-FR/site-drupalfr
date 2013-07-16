@@ -1,6 +1,68 @@
 Search API 1.x, dev (xx/xx/xxxx):
 ---------------------------------
 
+Search API 1.7 (07/01/2013):
+----------------------------
+- #1612708 by drunken monkey: Fixed Views caching with facet blocks.
+- #2024189 by drunken monkey: Improved serialization of the query class.
+- #1311260 by drunken monkey: Fixed tokenizing of string fields.
+- #1246998 by drunken monkey: Fixed deletion of items in read-only indexes.
+- #1310970 by drunken monkey: Added improved UI help for determining which
+  fields are available for sorting.
+- #1886738 by chx, Jelle_S, drunken monkey: Added Role filter data alteration.
+- #1837782 by drunken monkey: Fixed enabling of indexes through the Status tab.
+- #1382170 by orakili, lliss, drunken monkey: Added OR filtering for Views
+  option filter.
+- #2012706 by drunken monkey: Fixed $reset parameter for load functions.
+- #1851204 by mvc: Fixed exception when indexing book hierarchy.
+- #1926030 by stella: Added field machine name to indexes' "Fields" tabs.
+- #1879102 by fearlsgroove: Fixed Drush attempting to index 0 items.
+- #1999858 by drunken monkey: Cleaned up API documentation for data alterations.
+- #2010116 by drunken monkey: Enabled "Index items immediately" for the default
+  node index.
+- #2013581 by drunken monkey: Added multi-valued field to test module.
+- #1288724 by brunodbo, drunken monkey, fearlsgroove: Added option for using OR
+  in Views fulltext search.
+- #1694832 by drunken monkey: Fixed index field settings getting stale when
+  Field API field settings change.
+- #1285794 by drunken monkey: Fixed "All" option in Views' exposed "Items per
+  page" setting.
+
+Search API 1.6 (05/29/2013):
+----------------------------
+- #1649976 by Berdir, ilari.stenroth, drunken monkey: Fixed memory error during
+  crons run for large indexes.
+- #1346276 by drunken monkey: Fixed Tokenizer should only run on fulltext
+  fields.
+- #1697246 by drunken monkey: Added 'Parse mode' option to views.
+- #1993536 by drunken monkey, jpieck: Fixed handling of empty values in
+  processors.
+- #1992228 by drunken monkey: Fixed current search block for empty keys.
+- #1696434 by orakili, ldweeks, drunken monkey: Added Views argument handler for
+  all indexed taxonomy term fields.
+- #1988238 by esbenvb, drunken monkey: Fixed Views result display for deleted
+  entities.
+- #872912 by drunken monkey: Expanded and fixed test cases.
+- #1760706 by jgraham, das-peter, drunken monkey: Added a flexible way for
+  determining whether an index contains entities.
+
+Search API 1.5 (05/04/2013):
+----------------------------
+- #1169254 by cslavoie, drunken monkey, DYdave: Added transliteration processor.
+- #1959088 by drunken monkey: Fixed titles for contextual filters.
+- #1792296 by andrewbelcher, drunken monkey: Added a group for Search API hooks.
+- #1407844 by nbucknor: Added "exclude" option for Views contextual filters.
+- #1278942 by Simon Georges, drunken monkey: Added an option to apply
+  entity_access() to Views results.
+- #1819412 by drunken monkey: Added clean way for retrieving an index's data
+  alterations and processors.
+- #1838134 by das-peter, drunken monkey: Added hook_search_api_items_indexed().
+- #1471310 by drunken monkey: Fixed handling of unset fields when indexing.
+- #1944394 by drunken monkey: Added caching to SearchApiIndex::getFields().
+- #1594762 by drunken monkey, alanom, esclapes: Fixed detection of deleted items
+  in the Hierarchy data alteration.
+- #1702604 by JvE, slucero: Added option for maximum date facet depth.
+
 Search API 1.4 (01/09/2013):
 ----------------------------
 - #1827272 by drunken monkey: Fixed regression introduced by #1777710.

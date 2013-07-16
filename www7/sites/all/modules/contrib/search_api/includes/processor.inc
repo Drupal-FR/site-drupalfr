@@ -272,8 +272,14 @@ abstract class SearchApiAbstractProcessor implements SearchApiProcessorInterface
       $this->processFieldValue($value);
     }
     if (is_array($value)) {
-      $type = 'tokens';
-      $value = $this->normalizeTokens($value);
+      // Don't tokenize non-fulltext content!
+      if (in_array($type, array('text', 'tokens'))) {
+        $type = 'tokens';
+        $value = $this->normalizeTokens($value);
+      }
+      else {
+        $value = $this->implodeTokens($value);
+      }
     }
   }
 
@@ -306,6 +312,32 @@ abstract class SearchApiAbstractProcessor implements SearchApiProcessorInterface
   }
 
   /**
+   * Internal helper function for imploding tokens into a single string.
+   *
+   * @param array $tokens
+   *   The tokens array to implode.
+   *
+   * @return string
+   *   The text data from the tokens concatenated into a single string.
+   */
+  protected function implodeTokens(array $tokens) {
+    $ret = array();
+    foreach ($tokens as $token) {
+      if (empty($token['value']) && !is_numeric($token['value'])) {
+        // Filter out empty tokens.
+        continue;
+      }
+      if (is_array($token['value'])) {
+        $ret[] = $this->implodeTokens($token['value']);
+      }
+      else {
+        $ret[] = $token['value'];
+      }
+    }
+    return implode(' ', $ret);
+  }
+
+  /**
    * Method for preprocessing search keys.
    */
   protected function processKeys(&$keys) {
@@ -329,10 +361,20 @@ abstract class SearchApiAbstractProcessor implements SearchApiProcessorInterface
    */
   protected function processFilters(array &$filters) {
     $fields = $this->index->options['fields'];
-    foreach ($filters as &$f) {
+    foreach ($filters as $key => &$f) {
       if (is_array($f)) {
         if (isset($fields[$f[0]]) && $this->testField($f[0], $fields[$f[0]])) {
+          // We want to allow processors also to easily remove complete filters.
+          // However, we can't use empty() or the like, as that would sort out
+          // filters for 0 or NULL. So we specifically check only for the empty
+          // string, and we also make sure the filter value was actually changed
+          // by storing whether it was empty before.
+          $empty_string = $f[1] === '';
           $this->processFilterValue($f[1]);
+
+          if ($f[1] === '' && !$empty_string) {
+            unset($filters[$key]);
+          }
         }
       }
       else {
