@@ -45,8 +45,8 @@ Features:
 * Formating of phone numbers
 * Option for internationalization of phone numbers
 * IPhone support
-* Phone CCK fields can be used as a Token 
-* This module is compatible with module http://drupal.org/project/node_import Node Import module, this module allowing to import data into phone fields 
+* Phone CCK fields can be used as a Token
+* This module is compatible with module http://drupal.org/project/node_import Node Import module, this module allowing to import data into phone fields
 
 Prerequisites
 -------------
@@ -75,7 +75,7 @@ Todo List:
 
 Author
 ------
-Thierry Guégan (http://www.arvoriad.com)
+Thierry GuÃ©gan (http://www.arvoriad.com)
 
 If you use this module, find it useful, and want to send the author
 a thank you note, then use the Feedback/Contact page at the URL above.

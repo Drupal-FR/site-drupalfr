@@ -5,6 +5,8 @@
  * CCK Field for Hungarian phone numbers.
  */
 
+define('PHONE_HU_REGEX', "/^(\+36|06|)[\s.-]?([0-9]{1,2})[\s.-]?([0-9]{2,3})[\s.-]?([0-9]{2,4})$/");
+
 function phone_hu_metadata() {
   // These strings are translated using t() on output.
   return array(
@@ -20,22 +22,10 @@ function phone_hu_metadata() {
  */
 function valid_hu_phone_number($phonenumber) {
 
-  //$phonenumber = trim($phonenumber);
-
-  // define regular expression
-  $regex = "/
-    \D*           # optional separator
-	(?:\+?36|06)? # country code
-    (\d\d?)       # area code
-    \D*           # optional separator
-    (\d{3})       # second group
-    \D*           # optional separator
-    (\d{3,4})     # third group
-    \D*           # ignore trailing non-digits
-    $/x";
+  $phonenumber = trim($phonenumber);
 
   // return true if valid, false otherwise
-  return (bool) preg_match($regex, $phonenumber);
+  return (bool) preg_match(PHONE_HU_REGEX, $phonenumber);
 }
 
 /**
@@ -45,25 +35,18 @@ function valid_hu_phone_number($phonenumber) {
  *
  */
 function format_hu_phone_number($phonenumber, $field = FALSE) {
-
-  // define regular expression
-  $regex = "/
-    \D*           # optional separator
-	(?:\+?36|06)? # country code
-    (\d\d?)       # area code
-    \D*           # optional separator
-    (\d{3})       # second group
-    \D*           # optional separator
-    (\d{3,4})     # third group
-    \D*           # ignore trailing non-digits
-    $/x";
-
+  $phonenumber = trim($phonenumber);
   // get digits of phone number
-  preg_match($regex, $phonenumber, $matches);
+  preg_match(PHONE_HU_REGEX, $phonenumber, $matches);
+
+  $formatedphone = '';
+  if ($field && $field['phone_country_code']) {
+    $formatedphone .= '+36 ';
+  }
 
   // construct ten-digit phone number
-  $phonenumber = '+36 ' . $matches[1] . ' ' . $matches[2] . ' ' . $matches[3] . ' ' . $matches[4];
+  $formatedphone .=  $matches[2] . ' ' . $matches[3] . ' ' . $matches[4];
 
-  return $phonenumber;
+  return $formatedphone;
 }
 
