@@ -47,7 +47,7 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     // Create importer configuration.
     $this->createImporterConfiguration();
     $this->setPlugin('syndication', 'FeedsSimplePieParser');
-    $this->setSettings('syndication', 'FeedsNodeProcessor', array('content_type' => $typename));
+    $this->setSettings('syndication', 'FeedsNodeProcessor', array('bundle' => $typename));
     $this->addMappings('syndication', array(
       0 => array(
         'source' => 'title',
@@ -90,7 +90,8 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     // Create a CSV importer configuration.
     $this->createImporterConfiguration('Node import from CSV', 'node');
     $this->setPlugin('node', 'FeedsCSVParser');
-    $this->setSettings('node', 'FeedsNodeProcessor', array('content_type' => $typename));
+    $this->setSettings('node', 'FeedsNodeProcessor', array('bundle' => $typename));
+    $this->setSettings('node', NULL, array('content_type' => ''));
     $this->addMappings('node', array(
       0 => array(
         'source' => 'title',
@@ -101,10 +102,6 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
         'target' => 'field_files'
       ),
     ));
-    $edit = array(
-      'content_type' => '',
-    );
-    $this->drupalPost('admin/structure/feeds/node/settings', $edit, 'Save');
 
     // Import.
     $edit = array(

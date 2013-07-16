@@ -60,14 +60,15 @@ function file_feeds_set_target($source, $entity, $target, $value) {
     return;
   }
 
+  $entity_type = $source->importer->processor->entityType();
+
   // Determine file destination.
   // @todo This needs review and debugging.
-  list($entity_id, $vid, $bundle_name) = entity_extract_ids($entity->feeds_item->entity_type, $entity);
-  $instance_info = field_info_instance($entity->feeds_item->entity_type, $target, $bundle_name);
+  $instance_info = field_info_instance($entity_type, $target, $source->importer->processor->bundle());
   $info = field_info_field($target);
   $data = array();
   if (!empty($entity->uid)) {
-    $data[$entity->feeds_item->entity_type] = $entity;
+    $data[$entity_type] = $entity;
   }
   $destination = file_field_widget_uri($info, $instance_info, $data);
 

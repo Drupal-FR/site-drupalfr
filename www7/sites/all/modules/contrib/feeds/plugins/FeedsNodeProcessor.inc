@@ -9,6 +9,7 @@
  * Creates nodes from feed items.
  */
 class FeedsNodeProcessor extends FeedsProcessor {
+
   /**
    * Define entity type.
    */
@@ -30,10 +31,11 @@ class FeedsNodeProcessor extends FeedsProcessor {
    */
   protected function newEntity(FeedsSource $source) {
     $node = new stdClass();
-    $node->type = $this->config['content_type'];
+    $node->type = $this->bundle();
     $node->changed = REQUEST_TIME;
     $node->created = REQUEST_TIME;
     $node->language = LANGUAGE_NONE;
+    $node->is_new = TRUE;
     node_object_prepare($node);
     // Populate properties that are set by node_object_prepare().
     $node->log = 'Created by FeedsNodeProcessor';
@@ -50,14 +52,12 @@ class FeedsNodeProcessor extends FeedsProcessor {
    * @todo Reevaluate the use of node_object_prepare().
    */
   protected function entityLoad(FeedsSource $source, $nid) {
-    if ($this->config['update_existing'] == FEEDS_UPDATE_EXISTING) {
-      $node = node_load($nid, NULL, TRUE);
-    }
-    else {
-      // We're replacing the existing node. Only save the absolutely necessary.
-      $node = db_query("SELECT created, nid, vid, type, status FROM {node} WHERE nid = :nid", array(':nid' => $nid))->fetchObject();
+    $node = parent::entityLoad($source, $nid);
+
+    if ($this->config['update_existing'] != FEEDS_UPDATE_EXISTING) {
       $node->uid = $this->config['author'];
     }
+
     node_object_prepare($node);
 
     // Workaround for issue #1247506. See #1245094 for backstory.
@@ -87,7 +87,7 @@ class FeedsNodeProcessor extends FeedsProcessor {
 
       $author = user_load($entity->uid);
 
-      // If the uid was mapped directly, rather than by email or username, it 
+      // If the uid was mapped directly, rather than by email or username, it
       // could be invalid.
       if (!$author) {
         $message = 'User %uid is not a valid user.';
@@ -111,13 +111,18 @@ class FeedsNodeProcessor extends FeedsProcessor {
   }
 
   /**
+   * Validates a node.
+   */
+  protected function entityValidate($entity) {
+    if (!isset($entity->uid) || !is_numeric($entity->uid)) {
+       $entity->uid = $this->config['author'];
+    }
+  }
+
+  /**
    * Save a node.
    */
   public function entitySave($entity) {
-    // If nid is set and a node with that id doesn't exist, flag as new.
-    if (!empty($entity->nid) && !node_load($entity->nid)) {
-      $entity->is_new = TRUE;
-    }
     node_save($entity);
   }
 
@@ -164,10 +169,7 @@ class FeedsNodeProcessor extends FeedsProcessor {
    * Override parent::configDefaults().
    */
   public function configDefaults() {
-    $types = node_type_get_names();
-    $type = isset($types['article']) ? 'article' : key($types);
     return array(
-      'content_type' => $type,
       'expire' => FEEDS_EXPIRE_NEVER,
       'author' => 0,
       'authorize' => TRUE,
@@ -178,16 +180,8 @@ class FeedsNodeProcessor extends FeedsProcessor {
    * Override parent::configForm().
    */
   public function configForm(&$form_state) {
-    $types = node_type_get_names();
-    array_walk($types, 'check_plain');
     $form = parent::configForm($form_state);
-    $form['content_type'] = array(
-      '#type' => 'select',
-      '#title' => t('Content type'),
-      '#description' => t('Select the content type for the nodes to be created. <strong>Note:</strong> Users with "import !feed_id feeds" permissions will be able to <strong>import</strong> nodes of the content type selected here regardless of the node level permissions. Further, users with "clear !feed_id permissions" will be able to <strong>delete</strong> imported nodes regardless of their node level permissions.', array('!feed_id' => $this->id)),
-      '#options' => $types,
-      '#default_value' => $this->config['content_type'],
-    );
+
     $author = user_load($this->config['author']);
     $form['author'] = array(
       '#type' => 'textfield',
@@ -209,11 +203,6 @@ class FeedsNodeProcessor extends FeedsProcessor {
       '#options' => $period,
       '#description' => t('Select after how much time nodes should be deleted. The node\'s published date will be used for determining the node\'s age, see Mapping settings.'),
       '#default_value' => $this->config['expire'],
-    );
-    $form['update_existing']['#options'] = array(
-      FEEDS_SKIP_EXISTING => 'Do not update existing nodes',
-      FEEDS_REPLACE_EXISTING => 'Replace existing nodes',
-      FEEDS_UPDATE_EXISTING => 'Update existing nodes (slower than replacing them)',
     );
     return $form;
   }
@@ -251,7 +240,7 @@ class FeedsNodeProcessor extends FeedsProcessor {
       case 'feeds_source':
         // Get the class of the feed node importer's fetcher and set the source
         // property. See feeds_node_update() how $node->feeds gets stored.
-        if ($id = feeds_get_importer_id($this->config['content_type'])) {
+        if ($id = feeds_get_importer_id($this->bundle())) {
           $class = get_class(feeds_importer($id)->fetcher);
           $target_node->feeds[$class]['source'] = $value;
           // This effectively suppresses 'import on submission' feature.
@@ -279,9 +268,10 @@ class FeedsNodeProcessor extends FeedsProcessor {
    * Return available mapping targets.
    */
   public function getMappingTargets() {
-    $type = node_type_get_type($this->config['content_type']);
+    $type = node_type_get_type($this->bundle());
+
     $targets = parent::getMappingTargets();
-    if ($type->has_title) {
+    if ($type && $type->has_title) {
       $targets['title'] = array(
         'name' => t('Title'),
         'description' => t('The title of the node.'),
@@ -339,7 +329,7 @@ class FeedsNodeProcessor extends FeedsProcessor {
     }
 
     // If the target content type is a Feed node, expose its source field.
-    if ($id = feeds_get_importer_id($this->config['content_type'])) {
+    if ($id = feeds_get_importer_id($this->bundle())) {
       $name = feeds_importer($id)->config['name'];
       $targets['feeds_source'] = array(
         'name' => t('Feed source'),
@@ -351,7 +341,7 @@ class FeedsNodeProcessor extends FeedsProcessor {
     // Let other modules expose mapping targets.
     self::loadMappers();
     $entity_type = $this->entityType();
-    $bundle = $this->config['content_type'];
+    $bundle = $this->bundle();
     drupal_alter('feeds_processor_targets', $targets, $entity_type, $bundle);
 
     return $targets;
@@ -373,10 +363,10 @@ class FeedsNodeProcessor extends FeedsProcessor {
           $nid = db_query("SELECT nid FROM {node} WHERE nid = :nid", array(':nid' => $value))->fetchField();
           break;
         case 'title':
-          $nid = db_query("SELECT nid FROM {node} WHERE title = :title AND type = :type", array(':title' => $value, ':type' => $this->config['content_type']))->fetchField();
+          $nid = db_query("SELECT nid FROM {node} WHERE title = :title AND type = :type", array(':title' => $value, ':type' => $this->bundle()))->fetchField();
           break;
         case 'feeds_source':
-          if ($id = feeds_get_importer_id($this->config['content_type'])) {
+          if ($id = feeds_get_importer_id($this->bundle())) {
             $nid = db_query("SELECT fs.feed_nid FROM {node} n JOIN {feeds_source} fs ON n.nid = fs.feed_nid WHERE fs.id = :id AND fs.source = :source", array(':id' => $id, ':source' => $value))->fetchField();
           }
           break;

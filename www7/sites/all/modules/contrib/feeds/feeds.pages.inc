@@ -341,7 +341,12 @@ function theme_feeds_upload($variables) {
     $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
     $description .= '<div class="file-info">';
     $description .= '<div class="file-name">';
-    $description .= l($file->filename, $wrapper->getExternalUrl());
+    if ($wrapper) {
+      $description .= l($file->filename, $wrapper->getExternalUrl());
+    }
+    else {
+      $description .= t('URI scheme %scheme not available.', array('%scheme' =>  file_uri_scheme($uri)));
+    }
     $description .= '</div>';
     $description .= '<div class="file-size">';
     $description .= format_size($file->filesize);

@@ -123,7 +123,7 @@ class FeedsCSVParser extends FeedsParser {
     $sources = $uniques = array();
     foreach ($mappings as $mapping) {
       $sources[] = check_plain($mapping['source']);
-      if ($mapping['unique']) {
+      if (!empty($mapping['unique'])) {
         $uniques[] = check_plain($mapping['source']);
       }
     }
@@ -132,7 +132,19 @@ class FeedsCSVParser extends FeedsParser {
     $items = array();
     $items[] = format_plural(count($uniques), t('Column <strong>!column</strong> is mandatory and considered unique: only one item per !column value will be created.', array('!column' => implode(', ', $uniques))), t('Columns <strong>!columns</strong> are mandatory and values in these columns are considered unique: only one entry per value in one of these column will be created.', array('!columns' => implode(', ', $uniques))));
     $items[] = l(t('Download a template'), 'import/' . $this->id . '/template');
-    $form['help']['#markup'] = '<div class="help"><p>' . $output . '</p>' . theme('item_list', array('items' => $items)) . '</div>';
+    $form['help'] = array(
+      '#prefix' => '<div class="help">',
+      '#suffix' => '</div>',
+      'description' => array(
+        '#prefix' => '<p>',
+        '#markup' => $output,
+        '#suffix' => '</p>',
+      ),
+      'list' => array(
+        '#theme' => 'item_list',
+        '#items' => $items,
+      ),
+    );
     $form['delimiter'] = array(
       '#type' => 'select',
       '#title' => t('Delimiter'),
@@ -141,6 +153,8 @@ class FeedsCSVParser extends FeedsParser {
         ',' => ',',
         ';' => ';',
         'TAB' => 'TAB',
+        '|' => '|',
+        '+' => '+',
       ),
       '#default_value' => isset($source_config['delimiter']) ? $source_config['delimiter'] : ',',
     );
@@ -176,6 +190,8 @@ class FeedsCSVParser extends FeedsParser {
         ',' => ',',
         ';' => ';',
         'TAB' => 'TAB',
+        '|' => '|',
+        '+' => '+',
       ),
       '#default_value' => $this->config['delimiter'],
     );
@@ -192,7 +208,7 @@ class FeedsCSVParser extends FeedsParser {
     $mappings = feeds_importer($this->id)->processor->config['mappings'];
     $sources = $uniques = array();
     foreach ($mappings as $mapping) {
-      if ($mapping['unique']) {
+      if (!empty($mapping['unique'])) {
         $uniques[] = check_plain($mapping['source']);
       }
       else {

@@ -237,6 +237,7 @@ class FeedsSource extends FeedsConfigurable {
    *   method may throw the same exceptions as FeedsSource::import().
    */
   public function startImport() {
+    module_invoke_all('feeds_before_import', $this);
     $config = $this->importer->getConfig();
     if ($config['process_in_background']) {
       $this->startBackgroundJob('import');
@@ -525,6 +526,9 @@ class FeedsSource extends FeedsConfigurable {
       $this->config = unserialize($record->config);
       if (!empty($record->state)) {
         $this->state = unserialize($record->state);
+      }
+      if (!is_array($this->state)) {
+        $this->state = array();
       }
       if (!empty($record->fetcher_result)) {
         $this->fetcher_result = unserialize($record->fetcher_result);

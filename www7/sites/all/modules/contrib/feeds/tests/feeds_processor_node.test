@@ -408,13 +408,13 @@ class FeedsRSStoNodesTest extends FeedsWebTestCase {
   }
 
   /**
-   * Test that nodes will not be created if the user is unauthorized to create 
+   * Test that nodes will not be created if the user is unauthorized to create
    * them.
    */
   public function testAuthorize() {
 
-    // Create a user with limited permissions. We can't use 
-    // $this->drupalCreateUser here because we need to to set a specific user 
+    // Create a user with limited permissions. We can't use
+    // $this->drupalCreateUser here because we need to to set a specific user
     // name.
     $edit = array(
       'name' => 'Development Seed',
