@@ -3405,7 +3405,7 @@ class MollomDataTestCase extends MollomWebTestCase {
     );
     $form_state = array('values' => $values, 'buttons' => array());
     $data = mollom_form_get_values($form_state, $fields, $form_info['mapping']);
-    $data += array_fill_keys(array('postTitle', 'postBody', 'authorId', 'authorName', 'authorMail', 'authorUrl', 'authorOpenid', 'authorIp'), NULL);
+    $data += array_fill_keys(array('postTitle', 'postBody', 'authorId', 'authorCreated', 'authorName', 'authorMail', 'authorUrl', 'authorOpenid', 'authorIp'), NULL);
 
     $this->assertSame('postTitle', $data['postTitle'], $values['subject']);
     $body = array(
@@ -3416,6 +3416,7 @@ class MollomDataTestCase extends MollomWebTestCase {
     );
     $this->assertSame('postBody', $data['postBody'], implode(" \n", $body));
     $this->assertSame('authorId', $data['authorId'], NULL);
+    $this->assertSame('authorCreated', $data['authorCreated'], NULL);
     $this->assertSame('authorName', $data['authorName'], $values['name']);
     $this->assertSame('authorMail', $data['authorMail'], $values['mail']);
     $this->assertSame('authorUrl', $data['authorUrl'], NULL);
@@ -3442,7 +3443,7 @@ class MollomDataTestCase extends MollomWebTestCase {
     );
     $form_state = array('values' => $values, 'buttons' => array());
     $data = mollom_form_get_values($form_state, $fields, $form_info['mapping']);
-    $data += array_fill_keys(array('postTitle', 'postBody', 'authorId', 'authorName', 'authorMail', 'authorUrl', 'authorOpenid', 'authorIp'), NULL);
+    $data += array_fill_keys(array('postTitle', 'postBody', 'authorId', 'authorCreated', 'authorName', 'authorMail', 'authorUrl', 'authorOpenid', 'authorIp'), NULL);
 
     $this->assertSame('postTitle', $data['postTitle'], $values['subject']);
     $body = array(
@@ -3453,6 +3454,7 @@ class MollomDataTestCase extends MollomWebTestCase {
     );
     $this->assertSame('postBody', $data['postBody'], implode(" \n", $body));
     $this->assertSame('authorId', $data['authorId'], NULL);
+    $this->assertSame('authorCreated', $data['authorCreated'], NULL);
     $this->assertSame('authorName', $data['authorName'], $values['name']);
     $this->assertSame('authorMail', $data['authorMail'], NULL);
     $this->assertSame('authorUrl', $data['authorUrl'], NULL);
@@ -3468,11 +3470,12 @@ class MollomDataTestCase extends MollomWebTestCase {
     );
     $form_state = array('values' => $values, 'buttons' => array());
     $data = mollom_form_get_values($form_state, $fields, $form_info['mapping']);
-    $data += array_fill_keys(array('postTitle', 'postBody', 'authorId', 'authorName', 'authorMail', 'authorUrl', 'authorOpenid', 'authorIp'), NULL);
+    $data += array_fill_keys(array('postTitle', 'postBody', 'authorId', 'authorCreated', 'authorName', 'authorMail', 'authorUrl', 'authorOpenid', 'authorIp'), NULL);
 
     $this->assertSame('postTitle', $data['postTitle'], $values['subject']);
     $this->assertSame('postBody', $data['postBody'], $values['message']);
     $this->assertSame('authorId', $data['authorId'], $this->admin_user->uid);
+    $this->assertSame('authorCreated', $data['authorCreated'], $this->admin_user->created);
     $this->assertSame('authorName', $data['authorName'], $this->admin_user->name);
     $this->assertSame('authorMail', $data['authorMail'], $this->admin_user->mail);
     $this->assertSame('authorUrl', $data['authorUrl'], NULL);
@@ -4953,59 +4956,26 @@ class MollomModerateUserTestCase extends MollomWebTestCase {
 /**
  * Tests integration with Mollom Moderation services.
  */
-class MollomModerationIntegrationTestCase extends MollomWebTestCase {
+abstract class MollomModerationBaseTestCase extends MollomWebTestCase {
   protected $mollomClass = 'MollomDrupalTestLocal';
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Moderation integration',
-      'description' => 'Tests integration with Mollom Moderation services.',
-      'group' => 'Mollom',
-    );
-  }
-
   function setUp() {
-    parent::setUp(array('mollom_test'));
+    $modules = func_get_args();
+    $modules = (isset($modules[0]) ? $modules[0] : array());
+    parent::setUp($modules);
 
-    $this->drupalLogin($this->admin_user);
-    $this->setProtectionUI('mollom_test_form', MOLLOM_MODE_ANALYSIS, NULL, array(
-      'mollom[discard]' => 0,
-      'mollom[moderation]' => 1,
-    ));
-    $this->drupalLogout();
+    // CMP integration requires clean URLs to be enabled.
+    variable_set('clean_url', TRUE);
   }
 
   /**
-   * Creates a mollom_test post.
+   * Registers a test user through the UI.
    *
    * @param array $edit
-   *   (optional) Custom form input for mollom_test form.
+   *   (optional) Custom form input for user registration form.
    *
    * @return stdClass
-   *   The Mollom data object for the created post.
-   */
-  protected function drupalCreateTestPost(array $edit = array()) {
-    $edit += array(
-      'title' => 'spam',
-    );
-    $this->drupalPost('mollom-test/form', $edit, 'Submit');
-    $this->assertText('Successful form submission');
-    $mid = $this->getFieldValueByName('mid');
-    $record = mollom_test_load($mid);
-    $this->assertSame('Publishing status', $record->status, 0);
-    $data = mollom_data_load('mollom_test', $mid);
-    $this->assertTrue($data, 'Mollom data for post exists.');
-    return $data;
-  }
-
-  /**
-   * Creates a mollom_test post.
-   *
-   * @param array $edit
-   *   (optional) Custom form input for mollom_test form.
-   *
-   * @return stdClass
-   *   The Mollom data object for the created post.
+   *   The Mollom data object for the created user.
    */
   protected function drupalCreateTestUser(array $edit = array()) {
     $edit += array(
@@ -5015,10 +4985,10 @@ class MollomModerationIntegrationTestCase extends MollomWebTestCase {
     $edit['pass[pass1]'] = $edit['pass[pass2]'] = user_password();
     $this->drupalPost('user/register', $edit, t('Create new account'));
     $this->assertText(t('Registration successful. You are now logged in.'));
+
     $account = user_load_by_mail($edit['mail']);
     $this->assertSame('Account status', $account->status, 1);
-    $data = mollom_data_load('user', $account->uid);
-    $this->assertTrue($data, 'Mollom data for user exists.');
+    $data = $this->assertMollomData('user', $account->uid);
     return $data;
   }
 
@@ -5098,6 +5068,54 @@ class MollomModerationIntegrationTestCase extends MollomWebTestCase {
     return $out;
   }
 
+}
+
+/**
+ * Tests integration with Mollom Moderation services.
+ */
+class MollomModerationIntegrationTestCase extends MollomModerationBaseTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Moderation integration',
+      'description' => 'Tests integration with Mollom Moderation services.',
+      'group' => 'Mollom',
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('mollom_test'));
+
+    $this->drupalLogin($this->admin_user);
+    $this->setProtectionUI('mollom_test_form', MOLLOM_MODE_ANALYSIS, NULL, array(
+      'mollom[discard]' => 0,
+      'mollom[moderation]' => 1,
+    ));
+    $this->drupalLogout();
+  }
+
+  /**
+   * Creates a mollom_test post.
+   *
+   * @param array $edit
+   *   (optional) Custom form input for mollom_test form.
+   *
+   * @return stdClass
+   *   The Mollom data object for the created post.
+   */
+  protected function drupalCreateTestPost(array $edit = array()) {
+    $edit += array(
+      'title' => 'spam',
+    );
+    $this->drupalPost('mollom-test/form', $edit, 'Submit');
+    $this->assertText('Successful form submission');
+    $mid = $this->getFieldValueByName('mid');
+    $record = mollom_test_load($mid);
+    $this->assertSame('Publishing status', $record->status, 0);
+    $data = mollom_data_load('mollom_test', $mid);
+    $this->assertTrue($data, 'Mollom data for post exists.');
+    return $data;
+  }
+
   /**
    * Tests that the 'stored' property of checked content is updated according to local events.
    *
@@ -5120,7 +5138,7 @@ class MollomModerationIntegrationTestCase extends MollomWebTestCase {
 
     // Delete the post.
     // @todo Implement a delete (confirmation) form.
-    mollom_test_delete_multiple(array($mid));
+    mollom_test_delete($mid);
     $this->assertMollomWatchdogMessages();
 
     // Verify that 'stored=0' was passed to Mollom.
@@ -5350,4 +5368,126 @@ class MollomModerationIntegrationTestCase extends MollomWebTestCase {
     }
   }
 
+}
+
+/**
+ * Tests CMP integration for various entity types.
+ */
+class MollomModerationEntityTestCase extends MollomModerationBaseTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Moderation entities',
+      'description' => 'Tests CMP integration for various entity types.',
+      'group' => 'Mollom',
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('node', 'comment'));
+
+    // Allow registration by site visitors without administrator approval.
+    variable_set('user_register', 1);
+    variable_set('user_email_verification', FALSE);
+
+    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+    variable_set('comment_preview_article', DRUPAL_OPTIONAL);
+    variable_set('comment_form_location_article', COMMENT_FORM_BELOW);
+    user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('create article content', 'view own unpublished content', 'access content', 'access comments', 'post comments'));
+
+    $this->setProtection('article_node_form', MOLLOM_MODE_ANALYSIS, array(
+      'moderation' => 1,
+    ));
+    $this->setProtection('comment_node_article_form', MOLLOM_MODE_ANALYSIS, array(
+      'moderation' => 1,
+    ));
+    $this->setProtection('user_register_form', MOLLOM_MODE_ANALYSIS, array(
+      'moderation' => 1,
+    ));
+  }
+
+  function testModeration() {
+    // Register a new user. (we are directly logged in)
+    $account_data = $this->drupalCreateTestUser();
+    $account = user_load($account_data->id, TRUE);
+
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 1);
+    $this->assertSame('url', $record['url'], url('user/' . $account->uid, array('absolute' => TRUE)));
+
+    // Create a test node.
+    $edit = array(
+      'title' => 'ham node',
+    );
+    $this->drupalPost('node/add/article', $edit, t('Save'));
+    $node = $this->drupalGetNodeByTitle($edit['title']);
+    $node_data = $this->assertMollomData('node', $node->nid);
+    $node_path = 'node/' . $node->nid;
+
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 1);
+    $this->assertSame('url', $record['url'], url($node_path, array('absolute' => TRUE)));
+
+    // Create a first test comment.
+    $edit = array(
+      'subject' => 'ham comment 1',
+      'comment_body[und][0][value]' => 'ham comment 1',
+    );
+    $this->drupalPost($node_path, $edit, t('Save'));
+    $comment1 = db_query("SELECT * FROM {comment} WHERE subject = :title", array(
+      ':title' => $edit['subject'],
+    ))->fetch();
+    $comment1_data = $this->assertMollomData('comment', $comment1->cid);
+
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 1);
+    $this->assertSame('url', $record['url'], url('comment/' . $comment1->cid, array(
+      'absolute' => TRUE,
+    )));
+    $this->assertSame('contextUrl', $record['contextUrl'], url($node_path, array('absolute' => TRUE)));
+    $this->assertSame('contextTitle', $record['contextTitle'], $node->title);
+
+    // Create a second test comment.
+    $edit = array(
+      'subject' => 'ham comment 2',
+      'comment_body[und][0][value]' => 'ham comment 2',
+    );
+    $this->drupalPost($node_path, $edit, t('Save'));
+    $comment2 = db_query("SELECT * FROM {comment} WHERE subject = :title", array(
+      ':title' => $edit['subject'],
+    ))->fetch();
+    $comment2_data = $this->assertMollomData('comment', $comment2->cid);
+
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 1);
+    $this->assertSame('url', $record['url'], url('comment/' . $comment2->cid, array(
+      'absolute' => TRUE,
+    )));
+    $this->assertSame('contextUrl', $record['contextUrl'], url($node_path, array('absolute' => TRUE)));
+    $this->assertSame('contextTitle', $record['contextTitle'], $node->title);
+
+    // Moderate the second comment.
+    $this->mollomRequest('POST', 'mollom/moderate/' . $comment2_data->contentId . '/delete');
+    $this->assertResponse(200);
+    $this->assertMollomWatchdogMessages();
+    $this->assertFalse(comment_load($comment2->cid));
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 0);
+
+    // Moderate the node (which should also delete the first comment).
+    $this->mollomRequest('POST', 'mollom/moderate/' . $node_data->contentId . '/delete');
+    $this->assertResponse(200);
+    $this->assertMollomWatchdogMessages();
+    $this->assertFalse(node_load($node->nid, NULL, TRUE));
+    $this->assertFalse(comment_load($comment1->cid));
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 0);
+
+    // Moderate the user.
+    $this->mollomRequest('POST', 'mollom/moderate/' . $account_data->contentId . '/delete');
+    $this->assertResponse(200);
+    $this->assertMollomWatchdogMessages();
+    $this->assertFalse(user_load($account->uid, TRUE));
+    $record = $this->getServerRecord();
+    $this->assertSame('stored', $record['stored'], 0);
+  }
 }

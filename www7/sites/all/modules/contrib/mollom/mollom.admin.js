@@ -12,12 +12,13 @@ Drupal.behaviors.mollomBlacklistFilter = {
       // corresponding table row, context, and match.
       self.entries = {};
       $(this).find('tr:has(.mollom-blacklist-value)').each(function () {
-        var $row = $(this);
-        self.entries[$row.find('.mollom-blacklist-value').text()] = {
+        var $row = $(this), entry = {
+          value: $row.find('.mollom-blacklist-value').text(),
           context: $row.children('.mollom-blacklist-context').attr('class').match(/value-(\w+)/)[1],
           match: $row.children('.mollom-blacklist-match').attr('class').match(/value-(\w+)/)[1],
-          row: $row.get(0)
+          row: this
         };
+        self.entries[entry.context + '-' + entry.match + '-' + entry.value] = entry;
       });
 
       // Attach the instant text filtering behavior.
@@ -28,7 +29,7 @@ Drupal.behaviors.mollomBlacklistFilter = {
       self.lastSearch = {};
       var filterRows = function () {
         // Prepare static variables and conditions only once.
-        var i, value, visible, changed;
+        var i, visible, changed;
         var search = {
           // Blacklist entries are stored in lowercase, so to get any filter
           // results, the entered text must be converted to lowercase, too.
@@ -53,15 +54,15 @@ Drupal.behaviors.mollomBlacklistFilter = {
         // Likewise, we directly apply the 'display' style, since
         // jQuery.fn.hide() and jQuery.fn.show() call into jQuery.fn.animate(),
         // which is useless for this purpose.
-        for (value in self.entries) {
-          visible = (search.value.length == 0 || value.indexOf(search.value) != -1);
-          visible = visible && (search.context.length == 0 || self.entries[value].context == search.context);
-          visible = visible && (search.match.length == 0 || self.entries[value].match == search.match);
+        for (i in self.entries) {
+          visible = (search.context.length == 0 || self.entries[i].context == search.context);
+          visible = visible && (search.match.length == 0 || self.entries[i].match == search.match);
+          visible = visible && (search.value.length == 0 || self.entries[i].value.indexOf(search.value) != -1);
           if (visible) {
-            self.entries[value].row.style.display = '';
+            self.entries[i].row.style.display = '';
           }
           else {
-            self.entries[value].row.style.display = 'none';
+            self.entries[i].row.style.display = 'none';
           }
         }
       };

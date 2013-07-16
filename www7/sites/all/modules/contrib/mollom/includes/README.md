@@ -111,6 +111,18 @@ This library is considered stable and is actively used, but API changes may not 
 * See the [change log](https://github.com/Mollom/MollomPHP/blob/master/CHANGELOG.md) for details.
 * See the [todo list](https://github.com/Mollom/MollomPHP/blob/master/TODO.md) for future refactoring tasks (which will happen in a new major version).
 
+## Configuration
+
+### PHP <5.4 as CGI: Handling inbound [CMP] OAuth requests
+
+For PHP versions older than 5.4, and if PHP runs as CGI (not as Apache module/`mod_php`), you may need to enable `mod_rewrite` and place the following rewrite rules into your virtual host configuration or `.htaccess` file:
+
+    RewriteEngine On
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+Since PHP 5.4.0, [getallheaders()](http://php.net/manual/function.getallheaders.php) became also available under FastCGI.  In earlier PHP versions, the HTTP `Authorization` request header is not forwarded into PHP environment variables when PHP runs as CGI.
+
+
 ## License
 
 You may use this software under the terms of either the MIT License or the
@@ -118,3 +130,5 @@ GNU General Public License (GPL), Version 2.
 
 See LICENSE-MIT.txt and LICENSE-GPL.txt.
 
+
+[CMP]: http://mollom.com/moderation

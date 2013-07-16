@@ -155,41 +155,14 @@ class MollomDrupal extends Mollom {
    *   parameters in non-PHP format; e.g., 'foo=one&foo=bar'.
    */
   public static function getServerParameters() {
+    $data = parent::getServerParameters();
     if ($_SERVER['REQUEST_METHOD'] == 'GET' || $_SERVER['REQUEST_METHOD'] == 'HEAD') {
-      $data = self::httpParseQuery($_SERVER['QUERY_STRING']);
       // Remove $_GET['q'].
       unset($data['q']);
-    }
-    elseif ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'PUT') {
-      $data = self::httpParseQuery(file_get_contents('php://input'));
     }
     return $data;
   }
 
-  /**
-   * Retrieves the OAuth authorization header of an inbound request.
-   *
-   * @return array
-   *   An array containing all key/value pairs extracted out of the
-   *   'Authorization' HTTP header, if any.
-   */
-  public static function getServerAuthentication() {
-    $header = array();
-    if (function_exists('apache_request_headers')) {
-      $headers = apache_request_headers();
-      if (isset($headers['Authorization'])) {
-        $input = $headers['Authorization'];
-      }
-    }
-    elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-      $input = $_SERVER['HTTP_AUTHORIZATION'];
-    }
-    if (isset($input)) {
-      preg_match_all('@([^, =]+)="([^"]*)"@', $input, $header);
-      $header = array_combine($header[1], $header[2]);
-    }
-    return $header;
-  }
 }
 
 /**
@@ -406,7 +379,7 @@ class MollomDrupalTestInvalid extends MollomDrupalTest {
   /**
    * Overrides Mollom::query().
    */
-  protected function query($method, $path, array $data = array(), array $expected = array()) {
+  public function query($method, $path, array $data = array(), array $expected = array()) {
     $this->currentAttempt = 0;
     return parent::query($method, $path, $data, $expected);
   }
