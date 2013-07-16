@@ -1,44 +1,23 @@
 <?php
 
 /**
+ * Implements hook_schema().
+ */
+function search_api_solr_schema() {
+  // See, e.g., block_schema() for this trick. Seems to be the best way to get a
+  // cache table definition.
+  $schema['cache_search_api_solr'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_search_api_solr']['description'] = 'Cache table for the Search API Solr module to store various data related to Solr servers.';
+  return $schema;
+}
+
+/**
  * Implements hook_requirements().
  */
 function search_api_solr_requirements($phase) {
-  if ($phase == 'install') {
-    $t = get_t();
-    module_load_include('module', 'search_api_solr');
-    spl_autoload_register('_search_api_solr_autoload');
-    if (class_exists('Apache_Solr_Service')) {
-      $version = trim(Apache_Solr_Service::SVN_REVISION, '$ :A..Za..z');
-      if ($version < 59) {
-        return array(
-          'search_api_solr' => array(
-            'title' => $t('Solr PHP library'),
-            'value' => $t('The library is correctly installed, but out of date'),
-            'description' => $t('It is suggested to install the newest version (@version).', array('@version' => 'r60')),
-            'severity' => REQUIREMENT_WARNING,
-          ),
-        );
-      }
-      return array(
-        'search_api_solr' => array(
-          'title' => $t('Solr PHP library'),
-          'value' => $t('The library was correctly installed'),
-          'severity' => REQUIREMENT_OK,
-        ),
-      );
-    }
-    else {
-      return array(
-        'search_api_solr' => array(
-          'title' => $t('Solr PHP library'),
-          'value' => $t('The library was not correctly installed. Please see INSTALL.txt for instructions.'),
-          'severity' => REQUIREMENT_ERROR,
-        ),
-      );
-    }
-  }
-  elseif ($phase == 'runtime') {
+  $ret = array();
+
+  if ($phase == 'runtime') {
     $servers = search_api_server_load_multiple(FALSE, array('class' => 'search_api_solr_service', 'enabled' => TRUE));
     $count = 0;
     $unavailable = 0;
@@ -71,31 +50,9 @@ function search_api_solr_requirements($phase) {
       $ret['search_api_solr']['description'] = format_plural($count, 'The Solr server could be reached.', 'All @count Solr servers could be reached.');
       $ret['search_api_solr']['severity'] = REQUIREMENT_OK;
     }
-
-    // Check version of the SolrPhpClient library.
-    $version = trim(Apache_Solr_Service::SVN_REVISION, '$ :A..Za..z');
-    if ($version < 59) {
-      $ret['search_api_solr_client'] = array(
-        'title' => t('Solr PHP library'),
-        'value' => t('Version @version', array('@version' => "r$version")),
-        'description' => t('The library is correctly installed, but out of date. ' .
-            'It is suggested to install the <a href="@url">newest version</a> (@version).',
-            array('@url' => 'http://code.google.com/p/solr-php-client/downloads/list', '@version' => 'r60')),
-        'severity' => REQUIREMENT_WARNING,
-      );
-    }
-    return $ret;
   }
-}
 
-/**
- * Implements hook_install().
- *
- * We register our autoloader here because our hook_init() won't get called
- * until the next bootstrap (it registers the autoloader too.)
- */
-function search_api_solr_install() {
-  spl_autoload_register('_search_api_solr_autoload');
+  return $ret;
 }
 
 /**
@@ -123,8 +80,6 @@ function search_api_solr_update_dependencies() {
 }
 
 /**
- * Implements hook_update_N().
- *
  * Implements transition from using the index IDs to using machine names.
  */
 function search_api_solr_update_7101() {
@@ -151,4 +106,15 @@ function search_api_solr_update_7101() {
   return t('The Solr search module was updated. ' .
       'Please stop your Solr servers, replace their schema.xml with the new version and then start them again. ' .
       'All data indexed on Solr servers will have to be reindexed.');
+}
+
+/**
+ * Create the Search API Solr cache table {cache_search_api_solr}.
+ */
+function search_api_solr_update_7102() {
+  if (!db_table_exists('cache_search_api_solr')) {
+    $table = drupal_get_schema_unprocessed('system', 'cache');
+    $table['description'] = 'Cache table for the Search API Solr module to store various data related to Solr servers.';
+    db_create_table('cache_search_api_solr', $table);
+  }
 }

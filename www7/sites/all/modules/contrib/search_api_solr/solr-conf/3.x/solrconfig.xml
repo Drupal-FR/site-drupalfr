@@ -20,7 +20,7 @@
      For more details about configurations options that may appear in
      this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
-<config>
+<config name="drupal-4.1-solr-3.x">
   <!-- In all configuration below, a prefix of "solr." for class names
        is an alias that causes solr to search appropriate packages,
        including org.apache.solr.(search|update|request|core|analysis)
@@ -47,7 +47,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
     -->
-  <luceneMatchVersion>${luceneVersion:LUCENE_35}</luceneMatchVersion>
+  <luceneMatchVersion>${solr.luceneMatchVersion:LUCENE_35}</luceneMatchVersion>
 
   <!-- lib directives can be used to instruct Solr to load an Jars
        identified and use them to resolve any "plugins" specified in
@@ -310,8 +310,8 @@
                    triggering a new commit.
       -->
     <autoCommit>
-      <maxDocs>10000</maxDocs>
-      <maxTime>120000</maxTime>
+      <maxDocs>${solr.autoCommit.MaxDocs:10000}</maxDocs>
+      <maxTime>${solr.autoCommit.MaxTime:120000}</maxTime>
     </autoCommit>
 
     <!-- Update Related Event Listeners
@@ -857,7 +857,7 @@
       <bool name="omitHeader">true</bool>
       <float name="tie">0.01</float>
       <!-- Don't abort searches for the pinkPony request handler (set in solrcore.properties) -->
-      <int name="timeAllowed">${pinkPony.timeAllowed:-1}</int>
+      <int name="timeAllowed">${solr.pinkPony.timeAllowed:-1}</int>
       <str name="q.alt">*:*</str>
 
       <!-- By default, don't spell check -->
@@ -884,7 +884,15 @@
       <str name="mlt.maxqt">20</str>
       <str name="mlt.match.include">false</str>
       <!-- Abort any searches longer than 2 seconds (set in solrcore.properties) -->
-      <int name="timeAllowed">${mlt.timeAllowed:2000}</int>
+      <int name="timeAllowed">${solr.mlt.timeAllowed:2000}</int>
+    </lst>
+  </requestHandler>
+
+  <!-- A minimal query type for doing luene queries -->
+  <requestHandler name="standard" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="echoParams">explicit</str>
+      <bool name="omitHeader">true</bool>
     </lst>
   </requestHandler>
 
@@ -1078,15 +1086,15 @@
     -->
      <requestHandler name="/replication" class="solr.ReplicationHandler" >
        <lst name="master">
-         <str name="enable">${enable.master:false}</str>
+         <str name="enable">${solr.replication.master:false}</str>
          <str name="replicateAfter">commit</str>
          <str name="replicateAfter">startup</str>
-         <str name="confFiles">${confFiles}</str>
+         <str name="confFiles">${solr.replication.confFiles:schema.xml,mapping-ISOLatin1Accent.txt,protwords.txt,stopwords.txt,synonyms.txt,elevate.xml}</str>
        </lst>
        <lst name="slave">
-         <str name="enable">${enable.slave:false}</str>
-         <str name="masterUrl">${masterCoreUrl}/replication</str>
-         <str name="pollInterval">${pollTime:00:00:60}</str>
+         <str name="enable">${solr.replication.slave:false}</str>
+         <str name="masterUrl">${solr.replication.masterUrl:http://localhost:8983/solr}/replication</str>
+         <str name="pollInterval">${solr.replication.pollInterval:00:00:60}</str>
        </lst>
      </requestHandler>
 
@@ -1132,73 +1140,6 @@
        always be executed after the "last-components"
 
      -->
-
-   <!-- Spell Check
-
-        The spell check component can return a list of alternative spelling
-        suggestions.
-
-        http://wiki.apache.org/solr/SpellCheckComponent
-     -->
-  <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
-
-    <str name="queryAnalyzerFieldType">textSpell</str>
-
-    <!-- Multiple "Spell Checkers" can be declared and used by this
-         component
-      -->
-
-    <!-- a spellchecker built from a field of the main index, and
-         written to disk
-      -->
-    <lst name="spellchecker">
-      <str name="name">default</str>
-      <str name="field">name</str>
-      <str name="spellcheckIndexDir">spellchecker</str>
-      <!-- uncomment this to require terms to occur in 1% of the documents in order to be included in the dictionary
-        <float name="thresholdTokenFrequency">.01</float>
-      -->
-    </lst>
-
-    <!-- a spellchecker that uses a different distance measure -->
-    <!--
-       <lst name="spellchecker">
-         <str name="name">jarowinkler</str>
-         <str name="field">spell</str>
-         <str name="distanceMeasure">
-           org.apache.lucene.search.spell.JaroWinklerDistance
-         </str>
-         <str name="spellcheckIndexDir">spellcheckerJaro</str>
-       </lst>
-     -->
-
-    <!-- a spellchecker that use an alternate comparator
-
-         comparatorClass be one of:
-          1. score (default)
-          2. freq (Frequency first, then score)
-          3. A fully qualified class name
-      -->
-    <!--
-       <lst name="spellchecker">
-         <str name="name">freq</str>
-         <str name="field">lowerfilt</str>
-         <str name="spellcheckIndexDir">spellcheckerFreq</str>
-         <str name="comparatorClass">freq</str>
-         <str name="buildOnCommit">true</str>
-      -->
-
-    <!-- A spellchecker that reads the list of words from a file -->
-    <!--
-       <lst name="spellchecker">
-         <str name="classname">solr.FileBasedSpellChecker</str>
-         <str name="name">file</str>
-         <str name="sourceLocation">spellings.txt</str>
-         <str name="characterEncoding">UTF-8</str>
-         <str name="spellcheckIndexDir">spellcheckerFile</str>
-       </lst>
-      -->
-  </searchComponent>
 
   <!-- A request handler for demonstrating the spellcheck component.
 
@@ -1435,8 +1376,8 @@
                  default="true"
                  class="solr.highlight.HtmlFormatter">
         <lst name="defaults">
-          <str name="hl.simple.pre"><![CDATA[<em>]]></str>
-          <str name="hl.simple.post"><![CDATA[</em>]]></str>
+          <str name="hl.simple.pre"><![CDATA[<strong>]]></str>
+          <str name="hl.simple.post"><![CDATA[</strong>]]></str>
         </lst>
       </formatter>
 
@@ -1641,5 +1582,30 @@
        <healthcheck type="file">server-enabled</healthcheck>
       -->
   </admin>
+
+  <!-- Following is a dynamic way to include other components or any customized solrconfig.xml stuff, added by other contrib modules -->
+  <xi:include href="solrconfig_extra.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:fallback>
+      <!-- Spell Check
+
+          The spell check component can return a list of alternative spelling
+          suggestions. This component must be defined in
+          solrconfig_extra.xml if present, since it's used in the search handler.
+
+          http://wiki.apache.org/solr/SpellCheckComponent
+       -->
+      <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
+        <str name="queryAnalyzerFieldType">textSpell</str>
+
+        <!-- a spellchecker built from a field of the main index -->
+        <lst name="spellchecker">
+          <str name="name">default</str>
+          <str name="field">spell</str>
+          <str name="spellcheckIndexDir">spellchecker</str>
+          <str name="buildOnOptimize">true</str>
+        </lst>
+      </searchComponent>
+    </xi:fallback>
+  </xi:include>
 
 </config>

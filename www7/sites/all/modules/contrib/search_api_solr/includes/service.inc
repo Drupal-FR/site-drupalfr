@@ -11,15 +11,26 @@ class SearchApiSolrService extends SearchApiAbstractService {
   const SOLR_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
   /**
+   * The connection class used by this service.
+   *
+   * Must implement SearchApiSolrConnectionInterface.
+   *
+   * @var string
+   */
+  protected $connection_class = 'SearchApiSolrConnection';
+
+  /**
    * A connection to the Solr server.
    *
-   * @var SearchApiSolrConnection
+   * @var SearchApiSolrConnectionInterface
    */
   protected $solr;
 
   /**
-   * An array of all recognized types mapped to a prefix used for identifying
-   * them in the Solr schema.
+   * An array of all recognized types.
+   *
+   * Maps the type names to the prefixes used for identifying them in the Solr
+   * schema.
    *
    * @var array
    */
@@ -34,10 +45,12 @@ class SearchApiSolrService extends SearchApiAbstractService {
     'boolean' => 'b',
     'uri' => 's',
     'location' => 'loc',
-    'geohash' => 'geohash',
+    'geohash' => 'geo',
   );
 
   /**
+   * Static cache for getFieldNames().
+   *
    * @var array
    */
   protected $fieldNames = array();
@@ -54,7 +67,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
   /**
    * Saves whether a commit operation was already scheduled for this server.
    *
-   * @var boolean
+   * @var bool
    */
   protected $commitScheduled = FALSE;
 
@@ -65,22 +78,21 @@ class SearchApiSolrService extends SearchApiAbstractService {
    */
   protected $request_handler = NULL;
 
-  public function __construct(SearchApiServer $server) {
-    parent::__construct($server);
-  }
-
+  /**
+   * Overrides SearchApiAbstractService::configurationForm().
+   */
   public function configurationForm(array $form, array &$form_state) {
     if ($this->options) {
       // Editing this server
-      $url = 'http://' . $this->options['host'] . ':' . $this->options['port'] . $this->options['path'];
       $form['server_description'] = array(
         '#type' => 'item',
         '#title' => t('Solr server URI'),
-        '#description' => l($url, $url),
+        '#description' => $this->getServerLink(),
       );
     }
 
     $options = $this->options + array(
+      'scheme' => 'http',
       'host' => 'localhost',
       'port' => '8983',
       'path' => '/solr',
@@ -89,9 +101,20 @@ class SearchApiSolrService extends SearchApiAbstractService {
       'excerpt' => FALSE,
       'retrieve_data' => FALSE,
       'highlight_data' => FALSE,
-      'http_method' => Apache_Solr_Service::METHOD_POST,
+      'http_method' => 'POST',
       'autocorrect_spell' => TRUE,
       'autocorrect_suggest_words' => TRUE,
+    );
+
+    $form['scheme'] = array(
+      '#type' => 'select',
+      '#title' => t('HTTP protocol'),
+      '#description' => t('The HTTP protocol to use for sending queries.'),
+      '#default_value' => $options['scheme'],
+      '#options' => array(
+        'http' => 'http',
+        'https' => 'https',
+      ),
     );
 
     $form['host'] = array(
@@ -130,7 +153,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $form['http']['http_pass'] = array(
       '#type' => 'password',
       '#title' => t('Password'),
-      '#default_value' => $options['http_pass'],
+      '#description' => t('If this field is left blank and the HTTP username is filled out, the current password will not be changed.'),
     );
 
     $form['advanced'] = array(
@@ -172,8 +195,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
       '#description' => t('The HTTP method to use for sending queries. Usually, POST will work fine in all cases.'),
       '#default_value' => $options['http_method'],
       '#options' => array(
-        Apache_Solr_Service::METHOD_POST => 'POST',
-        Apache_Solr_Service::METHOD_GET => 'GET',
+        'POST' => 'POST',
+        'GET' => 'GET',
       ),
     );
 
@@ -201,12 +224,18 @@ class SearchApiSolrService extends SearchApiAbstractService {
     return $form;
   }
 
+  /**
+   * Overrides SearchApiAbstractService::configurationFormValidate().
+   */
   public function configurationFormValidate(array $form, array &$values, array &$form_state) {
     if (isset($values['port']) && (!is_numeric($values['port']) || $values['port'] < 0 || $values['port'] > 65535)) {
       form_error($form['port'], t('The port has to be an integer between 0 and 65535.'));
     }
   }
 
+  /**
+   * Overrides SearchApiAbstractService::configurationFormSubmit().
+   */
   public function configurationFormSubmit(array $form, array &$values, array &$form_state) {
     // Since the form is nested into another, we can't simply use #parents for
     // doing this array restructuring magic. (At least not without creating an
@@ -215,17 +244,30 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $values += $values['advanced'];
     $values += !empty($values['autocomplete']) ? $values['autocomplete'] : array();
     unset($values['http'], $values['advanced'], $values['autocomplete']);
+
     // Highlighting retrieved data only makes sense when we retrieve data.
     $values['highlight_data'] &= $values['retrieve_data'];
+
+    // For password fields, there is no default value, they're empty by default.
+    // Therefore we ignore empty submissions if the user didn't change either.
+    if ($values['http_pass'] === ''
+        && isset($this->options['http_user'])
+        && $values['http_user'] === $this->options['http_user']) {
+      $values['http_pass'] = $this->options['http_pass'];
+    }
 
     parent::configurationFormSubmit($form, $values, $form_state);
   }
 
+  /**
+   * Overrides SearchApiAbstractService::supportsFeature().
+   */
   public function supportsFeature($feature) {
     $supported = drupal_map_assoc(array(
       'search_api_autocomplete',
       'search_api_facets',
       'search_api_facets_operator_or',
+      'search_api_grouping',
       'search_api_mlt',
       'search_api_multi',
       'search_api_spellcheck',
@@ -236,17 +278,16 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
-   * View this server's settings.
+   * Overrides SearchApiAbstractService::viewSettings().
    */
   public function viewSettings() {
     $output = '';
     $options = $this->options;
 
-    $url = 'http://' . $options['host'] . ':' . $options['port'] . $options['path'];
     $output .= "<dl>\n  <dt>";
     $output .= t('Solr server URI');
     $output .= "</dt>\n  <dd>";
-    $output .= l($url, $url);
+    $output .= $this->getServerLink();
     $output .= '</dd>';
     if ($options['http_user']) {
       $output .= "\n  <dt>";
@@ -263,23 +304,49 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
+   * Returns a link to the Solr server, if the necessary options are set.
+   */
+  public function getServerLink() {
+    if (!$this->options) {
+      return '';
+    }
+    $host = $this->options['host'];
+    if ($host == 'localhost' && !empty($_SERVER['SERVER_NAME'])) {
+      $host = $_SERVER['SERVER_NAME'];
+    }
+    $url = $this->options['scheme'] . '://' . $host . ':' . $this->options['port'] . $this->options['path'];
+    return l($url, $url);
+  }
+
+  /**
    * Create a connection to the Solr server as configured in $this->options.
    */
   protected function connect() {
     if (!$this->solr) {
-      if (!class_exists('Apache_Solr_Service')) {
-        throw new Exception(t('SolrPhpClient library not found! Please follow the instructions in search_api_solr/INSTALL.txt for installing the Solr search module.'));
+      if (!class_exists($this->connection_class)) {
+        throw new SearchApiException(t('Invalid class @class set as Solr connection class.', array('@class' => $this->connection_class)));
       }
-      $this->solr = new SearchApiSolrConnection($this->options);
+      $options = $this->options + array('server' => $this->server->machine_name);
+      $this->solr = new $this->connection_class($options);
+      if (!($this->solr instanceof SearchApiSolrConnectionInterface)) {
+        $this->solr = NULL;
+        throw new SearchApiException(t('Invalid class @class set as Solr connection class.', array('@class' => $this->connection_class)));
+      }
     }
   }
 
+  /**
+   * Overrides SearchApiAbstractService::addIndex().
+   */
   public function addIndex(SearchApiIndex $index) {
     if (module_exists('search_api_multi') && module_exists('search_api_views')) {
       views_invalidate_cache();
     }
   }
 
+  /**
+   * Overrides SearchApiAbstractService::fieldsUpdated().
+   */
   public function fieldsUpdated(SearchApiIndex $index) {
     if (module_exists('search_api_multi') && module_exists('search_api_views')) {
       views_invalidate_cache();
@@ -287,6 +354,9 @@ class SearchApiSolrService extends SearchApiAbstractService {
     return TRUE;
   }
 
+  /**
+   * Overrides SearchApiAbstractService::removeIndex().
+   */
   public function removeIndex($index) {
     if (module_exists('search_api_multi') && module_exists('search_api_views')) {
       views_invalidate_cache();
@@ -304,6 +374,9 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
   }
 
+  /**
+   * Implements SearchApiServiceInterface::indexItems().
+   */
   public function indexItems(SearchApiIndex $index, array $items) {
     $documents = array();
     $ret = array();
@@ -312,7 +385,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
 
     foreach ($items as $id => $item) {
       try {
-        $doc = new Apache_Solr_Document();
+        $doc = new SearchApiSolrDocument();
         $doc->setField('id', $this->createId($index_id, $id));
         $doc->setField('index_id', $index_id);
         $doc->setField('item_id', $id);
@@ -337,25 +410,22 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
     try {
       $this->connect();
-      $response = $this->solr->addDocuments($documents);
-      if ($response->getHttpStatus() == 200) {
-        if (!empty($index->options['index_directly'])) {
-          $this->scheduleCommit();
-        }
-        return $ret;
+      $this->solr->addDocuments($documents);
+      if (!empty($index->options['index_directly'])) {
+        $this->scheduleCommit();
       }
-      throw new SearchApiException(t('HTTP status @status: @msg.',
-          array('@status' => $response->getHttpStatus(), '@msg' => $response->getHttpStatusMessage())));
+      return $ret;
     }
-    catch (Exception $e) {
+    catch (SearchApiException $e) {
       watchdog_exception('search_api_solr', $e, "%type while indexing: !message in %function (line %line of %file).");
     }
     return array();
   }
 
   /**
-   * Creates an ID used as the unique identifier at the Solr server. This has to
-   * consist of both index and item ID.
+   * Creates an ID used as the unique identifier at the Solr server.
+   *
+   * This has to consist of both index and item ID.
    */
   protected function createId($index_id, $item_id) {
     return "$index_id-$item_id";
@@ -415,11 +485,12 @@ class SearchApiSolrService extends SearchApiAbstractService {
 
   /**
    * Helper method for indexing.
-   * Add $field with field name $key to the document $doc. The format of $field
+   *
+   * Adds $value with field name $key to the document $doc. The format of $value
    * is the same as specified in SearchApiServiceInterface::indexItems().
    */
-  protected function addIndexField(Apache_Solr_Document $doc, $key, $value, $type, $multi_valued = FALSE) {
-    // Don't index empty values (i.e., when field is missing)
+  protected function addIndexField(SearchApiSolrDocument $doc, $key, $value, $type, $multi_valued = FALSE) {
+    // Don't index empty values (i.e., when field is missing).
     if (!isset($value)) {
       return;
     }
@@ -462,12 +533,14 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
-   * Delete items from an index on this server.
+   * Implements SearchApiServiceInterface::deleteItems().
    *
    * This method has a custom, Solr-specific extension:
+   *
    * If $ids is a string other than "all", it is treated as a Solr query. All
    * items matching that Solr query are then deleted. If $index is additionally
    * specified, then only those items also lying on that index will be deleted.
+   *
    * It is up to the caller to ensure $ids is a valid query when the method is
    * called in this fashion.
    */
@@ -496,26 +569,32 @@ class SearchApiSolrService extends SearchApiAbstractService {
       }
       $this->scheduleCommit();
     }
-    catch(Exception $e) {
+    catch(SearchApiException $e) {
       watchdog_exception('search_api_solr', $e, '%type while deleting items from server @server: !message in %function (line %line of %file).', array('@server' => $this->server->name));
     }
   }
 
+  /**
+   * Implements SearchApiServiceInterface::search().
+   */
   public function search(SearchApiQueryInterface $query) {
     $time_method_called = microtime(TRUE);
-    // Reset request handler
+    // Reset request handler.
     $this->request_handler = NULL;
-    // Get field information
+    // Get field information.
     $index = $query->getIndex();
     $fields = $this->getFieldNames($index);
+    // Get Solr connection.
+    $this->connect();
+    $version = $this->solr->getSolrVersion();
 
-    // Extract keys
+    // Extract keys.
     $keys = $query->getKeys();
     if (is_array($keys)) {
       $keys = $this->flattenKeys($keys);
     }
 
-    // Set searched fields
+    // Set searched fields.
     $options = $query->getOptions();
     $search_fields = $query->getFields();
     // Get the index fields to be able to retrieve boosts.
@@ -527,36 +606,41 @@ class SearchApiSolrService extends SearchApiAbstractService {
       $qf[] = $fields[$f] . $boost;
     }
 
-    // Extract filters
+    // Extract filters.
     $filter = $query->getFilter();
     $fq = $this->createFilterQueries($filter, $fields, $index->options['fields']);
     $fq[] = 'index_id:' . $index->machine_name;
 
-    // Extract sort
+    // Extract sort.
     $sort = array();
-    foreach ($query->getSort() as $f => $order) {
-      $f = $fields[$f];
+    foreach ($query->getSort() as $field => $order) {
+      $f = $fields[$field];
       if (substr($f, 0, 3) == 'ss_') {
         $f = 'sort_' . substr($f, 3);
       }
       $order = strtolower($order);
-      $sort[] = "$f $order";
+      $sort[$field] = "$f $order";
     }
 
-    // Get facet fields
+    // Get facet fields.
     $facets = $query->getOption('search_api_facets', array());
     $facet_params = $this->getFacetParams($facets, $fields, $fq);
 
-    // Handle highlighting
+    // Handle highlighting.
     $highlight_params = $this->getHighlightParams($query);
 
-    // Handle More Like This query
+    // Handle More Like This query.
     $mlt = $query->getOption('search_api_mlt');
     if ($mlt) {
       $mlt_params['qt'] = 'mlt';
       // The fields to look for similarities in.
       $mlt_fl = array();
       foreach($mlt['fields'] as $f) {
+        // Solr 4 has a bug which results in numeric and date fields not being
+        // supported in MLT queries.
+        if ($version == 4 && in_array($fields[$f][0], array('i', 'f', 'd'))) {
+          continue;
+        }
         $mlt_fl[] = $fields[$f];
         // For non-text fields, set minimum word length to 0.
         if (isset($index->options['fields'][$f]['type']) && !search_api_is_text_type($index->options['fields'][$f]['type'])) {
@@ -564,22 +648,163 @@ class SearchApiSolrService extends SearchApiAbstractService {
         }
       }
       $mlt_params['mlt.fl'] = implode(',', $mlt_fl);
-      $keys = 'id:' . SearchApiSolrConnection::phrase($this->createId($index->machine_name, $mlt['id']));
+      $id = $this->createId($index->machine_name, $mlt['id']);
+      $id = call_user_func(array($this->connection_class, 'phrase'), $id);
+      $keys = 'id:' . $id;
     }
 
-    // Set defaults
+    // Handle spatial filters.
+    if ($spatials = $query->getOption('search_api_location')) {
+      foreach ($spatials as $i => $spatial) {
+        if (empty($spatial['field']) || empty($spatial['lat']) || empty($spatial['lon'])) {
+          continue;
+        }
+
+        unset($radius);
+        $field = $fields[$spatial['field']];
+        $escaped_field = SearchApiSolrConnection::escapeFieldName($field);
+        $point = ((float) $spatial['lat']) . ',' . ((float) $spatial['lon']);
+
+        // Prepare the filter settings.
+        if (isset($spatial['radius'])) {
+          $radius = (float) $spatial['radius'];
+        }
+        $spatial_method = 'geofilt';
+        if (isset($spatial['method']) && in_array($spatial['method'], array('geofilt', 'bbox'))) {
+          $spatial_method = $spatial['method'];
+        }
+
+        // Change the fq facet ranges to the correct fq.
+        foreach ($fq as $key => $value) {
+          // If the fq consists only of a filter on this field, replace it with
+          // a range.
+          $preg_field = preg_quote($escaped_field, '/');
+          if (preg_match('/^' . $preg_field . ':\["?(\*|\d+(?:\.\d+)?)"? TO "?(\*|\d+(?:\.\d+)?)"?\]$/', $value, $m)) {
+            unset($fq[$key]);
+            if (is_numeric($lower = trim($m[1], '"')) && $lower) {
+              // Sadly, this doesn't work. We usually don't need lower bounds,
+              // though (our facetting implementation doesn't create them, so it
+              // should be fine to ignore this for now.
+              //$fq[] = "-{!$spatial_method pt=$point sfield=$field d=$lower}";
+            }
+            if (is_numeric($upper = trim($m[2], '"'))) {
+              // Make the radius tighter accordingly.
+              $radius = isset($radius) ? min($radius, $upper) : $upper;
+            }
+          }
+        }
+
+        // If either a radius was given in the option, or a filter was
+        // encountered, set a filter for the lowest value.
+        if (isset($radius)) {
+          $fq[] = "{!$spatial_method pt=$point sfield=$field d=$radius}";
+        }
+
+        // Change sort on the field, if set.
+        if (isset($sort[$spatial['field']])) {
+          $sort[$spatial['field']] = str_replace($field, "geodist($field,$point)", $sort[$spatial['field']]);
+        }
+
+        // Change the facet parameters for spatial fields to return distance
+        // facets.
+        if (!empty($facets)) {
+          if (!empty($facet_params['facet.field'])) {
+            $facet_params['facet.field'] = array_diff($facet_params['facet.field'], array($field));
+          }
+          foreach ($facets as $delta => $facet) {
+            if ($facet['field'] != $spatial['field']) {
+              continue;
+            }
+            $steps = $facet['limit'] > 0 ? $facet['limit'] : 5;
+            $step = (isset($radius) ? $radius : 100) / $steps;
+            for ($k = $steps - 1; $k > 0; --$k) {
+              $distance = $step * $k;
+              $key = "spatial-$delta-$distance";
+              $facet_params['facet.query'][] = "{!$spatial_method pt=$point sfield=$field d=$distance key=$key}";
+            }
+            foreach (array('limit', 'mincount', 'missing') as $setting) {
+              unset($facet_params["f.$field.facet.$setting"]);
+            }
+          }
+        }
+      }
+    }
+
+    // Handle field collapsing / grouping.
+    $grouping = $query->getOption('search_api_grouping');
+    if (!empty($grouping['use_grouping'])) {
+      $group_params['group'] = 'true';
+      // We always want the number of groups returned so that we get pagers done
+      // right.
+      $group_params['group.ngroups'] = 'true';
+      if (!empty($grouping['truncate'])) {
+        $group_params['group.truncate'] = 'true';
+      }
+      if (!empty($grouping['group_facet'])) {
+        $group_params['group.facet'] = 'true';
+      }
+      foreach ($grouping['fields'] as $collapse_field) {
+        $type = $index_fields[$collapse_field]['type'];
+        // Only single-valued fields are supported.
+        if ($version < 4) {
+          // For Solr 3.x, only string and boolean fields are supported.
+          if (search_api_is_list_type($type) || !search_api_is_text_type($type, array('string', 'boolean', 'uri'))) {
+            $warnings[] = t('Grouping is not supported for field @field. ' .
+                'Only single-valued fields of type "String", "Boolean" or "URI" are supported.',
+                array('@field' => $index_fields[$collapse_field]['name']));
+            continue;
+          }
+        }
+        else {
+          if (search_api_is_list_type($type) || search_api_is_text_type($type)) {
+            $warnings[] = t('Grouping is not supported for field @field. ' .
+                'Only single-valued fields not indexed as "Fulltext" are supported.',
+                array('@field' => $index_fields[$collapse_field]['name']));
+            continue;
+          }
+        }
+        $group_params['group.field'][] = $fields[$collapse_field];
+      }
+      if (empty($group_params['group.field'])) {
+        unset($group_params);
+      }
+      else {
+        if (!empty($grouping['group_sort'])) {
+          foreach ($grouping['group_sort'] as $group_sort_field => $order) {
+            if (isset($fields[$group_sort_field])) {
+              $f = $fields[$group_sort_field];
+              if (substr($f, 0, 3) == 'ss_') {
+                $f = 'sort_' . substr($f, 3);
+              }
+              $order = strtolower($order);
+              $group_params['group.sort'][] = $f . ' ' . $order;
+            }
+          }
+          if (!empty($group_params['group.sort'])) {
+            $group_params['group.sort'] = implode(', ', $group_params['group.sort']);
+          }
+        }
+        if (!empty($grouping['group_limit']) && ($grouping['group_limit'] != 1)) {
+          $group_params['group.limit'] = $grouping['group_limit'];
+        }
+      }
+    }
+
+    // Set defaults.
     if (!$keys) {
       $keys = NULL;
     }
-    $offset = isset($options['offset']) ? $options['offset'] : 0;
-    $limit = isset($options['limit']) ? $options['limit'] : 1000000;
 
-    // Collect parameters
+    // Collect parameters.
     $params = array(
       'fl' => 'item_id,score',
       'qf' => $qf,
       'fq' => $fq,
     );
+    if (isset($options['offset'])) {
+      $params['start'] = $options['offset'];
+    }
+    $params['rows'] = isset($options['limit']) ? $options['limit'] : 1000000;
     if ($sort) {
       $params['sort'] = implode(', ', $sort);
     }
@@ -595,40 +820,42 @@ class SearchApiSolrService extends SearchApiAbstractService {
     if (!empty($mlt_params['mlt.fl'])) {
       $params += $mlt_params;
     }
+    if (!empty($group_params)) {
+      $params += $group_params;
+    }
     if (!empty($this->options['retrieve_data'])) {
       $params['fl'] = '*,score';
     }
+    // Retrieve http method from server options.
+    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'POST';
+
     $call_args = array(
-      'query'  => &$keys,
-      'offset' => &$offset,
-      'limit'  => &$limit,
-      'params' => &$params,
+      'query'       => &$keys,
+      'params'      => &$params,
+      'http_method' => &$http_method,
     );
     if ($this->request_handler) {
       $this->setRequestHandler($this->request_handler, $call_args);
     }
 
     try {
-      // Send search request
+      // Send search request.
       $time_processing_done = microtime(TRUE);
-      $this->connect();
       drupal_alter('search_api_solr_query', $call_args, $query);
       $this->preQuery($call_args, $query);
 
-      // Retrieve http method from server options.
-      $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : Apache_Solr_Service::METHOD_POST;
-      $response = $this->solr->search($keys, $offset, $limit, $params, $http_method);
+      $response = $this->solr->search($keys, $params, $http_method);
       $time_query_done = microtime(TRUE);
 
-      if ($response->getHttpStatus() != 200) {
-        throw new SearchApiException(t('The Solr server responded with status code @status: @msg.',
-            array('@status' => $response->getHttpStatus(), '@msg' => $response->getHttpStatusMessage())));
-      }
-
-      // Extract results
+      // Extract results.
       $results = $this->extractResults($query, $response);
 
-      // Extract facets
+      // Add warnings, if present.
+      if (!empty($warnings)) {
+        $results['warnings'] = isset($results['warnings']) ? array_merge($warnings, $results['warnings']) : $warnings;
+      }
+
+      // Extract facets.
       if ($facets = $this->extractFacets($query, $response)) {
         $results['search_api_facets'] = $facets;
       }
@@ -636,7 +863,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       drupal_alter('search_api_solr_search_results', $results, $query, $response);
       $this->postQuery($results, $query, $response);
 
-      // Compute performance
+      // Compute performance.
       $time_end = microtime(TRUE);
       $results['performance'] = array(
         'complete' => $time_end - $time_method_called,
@@ -647,7 +874,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
 
       return $results;
     }
-    catch (Exception $e) {
+    catch (SearchApiException $e) {
       throw new SearchApiException(t('An error occurred while trying to search with Solr: @msg.', array('@msg' => $e->getMessage())));
     }
   }
@@ -655,8 +882,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
   /**
    * Extract results from a Solr response.
    *
-   * @param Apache_Solr_Response $response
-   *   A response object from SolrPhpClient.
+   * @param object $response
+   *   A HTTP response object.
    *
    * @return array
    *   An array with two keys:
@@ -664,7 +891,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
    *   - results: An array of search results, as specified by
    *     SearchApiQueryInterface::execute().
    */
-  protected function extractResults(SearchApiQueryInterface $query, Apache_Solr_Response $response) {
+  protected function extractResults(SearchApiQueryInterface $query, $response) {
     $index = $query->getIndex();
     $fields = $this->getFieldNames($index);
     $field_options = $index->options['fields'];
@@ -674,14 +901,35 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $results['results'] = array();
     // In some rare cases (e.g., MLT query with nonexistent ID) the response
     // will be NULL.
-    if (!isset($response->response)) {
+    if (!isset($response->response) && !isset($response->grouped)) {
       $results['result count'] = 0;
       return $results;
     }
-    $results['result count'] = $response->response->numFound;
+
+    // If field collapsing has been enabled for this query, we need to process
+    // the results differently.
+    $grouping = $query->getOption('search_api_grouping');
+    if (!empty($grouping['use_grouping']) && !empty($response->grouped)) {
+      $docs = array();
+      $results['result count'] = 0;
+      foreach ($grouping['fields'] as $field) {
+        if (!empty($response->grouped->{$fields[$field]})) {
+          $results['result count'] += $response->grouped->{$fields[$field]}->ngroups;
+          foreach ($response->grouped->{$fields[$field]}->groups as $group) {
+            foreach ($group->doclist->docs as $doc) {
+              $docs[] = $doc;
+            }
+          }
+        }
+      }
+    }
+    else {
+      $results['result count'] = $response->response->numFound;
+      $docs = $response->response->docs;
+    }
 
     // Add each search result to the results array.
-    foreach ($response->response->docs as $doc) {
+    foreach ($docs as $doc) {
       // Blank result array.
       $result = array(
         'id' => NULL,
@@ -738,7 +986,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
    * Will also use highlighted fields to replace retrieved field data, if the
    * corresponding option is set.
    */
-  protected function getExcerpt(Apache_Solr_Response $response, $id, array &$fields, array $field_mapping) {
+  protected function getExcerpt($response, $id, array &$fields, array $field_mapping) {
     if (!isset($response->highlighting->$id)) {
       return FALSE;
     }
@@ -777,22 +1025,26 @@ class SearchApiSolrService extends SearchApiAbstractService {
   /**
    * Extract facets from a Solr response.
    *
-   * @param Apache_Solr_Response $response
+   * @param object $response
    *   A response object from SolrPhpClient.
    *
    * @return array
    *   An array describing facets that apply to the current results.
    */
-  protected function extractFacets(SearchApiQueryInterface $query, Apache_Solr_Response $response) {
+  protected function extractFacets(SearchApiQueryInterface $query, $response) {
+    $facets = array();
+
+    if (!isset($response->facet_counts)) {
+      return $facets;
+    }
+
+    $index = $query->getIndex();
+    $fields = $this->getFieldNames($index);
+
+    $extract_facets = $query->getOption('search_api_facets', array());
+
     if (isset($response->facet_counts->facet_fields)) {
-      $index = $query->getIndex();
-      $fields = $this->getFieldNames($index);
-
-      $facets = array();
       $facet_fields = $response->facet_counts->facet_fields;
-
-      $extract_facets = $query->getOption('search_api_facets');
-      $extract_facets = ($extract_facets ? $extract_facets : array());
 
       foreach ($extract_facets as $delta => $info) {
         $field = $fields[$info['field']];
@@ -801,15 +1053,18 @@ class SearchApiSolrService extends SearchApiAbstractService {
           $terms = $facet_fields->$field;
           if ($info['missing']) {
             // We have to correctly incorporate the "_empty_" term.
-            // This will ensure that the term with the least results is dropped, if the limit would be exceeded.
-            if (isset($terms->_empty_) && $terms->_empty_ < $min_count) {
-              unset($terms->_empty_);
-            }
-            else {
-              $terms = (array) $terms;
-              arsort($terms);
-              if (count($terms) > $info['limit']) {
-                array_pop($terms);
+            // This will ensure that the term with the least results is dropped,
+            // if the limit would be exceeded.
+            if (isset($terms->_empty_)) {
+              if ($terms->_empty_ < $min_count) {
+                unset($terms->_empty_);
+              }
+              else {
+                $terms = (array) $terms;
+                arsort($terms);
+                if ($info['limit'] > 0 && count($terms) > $info['limit']) {
+                  array_pop($terms);
+                }
               }
             }
           }
@@ -820,22 +1075,29 @@ class SearchApiSolrService extends SearchApiAbstractService {
           $type = isset($index->options['fields'][$info['field']]['type']) ? $index->options['fields'][$info['field']]['type'] : 'string';
           foreach ($terms as $term => $count) {
             if ($count >= $min_count) {
-              if ($type == 'boolean') {
+              if ($term === '_empty_') {
+                $term = '!';
+              }
+              elseif ($type == 'boolean') {
                 if ($term == 'true') {
-                  $term = 1;
+                  $term = '"1"';
                 }
                 elseif ($term == 'false') {
-                  $term = 0;
+                  $term = '"0"';
                 }
               }
               elseif ($type == 'date') {
-                $term = isset($term) ? strtotime($term) : NULL;
+                $term = $term ? '"' . strtotime($term) . '"' : NULL;
               }
-              $term = $term === '_empty_' ? '!' : '"' . $term . '"';
-              $facets[$delta][] = array(
-                'filter' => $term,
-                'count' => $count,
-              );
+              else {
+                $term = "\"$term\"";
+              }
+              if ($term) {
+                $facets[$delta][] = array(
+                  'filter' => $term,
+                  'count' => $count,
+                );
+              }
             }
           }
           if (empty($facets[$delta])) {
@@ -844,8 +1106,30 @@ class SearchApiSolrService extends SearchApiAbstractService {
         }
       }
 
-      return $facets;
     }
+
+    if (isset($response->facet_counts->facet_queries)) {
+      if ($spatials = $query->getOption('search_api_location')) {
+        $queries = array();
+        foreach ($response->facet_counts->facet_queries as $key => $count) {
+          if (!preg_match('/^spatial-(.*)-(\d+(?:\.\d+)?)$/', $key, $m)) {
+            continue;
+          }
+          if (empty($extract_facets[$m[1]])) {
+            continue;
+          }
+          $facet = $extract_facets[$m[1]];
+          if ($count >= $facet['min_count']) {
+            $facets[$m[1]][] = array(
+              'filter' => "[* {$m[2]}]",
+              'count' => $count,
+            );
+          }
+        }
+      }
+    }
+
+    return $facets;
   }
 
   /**
@@ -881,7 +1165,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       }
       else {
         $key = trim($key);
-        $key = SearchApiSolrConnection::phrase($key);
+        $key = call_user_func(array($this->connection_class, 'phrase'), $key);
         $k[] = $key;
       }
     }
@@ -951,7 +1235,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
    * and operator.
    */
   protected function createFilterQuery($field, $value, $operator, $field_info) {
-    $field = SearchApiSolrConnection::escapeFieldName($field);
+    $field = call_user_func(array($this->connection_class, 'escapeFieldName'), $field);
     if ($value === NULL) {
       return ($operator == '=' ? '-' : '') . "$field:[* TO *]";
     }
@@ -990,7 +1274,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
         $value = format_date($value, 'custom', self::SOLR_DATE_FORMAT, 'UTC');
         break;
     }
-    return SearchApiSolrConnection::phrase($value);
+    return call_user_func(array($this->connection_class, 'phrase'), $value);
   }
 
   /**
@@ -1015,7 +1299,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       // Check for the "or" operator.
       if (isset($info['operator']) && $info['operator'] === 'or') {
         // Remember that filters for this field should be tagged.
-        $escaped = SearchApiSolrConnection::escapeFieldName($fields[$info['field']]);
+        $escaped = call_user_func(array($this->connection_class, 'escapeFieldName'), $fields[$info['field']]);
         $taggedFields[$escaped] = "{!tag=$escaped}";
         // Add the facet field.
         $facet_params['facet.field'][] = "{!ex=$escaped}$field";
@@ -1094,17 +1378,18 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
-   * Helper method for setting the request handler, and making necessary
-   * adjustments to the request parameters.
+   * Sets the request handler.
+   *
+   * This should also make the needed adjustments to the request parameters.
    *
    * @param $handler
    *   Name of the handler to set.
    * @param array $call_args
-   *   An associative array containing all four arguments to the
-   *   Apache_Solr_Service::search() call ("query", "offset", "limit" and
-   *   "params") as references.
+   *   An associative array containing all three arguments to the
+   *   SearchApiSolrConnectionInterface::search() call ("query", "params" and
+   *   "method") as references.
    *
-   * @return boolean
+   * @return bool
    *   TRUE iff this method invocation handled the given handler. This allows
    *   subclasses to recognize whether the request handler was already set by
    *   this method.
@@ -1118,13 +1403,15 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
-   * Empty method to allow subclasses to apply custom changes before the query
-   * is sent to Solr. Works exactly like hook_search_api_solr_query_alter().
+   * Empty method called before sending a search query to Solr.
+   *
+   * This allows subclasses to apply custom changes before the query is sent to
+   * Solr. Works exactly like hook_search_api_solr_query_alter().
    *
    * @param array $call_args
-   *   An associative array containing all four arguments to the
-   *   Apache_Solr_Service::search() call ("query", "offset", "limit" and
-   *   "params") as references.
+   *   An associative array containing all three arguments to the
+   *   SearchApiSolrConnectionInterface::search() call ("query", "params" and
+   *   "method") as references.
    * @param SearchApiQueryInterface $query
    *   The SearchApiQueryInterface object representing the executed search query.
    */
@@ -1140,10 +1427,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
    *   The results array that will be returned for the search.
    * @param SearchApiQueryInterface $query
    *   The SearchApiQueryInterface object representing the executed search query.
-   * @param Apache_Solr_Response $response
+   * @param object $response
    *   The response object returned by Solr.
    */
-  protected function postQuery(array &$results, SearchApiQueryInterface $query, Apache_Solr_Response $response) {
+  protected function postQuery(array &$results, SearchApiQueryInterface $query, $response) {
   }
 
   //
@@ -1151,28 +1438,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
   //
 
   /**
-   * Get autocompletion suggestions for some user input.
-   *
-   * @param SearchApiQueryInterface $query
-   *   A query representing the completed user input so far.
-   * @param SearchApiAutocompleteSearch $search
-   *   An object containing details about the search the user is on, and
-   *   settings for the autocompletion.
-   * @param string $incomplete_key
-   *   The start of another fulltext keyword for the search, which should be
-   *   completed.
-   * @param string $user_input
-   *   The complete user input for the fulltext search keywords so far.
-   *
-   * @return array
-   *   An array of suggestion. Each suggestion is either a simple string
-   *   containing the whole suggested keywords, or an array containing the
-   *   following keys:
-   *   - prefix: For special suggestions, some kind of prefix describing them.
-   *   - suggestion_prefix: A suggested prefix for the entered input.
-   *   - user_input: The input entered by the user. Defaults to $user_input.
-   *   - suggestion_suffix: A suggested suffix for the entered input.
-   *   - results: If available, the estimated number of results for these keys.
+   * Implements SearchApiAutocompleteInterface::getAutocompleteSuggestions().
    */
   // Largely copied from the apachesolr_autocomplete module.
   public function getAutocompleteSuggestions(SearchApiQueryInterface $query, SearchApiAutocompleteSearch $search, $incomplete_key, $user_input) {
@@ -1236,6 +1502,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $params = array(
       'qf' => $qf,
       'fq' => $fq,
+      'rows' => 0,
       'facet' => 'true',
       'facet.field' => $facet_fields,
       'facet.prefix' => $incomp,
@@ -1244,11 +1511,13 @@ class SearchApiSolrService extends SearchApiAbstractService {
       'spellcheck' => (!isset($this->options['autocorrect_spell']) || $this->options['autocorrect_spell']) ? 'true' : 'false',
       'spellcheck.count' => 1,
     );
+    // Retrieve http method from server options.
+    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'POST';
+
     $call_args = array(
-      'query'  => &$keys,
-      'offset' => 0,
-      'limit'  => 0,
-      'params' => &$params,
+      'query'       => &$keys,
+      'params'      => &$params,
+      'http_method' => &$http_method,
     );
     if ($this->request_handler) {
       $this->setRequestHandler($this->request_handler, $call_args);
@@ -1260,12 +1529,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
         $this->connect();
         drupal_alter('search_api_solr_query', $call_args, $query);
         $this->preQuery($call_args, $query);
-        $response = $this->solr->search($keys, 0, 0, $params);
-
-        if ($response->getHttpStatus() != 200) {
-          watchdog('search_api_solr', 'The Solr server responded with status code @status: @msg.', array('@status' => $response->getHttpStatus(), '@msg' => $response->getHttpStatusMessage()), WATCHDOG_WARNING, 'admin/config/search/search_api/server/' . $this->server->machine_name);
-          return array();
-        }
+        $response = $this->solr->search($keys, $params, $http_method);
 
         if (!empty($response->spellcheck->suggestions)) {
           $replace = array();
@@ -1344,7 +1608,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
           }
         }
       }
-      catch (Exception $e) {
+      catch (SearchApiException $e) {
         watchdog_exception('search_api_solr', $e, "%type during autocomplete Solr query: !message in %function (line %line of %file).", array(), WATCHDOG_WARNING);
       }
 
@@ -1364,34 +1628,14 @@ class SearchApiSolrService extends SearchApiAbstractService {
   //
 
   /**
-   * Create a query object for searching on this server.
-   *
-   * @param $options
-   *   Associative array of options configuring this query. See
-   *   SearchApiMultiQueryInterface::__construct().
-   *
-   * @throws SearchApiException
-   *   If the server is currently disabled.
-   *
-   * @return SearchApiMultiQueryInterface
-   *   An object for searching this server.
+   * Implements SearchApiMultiServiceInterface::queryMultiple().
    */
   public function queryMultiple(array $options = array()) {
     return new SearchApiMultiQuery($this->server, $options);
   }
 
   /**
-   * Executes a search on the server represented by this object.
-   *
-   * @param SearchApiMultiQueryInterface $query
-   *   The search query to execute.
-   *
-   * @throws SearchApiException
-   *   If an error prevented the search from completing.
-   *
-   * @return array
-   *   An associative array containing the search results, as required by
-   *   SearchApiMultiQueryInterface::execute().
+   * Implements SearchApiMultiServiceInterface::searchMultiple().
    */
   public function searchMultiple(SearchApiMultiQueryInterface $query) {
     $time_method_called = microtime(TRUE);
@@ -1441,7 +1685,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     // Restrict search to searched indexes.
     $index_filter = array();
     foreach ($query->getIndexes() as $index_id => $index) {
-      $index_filter[] = 'index_id:' . SearchApiSolrConnection::phrase($index_id);
+      $index_filter[] = 'index_id:' . call_user_func(array($this->connection_class, 'phrase'), $index_id);
     }
     $fq[] = implode(' OR ', $index_filter);
 
@@ -1458,116 +1702,143 @@ class SearchApiSolrService extends SearchApiAbstractService {
 
     // Get facet fields
     $facets = $query->getOption('search_api_facets') ? $query->getOption('search_api_facets') : array();
-    $facet_params = $this->getFacetParams($facets, $solr_fields);
+    $facet_params = $this->getFacetParams($facets, $solr_fields, $fq);
 
     // Set defaults
     if (!$keys) {
       $keys = NULL;
     }
     $options = $query->getOptions();
-    $offset = isset($options['offset']) ? $options['offset'] : 0;
-    $limit = isset($options['limit']) ? $options['limit'] : 1000000;
 
     // Collect parameters
     $params = array(
-      'qf' => $qf,
       'fl' => 'item_id,index_id,score',
+      'qf' => $qf,
       'fq' => $fq,
     );
+    if (isset($options['offset'])) {
+      $params['start'] = $options['offset'];
+    }
+    if (isset($options['limit'])) {
+      $params['rows'] = $options['limit'];
+    }
     if ($sort) {
       $params['sort'] = implode(', ', $sort);
     }
     if (!empty($facet_params['facet.field'])) {
       $params += $facet_params;
     }
-    try {
-      // Send search request
-      $time_processing_done = microtime(TRUE);
-      $this->connect();
-      $call_args = array(
-        'query'  => &$keys,
-        'offset' => &$offset,
-        'limit'  => &$limit,
-        'params' => &$params,
+
+    // Retrieve http method from server options.
+    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'POST';
+
+    // Send search request
+    $time_processing_done = microtime(TRUE);
+    $this->connect();
+
+    $call_args = array(
+      'query'       => &$keys,
+      'params'      => &$params,
+      'http_method' => &$http_method,
+    );
+    drupal_alter('search_api_solr_multi_query', $call_args, $query);
+
+    $response = $this->solr->search($keys, $params, $http_method);
+    $time_query_done = microtime(TRUE);
+
+    // Extract results
+    $results = array();
+    $results['result count'] = $response->response->numFound;
+    $results['results'] = array();
+    $tmp = array();
+    foreach ($response->response->docs as $id => $doc) {
+      $result = array(
+        'id' => $doc->item_id,
+        'index_id' => $doc->index_id,
+        'score' => $doc->score,
       );
-      drupal_alter('search_api_solr_multi_query', $call_args, $query);
-
-      // Retrieve http method from server options.
-      $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : Apache_Solr_Service::METHOD_POST;
-      $response = $this->solr->search($keys, $offset, $limit, $params, $http_method);
-      $time_query_done = microtime(TRUE);
-
-      if ($response->getHttpStatus() != 200) {
-        throw new SearchApiException(t('The Solr server responded with status code @status: @msg.',
-            array('@status' => $response->getHttpStatus(), '@msg' => $response->getHttpStatusMessage())));
+      $excerpt = $this->getExcerpt($response, $id, $tmp, array());
+      if ($excerpt) {
+        $result['excerpt'] = $excerpt;
       }
+      $results['results'][$id] = $result;
+    }
 
-      // Extract results
-      $results = array();
-      $results['result count'] = $response->response->numFound;
-      $results['results'] = array();
-      $tmp = array();
-      foreach ($response->response->docs as $id => $doc) {
-        $result = array(
-          'id' => $doc->item_id,
-          'index_id' => $doc->index_id,
-          'score' => $doc->score,
-        );
-        $excerpt = $this->getExcerpt($response, $id, $tmp, array());
-        if ($excerpt) {
-          $result['excerpt'] = $excerpt;
-        }
-        $results['results'][$id] = $result;
-      }
-
-      // Extract facets
-      if (isset($response->facet_counts->facet_fields)) {
-        $results['search_api_facets'] = array();
-        $facet_fields = $response->facet_counts->facet_fields;
-        foreach ($facets as $delta => $info) {
-          $field = $this->getFacetField($solr_fields[$info['field']]);
-          if (!empty($facet_fields->$field)) {
-            $min_count = $info['min_count'];
-            $terms = $facet_fields->$field;
-            if ($info['missing']) {
-              // We have to correctly incorporate the "_empty_" term.
-              // This will ensure that the term with the least results is dropped, if the limit would be exceeded.
-              $terms = (array) $terms;
-              arsort($terms);
-              if (count($terms) > $info['limit']) {
-                array_pop($terms);
+    // Extract facets
+    if (isset($response->facet_counts->facet_fields)) {
+      $results['search_api_facets'] = array();
+      $facet_fields = $response->facet_counts->facet_fields;
+      foreach ($facets as $delta => $info) {
+        $field = $solr_fields[$info['field']];
+        if (!empty($facet_fields->$field)) {
+          $min_count = $info['min_count'];
+          $terms = $facet_fields->$field;
+          if ($info['missing']) {
+            // We have to correctly incorporate the "_empty_" term.
+            // This will ensure that the term with the least results is dropped,
+            // if the limit would be exceeded.
+            if (isset($terms->_empty_)) {
+              if ($terms->_empty_ < $min_count) {
+                unset($terms->_empty_);
+              }
+              else {
+                $terms = (array) $terms;
+                arsort($terms);
+                if ($info['limit'] > 0 && count($terms) > $info['limit']) {
+                  array_pop($terms);
+                }
               }
             }
-            foreach ($terms as $term => $count) {
-              if ($count >= $min_count) {
-                $term = $term == '_empty_' ? '!' : '"' . $term . '"';
+          }
+          elseif (isset($terms->_empty_)) {
+            $terms = clone $terms;
+            unset($terms->_empty_);
+          }
+          $type = isset($index->options['fields'][$info['field']]['type']) ? $index->options['fields'][$info['field']]['type'] : 'string';
+          foreach ($terms as $term => $count) {
+            if ($count >= $min_count) {
+              if ($term === '_empty_') {
+                $term = '!';
+              }
+              elseif ($type == 'boolean') {
+                if ($term == 'true') {
+                  $term = '"1"';
+                }
+                elseif ($term == 'false') {
+                  $term = '"0"';
+                }
+              }
+              elseif ($type == 'date') {
+                $term = $term ? '"' . strtotime($term) . '"' : NULL;
+              }
+              else {
+                $term = "\"$term\"";
+              }
+              if ($term) {
                 $results['search_api_facets'][$delta][] = array(
                   'filter' => $term,
                   'count' => $count,
                 );
               }
             }
-            if (empty($results['search_api_facets'][$delta]) || count($results['search_api_facets'][$delta]) <= 1) {
-              unset($results['search_api_facets'][$delta]);
-            }
+          }
+          if (empty($results['search_api_facets'][$delta])) {
+            unset($results['search_api_facets'][$delta]);
           }
         }
       }
-
-      // Compute performance
-      $time_end = microtime(TRUE);
-      $results['performance'] = array(
-        'complete' => $time_end - $time_method_called,
-        'preprocessing' => $time_processing_done - $time_method_called,
-        'execution' => $time_query_done - $time_processing_done,
-        'postprocessing' => $time_end - $time_query_done,
-      );
-
-      return $results;
     }
-    catch (Exception $e) {
-      throw new SearchApiException($e->getMessage());
-    }
+
+    // Compute performance
+    $time_end = microtime(TRUE);
+    $results['performance'] = array(
+      'complete' => $time_end - $time_method_called,
+      'preprocessing' => $time_processing_done - $time_method_called,
+      'execution' => $time_query_done - $time_processing_done,
+      'postprocessing' => $time_end - $time_query_done,
+    );
+
+    return $results;
   }
 
   //
@@ -1590,11 +1861,12 @@ class SearchApiSolrService extends SearchApiAbstractService {
   public function commit() {
     try {
       $this->connect();
-      return $this->solr->commit(FALSE, FALSE, FALSE);
+      return $this->solr->commit(FALSE);
     }
-    catch (Exception $e) {
-      watchdog('search_api_solr', 'A commit operation for server @name failed: @msg.',
-          array('@name' => $this->server->machine_name, '@msg' => $e->getMessage()), WATCHDOG_WARNING);
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api_solr', $e,
+          '%type while trying to commit on server @server: !message in %function (line %line of %file).',
+          array('@server' => $this->server->machine_name), WATCHDOG_WARNING);
     }
   }
 
@@ -1612,7 +1884,30 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
-   * @return SearchApiSolrConnection
+   * Gets the Solr connection class used by this service.
+   *
+   * @return string
+   *   The name of a class which implements SearchApiSolrConnectionInterface.
+   */
+  public function getConnectionClass() {
+    return $this->connection_class;
+  }
+
+  /**
+   * Sets the Solr connection class used by this service.
+   *
+   * @param string $class
+   *   The name of a class which implements SearchApiSolrConnectionInterface.
+   */
+  public function setConnectionClass($class) {
+    $this->connection_class = $class;
+    $this->solr = NULL;
+  }
+
+  /**
+   * Gets the currently used Solr connection object.
+   *
+   * @return SearchApiSolrConnectionInterface
    *   The solr connection object used by this server.
    */
   public function getSolrConnection() {
@@ -1623,33 +1918,17 @@ class SearchApiSolrService extends SearchApiAbstractService {
   /**
    * Get metadata about fields in the Solr/Lucene index.
    *
-   * @param boolean $reset
-   *   Reload the cached data?
+   * @param int $num_terms
+   *   Number of 'top terms' to return.
+   *
+   * @return array
+   *   An array of SearchApiSolrField objects.
+   *
+   * @see SearchApiSolrConnectionInterface::getFields()
    */
-  public function getFields($reset = FALSE) {
-    $cid = 'search_api_solr:fields:' . $this->server->machine_name;
-
-    // If the data hasn't been retrieved before and we aren't refreshing it, try
-    // to get data from the cache.
-    if (!isset($this->fields) && !$reset) {
-      $cache = cache_get($cid);
-      if (isset($cache->data) && !$reset) {
-        $this->fields = $cache->data;
-      }
-    }
-
-    // If there was no data in the cache, or if we're refreshing the data,
-    // connect to the Solr server, retrieve schema information, and cache it.
-    if (!isset($this->fields) || $reset) {
-      $this->connect();
-      $this->fields = array();
-      foreach ($this->solr->getFields() as $name => $info) {
-        $this->fields[$name] = new SearchApiSolrField($info);
-      }
-      cache_set($cid, $this->fields);
-    }
-
-    return $this->fields;
+  public function getFields($num_terms = 0) {
+    $this->connect();
+    return $this->solr->getFields($num_terms);
   }
 
 }
