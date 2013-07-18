@@ -1050,6 +1050,7 @@ function drupalfr_annuaire_field_default_fields() {
           'Conseil/Architecture' => 'Conseil/Architecture',
           'Formation' => 'Formation',
           'Accessibilité' => 'Accessibilité',
+          'cabinet' => 'Cabinet de recrutement',
           'Autres' => 'Autres',
         ),
         'allowed_values_function' => '',
@@ -1062,7 +1063,7 @@ function drupalfr_annuaire_field_default_fields() {
     ),
     'field_instance' => array(
       'bundle' => 'annuaire',
-      'default_value' => '',
+      'default_value' => NULL,
       'deleted' => '0',
       'description' => 'Sélectionnez les prestations que votre société propose. Merci de garder à l\'esprit que les services que présentez ici doivent être en rapport direct avec Drupal.',
       'display' => array(
@@ -1091,18 +1092,16 @@ function drupalfr_annuaire_field_default_fields() {
       'entity_type' => 'node',
       'field_name' => 'field_type_de_service',
       'label' => 'Type de service',
-      'required' => FALSE,
+      'required' => 0,
       'settings' => array(
         'text_processing' => '0',
         'user_register_form' => FALSE,
       ),
       'weight' => '-2',
       'widget' => array(
-        'active' => '1',
+        'active' => 1,
         'module' => 'options',
-        'settings' => array(
-          'default_value' => NULL,
-        ),
+        'settings' => array(),
         'type' => 'options_buttons',
         'weight' => '3',
       ),
