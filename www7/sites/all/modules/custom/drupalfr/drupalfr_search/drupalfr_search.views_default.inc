@@ -42,21 +42,27 @@ function drupalfr_search_views_default_views() {
   $handler->display->display_options['pager']['options']['tags']['last'] = 'dernier »';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
-  /* Champ: Indexed Nœud : Titre */
+  /* Comportement en l'absence de résultats: Global : Texte non filtré */
+  $handler->display->display_options['empty']['area_text_custom']['id'] = 'area_text_custom';
+  $handler->display->display_options['empty']['area_text_custom']['table'] = 'views';
+  $handler->display->display_options['empty']['area_text_custom']['field'] = 'area_text_custom';
+  $handler->display->display_options['empty']['area_text_custom']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area_text_custom']['content'] = 'Aucun résultat pour cette recherche.';
+  /* Champ: Nœud indexé(e) : Titre */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = '';
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_entity'] = 1;
-  /* Champ: Rechercher : Excerpt */
+  /* Champ: Rechercher : Extrait */
   $handler->display->display_options['fields']['search_api_excerpt']['id'] = 'search_api_excerpt';
   $handler->display->display_options['fields']['search_api_excerpt']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['fields']['search_api_excerpt']['field'] = 'search_api_excerpt';
   $handler->display->display_options['fields']['search_api_excerpt']['label'] = '';
   $handler->display->display_options['fields']['search_api_excerpt']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['search_api_excerpt']['link_to_entity'] = 0;
-  /* Champ: Indexed Nœud : Type de contenu */
+  /* Champ: Nœud indexé(e) : Type de contenu */
   $handler->display->display_options['fields']['type']['id'] = 'type';
   $handler->display->display_options['fields']['type']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['fields']['type']['field'] = 'type';
@@ -64,7 +70,7 @@ function drupalfr_search_views_default_views() {
   $handler->display->display_options['fields']['type']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['type']['link_to_entity'] = 0;
   $handler->display->display_options['fields']['type']['format_name'] = 1;
-  /* Champ: Indexed Nœud : Auteur */
+  /* Champ: Nœud indexé(e) : Auteur */
   $handler->display->display_options['fields']['author']['id'] = 'author';
   $handler->display->display_options['fields']['author']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['fields']['author']['field'] = 'author';
@@ -72,7 +78,7 @@ function drupalfr_search_views_default_views() {
   $handler->display->display_options['fields']['author']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['author']['link_to_entity'] = 1;
   $handler->display->display_options['fields']['author']['view_mode'] = 'full';
-  /* Champ: Indexed Nœud : Date de création */
+  /* Champ: Nœud indexé(e) : Date de création */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['fields']['created']['field'] = 'created';
@@ -80,7 +86,7 @@ function drupalfr_search_views_default_views() {
   $handler->display->display_options['fields']['created']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['created']['date_format'] = 'long';
   $handler->display->display_options['fields']['created']['link_to_entity'] = 0;
-  /* Champ: Indexed Nœud : Nombre de commentaires */
+  /* Champ: Nœud indexé(e) : Nombre de commentaires */
   $handler->display->display_options['fields']['comment_count']['id'] = 'comment_count';
   $handler->display->display_options['fields']['comment_count']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['fields']['comment_count']['field'] = 'comment_count';
@@ -91,12 +97,12 @@ function drupalfr_search_views_default_views() {
   $handler->display->display_options['fields']['comment_count']['format_plural_singular'] = '1 commentaire';
   $handler->display->display_options['fields']['comment_count']['format_plural_plural'] = '@count commentaires';
   $handler->display->display_options['fields']['comment_count']['link_to_entity'] = 0;
-  /* Critère de tri: Rechercher : Relevance */
+  /* Critère de tri: Rechercher : Pertinence */
   $handler->display->display_options['sorts']['search_api_relevance']['id'] = 'search_api_relevance';
   $handler->display->display_options['sorts']['search_api_relevance']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['sorts']['search_api_relevance']['field'] = 'search_api_relevance';
   $handler->display->display_options['sorts']['search_api_relevance']['order'] = 'DESC';
-  /* Critère de filtrage: Rechercher : Fulltext search */
+  /* Critère de filtrage: Rechercher : Recherche en texte intégral */
   $handler->display->display_options['filters']['search_api_views_fulltext']['id'] = 'search_api_views_fulltext';
   $handler->display->display_options['filters']['search_api_views_fulltext']['table'] = 'search_api_index_node_content';
   $handler->display->display_options['filters']['search_api_views_fulltext']['field'] = 'search_api_views_fulltext';
@@ -114,9 +120,12 @@ function drupalfr_search_views_default_views() {
     11 => 0,
     7 => 0,
     12 => 0,
+    14 => 0,
   );
+  $handler->display->display_options['filters']['search_api_views_fulltext']['mode'] = 'filter';
   $handler->display->display_options['filters']['search_api_views_fulltext']['fields'] = array(
     'title' => 'title',
+    'search_api_aggregation_1' => 'search_api_aggregation_1',
     'body:value' => 'body:value',
   );
 
@@ -139,6 +148,7 @@ function drupalfr_search_views_default_views() {
     t('‹ précédent'),
     t('suivant ›'),
     t('dernier »'),
+    t('Aucun résultat pour cette recherche.'),
     t('.'),
     t(' '),
     t('Recherche'),
