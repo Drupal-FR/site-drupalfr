@@ -249,7 +249,7 @@ function dfr_documentation_field_default_fields() {
       'module' => 'file',
       'settings' => array(
         'default_file' => 0,
-        'display_default' => '1',
+        'display_default' => 1,
         'display_field' => 1,
         'uri_scheme' => 'public',
       ),

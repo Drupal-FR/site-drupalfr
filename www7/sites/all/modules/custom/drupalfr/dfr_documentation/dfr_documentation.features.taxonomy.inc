@@ -13,7 +13,7 @@ function dfr_documentation_taxonomy_default_vocabularies() {
       'name' => 'Forum',
       'machine_name' => 'vocabulary_1',
       'description' => 'Catégorie de vocabulaire pour les forums.',
-      'hierarchy' => '1',
+      'hierarchy' => '0',
       'module' => 'forum',
       'weight' => '-10',
     ),
