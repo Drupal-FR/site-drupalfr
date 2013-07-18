@@ -949,22 +949,11 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['tid']['type'] = 'select';
   $handler->display->display_options['filters']['tid']['vocabulary'] = 'vocabulary_4';
   $handler->display->display_options['filters']['tid']['hierarchy'] = 1;
-  /* Critère de filtrage: Gestionnaire défectueux/manquant */
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['id'] = 'field_workflow_status_value_many_to_one';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['table'] = 'node_data_field_workflow_status';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['field'] = 'field_workflow_status_value_many_to_one';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['operator'] = 'or';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['value'] = array();
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['group'] = '0';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator_id'] = 'field_workflow_status_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['label'] = 'Statut';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['operator'] = 'field_workflow_status_value_many_to_one_op';
-  $handler->display->display_options['filters']['field_workflow_status_value_many_to_one']['expose']['identifier'] = 'field_workflow_status_value_many_to_one';
   $handler->display->display_options['path'] = 'user/%/tracker';
   $handler->display->display_options['menu']['type'] = 'tab';
-  $handler->display->display_options['menu']['title'] = 'Suivi';
+  $handler->display->display_options['menu']['title'] = 'Mes contenus';
   $handler->display->display_options['menu']['weight'] = '10';
+  $handler->display->display_options['menu']['context'] = 0;
 
   /* Display: Admin Tracker */
   $handler = $view->new_display('page', 'Admin Tracker', 'page_5');
