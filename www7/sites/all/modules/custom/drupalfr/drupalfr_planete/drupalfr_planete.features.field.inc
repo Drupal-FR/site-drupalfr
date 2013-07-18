@@ -471,7 +471,7 @@ function drupalfr_planete_field_default_fields() {
   t('Auteur');
   t('Body');
   t('Flux RSS pour le planète');
-  t('Saisissez ici si vous le souhaitez l\'URL du flux de votre site personnel ou blog, afin qu\'il soit agrégé dans le planète drupalfr.');
+  t('Saisissez ici si vous le souhaitez l\'URL du flux de votre site personnel ou blog, afin qu\'il soit agrégé dans le planète drupalfr. Il doit s\'agir de contenus parlant de Drupal et en français. L\'équipe se réserve le droit de supprimer tout contenu non adéquat');
   t('Tags');
   t('URL');
 
