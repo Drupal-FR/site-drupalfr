@@ -33,22 +33,109 @@
 /** ******************************************************* **/
 /** Forum                                                   **/
 /** ******************************************************* **/
+.page-forum .action-links li {
+  clear: both;
+  /*float: right;*/
+  text-align: center;
+}
+.page-forum #page-title {
+  display: inline-block;
+  float: left;
+}
+#forum table {
+  border: 1px solid #e4eaef;
+}
+#forum table tr td,
+#forum table tr th {
+  border: 0;
+  border-bottom: 1px solid #e4eaef;
+  line-height: 16px;
+  vertical-align: middle;
+}
+#forum table tr.container td {
+  line-height: 16px;
+  vertical-align: middle;
+}
+#forum table tr td.forum .description {
+  clear: both;
+  font-size: 12px;
+  line-height: 13px;
+  margin-top: 1em;
+}
+#forum table tr td.icon {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+#forum table .last-reply {
+  font-size: 12px;
+  line-height: 13px;
+  white-space: normal;
+  width: 120px;
+}
+#forum table .submitted {font-style:normal;color:#444;}
+#forum table .submitted a {
+  color: #001722;
+  font-weight: bold;
+}
+#forum table .submitted .time {
+  display: block;
+  font-size: 11px;
+}
 
-#forum table {}
-#forum table .submitted,
-#forum table .submitted a {font-style:normal;color:#444;}
-
-#forum .container {border-top: 5px solid #E4EAEF;}
 #forum tr:first-child .container {border-top: 1px solid #E4EAEF;}
 #forum .container .name {
   font-size:18px;
   padding:0.5em 0 0 0.5em;
 }
-#forum .description
+#forum div.indent {margin-left: 10px;}
+#forum td.title a {color: #245772;}
+
+#forum .description,
 #forum .title .submitted,
-#forum .title .submitted a {color:#898989;}
+#forum .title .submitted a {color:#50595d;}
 
 
+form.node-forum-form .field-name-field-workflow-status,
+form.node-forum-form .field-name-taxonomy-forums,
+form.node-forum-form .field-name-taxonomy-vocabulary-4 {float: left; margin-right: 1em;}
+form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
+
+.node-type-forum .node-forum .field-name-taxonomy-forums,
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5,
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-4 {
+  font-size: 12px;
+}
+.node-type-forum .node-forum .field-name-taxonomy-forums .field-label,
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-label,
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-4 .field-label {
+  text-transform: uppercase;
+}
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item {
+  display: inline-block;
+}
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item:after {
+  color: #036ba5;
+  content: ";";
+  padding-right: 5px;
+}
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item:last-child:after {
+  color: #036ba5;
+  content: ".";
+}
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item a {
+  font-size: 12px;
+  /*border: 1px solid #036ba5;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius:5 px;
+
+  margin-right: 5px;
+  padding: 2px 0.5em;*/
+}
+
+.node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item a:hover {
+  color: #528ba8;
+}
 /** ******************************************************* **/
 /** Ajouter du contenu                                      **/
 /** ******************************************************* **/

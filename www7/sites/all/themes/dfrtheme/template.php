@@ -399,3 +399,21 @@ function dfrtheme_preprocess_views_view(&$variables) {
     $variables['footer'] = $footer;
   }
 }
+
+/**
+ * Implements hook_theme().
+ */
+function dfrtheme_theme() {
+  return array(
+    'forum_list' => array(
+      'template' => 'forum-list',
+      'path' => drupal_get_path('theme', 'dfrtheme') . '/templates/forum/',
+      'variables' => array('forums' => NULL, 'parents' => NULL, 'tid' => NULL),
+    ),
+    'forum_submitted' => array(
+      'template' => 'forum-submitted',
+      'path' => drupal_get_path('theme', 'dfrtheme') . '/templates/forum/',
+      'variables' => array('topic' => NULL),
+    ),
+  );
+}
