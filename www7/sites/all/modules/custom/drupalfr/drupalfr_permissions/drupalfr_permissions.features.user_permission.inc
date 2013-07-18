@@ -15,7 +15,8 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'access administration pages',
     'roles' => array(
       0 => 'admin',
-      1 => 'node administrateurs',
+      1 => 'modérateur emploi',
+      2 => 'node administrateurs',
     ),
     'module' => 'system',
   );
@@ -393,15 +394,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'system',
   );
 
-  // Exported permission: administer twitter blocks.
-  $permissions['administer twitter blocks'] = array(
-    'name' => 'administer twitter blocks',
-    'roles' => array(
-      0 => 'admin',
-    ),
-    'module' => 'twitter_block',
-  );
-
   // Exported permission: administer url aliases.
   $permissions['administer url aliases'] = array(
     'name' => 'administer url aliases',
@@ -566,7 +558,8 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'delete any annuaire content',
     'roles' => array(
       0 => 'admin',
-      1 => 'node administrateurs',
+      1 => 'modérateur emploi',
+      2 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -597,7 +590,8 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'delete any offre content',
     'roles' => array(
       0 => 'admin',
-      1 => 'node administrateurs',
+      1 => 'modérateur emploi',
+      2 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -784,7 +778,8 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'edit any annuaire content',
     'roles' => array(
       0 => 'admin',
-      1 => 'node administrateurs',
+      1 => 'modérateur emploi',
+      2 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -816,7 +811,8 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'edit any offre content',
     'roles' => array(
       0 => 'admin',
-      1 => 'node administrateurs',
+      1 => 'modérateur emploi',
+      2 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -1068,6 +1064,7 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'publish any offre content',
     'roles' => array(
       0 => 'admin',
+      1 => 'modérateur emploi',
     ),
     'module' => 'publishcontent',
   );
@@ -1243,6 +1240,7 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'unpublish any offre content',
     'roles' => array(
       0 => 'admin',
+      1 => 'modérateur emploi',
     ),
     'module' => 'publishcontent',
   );
