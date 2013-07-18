@@ -29,6 +29,16 @@ function dfr_format_filter_default_formats() {
         'settings' => array(
           'local_paths' => '',
           'protocol_style' => 'path',
+          'local_paths_exploded' => array(
+            0 => array(
+              'path' => '/',
+            ),
+            1 => array(
+              'path' => '/',
+              'host' => 'default',
+            ),
+          ),
+          'base_url_host' => 'default',
         ),
       ),
       'filter_html' => array(
@@ -145,7 +155,7 @@ function dfr_format_filter_default_formats() {
         'weight' => '-49',
         'status' => '1',
         'settings' => array(
-          'allowed_html' => '<h1> <h2> <h3> <h4> <a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd> <strike>',
+          'allowed_html' => '<h1> <h2> <h3> <h4> <a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd> <strike> <img>',
           'filter_html_help' => 0,
           'filter_html_nofollow' => 1,
         ),
