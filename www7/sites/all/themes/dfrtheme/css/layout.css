@@ -1,48 +1,62 @@
-
 body {}
-
 #page-wrapper {}
-	#page {}
-
-		#header {
-			position:relative;
-		}
-			#logo {
-				width:100px;
-				height:110px;
-			}
-
-		#header-bottom {min-height:70px;}
-
-		#main-wrapper {}
-			#main {
-				padding:2em 0;
-			}
-				#sidebar-first {}
-				#content {}
-				.sidebar-first #content {}
-
-		#footer {}
+  #page {}
+    #header {
+      position: relative;
+    }
+      #logo {
+        height: 110px;
+        width: 100px;
+      }
+    #header-bottom {
+      min-height: 70px;
+    }
+    #main-wrapper {}
+      #main {
+        padding: 2em 0;
+      }
+        #sidebar-first {}
+        #content {}
+        .sidebar-first #content {}
+    #footer {}
 
 .inner {
-	width:100%;
-	margin:0 auto;
+  margin: 0 auto;
+  width: 100%;
 }
 
 @media screen and (min-width:768px) {
-	#sidebar-first {float:left;width:30%;margin-left:-100%;padding-right:3%;}
-	#content {width:100%;}
-	.sidebar-first #content {float:left;padding-left:30%;}
+  #sidebar-first {
+    float: left;
+    margin-left: -100%;
+    padding-right: 3%;
+    width: 30%;
+  }
+  #content {
+    width: 100%;
+  }
+  .sidebar-first #content {
+    float: left;
+    padding-left: 30%;
+  }
 }
-
 
 @media screen and (max-width:980px) {
-	#main-wrapper .inner {padding-left:2em;padding-right:2em;}
-	.inner {padding:0 1%;}
+  #main-wrapper .inner {
+    padding-right: 2em;
+    padding-left: 2em;
+  }
+  .inner {
+    padding: 0 1%;
+  }
 }
 @media screen and (min-width:900px) {
-	.inner {max-width: 980px;}
+  .inner {
+    max-width: 980px;
+  }
 }
 @media screen and (min-width:1280px) {
-	.inner {max-width: 1200px;}
+  .inner {
+    max-width: 1200px;
+  }
 }
