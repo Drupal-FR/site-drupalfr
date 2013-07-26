@@ -1,40 +1,45 @@
 /** ******************************************************* **/
 /** Homepage                                                **/
 /** ******************************************************* **/
-
-.front #page-title {display:none;}
-
+.front #page-title {
+  display: none;
+}
 .front #block-system-main {}
 .front #block-system-main .node {}
-.front #block-system-main .node footer {margin-top:2em;padding-top:0;}
-.front #block-system-main .node li {
-  display:inline-block;
-  padding-left:10px;
-  margin-right:1em;
+.front #block-system-main .node footer {
+  margin-top: 2em;
+  padding-top: 0;
 }
-
+.front #block-system-main .node li {
+  display: inline-block;
+  margin-right: 1em;
+  padding-left: 10px;
+}
 
 /** ******************************************************* **/
 /** Documentation                                           **/
 /** ******************************************************* **/
-
 #documentation {}
 #documentation .node-doc {
-  border-bottom:1px solid #dee6ee;
-  margin-bottom:1em;
+  border-bottom: 1px solid #dee6ee;
+  margin-bottom: 1em;
 }
-#documentation .node-doc:last-child {border-bottom:none;}
-
-#documentation .node-doc .menu a {color:#444;}
-#documentation .node-doc .menu a:hover {/*color:#00c3dd;*/color:#036ba5;}
-
+#documentation .node-doc:last-child {
+  border-bottom: none;
+}
+#documentation .node-doc .menu a {
+  color: #444;
+}
+#documentation .node-doc .menu a:hover {
+/*color: #00c3dd;*/
+  color: #036ba5;
+}
 
 /** ******************************************************* **/
 /** Forum                                                   **/
 /** ******************************************************* **/
 .page-forum .action-links li {
   clear: both;
-  /*float: right;*/
   text-align: center;
 }
 .page-forum #page-title {
@@ -71,7 +76,10 @@
   white-space: normal;
   width: 120px;
 }
-#forum table .submitted {font-style:normal;color:#444;}
+#forum table .submitted {
+  color: #444;
+  font-style: normal;
+}
 #forum table .submitted a {
   color: #001722;
   font-weight: bold;
@@ -81,24 +89,35 @@
   font-size: 11px;
 }
 
-#forum tr:first-child .container {border-top: 1px solid #E4EAEF;}
-#forum .container .name {
-  font-size:18px;
-  padding:0.5em 0 0 0.5em;
+#forum tr:first-child .container {
+  border-top: 1px solid #E4EAEF;
 }
-#forum div.indent {margin-left: 10px;}
-#forum td.title a {color: #245772;}
+#forum .container .name {
+  font-size: 18px;
+  padding: 0.5em 0 0 0.5em;
+}
+#forum div.indent {
+  margin-left: 10px;
+}
+#forum td.title a {
+  color: #245772;
+}
 
 #forum .description,
 #forum .title .submitted,
-#forum .title .submitted a {color:#50595d;}
-
+#forum .title .submitted a {
+  color: #50595d;
+}
 
 form.node-forum-form .field-name-field-workflow-status,
 form.node-forum-form .field-name-taxonomy-forums,
-form.node-forum-form .field-name-taxonomy-vocabulary-4 {float: left; margin-right: 1em;}
-form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
-
+form.node-forum-form .field-name-taxonomy-vocabulary-4 {
+  float: left;
+  margin-right: 1em;
+}
+form.node-forum-form .field-name-taxonomy-vocabulary-5 {
+  clear: both;
+}
 .node-type-forum .node-forum .field-name-taxonomy-forums,
 .node-type-forum .node-forum .field-name-taxonomy-vocabulary-5,
 .node-type-forum .node-forum .field-name-taxonomy-vocabulary-4 {
@@ -123,28 +142,23 @@ form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
 }
 .node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item a {
   font-size: 12px;
-  /*border: 1px solid #036ba5;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius:5 px;
-
-  margin-right: 5px;
-  padding: 2px 0.5em;*/
 }
 
 .node-type-forum .node-forum .field-name-taxonomy-vocabulary-5 .field-items .field-item a:hover {
   color: #528ba8;
 }
+
 /** ******************************************************* **/
 /** Ajouter du contenu                                      **/
 /** ******************************************************* **/
-
 /* node/add */
 .node-type-list {}
-.node-type-list dd {margin-left:0;}
-.node-type-list dd + dt {margin-top:1em;}
-
-
+.node-type-list dd {
+  margin-left: 0;
+}
+.node-type-list dd + dt {
+  margin-top: 1em;
+}
 
 /** ******************************************************* **/
 /** Annuaire                                                **/
@@ -154,53 +168,80 @@ form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
 .view-annuaire-prestataires.view-display-id-page_1 {}
 
 .node-annuaire {}
-.node-annuaire > footer {margin:0;padding:0;border-top:0;}
-.node-annuaire .field {margin-bottom: 1em;}
-.node-annuaire .field-items {background:#fff;}
+.node-annuaire > footer {
+  border-top: 0;
+  margin: 0;
+  padding: 0;
+}
+.node-annuaire .field {
+  margin-bottom: 1em;
+}
+.node-annuaire .field-items {
+  background: #fff;
+}
 .node-annuaire .field-type-image .field-items{
-  padding:0;border:0;
-  border-radius:0;
-  -moz-border-radius:0;
-  -webkit-border-radius:0;
+  border: 0;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  padding: 0;
 }
 
 #block-views-offres-block-2 {}
-#block-views-offres-block-2 > h2 {margin-bottom:0.5em;}
+#block-views-offres-block-2 > h2 {
+  margin-bottom: 0.5em;
+}
 #block-views-offres-block-2 .view-content {}
 #block-views-offres-block-2 .views-row {
-  background:url(../images/marker-2.gif) 0 8px no-repeat;
-  padding:0 16px;
-  margin:0.5em 0;
+  background: url(../images/marker-2.gif) 0 8px no-repeat;
+  margin: 0.5em 0;
+  padding: 0 16px;
 }
-#block-views-offres-block-2 .views-field {display:inline-block;line-height:20px;}
-#block-views-offres-block-2 h3 {margin-bottom:0;letter-spacing: 0;font-weight: normal;}
-#block-views-offres-block-2 .views-field-field-type-contrat {color:#999;}
-
+#block-views-offres-block-2 .views-field {
+  display: inline-block;
+  line-height: 20px;
+}
+#block-views-offres-block-2 h3 {
+  font-weight: normal;
+  letter-spacing: 0;
+  margin-bottom: 0;
+}
+#block-views-offres-block-2 .views-field-field-type-contrat {
+  color: #999;
+}
 
 @media screen and (min-width:768px) {
   .node-annuaire .field {
+    border-collapse: collapse;
+    display: table;
     margin-bottom: 0;
-    display:table;
-    width:100%;
-    border-collapse:collapse;
+    width: 100%;
   }
-  .node-annuaire .field:last-child {border-bottom: 1px solid #E4EAEF;}
+  .node-annuaire .field:last-child {
+    border-bottom: 1px solid #E4EAEF;
+  }
   .node-annuaire .field-label,
   .node-annuaire .field-items,
   .node-annuaire .field-type-image .field-items{
-    display:table-cell;
-    vertical-align: top;
     border-top: 1px solid #E4EAEF;
-    padding:0.5em;
+    display: table-cell;
+    padding: 0.5em;
+    vertical-align: top;
+
   }
-  .node-annuaire .field-label {width:30%;}
-  .node-annuaire .field-items {width:70%;}
+  .node-annuaire .field-label {
+    width: 30%;
+  }
+  .node-annuaire .field-items {
+    width: 70%;
+  }
 
-  #block-views-offres-block-2 .views-row {display:inline-block;vertical-align: top;width:49%;}
+  #block-views-offres-block-2 .views-row {
+    display: inline-block;
+    vertical-align: top;
+    width: 49%;
+  }
 }
-
-
-
 
 /** ******************************************************* **/
 /** Prochains evenements                                    **/
@@ -209,81 +250,94 @@ form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
 
 .drupalfr-event-full {}
 .drupalfr-event-full .event-extra-info {
-  color:#898989;
+  color: #898989;
   font-style: italic;
   margin-bottom: 1em;
 }
 
-
-
 /** ******************************************************* **/
 /** Emploi                                                  **/
 /** ******************************************************* **/
-
 .node-offre {}
 
 .field-name-field-region {}
-.field-name-field-region .field-item {display: inline-block;}
-.field-name-field-region .field-item:before {content:", ";}
-.field-name-field-region .field-item:first-child:before {content:"";}
-
+.field-name-field-region .field-item {
+  display: inline-block;
+}
+.field-name-field-region .field-item:before {
+  content: ", ";
+}
+.field-name-field-region .field-item:first-child:before {
+  content: "";
+}
 .node-offre.node-full {}
-
-
 
 /** ******************************************************* **/
 /** Planete                                                 **/
 /** ******************************************************* **/
-
 .page-planete {}
 
-.node-planete {margin-bottom:1em;}
-.node-planete .field-type-image {margin:0;}
+.node-planete {
+  margin-bottom: 1em;
+}
+.node-planete .field-type-image {
+  margin: 0;
+}
 .node-planete .field-type-image .field-items {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
   padding:0;
-  border:0;
-  background:none;
-  border-radius:0;
-  -moz-border-radius:0;
-  -webkit-border-radius:0;
 }
 .node-planete > header,
 .node-planete > .content {
-  display:inline-block;vertical-align: top;
+  display: inline-block;
+  vertical-align: top;
 }
-.node-planete > header {width:15%;}
-.node-planete > .content {width:84%;}
+.node-planete > header {
+  width: 15%;
+}
+.node-planete > .content {
+  width: 84%;
+}
 
-
-.field-name-field-planete-user {position:relative;}
-.field-name-field-planete-user .field-name-field-picture {float:none;}
+.field-name-field-planete-user {
+  position: relative;
+}
+.field-name-field-planete-user .field-name-field-picture {
+  float: none;
+}
 .field-name-field-planete-user .content {
-  display:none;
-  position:absolute;z-index:1;
-  top:66%;
-  left:-11.5em;
-  width:30em;
-  padding:1em;
-
-  border:1px solid #E4EAEF;
-  background:#fff;
-  -webkit-border-radius: 5px;-webkit-background-clip:padding-box;
-  -moz-border-radius: 5px;-moz-background-clip:padding-box;
-  border-radius: 5px;background-clip:padding-box;
-
+  background: #fff;
+  background-clip: padding-box;
+  -moz-background-clip: padding-box;
+  -webkit-background-clip: padding-box;
+  border: 1px solid #E4EAEF;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 2px 2px 2px rgba(50, 50, 50, 0.4);
+  -moz-box-shadow: 2px 2px 2px rgba(50, 50, 50, 0.4);
   -webkit-box-shadow: 2px 2px 2px rgba(50, 50, 50, 0.4);
-  -moz-box-shadow:    2px 2px 2px rgba(50, 50, 50, 0.4);
-  box-shadow:         2px 2px 2px rgba(50, 50, 50, 0.4);
+  display: none;
+  padding: 1em;
+  position: absolute;
+  top: 66%;
+  left: -11.5em;
+  width: 30em;
+  z-index: 1;
 }
 .field-name-field-planete-user .content:after,
 .field-name-field-planete-user .content:before {
-  bottom: 100%;
   border: solid transparent;
   content: " ";
   height: 0;
-  width: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
+  bottom: 100%;
+  width: 0;
 }
 .field-name-field-planete-user .content:after {
   border-color: rgba(255, 255, 255, 0);
@@ -299,17 +353,13 @@ form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
   left: 50%;
   margin-left: -21px;
 }
-
-
-.field-name-field-planete-user.expanded .content {display:block;}
-
-
-
+.field-name-field-planete-user.expanded .content {
+  display: block;
+}
 
 /** ******************************************************* **/
 /** Solr search                                             **/
 /** ******************************************************* **/
-
 .view-solr-search {}
   .view-solr-search .view-filters {}
   .view-solr-search .view-content {}
@@ -319,7 +369,10 @@ form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
     margin-bottom: 1em;
     padding-bottom: 1em;
   }
-  .view-solr-search .views-field-title {font-size:24px;line-height:1.4;}
+  .view-solr-search .views-field-title {
+    font-size: 24px;
+    line-height: 1.4;
+  }
   .view-solr-search .views-field-search-api-excerpt {}
 
   .view-solr-search .views-field-type,
@@ -332,6 +385,6 @@ form.node-forum-form .field-name-taxonomy-vocabulary-5 {clear: both;}
   .view-solr-search .views-field-author:before,
   .view-solr-search .views-field-created:before,
   .view-solr-search .views-field-comment-count:before {
-    content:"-";
+    content: "-";
     display: inline-block;
   }
