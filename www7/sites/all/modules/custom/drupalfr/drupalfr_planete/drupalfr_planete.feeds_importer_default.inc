@@ -23,6 +23,7 @@ function drupalfr_planete_feeds_importer_default() {
         'auto_detect_feeds' => 1,
         'use_pubsubhubbub' => 0,
         'designated_hub' => '',
+        'request_timeout' => NULL,
       ),
     ),
     'parser' => array(
@@ -32,7 +33,6 @@ function drupalfr_planete_feeds_importer_default() {
     'processor' => array(
       'plugin_key' => 'FeedsNodeProcessor',
       'config' => array(
-        'content_type' => 'planete',
         'expire' => '-1',
         'author' => '17030',
         'mappings' => array(
@@ -76,6 +76,7 @@ function drupalfr_planete_feeds_importer_default() {
         'input_format' => '3',
         'authorize' => 0,
         'skip_hash_check' => 0,
+        'bundle' => 'planete',
       ),
     ),
     'content_type' => 'planete_feed_source',
