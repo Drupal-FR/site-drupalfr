@@ -251,3 +251,11 @@ forum/*'
  */
 function dfr_blocks_uninstall() {
 }
+
+/**
+ * Implements hook_update_N().
+ */
+function dfr_blocks_update_7100() {
+  variable_set('drupalfr_current_version' , 7);
+  variable_set('drupalfr_previous_version' , 6);
+}
