@@ -1,23 +1,15 @@
 <?php
 
-function publishcontent_update_6001() {
-  $ret = $node_types = array();
-  $query = 'SELECT pid, perm FROM {permission}';
-  $result = db_query($query);
-  $update_sql = 'UPDATE {permission} SET perm = "%s" WHERE pid = %d';
-  while ($row = db_fetch_array($result)) {
-    $old_perm = $row['perm'];
-    $subjects = array('*all*');
-    $replacements = array('any');
-    foreach (node_get_types() as $type) {
-      $subjects[] = 'publish ' . check_plain($type->type) . ' content';
-      $subjects[] = 'unpublish ' . check_plain($type->type) . ' content';
-      $replacements[] = 'publish any ' . check_plain($type->type) . ' content';
-      $replacements[] = 'unpublish any '. check_plain($type->type) . ' content';
-    }
-    $new_perm = str_replace($subjects, $replacements, $row['perm']);
-    $ret[] = array('success' => db_query($update_sql, $new_perm, $row['pid']), 'query' => t('Updated permission set @set', array('@set' => $row['pid'])));
-  }
-  variable_set('menu_rebuild_needed', TRUE);
-  return $ret;
+/**
+ * @file
+ * Install file for the publish content module.
+ */
+
+/**
+ * Copy tabs preference into new variable called publishcontent_method.
+ */
+function publishcontent_update_7001() {
+  $new_method = variable_get('publishcontent_tabs', TRUE) ? PUBLISHCONTENT_METHOD_TABS : PUBLISHCONTENT_METHOD_NONE;
+  variable_set('publishcontent_method', $new_method);
+  variable_del('publishcontent_tabs');
 }
