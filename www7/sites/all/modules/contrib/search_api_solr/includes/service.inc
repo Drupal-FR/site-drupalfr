@@ -636,9 +636,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
       // The fields to look for similarities in.
       $mlt_fl = array();
       foreach($mlt['fields'] as $f) {
-        // Solr 4 has a bug which results in numeric and date fields not being
-        // supported in MLT queries.
-        if ($version == 4 && in_array($fields[$f][0], array('i', 'f', 'd'))) {
+        // Solr 4 has a bug which results in numeric fields not being supported
+        // in MLT queries.
+        // Date fields don't seem to be supported at all.
+        if ($fields[$f][0] === 'd' || ($version == 4 && in_array($fields[$f][0], array('i', 'f')))) {
           continue;
         }
         $mlt_fl[] = $fields[$f];
@@ -899,6 +900,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
     // Set up the results array.
     $results = array();
     $results['results'] = array();
+    // Keep a copy of the response in the results so it's possible to extract
+    // further useful information out of it, if necessary.
+    $results['search_api_solr_response'] = $response;
+
     // In some rare cases (e.g., MLT query with nonexistent ID) the response
     // will be NULL.
     if (!isset($response->response) && !isset($response->grouped)) {
@@ -1006,9 +1011,9 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
     if (!empty($this->options['highlight_data'])) {
       foreach ($field_mapping as $search_api_property => $solr_property) {
-        if (substr($solr_property, 0, 2) == 't_' && !empty($response->highlighting->$id->$solr_property)) {
+        if (substr($solr_property, 0, 3) == 'tm_' && !empty($response->highlighting->$id->$solr_property)) {
           // Contrary to above, we here want to preserve HTML, so we just
-          // replace the [HIGHLIGHT] tags with the appropriate format here.
+          // replace the [HIGHLIGHT] tags with the appropriate format.
           $fields[$search_api_property] = $this->formatHighlighting($response->highlighting->$id->$solr_property);
         }
       }
@@ -1017,7 +1022,15 @@ class SearchApiSolrService extends SearchApiAbstractService {
     return $output;
   }
 
-
+  /**
+   * Changes highlighting tags from our custom, HTML-safe ones to HTML.
+   *
+   * @param string|array $snippet
+   *   The snippet(s) to format.
+   *
+   * @return string|array
+   *   The snippet(s), properly formatted as HTML.
+   */
   protected function formatHighlighting($snippet) {
     return preg_replace('#\[(/?)HIGHLIGHT\]#', '<$1strong>', $snippet);
   }
@@ -1072,7 +1085,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
             $terms = clone $terms;
             unset($terms->_empty_);
           }
-          $type = isset($index->options['fields'][$info['field']]['type']) ? $index->options['fields'][$info['field']]['type'] : 'string';
+          $type = isset($index->options['fields'][$info['field']]['type']) ? search_api_extract_inner_type($index->options['fields'][$info['field']]['type']) : 'string';
           foreach ($terms as $term => $count) {
             if ($count >= $min_count) {
               if ($term === '_empty_') {
@@ -1174,7 +1187,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
 
     // Formatting the keys into a Solr query can be a bit complex. The following
-    // code will produce that look like this:
+    // code will produce filters that look like this:
     //
     // #conjunction | #negation | return value
     // ----------------------------------------------------------------
@@ -1186,17 +1199,17 @@ class SearchApiSolrService extends SearchApiAbstractService {
     // If there was just a single, unnested key, we can ignore all this.
     if (count($k) == 1 && empty($nested_expressions)) {
       $k = reset($k);
-      return $neg ? "-$k" : $k;
+      return $neg ? "*:* AND -$k" : $k;
     }
 
     if ($or) {
       if ($neg) {
-        return '-' . implode(' -', $k);
+        return '*:* AND -' . implode(' AND -', $k);
       }
       return '((' . implode(') OR (', $k) . '))';
     }
     $k = implode(' ', $k);
-    return $neg ? "-($k)" : $k;
+    return $neg ? "*:* AND -($k)" : $k;
   }
 
   /**
@@ -1237,13 +1250,13 @@ class SearchApiSolrService extends SearchApiAbstractService {
   protected function createFilterQuery($field, $value, $operator, $field_info) {
     $field = call_user_func(array($this->connection_class, 'escapeFieldName'), $field);
     if ($value === NULL) {
-      return ($operator == '=' ? '-' : '') . "$field:[* TO *]";
+      return ($operator == '=' ? '*:* AND -' : '') . "$field:[* TO *]";
     }
     $value = trim($value);
     $value = $this->formatFilterValue($value, search_api_extract_inner_type($field_info['type']));
     switch ($operator) {
       case '<>':
-        return "-($field:$value)";
+        return "*:* AND -($field:$value)";
       case '<':
         return "$field:{* TO $value}";
       case '<=':
@@ -1344,8 +1357,15 @@ class SearchApiSolrService extends SearchApiAbstractService {
    *
    * (The $query parameter currently isn't used and only here for the potential
    * sake of subclasses.)
+   *
+   * @param SearchApiQueryInterface|SearchApiMultiQueryInterface $query
+   *   The query object, either for a normal Search API query or a multi-index
+   *   query.
+   *
+   * @return array
+   *   An array of parameters to be added to the Solr search request.
    */
-  protected function getHighlightParams(SearchApiQueryInterface $query) {
+  protected function getHighlightParams($query) {
     $highlight_params = array();
 
     if (!empty($this->options['excerpt']) || !empty($this->options['highlight_data'])) {
@@ -1359,7 +1379,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
 
     if (!empty($this->options['highlight_data'])) {
-      $highlight_params['hl.fl'] = 't_*';
+      $highlight_params['hl.fl'] = 'tm_*';
       $highlight_params['hl.snippets'] = 1;
       $highlight_params['hl.fragsize'] = 0;
       if (!empty($this->options['excerpt'])) {
@@ -1595,12 +1615,14 @@ class SearchApiSolrService extends SearchApiAbstractService {
               if (drupal_strtolower(substr($term, 0, $incomp_length)) == $incomp) {
                 $suggestions[] = array(
                   'suggestion_suffix' => substr($term, $incomp_length),
+                  'term' => $term,
                   'results' => $count,
                 );
               }
               else {
                 $suggestions[] = array(
                   'suggestion_suffix' => ' ' . $term,
+                  'term' => $term,
                   'results' => $count,
                 );
               }
@@ -1704,6 +1726,9 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $facets = $query->getOption('search_api_facets') ? $query->getOption('search_api_facets') : array();
     $facet_params = $this->getFacetParams($facets, $solr_fields, $fq);
 
+    // Handle highlighting.
+    $highlight_params = $this->getHighlightParams($query);
+
     // Set defaults
     if (!$keys) {
       $keys = NULL;
@@ -1727,6 +1752,9 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
     if (!empty($facet_params['facet.field'])) {
       $params += $facet_params;
+    }
+    if (!empty($highlight_params)) {
+      $params += $highlight_params;
     }
 
     // Retrieve http method from server options.
@@ -1757,7 +1785,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
         'index_id' => $doc->index_id,
         'score' => $doc->score,
       );
-      $excerpt = $this->getExcerpt($response, $id, $tmp, array());
+      $solr_id = $this->createId($doc->index_id, $result['id']);
+      $excerpt = $this->getExcerpt($response, $solr_id, $tmp, array());
       if ($excerpt) {
         $result['excerpt'] = $excerpt;
       }
@@ -1794,7 +1823,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
             $terms = clone $terms;
             unset($terms->_empty_);
           }
-          $type = isset($index->options['fields'][$info['field']]['type']) ? $index->options['fields'][$info['field']]['type'] : 'string';
+          $type = isset($index->options['fields'][$info['field']]['type']) ? search_api_extract_inner_type($index->options['fields'][$info['field']]['type']) : 'string';
           foreach ($terms as $term => $count) {
             if ($count >= $min_count) {
               if ($term === '_empty_') {
@@ -1929,6 +1958,31 @@ class SearchApiSolrService extends SearchApiAbstractService {
   public function getFields($num_terms = 0) {
     $this->connect();
     return $this->solr->getFields($num_terms);
+  }
+
+  /**
+   * Retrieves a config file or file list from the Solr server.
+   *
+   * Uses the admin/file request handler.
+   *
+   * @param string|null $file
+   *   (optional) The name of the file to retrieve. If the file is a directory,
+   *   the directory contents are instead listed and returned. NULL represents
+   *   the root config directory.
+   *
+   * @return object
+   *  A HTTP response object containing either the file contents or a file list.
+   */
+  public function getFile($file = NULL) {
+    $this->connect();
+
+    $file_servlet_name = constant($this->connection_class . '::FILE_SERVLET');
+
+    $params['contentType'] = 'text/xml;charset=utf-8';
+    if ($file) {
+      $params['file'] = $file;
+    }
+    return $this->solr->makeServletRequest($file_servlet_name, $params);
   }
 
 }

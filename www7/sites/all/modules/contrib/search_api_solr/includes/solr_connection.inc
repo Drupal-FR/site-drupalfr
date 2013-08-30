@@ -108,6 +108,11 @@ class SearchApiSolrConnection implements SearchApiSolrConnectionInterface {
   const STATS_SERVLET_4 = 'admin/mbeans?wt=xml&stats=true';
 
   /**
+   * Path to the file servlet.
+   */
+  const FILE_SERVLET = 'admin/file';
+
+  /**
    * The options passed when creating this connection.
    *
    * @var array

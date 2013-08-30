@@ -45,8 +45,9 @@ Regarding third-party features, the following are supported:
   Lets you display items that are similar to a given one. Use, e.g., to create
   a "More like this" block for node pages.
   NOTE: Due to a regression in Solr itself, "More like this" doesn't work with
-  integer, float and date fields in Solr 4. As a work-around, you can index the
-  fields (or copies of them) as string values. See [4] for details.
+  integer and float fields in Solr 4. As a work-around, you can index the fields
+  (or copies of them) as string values. See [4] for details.
+  Also, MLT with date fields isn't currently supported at all for any version.
 - search_api_multi
   Introduced by module: search_api_multi
   Allows you to search multiple indexes at once, as long as they are on the same
