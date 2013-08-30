@@ -61,6 +61,13 @@ function flag_entity_property_info_alter(&$info) {
         'flag_name' => $flag->name,
         'flag_entity_type' => $flag->entity_type,
       );
+      $info['user']['properties']['flag_sid'] = array(
+        'label' => t('Flag user session identifier'),
+        'description' => t('Returns the sessions id used to distinguish anonymous users from each other.'),
+        'type' => 'text',
+        'getter callback' => 'flag_properties_get_user_sid',
+        'computed' => TRUE,
+      );
       // Entity property: list of users who have flagged this entity.
       // This can go on either the entity as a whole, or on bundles, depending
       // on whether the flag is limited by bundle.

@@ -12,7 +12,7 @@ function flag_features_export($data, &$export, $module_name = '') {
   $pipe = array();
 
   // Add flag module as a dependency.
-  $export['dependencies']['features'] = 'flag';
+  $export['dependencies']['flag'] = 'flag';
 
   // Ensure the modules that provide the flag are included as dependencies.
   $modules = flag_features_providing_module();
@@ -80,6 +80,9 @@ function flag_features_revert($module = NULL) {
     module_load_include('inc', 'flag', '/includes/flag.admin');
     $default_flags = module_invoke($module, 'flag_default_flags');
 
+    // Build up values for the cache clear.
+    $entity_types = array();
+
     // Revert flags that are defined in code.
     foreach ($default_flags as $flag_name => $flag_info) {
       if (is_numeric($flag_name)) {
@@ -90,8 +93,10 @@ function flag_features_revert($module = NULL) {
       if ($flag && $flag->revert() === FALSE) {
         drupal_set_message(t('Could not revert flag %flag-name to the state described in your code: Your flag was created by a different version of the Flag module than is now being used.', array('%flag-name' => $flag->name)), 'error');
       }
+
+      $entity_types[] = $flag->entity_type;
     }
-    _flag_clear_cache();
+    _flag_clear_cache($entity_types);
   }
 }
 

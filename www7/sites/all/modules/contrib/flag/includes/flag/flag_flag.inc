@@ -358,12 +358,17 @@ class flag_flag {
   }
 
   /**
-   * Stores some object in fetch_entity()'s cache, so subsequenet calls to
-   * fetch_entity() return it.
+   * Store an object in the flag handler's cache.
    *
    * This is needed because otherwise fetch_object() loads the object from the
    * database (by calling _load_entity()), whereas sometimes we want to fetch
-   * an object that hasn't yet been saved to the database. See flag_nodeapi().
+   * an object that hasn't yet been saved to the database. Subsequent calls to
+   * fetch_entity() return the remembered object.
+   *
+   * @param $entity_id
+   *  The ID of the object to cache.
+   * @param $object
+   *  The object to cache.
    */
   function remember_entity($entity_id, $object) {
     $this->fetch_entity($entity_id, $object);
@@ -421,10 +426,10 @@ class flag_flag {
    * Determines whether the user has the permission to use this flag.
    *
    * @param $action
-   *   Optional. The action to test, either "flag" or "unflag". If none given,
+   *   (optional) The action to test, either "flag" or "unflag". If none given,
    *   "flag" will be tested, which is the minimum permission to use a flag.
    * @param $account
-   *   Optional. The user object. If none given, the current user will be used.
+   *   (optional) The user object. If none given, the current user will be used.
    *
    * @return
    *   Boolean TRUE if the user is allowed to flag/unflag. FALSE otherwise.
@@ -524,7 +529,7 @@ class flag_flag {
    *   The array of entity IDs to check. The keys are the entity IDs, the
    *   values are the actions to test: either 'flag' or 'unflag'.
    * @param $account
-   *   Optional. The account for which the actions will be compared against.
+   *   (optional) The account for which the actions will be compared against.
    *   If left empty, the current user will be used.
    *
    * @return
@@ -612,9 +617,10 @@ class flag_flag {
    * possibly subtype, of entity.
    *
    * @param $entity_type
-   *   The type of entity being checked, usually "node".
+   *   The type of entity being checked, such as "node".
    * @param $content_subtype
-   *   The subtype (node type) being checked.
+   *   The subtype being checked. For entities this will be the bundle name (the
+   *   node type in the case of nodes).
    *
    * @return
    *   TRUE if the flag is enabled for this type and subtype.
@@ -669,7 +675,7 @@ class flag_flag {
    * @param $skip_permission_check
    *   Flag the item even if the $account user don't have permission to do so.
    * @param $flagging
-   *   Optional. This method works in tandem with Drupal's Field subsystem.
+   *   (optional) This method works in tandem with Drupal's Field subsystem.
    *   Pass in a flagging entity if you want operate on it as well.
    *
    * @return
@@ -863,9 +869,9 @@ class flag_flag {
    * @param mixed $entity_id
    *   The unique identifier of the object being flagged.
    * @param int $uid
-   *   Optional. The user id of the user doing the flagging.
+   *   (optional) The user id of the user doing the flagging.
    * @param mixed $sid
-   *   Optional. The user SID (provided by Session API) who is doing the
+   *   (optional) The user SID (provided by Session API) who is doing the
    *   flagging. The SID is 0 for logged in users.
    *
    * @return stdClass
@@ -890,7 +896,7 @@ class flag_flag {
    * item results in only one SQL query.
    *
    * @param $uid
-   *   Optional. The user ID whose flags we're checking. If none given, the
+   *   (optional) The user ID whose flags we're checking. If none given, the
    *   current user will be used.
    *
    * @return
@@ -1266,6 +1272,12 @@ class flag_flag {
    * Saves a flag to the database. It is a wrapper around update() and insert().
    */
   function save() {
+    // Allow the 'global' property to be a boolean, particularly when defined in
+    // hook_flag_default_flags(). Without this, a value of FALSE gets casted to
+    // an empty string which violates our schema. Other boolean properties are
+    // fine, as they are serialized.
+    $this->global = (int) $this->global;
+
     if (isset($this->fid)) {
       $this->update();
       $this->is_new = FALSE;

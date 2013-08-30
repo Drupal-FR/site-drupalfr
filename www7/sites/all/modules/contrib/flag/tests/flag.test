@@ -33,6 +33,9 @@ abstract class FlagTestCaseBase extends DrupalWebTestCase {
 
 }
 
+/**
+ * Test CRUD operations on Flagging entities.
+ */
 class FlagFlaggingCRUDTestCase extends FlagTestCaseBase {
 
   /**
@@ -209,6 +212,9 @@ class FlagFlaggingCRUDTestCase extends FlagTestCaseBase {
 
 }
 
+/**
+ * Test Flag admin UI.
+ */
 class FlagAdminTestCase extends FlagTestCaseBase {
   var $_flag = FALSE;
 
@@ -583,6 +589,9 @@ class FlagAccessLinkTestCase extends FlagTestCaseBase {
 
 }
 
+/**
+ * Test the 'confirm form' link type.
+ */
 class FlagLinkTypeConfirmTestCase extends DrupalWebTestCase {
 
   /**
@@ -857,6 +866,106 @@ class FlagHookFlagAccessTestCase extends FlagTestCaseBase {
     $this->drupalGet('node/' . $this->nid);
 
     $this->assertNoLink('Flag this item', 0, 'The flag link does not appear on the page.');
+  }
+
+}
+
+/**
+ * Test use of EntityFieldQueries with flagging entities.
+ */
+class FlagEntityFieldQueryTestCase extends FlagTestCaseBase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+     return array(
+      'name' => t('Flagging Entity Field Query Extension'),
+      'description' => t('Entity Field Query for flagging entities.'),
+      'group' => t('Flag'),
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  function setUp() {
+    parent::setUp('flag');
+
+    $flag_data = array(
+      'entity_type' => 'node',
+      'name' => 'test_flag_1',
+      'title' => 'Test Flag',
+      'global' => 0,
+      'types' => array(
+        0 => 'article',
+      ),
+      'flag_short' => 'Flag this item',
+      'flag_long' => '',
+      'flag_message' => '',
+      'unflag_short' => 'Unflag this item',
+      'unflag_long' => '',
+      'unflag_message' => '',
+      'unflag_denied_text' => 'You may not unflag this item',
+      // Use the normal link type as it involves no intermediary page loads.
+      'link_type' => 'normal',
+      'weight' => 0,
+      'show_on_form' => 0,
+      'access_author' => '',
+      'show_contextual_link' => 0,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
+      'i18n' => 0,
+      'api_version' => 3,
+    );
+
+    $this->flag1 = $this->createFlag($flag_data);
+    $flag_data['name'] = 'test_flag_2';
+    $this->flag2 = $this->createFlag($flag_data);
+    $flag_data['name'] = 'test_flag_3';
+    $this->flag3 = $this->createFlag($flag_data);
+
+    // Create test user who can flag and unflag.
+    $this->flag_unflag_user = $this->drupalCreateUser(array('flag test_flag_1', 'unflag test_flag_1', 'flag test_flag_2', 'unflag test_flag_2'));
+    $this->drupalLogin($this->flag_unflag_user);
+
+  }
+
+  /**
+   * Test use of EntityFieldQuery with flagging entities.
+   */
+  function testEntityFieldQuery() {
+     $node_settings = array(
+      'title' => $this->randomName(),
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = $this->drupalCreateNode($node_settings);
+
+    flag('flag', 'test_flag_1', $node->nid, $this->flag_unflag_user);
+    flag('flag', 'test_flag_2', $node->nid, $this->flag_unflag_user);
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'flagging')
+      ->entityCondition('bundle', 'test_flag_1');
+
+    $flagged = $query->execute();
+    $this->assertEqual(count($flagged['flagging']), 1);
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'flagging')
+      ->entityCondition('bundle', 'test%', 'like');
+    $flagged = $query->execute();
+    $this->assertEqual(count($flagged['flagging']), 2);
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'flagging')
+      ->entityCondition('bundle', array('test_flag_1', 'test_flag_2'), 'IN');
+    $this->assertEqual(count($flagged['flagging']), 2);
   }
 
 }

@@ -57,7 +57,37 @@ function hook_flag_type_info_alter(&$definitions) {
  * Define default flags.
  */
 function hook_flag_default_flags() {
-
+  $flags = array();
+  $flags['bookmarks'] = array (
+    'entity_type' => 'node',
+    'title' => 'Bookmarks',
+    'global' => FALSE,
+    'types' => array (
+      0 => 'article',
+      1 => 'blog',
+    ),
+    'flag_short' => 'Bookmark this',
+    'flag_long' => 'Add this post to your bookmarks',
+    'flag_message' => 'This post has been added to your bookmarks',
+    'unflag_short' => 'Unbookmark this',
+    'unflag_long' => 'Remove this post from your bookmarks',
+    'unflag_message' => 'This post has been removed from your bookmarks',
+    'unflag_denied_text' => '',
+    'link_type' => 'toggle',
+    'weight' => 0,
+    'show_in_links' => array (
+      'full' => TRUE,
+      'token' => FALSE,
+    ),
+    'show_as_field' => FALSE,
+    'show_on_form' => FALSE,
+    'access_author' => '',
+    'show_contextual_link' => TRUE,
+    'show_on_profile' => FALSE,
+    'access_uid' => '',
+    'api_version' => 3,
+  );
+  return $flags;
 }
 
 /**

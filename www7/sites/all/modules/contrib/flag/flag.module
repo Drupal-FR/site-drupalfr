@@ -140,32 +140,38 @@ function flagging_save($flagging) {
 /**
  * Implements hook_entity_query_alter().
  *
- * Converts EntityFieldQuery instances on flaggings that have an entity
- * condition on bundles (flag machine names).
+ * Replaces bundle condition in EntityFieldQuery on flagging entities
+ * with query condition on [name] field in [flag] table.
  *
- * Based on taxonomy_entity_query_alter().
+ * @see flag_query_flagging_flag_names_alter()
  */
-function flag_entity_query_alter($query) {
+function flag_entity_query_alter(EntityFieldQuery $query) {
   $conditions = &$query->entityConditions;
 
   // Alter only flagging queries with bundle conditions.
   if (isset($conditions['entity_type']) && $conditions['entity_type']['value'] == 'flagging' && isset($conditions['bundle'])) {
-    // Convert flag machine names to flag IDs.
-    $flags = flag_get_flags();
-    $fids = array();
-    if (is_array($conditions['bundle']['value'])) {
-      foreach ($conditions['bundle']['value'] as $flag_name) {
-        $fids[] = $flags[$flag_name]->fid;
-      }
-    }
-    else {
-      $flag_name = $conditions['bundle']['value'];
-      $fids = $flags[$flag_name]->fid;
-    }
-
-    $query->propertyCondition('fid', $fids, $conditions['bundle']['operator']);
+    $query->addTag('flagging_flag_names'); // Add tag to alter query.
+    // Make value and operator of the bundle condition accessible
+    // in hook_query_TAG_alter.
+    $query->addMetaData('flag_name_value', $conditions['bundle']['value']);
+    $query->addMetaData('flag_name_operator', $conditions['bundle']['operator']);
     unset($conditions['bundle']);
   }
+}
+
+/**
+ * Implements hook_query_TAG_alter() for flagging_flag_names tag.
+ *
+ * @see flag_entity_query_alter()
+ */
+function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
+  // Get value and operator for bundle condition from meta data.
+  $value = $query->getMetaData('flag_name_value');
+  $operator = $query->getMetaData('flag_name_operator');
+  // Join [flag] and [flagging] tables by [fid] and
+  // apply bundle condition on [flag].[name] field.
+  $query->join('flag', 'f', 'flagging.fid = f.fid');
+  $query->condition('f.name', $value, $operator);
 }
 
 /**
@@ -331,11 +337,16 @@ function flag_admin_menu_map() {
 /**
  * Menu loader for '%flag' arguments.
  *
+ * @param $flag_name
+ *   The machine name of the flag.
  * @param $include_disabled
- *   Whether to return a disabled flag too. Normally only enabled flags are
- *   returned. Some menu items operate on disabled flags and in this case
- *   you need to turn on this switch by doing
- *   <code>'load arguments' => array(TRUE)</code> in your menu router.
+ *   (optional) Whether to return a disabled flag too. Normally only enabled
+ *   flags are returned. Some menu items operate on disabled flags and in this
+ *   case you need to turn on this switch by doing:
+ *   @code
+ *   'load arguments' => array(TRUE)
+ *   @endcode
+ *   in your hook_menu().
  *
  * @return
  *   Either the flag object, or FALSE if none was found.
@@ -463,7 +474,16 @@ function flag_hook_info() {
 }
 
 /**
- * Returns a flag definition.
+ * Get a flag type definition.
+ *
+ * @param $entity_type
+ *   (optional) The entity type to get the definition for, or NULL to return
+ *   all flag types.
+ *
+ * @return
+ *   The flag type definition array.
+ *
+ * @see hook_flag_type_info()
  */
 function flag_fetch_definition($entity_type = NULL) {
   $definitions = &drupal_static(__FUNCTION__);
@@ -491,6 +511,9 @@ function flag_fetch_definition($entity_type = NULL) {
 
 /**
  * Returns all flag types defined on the system.
+ *
+ * @return
+ *   An array of flag type names.
  */
 function flag_get_types() {
   $types = &drupal_static(__FUNCTION__);
@@ -1108,7 +1131,7 @@ function flag_user_delete($account) {
 }
 
 /**
- * Callback function for user account cancellation or deletion.
+ * Shared helper for user account cancellation or deletion.
  */
 function flag_user_account_removal($account) {
   // Remove flags by this user.
@@ -1224,18 +1247,27 @@ function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
 /**
  * Flags or unflags an item.
  *
+ * @param $action
+ *   Either 'flag' or 'unflag'.
+ * @param $flag_name
+ *   The name of the flag to use.
+ * @param $entity_id
+ *   The ID of the item to flag or unflag.
  * @param $account
- *   The user on whose behalf to flag. Leave empty for the current user.
+ *   (optional) The user on whose behalf to flag. Omit for the current user.
+ * @param permissions_check
+ *   (optional) A boolean indicating whether to skip permissions.
+ *
  * @return
  *   FALSE if some error occured (e.g., user has no permission, flag isn't
  *   applicable to the item, etc.), TRUE otherwise.
  */
-function flag($action, $flag_name, $entity_id, $account = NULL) {
+function flag($action, $flag_name, $entity_id, $account = NULL, $permissions_check = FALSE) {
   if (!($flag = flag_get_flag($flag_name))) {
     // Flag does not exist.
     return FALSE;
   }
-  return $flag->flag($action, $entity_id, $account);
+  return $flag->flag($action, $entity_id, $account, $permissions_check);
 }
 
 /**
@@ -1614,6 +1646,68 @@ function _flag_link_type_descriptions() {
 // Non-Views public API
 
 /**
+ * Get the count of flags for a certain entity.
+ *
+ * @param $flag
+ *   The flag.
+ * @param $entity_type
+ *   The entity type (usually 'node').
+ *
+ * @return
+ *   The flag count with the flag name and entity type as the array key.
+ */
+function flag_get_entity_flag_counts($flag, $entity_type) {
+  $counts = &drupal_static(__FUNCTION__);
+
+  // We check to see if the flag count is already in the cache,
+  // if it's not, run the query.
+  if (!isset($counts[$flag->name][$entity_type])) {
+    $counts[$flag->name][$entity_type] = array();
+    $result = db_select('flagging', 'f')
+      ->fields('f', array('fid'))
+      ->condition('fid', $flag->fid)
+      ->condition('entity_type', $entity_type)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $counts[$flag->name][$entity_type] =  $result;
+  }
+
+  return $counts[$flag->name][$entity_type];
+}
+
+/**
+ * Get the user's flag count.
+ *
+ * @param $flag
+ *   The flag.
+ * @param $user
+ *   The user object.
+ *
+ * @return
+ *   The flag count with the flag name and the uid as the array key.
+ */
+function flag_get_user_flag_counts($flag, $user) {
+  $counts = &drupal_static(__FUNCTION__);
+
+  // We check to see if the flag count is already in the cache,
+  // if it's not, run the query.
+  if (!isset($counts[$flag->name][$user->uid])) {
+    $counts[$flag->name][$user->uid] = array();
+    $result = db_select('flagging', 'f')
+      ->fields('f', array('fid'))
+      ->condition('fid', $flag->fid)
+      ->condition('uid', $user->uid)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $counts[$flag->name][$user->uid] = $result;
+  }
+
+  return $counts[$flag->name][$user->uid];
+}
+
+/**
  * Get flag counts for all flags on a node.
  *
  * @param $entity_type
@@ -1621,8 +1715,8 @@ function _flag_link_type_descriptions() {
  * @param $entity_id
  *   The entity ID (usually the node ID).
  *
- * @return $flags
- *   An array of the structure [name] => [number of flags].
+ * @return
+ *   The flag count with the entity type and id as array keys.
  */
 function flag_get_counts($entity_type, $entity_id) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1651,7 +1745,7 @@ function flag_get_counts($entity_type, $entity_id) {
  * @param $flag_name
  *   The flag name for which to retrieve a flag count.
  * @param $reset
- *   Reset the internal cache and execute the SQL query another time.
+ *   (optional) Reset the internal cache and execute the SQL query another time.
  */
 function flag_get_flag_counts($flag_name, $reset = FALSE) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1707,14 +1801,14 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  * returned.
  *
  * @param $entity_type
- *   Optional. The type of entity for which to load the flags. Usually 'node'.
+ *   (optional) The type of entity for which to load the flags. Usually 'node'.
  * @param $content_subtype
- *   Optional. The node type for which to load the flags.
+ *   (optional) The node type for which to load the flags.
  * @param $account
- *   Optional. The user accont to filter available flags. If not set, all
+ *   (optional) The user accont to filter available flags. If not set, all
  *   flags for will this node will be returned.
  *
- * @return $flags
+ * @return
  *   An array of the structure [fid] = flag_object.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
@@ -1812,7 +1906,8 @@ function _flag_compare_weight($flag1, $flag2) {
  * Retrieve a list of flags defined by modules.
  *
  * @param $include_disabled
- *   Unless specified, only enabled flags will be returned.
+ *   (optional) Unless specified, only enabled flags will be returned.
+ *
  * @return
  *   An array of flag prototypes, not usable for flagging. Use flag_get_flags()
  *   if needing to perform a flagging with any enabled flag.
@@ -1856,8 +1951,11 @@ function flag_get_default_flags($include_disabled = FALSE) {
 /**
  * Get all flagged entities in a flag.
  *
- * @param
+ * @param $flag_name
  *   The flag name for which to retrieve flagged entites.
+ *
+ * @return
+ *   An array of flagging data, keyed by the flagging ID.
  */
 function flag_get_flag_flagging_data($flag_name) {
   $return = array();
@@ -1870,22 +1968,22 @@ function flag_get_flag_flagging_data($flag_name) {
 }
 
 /**
- * Find what a user has flagged, either a single node or on the entire site.
+ * Find what a user has flagged, either a single entity or on the entire site.
  *
  * @param $entity_type
  *   The type of entity that will be retrieved. Usually 'node'.
  * @param $entity_id
- *   Optional. The entity ID to check for flagging. If none given, all
+ *   (optional) The entity ID to check for flagging. If none given, all
  *   entities flagged by this user will be returned.
  * @param $uid
- *   Optional. The user ID whose flags we're checking. If none given, the
+ *   (optional) The user ID whose flags we're checking. If none given, the
  *   current user will be used.
  * @param $sid
- *   Optional. The user SID (provided by Session API) whose flags we're
+ *   (optional) The user SID (provided by Session API) whose flags we're
  *   checking. If none given, the current user will be used. The SID is 0 for
  *   logged in users.
  *
- * @return $flags
+ * @return
  *   If returning a single item's flags (that is, when $entity_id isn't NULL),
  *   an array of the structure
  *   [flag_name] => (flagging_id => [flagging_id], uid => [uid], entity_id => [entity_id], timestamp => [timestamp], ...)
@@ -1952,7 +2050,7 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
  * @param $entity_id
  *   The entity ID to check for flagging.
  * @param $flag_name
- *   Optional. The name of a flag if wanting a list specific to a single flag.
+ *   (optional) The name of a flag if wanting a list specific to a single flag.
  *
  * @return
  *   If no flag name is given, an array of flagging data, keyed by the user
@@ -2032,20 +2130,36 @@ function flag_create_link($flag_name, $entity_id) {
  *   The user object on behalf the trimming will occur.
  * @param $cutoff_size
  *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
+ * @param $trim_newest
+ *   An optional boolean indicating whether to trim the newest flags.
+ * @param $permissions_check
+ *   (optional) A boolean indicating whether to skip permissions.
+ *   This will trim the flag if $permissions_check is TRUE even if the user
+ *   doesn't have the permission to flag/unflag.
  */
-function flag_trim_flag($flag, $account, $cutoff_size) {
-  $result = db_select('flagging', 'fc')
+function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest, $permissions_check = FALSE) {
+  $query = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
     ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
     // Account for session ID (in the case of anonymous users).
-    ->condition('sid', flag_get_sid($account->uid))
-    ->orderBy('timestamp', 'DESC')
-    ->execute();
+    ->condition('sid', flag_get_sid($account->uid));
+  // If $trim_newest is TRUE, then, we should order by 'ASC' as we should trim
+  // the newest flags.
+  if ($trim_newest) {
+    $query->orderBy('timestamp', 'ASC');
+  }
+  else {
+    $query->orderBy('timestamp', 'DESC') ;
+  }
+
+  // Execute the query
+  $result = $query->execute();
+
   $i = 1;
   foreach ($result as $row) {
     if ($i++ > $cutoff_size) {
-      flag('unflag', $flag->name, $row->entity_id, $account);
+      flag('unflag', $flag->name, $row->entity_id, $account, $permissions_check);
     }
   }
 }
@@ -2056,7 +2170,7 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
  * @param $flag
  *   The flag object.
  * @param $entity_id
- *   Optional. The entity ID on which all flaggings will be removed. If left
+ *   (optional) The entity ID on which all flaggings will be removed. If left
  *   empty, this will remove all of this flag's entities.
  */
 function flag_reset_flag($flag, $entity_id = NULL) {
@@ -2090,9 +2204,10 @@ function flag_reset_flag($flag, $entity_id = NULL) {
  * Return an array of link types provided by modules.
  *
  * @return
- *  An array of link types as defined by hook_flag_link_type_info(). These are keyed
- *  by the type name, and each value is an array of properties. In addition to
- *  those defined in hook_flag_link_type_info(), the following properties are set:
+ *  An array of link types as defined by hook_flag_link_type_info(). These are
+ *  keyed by the type name, and each value is an array of properties. In
+ *  addition to those defined in hook_flag_link_type_info(), the following
+ *  properties are set:
  *  - 'module': The providing module.
  *  - 'name': The machine name of the type.
  *
@@ -2106,7 +2221,9 @@ function flag_get_link_types() {
     if ($cache = cache_get('flag_link_type_info')) {
       $link_types = $cache->data;
     }
-    else {
+    // In some rare edge cases cache_get() can return an empty result. If it
+    // does, we make sure to fetch the link types again.
+    if (empty($link_types)) {
       $link_types = array();
       foreach (module_implements('flag_link_type_info') as $module) {
         $module_types = module_invoke($module, 'flag_link_type_info');
@@ -2150,6 +2267,21 @@ function flag_check_token($token, $entity_id) {
 
 /**
  * Set the Session ID for a user. Utilizes the Session API module.
+ *
+ * Creates a Session ID for an anonymous user and returns it. It will always
+ * return 0 for registered users.
+ *
+ * @param int $uid
+ *   (optional) The user ID to create a session ID for. Defaults to the
+ *   current user.
+ * @param bool $create
+ *   (optional) Determines whether a session should be created if it doesn't
+ *   exist yet. Defaults to TRUE.
+ *
+ * @return
+ *   The session ID, if a session was created. If not, the return value is 0.
+ *
+ * @see flag_get_sid()
  */
 function flag_set_sid($uid = NULL, $create = TRUE) {
   $sids = &drupal_static(__FUNCTION__, array());
@@ -2158,8 +2290,13 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
     $uid = $GLOBALS['user']->uid;
   }
 
-  if (!isset($sids[$uid])) {
+  // Set the sid if none has been set yet. If the caller specified to create an
+  // sid and we have an invalid one (-1), create it.
+  if (!isset($sids[$uid]) || ($sids[$uid] == -1 && $create)) {
     if (module_exists('session_api') && session_api_available() && $uid == 0) {
+      // This returns one of the following:
+      // - -1. This indicates that no session exists and none was created.
+      // - A positive integer with the Session ID when it does exist.
       $sids[$uid] = session_api_get_sid($create);
     }
     else {
@@ -2167,18 +2304,28 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
     }
   }
 
-  return $sids[$uid];
+  // Keep the -1 case internal and let the outside world only distinguish two
+  // cases: (1) there is an SID; (2) there is no SID (-> 0).
+  return $sids[$uid] == -1 ? 0 : $sids[$uid];
 }
 
 /**
  * Get the Session ID for a user. Utilizes the Session API module.
  *
- * @param $uid
- *   The user ID. If the UID is 0 (anonymous users), then a SID will be
- *   returned. SID will always be 0 for any authenticated user.
- * @param $create
- *   If the user doesn't yet have a session, should one be created? Defaults
- *   to FALSE.
+ * Gets the Session ID for an anonymous user. It will always return 0 for
+ * registered users.
+ *
+ * @param int $uid
+ *   (optional) The user ID to return the session ID for. Defaults to the
+ *   current user.
+ * @param bool $create
+ *   (optional) Determines whether a session should be created if it doesn't
+ *   exist yet. Defaults to FALSE.
+ *
+ * @return
+ *   The session ID, if the session exists. If not, the return value is 0.
+ *
+ * @see flag_set_sid()
  */
 function flag_get_sid($uid = NULL, $create = FALSE) {
   return flag_set_sid($uid, $create);
@@ -2334,4 +2481,33 @@ function flag_properties_get_flagging_users($entity, array $options, $name, $ent
   $flagging_data = flag_get_entity_flags($entity_type, $entity_id, $property_info['flag_name']);
 
   return array_keys($flagging_data);
+}
+
+/**
+ * Getter callback that returns the SID of the user that is being retrieved.
+ *
+ * Callback for hook_entity_property_info_alter().
+ *
+ * @param stdobj $entity
+ *  The entity object representing a user for which we are getting inforamtion for.
+ *
+ * @param array $options
+ *  Options reguarding the nature of the entity. Language, etc.
+ *
+ * @param string $name
+ *  The name of the property we are running this callback for.
+ *
+ * @param string $entity_type
+ *  The type that the stdobj $entity is supposed to be.
+ *
+ * @param $property_info
+ *  The ifnromatin that represents the property we are providing a result for.
+ *
+ * @return an integer representing the user's sid field from the session_api table
+ *
+ * @ingroup callbacks
+ */
+function flag_properties_get_user_sid($entity, array $options, $name, $entity_type, $property_info) {
+  $sid =  flag_get_sid($entity->uid, FALSE);
+  return $sid;
 }

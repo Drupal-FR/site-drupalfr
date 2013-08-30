@@ -88,7 +88,7 @@ function theme_flag_admin_listing($variables) {
     $permission = "flag $flag->name";
     $roles = user_roles(FALSE, $permission);
     $row = array();
-    $row[] = $flag->title . ' <small>(' . t('Machine name: @name', array('@name' => $flag->name)) . ')</small>';
+    $row[] = check_plain($flag->title) . ' <small>(' . t('Machine name: @name', array('@name' => $flag->name)) . ')</small>';
     if (count($flags) > 1) {
       $row[] = drupal_render($form['flags'][$flag->name]['weight']);
     }
@@ -668,7 +668,7 @@ function flag_form_submit($form, &$form_state) {
   $flag->enable();
   drupal_set_message(t('Flag @title has been saved.', array('@title' => $flag->get_title())));
   // We clear caches more vigorously if the flag was new.
-  _flag_clear_cache(!empty($flag->is_new));
+  _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
 
   // Save permissions.
   // This needs to be done after the flag cache has been cleared, so that
@@ -753,7 +753,7 @@ function flag_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $flag->delete();
     $flag->disable();
-    _flag_clear_cache(TRUE);
+    _flag_clear_cache($flag->entity_type, TRUE);
   }
   drupal_set_message(t('Flag @name has been deleted.', array('@name' => $flag->get_title())));
   $form_state['redirect'] = FLAG_ADMIN_PATH;
@@ -771,26 +771,44 @@ function flag_check_link_types($element) {
 }
 
 /**
- * Clears various caches when a flag is modified.
+ * Clears various caches when one or more flags are modified.
  *
- * @param $clear_entity_info
- *  Whether to also clear the entity info cache. This is needed when adding or
- *  deleting a flag, as this changes the bundles on the flagging entity. In
+ * @param $entity_types
+ *  The entity types for the flags. May be a single value or an array.
+ * @param $is_insert_or_delete
+ *  Whether the modified flag is being inserted (saved for the first time) or
+ *  deleted. This results in a more vigorous clearing of caches. In
  *  particular, when no flags exist yet, no Field admin UI paths exist and these
  *  need to be created.
  */
-function _flag_clear_cache($clear_entity_info = FALSE) {
+function _flag_clear_cache($entity_types, $is_insert_or_delete = FALSE) {
+  if (!is_array($entity_types)) {
+    $entity_types = array($entity_types);
+  }
+
   // Reset our flags cache, thereby making the following code aware of the
   // modifications.
   drupal_static_reset('flag_get_flags');
 
-  if ($clear_entity_info) {
+  if ($is_insert_or_delete) {
+    // A new or deleted flag means we are changing bundles on the Flagging
+    // entity, and thus need to clear the entity info cache.
     entity_info_cache_clear();
+  }
+
+  // Clear FieldAPI's field_extra cache, so our changes to pseudofields are
+  // noticed. It's rather too much effort to both a) check whether the
+  // pseudofield setting has changed either way, and b) specifically clear just
+  // the bundles that are (or were!!) affected, so we just clear for all bundles
+  // on our entity type regardlesss.
+  foreach ($entity_types as $entity_type) {
+    cache_clear_all("field_info:bundle_extra:$entity_type:", 'cache_field', TRUE);
   }
 
   if (module_exists('views')) {
     views_invalidate_cache();
   }
+
   // The title of a flag may appear in the menu (indirectly, via our "default
   // views"), so we need to clear the menu cache. This call also clears the
   // page cache, which is desirable too because the flag labels may have

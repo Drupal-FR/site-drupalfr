@@ -47,18 +47,22 @@ function flag_export_flags($flags = array(), $module = '', $indent = '') {
     // Allow other modules to change the exported flag.
     drupal_alter('flag_export', $new_flag);
 
-    // Remove the flag ID.
-    unset($new_flag['fid']);
-    // The name is emitted as the key for the array.
-    unset($new_flag['name']);
-
-// Do not export the whole entity info, as it is just used as helper data.
-    if (isset($new_flag['entity_info'])) {
-      unset($new_flag['entity_info']);
+    // Remove properties we don't export.
+    $unset_properties = array(
+      // Remove the flag ID.
+      'fid',
+      // The name is emitted as the key for the array.
+      'name',
+      // The entity info is just used as helper data.
+      'entity_info',
+      // Remove roles.
+      'roles',
+      // Remove errors.
+      'errors',
+    );
+    foreach ($unset_properties as $property) {
+      unset($new_flag[$property]);
     }
-
-    // Remove roles.
-    unset($new_flag['roles']);
 
     $output .= $indent . '// Exported flag: "' . check_plain($flag->get_title()) . '"' . ".\n";
     $output .= $indent . '$flags[\'' . $flag->name . '\'] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
@@ -141,6 +145,10 @@ function flag_import_form_validate($form, &$form_state) {
 function flag_import_form_submit($form, &$form_state) {
   module_load_include('inc', 'flag', 'includes/flag.admin');
 
+  // Build up values for the cache clear.
+  $entity_types = array();
+  $new = FALSE;
+
   foreach ($form_state['flags'] as $flag) {
     $flag->save();
     if (!empty($flag->status)) {
@@ -148,12 +156,14 @@ function flag_import_form_submit($form, &$form_state) {
     }
     if ($flag->is_new) {
       drupal_set_message(t('Flag @name has been imported.', array('@name' => $flag->name)));
+      $new = TRUE;
     }
     else {
       drupal_set_message(t('Flag @name has been updated.', array('@name' => $flag->name)));
     }
+    $entity_types[] = $flag->entity_type;
   }
-  _flag_clear_cache();
+  _flag_clear_cache($entity_types, $new);
 
   $form_state['redirect'] = FLAG_ADMIN_PATH;
 }
