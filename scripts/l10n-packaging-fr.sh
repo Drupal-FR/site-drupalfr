@@ -18,6 +18,7 @@ DIR="$RESULT/.."
 #############
 # Telechargement Drupal
 /usr/bin/drush dl drupal-7 -q --drupal-project-rename=drupal7 --destination=$DIR
+
 # Detection de version
 VERSION=`drush status drupal-version --pipe -r $DIR/drupal7`
 
@@ -33,7 +34,7 @@ tar cpzf drupal-7.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
 # Stockage du numéro de version dans une variable pour affichage sur le site.
-/usr/bin/drush -r $DIR/www7 vset drupalfr_version_d7 -q --yes --exact --format="string" "$VERSION"
+/usr/bin/drush -r $DIR/www7 vset drupalfr_current_version -q --yes --exact --format="string" "$VERSION"
 
 #############
 # Version 6
@@ -55,7 +56,7 @@ tar cpzf drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
 # Stockage du numéro de version dans une variable pour affichage sur le site.
-/usr/bin/drush -r $DIR/www7 vset drupalfr_version_d6 -q --yes --exact --format="string" "$VERSION"
+/usr/bin/drush -r $DIR/www7 vset drupalfr_previous_version -q --yes --exact --format="string" "$VERSION"
 
 exit
 
