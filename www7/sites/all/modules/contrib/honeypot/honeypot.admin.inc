@@ -20,9 +20,10 @@ function honeypot_admin_form($form, &$form_state) {
     $form['configuration']['honeypot_protect_all_forms'] = array(
       '#type' => 'checkbox',
       '#title' => t('Protect all forms with Honeypot'),
-      '#description' => t('This will enable Honeypot protection for ALL forms on this site, regardless of the settings in the Honeypot enabled forms section below.'),
+      '#description' => t('Enable Honeypot protection for ALL forms on this site (it is best to only enable Honeypot for the forms you need below).'),
       '#default_value' => variable_get('honeypot_protect_all_forms', 0),
     );
+    $form['configuration']['honeypot_protect_all_forms']['#description'] .= '<br />' . t('<strong>Page caching will be disabled on any page where a form is present if the Honeypot time limit is not set to 0.</strong>');
     $form['configuration']['honeypot_log'] = array(
       '#type' => 'checkbox',
       '#title' => t('Log blocked form submissions'),
@@ -40,12 +41,13 @@ function honeypot_admin_form($form, &$form_state) {
     $form['configuration']['honeypot_time_limit'] = array(
       '#type' => 'textfield',
       '#title' => t('Honeypot time limit'),
-      '#description' => t('Minimum time required before form should be considered entered by a human instead of a bot. Set to 0 to disable. <strong>Page caching will be disabled if there is a form protected by time limit on the page.</strong>'),
+      '#description' => t('Minimum time required before form should be considered entered by a human instead of a bot. Set to 0 to disable.'),
       '#default_value' => variable_get('honeypot_time_limit', 5),
       '#required' => TRUE,
       '#size' => 5,
       '#field_suffix' => t('seconds'),
     );
+    $form['configuration']['honeypot_time_limit']['#description'] .= '<br />' . t('<strong>Page caching will be disabled if there is a form protected by time limit on the page.</strong>');
 
   // Honeypot Enabled forms.
   $form['enabled_forms'] = array(

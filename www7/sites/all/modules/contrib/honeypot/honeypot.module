@@ -61,9 +61,11 @@ function honeypot_form_alter(&$form, &$form_state, $form_id) {
 
   $unprotected_forms = array(
     'user_login',
+    'user_login_block',
     'search_form',
     'search_block_form',
     'views_exposed_form',
+    'honeypot_admin_form',
   );
 
   // If configured to protect all forms, add protection to every form.
@@ -184,7 +186,7 @@ function honeypot_add_form_protection(&$form, &$form_state, $options = array()) 
 
   // Allow other modules to react to addition of form protection.
   if (!empty($options)) {
-    module_invoke_all('honeypot_add_form_protection', $options, $form['form_id']['#value']);
+    module_invoke_all('honeypot_add_form_protection', $options, $form);
   }
 }
 
@@ -229,11 +231,11 @@ function _honeypot_time_restriction_validate($form, &$form_state) {
  *   Form ID for the form on which submission was blocked.
  * @param $type
  *   String indicating the reason the submission was blocked. Allowed values:
- *     - 'honeypot'
- *     - 'honeypot_time'
+ *     - honeypot: If honeypot field was filled in.
+ *     - honeypot_time: If form was completed before the configured time limit.
  */
 function _honeypot_log($form_id, $type) {
-  honeypot_log_failure();
+  honeypot_log_failure($form_id, $type);
   if (variable_get('honeypot_log', 0)) {
     $variables = array(
         '%form'  => $form_id,
@@ -280,9 +282,17 @@ function honeypot_get_time_limit($form_values = array()) {
 
 /**
  * Log the failed submision with timestamp.
+ *
+ * @param $form_id
+ *   Form ID for the rejected form submission.
+ * @param $type
+ *   String indicating the reason the submission was blocked. Allowed values:
+ *     - honeypot: If honeypot field was filled in.
+ *     - honeypot_time: If form was completed before the configured time limit.
  */
-function honeypot_log_failure() {
+function honeypot_log_failure($form_id, $type) {
   global $user;
+
   // Log failed submissions for authenticated users.
   if ($user->uid) {
     db_insert('honeypot_user')
@@ -296,4 +306,7 @@ function honeypot_log_failure() {
   else {
     flood_register_event('honeypot');
   }
+
+  // Allow other modules to react to honeypot rejections.
+  module_invoke_all('honeypot_reject', $form_id, $user->uid, $type);
 }
