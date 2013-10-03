@@ -27,7 +27,13 @@ function search_api_views_views_data() {
         );
       }
 
-      $wrapper = $index->entityWrapper(NULL, TRUE);
+      try {
+        $wrapper = $index->entityWrapper(NULL, TRUE);
+      }
+      catch (EntityMetadataWrapperException $e) {
+        watchdog_exception('search_api_views', $e, "%type while retrieving metadata for index %index: !message in %function (line %line of %file).", array('%index' => $index->name), WATCHDOG_WARNING);
+        continue;
+      }
 
       // Add field handlers and relationships provided by the Entity API.
       foreach ($wrapper as $key => $property) {
@@ -179,7 +185,7 @@ function _search_api_views_add_handlers($id, array $field, EntityMetadataWrapper
     $table[$id]['filter']['handler'] = 'SearchApiViewsHandlerFilter';
   }
 
-  if ($inner_type == 'string') {
+  if ($inner_type == 'string' || $inner_type == 'uri') {
     $table[$id]['argument']['handler'] = 'SearchApiViewsHandlerArgumentString';
   }
   else {

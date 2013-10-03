@@ -1,6 +1,40 @@
 Search API 1.x, dev (xx/xx/xxxx):
 ---------------------------------
 
+Search API 1.8 (09/01/2013):
+----------------------------
+- #1414048 by drunken monkey: Fixed exception in views.inc removes all Search
+  API tables.
+- #1921690 by drunken monkey: Fixed stale Views cache when indexed fields
+  change.
+- #2077035 by maciej.zgadzaj: Fixed whitespace recognition for search keys.
+- #2071229 by drunken monkey: Fixed use of core search constant.
+- #2069023 by drunken monkey: Fixed reaction to disabled modules.
+- #2057867 by drunken monkey: Fixed multiple values for taxonomy contextual
+  filter.
+- #2052701 by drunken monkey, erdos: Fixed cron queue state when disabling the
+  module.
+- #1878606 by drunken monkey: Fixed labels for boolean facets.
+- #2053171 by drunken monkey: Improved tests.
+- #1433720 by davidwbarratt, drunken monkey, JvE: Fixed handling of empty
+  selection for checkboxes.
+- #1414078 by drunken monkey, jaxxed: Fixed revert of exportables.
+- #2011396 by drunken monkey: Fixed support for several facets on a single
+  field.
+- #2050117 by izus, drunken monkey: Updated README.txt to reflect removed
+  sub-modules.
+- #2041365 by drunken monkey: Fixed error reporting for the MLT contextual
+  filter.
+- #2044711 by stBorchert, drunken monkey: Fixed facet adapter's
+  getCurrentSearch() method to not cache failed attempts.
+- #1411712 by Krasnyj, drunken monkey: Fixed notices in Views with groups.
+- #1959506 by jantoine, drunken monkey: Fixed "search id" for Views facets
+  block display.
+- #1902168 by rbruhn, drunken monkey, mpv: Fixed fatal error during Features
+  import.
+- #2040111 by arpieb: Fixed Views URL argument handler to allow multiple values.
+- #1064520 by drunken monkey: Added a processor for highlighting.
+
 Search API 1.7 (07/01/2013):
 ----------------------------
 - #1612708 by drunken monkey: Fixed Views caching with facet blocks.

@@ -105,7 +105,7 @@ class SearchApiViewsHandlerFilterOptions extends SearchApiViewsHandlerFilter {
       '#options' => $options,
       '#multiple' => TRUE,
       '#size' => min(4, count($this->definition['options'])),
-      '#default_value' => isset($this->value) ? $this->value : array(),
+      '#default_value' => is_array($this->value) ? $this->value : array(),
     );
     // Hide the value box if operator is 'empty' or 'not empty'.
     // Radios share the same selector so we have to add some dummy selector.

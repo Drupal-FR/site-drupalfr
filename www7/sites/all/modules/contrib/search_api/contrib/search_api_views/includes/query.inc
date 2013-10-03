@@ -51,6 +51,13 @@ class SearchApiViewsQuery extends views_plugin_query {
   protected $errors;
 
   /**
+   * Whether to abort the search instead of executing it.
+   *
+   * @var bool
+   */
+  protected $abort = FALSE;
+
+  /**
    * The names of all fields whose value is required by a handler.
    *
    * The format follows the same as Search API field identifiers (parent:child).
@@ -209,6 +216,7 @@ class SearchApiViewsQuery extends views_plugin_query {
       // Add a nested filter for each filter group, with its set conjunction.
       foreach ($this->where as $group_id => $group) {
         if (!empty($group['conditions']) || !empty($group['filters'])) {
+          $group += array('type' => 'AND');
           // For filters without a group, we want to always add them directly to
           // the query.
           $filter = ($group_id === '') ? $this->query : $this->query->createFilter($group['type']);
@@ -264,7 +272,7 @@ class SearchApiViewsQuery extends views_plugin_query {
    * $view->pager['current_page'].
    */
   public function execute(&$view) {
-    if ($this->errors) {
+    if ($this->errors || $this->abort) {
       if (error_displayable()) {
         foreach ($this->errors as $msg) {
           drupal_set_message(check_plain($msg), 'error');
@@ -302,6 +310,16 @@ class SearchApiViewsQuery extends views_plugin_query {
       // Recursion to get the same error behaviour as above.
       return $this->execute($view);
     }
+  }
+
+  /**
+   * Aborts this search query.
+   *
+   * Used by handlers to flag a fatal error which shouldn't be displayed but
+   * still lead to the view returning empty and the search not being executed.
+   */
+  public function abort() {
+    $this->abort = TRUE;
   }
 
   /**
