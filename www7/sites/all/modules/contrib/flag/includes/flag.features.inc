@@ -111,5 +111,14 @@ function flag_features_providing_module() {
       $modules[$key] = isset($value['module']) ? $value['module'] : $module;
     }
   }
+
+  // Any entity type without a flag providing module will be provided by the
+  // flag module.
+  foreach (entity_get_info() as $entity_type => $entity) {
+    if (!isset($modules[$entity_type]) && empty($entity['configuration']) && $entity_type !== 'taxonomy_vocabulary') {
+      $modules[$entity_type] = 'flag';
+    }
+  }
+
   return $modules;
 }

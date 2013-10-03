@@ -168,6 +168,11 @@ function flag_rules_event_info() {
  */
 function flag_rules_action_info() {
   $param_defaults = array(
+    'flagging_user' => array(
+      'type' => 'user',
+      'label' => t('User on whose behalf to flag'),
+      'description' => t('For non-global flags, this is the user on whose behalf to flag the object. In addition, if checked below, the access permissions to the flag are checked against this user.'),
+    ),
     'permission_check' => array(
       'type' => 'boolean',
       'label' => t('Skip permission check'),
@@ -199,7 +204,8 @@ function flag_rules_action_info() {
           'label' => t('Trim newest flags'),
           'description' => t('Checking this will trim the newest flags.  This will prevent new flags once a limit is reached.'),
         ),
-      ) + $param_defaults,
+        'permission_check' => $param_defaults['permission_check'],
+      ),
       'group' => t('Flag'),
       'access callback' => 'flag_rules_integration_access',
     ),
@@ -267,11 +273,6 @@ function flag_rules_action_info() {
       'group' => t('Flag'),
       'access callback' => 'flag_rules_integration_access',
     ),
-  );
-  $param_defaults['flagging_user'] = array(
-    'type' => 'user',
-    'label' => t('User on whose behalf to flag'),
-    'description' => t('For non-global flags, this is the user on whose behalf to flag the object. In addition, if checked below, the access permissions to the flag are checked against this user.'),
   );
   foreach (flag_get_types() as $type) {
     $entity_info = entity_get_info($type);

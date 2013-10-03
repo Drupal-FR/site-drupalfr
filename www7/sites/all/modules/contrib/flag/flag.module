@@ -612,7 +612,7 @@ function flag_field_extra_fields() {
   $flags = flag_get_flags();
   foreach ($flags as $name => $flag) {
     // Skip flags that aren't on entities.
-    if (!is_subclass_of($flag, 'flag_entity')) {
+    if (!($flag instanceof flag_entity)) {
       continue;
     }
 
@@ -2013,8 +2013,8 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
         ->condition('sid', $sid)
         ->execute();
 
-      foreach ($result as $flag_content) {
-        $flagged_content[$uid][$sid][$entity_type][$entity_id][$flag_names[$flag_content->fid]] = $flag_content;
+      foreach ($result as $flagging_data) {
+        $flagged_content[$uid][$sid][$entity_type][$entity_id][$flag_names[$flagging_data->fid]] = $flagging_data;
       }
     }
     return $flagged_content[$uid][$sid][$entity_type][$entity_id];
@@ -2033,8 +2033,8 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
         )
         ->condition('sid', $sid)
         ->execute();
-      foreach ($result as $flag_content) {
-        $flagged_content[$uid][$sid][$entity_type]['all'][$flag_names[$flag_content->fid]][$flag_content->entity_id] = $flag_content;
+      foreach ($result as $flagging_data) {
+        $flagged_content[$uid][$sid][$entity_type]['all'][$flag_names[$flagging_data->fid]][$flagging_data->entity_id] = $flagging_data;
       }
     }
     return $flagged_content[$uid][$sid][$entity_type]['all'];
@@ -2071,11 +2071,11 @@ function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
       ->orderBy('timestamp', 'DESC')
       ->execute();
     $entity_flags[$entity_type][$entity_id] = array();
-    foreach ($result as $flag_content) {
+    foreach ($result as $flagging_data) {
       // Build a list of flaggings for all flags by user.
-      $entity_flags[$entity_type][$entity_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
+      $entity_flags[$entity_type][$entity_id]['users'][$flagging_data->uid][$flag_names[$flagging_data->fid]] = $flagging_data;
       // Build a list of flaggings for each individual flag.
-      $entity_flags[$entity_type][$entity_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
+      $entity_flags[$entity_type][$entity_id]['flags'][$flag_names[$flagging_data->fid]][$flagging_data->uid] = $flagging_data;
     }
   }
   if (empty($entity_flags[$entity_type][$entity_id])) {
