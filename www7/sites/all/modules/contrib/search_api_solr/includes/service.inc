@@ -102,8 +102,35 @@ class SearchApiSolrService extends SearchApiAbstractService {
       'retrieve_data' => FALSE,
       'highlight_data' => FALSE,
       'http_method' => 'POST',
+      // Default to TRUE for new servers, but to FALSE for existing ones.
+      'clean_ids' => $this->options ? FALSE : TRUE,
       'autocorrect_spell' => TRUE,
       'autocorrect_suggest_words' => TRUE,
+    );
+
+    if (!$options['clean_ids']) {
+      if (module_exists('advanced_help')) {
+        $variables['@url']= url('help/search_api_solr/README.txt');
+      }
+      else {
+        $variables['@url']= url(drupal_get_path('module', 'search_api_solr') . '/README.txt');
+      }
+      $description = t('Change Solr field names to be more compatible with advanced features. Doing this leads to re-indexing of all indexes on this server. See <a href="@url">README.txt</a> for details.', $variables);
+      $form['clean_ids_form'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Clean field identifiers'),
+        '#description' => $description,
+        '#collapsible' => TRUE,
+      );
+      $form['clean_ids_form']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Switch to clean field identifiers'),
+        '#submit' => array('_search_api_solr_switch_to_clean_ids'),
+      );
+    }
+    $form['clean_ids'] = array(
+      '#type' => 'value',
+      '#value' => $options['clean_ids'],
     );
 
     $form['scheme'] = array(
@@ -405,6 +432,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
       }
     }
 
+    // Let other modules alter documents before sending them to solr.
+    drupal_alter('search_api_solr_documents', $documents, $index, $items);
+    $this->alterSolrDocuments($documents, $index, $items);
+
     if (!$documents) {
       return array();
     }
@@ -434,8 +465,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
   /**
    * Create a list of all indexed field names mapped to their Solr field names.
    *
-   * The special fields "search_api_id", "search_api_relevance", and "id" are
-   * also included. Any Solr fields that exist on search results are mapped back
+   * The special fields "search_api_id" and "search_api_relevance" are also
+   * included. Any Solr fields that exist on search results are mapped back to
    * to their local field names in the final result set.
    *
    * @see SearchApiSolrService::search()
@@ -444,9 +475,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
     if (!isset($this->fieldNames[$index->machine_name]) || $reset) {
       // This array maps "local property name" => "solr doc property name".
       $ret = array(
-        'search_api_id' => 'ss_search_api_id',
+        'search_api_id' => 'item_id',
         'search_api_relevance' => 'score',
-        'search_api_item_id' => 'item_id',
       );
 
       // Add the names of any fields configured on the index.
@@ -469,7 +499,12 @@ class SearchApiSolrService extends SearchApiAbstractService {
         if ($pref != 'tm') {
           $pref .= $type == $inner_type ? 's' : 'm';
         }
-        $name = $pref . '_' . $key;
+        if (!empty($this->options['clean_ids'])) {
+          $name = $pref . '_' . str_replace(':', '$', $key);
+        }
+        else {
+          $name = $pref . '_' . $key;
+        }
 
         $ret[$key] = $name;
       }
@@ -530,6 +565,25 @@ class SearchApiSolrService extends SearchApiAbstractService {
     else {
       $doc->setField($key, $value);
     }
+  }
+
+  /**
+   * Applies custom modifications to indexed Solr documents.
+   *
+   * This method allows subclasses to easily apply custom changes before the
+   * documents are sent to Solr. The method is empty by default.
+   *
+   * @param array $documents
+   *   An array of SearchApiSolrDocument objects ready to be indexed, generated
+   *   from $items array.
+   * @param SearchApiIndex $index
+   *   The search index for which items are being indexed.
+   * @param array $items
+   *   An array of items being indexed.
+   *
+   * @see hook_search_api_solr_documents_alter()
+   */
+  protected function alterSolrDocuments(array &$documents, SearchApiIndex $index, array $items) {
   }
 
   /**
@@ -682,28 +736,37 @@ class SearchApiSolrService extends SearchApiAbstractService {
           $preg_field = preg_quote($escaped_field, '/');
           if (preg_match('/^' . $preg_field . ':\["?(\*|\d+(?:\.\d+)?)"? TO "?(\*|\d+(?:\.\d+)?)"?\]$/', $value, $m)) {
             unset($fq[$key]);
-            if (is_numeric($lower = trim($m[1], '"')) && $lower) {
-              // Sadly, this doesn't work. We usually don't need lower bounds,
-              // though (our facetting implementation doesn't create them, so it
-              // should be fine to ignore this for now.
-              //$fq[] = "-{!$spatial_method pt=$point sfield=$field d=$lower}";
+            if ($m[1] && is_numeric($m[1])) {
+              $min_radius = isset($min_radius) ? max($min_radius, $m[1]) : $m[1];
             }
-            if (is_numeric($upper = trim($m[2], '"'))) {
+            if (is_numeric($m[2])) {
               // Make the radius tighter accordingly.
-              $radius = isset($radius) ? min($radius, $upper) : $upper;
+              $radius = isset($radius) ? min($radius, $m[2]) : $m[2];
             }
           }
         }
 
         // If either a radius was given in the option, or a filter was
-        // encountered, set a filter for the lowest value.
-        if (isset($radius)) {
+        // encountered, set a filter for the lowest value. If a lower boundary
+        // was set (too), we can only set a filter for that if the field name
+        // doesn't contains any colons.
+        if (isset($min_radius) && strpos($field, ':') === FALSE) {
+          $upper = isset($radius) ? " u=$radius" : '';
+          $fq[] = "{!frange l=$min_radius$upper}geodist($field,$point)";
+        }
+        elseif (isset($radius)) {
           $fq[] = "{!$spatial_method pt=$point sfield=$field d=$radius}";
         }
 
-        // Change sort on the field, if set.
-        if (isset($sort[$spatial['field']])) {
-          $sort[$spatial['field']] = str_replace($field, "geodist($field,$point)", $sort[$spatial['field']]);
+        // Change sort on the field, if set (and not already changed).
+        if (isset($sort[$spatial['field']]) && substr($sort[$spatial['field']], 0, strlen($field)) === $field) {
+          if (strpos($field, ':') === FALSE) {
+            $sort[$spatial['field']] = str_replace($field, "geodist($field,$point)", $sort[$spatial['field']]);
+          }
+          else {
+            $link = l(t('edit server'), 'admin/config/search/search_api/server/' . $this->server->machine_name . '/edit');
+            watchdog('search_api_solr', 'Location sort on field @field had to be ignored because unclean field identifiers are used.', array('@field' => $spatial['field']), WATCHDOG_WARNING, $link);
+          }
         }
 
         // Change the facet parameters for spatial fields to return distance
@@ -728,6 +791,12 @@ class SearchApiSolrService extends SearchApiAbstractService {
             }
           }
         }
+      }
+    }
+    // Normal sorting on location fields isn't possible.
+    foreach ($sort as $field => $sort_param) {
+      if (substr($sort_param, 0, 3) === 'loc') {
+        unset($sort[$field]);
       }
     }
 
@@ -961,7 +1030,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       // We can find the item id and score in the special 'search_api_*'
       // properties. Mappings are provided for these properties in
       // SearchApiSolrService::getFieldNames().
-      $result['id'] = $result['fields']['search_api_item_id'];
+      $result['id'] = $result['fields']['search_api_id'];
       $result['score'] = $result['fields']['search_api_relevance'];
 
       $solr_id = $this->createId($index->machine_name, $result['id']);
@@ -1663,7 +1732,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $time_method_called = microtime(TRUE);
     // Get field information
     $solr_fields = array(
-      'search_api_id' => 'ss_search_api_id',
+      'search_api_id' => 'item_id',
       'search_api_relevance' => 'score',
       'search_api_multi_index' => 'index_id',
     );

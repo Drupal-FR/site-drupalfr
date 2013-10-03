@@ -28,6 +28,16 @@ usually suffices. In any case, you can use it for developing andd testing. The
 following instructions will assume you are using the example application,
 otherwise you should be able to substitute the corresponding paths.
 
+NOTE: The Solr 4.3+ example application is currently not completely supported
+with the configuration files included in this module, due to a slight change in
+directory structure. To fix this, simply copy, move or symlink the contrib/
+directory from the top level of the extracted Solr package one level down to
+example/.
+(For other directory structures: the contrib/ directory has to be in the
+directory two levels up from the one which includes the conf/ directory. For
+help, just start the Solr server and check the log files for WARN messages –
+they should state in which place Solr expects the directory to be.)
+
 CAUTION! For production sites, it is vital that you somehow prevent outside
 access to the Solr server. Otherwise, attackers could read, corrupt or delete
 all your indexed data. Using the example server WON'T prevent this by default.
@@ -51,7 +61,7 @@ though, as it contains really useful definitions, while the file provided with
 this module is empty, apart from some documentation. For licensing reasons, it
 is not possible for us to include the definitions in the example config file in
 the copy this module provides.
- 
+
 You can then start Solr. For the example application, go to $SOLR/example/ and
 issue the following command (assuming Java is correctly installed):
 

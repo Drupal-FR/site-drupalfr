@@ -181,3 +181,34 @@ function search_api_access_server_files(SearchApiServer $server) {
 
   return FALSE;
 }
+
+/**
+ * Switches a server to use clean identifiers.
+ *
+ * Used as a submit callback in SearchApiSolrService::configurationForm().
+ */
+function _search_api_solr_switch_to_clean_ids(array $form, array &$form_state) {
+  $server = $form_state['server'];
+  $server->options['clean_ids'] = TRUE;
+  $server->save();
+  drupal_set_message(t('The Solr server was successfully switched to use clean field identifiers.'));
+
+  $count = 0;
+  $conditions['server'] = $server->machine_name;
+  $conditions['enabled'] = 1;
+  foreach (search_api_index_load_multiple(FALSE, $conditions) as $index) {
+    if (!empty($index->options['fields'])) {
+      foreach ($index->options['fields'] as $key => $field) {
+        if (strpos($key, ':') !== FALSE) {
+          $index->reindex();
+          ++$count;
+          break;
+        }
+      }
+    }
+  }
+  if ($count) {
+    $msg = format_plural($count, '1 index was scheduled for re-indexing.', '@count indexes were scheduled for re-indexing.');
+    drupal_set_message($msg);
+  }
+}

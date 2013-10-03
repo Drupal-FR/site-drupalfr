@@ -93,6 +93,19 @@ different sets of fields in different searches on an index, it is adviced that
 you collect all fields that should be searchable into a single field using the
 “Aggregated fields” data alteration.
 
+Clean field identifiers:
+  If your Solr server was created in a module version prior to 1.2, you will get
+  the option to switch the server to "Clean field identifiers" (which is default
+  for all new servers). This will change the Solr field names used for all
+  fields whose Search API identifiers contain a colon (i.e., all nested fields)
+  to support some advanced functionality, like sorting by distance, for which
+  Solr is buggy when using field names with colons.
+  The only downside of this change is that the data in Solr for these fields
+  will become invalid, so all indexes on the server which contain such fields
+  will be scheduled for re-indexing. (If you don't want to search on incomplete
+  data until the re-indexing is finished, you can additionally manually clear
+  the indexes, on their Status tabs, to prevent this.)
+
 Hidden variables
 ----------------
 
