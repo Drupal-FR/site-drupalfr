@@ -83,7 +83,7 @@ function drupalfr_planete_feeds_importer_default() {
     'update' => 0,
     'import_period' => '3600',
     'expire_period' => 3600,
-    'import_on_create' => 0,
+    'import_on_create' => 1,
     'process_in_background' => 1,
   );
   $export['planet'] = $feeds_importer;
