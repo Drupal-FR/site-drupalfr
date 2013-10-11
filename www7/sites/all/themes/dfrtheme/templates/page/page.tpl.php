@@ -111,10 +111,6 @@
 		<?php endif; ?>
 
 		<div id="main-wrapper"><div class="inner">
-            <?php if ($is_front): ?>
-              <div class="push-drupalcamp"><a href="http://paris2013.drupalcamp.fr" title="Site dédié du Drupalcamp Paris 2013">Visiter le site dédié au Drupalcamp Paris du 21, 22 et 23 juin 2013.</a></div>
-            <?php endif; ?>
-		
 			<?php print render($page['content_top']); ?>
 
 			<?php if ($breadcrumb && !$is_front): ?>
