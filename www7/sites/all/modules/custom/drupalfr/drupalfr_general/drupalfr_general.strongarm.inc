@@ -102,14 +102,14 @@ Avancé<br/>
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'mollom_private_key';
-  $strongarm->value = '2d892a88bdae58a53d4ed6f2dcbb420f';
+  $strongarm->value = 'b3c4fc88039beb4678abe4024f51551d';
   $export['mollom_private_key'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'mollom_public_key';
-  $strongarm->value = 'b655e8ceffe4a8ca104aa29a5c7cf599';
+  $strongarm->value = 'd2a49d32eb10a577a0296ed1c788d1d5';
   $export['mollom_public_key'] = $strongarm;
 
   $strongarm = new stdClass();
