@@ -72,7 +72,7 @@ class twitter_puller {
         $num = 100;
       }
       $url = 'https://api.twitter.com/1.1/search/tweets.json';
-      $query = '?q=' . rawurlencode($this->twitkey) ."&include_entities=true&count=${num}";
+      $query = '?q=' . rawurlencode($this->twitkey) ."-filter:retweets&include_entities=true&count=${num}";
     }
 
     // Look for the twitter-api-lib, using libraries module if possible
