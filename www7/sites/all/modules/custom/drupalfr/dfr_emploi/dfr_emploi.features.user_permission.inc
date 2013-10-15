@@ -10,6 +10,16 @@
 function dfr_emploi_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: create field_flag_moderation.
+  $permissions['create field_flag_moderation'] = array(
+    'name' => 'create field_flag_moderation',
+    'roles' => array(
+      0 => 'admin',
+      1 => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: create offre content.
   $permissions['create offre content'] = array(
     'name' => 'create offre content',
@@ -17,6 +27,25 @@ function dfr_emploi_user_default_permissions() {
       0 => 'authenticated user',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: edit field_flag_moderation.
+  $permissions['edit field_flag_moderation'] = array(
+    'name' => 'edit field_flag_moderation',
+    'roles' => array(
+      0 => 'admin',
+      1 => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: edit own field_flag_moderation.
+  $permissions['edit own field_flag_moderation'] = array(
+    'name' => 'edit own field_flag_moderation',
+    'roles' => array(
+      0 => 'admin',
+    ),
+    'module' => 'field_permissions',
   );
 
   // Exported permission: edit own offre content.
@@ -35,6 +64,25 @@ function dfr_emploi_user_default_permissions() {
       0 => 'authenticated user',
     ),
     'module' => 'publishcontent',
+  );
+
+  // Exported permission: view field_flag_moderation.
+  $permissions['view field_flag_moderation'] = array(
+    'name' => 'view field_flag_moderation',
+    'roles' => array(
+      0 => 'admin',
+      1 => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: view own field_flag_moderation.
+  $permissions['view own field_flag_moderation'] = array(
+    'name' => 'view own field_flag_moderation',
+    'roles' => array(
+      0 => 'admin',
+    ),
+    'module' => 'field_permissions',
   );
 
   return $permissions;

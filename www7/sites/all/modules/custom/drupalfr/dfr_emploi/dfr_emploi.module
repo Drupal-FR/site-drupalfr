@@ -181,3 +181,54 @@ function dfr_emploi_cron() {
     }
   }
 }
+
+/**
+ * Implements hook_action_info().
+ */
+function dfr_emploi_action_info() {
+  return array(
+    'dfr_emploi_reject_job_offer' => array(
+      'type' => 'node',
+      'label' => t('Reject and unpublish a job offer.'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+    'dfr_emploi_approve_job_offer' => array(
+      'type' => 'node',
+      'label' => t('Approve and publish a job offer.'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
+ * Unpublish and mark as rejected a job offer.
+ *
+ * @param $node
+ *   Job offer object.
+ *
+ * @param $context
+ */
+function dfr_emploi_reject_job_offer(&$node, $context) {
+  $node->field_flag_moderation[LANGUAGE_NONE][0]['value'] = 'rejected';
+  $node->status = 0;
+}
+
+
+/**
+ * Publish and mark as approved a job offer.
+ *
+ * @param $node
+ *   Job offer object.
+ *
+ * @param $context
+ */
+function dfr_emploi_approve_job_offer(&$node, $context) {
+  $node->field_flag_moderation[LANGUAGE_NONE][0]['value'] = 'approved';
+  $node->status = 1;
+}
