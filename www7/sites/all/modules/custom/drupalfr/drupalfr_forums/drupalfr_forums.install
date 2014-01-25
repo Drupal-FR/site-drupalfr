@@ -16,6 +16,15 @@ function drupalfr_forums_install() {
 }
 
 /**
+ * Implements hook_uninstall().
+ */
+function drupalfr_forums_uninstall() {
+  db_delete('variable')
+    ->condition('name', 'drupalfr_forums_%', 'LIKE')
+    ->execute();
+}
+
+/**
  * Implements hook_update_N().
  */
 function drupalfr_forums_update_7001(&$sandbox) {
