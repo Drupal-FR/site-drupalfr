@@ -123,9 +123,11 @@ function drupalfr_forums_form_forum_admin_settings_alter(&$form, &$form_state, $
   $field = field_info_field('taxonomy_forums');
   $voc = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
   $tree = taxonomy_get_tree($voc->vid, $field['settings']['allowed_values'][0]['parent']);
+  $containers = variable_get('forum_containers', array());
   foreach ($tree as $item) {
     $form['dfr']['drupalfr_forums_restricted_forums_list']['#options'][$item->tid] = str_repeat('-', $item->depth) . ' ' . $item->name;
-    if ($item->depth == 0) {
+    // Disable containers to only allow to restrict forums in which we can post.
+    if (in_array($item->tid, $containers)) {
       $form['dfr']['drupalfr_forums_restricted_forums_list'][$item->tid]['#disabled'] = TRUE;
     }
   }
