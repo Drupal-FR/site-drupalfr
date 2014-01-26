@@ -19,22 +19,20 @@ function drupalfr_forums_permission() {
 }
 
 /**
- * Checks if the forum section in restricted.
+ * Checks if the forum section is restricted.
  *
- * Do not try to put this on one line, we need to return TRUE only if the tid is
- * in the array AND the user does not have the bypass permission.
- *
- * @param string $forum_tid
- *   The forum subsection tid.
+ * @param int $forum_tid
+ *   The forum section tid.
  * @return bool
  *   TRUE if this forum is restricted and the user have no  bypass permission,
  * else FALSE.
  */
 function _drupalfr_forums_forum_is_restricted($forum_tid) {
-  if (in_array($forum_tid, array_filter(variable_get('drupalfr_forums_restricted_forums_list', array())))) {
-    return !user_access('bypass restricted forums');
-  }
-  return FALSE;
+  $restricted_forums = array_filter(variable_get('drupalfr_forums_restricted_forums_list', array()));
+  $is_restricted = in_array($forum_tid, $restricted_forums);
+  $has_bypass = user_access('bypass restricted forums');
+
+  return $is_restricted && !$has_bypass;
 }
 
 /**
