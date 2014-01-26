@@ -36,6 +36,31 @@ function _drupalfr_forums_forum_is_restricted($forum_tid) {
 }
 
 /**
+ * Checks if the user can post in the forum section.
+ *
+ * @param int $forum_tid
+ *   The forum section tid.
+ * @param mixed $uid
+ *   The user uid.
+ * @return bool
+ *   TRUE if the user can post in this forum section, else FALSE.
+ */
+function _drupalfr_forums_forum_can_post($forum_tid, $uid = NULL) {
+  if (NULL === $uid) {
+    global $user;
+    $uid = $user->uid;
+  }
+  elseif (is_object($uid)) {
+    $uid = $uid->uid;
+  }
+
+  $is_restricted = _drupalfr_forums_forum_is_restricted($forum_tid);
+  $has_enough_karma = userpoints_get_current_points($uid, 'all') < variable_get('drupalfr_forums_restricted_forums_amount', 15);
+
+  return !$is_restricted || $has_enough_karma;
+}
+
+/**
  * Implements hook_node_access().
  *
  * Forbids the user to create a post in a restricted forum if he does not have
@@ -44,7 +69,7 @@ function _drupalfr_forums_forum_is_restricted($forum_tid) {
 function drupalfr_forums_node_access($node, $op, $account) {
   if ($op == 'create' && $node == 'forum') {
     $requested_forum_id = arg(3);
-    if (_drupalfr_forums_forum_is_restricted($requested_forum_id) && userpoints_get_current_points($account->uid, 'all') < variable_get('drupalfr_forums_restricted_forums_amount', 15)) {
+    if (!_drupalfr_forums_forum_can_post($requested_forum_id, $account->uid)) {
       return NODE_ACCESS_DENY;
     }
   }
@@ -57,11 +82,9 @@ function drupalfr_forums_node_access($node, $op, $account) {
  * to create posts in this one.
  */
 function drupalfr_forums_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  global $user;
-
   if ($root_path == 'forum' || $root_path == 'forum/%') {
     $tid = (isset($router_item['page_arguments'][0]) ? $router_item['page_arguments'][0]->tid : 0);
-    if (_drupalfr_forums_forum_is_restricted($tid) && userpoints_get_current_points($user->uid, 'all') < variable_get('drupalfr_forums_restricted_forums_amount', 15)) {
+    if (!_drupalfr_forums_forum_can_post($tid)) {
       $field = field_info_field('taxonomy_forums');
       foreach ($field['bundles']['node'] as $type) {
         unset($data['actions']['output'][$type]);
@@ -85,11 +108,9 @@ function drupalfr_forums_menu_local_tasks_alter(&$data, $router_item, $root_path
 function drupalfr_forums_form_forum_node_form_alter(&$form, &$form_state, $form_id) {
   global $user;
 
-  if (userpoints_get_current_points($user->uid, 'all') < variable_get('drupalfr_forums_restricted_forums_amount', 15)) {
-    foreach ($form['taxonomy_forums'][LANGUAGE_NONE]['#options'] as $tid => $name) {
-      if (_drupalfr_forums_forum_is_restricted($tid)) {
-        unset($form['taxonomy_forums'][LANGUAGE_NONE]['#options'][$tid]);
-      }
+  foreach ($form['taxonomy_forums'][LANGUAGE_NONE]['#options'] as $tid => $name) {
+    if (!_drupalfr_forums_forum_can_post($tid)) {
+      unset($form['taxonomy_forums'][LANGUAGE_NONE]['#options'][$tid]);
     }
   }
 }
