@@ -78,17 +78,23 @@ function drupalfr_forums_node_access($node, $op, $account) {
 /**
  * Implements hook_menu_local_tasks_alter().
  *
- * Removes the node/add/form/% link from the actions if the user is not allowed
- * to create posts in this one.
+ * Removes the node/add/%type/% links from the actions on the 'forum' subpages
+ * if the user is not allowed to create posts in the current forum section.
+ * These links were added by the forum_menu_local_tasks_alter() function.
+ *
+ * @see forum_menu_local_tasks_alter().
  */
 function drupalfr_forums_menu_local_tasks_alter(&$data, $router_item, $root_path) {
   if ($root_path == 'forum' || $root_path == 'forum/%') {
     $tid = (isset($router_item['page_arguments'][0]) ? $router_item['page_arguments'][0]->tid : 0);
+    // If the user cannot post in this forum section.
     if (!_drupalfr_forums_forum_can_post($tid)) {
+      // Remove all node/add/%type/% links from the actions.
       $field = field_info_field('taxonomy_forums');
       foreach ($field['bundles']['node'] as $type) {
         unset($data['actions']['output'][$type]);
       }
+      // Add a message to inform the user that he cannot post in the section.
       $data['actions']['output']['disallowed'] = array(
         '#theme' => 'menu_local_action',
         '#link' => array(
@@ -139,6 +145,7 @@ function drupalfr_forums_form_forum_admin_settings_alter(&$form, &$form_state, $
     '#options' => array(),
     '#default_value' => variable_get('drupalfr_forums_restricted_forums_list', array()),
   );
+  // Populate forums list.
   $field = field_info_field('taxonomy_forums');
   $voc = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
   $tree = taxonomy_get_tree($voc->vid, $field['settings']['allowed_values'][0]['parent']);
