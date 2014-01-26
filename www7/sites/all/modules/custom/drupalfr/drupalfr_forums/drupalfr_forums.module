@@ -135,7 +135,7 @@ function drupalfr_forums_form_forum_admin_settings_alter(&$form, &$form_state, $
   $form['dfr']['drupalfr_forums_restricted_forums_amount'] = array(
     '#type' => 'textfield',
     '#title' => t('Karma minimal'),
-    '#description' => t('Nombre de points de karma minimal nécessaire pour poster dans un forum restreint.'),
+    '#description' => t('Nombre de points de karma minimal nécessaires pour poster dans un forum restreint.'),
     '#default_value' => variable_get('drupalfr_forums_restricted_forums_amount', 15),
   );
 
