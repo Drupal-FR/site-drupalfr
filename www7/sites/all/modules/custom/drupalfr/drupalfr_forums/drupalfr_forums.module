@@ -5,3 +5,156 @@
  */
 
 include_once 'drupalfr_forums.features.inc';
+
+/**
+ * Implements hook_permission().
+ */
+function drupalfr_forums_permission() {
+  return array(
+    'bypass restricted forums' => array(
+      'title' => t('Bypass restricted forums'),
+      'description' => t('Allow to post in restricted forums even without enough karma.'),
+    ),
+  );
+}
+
+/**
+ * Checks if the forum section is restricted.
+ *
+ * @param int $forum_tid
+ *   The forum section tid.
+ * @return bool
+ *   TRUE if this forum is restricted and the user have no  bypass permission,
+ * else FALSE.
+ */
+function _drupalfr_forums_forum_is_restricted($forum_tid) {
+  $restricted_forums = array_filter(variable_get('drupalfr_forums_restricted_forums_list', array()));
+  $is_restricted = in_array($forum_tid, $restricted_forums);
+  $has_bypass = user_access('bypass restricted forums');
+
+  return $is_restricted && !$has_bypass;
+}
+
+/**
+ * Checks if the user can post in the forum section.
+ *
+ * @param int $forum_tid
+ *   The forum section tid.
+ * @param mixed $uid
+ *   The user uid.
+ * @return bool
+ *   TRUE if the user can post in this forum section, else FALSE.
+ */
+function _drupalfr_forums_forum_can_post($forum_tid, $uid = NULL) {
+  if (NULL === $uid) {
+    global $user;
+    $uid = $user->uid;
+  }
+  elseif (is_object($uid)) {
+    $uid = $uid->uid;
+  }
+
+  $is_restricted = _drupalfr_forums_forum_is_restricted($forum_tid);
+  $has_enough_karma = userpoints_get_current_points($uid, 'all') < variable_get('drupalfr_forums_restricted_forums_amount', 15);
+
+  return !$is_restricted || $has_enough_karma;
+}
+
+/**
+ * Implements hook_node_access().
+ *
+ * Forbids the user to create a post in a restricted forum if he does not have
+ * enough karma.
+ */
+function drupalfr_forums_node_access($node, $op, $account) {
+  if ($op == 'create' && $node == 'forum') {
+    $requested_forum_id = arg(3);
+    if (!_drupalfr_forums_forum_can_post($requested_forum_id, $account->uid)) {
+      return NODE_ACCESS_DENY;
+    }
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Removes the node/add/%type/% links from the actions on the 'forum' subpages
+ * if the user is not allowed to create posts in the current forum section.
+ * These links were added by the forum_menu_local_tasks_alter() function.
+ *
+ * @see forum_menu_local_tasks_alter().
+ */
+function drupalfr_forums_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  if ($root_path == 'forum' || $root_path == 'forum/%') {
+    $tid = (isset($router_item['page_arguments'][0]) ? $router_item['page_arguments'][0]->tid : 0);
+    // If the user cannot post in this forum section.
+    if (!_drupalfr_forums_forum_can_post($tid)) {
+      // Remove all node/add/%type/% links from the actions.
+      $field = field_info_field('taxonomy_forums');
+      foreach ($field['bundles']['node'] as $type) {
+        unset($data['actions']['output'][$type]);
+      }
+      // Add a message to inform the user that he cannot post in the section.
+      $data['actions']['output']['disallowed'] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => array(
+          'title' => t('You are not allowed to post new content in the forum.'),
+        ),
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Removes the restricted forums from the post creation form if the user does
+ * not have enough karma.
+ */
+function drupalfr_forums_form_forum_node_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
+
+  foreach ($form['taxonomy_forums'][LANGUAGE_NONE]['#options'] as $tid => $name) {
+    if (!_drupalfr_forums_forum_can_post($tid)) {
+      unset($form['taxonomy_forums'][LANGUAGE_NONE]['#options'][$tid]);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds configuration fields to the forum settings form.
+ */
+function drupalfr_forums_form_forum_admin_settings_alter(&$form, &$form_state, $form_id) {
+  $form['dfr'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('DrupalFr.org'),
+  );
+
+  $form['dfr']['drupalfr_forums_restricted_forums_amount'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Karma minimal'),
+    '#description' => t('Nombre de points de karma minimal nécessaires pour poster dans un forum restreint.'),
+    '#default_value' => variable_get('drupalfr_forums_restricted_forums_amount', 15),
+  );
+
+  $form['dfr']['drupalfr_forums_restricted_forums_list'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Forums restreints'),
+    '#options' => array(),
+    '#default_value' => variable_get('drupalfr_forums_restricted_forums_list', array()),
+  );
+  // Populate forums list.
+  $field = field_info_field('taxonomy_forums');
+  $voc = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
+  $tree = taxonomy_get_tree($voc->vid, $field['settings']['allowed_values'][0]['parent']);
+  $containers = variable_get('forum_containers', array());
+  foreach ($tree as $item) {
+    $form['dfr']['drupalfr_forums_restricted_forums_list']['#options'][$item->tid] = str_repeat('-', $item->depth) . ' ' . $item->name;
+    // Disable containers to only allow to restrict forums in which we can post.
+    if (in_array($item->tid, $containers)) {
+      $form['dfr']['drupalfr_forums_restricted_forums_list'][$item->tid]['#disabled'] = TRUE;
+    }
+  }
+}

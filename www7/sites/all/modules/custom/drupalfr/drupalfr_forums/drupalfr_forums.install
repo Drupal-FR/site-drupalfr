@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ * Code for the DrupalFR forums feature installation.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function drupalfr_forums_install() {
+  // Set the weight of the forum.module to 2 so it is loaded after the forum.module.
+  db_update('system')
+    ->fields(array('weight' => 2))
+    ->condition('name', 'drupalfr_forums')
+    ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function drupalfr_forums_uninstall() {
+  db_delete('variable')
+    ->condition('name', 'drupalfr_forums_%', 'LIKE')
+    ->execute();
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function drupalfr_forums_update_7001(&$sandbox) {
+  // Set the weight of the forum.module to 2 so it is loaded after the forum.module.
+  db_update('system')
+    ->fields(array('weight' => 2))
+    ->condition('name', 'drupalfr_forums')
+    ->execute();
+}
