@@ -524,7 +524,7 @@ function drupalfr_general_views_default_views() {
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  $handler->display->display_options['path'] = 'admin/user/spammer';
+  $handler->display->display_options['path'] = 'admin/people/spammer';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Trouve le spammer';
   $handler->display->display_options['menu']['weight'] = '0';

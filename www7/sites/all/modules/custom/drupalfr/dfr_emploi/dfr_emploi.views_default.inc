@@ -460,6 +460,11 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
+  /* Champ: Utilisateur : Courriel */
+  $handler->display->display_options['fields']['mail']['id'] = 'mail';
+  $handler->display->display_options['fields']['mail']['table'] = 'users';
+  $handler->display->display_options['fields']['mail']['field'] = 'mail';
+  $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
   /* Champ: Contenu : Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
@@ -808,6 +813,11 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
+  /* Champ: Utilisateur : Courriel */
+  $handler->display->display_options['fields']['mail']['id'] = 'mail';
+  $handler->display->display_options['fields']['mail']['table'] = 'users';
+  $handler->display->display_options['fields']['mail']['field'] = 'mail';
+  $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
   /* Champ: Contenu : Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
@@ -1069,6 +1079,11 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
+  /* Champ: Utilisateur : Courriel */
+  $handler->display->display_options['fields']['mail']['id'] = 'mail';
+  $handler->display->display_options['fields']['mail']['table'] = 'users';
+  $handler->display->display_options['fields']['mail']['field'] = 'mail';
+  $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
   /* Champ: Contenu : Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
@@ -1137,6 +1152,7 @@ function dfr_emploi_views_default_views() {
     t('Date de création'),
     t('Société'),
     t('Rédigé par'),
+    t('Courriel'),
     t('Flag modération'),
     t('Page d\'édition'),
     t('Publié'),
