@@ -22,8 +22,12 @@ $conf['cron_key'] = 'zMT41f2ar4tCNxVS_SN1mcWKNlQbIz9_se7KdzQlZHo';
 $conf['dfr_emploi_rewrite_urls'] = FALSE;
 $conf['drupalfr_planete_rewrite_urls'] = FALSE;
 
-// Change cookie domain.
+// Change cookie domain, example: .drupalfr.org .
 $cookie_domain = '';
+
+// If devel is enabled, uncomment this line to catch the emails. 
+// $conf['mail_system'] = array('default-system' => 'DevelMailLog');
+
 
 // SOLR configuration if you want to play with search.
 $conf['drupalfr_solr_server_options'] = array(
