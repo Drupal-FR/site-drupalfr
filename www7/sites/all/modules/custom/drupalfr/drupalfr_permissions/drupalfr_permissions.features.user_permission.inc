@@ -56,7 +56,8 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'access content overview',
     'roles' => array(
       0 => 'admin',
-      1 => 'node administrateurs',
+      1 => 'modérateur emploi',
+      2 => 'node administrateurs',
     ),
     'module' => 'node',
   );
@@ -1425,7 +1426,8 @@ function drupalfr_permissions_user_default_permissions() {
   $permissions['view own unpublished content'] = array(
     'name' => 'view own unpublished content',
     'roles' => array(
-      0 => 'authenticated user',
+      0 => 'admin',
+      1 => 'authenticated user',
     ),
     'module' => 'node',
   );
