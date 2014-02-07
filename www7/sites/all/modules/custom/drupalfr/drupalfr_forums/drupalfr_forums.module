@@ -68,7 +68,7 @@ function _drupalfr_forums_forum_can_post($forum_tid, $uid = NULL) {
   }
 
   $is_restricted = _drupalfr_forums_forum_is_restricted($forum_tid);
-  $has_enough_karma = userpoints_get_current_points($uid, 'all') < variable_get('drupalfr_forums_restricted_forums_amount', 15);
+  $has_enough_karma = userpoints_get_current_points($uid, 'all') >= variable_get('drupalfr_forums_restricted_forums_amount', 15);
 
   return !$is_restricted || $has_enough_karma;
 }
