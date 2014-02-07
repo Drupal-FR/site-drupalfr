@@ -81,8 +81,14 @@ function _drupalfr_forums_forum_can_post($forum_tid, $uid = NULL) {
  */
 function drupalfr_forums_node_access($node, $op, $account) {
   if ($op == 'create' && $node == 'forum') {
+    // Consider that we are on the node creation page by default.
     $requested_forum_id = arg(3);
-    if (!_drupalfr_forums_forum_can_post($requested_forum_id, $account->uid)) {
+    // If we are one a forum list page by default.
+    if (arg(0) == 'forum') {
+      $requested_forum_id = arg(1);
+    }
+
+    if (!empty($requested_forum_id) && !_drupalfr_forums_forum_can_post($requested_forum_id, $account->uid)) {
       return NODE_ACCESS_DENY;
     }
   }
