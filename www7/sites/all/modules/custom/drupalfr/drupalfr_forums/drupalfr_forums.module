@@ -5,3 +5,16 @@
  */
 
 include_once 'drupalfr_forums.features.inc';
+
+/**
+ * Implements hook_preprocess_comment().
+ *
+ * Add the 'comment-accepted' CSS class on comments that have been accepted by
+ * the post author.
+ */
+function drupalfr_forums_preprocess_comment(&$vars, $hook) {
+  $flag = flag_get_entity_flags('comment', $vars['comment']->cid, 'accepted_answer');
+  if (!empty($flag)) {
+    $vars['classes_array'][] = 'comment-accepted';
+  }
+}
