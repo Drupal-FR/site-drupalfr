@@ -36,3 +36,4 @@ $conf['drupalfr_solr_server_options'] = array(
   'path' => '/solr',
 );
 
+Merci pour votre aide !
