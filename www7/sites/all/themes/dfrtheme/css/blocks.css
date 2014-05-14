@@ -92,7 +92,7 @@
 /** ******************************************************* **/
 /** Content top                                             **/
 /** ******************************************************* **/
-.region-content-top .block {
+.region-content-top .block-dfr-blocks {
   background: #036ba5;
   background-image: -moz-radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
   background-image: -webkit-radial-gradient(50% 10%, circle cover, #01a5ca, #036ba5 70%);
@@ -109,8 +109,19 @@
   padding: 1em 0 3.5em 0;
   position: relative;
 }
+.region-content-top .block-block {
+  margin: 1em 0;
+  width: 100%;
+}
+.region-content-top .block-block img {
+  width: 100%;
+}
 
-.region-content-top .block-title {
+.region-content-top #block-block-12 {
+  display: none;
+}
+
+.region-content-top .block-dfr-blocks .block-title {
   /*background: url(../images/spacer-1.png) 0 100% repeat-x;*/
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   color: #fff;
@@ -122,22 +133,27 @@
   padding: 0 0 1em 1em;
   text-shadow: 0 1px 0 #000;
 }
-.region-content-top .block .content {
+.region-content-top ..block-dfr-blocks .content {
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   padding: 1em 2em 0 1em;
 }
-.region-content-top .block .btn-link {
+.region-content-top ..block-dfr-blocks .btn-link {
   position: absolute;
   bottom: 1em;
 }
-.region-content-top .block .btn-link:hover {
+.region-content-top ..block-dfr-blocks .btn-link:hover {
   background: #fff;
   color: #001D26;
 }
 
 @media screen and (min-width:640px) {
-  .region-content-top .block {
+  .region-content-top .block-block {
+    margin: 2em 0 1em 5%;
+    vertical-align: top;
+    width: 60%;
+  }
+  .region-content-top .block-dfr-blocks {
     display: inline-block;
     min-height: 200px;
     margin: 2em 2.5% 1em;
@@ -149,6 +165,12 @@
   }
   .region-content-top .block-3 {
     margin-right: 0;
+  }
+  .region-content-top #block-block-13 {
+    display: none;
+  }
+  .region-content-top #block-block-12 {
+    display: inline-block;
   }
 }
 
