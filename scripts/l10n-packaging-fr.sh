@@ -20,7 +20,7 @@ DIR="$RESULT/.."
 /usr/bin/drush dl drupal-7 -q --drupal-project-rename=drupal7 --destination=$DIR
 
 # Detection de version
-VERSION=`drush status drupal-version --pipe -r $DIR/drupal7`
+VERSION=`drush core-status drupal-version --format=list -r $DIR/drupal7`
 
 # Recuperation + copie de la trad de la version
 wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
@@ -41,8 +41,9 @@ rm -r $DIR/drupal-$VERSION
 #############
 # Telechargement Drupal
 /usr/bin/drush dl drupal-6 -q --drupal-project-rename=drupal6 --destination=$DIR
+
 # Detection de version
-VERSION=`drush status drupal-version --pipe -r $DIR/drupal6`
+VERSION=`drush core-status drupal-version --format=list -r $DIR/drupal6`
 
 # Recuperation + copie de la trad de la version
 wget http://ftp.drupal.org/files/translations/6.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
