@@ -17,10 +17,10 @@ DIR="$RESULT/.."
 # Version 7
 #############
 # Telechargement Drupal
-/usr/bin/drush dl drupal-7 -q --drupal-project-rename=drupal7 --destination=$DIR
+/usr/local/bin/drush dl drupal-7 -q --drupal-project-rename=drupal7 --destination=$DIR
 
 # Detection de version
-VERSION=`drush core-status drupal-version --format=list -r $DIR/drupal7`
+VERSION=`/usr/local/bin/drush core-status drupal-version --format=list -r $DIR/drupal7`
 
 # Recuperation + copie de la trad de la version
 wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
@@ -30,20 +30,20 @@ rm $DIR/drupal-$VERSION.fr.po
 mv $DIR/drupal7 $DIR/drupal-$VERSION
 
 # Tarball
-tar cpzf drupal-7.latest.tar.gz --directory $DIR drupal-$VERSION
+tar cpzf $DIR/scripts/drupal-7.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
 # Stockage du numéro de version dans une variable pour affichage sur le site.
-/usr/bin/drush -r $DIR/www7 vset drupalfr_current_version -q --yes --exact --format="string" "$VERSION"
+/usr/local/bin/drush -r $DIR/www7 vset drupalfr_current_version -q --yes --exact --format="string" "$VERSION"
 
 #############
 # Version 6
 #############
 # Telechargement Drupal
-/usr/bin/drush dl drupal-6 -q --drupal-project-rename=drupal6 --destination=$DIR
+/usr/local/bin/drush dl drupal-6 -q --drupal-project-rename=drupal6 --destination=$DIR
 
 # Detection de version
-VERSION=`drush core-status drupal-version --format=list -r $DIR/drupal6`
+VERSION=`/usr/local/bin/drush core-status drupal-version --format=list -r $DIR/drupal6`
 
 # Recuperation + copie de la trad de la version
 wget http://ftp.drupal.org/files/translations/6.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
@@ -53,11 +53,11 @@ rm $DIR/drupal-$VERSION.fr.po
 mv $DIR/drupal6 $DIR/drupal-$VERSION
 
 # Tarball
-tar cpzf drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
+tar cpzf $DIR/scripts/drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
 # Stockage du numéro de version dans une variable pour affichage sur le site.
-/usr/bin/drush -r $DIR/www7 vset drupalfr_previous_version -q --yes --exact --format="string" "$VERSION"
+/usr/local/bin/drush -r $DIR/www7 vset drupalfr_previous_version -q --yes --exact --format="string" "$VERSION"
 
 exit
 
