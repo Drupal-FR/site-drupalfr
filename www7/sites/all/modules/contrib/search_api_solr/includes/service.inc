@@ -27,28 +27,6 @@ class SearchApiSolrService extends SearchApiAbstractService {
   protected $solr;
 
   /**
-   * An array of all recognized types.
-   *
-   * Maps the type names to the prefixes used for identifying them in the Solr
-   * schema.
-   *
-   * @var array
-   */
-  protected static $type_prefixes = array(
-    'text' => 'tm',
-    'tokens' => 'tm',
-    'string' => 's',
-    'integer' => 'i',
-    'decimal' => 'f',
-    'date' => 'd',
-    'duration' => 'i',
-    'boolean' => 'b',
-    'uri' => 's',
-    'location' => 'loc',
-    'geohash' => 'geo',
-  );
-
-  /**
    * Static cache for getFieldNames().
    *
    * @var array
@@ -101,19 +79,22 @@ class SearchApiSolrService extends SearchApiAbstractService {
       'excerpt' => FALSE,
       'retrieve_data' => FALSE,
       'highlight_data' => FALSE,
-      'http_method' => 'POST',
+      'skip_schema_check' => FALSE,
+      'solr_version' => '',
+      'http_method' => 'AUTO',
       // Default to TRUE for new servers, but to FALSE for existing ones.
       'clean_ids' => $this->options ? FALSE : TRUE,
+      'site_hash' => $this->options ? FALSE : TRUE,
       'autocorrect_spell' => TRUE,
       'autocorrect_suggest_words' => TRUE,
     );
 
     if (!$options['clean_ids']) {
       if (module_exists('advanced_help')) {
-        $variables['@url']= url('help/search_api_solr/README.txt');
+        $variables['@url'] = url('help/search_api_solr/README.txt');
       }
       else {
-        $variables['@url']= url(drupal_get_path('module', 'search_api_solr') . '/README.txt');
+        $variables['@url'] = url(drupal_get_path('module', 'search_api_solr') . '/README.txt');
       }
       $description = t('Change Solr field names to be more compatible with advanced features. Doing this leads to re-indexing of all indexes on this server. See <a href="@url">README.txt</a> for details.', $variables);
       $form['clean_ids_form'] = array(
@@ -131,6 +112,25 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $form['clean_ids'] = array(
       '#type' => 'value',
       '#value' => $options['clean_ids'],
+    );
+
+    if (!$options['site_hash']) {
+      $description = t('If you want to index content from multiple sites on a single Solr server, you should enable the multi-site compatibility here. Note, however, that this will completely clear all search indexes (from this site) lying on this server. All content will have to be re-indexed.');
+      $form['site_hash_form'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Multi-site compatibility'),
+        '#description' => $description,
+        '#collapsible' => TRUE,
+      );
+      $form['site_hash_form']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Turn on multi-site compatibility and clear all indexes'),
+        '#submit' => array('_search_api_solr_switch_to_site_hash'),
+      );
+    }
+    $form['site_hash'] = array(
+      '#type' => 'value',
+      '#value' => $options['site_hash'],
     );
 
     $form['scheme'] = array(
@@ -210,6 +210,24 @@ class SearchApiSolrService extends SearchApiAbstractService {
       '#description' => t('When retrieving result data from the Solr server, try to highlight the search terms in the returned fulltext fields.'),
       '#default_value' => $options['highlight_data'],
     );
+    $form['advanced']['skip_schema_check'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Skip schema verification'),
+      '#description' => t('Skip the automatic check for schema-compatibillity. Use this override if you are seeing an error-message about an incompatible schema.xml configuration file, and you are sure the configuration is compatible.'),
+      '#default_value' => $options['skip_schema_check'],
+    );
+    $form['advanced']['solr_version'] = array(
+      '#type' => 'select',
+      '#title' => t('Solr version override'),
+      '#description' => t('Specify the Solr version manually in case it cannot be retrived automatically. The version can be found in the Solr admin interface under "Solr Specification Version" or "solr-spec"'),
+      '#options' => array(
+        '' => t('Determine automatically'),
+        '1' => '1.4',
+        '3' => '3.x',
+        '4' => '4.x',
+      ),
+      '#default_value' => $options['solr_version'],
+    );
     // Highlighting retrieved data only makes sense when we retrieve data.
     // (Actually, internally it doesn't really matter. However, from a user's
     // perspective, having to check both probably makes sense.)
@@ -219,9 +237,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $form['advanced']['http_method'] = array(
       '#type' => 'select',
       '#title' => t('HTTP method'),
-      '#description' => t('The HTTP method to use for sending queries. Usually, POST will work fine in all cases.'),
+      '#description' => t('The HTTP method to use for sending queries. GET will often fail with larger queries, while POST should not be cached. AUTO will use GET when possible, and POST for queries that are too large.'),
       '#default_value' => $options['http_method'],
       '#options' => array(
+        'AUTO' => t('AUTO'),
         'POST' => 'POST',
         'GET' => 'GET',
       ),
@@ -287,9 +306,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
   }
 
   /**
-   * Overrides SearchApiAbstractService::supportsFeature().
+   * {@inheritdoc}
    */
   public function supportsFeature($feature) {
+    // First, check the features we always support.
     $supported = drupal_map_assoc(array(
       'search_api_autocomplete',
       'search_api_facets',
@@ -297,37 +317,148 @@ class SearchApiSolrService extends SearchApiAbstractService {
       'search_api_grouping',
       'search_api_mlt',
       'search_api_multi',
+      'search_api_service_extra',
       'search_api_spellcheck',
       'search_api_data_type_location',
       'search_api_data_type_geohash',
     ));
-    return isset($supported[$feature]);
+    if (isset($supported[$feature])) {
+      return TRUE;
+    }
+
+    // If it is a custom data type, maybe we support it automatically via
+    // search_api_solr_hook_search_api_data_type_info().
+    if (substr($feature, 0, 21) != 'search_api_data_type_') {
+      return FALSE;
+    }
+    $type = substr($feature, 21);
+    $type = search_api_get_data_type_info($type);
+    // We only support it if the "prefix" key is set.
+    return $type && !empty($type['prefix']);
   }
 
   /**
    * Overrides SearchApiAbstractService::viewSettings().
+   *
+   * Returns an empty string since information is instead added via
+   * getExtraInformation().
    */
   public function viewSettings() {
-    $output = '';
-    $options = $this->options;
+    return '';
+  }
 
-    $output .= "<dl>\n  <dt>";
-    $output .= t('Solr server URI');
-    $output .= "</dt>\n  <dd>";
-    $output .= $this->getServerLink();
-    $output .= '</dd>';
-    if ($options['http_user']) {
-      $output .= "\n  <dt>";
-      $output .= t('Basic HTTP authentication');
-      $output .= "</dt>\n  <dd>";
-      $output .= t('Username: @user', array('@user' => $options['http_user']));
-      $output .= "</dd>\n  <dd>";
-      $output .= t('Password: @pass', array('@pass' => str_repeat('*', strlen($options['http_pass']))));
-      $output .= '</dd>';
+  /**
+   * {@inheritdoc}
+   */
+  public function getExtraInformation() {
+    $info = array();
+
+    $info[] = array(
+      'label' => t('Solr server URI'),
+      'info' => $this->getServerLink(),
+    );
+
+    if ($this->options['http_user']) {
+      $vars = array(
+        '@user' => $this->options['http_user'],
+        '@pass' => str_repeat('*', strlen($this->options['http_pass'])),
+      );
+      $http = t('Username: @user; Password: @pass', $vars);
+      $info[] = array(
+        'label' => t('Basic HTTP authentication'),
+        'info' => $http,
+      );
     }
-    $output .= "\n</dl>";
 
-    return $output;
+    if ($this->server->enabled) {
+      // If the server is enabled, check whether Solr can be reached.
+      $ping = $this->ping();
+      if ($ping) {
+        $msg = t('The Solr server could be reached (latency: @millisecs ms).', array('@millisecs' => $ping * 1000));
+      }
+      else {
+        $msg = t('The Solr server could not be reached. Further data is therefore unavailable.');
+      }
+      $info[] = array(
+        'label' => t('Connection'),
+        'info' => $msg,
+        'status' => $ping ? 'ok' : 'error',
+      );
+
+      if ($ping) {
+        try {
+          // If Solr can be reached, provide more information. This isn't done
+          // often (only when an admin views the server details), so we clear the
+          // cache to get the current data.
+          $this->connect();
+          $this->solr->clearCache();
+          $data = $this->solr->getLuke();
+          if (isset($data->index->numDocs)) {
+            // Collect the stats
+            $stats_summary = $this->solr->getStatsSummary();
+
+            $pending_msg = $stats_summary['@pending_docs'] ? t('(@pending_docs sent but not yet processed)', $stats_summary) : '';
+            $index_msg = $stats_summary['@index_size'] ? t('(@index_size on disk)', $stats_summary) : '';
+            $indexed_message = t('@num items !pending !index_msg', array(
+              '@num' => $data->index->numDocs,
+              '!pending' => $pending_msg,
+              '!index_msg' => $index_msg,
+            ));
+            $info[] = array(
+              'label' => t('Indexed'),
+              'info' => $indexed_message,
+            );
+
+            if (!empty($stats_summary['@deletes_total'])) {
+              $info[] = array(
+                'label' => t('Pending Deletions'),
+                'info' => $stats_summary['@deletes_total'],
+              );
+            }
+
+            $info[] = array(
+              'label' => t('Delay'),
+              'info' => t('@autocommit_time before updates are processed.', $stats_summary),
+            );
+
+            $status = 'ok';
+            if (empty($this->options['skip_schema_check'])) {
+              if (substr($stats_summary['@schema_version'], 0, 10) == 'search-api') {
+                drupal_set_message(t('Your schema.xml version is too old. Please replace all configuration files with the ones packaged with this module and re-index you data.'), 'error');
+                $status = 'error';
+              }
+              elseif (substr($stats_summary['@schema_version'], 0, 9) != 'drupal-4.') {
+                $variables['@url'] = url(drupal_get_path('module', 'search_api_solr') . '/INSTALL.txt');
+                $message = t('You are using an incompatible schema.xml configuration file. Please follow the instructions in the <a href="@url">INSTALL.txt</a> file for setting up Solr.', $variables);
+                drupal_set_message($message, 'error');
+                $status = 'error';
+              }
+            }
+            $info[] = array(
+              'label' => t('Schema'),
+              'info' => $stats_summary['@schema_version'],
+              'status' => $status,
+            );
+
+            if (!empty($stats_summary['@core_name'])) {
+              $info[] = array(
+                'label' => t('Solr Core Name'),
+                'info' => $stats_summary['@core_name'],
+              );
+            }
+          }
+        }
+        catch (SearchApiException $e) {
+          $info[] = array(
+            'label' => t('Additional information'),
+            'info' => t('An error occurred while trying to retrieve additional information from the Solr server: @msg.', array('@msg' => $e->getMessage())),
+            'status' => 'error',
+          );
+        }
+      }
+    }
+
+    return $info;
   }
 
   /**
@@ -388,16 +519,21 @@ class SearchApiSolrService extends SearchApiAbstractService {
     if (module_exists('search_api_multi') && module_exists('search_api_views')) {
       views_invalidate_cache();
     }
-    $id = is_object($index) ? $index->machine_name : $index;
+    $index_id = is_object($index) ? $index->machine_name : $index;
     // Only delete the index's data if the index isn't read-only.
     if (!is_object($index) || empty($index->read_only)) {
-      try {
-        $this->connect();
-        $this->solr->deleteByQuery("index_id:" . $id);
+      $this->connect();
+      $index_id = $this->getIndexId($index_id);
+      // Since the index ID we use for indexing can contain arbitrary
+      // prefixes, we have to escape it for use in the query.
+      $index_id = call_user_func(array($this->connection_class, 'phrase'), $index_id);
+      $query = "index_id:$index_id";
+      if (!empty($this->options['site_hash'])) {
+        // We don't need to escape the site hash, as that consists only of
+        // alphanumeric characters.
+        $query .= ' hash:' . search_api_solr_site_hash();
       }
-      catch (Exception $e) {
-        watchdog_exception('search_api_solr', $e, "%type while deleting an index's data: !message in %function (line %line of %file).");
-      }
+      $this->solr->deleteByQuery($query);
     }
   }
 
@@ -407,28 +543,54 @@ class SearchApiSolrService extends SearchApiAbstractService {
   public function indexItems(SearchApiIndex $index, array $items) {
     $documents = array();
     $ret = array();
-    $index_id = $index->machine_name;
+    $index_id = $this->getIndexId($index->machine_name);
     $fields = $this->getFieldNames($index);
+    $languages = language_list();
+    $base_urls = array();
 
     foreach ($items as $id => $item) {
-      try {
-        $doc = new SearchApiSolrDocument();
-        $doc->setField('id', $this->createId($index_id, $id));
-        $doc->setField('index_id', $index_id);
-        $doc->setField('item_id', $id);
+      $doc = new SearchApiSolrDocument();
+      $doc->setField('id', $this->createId($index_id, $id));
+      $doc->setField('index_id', $index_id);
+      $doc->setField('item_id', $id);
 
-        foreach ($item as $key => $field) {
-          if (!isset($fields[$key])) {
-            throw new SearchApiException(t('Unknown field @field.', array('@field' => $key)));
+      // If multi-site compatibility is enabled, add the site hash and
+      // language-specific base URL.
+      if (!empty($this->options['site_hash'])) {
+        $doc->setField('hash', search_api_solr_site_hash());
+        $lang = $item['search_api_language']['value'];
+        if (empty($base_urls[$lang])) {
+          $url_options = array('absolute' => TRUE);
+          if (isset($languages[$lang])) {
+            $url_options['language'] = $languages[$lang];
           }
-          $this->addIndexField($doc, $fields[$key], $field['value'], $field['type']);
+          $base_urls[$lang] = url(NULL, $url_options);
         }
+        $doc->setField('site', $base_urls[$lang]);
+      }
 
+      // Now add all fields contained in the item, with dynamic fields.
+      foreach ($item as $key => $field) {
+        // If the field is not known for the index, something weird has
+        // happened. We refuse to index the items and hope that the others are
+        // OK.
+        if (!isset($fields[$key])) {
+          $type = search_api_get_item_type_info($index->item_type);
+          $vars = array(
+            '@field' => $key,
+            '@type' => $type ? $type['name'] : $index->item_type,
+            '@id' => $id,
+          );
+          watchdog('search_api_solr', 'Error while indexing: Unknown field @field set for @type with ID @id.', $vars, WATCHDOG_WARNING);
+          $doc = NULL;
+          break;
+        }
+        $this->addIndexField($doc, $fields[$key], $field['value'], $field['type']);
+      }
+
+      if ($doc) {
         $documents[] = $doc;
         $ret[] = $id;
-      }
-      catch (Exception $e) {
-        watchdog_exception('search_api_solr', $e, "%type while indexing @type with ID @id: !message in %function (line %line of %file).", array('@type' => $index->item_type, '@id' => $id), WATCHDOG_WARNING);
       }
     }
 
@@ -456,10 +618,14 @@ class SearchApiSolrService extends SearchApiAbstractService {
   /**
    * Creates an ID used as the unique identifier at the Solr server.
    *
-   * This has to consist of both index and item ID.
+   * This has to consist of both index and item ID. Optionally, the site hash is
+   * also included.
+   *
+   * @see search_api_solr_site_hash()
    */
   protected function createId($index_id, $item_id) {
-    return "$index_id-$item_id";
+    $site_hash = !empty($this->options['site_hash']) ? search_api_solr_site_hash() . '-' : '';
+    return "$site_hash$index_id-$item_id";
   }
 
   /**
@@ -495,9 +661,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
         }
 
         $inner_type = search_api_extract_inner_type($type);
-        $pref = isset(self::$type_prefixes[$inner_type]) ? self::$type_prefixes[$inner_type] : '';
-        if ($pref != 'tm') {
-          $pref .= $type == $inner_type ? 's' : 'm';
+        $type_info = search_api_solr_get_data_type_info($inner_type);
+        $pref = isset($type_info['prefix']) ? $type_info['prefix']: '';
+        if (empty($type_info['always multiValued'])) {
+          $pref .= ($type == $inner_type) ? 's' : 'm';
         }
         if (!empty($this->options['clean_ids'])) {
           $name = $pref . '_' . str_replace(':', '$', $key);
@@ -599,33 +766,33 @@ class SearchApiSolrService extends SearchApiAbstractService {
    * called in this fashion.
    */
   public function deleteItems($ids = 'all', SearchApiIndex $index = NULL) {
-    try {
-      $this->connect();
+    $this->connect();
+    if (is_array($ids)) {
+      $index_id = $this->getIndexId($index->machine_name);
+      $solr_ids = array();
+      foreach ($ids as $id) {
+        $solr_ids[] = $this->createId($index_id, $id);
+      }
+      $this->solr->deleteByMultipleIds($solr_ids);
+    }
+    else {
+      $query = array();
       if ($index) {
-        $index_id = $index->machine_name;
-        if (is_array($ids)) {
-          $solr_ids = array();
-          foreach ($ids as $id) {
-            $solr_ids[] = $this->createId($index_id, $id);
-          }
-          $this->solr->deleteByMultipleIds($solr_ids);
-        }
-        elseif ($ids == 'all') {
-          $this->solr->deleteByQuery("index_id:" . $index_id);
-        }
-        else {
-          $this->solr->deleteByQuery("index_id:" . $index_id . ' (' . $ids . ')');
-        }
+        $index_id = $this->getIndexId($index->machine_name);
+        $index_id = call_user_func(array($this->connection_class, 'phrase'), $index_id);
+        $query[] = "index_id:$index_id";
       }
-      else {
-        $q = $ids == 'all' ? '*:*' : $ids;
-        $this->solr->deleteByQuery($q);
+      if (!empty($this->options['site_hash'])) {
+        // We don't need to escape the site hash, as that consists only of
+        // alphanumeric characters.
+        $query[] = 'hash:' . search_api_solr_site_hash();
       }
-      $this->scheduleCommit();
+      if ($ids != 'all') {
+        $query[] = $query ? "($ids)" : $ids;
+      }
+      $this->solr->deleteByQuery($query ? implode(' ', $query) : '*:*');
     }
-    catch(SearchApiException $e) {
-      watchdog_exception('search_api_solr', $e, '%type while deleting items from server @server: !message in %function (line %line of %file).', array('@server' => $this->server->name));
-    }
+    $this->scheduleCommit();
   }
 
   /**
@@ -637,6 +804,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $this->request_handler = NULL;
     // Get field information.
     $index = $query->getIndex();
+    $index_id = $this->getIndexId($index->machine_name);
     $fields = $this->getFieldNames($index);
     // Get Solr connection.
     $this->connect();
@@ -663,7 +831,12 @@ class SearchApiSolrService extends SearchApiAbstractService {
     // Extract filters.
     $filter = $query->getFilter();
     $fq = $this->createFilterQueries($filter, $fields, $index->options['fields']);
-    $fq[] = 'index_id:' . $index->machine_name;
+    $fq[] = 'index_id:' . call_user_func(array($this->connection_class, 'phrase'), $index_id);
+    if (!empty($this->options['site_hash'])) {
+      // We don't need to escape the site hash, as that consists only of
+      // alphanumeric characters.
+      $fq[] = 'hash:' . search_api_solr_site_hash();
+    }
 
     // Extract sort.
     $sort = array();
@@ -703,7 +876,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
         }
       }
       $mlt_params['mlt.fl'] = implode(',', $mlt_fl);
-      $id = $this->createId($index->machine_name, $mlt['id']);
+      $id = $this->createId($index_id, $mlt['id']);
       $id = call_user_func(array($this->connection_class, 'phrase'), $id);
       $keys = 'id:' . $id;
     }
@@ -897,7 +1070,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       $params['fl'] = '*,score';
     }
     // Retrieve http method from server options.
-    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'POST';
+    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'AUTO';
 
     $call_args = array(
       'query'       => &$keys,
@@ -1033,7 +1206,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
       $result['id'] = $result['fields']['search_api_id'];
       $result['score'] = $result['fields']['search_api_relevance'];
 
-      $solr_id = $this->createId($index->machine_name, $result['id']);
+      $index_id = $this->getIndexId($index->machine_name);
+      $solr_id = $this->createId($index_id, $result['id']);
       $excerpt = $this->getExcerpt($response, $solr_id, $result['fields'], $fields);
       if ($excerpt) {
         $result['excerpt'] = $excerpt;
@@ -1261,7 +1435,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     // #conjunction | #negation | return value
     // ----------------------------------------------------------------
     // AND          | FALSE     | A B C
-    // AND          | TRUE      | -(A B C)
+    // AND          | TRUE      | -(A AND B AND C)
     // OR           | FALSE     | ((A) OR (B) OR (C))
     // OR           | TRUE      | -A -B -C
 
@@ -1277,7 +1451,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       }
       return '((' . implode(') OR (', $k) . '))';
     }
-    $k = implode(' ', $k);
+    $k = implode($neg ? ' AND ' : ' ', $k);
     return $neg ? "*:* AND -($k)" : $k;
   }
 
@@ -1318,6 +1492,16 @@ class SearchApiSolrService extends SearchApiAbstractService {
    */
   protected function createFilterQuery($field, $value, $operator, $field_info) {
     $field = call_user_func(array($this->connection_class, 'escapeFieldName'), $field);
+    // Special handling for location fields.
+    if (isset($field_info['real_type']) && $field_info['real_type'] == 'location') {
+      // Empty / non-empty comparison has to take place in one of the subfields
+      // of the location field type. These subfields are usually generated with
+      // the index and the field type as name suffix.
+      // @TODO Do we need to handle other operators / values too?
+      if ($value === NULL) {
+        $field .= '_0___tdouble';
+      }
+    }
     if ($value === NULL) {
       return ($operator == '=' ? '*:* AND -' : '') . "$field:[* TO *]";
     }
@@ -1578,7 +1762,13 @@ class SearchApiSolrService extends SearchApiAbstractService {
 
     // Extract filters
     $fq = $this->createFilterQueries($query->getFilter(), $fields, $index->options['fields']);
-    $fq[] = 'index_id:' . $index->machine_name;
+    $index_id = $this->getIndexId($index->machine_name);
+    $fq[] = 'index_id:' . call_user_func(array($this->connection_class, 'phrase'), $index_id);
+    if (!empty($this->options['site_hash'])) {
+      // We don't need to escape the site hash, as that consists only of
+      // alphanumeric characters.
+      $fq[] = 'hash:' . search_api_solr_site_hash();
+    }
 
     // Autocomplete magic
     $facet_fields = array();
@@ -1601,7 +1791,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       'spellcheck.count' => 1,
     );
     // Retrieve http method from server options.
-    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'POST';
+    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'AUTO';
 
     $call_args = array(
       'query'       => &$keys,
@@ -1741,11 +1931,11 @@ class SearchApiSolrService extends SearchApiAbstractService {
         'type' => 'string',
       ),
     );
-    foreach ($query->getIndexes() as $index_id => $index) {
+    foreach ($query->getIndexes() as $index) {
       if (empty($index->options['fields'])) {
         continue;
       }
-      $prefix = $index_id . ':';
+      $prefix = $this->getIndexId($index->machine_name) . ':';
       foreach ($this->getFieldNames($index) as $field => $key) {
         if (!isset($solr_fields[$field])) {
           $solr_fields[$prefix . $field] = $key;
@@ -1775,10 +1965,16 @@ class SearchApiSolrService extends SearchApiAbstractService {
 
     // Restrict search to searched indexes.
     $index_filter = array();
-    foreach ($query->getIndexes() as $index_id => $index) {
+    foreach ($query->getIndexes() as $index) {
+      $index_id = $this->getIndexId($index->machine_name);
       $index_filter[] = 'index_id:' . call_user_func(array($this->connection_class, 'phrase'), $index_id);
     }
     $fq[] = implode(' OR ', $index_filter);
+    if (!empty($this->options['site_hash'])) {
+      // We don't need to escape the site hash, as that consists only of
+      // alphanumeric characters.
+      $fq[] = 'hash:' . search_api_solr_site_hash();
+    }
 
     // Extract sort
     $sort = array();
@@ -1827,7 +2023,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     }
 
     // Retrieve http method from server options.
-    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'POST';
+    $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'AUTO';
 
     // Send search request
     $time_processing_done = microtime(TRUE);
@@ -1892,7 +2088,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
             $terms = clone $terms;
             unset($terms->_empty_);
           }
-          $type = isset($index->options['fields'][$info['field']]['type']) ? search_api_extract_inner_type($index->options['fields'][$info['field']]['type']) : 'string';
+          $type = isset($fields[$info['field']]['type']) ? search_api_extract_inner_type($fields[$info['field']]['type']) : 'string';
           foreach ($terms as $term => $count) {
             if ($count >= $min_count) {
               if ($term === '_empty_') {
@@ -1926,6 +2122,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
         }
       }
     }
+
+    drupal_alter('search_api_solr_multi_search_results', $results, $query, $response);
 
     // Compute performance
     $time_end = microtime(TRUE);
@@ -2052,6 +2250,28 @@ class SearchApiSolrService extends SearchApiAbstractService {
       $params['file'] = $file;
     }
     return $this->solr->makeServletRequest($file_servlet_name, $params);
+  }
+
+  /**
+   * Prefixes an index ID as configured.
+   *
+   * The resulting ID will be a concatenation of the following strings:
+   * - If set, the "search_api_solr_index_prefix" variable.
+   * - If set, the index-specific "search_api_solr_index_prefix_INDEX" variable.
+   * - The index's machine name.
+   *
+   * @param string $machine_name
+   *   The index's machine name.
+   *
+   * @return string
+   *   The prefixed machine name.
+   */
+  protected function getIndexId($machine_name) {
+    // Prepend per-index prefix.
+    $id = variable_get('search_api_solr_index_prefix_' . $machine_name, '') . $machine_name;
+    // Prepend environment prefix.
+    $id = variable_get('search_api_solr_index_prefix', '') . $id;
+    return $id;
   }
 
 }

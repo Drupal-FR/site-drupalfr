@@ -59,13 +59,12 @@ function search_api_solr_requirements($phase) {
  * Implements hook_uninstall().
  */
 function search_api_solr_uninstall() {
-  if (module_exists('search_api')) {
-    db_delete('search_api_server')
-      ->condition('class', 'search_api_solr_service')
-      ->execute();
-  }
   variable_del('search_api_solr_last_optimize');
   variable_del('search_api_solr_autocomplete_max_occurrences');
+  variable_del('search_api_solr_index_prefix');
+  variable_del('search_api_solr_http_get_max_length');
+  variable_del('search_api_solr_cron_action');
+  variable_del('search_api_solr_site_hash');
 }
 
 /**
