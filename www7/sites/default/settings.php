@@ -19,7 +19,7 @@ $drupal_hash_salt = '';
 /**
  * Shared base domain
  */
-$cookie_domain = '.drupalfr.org';
+#$cookie_domain = '.drupalfr.org';
 
 /**
  * PHP settings:
