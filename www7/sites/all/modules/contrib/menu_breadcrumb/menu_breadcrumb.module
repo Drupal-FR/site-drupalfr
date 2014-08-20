@@ -324,7 +324,9 @@ function menu_breadcrumb_init() {
       else {
         if (array_key_exists($menu_name, $menu_link_menus)) {
           $active_menus = menu_get_active_menu_names();
-          $active_menus[] = $menu_name;
+          // Add our menu to the front of the active menus list so it takes
+          // precedence over all other menus.
+          array_unshift($active_menus, $menu_name);
           menu_set_active_menu_names($active_menus);
           break;
         }
