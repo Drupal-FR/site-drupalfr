@@ -31,7 +31,7 @@ function flag_flag_is_flagged_access_get_children($plugin, $parent) {
 
   foreach ($entities as $entity_type => $info) {
     if (entity_type_supports($entity_type, 'view')) {
-      $plugin['title'] =  t('@entity_type is flagged', array('@entity_type' => $info['label']));
+      $plugin['title'] = t('@entity_type is flagged', array('@entity_type' => $info['label']));
       $plugin['keyword'] = $entity_type;
       $plugin['name'] = $parent . ':' . $entity_type;
       $plugin['required context'] = new ctools_context_required(t('Entity'), $entity_type);
@@ -46,22 +46,35 @@ function flag_flag_is_flagged_access_get_children($plugin, $parent) {
  * Settings form.
  */
 function flag_flag_is_flagged_access_settings(&$form, &$form_state, $conf) {
-  $options = array();
+  $flag_name_options = array();
 
   $plugin = $form_state['plugin'];
   $entity_type = explode(':', $plugin['name']);
   $entity_type = $entity_type[1];
 
   foreach (flag_get_flags($entity_type) as $flag) {
-    $options[$flag->name] = check_plain($flag->title);
+    $flag_name_options[$flag->name] = check_plain($flag->title);
   }
+
+  $flag_user_options = array(
+    'any' => t('Flagged by anyone'),
+    'user' => t('Flagged by current user'),
+  );
+  $flag_user_default = isset($conf['flag_user']) ? $conf['flag_user'] : 'user';
 
   $form['settings']['flag_name'] = array(
     '#title' => t('Flag name'),
     '#type' => 'radios',
-    '#options' => $options,
+    '#options' => $flag_name_options,
     '#description' => t('Include only flagged content.'),
     '#default_value' => $conf['flag_name'],
+  );
+  $form['settings']['flag_user'] = array(
+    '#title' => t('Filter by flag owner'),
+    '#type' => 'radios',
+    '#options' => $flag_user_options,
+    '#description' => t('Show content flagged by anyone or only by current user.'),
+    '#default_value' => $flag_user_default,
   );
   return $form;
 }
@@ -78,19 +91,33 @@ function flag_flag_is_flagged_access_check($conf, $context) {
   // Get the ID of the entity.
   list($id) = entity_extract_ids($flag->entity_type, $context->data);
 
-  return $flag->is_flagged($id);
+  // Get either the count of users who have flagged this entity or find out
+  // whether the current user has flagged this node, depending on settings.
+  if (isset($conf['flag_user']) && $conf['flag_user'] == 'any') {
+    $count = count(flag_get_entity_flags($flag->entity_type, $id, $conf['flag_name']));
+    return $count;
+  }
+  else {
+    return $flag->is_flagged($id);
+  }
 }
 
 /**
- * Provide a summary description based upon the specified context
+ * Provide a summary description based upon the specified context.
  */
 function flag_flag_is_flagged_access_summary($conf, $context) {
   $flag = flag_get_flag($conf['flag_name']);
 
   if ($flag) {
-    return t('@identifier is flagged with "@flag"', array('@flag' => check_plain($flag->title), '@identifier' => $context->identifier));
+    $flag_limit_by = '';
+    if (isset($conf['flag_user']) && $conf['flag_user'] == 'user') {
+      return t('@identifier is flagged with "@flag" by current user.', array('@flag' => $flag->title, '@identifier' => $context->identifier));
+    }
+    elseif (isset($conf['flag_user']) && $conf['flag_user'] == 'any') {
+      return t('@identifier is flagged with "@flag" by anyone.', array('@flag' => $flag->title, '@identifier' => $context->identifier));
+    }
   }
   else {
-    return t('Missing/ deleted flag "@flag"', array('@flag' => $conf['flag_name']));
+    return t('Missing/deleted flag "@flag"', array('@flag' => $conf['flag_name']));
   }
 }

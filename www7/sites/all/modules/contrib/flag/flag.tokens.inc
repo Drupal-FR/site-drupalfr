@@ -7,6 +7,8 @@
 
 /**
  * Implements of hook_token_info().
+ *
+ * The tokens we provide on generic entities require token module.
  */
 function flag_token_info() {
   $types = array();
@@ -74,18 +76,29 @@ function flag_token_info() {
     'description' => t('The current count total for this flag.'),
   );
 
-  // Add tokens for the flag count available at the node/comment/user level.
-  foreach (flag_get_types() as $flag_type) {
-    $flags = flag_get_flags($flag_type);
-    foreach ($flags as $flag) {
-      $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->name) . '-count'] = array(
-        'name' => t('@flag flag count', array('@flag' => $flag->get_title())),
-        'description' => t('Total flag count for flag @flag', array('@flag' => $flag->get_title())),
-      );
-      $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->name) . '-link'] = array(
-        'name' => t('@flag flag link', array('@flag' => $flag->get_title())),
-        'description' => t('Flag/unflag link for @flag', array('@flag' => $flag->get_title())),
-      );
+  // Add tokens for the flag count available at the entity level.
+  // These require token module because we need its helper data and functions
+  // to deal with token types that are not the same as the entity types they are
+  // for (in particular, terms and vocabularies).
+  if (module_exists('token')) {
+    $entity_info = entity_get_info();
+    foreach (flag_get_types() as $flag_type) {
+      // The flag type is the entity type, but this is not necessarily the same
+      // as the entity's token type.
+      $token_type = $entity_info[$flag_type]['token type'];
+      $flags = flag_get_flags($flag_type);
+      foreach ($flags as $flag) {
+        $tokens[$token_type]['flag-' . str_replace('_', '-', $flag->name) . '-count'] = array(
+          'name' => t('@flag flag count', array('@flag' => $flag->get_title())),
+          'description' => t('Total flag count for flag @flag', array('@flag' => $flag->get_title())),
+          'flag-type' => $flag_type,
+        );
+        $tokens[$token_type]['flag-' . str_replace('_', '-', $flag->name) . '-link'] = array(
+          'name' => t('@flag flag link', array('@flag' => $flag->get_title())),
+          'description' => t('Flag/unflag link for @flag', array('@flag' => $flag->get_title())),
+          'flag-type' => $flag_type,
+        );
+      }
     }
   }
 
@@ -110,6 +123,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
         case 'name':
           $replacements[$original] = $sanitize ? check_plain($flag->name) : $flag->name;
           break;
+
         case 'title':
           $replacements[$original] = $sanitize ? check_plain($flag->get_title()) : $flag->get_title();
           break;
@@ -136,18 +150,23 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
         case 'action':
           $replacements[$original] = $action->action;
           break;
+
         case 'entity-url':
           $replacements[$original] = $sanitize ? check_url($action->entity_url) : $action->entity_url;
           break;
+
         case 'entity-title':
           $replacements[$original] = $sanitize ? check_plain($action->entity_title) : $action->entity_title;
           break;
+
         case 'entity-type':
           $replacements[$original] = $action->entity_type;
           break;
+
         case 'entity-id':
           $replacements[$original] = $action->entity_id;
           break;
+
         case 'count':
           $replacements[$original] = $action->count;
           break;
@@ -155,18 +174,23 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
     }
   }
 
-  if (isset($data[$type]) && in_array($type, flag_get_types())) {
-    $flags = flag_get_flags($type);
-    $object = $data[$type];
-    foreach ($flags as $flag) {
-      foreach ($tokens as $name => $original) {
-        $flag_count_token = 'flag-' . str_replace('_', '-', $flag->name) . '-count';
-        $flag_link_token = 'flag-' . str_replace('_', '-', $flag->name) . '-link';
-        if ($name == $flag_count_token) {
-          $replacements[$original] = $flag->get_count($flag->get_entity_id($object));
-        }
-        elseif ($name == $flag_link_token) {
-          $replacements[$original] = flag_create_link($flag->name, $flag->get_entity_id($object));
+  // We only provide tokens on entity types if we have token module's helper
+  // methods available.
+  if (isset($data[$type]) && module_exists('token')) {
+    $entity_type = token_get_entity_mapping('token', $type);
+    if ($entity_type && in_array($entity_type, flag_get_types())) {
+      $flags = flag_get_flags($entity_type);
+      $object = $data[$type];
+      foreach ($flags as $flag) {
+        foreach ($tokens as $name => $original) {
+          $flag_count_token = 'flag-' . str_replace('_', '-', $flag->name) . '-count';
+          $flag_link_token = 'flag-' . str_replace('_', '-', $flag->name) . '-link';
+          if ($name == $flag_count_token) {
+            $replacements[$original] = $flag->get_count($flag->get_entity_id($object));
+          }
+          elseif ($name == $flag_link_token) {
+            $replacements[$original] = flag_create_link($flag->name, $flag->get_entity_id($object));
+          }
         }
       }
     }

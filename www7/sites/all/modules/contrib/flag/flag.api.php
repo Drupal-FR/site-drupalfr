@@ -58,11 +58,11 @@ function hook_flag_type_info_alter(&$definitions) {
  */
 function hook_flag_default_flags() {
   $flags = array();
-  $flags['bookmarks'] = array (
+  $flags['bookmarks'] = array(
     'entity_type' => 'node',
     'title' => 'Bookmarks',
     'global' => FALSE,
-    'types' => array (
+    'types' => array(
       0 => 'article',
       1 => 'blog',
     ),
@@ -75,7 +75,7 @@ function hook_flag_default_flags() {
     'unflag_denied_text' => '',
     'link_type' => 'toggle',
     'weight' => 0,
-    'show_in_links' => array (
+    'show_in_links' => array(
       'full' => TRUE,
       'token' => FALSE,
     ),
@@ -91,9 +91,21 @@ function hook_flag_default_flags() {
 }
 
 /**
+ * Alter the definition of default flags.
+ *
+ * @param array &$flags
+ *   An array keyed by flag machine name containing flag definitions.
+ */
+function hook_flag_default_flags_alter(&$flags) {
+  if (!empty($flags['bookmark'])) {
+    $flags['bookmark']['title'] = 'Bananana Bookmark';
+  }
+}
+
+/**
  * Allow modules to alter a flag when it is initially loaded.
  *
- * @see flag_get_flags().
+ * @see flag_get_flags()
  */
 function hook_flag_alter(&$flag) {
 
@@ -183,7 +195,7 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
       $count = count($flags[$flag->name]);
       if ($count >= 2) {
         // Users may flag only 2 nodes with this flag.
-        return(array('access-denied' => t('You may only flag 2 nodes with the test flag.')));
+        return (array('access-denied' => t('You may only flag 2 nodes with the test flag.')));
       }
     }
   }
@@ -350,15 +362,23 @@ function hook_flag_reset($flag, $entity_id, $rows) {
 /**
  * Alter the javascript structure that describes the flag operation.
  *
+ * @param $info
+ *   The info array before it is returned from flag_build_javascript_info().
  * @param $flag
  *   The full flag object.
- * @param $entity_id
- *   The ID of the node, comment, user or other object being flagged.
  *
  * @see flag_build_javascript_info()
  */
-function hook_flag_javascript_info_alter() {
-
+function hook_flag_javascript_info_alter(&$info, $flag) {
+  if ($flag->name === 'test') {
+    $info['newLink'] = $flag->theme($flag->is_flagged($info['contentId']) ? 'unflag' : 'flag', $info['contentId'], array(
+      'after_flagging' => TRUE,
+      'errors' => $flag->get_errors(),
+      // Additional options to pass to theme's preprocess function/template.
+      'icon' => TRUE,
+      'hide_text' => TRUE,
+    ));
+  }
 }
 
 /**
