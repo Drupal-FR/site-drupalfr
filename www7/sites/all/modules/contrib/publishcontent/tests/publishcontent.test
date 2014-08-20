@@ -33,6 +33,22 @@ abstract class PublishContentWebTestBase extends DrupalWebTestCase {
   public abstract function assertNodeOperationAccess($nid, $op, $expected_response, $msg = '');
 
   /**
+   * Allow content type to be used with publish content.
+   */
+  public function enablePublishContentForContentType($types) {
+    if (!is_array($types)) {
+      $types = array($types);
+    }
+
+    foreach ($types as $type) {
+      variable_set('publishcontent_' . $type, TRUE);
+    }
+
+    // Rebuild SimpleTests permissions cache.
+    $this->checkPermissions(array(), TRUE);
+  }
+
+  /**
    * Assert the status of a given node.
    *
    * @param int $nid
@@ -243,7 +259,7 @@ abstract class PublishContentWebTestBase extends DrupalWebTestCase {
    */
   public function testPublishNotUnpublish() {
     $type = 'page';
-    variable_set('publishcontent_' . $type, TRUE);
+    $this->enablePublishContentForContentType($type);
 
     $web_user = $this->drupalCreateUser(array(
       'access content',
@@ -274,7 +290,8 @@ abstract class PublishContentWebTestBase extends DrupalWebTestCase {
    */
   public function testNotPublishUnpublish() {
     $type = 'page';
-    variable_set('publishcontent_' . $type, TRUE);
+    $this->enablePublishContentForContentType($type);
+
     $web_user = $this->drupalCreateUser(array(
       'access content',
       'unpublish any ' . $type . ' content',
@@ -300,7 +317,7 @@ abstract class PublishContentWebTestBase extends DrupalWebTestCase {
    */
   public function testPublishUnpublish() {
     $type = 'page';
-    variable_set('publishcontent_' . $type, TRUE);
+    $this->enablePublishContentForContentType($type);
 
     $web_user_1 = $this->drupalCreateUser(array(
       'access content',
@@ -366,8 +383,7 @@ abstract class PublishContentWebTestBase extends DrupalWebTestCase {
    */
   public function testBasicPublishCallback() {
     $type = 'page';
-    variable_set('publishcontent_' . $type, TRUE);
-    variable_set('publishcontent_article', TRUE);
+    $this->enablePublishContentForContentType(array($type, 'article'));
 
     $web_user_1 = $this->drupalCreateUser(array(
       'access content',
@@ -697,7 +713,7 @@ class PublishContentCheckboxTests extends PublishContentWebTestBase {
    */
   public function testAccessNodeAdd() {
     $type = 'page';
-    variable_set('publishcontent_' . $type, TRUE);
+    $this->enablePublishContentForContentType($type);
 
     $web_user_1 = $this->drupalCreateUser(array(
       'access content',

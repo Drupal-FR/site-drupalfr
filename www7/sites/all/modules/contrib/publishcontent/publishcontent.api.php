@@ -17,13 +17,13 @@
  *   The user wanting to publish the node.
  *
  * @return bool|NULL
- *   TRUE - if the user should access return TRUE
- *   FALSE - if the user definetley should not access return FALSE
- *   NULL - This module wan't change the outcome. It is typically
- *   better to return NULL than FALSE. If no module returns TRUE
- *   then the user will be denied access. If one module returns
- *   FALSE then the user will denied even if another module returns
- *   TRUE.
+ *   PUBLISHCONTENT_ACCESS_ALLOW - if the account can publish the node
+ *   PUBLISHCONTENT_ACCESS_DENY - if the user definetley can not publish
+ *   PUBLISHCONTENT_ACCESS_IGNORE - This module wan't change the outcome.
+ *   It is typically better to return IGNORE than DENY. If no module returns
+ *   ALLOW then the account will be denied publish access. If one module
+ *   returns DENY then the user will denied even if another module returns
+ *   ALLOW.
  */
 function hook_publishcontent_publish_access($node, $account) {
   $access = !$node->status &&
@@ -37,8 +37,15 @@ function hook_publishcontent_publish_access($node, $account) {
   );
 
   if ($access) {
-    return TRUE;
+    // The user can publish the node according to this hook.
+    // If another hook denys access they will be denied.
+    return PUBLISHCONTENT_ACCESS_ALLOW;
   }
+
+  // This function does not believe they can publish but is
+  // not explicitly denying access to publish. If no other hooks
+  // allow it then the user will be denied.
+  return PUBLISHCONTENT_ACCESS_IGNORE;
 }
 
 /**
@@ -53,13 +60,13 @@ function hook_publishcontent_publish_access($node, $account) {
  *   The user wanting to unpublish the node.
  *
  * @return bool|NULL
- *   TRUE - if the user should access return TRUE
- *   FALSE - if the user definetley should not access return FALSE
- *   NULL - This module wan't change the outcome. It is typically
- *   better to return NULL than FALSE. If no module returns TRUE
- *   then the user will be denied access. If one module returns
- *   FALSE then the user will denied even if another module returns
- *   TRUE.
+ *   PUBLISHCONTENT_ACCESS_ALLOW - if the user can unpublish the node.
+ *   PUBLISHCONTENT_ACCESS_DENY - if the user definetley cannot unpublish.
+ *   PUBLISHCONTENT_ACCESS_IGNORE - This module wan't change the outcome.
+ *   It is typically better to return IGNORE than DENY. If no module returns
+ *   ALLOW then the user will be denied access. If one module returns
+ *   DENY then the user will denied even if another module returns
+ *   ALLOW.
  */
 function hook_publishcontent_unpublish_access($node, $account) {
   $access = $node->status &&
@@ -73,6 +80,13 @@ function hook_publishcontent_unpublish_access($node, $account) {
   );
 
   if ($access) {
-    return TRUE;
+    // The user is allowed to unpublish the node according to this hook.
+    // If another hook denys access they will be denied.
+    return PUBLISHCONTENT_ACCESS_ALLOW;
   }
+
+  // This function does not believe they can publish but is
+  // not explicitly denying access to publish. If no other hooks
+  // allow it then the user will be denied.
+  return PUBLISHCONTENT_ACCESS_IGNORE;
 }
