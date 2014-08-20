@@ -3,3 +3,14 @@ div.codeblock {
   border: 1px solid #CCC;
   background-color: #EEE;
 }
+
+/*
+Multiclass not supported in IE6.
+*/
+div.codeblock.nowrap-expand {
+  /*
+  Not supported in IE6 or 7.
+  */
+  white-space: nowrap;
+  overflow: hidden;
+}
