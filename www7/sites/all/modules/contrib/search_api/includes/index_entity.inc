@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Contains SearchApiIndex.
+ */
+
+/**
  * Class representing a search index.
  */
 class SearchApiIndex extends Entity {
@@ -175,21 +180,17 @@ class SearchApiIndex extends Entity {
    * Execute necessary tasks for a newly created index.
    */
   public function postCreate() {
-    if ($this->enabled) {
-      $this->queueItems();
-    }
-    $server = $this->server();
-    if ($server) {
-      // Tell the server about the new index.
-      if ($server->enabled) {
+    try {
+      if ($server = $this->server()) {
+        // Tell the server about the new index.
         $server->addIndex($this);
+        if ($this->enabled) {
+          $this->queueItems();
+        }
       }
-      else {
-        $tasks = variable_get('search_api_tasks', array());
-        // When we add or remove an index, we can ignore all other tasks.
-        $tasks[$server->machine_name][$this->machine_name] = array('add');
-        variable_set('search_api_tasks', $tasks);
-      }
+    }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
     }
   }
 
@@ -197,19 +198,13 @@ class SearchApiIndex extends Entity {
    * Execute necessary tasks when the index is removed from the database.
    */
   public function postDelete() {
-    if ($server = $this->server()) {
-      if ($server->enabled) {
+    try {
+      if ($server = $this->server()) {
         $server->removeIndex($this);
       }
-      // Once the index is deleted, servers won't be able to tell whether it was
-      // read-only. Therefore, we prefer to err on the safe side and don't call
-      // the server method at all if the index is read-only and the server
-      // currently disabled.
-      elseif (empty($this->read_only)) {
-        $tasks = variable_get('search_api_tasks', array());
-        $tasks[$server->machine_name][$this->machine_name] = array('remove');
-        variable_set('search_api_tasks', $tasks);
-      }
+    }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
     }
 
     // Stop tracking entities for indexing.
@@ -221,7 +216,12 @@ class SearchApiIndex extends Entity {
    */
   public function queueItems() {
     if (!$this->read_only) {
-      $this->datasource()->startTracking(array($this));
+      try {
+        $this->datasource()->startTracking(array($this));
+      }
+      catch (SearchApiException $e) {
+        watchdog_exception('search_api', $e);
+      }
     }
   }
 
@@ -229,15 +229,20 @@ class SearchApiIndex extends Entity {
    * Remove all records of entities to index.
    */
   public function dequeueItems() {
-    $this->datasource()->stopTracking(array($this));
-    _search_api_empty_cron_queue($this);
+    try {
+      $this->datasource()->stopTracking(array($this));
+    }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
+    }
   }
 
   /**
-   * Saves this index to the database, either creating a new record or updating
-   * an existing one.
+   * Saves this index to the database.
    *
-   * @return
+   * Either creates a new record or updates the existing one with the same ID.
+   *
+   * @return int|false
    *   Failure to save the index will return FALSE. Otherwise, SAVED_NEW or
    *   SAVED_UPDATED is returned depending on the operation performed. $this->id
    *   will be set if a new index was inserted.
@@ -246,14 +251,24 @@ class SearchApiIndex extends Entity {
     if (empty($this->description)) {
       $this->description = NULL;
     }
-    if (empty($this->server)) {
+    $server = FALSE;
+    if (!empty($this->server)) {
+      $server = search_api_server_load($this->server);
+      if (!$server) {
+        $vars['%server'] = $this->server;
+        $vars['%index'] = $this->name;
+        watchdog('search_api', 'Unknown server %server specified for index %index.', $vars, WATCHDOG_ERROR);
+      }
+    }
+    if (!$server) {
       $this->server = NULL;
       $this->enabled = FALSE;
     }
-    // This will also throw an exception if the server doesn't exist – which is good.
-    elseif (!$this->server(TRUE)->enabled) {
-      $this->enabled = FALSE;
+    if (!empty($this->options['fields'])) {
+      ksort($this->options['fields']);
     }
+
+    $this->resetCaches();
 
     return parent::save();
   }
@@ -267,7 +282,7 @@ class SearchApiIndex extends Entity {
    * @param array $fields
    *   The new field values.
    *
-   * @return
+   * @return int|false
    *   SAVE_UPDATED on success, FALSE on failure, 0 if the fields already had
    *   the specified values.
    */
@@ -296,7 +311,7 @@ class SearchApiIndex extends Entity {
   /**
    * Schedules this search index for re-indexing.
    *
-   * @return
+   * @return bool
    *   TRUE on success, FALSE on failure.
    */
   public function reindex() {
@@ -311,7 +326,7 @@ class SearchApiIndex extends Entity {
   /**
    * Clears this search index and schedules all of its items for re-indexing.
    *
-   * @return
+   * @return bool
    *   TRUE on success, FALSE on failure.
    */
   public function clear() {
@@ -319,19 +334,11 @@ class SearchApiIndex extends Entity {
       return TRUE;
     }
 
-    $server = $this->server();
-    if ($server->enabled) {
-      $server->deleteItems('all', $this);
+    try {
+      $this->server()->deleteItems('all', $this);
     }
-    else {
-      $tasks = variable_get('search_api_tasks', array());
-      // If the index was cleared or newly added since the server was last enabled, we don't need to do anything.
-      if (!isset($tasks[$server->machine_name][$this->machine_name])
-          || (array_search('add', $tasks[$server->machine_name][$this->machine_name]) === FALSE
-              && array_search('clear', $tasks[$server->machine_name][$this->machine_name]) === FALSE)) {
-        $tasks[$server->machine_name][$this->machine_name][] = 'clear';
-        variable_set('search_api_tasks', $tasks);
-      }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
     }
 
     _search_api_index_reindex($this);
@@ -377,7 +384,12 @@ class SearchApiIndex extends Entity {
    *   otherwise.
    */
   public function getEntityType() {
-    return $this->datasource()->getEntityType();
+    try {
+      return $this->datasource()->getEntityType();
+    }
+    catch (SearchApiException $e) {
+      return NULL;
+    }
   }
 
   /**
@@ -412,7 +424,7 @@ class SearchApiIndex extends Entity {
    *   SearchApiQueryInterface::__construct().
    *
    * @throws SearchApiException
-   *   If the index is currently disabled.
+   *   If the index is currently disabled or its server doesn't exist.
    *
    * @return SearchApiQueryInterface
    *   A query object for searching this index.
@@ -426,15 +438,20 @@ class SearchApiIndex extends Entity {
 
 
   /**
-   * Indexes items on this index. Will return an array of IDs of items that
-   * should be marked as indexed – i.e., items that were either rejected by a
-   * data-alter callback or were successfully indexed.
+   * Indexes items on this index.
+   *
+   * Will return an array of IDs of items that should be marked as indexed –
+   * i.e., items that were either rejected by a data-alter callback or were
+   * successfully indexed.
    *
    * @param array $items
-   *   An array of items to index.
+   *   An array of items to index, of this index's item type.
    *
    * @return array
    *   An array of the IDs of all items that should be marked as indexed.
+   *
+   * @throws SearchApiException
+   *   If an error occurred during indexing.
    */
   public function index(array $items) {
     if ($this->read_only) {
@@ -952,12 +969,18 @@ class SearchApiIndex extends Entity {
    * @return EntityMetadataWrapper
    *   A wrapper for the item type of this index, optionally loaded with the
    *   given data and having additional fields according to the data alterations
-   *   of this index.
+   *   of this index (if $alter wasn't set to FALSE).
    */
   public function entityWrapper($item = NULL, $alter = TRUE) {
-    $info['property info alter'] = $alter ? array($this, 'propertyInfoAlter') : '_search_api_wrapper_add_all_properties';
-    $info['property defaults']['property info alter'] = '_search_api_wrapper_add_all_properties';
-    return $this->datasource()->getMetadataWrapper($item, $info);
+    try {
+      $info['property info alter'] = $alter ? array($this, 'propertyInfoAlter') : '_search_api_wrapper_add_all_properties';
+      $info['property defaults']['property info alter'] = '_search_api_wrapper_add_all_properties';
+      return $this->datasource()->getMetadataWrapper($item, $info);
+    }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
+      return entity_metadata_wrapper($this->item_type);
+    }
   }
 
   /**
@@ -972,7 +995,13 @@ class SearchApiIndex extends Entity {
    * @see SearchApiDataSourceControllerInterface::loadItems()
    */
   public function loadItems(array $ids) {
-    return $this->datasource()->loadItems($ids);
+    try {
+      return $this->datasource()->loadItems($ids);
+    }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
+      return array();
+    }
   }
 
   /**
