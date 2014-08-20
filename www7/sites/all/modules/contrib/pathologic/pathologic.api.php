@@ -72,7 +72,7 @@ function hook_pathologic_alter(&$url_params, $parts, $settings) {
   }
 
   // If it's a path to a local image, make sure it's using our CDN server.
-  if (preg_match('~\.(png|gif|jpe?g)$', $url_params['path'])) {
+  if (preg_match('~\.(png|gif|jpe?g)$~', $url_params['path'])) {
     $url_params['path'] = 'http://cdn.example.com/' . $url_params['path'];
     $url_params['options']['external'] = TRUE;
   }

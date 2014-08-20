@@ -75,6 +75,16 @@ function _pathologic_settings($form, &$form_state, $filter, $format, $defaults, 
  * if language path prefixing (eg /ja/node/123) is in use. REMEMBER THIS IN THE
  * FUTURE, ALBRIGHT.
  *
+ * The below code uses the @ operator before parse_url() calls because in PHP
+ * 5.3.2 and earlier, parse_url() causes a warning of parsing fails. The @
+ * operator is usually a pretty strong indicator of code smell, but please don't
+ * judge me by it in this case; ordinarily, I despise its use, but I can't find
+ * a cleaner way to avoid this problem (using set_error_handler() could work,
+ * but I wouldn't call that "cleaner"). Fortunately, Drupal 8 will require at
+ * least PHP 5.3.5, so this mess doesn't have to spread into the D8 branch of
+ * Pathologic.
+ * @see https://drupal.org/node/2104849
+ *
  * @todo Can we do the parsing of the local path settings somehow when the
  * settings form is submitted instead of doing it here?
  */
@@ -82,14 +92,14 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
   // Get the base URL and explode it into component parts. We add these parts
   // to the exploded local paths settings later.
   global $base_url;
-  $base_url_parts = parse_url($base_url . '/');
+  $base_url_parts = @parse_url($base_url . '/');
   // Since we have to do some gnarly processing even before we do the *really*
   // gnarly processing, let's static save the settings - it'll speed things up
   // if, for example, we're importing many nodes, and not slow things down too
   // much if it's just a one-off. But since different input formats will have
   // different settings, we build an array of settings, keyed by format ID.
-  $settings = &drupal_static(__FUNCTION__, array());
-  if (!isset($settings[$filter->format])) {
+  $cached_settings = &drupal_static(__FUNCTION__, array());
+  if (!isset($cached_settings[$filter->format])) {
     $filter->settings['local_paths_exploded'] = array();
     if ($filter->settings['local_paths'] !== '') {
       // Build an array of the exploded local paths for this format's settings.
@@ -98,7 +108,7 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
       // @see http://drupal.org/node/1727492
       $local_paths = array_filter(array_map('trim', explode("\n", $filter->settings['local_paths'])));
       foreach ($local_paths as $local) {
-        $parts = parse_url($local);
+        $parts = @parse_url($local);
         // Okay, what the hellish "if" statement is doing below is checking to
         // make sure we aren't about to add a path to our array of exploded
         // local paths which matches the current "local" path. We consider it
@@ -145,37 +155,39 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
     // We'll also just store the host part separately for easy access.
     $filter->settings['base_url_host'] = $base_url_parts['host'];
 
-    $settings[$filter->format] = $filter->settings;
+    $cached_settings[$filter->format] = $filter->settings;
   }
   // Get the language code for the text we're about to process.
-  $settings['langcode'] = $langcode;
+  $cached_settings['langcode'] = $langcode;
   // And also take note of which settings in the settings array should apply.
-  $settings['current_settings'] = &$settings[$filter->format];
+  $cached_settings['current_settings'] = &$cached_settings[$filter->format];
 
   // Now that we have all of our settings prepared, attempt to process all
   // paths in href, src, action or longdesc HTML attributes. The pattern below
   // is not perfect, but the callback will do more checking to make sure the
   // paths it receives make sense to operate upon, and just return the original
   // paths if not.
-  return preg_replace_callback('~(href|src|action|longdesc)="([^"]+)~i', '_pathologic_replace', $text);
+  return preg_replace_callback('~ (href|src|action|longdesc)="([^"]+)~i', '_pathologic_replace', $text);
 }
 
 /**
  * Process and replace paths. preg_replace_callback() callback.
  */
 function _pathologic_replace($matches) {
+  // Get the base path.
+  global $base_path;
+
   // Get the settings for the filter. Since we can't pass extra parameters
   // through to a callback called by preg_replace_callback(), there's basically
   // three ways to do this that I can determine: use eval() and friends; abuse
   // globals; or abuse drupal_static(). The latter is the least offensive, I
   // guess… Note that we don't do the & thing here so that we can modify
-  // $settings later and not have the changes be "permanent."
-  $settings = drupal_static('_pathologic_filter');
+  // $cached_settings later and not have the changes be "permanent."
+  $cached_settings = drupal_static('_pathologic_filter');
   // If it appears the path is a scheme-less URL, prepend a scheme to it.
   // parse_url() cannot properly parse scheme-less URLs. Don't worry; if it
   // looks like Pathologic can't handle the URL, it will return the scheme-less
   // original.
-  
   // @see https://drupal.org/node/1617944
   // @see https://drupal.org/node/2030789
   if (strpos($matches[2], '//') === 0) {
@@ -190,7 +202,7 @@ function _pathologic_replace($matches) {
   // @see http://drupal.org/node/1672932
   $original_url = htmlspecialchars_decode($matches[2]);
   // …and parse the URL
-  $parts = parse_url($original_url);
+  $parts = @parse_url($original_url);
   // Do some more early tests to see if we should just give up now.
   if (
     // If parse_url() failed, give up.
@@ -227,7 +239,7 @@ function _pathologic_replace($matches) {
   if (isset($parts['scheme']) && $parts['scheme'] === 'files') {
     // Path Filter "files:" support. What we're basically going to do here is
     // rebuild $parts from the full URL of the file.
-    $new_parts = parse_url(file_create_url(file_default_scheme() . '://' . $parts['path']));
+    $new_parts = @parse_url(file_create_url(file_default_scheme() . '://' . $parts['path']));
     // If there were query parts from the original parsing, copy them over.
     if (!empty($parts['query'])) {
       $new_parts['query'] = $parts['query'];
@@ -235,10 +247,10 @@ function _pathologic_replace($matches) {
     $new_parts['path'] = rawurldecode($new_parts['path']);
     $parts = $new_parts;
     // Don't do language handling for file paths.
-    $settings['is_file'] = TRUE;
+    $cached_settings['is_file'] = TRUE;
   }
   else {
-    $settings['is_file'] = FALSE;
+    $cached_settings['is_file'] = FALSE;
   }
 
   // Let's also bail out of this doesn't look like a local path.
@@ -246,7 +258,7 @@ function _pathologic_replace($matches) {
   // Cycle through local paths and find one with a host and a path that matches;
   // or just a host if that's all we have; or just a starting path if that's
   // what we have.
-  foreach ($settings['current_settings']['local_paths_exploded'] as $exploded) {
+  foreach ($cached_settings['current_settings']['local_paths_exploded'] as $exploded) {
     // If a path is available in both…
     if (isset($exploded['path']) && isset($parts['path'])
       // And the paths match…
@@ -283,7 +295,7 @@ function _pathologic_replace($matches) {
     // e.g.: if our url is /foo/bar we'll mark this as a match for
     // http://example.com but want to keep searching and would prefer a match
     // to http://example.com/foo if that's configured as a local path
-    elseif (!isset($parts['host']) && (!isset($exploded['path']) || $exploded['path'] == '/')) {
+    elseif (!isset($parts['host']) && (!isset($exploded['path']) || $exploded['path'] === $base_path)) {
       $found = TRUE;
     }
   }
@@ -326,12 +338,12 @@ function _pathologic_replace($matches) {
 
   // If we didn't previously identify this as a file, check to see if the file
   // exists now that we have the correct path relative to DRUPAL_ROOT
-  if (!$settings['is_file']){
-    $settings['is_file'] = !empty($parts['path']) && is_file(DRUPAL_ROOT . '/'. $parts['path']);
+  if (!$cached_settings['is_file']) {
+    $cached_settings['is_file'] = !empty($parts['path']) && is_file(DRUPAL_ROOT . '/'. $parts['path']);
   }
 
   // Okay, deal with language stuff.
-  if ($settings['is_file']) {
+  if ($cached_settings['is_file']) {
     // If we're linking to a file, use a fake LANGUAGE_NONE language object.
     // Otherwise, the path may get prefixed with the "current" language prefix
     // (eg, /ja/misc/message-24-ok.png)
@@ -365,7 +377,7 @@ function _pathologic_replace($matches) {
       'fragment' => isset($parts['fragment']) ? $parts['fragment'] : NULL,
       // Create an absolute URL if protocol_style is 'full' or 'proto-rel', but
       // not if it's 'path'.
-      'absolute' => $settings['current_settings']['protocol_style'] !== 'path',
+      'absolute' => $cached_settings['current_settings']['protocol_style'] !== 'path',
       // If we seem to have found a language for the path, pass it along to
       // url(). Otherwise, ignore the 'language' parameter.
       'language' => isset($parts['language_obj']) ? $parts['language_obj'] : NULL,
@@ -381,7 +393,7 @@ function _pathologic_replace($matches) {
 
   // Now alter!
   // @see http://drupal.org/node/1762022
-  drupal_alter('pathologic', $url_params, $parts, $settings);
+  drupal_alter('pathologic', $url_params, $parts, $cached_settings);
 
   // If any of the alter hooks asked us to just pass along the original URL,
   // then do so.
@@ -396,9 +408,9 @@ function _pathologic_replace($matches) {
   // @see http://drupal.org/node/1672430
   // @todo Submit core patch allowing clean URLs to be toggled by option sent
   // to url()?
-  if (!empty($settings['is_file'])) {
-    $settings['orig_clean_url'] = !empty($GLOBALS['conf']['clean_url']);
-    if (!$settings['orig_clean_url']) {
+  if (!empty($cached_settings['is_file'])) {
+    $cached_settings['orig_clean_url'] = !empty($GLOBALS['conf']['clean_url']);
+    if (!$cached_settings['orig_clean_url']) {
       $GLOBALS['conf']['clean_url'] = TRUE;
     }
   }
@@ -408,20 +420,20 @@ function _pathologic_replace($matches) {
 
   // If we turned clean URLs on before to create a path to a file, turn them
   // back off.
-  if ($settings['is_file'] && !$settings['orig_clean_url']) {
+  if ($cached_settings['is_file'] && !$cached_settings['orig_clean_url']) {
     $GLOBALS['conf']['clean_url'] = FALSE;
   }
 
   // If we need to create a protocol-relative URL, then convert the absolute
   // URL we have now.
-  if ($settings['current_settings']['protocol_style'] === 'proto-rel') {
+  if ($cached_settings['current_settings']['protocol_style'] === 'proto-rel') {
     // Now, what might have happened here is that url() returned a URL which
     // isn't on "this" server due to a hook_url_outbound_alter() implementation.
     // We don't want to convert the URL in that case. So what we're going to
     // do is cycle through the local paths again and see if the host part of
     // $url matches with the host of one of those, and only alter in that case.
-    $url_parts = parse_url($url);
-    if (!empty($url_parts['host']) && $url_parts['host'] === $settings['current_settings']['base_url_host']) {
+    $url_parts = @parse_url($url);
+    if (!empty($url_parts['host']) && $url_parts['host'] === $cached_settings['current_settings']['base_url_host']) {
       $url = _pathologic_url_to_protocol_relative($url);
     }
   }
@@ -430,7 +442,7 @@ function _pathologic_replace($matches) {
   // @see http://drupal.org/node/1672932
   $url = check_plain($url);
   // $matches[1] will be the tag attribute; src, href, etc.
-  return "{$matches[1]}=\"{$url}";
+  return " {$matches[1]}=\"{$url}";
 }
 
 /**
