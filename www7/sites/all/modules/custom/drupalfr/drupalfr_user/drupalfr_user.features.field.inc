@@ -187,6 +187,7 @@ function drupalfr_user_field_default_fields() {
           'drupalcamp-toulouse' => 'J’ai participé au DrupalCamp du 26 novembre 2011 à Toulouse',
           'drupalcamp-lyon-2' => 'J’ai participé au DrupalCamp du 26 mai 2012 à Lyon',
           'dcparis13' => 'J\'ai participé au Drupalcamp Paris 2013',
+          'dcsoleil14' => 'J\'ai participé au Drupalcamp Soleil 2014',
           'drupalcon-barcelona' => 'J’ai participé à la conférence Drupal 2007 (Barcelone, Espagne)',
           'drupalcon-brussels' => 'J’ai participé à la conférence Drupal 2006 (Bruxelles, Belgique)',
           'drupalcon-paris' => 'J\'ai participé à la conférence Drupal à Paris en 2009',
