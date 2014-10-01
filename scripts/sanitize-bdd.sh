@@ -9,12 +9,16 @@
 #@author Guillaume Bec <guillaume.bec@gmail.com>
 
 TMPSITE=sandfr
-EXPORTFILE="/home/drupalfr/export/sandfr-$(date +%F).sql"
-DRUPAL=/data/core1/drupalfr/www7
-SANSQL=/data/core1/drupalfr/scripts/sanitize.sql
-CONFDRUSH=/data/core1/drupalfr/scripts/drushrc.php
-DRUSH=/usr/bin/drush
+EXPORTFILE="/var/www/site-drupalfr/export/sandfr-$(date +%F).sql.gz"
+DRUPAL=/var/www/site-drupalfr/www7
+SANSQL=/var/www/site-drupalfr/scripts/sanitize.sql
+CONFDRUSH=/var/www/site-drupalfr/scripts/drushrc.php
+DRUSH=/usr/local/bin/drush
 
-$DRUSH sql-sync -y -r $DRUPAL -c $CONFDRUSH --structure-tables-key=sanitize --create-db default $TMPSITE
+$DRUSH sql-sync -y -r $DRUPAL -c $CONFDRUSH --structure-tables-key=sanitize default $TMPSITE
+#$DRUSH sql-sync -y -r $DRUPAL -c $CONFDRUSH --structure-tables-key=sanitize --create-db default $TMPSITE
+echo "SYNC DONE"
 $DRUSH -y -r $DRUPAL -l $TMPSITE sql-cli < $SANSQL
-$DRUSH -y -r $DRUPAL -l $TMPSITE sql-dump > $EXPORTFILE
+echo "APPLY SANITIZE"
+$DRUSH -y -r $DRUPAL -l $TMPSITE sql-dump --gzip > $EXPORTFILE
+echo "EXPORT DUMP"
