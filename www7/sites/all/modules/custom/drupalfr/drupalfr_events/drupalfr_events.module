@@ -94,7 +94,7 @@ function drupalfr_events_fetch_events($items = 5) {
     }
   }
   else {
-    watchdog('events_meetup', 'Error parsing the meetup feed. @reponse', array('@response' => $response));
+    watchdog('events_meetup', 'Error parsing the meetup feed. @response', array('@response' => $response));
     return FALSE;
   }
 }
