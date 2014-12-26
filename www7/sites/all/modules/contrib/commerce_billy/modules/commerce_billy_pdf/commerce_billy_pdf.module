@@ -1,0 +1,241 @@
+<?php
+
+/**
+ * @file
+ * Commerce Billy module file.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_billy_pdf_menu() {
+  $items['invoice-pdf/%commerce_order'] = array(
+    'title' => 'Invoice',
+    'page callback' => 'commerce_billy_pdf',
+    'page arguments' => array(1),
+    'access callback' => 'commerce_billy_pdf_view_access',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/commerce/config/billy-invoice/pdf'] = array(
+    'title' => 'PDF',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_billy_pdf_admin_form'),
+    'access arguments' => array('configure order settings'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'commerce_billy_pdf.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Access callback for the PDF invoice.
+ *
+ * Deny access if order is not in status 'invoiced' or the current user does not
+ * have view access to the order itself.
+ * Furthermore admins can access 'canceled' orders (credit memo).
+ */
+function commerce_billy_pdf_view_access($order) {
+  if ($order->status == 'canceled' && user_access('administer commerce_order entities')) {
+    return TRUE;
+  }
+  elseif ($order->status != 'invoiced') {
+    return FALSE;
+  }
+  return commerce_order_customer_order_view_access($order);
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_billy_pdf_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'commerce_billy_pdf') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function commerce_billy_pdf_entity_info_alter(&$info) {
+  $info['commerce_order']['view modes']['pdf'] = array(
+    'label' => t('PDF'),
+    'custom settings' => FALSE,
+  );
+  $info['commerce_order']['view modes']['canceled'] = array(
+    'label' => t('Credit memo'),
+    'custom settings' => FALSE,
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_billy_pdf_theme() {
+  // Register the template specific for the commerce pdf order.
+  $items['commerce_order__commerce_order__pdf'] = array(
+    'render element' => 'elements',
+    'template' => 'commerce_order--commerce_order--pdf',
+    'path' => drupal_get_path('module', 'commerce_billy_pdf') . '/templates',
+  );
+  $items['commerce_order__commerce_order__canceled'] = array(
+    'render element' => 'elements',
+    'template' => 'commerce_order--commerce_order--canceled',
+    'path' => drupal_get_path('module', 'commerce_billy_pdf') . '/templates',
+  );
+  $items['commerce_billy_pdf_page'] = array(
+    'variables' => array('viewed_orders' => array(), 'inline_css' => ''),
+    'template' => 'commerce_billy_pdf_page',
+    'path' => drupal_get_path('module', 'commerce_billy_pdf') . '/templates',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_preprocess_entity().
+ *
+ * Adds theme hook suggestions for the pdf and canceled view modes, allowing the
+ * commerce_billy_pdf templates to be used for orders of all bundles.
+ */
+function commerce_billy_pdf_preprocess_entity(&$variables) {
+  $entity_type = $variables['entity_type'];
+  $view_mode = $variables['view_mode'];
+  $pdf_view_modes = array('pdf', 'canceled');
+  if ($entity_type == 'commerce_order' && in_array($view_mode, $pdf_view_modes)) {
+    $variables['theme_hook_suggestions'][] = $entity_type . '__commerce_order__' . $view_mode;
+  }
+}
+
+/**
+ * Page callback for invoice PDF.
+ */
+function commerce_billy_pdf($order) {
+  $html = commerce_billy_pdf_html($order);
+  $filename = preg_replace('/[^a-z0-9]/', '_', drupal_strtolower('invoice_' . $order->order_number)) . '.pdf';
+
+  try {
+    commerce_billy_pdf_output($html, $filename);
+    // print $html;
+    drupal_exit();
+  }
+  catch (DOMPDF_Exception $e) {
+    drupal_set_message(t('Error generating PDF invoice. Please contact the website administrator.'), 'error');
+    watchdog('commerce_billy_pdf', 'DOMPDF exception while generating pdf invoice: %message', array('%message' => $e->getMessage()), WATCHDOG_ERROR);
+    return '';
+  }
+}
+
+/**
+ * Helper function that returns the generated HTML for the invoice PDFs.
+ *
+ * @param object[] $orders
+ *   Array of order objects.
+ */
+function commerce_billy_pdf_html($orders) {
+  // Backwards compatibilty: also accept a single order object.
+  if (is_object($orders)) {
+    $orders = array($orders);
+  }
+  foreach ($orders as $order) {
+    $vars['viewed_orders'][] = entity_view('commerce_order', array($order->order_id => $order), 'pdf', NULL, TRUE);
+    // Add a credit memo.
+    if ($order->status == 'canceled') {
+      $vars['viewed_orders'][] = entity_view('commerce_order', array($order->order_id => $order), 'canceled', NULL, TRUE);
+    }
+  }
+  $css_files = variable_get('commerce_billy_pdf_css_files', array(drupal_get_path('module', 'commerce_billy_pdf') . '/css/pdf.css'));
+  $vars['inline_css'] = "";
+  foreach ($css_files as $file) {
+    $vars['inline_css'] .= file_get_contents($file);
+  }
+
+  return theme('commerce_billy_pdf_page', $vars);
+}
+
+/**
+ * Implements hook_commerce_order_view().
+ */
+function commerce_billy_pdf_commerce_order_view($order, $view_mode) {
+  // Add content variables for the PDF generation.
+  $settings = variable_get('commerce_billy_pdf_text_settings', array());
+  $custom_date_format = !empty($settings['invoice_date_format']) ? $settings['invoice_date_format'] : 'Y-m-d';
+  if ($view_mode == "pdf" || $view_mode == 'canceled') {
+    $order->content['invoice_footer'] = array(
+      '#markup' => isset($settings['invoice_footer']) ? $settings['invoice_footer'] : '',
+    );
+    $order->content['invoice_header'] = array(
+      '#markup' => isset($settings['invoice_header']) ? $settings['invoice_header'] : '',
+    );
+    $order->content['invoice_text'] = array(
+      '#markup' => isset($settings['invoice_text']) ? $settings['invoice_text'] : '',
+    );
+    $invoice_date = format_date($order->field_commerce_billy_i_date[LANGUAGE_NONE][0]['value'], 'custom', $custom_date_format);
+    if (!empty($settings['invoice_location'])) {
+      $invoice_header_date_text = t('@location, @date', array('@location' => $settings['invoice_location'], '@date' => $invoice_date));
+    }
+    else {
+      $invoice_header_date_text = $invoice_date;
+    }
+    $order->content['invoice_header_date'] = array(
+      '#markup' => $invoice_header_date_text,
+    );
+    $order->content['order_number'] = array(
+      '#markup' => t('Invoice No.: @id', array('@id' => $order->order_number)),
+    );
+    $order->content['order_id'] = array(
+      '#markup' => t('Order No.: @id', array('@id' => $order->order_id)),
+    );
+    $order->content['invoice_logo'] = array(
+      '#value' => variable_get('commerce_billy_pdf_logo', 'misc/druplicon.png'),
+    );
+  }
+  if ($view_mode == "canceled") {
+    $order->content['invoice_header_date'] = array(
+      '#markup' => t('@location, @date', array('@location' => $location, '@date' => format_date($order->field_commerce_billy_cancel_date[LANGUAGE_NONE][0]['value'], 'custom', $custom_date_format))),
+    );
+  }
+}
+
+/**
+ * Transforms HTML to PDF and outputs it to the browser.
+ */
+function commerce_billy_pdf_output($html, $filename) {
+  $dompdf = commerce_billy_pdf_prepare_dompdf($html, $filename);
+  if ($dompdf) {
+    $dompdf->stream($filename, array('Attachment' => TRUE));
+  }
+  else {
+    return t('DOMPDF not found');
+  }
+}
+
+
+/**
+ * Helper function that instantiates new DOMPDF class and renders the HTML.
+ *
+ * The returned dompdf object can then be used to either directly stream the
+ * output or to create a file.
+ */
+function commerce_billy_pdf_prepare_dompdf($html, $filename) {
+  $path = libraries_get_path('dompdf');
+  if (!empty($path)) {
+    // dompdf needs write access to its font directory.
+    // Copy "libraries/dompdf/lib/fonts" to your public files directory in order
+    // for this to work.
+    $dir = drupal_realpath('public://');
+    define('DOMPDF_FONT_DIR', $dir . '/fonts/');
+    define('DOMPDF_TEMP_DIR', file_directory_temp());
+    require_once DRUPAL_ROOT . '/' . $path . '/dompdf_config.inc.php';
+    spl_autoload_register('DOMPDF_autoload');
+
+    $dompdf = new DOMPDF();
+    $dompdf->set_paper('a4', 'portrait');
+
+    $html = htmlspecialchars_decode(htmlentities($html, ENT_NOQUOTES, 'UTF-8'), ENT_NOQUOTES);
+    $dompdf->load_html($html);
+    $dompdf->render();
+    return $dompdf;
+  }
+  return FALSE;
+}

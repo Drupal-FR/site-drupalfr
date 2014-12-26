@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * Commerce Billy installation file.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_billy_uninstall() {
+  variable_del('commerce_billy_invoice_nr_method');
+  variable_del('commerce_billy_auto_invoice');
+  variable_del('commerce_billy_invoice_nr_pattern');
+  variable_del('commerce_billy_invoice_nr_last');
+}
+
+/**
+ * Update Commerce Billy variables.
+ */
+function commerce_billy_update_7100() {
+  $pattern_old = variable_get('commerce_billy_invoice_nr_pattern', '[invoice_nr]');
+  $selected_method = variable_get('commerce_billy_invoice_nr_method', COMMERCE_BILLY_INVOICE_METHOD_YEARLY);
+  switch ($selected_method) {
+    case COMMERCE_BILLY_INVOICE_METHOD_INFINITE:
+      $last_number = commerce_billy_query_variable('commerce_billy_invoice_nr_last_infinite');
+      $new_nr_array = array(
+        'id' => isset($last_number) ? $last_number : 0,
+      );
+      variable_set('commerce_billy_invoice_nr_last', $new_nr_array);
+
+      $pattern_new = str_replace('[invoice_nr]', '{id}', $pattern_old);
+      variable_set('commerce_billy_invoice_nr_pattern', $pattern_new);
+
+      break;
+
+    case COMMERCE_BILLY_INVOICE_METHOD_YEARLY:
+      $last_number = commerce_billy_query_variable('commerce_billy_invoice_nr_last_yearly');
+      if ($last_number) {
+        $parts = explode('-', $last_number);
+        $new_nr_array = array(
+          'year' => $parts[0],
+          'id' => $parts[1],
+        );
+      }
+      else {
+        $new_nr_array = array(
+          'year' => date('Y'),
+          'id' => 0,
+        );
+      }
+      variable_set('commerce_billy_invoice_nr_last', $new_nr_array);
+
+      $pattern_new = str_replace('[invoice_nr]', '[date:custom:Y]-{id}', $pattern_old);
+      variable_set('commerce_billy_invoice_nr_pattern', $pattern_new);
+
+      break;
+
+    case COMMERCE_BILLY_INVOICE_METHOD_MONTHLY:
+      $last_number = commerce_billy_query_variable('commerce_billy_invoice_nr_last_monthly');
+      if ($last_number) {
+        $parts = explode('-', $last_number);
+        $new_nr_array = array(
+          'year' => $parts[0],
+          'month' => $parts[1],
+          'id' => $parts[2],
+        );
+      }
+      else {
+        $new_nr_array = array(
+          'year' => date('Y'),
+          'month' => date('m'),
+          'id' => 0,
+        );
+      }
+      variable_set('commerce_billy_invoice_nr_last', $new_nr_array);
+
+      $pattern_new = str_replace('[invoice_nr]', '[date:custom:Y-m]-{id}', $pattern_old);
+      variable_set('commerce_billy_invoice_nr_pattern', $pattern_new);
+
+      break;
+  }
+  variable_del('commerce_billy_invoice_nr_last_infinite');
+  variable_del('commerce_billy_invoice_nr_last_yearly');
+  variable_del('commerce_billy_invoice_nr_last_monthly');
+}
