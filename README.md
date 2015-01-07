@@ -9,6 +9,7 @@ To deploy localy, create a settings.local.php file in /www7/sites/default/
 
 With the following data:
 
+```php
 <?php
 $databases['default']['default'] = array(
   'driver' => 'mysql',
@@ -35,5 +36,6 @@ $conf['drupalfr_solr_server_options'] = array(
   'port' => '8983',
   'path' => '/solr',
 );
+```
 
 Merci pour votre aide !
