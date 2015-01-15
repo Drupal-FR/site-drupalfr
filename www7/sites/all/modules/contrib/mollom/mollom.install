@@ -943,7 +943,7 @@ function mollom_update_7200() {
     ));
   }
   // Change 'spam' into 'spamScore' double.
-  if (db_field_exists('mollom', spam) && !db_field_exists('mollom', 'spamScore') && !db_field_exists('mollom', 'spam_score')) {
+  if (db_field_exists('mollom', 'spam') && !db_field_exists('mollom', 'spamScore') && !db_field_exists('mollom', 'spam_score')) {
     db_change_field('mollom', 'spam', 'spamScore', array(
       'description' => 'Text analysis spam check result.',
       'type' => 'float',
@@ -1294,7 +1294,7 @@ function mollom_update_7213() {
       'not null' => FALSE,
     ));
   }
-  if (db_field_exists('mollom', 'profanityScore') && !db_field_exists('profanity_score')) {
+  if (db_field_exists('mollom', 'profanityScore') && !db_field_exists('mollom', 'profanity_score')) {
     db_change_field('mollom', 'profanityScore', 'profanity_score', array(
       'description' => 'Text analysis profanity check result.',
       'type' => 'float',
