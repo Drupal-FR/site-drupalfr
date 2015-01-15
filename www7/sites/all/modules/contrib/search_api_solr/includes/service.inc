@@ -161,7 +161,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $form['path'] = array(
       '#type' => 'textfield',
       '#title' => t('Solr path'),
-      '#description' => t('The path that identifies the Solr instance to use on the server.'),
+      '#description' => t('The path that identifies the Solr instance to use on the server. (For Solr 4.x servers, this should include the name of the core to use.)'),
       '#default_value' => $options['path'],
     );
 
@@ -942,6 +942,19 @@ class SearchApiSolrService extends SearchApiAbstractService {
           }
         }
 
+        // Add parameters to fetch distance, if requested.
+        if (!empty($spatial['distance']) && $version >= 4) {
+          if (strpos($field, ':') === FALSE) {
+            // Add pseudofield with the distance to the result items.
+            $location_fields[] = '_' . $field . '_distance_:geodist(' . $field . ',' . $point . ')';
+          }
+          else {
+            $link = l(t('edit server'), 'admin/config/search/search_api/server/' . $this->server->machine_name . '/edit');
+            watchdog('search_api_solr', "Location distance information can't be added because unclean field identifiers are used.", array(), WATCHDOG_WARNING, $link);
+          }
+        }
+
+
         // Change the facet parameters for spatial fields to return distance
         // facets.
         if (!empty($facets)) {
@@ -1069,6 +1082,10 @@ class SearchApiSolrService extends SearchApiAbstractService {
     if (!empty($this->options['retrieve_data'])) {
       $params['fl'] = '*,score';
     }
+    if (!empty($location_fields)) {
+      $params['fl'] .= ',' . implode(',', $location_fields);
+    }
+
     // Retrieve http method from server options.
     $http_method = !empty($this->options['http_method']) ? $this->options['http_method'] : 'AUTO';
 
@@ -1138,6 +1155,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $index = $query->getIndex();
     $fields = $this->getFieldNames($index);
     $field_options = $index->options['fields'];
+    $version = $this->solr->getSolrVersion();
 
     // Set up the results array.
     $results = array();
@@ -1174,6 +1192,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       $results['result count'] = $response->response->numFound;
       $docs = $response->response->docs;
     }
+    $spatials = $query->getOption('search_api_location');
 
     // Add each search result to the results array.
     foreach ($docs as $doc) {
@@ -1205,6 +1224,22 @@ class SearchApiSolrService extends SearchApiAbstractService {
       // SearchApiSolrService::getFieldNames().
       $result['id'] = $result['fields']['search_api_id'];
       $result['score'] = $result['fields']['search_api_relevance'];
+
+      // If location based search is enabled ensure the calculated distance is
+      // set to the appropriate field. If the calculation wasn't possible add
+      // the coordinates to allow calculation.
+      if ($spatials) {
+        foreach ($spatials as $spatial) {
+          if (isset($spatial['field']) && !empty($spatial['distance'])) {
+            if ($version >= 4) {
+              $doc_field = '_' . $fields[$spatial['field']] . '_distance_';
+              if (!empty($doc->{$doc_field})) {
+                $results['search_api_location'][$spatial['field']][$result['id']]['distance'] = $doc->{$doc_field};
+              }
+            }
+          }
+        }
+      }
 
       $index_id = $this->getIndexId($index->machine_name);
       $solr_id = $this->createId($index_id, $result['id']);
@@ -1451,7 +1486,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       }
       return '((' . implode(') OR (', $k) . '))';
     }
-    $k = implode($neg ? ' AND ' : ' ', $k);
+    $k = implode(' AND ', $k);
     return $neg ? "*:* AND -($k)" : $k;
   }
 
@@ -1471,7 +1506,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
           $fq[] = $this->createFilterQuery($solr_fields[$f[0]], $f[1], $f[2], $fields[$f[0]]);
         }
       }
-      else {
+      elseif ($f instanceof SearchApiQueryFilterInterface) {
         $q = $this->createFilterQueries($f, $solr_fields, $fields);
         if ($filter->getConjunction() != $f->getConjunction()) {
           // $or == TRUE means the nested filter has conjunction AND, and vice versa
@@ -1481,6 +1516,16 @@ class SearchApiSolrService extends SearchApiAbstractService {
         else {
           $fq = array_merge($fq, $q);
         }
+      }
+    }
+    if (method_exists($filter, 'getTags')) {
+      foreach ($filter->getTags() as $tag) {
+        $tag = "{!tag=$tag}";
+        foreach ($fq as $i => $filter) {
+          $fq[$i] = $tag . $filter;
+        }
+        // We can only apply one tag per filter.
+        break;
       }
     }
     return ($or && count($fq) > 1) ? array('((' . implode(') OR (', $fq) . '))') : $fq;
@@ -1555,7 +1600,6 @@ class SearchApiSolrService extends SearchApiAbstractService {
     $facet_params['facet.limit'] = 10;
     $facet_params['facet.mincount'] = 1;
     $facet_params['facet.missing'] = 'false';
-    $taggedFields = array();
     foreach ($facets as $info) {
       if (empty($fields[$info['field']])) {
         continue;
@@ -1565,10 +1609,9 @@ class SearchApiSolrService extends SearchApiAbstractService {
       // Check for the "or" operator.
       if (isset($info['operator']) && $info['operator'] === 'or') {
         // Remember that filters for this field should be tagged.
-        $escaped = call_user_func(array($this->connection_class, 'escapeFieldName'), $fields[$info['field']]);
-        $taggedFields[$escaped] = "{!tag=$escaped}";
+        $tag = 'facet:' . $info['field'];
         // Add the facet field.
-        $facet_params['facet.field'][] = "{!ex=$escaped}$field";
+        $facet_params['facet.field'][] = "{!ex=$tag}$field";
       }
       else {
         // Add the facet field.
@@ -1585,20 +1628,6 @@ class SearchApiSolrService extends SearchApiAbstractService {
       // Set missing, if specified.
       if ($info['missing']) {
         $facet_params["f.$field.facet.missing"] = 'true';
-      }
-    }
-    // Tag filters of fields with "OR" facets.
-    foreach ($taggedFields as $field => $tag) {
-      $regex = '#(?<![^( ])' . preg_quote($field, '#') . ':#';
-      foreach ($fq as $i => $filter) {
-        // Solr can't handle two tags on the same filter, so we don't add two.
-        // Another option here would even be to remove the other tag, too,
-        // since we can be pretty sure that this filter does not originate from
-        // a facet – however, wrong results would still be possible, and this is
-        // definitely an edge case, so don't bother.
-        if (preg_match($regex, $filter) && substr($filter, 0, 6) != '{!tag=') {
-          $fq[$i] = $tag . $filter;
-        }
       }
     }
 

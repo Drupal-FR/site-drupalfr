@@ -23,7 +23,7 @@ function search_api_solr_views_data_alter(array &$data) {
         // Just ignore invalid servers and skip the index.
       }
       if (!$server || empty($server->options['retrieve_data'])) {
-        return;
+        continue;
       }
       // Fill in base data.
       $key = 'search_api_index_' . $index->machine_name;

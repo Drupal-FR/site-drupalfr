@@ -907,8 +907,8 @@ class SearchApiSolrConnection implements SearchApiSolrConnectionInterface {
       if (!empty($params['fq'])) {
         $qalt = array();
         foreach ($params['fq'] as $i => $fq) {
-          // Tagged filters cannot be moved to q.alt.
-          if ($fq[0] !== '{') {
+          // Tagged and negative filters cannot be moved to q.alt.
+          if ($fq[0] !== '{' && $fq[0] !== '-') {
             $qalt[] = "($fq)";
             unset($params['fq'][$i]);
           }
