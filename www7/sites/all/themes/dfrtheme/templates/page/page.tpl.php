@@ -111,6 +111,10 @@
 		<?php endif; ?>
 
 		<div id="main-wrapper"><div class="inner">
+			<?php if ($is_front): ?>
+			    <div class="push-drupalcamp"><a href="http://montpellier2015.drupaldays.org/" title="Site dédié des Drupal Dev Days Montpellier 2015">Visiter le site dédié aux Drupal Dev Days Montpellier du 13 au 19 avril 2015.</a></div>
+			<?php endif; ?>
+
 			<?php print render($page['content_top']); ?>
 
 			<?php if ($breadcrumb && !$is_front): ?>
