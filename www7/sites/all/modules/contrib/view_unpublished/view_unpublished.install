@@ -17,3 +17,12 @@ function view_unpublished_enable() {
 function view_unpublished_disable() {
   node_access_needs_rebuild(TRUE);
 }
+
+/**
+ * Enable notice to rebuild node access permissions since a new node access realm
+ * was added to respect the core "view own unpublished content" permission
+ * See https://drupal.org/node/1762904
+ */
+function view_unpublished_update_7100() {
+  node_access_needs_rebuild(TRUE);
+}
