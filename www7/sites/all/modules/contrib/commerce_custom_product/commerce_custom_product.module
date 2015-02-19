@@ -1,0 +1,193 @@
+<?php
+
+/**
+ * @file
+ * Adds features to support the creation of customizable products.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_custom_product_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/line-items/add-product-line-item-type'] = array(
+    'title' => 'Add a product line item type',
+    'description' => 'Create a new customizable product line item type.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_custom_product_line_item_type_form', array('type' => '', 'name' => '')),
+    'access arguments' => array('administer line item types'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/commerce_custom_product.admin.inc',
+  );
+
+  // Add delete links for custom product line item types that can be deleted.
+  foreach (commerce_custom_product_commerce_line_item_type_info() as $type => $line_item_type) {
+    // Convert underscores to hyphens for the menu item argument.
+    $type_arg = strtr($type, '_', '-');
+
+    $items['admin/commerce/config/line-items/' . $type_arg . '/edit'] = array(
+      'title' => 'Edit',
+      'description' => 'Edit the custom product line item type.',
+      'page callback' => 'commerce_custom_product_line_item_type_edit',
+      'page arguments' => array($type),
+      'access arguments' => array('administer line item types'),
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 5,
+      'file' => 'includes/commerce_custom_product.admin.inc',
+    );
+
+    $items['admin/commerce/config/line-items/' . $type_arg . '/delete'] = array(
+      'title' => 'Delete',
+      'description' => 'Delete the custom product line item type.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_custom_product_line_item_type_delete_form', $type),
+      'access callback' => 'commerce_custom_product_line_item_type_delete_access',
+      'access arguments' => array($type),
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 10,
+      'file' => 'includes/commerce_custom_product.admin.inc',
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Determines access to a delete form for the given line item type.
+ */
+function commerce_custom_product_line_item_type_delete_access($type) {
+  // Load the line item type.
+  $line_item_type = commerce_line_item_type_load($type);
+
+  // Look for any line items of this type.
+  $query = new EntityFieldQuery();
+
+  $query
+    ->entityCondition('entity_type', 'commerce_line_item', '=')
+    ->entityCondition('bundle', $type, '=')
+    ->count();
+
+  // If we found at least one, return FALSE to prevent deletion of this line
+  // item type.
+  if ($query->execute() > 0) {
+    return FALSE;
+  }
+
+  return user_access('administer line item types');
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_custom_product_help($path, $arg) {
+  if ($path == 'admin/commerce/config/line-items') {
+    return '<p>' . t('Add as many product line item types as you need to support the types of customizable products on your site. You must then change the Add to Cart form display formatter settings of a product reference field to use the new line item type. Any fields attached to the line item type marked to appear on the Add to Cart form will then appear when that form is rendered.') . '</p><p>' . t('Once a line item has been saved for the custom line item type (such as a product being added to the cart), the line item type can no longer be deleted unless you first delete all related line items.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_commerce_line_item_type_info().
+ */
+function commerce_custom_product_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  // Look for product line item types currently defined in the database.
+  $db_types = commerce_custom_product_line_item_types();
+
+  if (!empty($db_types)) {
+    foreach ($db_types as $type => $line_item_type) {
+      $line_item_types[$type] = array(
+        'name' => check_plain($line_item_type['name']),
+        'description' => t('A customizable product line item type.'),
+        'product' => TRUE,
+        'add_form_submit_value' => t('Add product'),
+        'base' => 'commerce_product_line_item',
+      );
+    }
+  }
+
+  return $line_item_types;
+}
+
+/**
+ * Returns an array of all available customizable product line item types.
+ */
+function commerce_custom_product_line_item_types() {
+  return db_query('SELECT * FROM {commerce_product_line_item_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
+}
+
+/**
+ * Saves a customizable product line item type.
+ *
+ * @param $line_item_type
+ *   The full line item type info array to save.
+ * @param $configure
+ *   Boolean indicating whether or not line item type configuration should be
+ *   performed in the event of a new line item type being saved.
+ * @param $skip_rebuild
+ *   Boolean indicating whether or not this save should result in the menu being
+ *   rebuilt; defaults to FALSE. This is useful when you intend to perform many
+ *   saves at once, as menu rebuilding is very costly to performance.
+ *
+ * @return
+ *   The return value of the call to drupal_write_record() to save the line item
+ *   type, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the
+ *   type of query performed to save the line item type.
+ */
+function commerce_custom_product_line_item_type_save($line_item_type, $configure = TRUE, $skip_rebuild = FALSE) {
+  $op = drupal_write_record('commerce_product_line_item_type', $line_item_type, commerce_line_item_type_load($line_item_type['type']) ? 'type' : array());
+  commerce_line_item_types_reset();
+
+  if ($op == SAVED_NEW) {
+    // Notify the field API that a new bundle has been created.
+    field_attach_create_bundle('commerce_line_item', $line_item_type['type']);
+
+    // Load the full line item type array.
+    $line_item_type = commerce_line_item_type_load($line_item_type['type']);
+
+    // Configure the new line item type with default fields.
+    if ($configure) {
+      commerce_line_item_configure_line_item_type($line_item_type);
+    }
+
+    // Notify other modules that a new line item type has been created.
+    module_invoke_all('commerce_custom_product_line_item_type_insert', $line_item_type, $skip_reset);
+  }
+  elseif ($op == SAVED_UPDATED) {
+    // Notify other modules that an existing line item type has been updated.
+    module_invoke_all('commerce_custom_product_line_item_type_update', $line_item_type, $skip_reset);
+  }
+
+  if (!$skip_rebuild) {
+    variable_set('menu_rebuild_needed', TRUE);
+  }
+
+  return $op;
+}
+
+/**
+ * Deletes a customizable product line item type.
+ *
+ * @param $type
+ *   The machine-name of the line item type to delete.
+ */
+function commerce_custom_product_line_item_type_delete($type) {
+  // Load the full line item type.
+  $line_item_type = commerce_line_item_type_load($type);
+
+  db_delete('commerce_product_line_item_type')
+    ->condition('type', $type)
+    ->execute();
+
+  commerce_line_item_types_reset();
+
+  // Notify other modules that this bundle / line item type has been deleted.
+  field_attach_delete_bundle('commerce_line_item', $line_item_type['type']);
+  module_invoke_all('commerce_custom_product_line_item_type_delete', $line_item_type);
+
+  menu_rebuild();
+}

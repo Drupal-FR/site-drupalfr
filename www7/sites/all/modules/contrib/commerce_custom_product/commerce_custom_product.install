@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Defines the database schema for customizable product support.
+ */
+
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_custom_product_schema() {
+  $schema = array();
+
+  $schema['commerce_product_line_item_type'] = array(
+    'description' => 'Stores information about custom product line item types.',
+    'fields' => array(
+      'type' => array(
+        'description' => 'The machine-name of the line item type.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'name' => array(
+        'description' => 'The human-readable name of the line item type.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('type'),
+  );
+
+  return $schema;
+}

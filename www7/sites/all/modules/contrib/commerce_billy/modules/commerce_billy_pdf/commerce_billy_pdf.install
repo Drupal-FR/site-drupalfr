@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ * Commerce Billy PDF installation file.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function commerce_billy_pdf_enable() {
+  // Init some defaults.
+  $settings = array(
+    'invoice_header' => 'My company<br/>Street 123, State<br/>United States',
+    'invoice_location' => 'Location',
+    'invoice_text' => '',
+    'invoice_footer' => 'My company, Street 123, State, United States',
+  );
+  variable_set('commerce_billy_pdf_text_settings', $settings);
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_billy_pdf_uninstall() {
+  variable_del('commerce_billy_pdf_text_settings');
+  variable_del('commerce_billy_pdf_logo');
+  variable_del('commerce_billy_pdf_css_files');
+}
