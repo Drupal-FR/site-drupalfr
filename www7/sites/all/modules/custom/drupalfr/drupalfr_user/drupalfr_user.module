@@ -109,3 +109,52 @@ function drupalfr_user_block_view_alter(&$data, $block) {
     }
   }
 }
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function drupalfr_user_field_extra_fields() {
+  $extra['user']['user'] = array(
+    'display' => array(
+      'adherent' => array(
+        'label'       => t('Adhérent'),
+        'description' => t("Si l'utilisateur est un adhérent."),
+        'weight'      => 0,
+      ),
+    ),
+  );
+
+  return $extra;
+}
+
+/**
+ * Implements hook_user_view().
+ */
+function drupalfr_user_user_view($account, $view_mode, $langcode) {
+  $extrafields = field_extra_fields_get_display('user', 'user', $view_mode);
+
+  if (isset($extrafields['adherent']) && isset($extrafields['adherent']['visible']) && $extrafields['adherent']['visible'] && in_array('adhérent', $account->roles)) {
+    $account->content['adherent'] = array(
+      '#title'         => t("Adhérent"),
+      '#field_name'    => 'adherent',
+      '#field_type'    => 'text',
+      '#entity_type'   => 'user',
+      '#bundle'        => 'user',
+      '#view_mode'     => $view_mode,
+      '#items'         => array(
+        array(
+          'value'      => t("Adhérent"),
+          'format'     => NULL,
+          'safe_value' => t("Adhérent"),
+        )
+      ),
+      '#children'      => '',
+      '#theme'         => array('field'),
+      '#label_display' => 'hidden',
+      '#formatter'     => 'text_defaut',
+      array(
+        '#markup' => t("Adhérent"),
+      ),
+    );
+  }
+}
