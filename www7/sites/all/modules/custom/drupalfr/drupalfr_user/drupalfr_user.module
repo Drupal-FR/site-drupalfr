@@ -4,9 +4,9 @@
 
 function drupalfr_user_menu() {
   $items['port'] = array(
-    'title' => 'test function for port', 
-    'page callback' => 'drupalfr_user_migration', 
-    'access arguments' => array('access content'), 
+    'title' => 'test function for port',
+    'page callback' => 'drupalfr_user_migration',
+    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
   return $items;
@@ -86,9 +86,26 @@ dpm($edit);
     if($saved_user = user_save($user, $edit)) {
       dpm($saved_user);
     }
-  */  
+  */
   }
 
   return 'done';
 
+}
+
+/**
+ * Implements hook_block_view_alter().
+ *
+ * Remove block individual membership sidebar if the user has role adhérent.
+ */
+function drupalfr_user_block_view_alter(&$data, $block) {
+  // Block individual membership sidebar.
+  if ($block->module == 'views' && $block->delta == '3bb27222d54bf4d9ed1413a577c3a240') {
+    global $user;
+
+    // Remove the block if the user is a member.
+    if (in_array('adhérent', $user->roles)) {
+      unset($data['content']);
+    }
+  }
 }
