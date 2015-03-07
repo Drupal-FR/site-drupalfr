@@ -104,6 +104,7 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#empty_value' => '',
     '#size' => 10,
     '#prefix' => ' ',
+    '#render_option_value' => $address_format['render_administrative_area_value'],
     '#attributes' => array(
       'class' => array('state'),
       'x-autocompletetype' => 'region',
@@ -138,7 +139,7 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
   }
 
   // Country-specific customizations.
-  if (in_array($address['country'], array('AU', 'NZ', 'RU'))) {
+  if (in_array($address['country'], array('AU', 'EE', 'LT', 'LV', 'NZ', 'RU'))) {
     // These countries don't use the "Address 2" line.
     // Leave it as a precaution, but hide the label to avoid confusing users.
     $format['street_block']['thoroughfare']['#title'] = t('Address');
@@ -152,7 +153,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
   elseif ($address['country'] == 'BR') {
     $format['locality_block']['dependent_locality']['#suffix'] = $clearfix;
     $format['locality_block']['dependent_locality']['#tag'] = 'div';
-    $format['locality_block']['administrative_area']['#render_option_value'] = TRUE;
     $format['locality_block']['administrative_area']['#suffix'] = $clearfix;
     $format['locality_block']['postal_code']['#tag'] = 'div';
     // Change some titles to make translation easier.
@@ -188,7 +188,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     $format['locality_block']['administrative_area']['#size'] = '30';
   }
   elseif ($address['country'] == 'ID') {
-    $format['locality_block']['administrative_area']['#render_option_value'] = TRUE;
     $format['locality_block']['administrative_area']['#weight'] = 1;
   }
   elseif ($address['country'] == 'JP') {
@@ -198,7 +197,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     $format['locality_block']['postal_code']['#size'] = 30;
     $format['locality_block']['administrative_area']['#weight'] = 20;
     $format['locality_block']['administrative_area']['#size'] = 30;
-    $format['locality_block']['administrative_area']['#render_option_value'] = TRUE;
     $format['locality_block']['locality']['#weight'] = 30;
     $format['street_block']['#weight'] = 20;
   }

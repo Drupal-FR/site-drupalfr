@@ -28,6 +28,7 @@ function addressfield_field_views_data($field) {
     'country' => 'addressfield_views_handler_field_country',
     'administrative_area' => 'views_handler_field',
     'sub_administrative_area' => 'views_handler_field',
+    'dependent_locality' => 'views_handler_field',
     'locality' => 'views_handler_field',
     'postal_code' => 'views_handler_field',
     'thoroughfare' => 'views_handler_field',

@@ -30,6 +30,39 @@ function CALLBACK_addressfield_format_callback(&$format, $address, $context = ar
 }
 
 /**
+ * Allows modules to alter the default values for an address field.
+ *
+ * @param $default_values
+ *   The array of default values. The country is populated from the
+ *   'default_country' widget setting.
+ * @param $context
+ *   An array with the following keys:
+ *   - field: The field array.
+ *   - instance: The instance array.
+ *   - address: The current address values. Allows for per-country defaults.
+ */
+function hook_addressfield_default_values_alter(&$default_values, $context) {
+  // If no other default country was provided, set it to France.
+  // Note: you might want to check $context['instance']['required'] and
+  // skip setting the default country if the field is optional.
+  if (empty($default_values['country'])) {
+    $default_values['country'] = 'FR';
+  }
+
+  // Determine the country for which other defaults should be provided.
+  $selected_country = $default_values['country'];
+  if (isset($context['address']['country'])) {
+    $selected_country = $context['address']['country'];
+  }
+
+  // Add defaults for the US.
+  if ($selected_country == 'US') {
+    $default_values['locality'] = 'New York';
+    $default_values['administrative_area'] = 'NY';
+  }
+}
+
+/**
  * Allows modules to alter the predefined address formats.
  *
  * @param $address_formats
