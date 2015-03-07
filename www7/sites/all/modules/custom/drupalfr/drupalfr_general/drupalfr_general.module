@@ -5,18 +5,3 @@
  */
 
 include_once 'drupalfr_general.features.inc';
-
-
-/**
- * Implements hook_menu_alter().
- */
-function drupalfr_general_menu_alter(&$items) {
-  // Remove the default people page listing, replace the parent page callback
-  // with the views settings.
-  $items['admin/people/people']['access callback'] = FALSE;
-  $items['admin/people']['page callback'] = $items['admin/people/advanced']['page callback'];
-  $items['admin/people']['page arguments'] = $items['admin/people/advanced']['page arguments'];
-  $items['admin/people']['load arguments'] = $items['admin/people/advanced']['load arguments'];
-  $items['admin/people']['access callback'] = $items['admin/people/advanced']['access callback'];
-  $items['admin/people']['access arguments'] = $items['admin/people/advanced']['access arguments'];
-}
