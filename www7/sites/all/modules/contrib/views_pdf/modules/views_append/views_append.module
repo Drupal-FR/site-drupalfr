@@ -1,0 +1,118 @@
+<?php
+/**
+ * @file
+ * Module for appending PDF views to other PDF views
+ *
+ * The module adds a field which can be used to append another view. The view is
+ * created by calling the View over a HTTP request.
+ *
+ */
+
+
+/**
+ * Implementation of hook_views_api().
+ */
+function views_append_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * This function emulates the request of a browser. This is used to get the
+ * PDF file to append.
+ */
+function views_append_request_with_cookie($url, $save_path) {
+
+  $urlComponents = parse_url($url);
+
+  // Define the specified port
+  if ($urlComponents['scheme'] === 'http')  {
+    $port = 80;
+  }
+  elseif ($urlComponents['scheme'] === 'https') {
+    $port = 443;
+  }
+  else {
+    $port = 80;
+  }
+
+  // Define the host
+  $host = $urlComponents['host'];
+
+  // Define the path
+  if (!empty($urlComponents['query'])) {
+    $path = $urlComponents['path'] . '?' . $urlComponents['query'];
+  }
+  else {
+    $path = $urlComponents['path'];
+  }
+
+  // Change host if ssl is used:
+  if ($port == 443) {
+    $hostUrl = "ssl://" . $host;
+  }
+  else {
+    $hostUrl = $host;
+  }
+
+  $fp = fsockopen($hostUrl, $port, $errno, $errstr, 30);
+
+  $method = 'GET';
+  $content = '';
+
+  if (!$fp) {
+    echo "$errstr ($errno)<br />\n";
+  }
+  else {
+    $out = "$method $path HTTP/1.1\r\n";
+    $out .= "Host: $host\r\n";
+    if ($method == 'POST') {
+      $out .= "Content-Type: application/x-www-form-urlencoded\r\n";
+    }
+    $out .= "Content-length: " . strlen($content) . "\r\n";
+    $out .= "Cookie: " . session_name() . '=' . session_id() . "; \r\n";
+    $out .= "Connection: Close\r\n\r\n";
+
+    if ($method == 'POST') {
+      $out .= $content;
+    }
+
+    fwrite($fp, $out);
+
+    $newFile = fopen($save_path, 'w');
+
+    $header = TRUE;
+
+    while (!feof($fp)) {
+      $content = fgets($fp, 8096);
+      if ($content == "\r\n") {
+        $header = FALSE;
+      }
+      elseif (!$header) {
+        fwrite($newFile, $content);
+      }
+
+    }
+    fclose($fp);
+    fclose($newFile);
+  }
+
+}
+
+function _views_append_parse_array_to_string($array) {
+
+  if (is_array($array)) {
+    foreach ($array as $key => $value) {
+      $string .= $key . '=' . $value . '&';
+    }
+    if (!empty($string)) {
+      $string = substr($string, 0, -1);
+    }
+
+    return $string;
+  }
+  else {
+    return $array;
+  }
+}
