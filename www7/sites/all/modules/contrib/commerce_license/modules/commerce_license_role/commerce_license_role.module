@@ -125,3 +125,43 @@ function commerce_license_role_allowed_values($field, $instance, $entity_type, $
   unset($roles[DRUPAL_AUTHENTICATED_RID]);
   return $roles;
 }
+
+/**
+ * Implements hook_entity_presave().
+ */
+function commerce_license_role_entity_presave($entity, $type) {
+  // we use this presave hook to set future
+  // granted & expires dates for license renewals,
+  // in case the user has an active license granting
+  // the same roles as the currently saved license:
+  if ($type == 'commerce_license' && empty($entity->granted)) {
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'commerce_license')
+      ->propertyCondition('uid', $entity->uid)
+      ->propertyCondition('status', COMMERCE_LICENSE_ACTIVE)
+      ->propertyOrderBy('expires', 'DESC')
+      ->range(0, 1)
+      ->execute();
+
+    if (isset($result['commerce_license'])) {
+      // compare roles to see if we need to create
+      // a new license as usual, or modify the granted
+      // and expiring dates if this license according
+      // to an existing active license which grants
+      // the same roles as this one:
+      $result_license_ids = array_keys($result['commerce_license']);
+      $current_id = array_shift($result_license_ids);
+      $license = entity_load_single('commerce_license', $current_id);
+      $found_license_role = $license->wrapper->product->commerce_license_role->value();
+      $this_license_role = $entity->wrapper->product->commerce_license_role->value();
+      if ($found_license_role == $this_license_role) {
+        $entity->granted = $license->expires;
+        $duration = $entity->wrapper->product->commerce_license_duration->value();
+        if ($duration > 0 && empty($entity->expires)) {
+          $entity->expires = $entity->granted + $duration;
+        }
+      }
+    }
+  }
+}
