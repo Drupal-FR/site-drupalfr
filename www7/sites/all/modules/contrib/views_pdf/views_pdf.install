@@ -1,0 +1,61 @@
+<?php
+/**
+ * @file
+ * Install the views module
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function views_pdf_requirements($phase) {
+  $requirements = array();
+
+  // Ensure translations don't break at install time.
+  $t = get_t();
+
+  // Report Drupal version.
+  if ($phase == 'runtime') {
+    $path_tcpdf = views_pdf_get_library('tcpdf');
+    $path_fpdi = views_pdf_get_library('fpdi');
+
+    $requirements['views_pdf_tcpdf'] = array(
+      'title' => $t('Views PDF - TCPDF'),
+      'value' => $t('Not present'),
+      'description' => $t('The TCPDF library is used for the Views PDF. Please download it and place it in this location: @location.', array('@location' => $path_tcpdf)),
+      'severity' => REQUIREMENT_ERROR,
+    );
+
+    $requirements['views_pdf_fpdi'] = array(
+      'title' => $t('Views PDF - FPDI'),
+      'value' => $t('Not present'),
+      'description' => $t('The FPDI library is used for the Views PDF. Please download it and place it in this location: @location.', array('@location' => $path_fpdi)),
+      'severity' => REQUIREMENT_ERROR,
+    );
+
+    $requirements['views_pdf_fpdi_tpl'] = array(
+      'title' => $t('Views PDF - FPDI Template File'),
+      'value' => $t('Not present'),
+      'description' => $t('The FPDI library requires to install the FPDI template file to incoporate with TCPDF. Please place the file in to this location: @location.', array('@location' => $path_fpdi . '/fpdf_tpl.php')),
+      'severity' => REQUIREMENT_ERROR,
+    );
+
+    if (file_exists($path_tcpdf)) {
+      $requirements['views_pdf_tcpdf']['severity'] = REQUIREMENT_OK;
+      $requirements['views_pdf_tcpdf']['value'] = $t('Present');
+      unset($requirements['views_pdf_tcpdf']['description']);
+    }
+    if (file_exists($path_fpdi)) {
+      $requirements['views_pdf_fpdi']['severity'] = REQUIREMENT_OK;
+      $requirements['views_pdf_fpdi']['value'] = $t('Present');
+      unset($requirements['views_pdf_fpdi']['description']);
+    }
+    if (file_exists($path_fpdi . '/fpdf_tpl.php')) {
+      $requirements['views_pdf_fpdi_tpl']['severity'] = REQUIREMENT_OK;
+      $requirements['views_pdf_fpdi_tpl']['value'] = $t('Present');
+      unset($requirements['views_pdf_fpdi_tpl']['description']);
+    }
+  }
+
+  return $requirements;
+}
+
