@@ -117,7 +117,7 @@ function _menu_breadcrumb_get_menus() {
     // Remove any defunct menu names. Only visible if we are showing
     // the admin settings form, so don't waste time processing this
     // otherwise.
-    if ($_GET['q'] == 'admin/config/menu_breadcrumb') {
+    if ($_GET['q'] == 'admin/config/user-interface/menu-breadcrumb') {
       $current_menu_names = array_merge($drupal_menu_names, array_unique($match_cache), array('menu_breadcrumb_default_menu'));
       $menus_current = array_intersect(array_keys($menus), $current_menu_names);
       $menus = array_intersect_key($menus, array_flip($menus_current));
@@ -290,6 +290,18 @@ function menu_breadcrumb_menu_list() {
 }
 
 /**
+ * Implementation of hook_menu_breadcrumb_alter().
+ *
+ * Alter links in the active trail before it is rendered as the breadcrumb.
+ */
+function menu_breadcrumb_menu_breadcrumb_alter(&$active_trail, $item) {
+  // Removes "Home" link to the front page, in case you already have one.
+  if (variable_get('menu_breadcrumb_remove_home_link', FALSE) && $active_trail[0]['href'] === '<front>') {
+    array_shift($active_trail);
+  }
+}
+
+/**
  * Implementation of hook_init().
  *
  * Set the active menu according to the current path.
@@ -336,6 +348,12 @@ function menu_breadcrumb_init() {
 
   // Generate the breadcrumbs using the active menu.
   $breadcrumb = drupal_get_breadcrumb();
+  
+  //if the breadcrumb is just the menu root, try to generate breadcrumb from URL if wanted
+  if (count($breadcrumb) == 1 && variable_get('menu_breadcrumb_no_menu_use_menu_path', 0)) {
+    //try to set breadcrumb based on URL path
+    $breadcrumb = _menu_breadcrumb_by_path($breadcrumb);
+  }
 
   if (variable_get('menu_breadcrumb_append_node_title', 0) == 1) {
     $node_title = filter_xss(menu_get_active_title(), array());
@@ -387,6 +405,20 @@ function menu_breadcrumb_admin_settings_form() {
     '#title' => t('Hide the breadcrumb if the breadcrumb only contains the link to the front page.'),
     '#description' => t('Choose whether or not the breadcrumb should be hidden if the breadcrumb only contains a link to the front page (<em>Home</em>.).'),
     '#default_value' => variable_get('menu_breadcrumb_hide_on_single_item', 0),
+  );
+  
+  $form['menu_breadcrumb_no_menu_use_menu_path'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('If the page is not in a menu, attempt to create a breadcrumb based on its URL'),
+    '#description' => t('Choose whether or not the breadcrumb should attempt to be generated from its URL if it does not belong to a menu'),
+    '#default_value' => variable_get('menu_breadcrumb_no_menu_use_menu_path', 0),
+  );
+
+  $form['menu_breadcrumb_remove_home_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Remove "Home" link.'),
+    '#description' => t('Removes "Home" link to the front page, in case you already have one.'),
+    '#default_value' => variable_get('menu_breadcrumb_remove_home_link', 0),
   );
 
   $form['include_exclude'] = array(
@@ -623,3 +655,84 @@ function menu_breadcrumb_html_id($id) {
   return $id;
 }
 
+function _menu_breadcrumb_by_path($breadcrumb = array()) {
+  global $language;
+  $parent_candidates = _menu_breadcrumb_get_parent_candidates(drupal_get_path_alias());
+  
+  if (empty($parent_candidates)) {
+    return $breadcrumb;
+  }
+
+  $matched_menus = array();
+  $matched_link_titles = array();
+  $query = db_select('menu_links', 'ml')
+    ->fields('ml', array('menu_name', 'mlid', 'link_path', 'link_title', 'depth', 'weight'))
+    ->condition('link_path', $parent_candidates, 'IN')
+    // Do not touch admin menu.
+    ->condition('menu_name', 'management', '!=')
+    // Only consider normal, visible menu links.
+    ->condition('hidden', 0);
+    
+  if (module_exists('i18n_menu')) {
+    $query->condition('language', $language->language);
+  }
+  
+  $results = $query->execute();
+
+  foreach ($results as $record) {
+    // If there is more than one matched link in a menu,
+    // use the deepest, heaviest.
+    if (!isset($matched_menus[$record->menu_name]) || $record->depth > $matched_menus[$record->menu_name]['depth'] || ($record->depth == $matched_menus[$record->menu_name]['depth'] && $record->weight > $matched_menus[$record->menu_name]['weight'])) {
+      $matched_menus[$record->menu_name]['link_path'] = $record->link_path;
+      $matched_menus[$record->menu_name]['depth'] = $record->depth;
+      $matched_menus[$record->menu_name]['weight'] = $record->weight;
+    }
+
+    // Get the Link Title if it can be found in a menu item.
+    if ($record->link_title && !isset($matched_link_titles[$record->link_path])) {
+      $matched_link_titles[$record->link_path] = $record->link_title;
+      if (module_exists('i18n_menu')) {
+        $matched_link_titles[$record->link_path] = _i18n_menu_link_title((array)$record, $language->language);
+      }
+    }
+  }
+
+  // Remove current page from breadcrumb.
+  array_pop($parent_candidates);
+
+  foreach ($parent_candidates as $link_path) {
+    // If the page title is found on a menu item, use it.
+    if (isset($matched_link_titles[$link_path])) {
+      $breadcrumb[] = l($matched_link_titles[$link_path], $link_path);
+    }
+    // Otherwise, use slow method to find out the title of a page.
+    elseif ($menu_item = menu_get_item($link_path)) {
+      $breadcrumb[] = l($menu_item['title'], $link_path);
+    }
+  }
+
+  return $breadcrumb;
+}
+
+/**
+ * Returns an array of parent candidates
+ *
+ * e.g. given the argument 'foo/bar/zee', this returns an array of 
+ * internal Drupal paths for 'foo', 'foo/bar', 'foo/bar/zee'.
+ *
+ * @param string $path
+ *   A Drupal path alias.
+ *
+ * @return array
+ *   An array of internal Drupal paths.
+ */
+function _menu_breadcrumb_get_parent_candidates($path) {
+  $pieces = explode('/', $path);
+  $path = '';
+  $parent_candidates = array();
+  foreach ($pieces as $piece) {
+    $path .= $piece . '/';
+    $parent_candidates[] = drupal_get_normal_path(rtrim($path, '/'));
+  }
+  return $parent_candidates;
+}
