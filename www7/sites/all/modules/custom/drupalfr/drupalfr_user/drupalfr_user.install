@@ -35,18 +35,18 @@ function drupalfr_user_install() {
    * vid = 22022
    * uid = 1084
    * SELECT * FROM content_type_profile WHERE nid = 11060 AND vid = 22022
-   * field_icq_value 
-   * field_jabber_value   
-   * field_link_url       
-   * field_link_title     
+   * field_icq_value
+   * field_jabber_value
+   * field_link_url
+   * field_link_title
    * field_link_attributes
-   * field_msn_email      
-   * field_nickname_value 
-   * field_picture_fid    
-   * field_picture_list   
-   * field_picture_data   
-   * field_realname_value 
-   * field_company_nid 
+   * field_msn_email
+   * field_nickname_value
+   * field_picture_fid
+   * field_picture_list
+   * field_picture_data
+   * field_realname_value
+   * field_company_nid
    * --------------------
    * filling of one user field #1
    *
@@ -63,7 +63,7 @@ function drupalfr_user_install() {
    * field_biography case
    * SELECT body_value FROM field_data_body WHERE bundle LIKE 'profile' AND entity_id = 11060 AND revision_id = 22022
    * body_value = 'Drupal Lover'
-   * 
+   *
    * --------------------
    * field_events case
    * SELECT * FROM content_field_events WHERE vid = 22022 AND nid = 11060
@@ -71,7 +71,7 @@ function drupalfr_user_install() {
    * 0     | drupalcamp-paris-2
    * 1     | drupalcamp-paris-3
    * 2     | drupalcamp-paris-4
-   * >>> direct to field_data_field_events as seens in #1 
+   * >>> direct to field_data_field_events as seens in #1
    */
 
   // Add new alias
@@ -118,4 +118,11 @@ function _drupalfr_user_install_ensure_default_user_picture() {
  */
 function drupalfr_user_update_7000() {
   _drupalfr_user_install_ensure_default_user_picture();
+}
+
+/**
+ * Set the start value of next_membership_number.
+ */
+function drupalfr_user_update_7001() {
+  variable_set('drupalfr_user_next_membership_number', 231);
 }

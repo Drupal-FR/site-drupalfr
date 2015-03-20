@@ -2,12 +2,22 @@
 
 // Drupal needs this blank file.
 
+/**
+ * Implements hook_menu().
+ */
 function drupalfr_user_menu() {
   $items['port'] = array(
     'title' => 'test function for port',
     'page callback' => 'drupalfr_user_migration',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
+  );
+  $items['admin/config/people/membership_number'] = array(
+    'title' => 'Membership number',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupalfr_user_membership_number_form'),
+    'access arguments' => array('administer licenses'),
+    'file' => 'includes/drupalfr_user.membership_number.inc',
   );
   return $items;
 }
