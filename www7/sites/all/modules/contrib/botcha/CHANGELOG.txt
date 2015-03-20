@@ -1,0 +1,56 @@
+botcha 7.x-3.x-dev
+------------------
+[#1861016] by ckng: PHP Fatal error:  Call to a member function addAdminLinks() on a non-object
+[#1867180] by retorque: ObscureUrl Recipe breaks in IE7 on node add form
+[#1974430] by monnerat: Botcha class name
+[#1991984] PHP warnings, simpletest exception
+
+
+botcha 7.x-1.x-dev
+------------------
+[#1637548] Fixed "Undefined variable: path in _botcha_url()"
+[#1694962] Fixed "Undefined index: xxxx_name in botcha_form_alter_botcha()"
+[#1788978] by Staratel: Move rule action to group BOTCHA
+[NOISSUE]  Added _POST and _GET to loglevel 5
+[NOISSUE]  Added _SERVER to loglevel 5
+[NOISSUE]  Added honeypot_js_css2field recipe
+[#1800406] by drclaw: Fixed array merge error in _form_set_class() 
+[#1800532] by drclaw: Fixed JS errors in IE7
+
+
+botcha 7.x-1.0, 2012-05-02
+--------------------------
+[#1045192] Port to D7
+[#1510082] Fixed form rebuild was not happening properly - D7 ignores global $conf['cache'] and needs $form_state['no_cache'] instead
+[NOISSUE]  Removed global $conf['cache'] = 0, all notes on performance and caching
+[NOISSUE]  Reworded "Form session reuse detected" message, added "Please try again..."
+[NOISSUE]  Copied some goodies from CAPTCHA, added update_7000 to rename form ids in BOTCHA points
+[#1075722] Cleanup, looks like sessions are handled properly for D7 (different from D6)
+[#1511034] Fixed "Undefined vaiable t in botcha_install line 117"
+[#1511042] Added configure path to botcha.info
+[#1534350] Fixed comments crash (due to remnant D6 hack)
+[NOISSUE]  Refactoring: Allow named recipe books other than 'default'; Use form_state to pass '#botcha' value
+[NOISSUE]  Fixed lost recipe selector for add new on BOTCHA admin page
+[NOISSUE]  Remove Captcha integration text from help if Captcha module is not present
+[NOISSUE]  Remove hole in user_login_block protection when accessed via /admin/ path
+[NOISSUE]  Reworked _form_alter and _form_validate workings to allow clean reset of default values
+[NOISSUE]  Added simple honeypot recipe suitable for simpletest (no JS)
+[NOISSUE]  Added simpletest test cases
+[#1544124] Fixed drush crash in rules integration due to API changes in rules 7.x-2.x
+
+
+botcha 6.x-1.x-dev
+------------------
+[#5308708] Added autocomplete=off to avoid false detects with client's autocomplete
+[NOISSUE]  Coder style fixes
+[NOISSUE]  Reworded "Form session reuse detected" message, added "Please try again..."
+[NOISSUE]  Backported secret key generation cleanup from 7.x-1.x-dev
+[NOISSUE]  Refactoring: Allow named recipe books other than 'default'; Use form_state to pass '#botcha' value
+[NOISSUE]  Remove Captcha integration text from help if Captcha module is not present
+[NOISSUE]  Remove hole in user_login_block protection when accessed via /admin/ path
+[NOISSUE]  Reworked _form_alter and _form_validate workings to allow clean reset of default values
+[NOISSUE]  Added simple honeypot recipe suitable for simpletest (no JS)
+[#1075722] Backport D7 session handling to D6
+[NOISSUE]  Added simpletest test cases
+
+

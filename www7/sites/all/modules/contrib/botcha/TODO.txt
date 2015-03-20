@@ -1,0 +1,61 @@
+
+TODO
+----
+- (fix it or leave it?) statistics by variable_set is too slow - it clears vaiable cache in variable_set
+- Allow recipe to be used multiple times. (different secret - hash should not collide)
+- Add hash collision detection (form_elements, url_elements)
+- Create and describe IRecipe to make implementation of new recipes easier
+- Replace getProperty with more transparent solution
+
+
+Development roadmap
+-------------------
+- DONE Keep blocked/passed statistics
+- DONE Select forms to be protected
+- Recipe description language
+?- Site hash (any need to make something on top of botcha_secret variable?)
+- Recipe update service
+  - CRON: call home, report self, get list of updates, cache it, load in chunks
+- More recipes
+- DONE D7
+
+
+
+Ideas For Implementation
+------------------------
+- Implement different recipies, enable by on/of setting, all recipies are additive
+Recipies:
+- obscure "magic" fields by adding a bunch of bugus hidden fields
+==== CSS+JS (verify bot is not executing JS or not loading CSS):
+- CSS is separate file (important), JS takes CSS attribute to calculate submission field setting
+==== JS (verify bot is not executing JS, but legitimate user can also disable JS):
+DONE - JS Change post variable
+- JS Change post variable to a hash value
+- JS Change post URL
+DONE - JS Change URL variable
+- JS Change URL variable to a hash value
+- JS Change submit button value (to a hash value)
+- JS Remove an input field completely
+- JS Convert a hidden field into an input field (?)
+- JS Change a hidden field (to a hash value) (bots are smart enough to leave them alone)
+DONE - JS + Honeypot field / hidden by CSS
+==== completely server-side:
+- Shuffle field names
+- Encrypt field names (except [some] honeypots
+- Verify all variables that are submitted - reject if any extra fields appeared
+- linked javascript file using 'document.write' to append the form
+- Server delays certain forms (e.g. user/register) to slow down spambot scripts
+==== CAPTCHA strengthening:
+- Limit time to submit captcha
+==== FORM strengthening:
+DONE - allow form post only once. invalidate form token. Next submit will fail.
+- minimum time check - submitted too early (2..3 seconds)
+- register form filters out any submissions with http://
+- block suspicious/empty useragent string, compare form build vs form submit
+==== COOKIE-based (needs JS)
+- save a cookie, then JS uses that cookie to fill a validation field
+- set a cookie by javascript then retrieve the cookie during form processing in the cgi script
+
+
+
+

@@ -1,0 +1,63 @@
+SELENIUM TESTS HOWTO
+
+ATTENTION! 
+DO NOT RUN ANY OF SELENIUM (OR SimpleTest) TESTS ON PRODUCTION SITE.
+There are scenarios when the whole production database can be wiped out if something fails in the code.
+Take some time to setup a developer site. It is worth the peace of mind.
+
+COMMON
+- Download Selenium Server Standalone jar from http://seleniumhq.org/download/
+- There are other pointers for below downloads on that page
+
+
+SETUP DRUPAL
+- Download http://drupal.org/project/selenium module to your Drupal installation and enable it
+- Patch Drupal core "patch -p1 < "path to selenium module"/selenium/D7-core-selenium.patch"
+
+SETUP SELENIUM SERVER SIDE (HUB)
+- Install java on the server
+- Copy Selenium Server Standalone jar to the server
+- Run selenium server as a hub, e.g.
+  java -jar selenium-server-standalone-2.28.0.jar -role hub -port 4444
+- Open port 4444 tunnel on the router between server and the internet (if there is one)
+- Visit the hub console at http://<server>:4444/grid/console
+  Where <server> is name or IP of the server
+
+
+
+SETUP SELENIUM CLIENT SIDE (NODE)
+- Download WebDriver for Chrome (chromedriver), install in $PATH/%PATH% (or add to $PATH/%PATH% ENV to point to the chromedriver)
+  chrome.exe (or chrome executable) should be also on the $PATH/%PATH%
+  exit Chrome, cd "C:\Users\"%USERNAME%"\AppData\Local\Google\Chrome\" or to where the chrome.exe is,
+  edit file "master_preferences", find and set "require_eula": false
+- Download WebDriver for IE, install in $PATH/%PATH% (or add to $PATH/%PATH% ENV to point to the driver)
+  iexplorer.exe (or IE executable) should be also on the $PATH/%PATH%
+- Download WebDriver for Opera, install in $PATH/%PATH% (or add to $PATH/%PATH% ENV to point to the driver)
+  opera.exe (or Opera executable) should be also on the $PATH/%PATH%
+- Install java on the client
+- Copy Selenium Server Standalone jar to the client
+- Run selenium server as a node, e.g.
+  java -jar selenium-server-standalone-2.28.0.jar -role node -hub http://<server>:4444/grid/register > selenium.log 2>&1
+  Where <server> is name or IP of the server
+  For Opera (by default Opera is not connected, need adjust settings):
+  java -jar selenium-server-standalone-2.28.0.jar -role node -hub http://<server>:4444/grid/register \
+    -browser browserName=firefox,maxInstances=5 \
+    -browser browserName=chrome,maxInstances=5 \
+    -browser "browserName=internet explorer,maxInstances=3" \
+    -browser browserName=opera \
+    > selenium.log 2>&1
+e.g.
+  java -jar selenium-server-standalone-2.28.0.jar -role node -hub http://10.0.0.5:4444/grid/register -browser browserName=firefox -browser browserName=chrome -browser "browserName=internet explorer" -browser browserName=opera > selenium.log 2>&1
+or
+  java -jar selenium-server-standalone-2.28.0.jar -role node -nodeConfig SeleniumClientNode.json > selenium.log 2>&1
+- Visit the hub console at http://<server>:4444/grid/console and inspect if node is talking to the hub
+
+
+RUN TESTS:
+- Open any browser of choice to run the tests. The tests initiate commands to the client browser via 
+  the Selenium Server Standalone HUB to the Selenium Server Standalone NODE.
+  Selenium Server Standalone NODE opens each test's target browser on the client using WebDriver and
+  passes commands from the test to the target browser.
+- Navigate to admin/config/development/testing
+- Select needed tests and hit Run
+

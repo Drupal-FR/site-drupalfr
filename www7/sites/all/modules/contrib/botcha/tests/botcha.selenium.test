@@ -1,0 +1,217 @@
+<?php
+
+/**
+ * @file
+ * Selenium-tests for BOTCHA module.
+ */
+
+/**
+ * Test case to use with Selenium2 WebDriver.
+ *
+ * How to use.
+ * 1) Install Drupal module Selenium as usual. Please follow its INSTALL-guide
+ * to set up Selenium server as well.
+ * @see http://drupal.org/project/selenium
+ * @see http://drupalcode.org/project/selenium.git/blob/refs/heads/7.x-3.x:/INSTALL.txt
+ * 2) Launch Selenium server.
+ * 3) If you are going to test in Opera, Internet Explorer or other, please note
+ *   that they are launched on the original site. See special instructions from
+ *   Selenium INSTALL.txt.
+ * 4) Launch them via standard Simpletest interface.
+ *   If you don't see new testcases in Simpletest admin form - just flush caches.
+ */
+// Workaround, since we use class, which is only available if Selenium module is enabled.
+if (module_exists('selenium')) {
+abstract class BotchaSeleniumTestCase extends DrupalSeleniumWebTestCase {
+  /**
+   * @var Botcha
+   */
+  protected $application;
+
+  /**
+   * Just a normal user.
+   */
+  protected $normal_user;
+
+  /*
+   * Node for test comment posting.
+   */
+  protected $node;
+
+  public function setUp() {
+    // Backward compatibility together with support of new way of passing modules parameter.
+    // @link DrupalWebTestCase::setUp() @endlink
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    parent::setUp(array_merge($modules, array('comment', 'moopapi', 'selenium', 'botcha')));
+    // Fill in an application.
+    $app_class = 'Botcha';
+    $app_class_lower = strtolower($app_class);
+    // @todo ?Should not we encapsulate decorators into ComponentFactory::get?
+    $this->application = ComponentFactory::get($app_class, Component::TYPE_CONTROLLER, Component::ID_APPLICATION, unserialize(variable_get("{$app_class_lower}_decorators", serialize(array()))));
+    // Put comments on page nodes on a separate page (default in D7: below post).
+    variable_set('comment_form_location_page', COMMENT_FORM_SEPARATE_PAGE);
+    // Create a normal user.
+    $permissions = array(
+      'access comments', 'post comments',
+      // @todo Abstract it.
+      //'post comments without approval',
+      'skip comment approval',
+      'access content', 'create page content', 'edit own page content',
+    );
+    $this->normal_user = $this->drupalCreateUser($permissions);
+    // Create test recipe book.
+    $rbid = 'testSelenium';
+    $this->recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $this->recipebook = $this->recipebook_controller->getRecipebook($rbid, TRUE)
+      ->setTitle('Selenium test')
+      ->setDescription('Is intended to test successful submissions for each recipe individually.')
+      ->setForm(Botcha::COMMENT_FORM_ID);
+    $this->recipebook_controller->save($this->recipebook);
+    // Create new node.
+    $this->node = $this->drupalCreateNode(array(
+      'title' => "Test title",
+    ));
+    // Reset all to apply new changes.
+    $this->resetAll();
+  }
+
+  function testBotchaRecipeSuccess() {
+    // Login as a normal user.
+    $this->drupalLogin($this->normal_user);
+    // Cycle through each JavaScript-recipe assigning it as a single recipe in recipe book.
+    $this->recipe_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPE);
+    $recipe_ids = $this->recipe_controller->getRecipes();
+    foreach ($recipe_ids as $recipe_id) {
+      // Test only JavaScript-recipes.
+      $recipe = $this->recipe_controller->getRecipe($recipe_id, FALSE);
+      if ($recipe instanceof BotchaRecipeUsingJsAbstract) {
+        // Turn on only one recipe.
+        $this->recipebook->setRecipe($recipe_id);
+        $this->recipebook_controller->save($this->recipebook);
+        // Post a comment.
+        $edit = array(
+          // @todo Abstract it.
+          //'comment' => "Test comment for $recipe_id",
+          'comment_body[und][0][value]' => "Test comment for $recipe_id",
+        );
+        $this->drupalPost("comment/reply/{$this->node->nid}", $edit, t('Save'));
+        // Assert that recipe works as designed.
+        $this->assertText('Your comment has been posted.', "$recipe_id doesn't block comment", 'BOTCHA');
+        $this->assertNoText(BOTCHA_WRONG_RESPONSE_ERROR_MESSAGE, "$recipe_id works as designed", 'BOTCHA');
+        // Turn off the recipe.
+        $this->recipebook->unsetRecipe($recipe_id);
+        $this->recipebook_controller->save($this->recipebook);
+      }
+    }
+    $this->drupalLogout();
+  }
+}
+
+abstract class BotchaSeleniumOnOriginalTestCase extends BotchaSeleniumTestCase {
+
+  public function setUp() {
+    // Turn on testing on original site.
+    $this->onOriginal = TRUE;
+    // Backward compatibility together with support of new way of passing modules parameter.
+    // @link DrupalWebTestCase::setUp() @endlink
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    parent::setUp($modules);
+  }
+
+  public function tearDown() {
+    // Remove all stuff we created.
+    // Remove a test recipe book.
+    $this->recipebook_controller->delete($this->recipebook);
+    // Delete a newly created node.
+    node_delete($this->node->nid);
+    // Remove roles...
+    $roles_to_remove = $this->normal_user->roles;
+    // ...leaving standard roles untouched.
+    unset($roles_to_remove[1]);
+    unset($roles_to_remove[2]);
+    unset($roles_to_remove[3]);
+    foreach ($roles_to_remove as $role_id => $role_pseudo_name) {
+      user_role_delete($role_id);
+      // In fact there is a single role.
+      break;
+    }
+    // Remove users.
+    // @todo Abstract it.
+    //user_delete($edit = array(), $this->normal_user->uid);
+    user_delete($this->normal_user->uid);
+    parent::tearDown();
+    // Flush all caches.
+    $this->resetAll();
+  }
+}
+
+
+/**
+ * Description of BotchaSeleniumFirefoxTestCase
+ */
+class BotchaSeleniumFirefoxTestCase extends BotchaSeleniumTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => t('BOTCHA Selenium tests : Firefox'),
+      'description' => t('Testing of the BOTCHA recipes and other JavaScript functionality in Firefox browser.'),
+      'dependencies' => array('moopapi', 'selenium'),
+      'group' => t('BOTCHA'),
+      'browsers' => array('firefox'),
+    );
+  }
+}
+
+
+/**
+ * Description of BotchaSeleniumChromeTestCase
+ */
+class BotchaSeleniumChromeTestCase extends BotchaSeleniumTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => t('BOTCHA Selenium tests : Chrome'),
+      'description' => t('Testing of the BOTCHA recipes and other JavaScript functionality in Chrome browser.'),
+      'dependencies' => array('moopapi', 'selenium'),
+      'group' => t('BOTCHA'),
+      'browsers' => array('chrome'),
+    );
+  }
+}
+
+
+/**
+ * Description of BotchaSeleniumOperaTestCase
+ */
+class BotchaSeleniumOperaTestCase extends BotchaSeleniumOnOriginalTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => t('BOTCHA Selenium tests : Opera'),
+      'description' => t('Testing of the BOTCHA recipes and other JavaScript functionality in Opera browser.'),
+      'dependencies' => array('moopapi', 'selenium'),
+      'group' => t('BOTCHA'),
+      'browsers' => array('opera'),
+    );
+  }
+}
+
+
+/**
+ * Description of BotchaSeleniumIETestCase
+ */
+class BotchaSeleniumIETestCase extends BotchaSeleniumOnOriginalTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => t('BOTCHA Selenium tests : Internet Explorer'),
+      'description' => t('Testing of the BOTCHA recipes and other JavaScript functionality in IE browser.'),
+      'dependencies' => array('moopapi', 'selenium'),
+      'group' => t('BOTCHA'),
+      'browsers' => array('iexplorer'),
+    );
+  }
+}
+}
