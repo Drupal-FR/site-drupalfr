@@ -1,0 +1,28 @@
+name = BOTCHA
+description = BOTCHA Spam Prevention.
+package = "Spam control"
+core = 7.x
+configure = admin/config/people/botcha
+
+dependencies[] = moopapi
+files[] = botcha.install
+files[] = botcha.module
+files[] = botcha.rules.inc
+files[] = controller/application/botcha.application.controller.inc
+files[] = controller/form/botcha.form.controller.inc
+files[] = controller/recipe/botcha.recipe.controller.inc
+files[] = controller/recipebook/botcha.recipebook.controller.inc
+files[] = model/application/botcha.application.model.inc
+files[] = model/form/botcha.form.model.inc
+files[] = model/recipe/botcha.recipe.model.inc
+files[] = model/recipebook/botcha.recipebook.model.inc
+; Tests
+files[] = tests/botcha.simpletest.test
+files[] = tests/botcha.selenium.test
+files[] = tests/upgrade/update.botcha.test
+; Information added by drupal.org packaging script on 2013-08-14
+version = "7.x-3.3"
+core = "7.x"
+project = "botcha"
+datestamp = "1376458567"
+

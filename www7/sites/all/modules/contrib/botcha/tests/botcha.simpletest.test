@@ -1,0 +1,1403 @@
+<?php
+
+/**
+ * @file
+ * Simpletest-tests for BOTCHA module.
+ */
+
+// TODO: write test for BOTCHAs on admin pages
+// TODO: test about placement (comment form, node forms, log in form, etc)
+// TODO: test custom BOTCHA validation stuff
+// TODO: test if entry on status report (Already X blocked form submissions) works
+// TODO: Add tests for integration with CAPTCHA
+// TODO: Test secret key auto-generation
+// TODO: Test behavior around "back" button for legit users - behave nicely, what message, how form values are preserved, etc.
+
+define('BOTCHA_SESSION_REUSE_ATTACK_ERROR_MESSAGE',
+  'Form session reuse detected.');
+
+define('BOTCHA_TIMEGATE_TIMEOUT_ERROR_MESSAGE',
+  'Form is submitted too fast.');
+
+define('BOTCHA_UNKNOWN_CSID_ERROR_MESSAGE',
+  'You must be a human, not a spam bot, to submit forms on this website.');
+
+define('BOTCHA_NO_JS_ERROR_MESSAGE',
+  'Please enable Javascript to use this form.');
+
+
+/**
+ * Base class for BOTCHA tests.
+ *
+ * Provides common setup stuff and various helper functions
+ */
+abstract class BotchaBaseWebTestCase extends DrupalWebTestCase {
+
+  /**
+   * @var Botcha
+   */
+  protected $application;
+
+  /**
+   * User with various administrative permissions.
+   * @var Drupal user
+   */
+  protected $admin_user;
+
+  /**
+   * Normal visitor with limited permissions
+   * @var Drupal user;
+   */
+  protected $normal_user;
+
+  public function setUp() {
+    // Backward compatibility together with support of new way of passing modules parameter.
+    // @link DrupalWebTestCase::setUp() @endlink
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    parent::setUp(array_merge($modules, array('comment', 'moopapi', 'botcha')));
+    // Fill in the application.
+    $this->application = ComponentFactory::get('Botcha', Component::TYPE_CONTROLLER, Component::ID_APPLICATION);
+    // Create a normal user.
+    $permissions = array(
+      'access comments', 'post comments',
+      // @todo Abstract it.
+      //'post comments without approval',
+      'skip comment approval',
+      'access content', 'create page content', 'edit own page content',
+    );
+    $this->normal_user = $this->drupalCreateUser($permissions);
+    // Create an admin user.
+    $permissions[] = 'administer BOTCHA settings';
+    $permissions[] = 'skip BOTCHA';
+    $permissions[] = 'administer permissions';
+    $permissions[] = 'administer content types';
+    // It is for admin test case.
+    $permissions[] = 'access site reports';
+    $this->admin_user = $this->drupalCreateUser($permissions);
+    // Put comments on page nodes on a separate page (default in D7: below post).
+    variable_set('comment_form_location_page', COMMENT_FORM_SEPARATE_PAGE);
+  }
+
+  /**
+   * Assert that the response is accepted:
+   * no "unknown CSID" message, no "CSID reuse attack detection" message,
+   * no "wrong answer" message.
+   */
+  protected function assertBotchaResponseAccepted() {
+    // There should be no error message about unknown BOTCHA session ID.
+    $this->assertNoText(t(BOTCHA_UNKNOWN_CSID_ERROR_MESSAGE),
+      'BOTCHA response should be accepted (known CSID).',
+      'BOTCHA');
+    // There should be no error message about CSID reuse attack.
+    $this->assertNoText(t(BOTCHA_SESSION_REUSE_ATTACK_ERROR_MESSAGE),
+      'BOTCHA response should be accepted (no BOTCHA session reuse attack detection).',
+      'BOTCHA');
+    // There should be no error message about wrong response.
+    //$this->assertNoText(t(BOTCHA_NO_JS_ERROR_MESSAGE),
+    //  'BOTCHA response should be accepted (JS enabled).',
+    //  'BOTCHA');
+  }
+
+  /**
+   * Assert that there is a BOTCHA on the form or not.
+   * @param bool $presence whether there should be a BOTCHA or not.
+   */
+  protected function assertBotchaPresence($presence) {
+    if ($presence) {
+      $this->assertText('If you\'re a human, don\'t change the following field',
+        'There should be a BOTCHA on the form.', 'BOTCHA');
+    }
+    else {
+      $this->assertNoText('If you\'re a human, don\'t change the following field',
+        'There should be no BOTCHA on the form.', 'BOTCHA');
+    }
+  }
+
+  /**
+   * Helper function to create a node with comments enabled.
+   *
+   * @return
+   *   Created node object.
+   */
+  protected function createNodeWithCommentsEnabled($type='page') {
+    $node_settings = array(
+      'type' => $type,
+      // @todo Abstract it.
+      //'comment' => COMMENT_NODE_READ_WRITE,
+      'comment' => COMMENT_NODE_OPEN,
+    );
+    $node = $this->drupalCreateNode($node_settings);
+    return $node;
+  }
+
+  /**
+   * Helper function to get form values array from comment form
+   */
+  protected function getCommentFormValuesFromForm() {
+    // Submit the form using the displayed values.
+    $langcode = LANGUAGE_NONE;
+    $displayed = array();
+    foreach (array(
+      'subject' => "//input[@id='edit-subject']/@value",
+      // @todo Abstract it.
+      //'comment' => "//textarea[@id='edit-comment-body-$langcode-0-value']",
+      "comment_body[$langcode][0][value]" => "//textarea[@id='edit-comment-body-$langcode-0-value']",
+      'botcha_response' => "//input[@id='edit-botcha-response']/@value",
+    ) as $field => $path) {
+      $value = current($this->xpath($path));
+      if (!empty($value)) {
+        $displayed[$field] = (string) $value;
+      }
+    }
+    return $displayed;
+  }
+
+  /**
+   * Helper function to generate a default form values array for comment forms
+   */
+  // "= NULL" is for backward compatibility.
+  protected function setCommentFormValues($should_pass = NULL) {
+    $langcode = LANGUAGE_NONE;
+    $edit = array(
+      'subject' => 'comment_subject ' . $this->randomName(32),
+      // @todo Abstract it.
+      //'comment' => 'comment_body ' . $this->randomName(256),
+      "comment_body[$langcode][0][value]" => 'comment_body ' . $this->randomName(256),
+    );
+    return $edit;
+  }
+
+  /**
+   * Helper function to generate a default form values array for node forms
+   */
+  // "= NULL" is for backward compatibility.
+  protected function setNodeFormValues($should_pass = NULL) {
+    // @todo Abstract it.
+    //$langcode = 'und';
+    $langcode = LANGUAGE_NONE;
+    $edit = array(
+      'title' => 'node_title ' . $this->randomName(32),
+      "body[$langcode][0][value]" => 'node_body ' . $this->randomName(256),
+    );
+    return $edit;
+  }
+
+  /**
+   * Get the form_build_id from the current form in the browser.
+   */
+  protected function getFormBuildIdFromForm($form = NULL) {
+    // Form a xpath query string.
+    $xpath = '//';
+    if (!empty($form)) {
+      // Specially to transform user_login to user-login.
+      // @todo getFormBuildIdFromForm ?Is there a better way to do it?
+      $form_filtered = str_replace('_', '-', $form);
+      // If form parameter is set we are looking for forms like it. It is useful
+      // when we have multiple forms on one page.
+      $xpath .= "form[contains(@id, '{$form_filtered}')]/div/";
+    }
+    $xpath .= "input[@name='form_build_id']/@value";
+    // Force conversion to string.
+    //$form_build_id = (string) current($this->xpath("//input[@name='form_build_id']/@value"));
+    $form_build_id = (string) current($this->xpath($xpath));
+    return $form_build_id;
+  }
+
+  /**
+   * Helper function to allow comment posting for anonymous users.
+   */
+  protected function allowCommentPostingForAnonymousVisitors() {
+    // Log in as admin.
+    $this->drupalLogin($this->admin_user);
+    // Post user permissions form
+    $edit = array(
+      '1[access comments]' => TRUE,
+      '1[post comments]' => TRUE,
+      // @todo Abstract it.
+      //'1[post comments without approval]' => TRUE,
+      '1[skip comment approval]' => TRUE,
+    );
+    // @todo Abstract it.
+    //$this->drupalPost('admin/user/permissions', $edit, 'Save permissions');
+    $this->drupalPost('admin/people/permissions', $edit, 'Save permissions');
+    $this->assertText('The changes have been saved.');
+    // Log admin out
+    $this->drupalLogout();
+  }
+  //-----------------------------------
+  /**
+   * Get an array of our expectations to cycle through: should we test that this
+   * form fails or successfully submitted or both?
+   */
+  public function getExpectations() {
+    return array(TRUE);
+  }
+
+  /**
+   * Get the list of names of the buttons that are available for this concrete
+   * form. Used as "modes" for behavior testing. Later we check that the real
+   * behavior after clicking this button matches our suspections.
+   */
+  function getButtonsByForm($form) {
+    $buttons = array();
+    switch ($form) {
+      case 'user_login':
+        $buttons[] = t('Log in');
+        break;
+      case 'node':
+      case 'comment':
+      default:
+        $buttons[] = t('Preview');
+        $buttons[] = t('Save');
+        break;
+    }
+    return $buttons;
+  }
+
+  /**
+   * Helper function to generate a default form values array for any form.
+   */
+  protected function setFormValues($form, $should_pass = TRUE, &$parameters = array()) {
+    $edit = array();
+    switch ($form) {
+      // These ones for testing FormUI.
+      case 'addForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $edit['botcha_form_id'] = drupal_strtolower($this->randomName(32));
+        $parameters['botcha_form_id'] = $edit['botcha_form_id'];
+        $edit["botcha_form_recipebook"] = $parameters['rbid'];
+        break;
+      case 'editForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // Fill in enabled.
+        $edit['botcha_enabled'] = $parameters['botcha_enabled'];
+        // Fill in recipe book.
+        $edit["botcha_form_recipebook"] = $parameters['rbid'];
+        break;
+      case 'deleteForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // Nothing to do.
+        break;
+      // These ones for testing RecipebookUI.
+      case 'addRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $edit['id'] = drupal_strtolower($this->randomName(32));
+        $edit['title'] = $this->randomName(32);
+        $edit['description'] = $this->randomName(255);
+        $edit['recipes[timegate]'] = 'timegate';
+        break;
+      case 'editRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $edit['title'] = $this->randomName(32);
+        $edit['description'] = $this->randomName(255);
+        $edit['recipes[timegate]'] = 'timegate';
+        break;
+      case 'deleteRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // @todo BotchaBaseWebTestCase setFormValues Case deleteRecipebook real logic.
+        break;
+      // And these ones for testing form submission.
+      case 'node':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $edit = $this->setNodeFormValues($should_pass);
+        break;
+      case 'user_login':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $edit = $this->setUserLoginFormValues($should_pass);
+        break;
+      case 'comment':
+      default:
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $edit = $this->setCommentFormValues($should_pass);
+        break;
+    }
+    return $edit;
+  }
+
+  /**
+   * Helper function to generate a default form values array for comment forms
+   */
+  protected function setUserLoginFormValues($should_pass) {
+    $edit = array(
+      'name' => $this->normal_user->name,
+      'pass' => $this->normal_user->pass_raw,
+    );
+    return $edit;
+  }
+
+  function checkPreConditions($form, $should_pass, $button) {
+    switch ($form) {
+      case 'comment':
+        // Check that comment form is enabled.
+        // @todo Abstract it.
+        //$this->assertTrue(variable_get("botcha_enabled_comment_form", 0), "BOTCHA protection for comment_form must be enabled", 'BOTCHA');
+        $this->assertTrue(variable_get("botcha_enabled_comment_node_page_form", 0), "BOTCHA protection for comment_node_page_form must be enabled", 'BOTCHA');
+        break;
+    }
+  }
+
+  /**
+   * Get one of predefined forms.
+   * Used to unify the process of testing.
+   */
+  function getForm($form, &$parameters = array()) {
+    $form_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_FORM);
+    $recipe_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPE);
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    // @todo Refactor all these switches with classes.
+    switch ($form) {
+      // These ones for testing FormUI.
+      case 'addForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->drupalGet(Botcha::ADMIN_PATH . '/form/add');
+        foreach (array('botcha_form_id', 'botcha_enabled', 'botcha_form_recipebook') as $field) {
+          $this->assertField($field, "There should be a $field field on the form", 'BOTCHA');
+        }
+        break;
+      case 'editForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $form_id = drupal_strtolower($this->randomName(12));
+        // Pass this newly created form to other methods.
+        $parameters['botcha_form_id'] = $form_id;
+        // Random enabled state generation.
+        // Converting to boolean is a workaround for drupalPost which interprets 0 as TRUE else.
+        $enabled = (bool)rand(0, 1);
+        $parameters['botcha_enabled'] = $enabled;
+        // The form should be already binded to some (let's say default) recipe book.
+        $rbid = 'default';
+        $botcha_form = $form_controller->getForm($form_id, TRUE)
+          ->setEnabled($enabled)
+          ->setRecipebook($rbid);
+        $form_controller->save($botcha_form);
+        // Assert form existence.
+        $this->assertTrue(!($form_controller->getForm($parameters['botcha_form_id'], FALSE) instanceof BotchaFormNone), "Form {$parameters['botcha_form_id']} exists", 'BOTCHA');
+        // Assert recipe book of the form.
+        $recipebook_id = $form_controller->getForm($parameters['botcha_form_id'], FALSE)->getRecipebook();
+        $this->assertEqual($rbid, $recipebook_id, "BOTCHA form has recipe book {$recipebook_id} (should have {$rbid})", 'BOTCHA');
+        // Assert enabled or not.
+        $this->assertEqual($enabled, $botcha_form->isEnabled(), 'BOTCHA form has correct state', 'BOTCHA');
+        $this->drupalGet(Botcha::ADMIN_PATH . "/form/{$form_id}");
+        foreach (array('botcha_form_id', 'botcha_enabled', 'botcha_form_recipebook') as $field) {
+          $this->assertField($field, "There should be a $field field on the form", 'BOTCHA');
+        }
+        // @todo Check that id field is disabled.
+        break;
+      case 'deleteForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $form_id = drupal_strtolower($this->randomName(12));
+        // Pass this newly created form to other methods.
+        $parameters['botcha_form_id'] = $form_id;
+        // The form should be already binded to some (let's say default) recipe book.
+        $botcha_form = $form_controller->getForm($form_id, TRUE)
+          ->setRecipebook('default');
+        $form_controller->save($botcha_form);
+        $this->drupalGet(Botcha::ADMIN_PATH . "/form/{$form_id}/delete");
+        break;
+      // These ones for testing RecipebookUI.
+      case 'addRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->drupalGet(Botcha::ADMIN_PATH . '/recipebook/add');
+        // @todo Implement recipes checking.
+        foreach (array('id', 'title', 'description') as $field) {
+          $this->assertField($field, "There should be a $field field on the form", 'BOTCHA');
+        }
+        break;
+      case 'editRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $id = drupal_strtolower($this->randomName(12));
+        // Save this id to the parameters.
+        $parameters['id'] = $id;
+        $title = $this->randomName(12);
+        $description = $this->randomString(255);
+        // We need some recipes already set to test unsetting.
+        $recipe_id = 'honeypot';
+        $recipebook = $recipebook_controller->getRecipebook($id, TRUE)
+          ->setTitle($title)
+          ->setDescription($description)
+          ->setRecipe($recipe_id);
+        $recipebook_controller->save($recipebook);
+        $this->drupalGet(Botcha::ADMIN_PATH . "/recipebook/{$id}");
+        // @todo Implement recipes appearance checking.
+        foreach (array('id', 'title', 'description') as $field) {
+          $this->assertField($field, "There should be a $field field on the form", 'BOTCHA');
+        }
+        break;
+      case 'deleteRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // @todo Case deleteRecipebook real logic.
+        break;
+      // And these ones are for testing form submissions.
+      case 'node':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->drupalGet('node/add/page');
+        $this->assertBotchaPresence(TRUE);
+        break;
+      case 'user_login':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->drupalGet('user');
+        $this->assertBotchaPresence(TRUE);
+        break;
+      case 'comment':
+      default:
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // Create node to post comment to.
+        $node = $this->createNodeWithCommentsEnabled();
+        $this->drupalGet("comment/reply/{$node->nid}");
+        $this->assertBotchaPresence(TRUE);
+        // Make sure comments on pages can be saved directly without preview.
+        // @todo Abstract it.
+        //variable_set('comment_preview_page', 0);
+        variable_set('comment_preview_page', DRUPAL_OPTIONAL);
+        break;
+    }
+  }
+
+  /**
+   * Post one of predefined forms.
+   * Used to unify the process of testing.
+   */
+  function postForm($form, $edit, $button = NULL, &$parameters = array()) {
+    switch ($form) {
+      // These ones for testing Form UI.
+      case 'addForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Add');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      case 'editForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Save');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      case 'deleteForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Delete');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      // These ones for testing Recipebook UI.
+      case 'addRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Add');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      case 'editRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Save');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      case 'deleteRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // @todo Case deleteRecipebook.
+        break;
+      // And these ones are for testing form submissions.
+      case 'node':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Save');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      case 'user_login':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $button = ($button) ? $button : t('Log in');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+      case 'comment':
+      default:
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // Make sure comments on pages can be saved directly without preview.
+        // @todo Abstract it.
+        //variable_set('comment_preview_page', 0);
+        variable_set('comment_preview_page', DRUPAL_OPTIONAL);
+        $button = ($button) ? $button : t('Save');
+        $this->drupalPost(NULL, $edit, $button);
+        break;
+    }
+  }
+
+  /**
+   * Check whether our suspections are real.
+   */
+  public function assertFormSubmission($form, $edit, $should_pass = TRUE, $button = NULL, &$parameters = array()) {
+    $form_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_FORM);
+    $recipe_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPE);
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    // @todo Refactor all these switches with classes.
+    switch ($form) {
+      // These ones for testing Form UI.
+      case 'addForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // Make sure that the message appeared.
+        //$this->assertText(t('Added BOTCHA form %form_id.', array('%form_id' => $parameters['botcha_form_id'])), 'BOTCHA form successfully added : Message displayed', 'BOTCHA');
+        $this->assertText("Added BOTCHA form {$parameters['botcha_form_id']}.", 'BOTCHA form successfully added : Message displayed', 'BOTCHA');
+        // Ensure that the form was created.
+        $this->assertTrue(!($form_controller->getForm($parameters['botcha_form_id'], FALSE) instanceof BotchaFormNone), 'BOTCHA form successfully added : Form saved to DB', 'BOTCHA');
+        // Assert recipe book of the form.
+        $recipebook_id = $form_controller->getForm($parameters['botcha_form_id'], FALSE)->getRecipebook();
+        $this->assertEqual($parameters['rbid'], $recipebook_id, "BOTCHA form successfully added : Recipe book {$parameters['rbid']} saved correctly as {$recipebook_id}", 'BOTCHA');
+        break;
+      case 'editForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // Make sure that the message appeared.
+        $this->assertText("Saved BOTCHA form settings for {$parameters['botcha_form_id']}.", 'BOTCHA form successfully saved : Message displayed', 'BOTCHA');
+        // @todo ?Why we need to call getForm with $create = TRUE? What's wrong?
+        $botcha_form = $form_controller->getForm($parameters['botcha_form_id'], TRUE);
+        // Assert recipe book of the form.
+        $recipebook_id = $botcha_form->getRecipebook();
+        // Ensure recipe book.
+        $this->assertEqual($parameters['rbid'], $recipebook_id, "BOTCHA form successfully saved : Recipe book {$parameters['rbid']} saved correctly as {$recipebook_id}", 'BOTCHA');
+        // Ensure enabled.
+        $this->assertEqual($parameters['botcha_enabled'], $botcha_form->isEnabled(), 'BOTCHA form was successfully turned on/off', 'BOTCHA');
+        break;
+      case 'deleteForm':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $form_id = $parameters['botcha_form_id'];
+        // Make sure that the message appeared.
+        $this->assertText("Deleted BOTCHA protection for form {$form_id}.", 'BOTCHA form successfully deleted : Message displayed', 'BOTCHA');
+        // Ensure that the form was deleted.
+        $this->assertTrue($form_controller->getForm($form_id, FALSE) instanceof BotchaFormNone, 'BOTCHA form successfully deleted', 'BOTCHA');
+        break;
+      // These ones for testing Recipebook UI.
+      case 'addRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->assertTrue(
+          $recipebook = $recipebook_controller->getRecipebook($edit['id'], FALSE),
+          "Recipe book {$edit['id']} should exist",
+          'BOTCHA'
+        );
+        foreach (array('id', 'title', 'description') as $field) {
+          $this->assertEqual(
+            $recipebook->$field,
+            $edit[$field],
+            "Recipe book {$edit['id']} should have $field equal $edit[$field] (in fact it has {$recipebook->$field})",
+            'BOTCHA'
+          );
+        }
+        break;
+      case 'editRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $recipebook = $recipebook_controller->getRecipebook($parameters['id'], FALSE);
+        foreach (array('title', 'description') as $field) {
+          $this->assertEqual(
+            $recipebook->$field,
+            $edit[$field],
+            "Recipe book {$parameters['id']} should have $field equal $edit[$field] (in fact it has {$recipebook->$field})",
+            'BOTCHA'
+          );
+        }
+        // @todo Add recipes assertion.
+        break;
+      case 'deleteRecipebook':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        // @todo Case deleteRecipebook.
+        break;
+      // And these ones are for testing form submissions.
+      case 'node':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->assertNodeFormSubmission($edit, $should_pass, $button);
+        break;
+      case 'user_login':
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->assertUserLoginFormSubmission($edit, $should_pass, $button);
+        break;
+      case 'comment':
+      default:
+        $this->debug("Entered %method %case", array('%method' => __METHOD__, '%case' => $form));
+        $this->assertCommentFormSubmission($edit, $should_pass, $button);
+        break;
+    }
+  }
+
+  /**
+   * Assert function for testing if comment posting works as it should.
+   *
+   * Creates node with comment writing enabled, tries to post comment
+   * with given BOTCHA response (caller should enable the desired
+   * challenge on page node comment forms) and checks if the result is as expected.
+   *
+   * @param $node existing node to post comments to (if NULL, will be created)
+   * @param $should_pass boolean describing if the posting should pass or should be blocked
+   * @param $message message to prefix to nested asserts
+   * @param $button name of button to click (t('Save') by default)
+   */
+  protected function assertCommentFormSubmission($edit, $should_pass, $button) {
+    // Assertion itself.
+    switch ($should_pass) {
+      case FALSE:
+        // Check for error message.
+        $this->assertText(BOTCHA_WRONG_RESPONSE_ERROR_MESSAGE,
+          'Comment submission should be blocked.', 'BOTCHA');
+        // Check that there is still BOTCHA after failed submit.
+        $this->assertBotchaPresence(TRUE);
+        $this->assertNoText($edit['subject'], 'Comment should not show up on node page.', 'BOTCHA');
+        // !!? Do we need to check message body?
+        //$this->assertNoText($comment_body, $message . ' Comment should not show up on node page.', 'BOTCHA');
+        break;
+      case TRUE:
+      default:
+        switch ($button) {
+          case t('Preview'):
+            // Check that there is still BOTCHA after preview.
+            $this->assertBotchaPresence(TRUE);
+            break;
+          case t('Save'):
+          default:
+            // There should be no error message.
+            $this->assertBotchaResponseAccepted();
+            $this->assertText($edit['subject'], 'Comment should show up on node page.', 'BOTCHA');
+            // !!? Do we need to check message body?
+            //$this->assertText($edit['comment_body'], $message . ' Comment should show up on node page.', 'BOTCHA');
+            break;
+        }
+        break;
+    }
+  }
+
+  /**
+   * Assert submission of node form, check whether it works how it should.
+   *
+   * @param type $edit
+   * @param type $should_pass
+   */
+  protected function assertNodeFormSubmission($edit, $should_pass, $button) {
+    // @todo assertNodeFormSubmission real logic
+  }
+
+  /**
+   * Assert submission of user login form, check whether it works how it should.
+   *
+   * @param type $edit
+   * @param type $should_pass
+   */
+  protected function assertUserLoginFormSubmission($edit, $should_pass, $button) {
+    switch ($should_pass) {
+      case FALSE:
+        // Check for error message.
+        $this->assertText(BOTCHA_WRONG_RESPONSE_ERROR_MESSAGE,
+          'BOTCHA should block user login form', 'BOTCHA');
+        // And make sure that user is not logged in:
+        // check for name and password fields on ?q=user.
+        $this->drupalGet('user');
+        $this->assertField('name', t('Username field found.'), 'BOTCHA');
+        $this->assertField('pass', t('Password field found.'), 'BOTCHA');
+        break;
+      case TRUE:
+      default:
+        // If log in was successful, log out to continue testing.
+        $this->drupalLogout();
+        break;
+    }
+  }
+
+  /**
+   * Used to print debug message on the test result screen.
+   * @param string $message_template
+   * @param array $substitutions
+   */
+  protected function debug($message_template, $substitutions = array()) {
+    return $this->pass(t($message_template, $substitutions), 'BOTCHA');
+  }
+}
+
+
+abstract class BotchaAdminTestCase extends BotchaBaseWebTestCase {
+
+  public function setUp() {
+    // @todo Abstract it.
+    parent::setUp(array('system'));
+    $form_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_FORM);
+    // Disable all recipes and forms for default recipe book not to have any
+    // problems with submitting forms.
+    $forms = $form_controller->getForms(TRUE);
+    foreach ($forms as $botcha_form) {
+      $form_id = $botcha_form->id;
+      $form_controller->getForm($form_id, FALSE)
+        // We don't need save() since isEnabled is handled via variable_set.
+        ->setEnabled(FALSE);
+    }
+    // Log in as admin.
+    $this->drupalLogin($this->admin_user);
+  }
+}
+
+class BotchaTestAdminGeneral extends BotchaAdminTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Admin: General BOTCHA administration functionality'),
+      'description' => t('Testing of the BOTCHA administration interface and functionality.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  /**
+   * Testing general BOTCHA admin functionality.
+   */
+  public function testAdminGeneral() {
+    variable_set('botcha_form_passed_counter',  $pass_cnt = rand(0, 10000));
+    variable_set('botcha_form_blocked_counter', $block_cnt = rand(1, 10000));
+    $build_cnt = $pass_cnt + $block_cnt;
+    // Assert that the statistics is present.
+    $this->drupalGet(Botcha::ADMIN_PATH);
+    $this->assertText("Already {$block_cnt} blocked form submissions.", 'BOTCHA blocked count statistics is present', 'BOTCHA');
+    $percent = sprintf("%0.3f", 100 * $block_cnt / $build_cnt);
+    $this->assertText("({$percent}% of total {$build_cnt} processed)", 'BOTCHA total count statistics is present', 'BOTCHA');
+    // Reset BOTCHA statistics.
+    $this->drupalPost(NULL, array(), t('Reset BOTCHA statistics'));
+    // Assert that the statistics is reset.
+    $this->assertText("BOTCHA statistics have been reset.", "Message displayed", 'BOTCHA');
+    $this->assertText("Already 0 blocked form submissions.", 'BOTCHA blocked count statistics is reset', 'BOTCHA');
+    $this->assertNoText("({$percent}% of total {$build_cnt} processed)", 'BOTCHA total count statistics is reset', 'BOTCHA');
+  }
+}
+
+class BotchaTestAdminLog extends BotchaAdminTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Admin: Admin log testing'),
+      'description' => t('Testing of the BOTCHA admin dblog placement.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  /**
+   * Testing of placing messages into log.
+   */
+  public function testAdminLog() {
+    // Unit testing: assume that correct work of other parts is tested elsewhere.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook();
+    // Fill in results array randomly to emulate spam check.
+    $is_spam = array();
+    $recipes_spam = array();
+    foreach ($recipebook->getRecipes() as $recipe_id) {
+      $value = (boolean) rand(0, 1);
+      $is_spam[$recipe_id] = $value;
+      if ($value) {
+        $recipes_spam[$recipe_id] = $recipe_id;
+      }
+    }
+    $count_recipes = count($is_spam);
+    $count_spam = count($recipes_spam);
+    $form_id = 'test_form_id';
+    $form = array();
+    $form['form_id']['#value'] = $form_id;
+    // Test success case.
+    // @todo Remove hardcode.
+    $recipebook->handle('success', $form, array(), $is_spam);
+    $this->drupalGet('admin/reports/dblog');
+    // @todo Assert that there is success message.
+    //$this->assertText(t('Checked %count botchas (%recipes_list)', array('%count' => $count_recipes, '%recipes_list' => implode(', ', $is_spam))), 'Success message is in log', 'BOTCHA');
+    // Test spam case.
+    // @todo Remove hardcode.
+    $recipebook->handle('spam', $form, array(), $is_spam);
+    $this->drupalGet('admin/reports/dblog');
+    // @todo It looks like being sometimes failed => find better way to click a link, that contains our form id.
+    // @todo Abstract it.
+    $this->clickLink("$form_id post blocked by BOTCHA: submission looks...");
+    // Assert that there is a spam message.
+    // We should pass plain text - so t() doesn't fit.
+    //$message = t('Failed %count_spam of %count_recipes recipes [%recipes_list] from "%rbid" recipe book.', array('%count_spam' => $count_spam, '%count_recipes' => $count_recipes, '%recipes_list' => implode(', ', $recipes_spam), '%rbid' => $recipebook->id));
+    $message = str_replace(
+      array('%count_spam', '%count_recipes', '%recipes_list', '%rbid'),
+      array($count_spam, $count_recipes, implode(', ', $recipes_spam), $recipebook->id),
+      'Failed %count_spam of %count_recipes recipes [%recipes_list] from "%rbid" recipe book.'
+    );
+    $this->assertText($message, 'Expected spam message \'' . $message . '\' is in log', 'BOTCHA');
+    // Assert filtering vulnerable data: password. Use case is as follows:
+    // 1) Enable BOTCHA protection for user registration form.
+    $form_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_FORM);
+    $form_id = 'user_register_form';
+    $botcha_form = $form_controller->getForm($form_id);
+    $botcha_form->setEnabled(TRUE);
+    // Set log level to one of the highest.
+    variable_set('botcha_loglevel', 6);
+    // Disable email verification to allow setting password during registration.
+    variable_set('user_email_verification', 0);
+    // 2) Register new user via that form.
+    $this->drupalLogout();
+    $edit = array(
+      'name' => $username = $this->randomName(),
+      'mail' => $mail = $username . '@example.com',
+      'pass[pass1]' => $password = user_password(),
+      'pass[pass2]' => $password,
+    );
+    $this->drupalPost('user/register', $edit, t('Create new account'));
+    // 3) Check that password is encrypted.
+    $this->drupalLogin($this->admin_user);
+    $this->drupalGet('admin/reports/dblog');
+    // Always blocked, because Simpletest can't run JavaScript.
+    $this->clickLink("$form_id post blocked by BOTCHA: submission...");
+    $pass_fields = array(
+      // Assert password is hidden in POST.
+      'pass1',
+      'pass2',
+      // Assert password is hidden in values.
+      'pass',
+      // Assert password is hidden in form.
+      '#value',
+    );
+    foreach ($pass_fields as $pass_field) {
+      // Filtering is needed because matching is handled on filtered text.
+      $this->assertText(filter_xss("[$pass_field] => ******", array()), t("Password $pass_field is hidden"));
+      $this->assertNoText(filter_xss("[$pass_field] => $password", array()), t("There is no raw $pass_field password"));
+    }
+  }
+}
+
+class BotchaTestAdminLinks extends BotchaAdminTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Admin: Admin links functionality testing'),
+      'description' => t('Testing of the BOTCHA admin links: insert, interoperate.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  /**
+   * Testing of the BOTCHA administration links.
+   */
+  public function testAdminLinks() {
+    $form_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_FORM);
+
+    // Test for [#1861016]
+    $this->drupalGet('user/' . $this->admin_user->uid . '/edit');
+    $this->assertText($this->admin_user->name, t('User name found.'), 'BOTCHA');
+
+    // Enable BOTCHA administration links.
+    $edit = array(
+      'botcha_administration_mode' => TRUE,
+    );
+    $this->drupalPost(Botcha::ADMIN_PATH . '/form', $edit, t('Save configuration'));
+    // Create a node with comments enabled.
+    $node = $this->createNodeWithCommentsEnabled();
+    // @todo Abstract it.
+    //$form_id = 'comment_form';
+    $form_id = 'comment_node_page_form';
+    $botcha_form = $form_controller->getForm($form_id);
+    // Allow BOTCHA to protect it ...
+    $botcha_form->setEnabled(TRUE);
+    // ... and also make it belonging to no recipebook.
+    $botcha_form->unsetRecipebook();
+    $form_controller->save($botcha_form);
+    // Go to node page.
+    $this->drupalGet('node/' . $node->nid);
+    // Click the add new comment link
+    $this->clickLink(t('Add new comment'));
+    $add_comment_url = $this->getUrl();
+    // Remove fragment part from comment URL to avoid problems with later asserts.
+    $add_comment_url = strtok($add_comment_url, "#");
+    // Click the BOTCHA admin link to enable a challenge.
+    $this->clickLink(t('Add BOTCHA protection on form'));
+    $this->assertFieldByName('botcha_form_id', $form_id, 'Form id has been automatically filled in');
+    // Enable 'default' BOTCHA.
+    $edit = array('botcha_form_recipebook' => 'default');
+    $this->drupalPost(NULL, $edit, t('Add'));
+    // Check if returned to original comment form.
+    $this->assertUrl($add_comment_url, array(),
+      'After setting BOTCHA with BOTCHA admin links: should return to original form.', 'BOTCHA');
+    // Check if BOTCHA was successfully enabled.
+    $this->assertText("Added BOTCHA form {$form_id}.", 'Message displayed', 'BOTCHA');
+    // Check the links appearance.
+    $botcha_form = $form_controller->getForm($form_id, FALSE);
+    $recipebook_id = $botcha_form->getRecipebook();
+    $this->assertLink(t('edit'));
+    $this->assertLink(t('disable'));
+    // Check if BOTCHA was successfully enabled (through API).
+    $this->assertFalse($botcha_form instanceof BotchaFormNone, "Botcha protection for {$form_id} form added via admin link", 'BOTCHA');
+    $this->assertEqual($recipebook_id, 'default', "Recipe book is chosen for {$form_id} form via admin link", 'BOTCHA');
+    /* @todo Delete it since it is already tested in testFormUI.
+    // Edit challenge type through BOTCHA admin links.
+    $this->clickLink(t('edit'));
+    // Enable 'default' BOTCHA.
+    $edit = array('botcha_type' => 'default');
+    $this->drupalPost($this->getUrl(), $edit, t('Save'));
+    // Check if returned to original comment form.
+    $this->assertEqual($add_comment_url, $this->getUrl(),
+      'After editing challenge type BOTCHA admin links: should return to original form.', 'BOTCHA');
+    // Check if BOTCHA was successfully changed (on BOTCHA admin links fieldset).
+    // This is actually the same as the previous setting because the botcha/Math is the
+    // default for the default challenge. TODO Make sure the edit is a real change.
+    $this->assertText(t('Saved BOTCHA point settings.', array('@type' => 'default')),
+      'Enable a challenge through the BOTCHA admin links', 'BOTCHA');
+    // Check if BOTCHA was successfully edited (through API).
+    $this->assertBotchaSetting(self::COMMENT_FORM_ID, 'default');
+    // Delete challenge through BOTCHA admin links.
+    $this->clickLink(t('delete'));
+    // And confirm.
+    $this->drupalPost($this->getUrl(), array(), 'Disable');
+    // Check if returned to original comment form.
+    $this->assertEqual($add_comment_url, $this->getUrl(),
+      'After disablin challenge with BOTCHA admin links: should return to original form.', 'BOTCHA');
+    // Check if BOTCHA was successfully disabled (on BOTCHA admin links fieldset).
+    $this->assertText(t('Disabled BOTCHA for form'),
+      'Disable challenge through the BOTCHA admin links', 'BOTCHA');
+    // Check if BOTCHA was successfully disabled (through API).
+    $this->assertBotchaSetting(self::COMMENT_FORM_ID, 'none');
+     *
+     */
+  }
+}
+
+class BotchaTestFormUI extends BotchaAdminTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Admin: FormUI testing'),
+      'description' => t('Testing of the FormUI functionality.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  /**
+   * Tests for creating, modifying and deleting botcha forms.
+   */
+  public function testFormUI() {
+    // Create a recipe book.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $id = 'test';
+    $title = 'FormUI recipe book';
+    $description = 'Created for testing FormUI';
+    $recipebook = $recipebook_controller->getRecipebook($id)
+      ->setTitle($title)
+      ->setDescription($description);
+    $recipebook_controller->save($recipebook);
+    $forms = array(
+      'addForm',
+      'editForm',
+      'deleteForm',
+    );
+    // Parameters that need to be passed through methods.
+    $parameters = array();
+    $parameters['rbid'] = $id;
+    foreach ($forms as $form) {
+      $this->getForm($form, $parameters);
+      $edit = $this->setFormValues($form, NULL, $parameters);
+      $this->postForm($form, $edit, NULL, $parameters);
+      $this->assertFormSubmission($form, $edit, NULL, NULL, $parameters);
+    }
+  }
+}
+
+class BotchaTestRecipebookUI extends BotchaAdminTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Admin: RecipebookUI testing'),
+      'description' => t('Testing of the RecipebookUI functionality.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  /**
+   * Tests for creating, modifying and deleting recipe books.
+   */
+  public function testRecipebookUI() {
+    $forms = array(
+      'addRecipebook',
+      'editRecipebook',
+      'deleteRecipebook',
+    );
+    // Parameters that need to be passed through methods.
+    $parameters = array();
+    foreach ($forms as $form) {
+      $this->getForm($form, $parameters);
+      $edit = $this->setFormValues($form, NULL, $parameters);
+      $this->postForm($form, $edit, NULL, $parameters);
+      $this->assertFormSubmission($form, $edit, NULL, NULL, $parameters);
+    }
+  }
+}
+
+
+/**
+ * Testing general BOTCHA functionality.
+ */
+class BotchaTestCase extends BotchaBaseWebTestCase {
+
+  public function setUp() {
+    parent::setUp();
+    // Allow comment posting for guests.
+    $this->allowCommentPostingForAnonymousVisitors();
+    // @todo Debug this situation: tests don't have any content types at the moment of the BOTCHA enabling.
+    // It causes lack of some form protection: comment_node_page_form as an example.
+    // For some reason we don't find this form after installation - but we should.
+    // So fix it manually.
+    $form_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_FORM);
+    $botcha_form = $form_controller->getForm('comment_node_page_form', TRUE)
+      ->setRecipebook('default')
+      ->setEnabled(TRUE);
+    $this->assertEqual($botcha_form, $form_controller->save($botcha_form), 'Form object correctly saved.', 'BOTCHA');
+    // Create recipebook "test" + bind all forms to it.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook('test', TRUE)
+      ->setTitle('Test recipebook')
+      ->setDescription("Created for {$this->testId}");
+    $default_recipebook = $recipebook_controller->getRecipebook();
+    foreach ($default_recipebook->getForms() as $form_id) {
+      $recipebook = $recipebook->setForm($form_id);
+    }
+    $this->assertEqual($recipebook, $recipebook_controller->save($recipebook), 'Recipebook object correctly saved.', 'BOTCHA');
+  }
+
+  public function testFormSubmission() {
+    $forms = array(
+      'comment',
+      // @todo Add user_login testing.
+      //'user_login',
+      // @todo Add other forms cases: node, webform, contact, etc.
+      //'node',
+    );
+    foreach ($forms as $form) {
+      // Determine what we expect: whether successful submission or blocked or both.
+      foreach ($this->getExpectations() as $should_pass) {
+        foreach ($this->getButtonsByForm($form) as $button) {
+          // Check some assumptions that are  necessary for this test.
+          $this->checkPreConditions($form, $should_pass, $button);
+          // Get a form.
+          $this->getForm($form);
+          // Fill in the form.
+          $edit = $this->setFormValues($form, $should_pass);
+          // Submit the form.
+          $this->postForm($form, $edit, $button);
+          // Make sure that we get what expected.
+          $this->assertFormSubmission($form, $edit, $should_pass, $button);
+        }
+      }
+    }
+  }
+
+  /**
+   * Test if BOTCHA is applied correctly when failing first and then resubmitting comments:
+   * comment form should have BOTCHA again and pass correct submission.
+   * (We use to fail BOTCHA as it is impossible to fail comment form on its own)
+   *
+   */
+  /* @todo Move it to separate testcase, since it doesn't make sense to test it for each recipe.
+  function testBotchaResubmit() {
+    $langcode = LANGUAGE_NONE;
+    // Set Test BOTCHA on comment form.
+    botcha_set_form_id_setting(self::COMMENT_FORM_ID, 'test');
+    // Create a node with comments enabled.
+    $node = $this->createNodeWithCommentsEnabled();
+    // Log in as normal user.
+    $this->drupalLogin($this->normal_user);
+    // Make sure comments on pages can be saved directely without preview.
+    variable_set('comment_preview_page', DRUPAL_OPTIONAL);
+    // Check if there is a BOTCHA on the comment form.
+    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->assertBotchaPresence(TRUE);
+    // Post comment on node.
+    $edit = $this->setCommentFormValues();
+    // Screw up fields (like a bot would do)
+    $edit['botcha_response'] = 'xx';
+    $comment_subject = $edit['subject'];
+    $comment_body = $edit["comment_body[$langcode][0][value]"];
+    $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Save'));
+    // Check for error message.
+    $this->assertText(t(BOTCHA_WRONG_RESPONSE_ERROR_MESSAGE), 'Comment submission should be blocked.', 'BOTCHA');
+    // Check that there is still BOTCHA after failed submit.
+    $this->assertBotchaPresence(TRUE);
+    // Copy all values from the form into new one.
+    $edit = $this->getCommentFormValuesFromForm();
+    // Get node page and check that comment is not present.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertNoText($comment_subject, 'Comment should not show up on node page.', 'BOTCHA');
+    $this->assertNoText($comment_body, 'Comment should not show up on node page.', 'BOTCHA');
+    $comment_subject = $edit['subject'];
+    $comment_body = $edit["comment_body[$langcode][0][value]"];
+    // Save comment again with correct BOTCHA.
+    $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Save'));
+    // There should be no error message.
+    $this->assertBotchaResponseAccepted();
+    // Get node page and check that comment shows up.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertText($comment_subject, 'Comment should show up on node page.', 'BOTCHA');
+    $this->assertText($comment_body, 'Comment should show up on node page.', 'BOTCHA');
+    // Log out.
+    $this->drupalLogout();
+  }
+   *
+   */
+}
+
+
+class BotchaUsingJsTestCase extends BotchaTestCase {
+
+  protected function assertBotchaPresence($presence) {
+    if ($presence) {
+      $this->assertText('If you\'re a human, don\'t change the following field',
+        'There should be a BOTCHA on the form.', 'BOTCHA');
+    }
+    else {
+      $this->assertNoText('If you\'re a human, don\'t change the following field',
+        'There should be no BOTCHA on the form.', 'BOTCHA');
+    }
+  }
+}
+
+
+class BotchaHoneypotTestCase extends BotchaUsingJsTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Honeypot method testing'),
+      'description' => t('Testing of the honeypot protection method.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    // Bind only one recipe to test recipe book.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook('test')->setRecipe('honeypot');
+    $recipebook_controller->save($recipebook);
+  }
+
+  public function getExpectations() {
+    return array(FALSE);
+  }
+
+  protected function setFormValues($form, $should_pass, &$parameters = array()) {
+    $edit = parent::setFormValues($form, $should_pass, $parameters);
+    // Since we can't test javascript (is there a way to do it?) and Simpletest
+    // can't evaluate javascript we should do nothing to break the submission.
+    return $edit;
+  }
+}
+
+
+// @todo BotchaRecipeHoneypot2 Refactor as a configuration of BotchaRecipeHoneypot.
+class BotchaHoneypot2TestCase extends BotchaUsingJsTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Honeypot2 method testing'),
+      'description' => t('Testing of the honeypot2 protection method.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    // Bind only one recipe to test recipe book.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook('test')->setRecipe('honeypot2');
+    $recipebook_controller->save($recipebook);
+  }
+
+  public function getExpectations() {
+    return array(FALSE);
+  }
+
+  protected function setFormValues($form, $should_pass, &$parameters = array()) {
+    $edit = parent::setFormValues($form, $should_pass, $parameters);
+    // Since we can't test javascript (is there a way to do it?) and Simpletest
+    // can't evaluate javascript we should do nothing to break the submission.
+    return $edit;
+  }
+}
+
+
+class BotchaObscureUrlTestCase extends BotchaUsingJsTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Obscure url method testing'),
+      'description' => t('Testing of the obscure url protection method.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    // Bind only one recipe to test recipe book.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook('test')->setRecipe('obscure_url');
+    $recipebook_controller->save($recipebook);
+  }
+
+  public function getExpectations() {
+    return array(FALSE);
+  }
+
+  protected function setFormValues($form, $should_pass, &$parameters = array()) {
+    $edit = parent::setFormValues($form, $should_pass, $parameters);
+    // Since we can't test javascript (is there a way to do it?) and Simpletest
+    // can't evaluate javascript we should do nothing to break the submission.
+    return $edit;
+  }
+}
+
+
+class BotchaNoResubmitTestCase extends BotchaTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('NoResubmit method testing'),
+      'description' => t('Testing of the session reuse attack protection.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    // Bind only one recipe to test recipe book.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook('test')->setRecipe('no_resubmit');
+    $recipebook_controller->save($recipebook);
+  }
+
+  public function getExpectations() {
+    return array(TRUE, FALSE);
+  }
+
+  protected function assertBotchaPresence($presence) {
+    // We couldn't understand whether this form implement no-resubmit protection
+    // or not by its appearance - so always pass this check.
+    return TRUE;
+  }
+
+  protected function setFormValues($form, $should_pass, &$parameters = array()) {
+    $edit = parent::setFormValues($form, $should_pass, $parameters);
+    switch ($should_pass) {
+      case FALSE:
+        // Get form_build_id of the form (to simulate resubmit).
+        $form_build_id = $this->getFormBuildIdFromForm($form);
+        // Submit a form once.
+        $this->postForm($form, $edit);
+        // Make sure it passes.
+        parent::assertFormSubmission($form, $edit, TRUE);
+        // Get new form.
+        $this->getForm($form);
+        //$edit = parent::setFormValues($form, $should_pass, $parameters);
+        // Set form_build_id of the current form to stored value (to simulate resubmit).
+        $edit['form_build_id'] = $form_build_id;
+        break;
+      case TRUE:
+      default:
+        // Everything is done already.
+        break;
+    }
+    return $edit;
+  }
+
+  public function assertFormSubmission($form, $edit, $should_pass = TRUE, $button = NULL, &$parameters = array()) {
+    switch ($form) {
+      case 'user_login':
+      case 'comment':
+        // Assertion itself.
+        switch ($should_pass) {
+          case FALSE:
+            // Check for error message.
+            $this->assertText(BOTCHA_SESSION_REUSE_ATTACK_ERROR_MESSAGE,
+              'Submission should be blocked.', 'BOTCHA');
+            break;
+        }
+        break;
+    }
+    // We are placing it to the end since we have a redirection there which
+    // makes impossible to assert submission by these conditions.
+    parent::assertFormSubmission($form, $edit, $should_pass, $button, $parameters);
+  }
+/* @todo ?Where to place and how to test MultipleBotchaProtectedFormsOnOnePage test case?
+  public function testMultipleBotchaProtectedFormsOnOnePage() {
+    // Set Test BOTCHA on comment form and login block
+    botcha_set_form_id_setting(self::COMMENT_FORM_ID, 'test');
+    botcha_set_form_id_setting('user_login_block', 'test');
+    // Create a node with comments enabled.
+    $node = $this->createNodeWithCommentsEnabled();
+    // Preview comment with correct BOTCHA answer.
+    $edit = $this->setCommentFormValues();
+    $comment_subject = $edit['subject'];
+    $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
+    // Post should be accepted: no warnings,
+    // no BOTCHA reuse detection (which could be used by user log in block).
+    $this->assertBotchaResponseAccepted();
+    $this->assertText($comment_subject);
+  }
+ *
+ */
+}
+
+
+class BotchaTimegateTestCase extends BotchaTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Timegate method testing'),
+      'description' => t('Testing of the timegate protection method.'),
+      'group' => t('BOTCHA'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    // Bind only one recipe to test recipe book.
+    $recipebook_controller = $this->application->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK);
+    $recipebook = $recipebook_controller->getRecipebook('test')->setRecipe('timegate');
+    $recipebook_controller->save($recipebook);
+  }
+
+  public function getExpectations() {
+    return array(TRUE, FALSE);
+  }
+
+  /**
+   * Recipe should modify default form to break itself.
+   *
+   * @param type $form
+   * @param type $should_pass
+   * @return type
+   */
+  protected function setFormValues($form, $should_pass, &$parameters = array()) {
+    $edit = parent::setFormValues($form, $should_pass, $parameters);
+    switch ($should_pass) {
+      case FALSE:
+        unset($edit['timegate']);
+        break;
+      case TRUE:
+      default:
+        $edit['timegate'] = (int) time() - (int) variable_get('botcha_timegate', 5) - 1;
+        break;
+    }
+    return $edit;
+  }
+
+  protected function assertBotchaPresence($presence) {
+    if ($presence) {
+      $this->assertField('timegate',
+        'There should be a BOTCHA timegate field on the form.', 'BOTCHA');
+    }
+    else {
+      $this->assertNoField('timegate',
+        'There should be no BOTCHA timegate field on the form.', 'BOTCHA');
+    }
+  }
+
+  public function assertFormSubmission($form, $edit, $should_pass = TRUE, $button = NULL, &$parameters = array()) {
+    switch ($form) {
+      case 'user_login':
+      case 'comment':
+        // Assertion itself.
+        switch ($should_pass) {
+          case FALSE:
+            // Check for error message.
+            $this->assertText(BOTCHA_TIMEGATE_TIMEOUT_ERROR_MESSAGE,
+              'Submission should be blocked.', 'BOTCHA');
+            break;
+        }
+        break;
+    }
+    // We are placing it to the end since we have a redirection there which
+    // makes impossible to assert submission by these conditions.
+    parent::assertFormSubmission($form, $edit, $should_pass, $button, $parameters);
+  }
+}
+// Some tricks to debug:
+// drupal_debug($data) // from devel module
+// file_put_contents('tmp.simpletest.html', $this->drupalGetContent());

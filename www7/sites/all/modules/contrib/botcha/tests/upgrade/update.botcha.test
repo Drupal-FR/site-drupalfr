@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Provides upgrade path tests for the Botcha module.
+ * If test failed and didn't get finished - you should patch Drupal core.
+ * @see http://drupal.org/node/1158114#comment-4863562
+ */
+
+/**
+ * Tests the Botcha 7.x-1.0 -> 7.x-3.x upgrade path.
+ */
+class BotchaUpdatePathTestCase extends UpdatePathTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Botcha update path',
+      'description' => 'Botcha update path tests.',
+      'group' => 'BOTCHA',
+    );
+  }
+
+  public function setUp() {
+    // Use the filled upgrade path and our trigger data.
+    $this->databaseDumpFiles = array(
+    drupal_get_path('module', 'simpletest') . '/tests/upgrade/drupal-7.filled.standard_all.database.php.gz',
+    // @todo Create dump and uncomment.
+    //drupal_get_path('module', 'botcha') . '/tests/upgrade/drupal-7.botcha.database.php',
+    );
+    parent::setUp();
+    // To isolate our modules.
+    $this->uninstallModulesExcept(array('comment', 'moopapi', 'botcha'));
+    // Re-register the autoload functions that were unregistered by
+    // UpdatePathTestCase::setUp(), because it also loads some module files
+    // that work with classes.
+    spl_autoload_register('drupal_autoload_class');
+    spl_autoload_register('drupal_autoload_interface');
+    registry_rebuild();
+  }
+
+  /**
+   * Tests that the upgrade is successful.
+   */
+  public function testFilledUpgrade() {
+    $this->assertTrue($this->performUpgrade(), t('The upgrade was completed successfully.'));
+  }
+}

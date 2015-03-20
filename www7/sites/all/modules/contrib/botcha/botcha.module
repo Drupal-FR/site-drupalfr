@@ -1,0 +1,464 @@
+<?php
+
+/**
+ * @file
+ * BOTCHA - Spam Prevention
+ * It modifies forms by adding various botcha's.
+ */
+
+define('BOTCHA_SECRET', variable_get('botcha_secret', '3288039533f40382398a85d52a8da366'));
+define('BOTCHA_LOG', 'BOTCHA');
+define('BOTCHA_LOGLEVEL', variable_get('botcha_loglevel', 2));
+/** BOTCHA_LOGLEVEL:
+ *  0 - no log
+ *  1 - log blocked/bad submissions only
+ *  2 - also log why blocked
+ *  3 - also log good submissions
+ *  4 - also log when preparing forms
+ *  5 - log extra submission details
+ *  6 - misc development items
+ * Please note!: Level 5 and 6 could cause putting vulnerable data into logs.
+ *   We have some basic escaping (e.g., for password field) - but any other data
+ *   could be found in raw format. Please be careful with logging level setting!
+ */
+
+// Error message.
+define('BOTCHA_WRONG_RESPONSE_ERROR_MESSAGE',
+  'You must be a human, not a spam bot, to submit forms on this website.');
+
+/**
+ * Filter out sensitive form data for logging
+ * Recursive.
+ */
+function _botcha_filter_form_log($form, $level = 0) {
+  $filtered_form = $form;
+  if (is_array($form) && !is_string($form)) {
+    foreach ($form as $key => $value) {
+      switch ($key) {
+        case '#post':
+          $filtered_form[$key] = ($level == 0)
+            ? _botcha_filter_form_log($value, -1)
+            : t('...[redundant entry - removed]');
+          break;
+        default:
+          // Filter out sensitive data.
+          $filtered_form[$key] = ($key === 'pass')
+            ? _botcha_filter_value($value)
+            : _botcha_filter_form_log($value, -1);
+          break;
+      }
+    }
+  }
+  return $filtered_form;
+}
+
+/**
+ * Filter out sensitive form data from values for logging.
+ */
+function _botcha_filter_value($value) {
+  $filtered_value = $value;
+  if (is_string($value)) {
+    $filtered_value = '********';
+  }
+  elseif (is_array($value)) {
+    foreach ($value as $key => $key_value) {
+      // Filter out sensitive data.
+      if (in_array($key, array('pass', 'pass1', 'pass2', '#value'))) {
+        $filtered_value[$key] = _botcha_filter_value($key_value);
+      }
+    }
+  }
+  return $filtered_value;
+}
+
+/**
+ * Helper function to get placement information for a given form_id.
+ * @param $form_id the form_id to get the placement information for.
+ * @param $form if a form corresponding to the given form_id, if there
+ *   is no placement info for the given form_id, this form is examined to
+ *   guess the placement.
+ * @return placement info array
+ * @see _botcha_insert_botcha_element()
+ *   for more info about the fields 'path', 'key' and 'weight'.
+ */
+function _botcha_get_botcha_placement($form_id, $form) {
+  // Get BOTCHA placement map from cache. Two levels of cache:
+  // static variable in this function and storage in the variables table.
+  static $placement_map = NULL;
+  // Try first level cache.
+  if ($placement_map === NULL) {
+    // If first level cache missed: try second level cache.
+    $placement_map = variable_get('botcha_placement_map_cache', NULL);
+    if ($placement_map === NULL) {
+      // If second level cache missed: start from a fresh placement map.
+      $placement_map = array();
+      // Prefill with some hard coded default entries.
+      // The comment form can have a 'Preview' button, or both a 'Submit' and 'Preview' button,
+      // which is tricky for automatic placement detection. Luckily, Drupal core sets their
+      // weight (19 and 20), so we just have to specify a slightly smaller weight.
+      $placement_map['comment_form'] = array(
+        'path' => array(),
+        'key' => NULL,
+        'weight' => 18.9,
+      );
+//FIXME: port over from CAPTCHA D7:
+      // Additional note: the node forms also have the posibility to only show a 'Preview' button.
+      // However, the 'Submit' button is always present, but is just not rendered ('#access' = FALSE)
+      // in those cases. The the automatic button detection should be sufficient for node forms.
+      // $placement_map['user_login'] = array('path' => array(), 'key' => NULL, 'weight' => 1.9);
+      // TODO: also make the placement 'overridable' from the admin UI?
+      // If second level cache missed: initialize the placement map
+      // and let other modules hook into this with the hook_botcha_placement_map hook.
+      // By default however, probably all Drupal core forms are already correctly
+      // handled with the best effort guess based on the 'actions' element (see below).
+//      $placement_map = module_invoke_all('botcha_placement_map');
+    }
+  }
+  // Query the placement map.
+  if (array_key_exists($form_id, $placement_map)) {
+    $placement = $placement_map[$form_id];
+  }
+  // If no placement info is available in placement map:
+  // search the form for buttons and guess placement from it.
+  else {
+    $buttons = _botcha_search_buttons($form);
+    if (count($buttons)) {
+      // Pick first button.
+      // TODO: make this more sophisticated? Use cases needed.
+      $placement = $buttons[0];
+    }
+    else {
+      // Use NULL when no buttons were found.
+      $placement = NULL;
+    }
+    // Store calculated placement in caches.
+    $placement_map[$form_id] = $placement;
+    variable_set('botcha_placement_map_cache', $placement_map);
+  }
+  return $placement;
+}
+
+/**
+ * Helper function to insert a BOTCHA element in a form before a given form element.
+ * @param $form the form to add the BOTCHA element to.
+ * @param $placement information where the BOTCHA element should be inserted.
+ *   $placement should be an associative array with fields:
+ *     - 'path': path (array of path items) of the container in the form where the
+ *       BOTCHA element should be inserted.
+ *     - 'key': the key of the element before which the BOTCHA element
+ *       should be inserted. If the field 'key' is undefined or NULL, the BOTCHA will
+ *       just be appended to the container.
+ *     - 'weight': if 'key' is not NULL: should be the weight of the element defined by 'key'.
+ *       If 'key' is NULL and weight is not NULL: set the weight property of the BOTCHA element
+ *       to this value.
+ * @param $botcha_element the BOTCHA element to insert.
+ */
+function _botcha_insert_botcha_element(&$form, $placement, $botcha_element) {
+  // Get path, target and target weight or use defaults if not available.
+  $target_key = isset($placement['key']) ? $placement['key'] : NULL;
+  $target_weight = isset($placement['weight']) ? $placement['weight'] : NULL;
+  $path = isset($placement['path']) ? $placement['path'] : array();
+  // Walk through the form along the path.
+  $form_stepper = &$form;
+  foreach ($path as $step) {
+    if (isset($form_stepper[$step])) {
+      $form_stepper = & $form_stepper[$step];
+    }
+    else {
+      // Given path is invalid: stop stepping and
+      // continue in best effort (append instead of insert).
+      $target_key = NULL;
+      break;
+    }
+  }
+  // If no target is available: just append the BOTCHA element to the container.
+  if ($target_key == NULL || !array_key_exists($target_key, $form_stepper)) {
+    // Optionally, set weight of BOTCHA element.
+    if ($target_weight != NULL) {
+      $botcha_element['#weight'] = $target_weight;
+    }
+    $form_stepper['botcha'] =  $botcha_element;
+  }
+  // If there is a target available: make sure the BOTCHA element comes right before it.
+  else {
+    // If target has a weight: set weight of BOTCHA element a bit smaller
+    // and just append the BOTCHA: sorting will fix the ordering anyway.
+    if ($target_weight != NULL) {
+      $botcha_element['#weight'] = $target_weight - .1;
+      $form_stepper['botcha'] =  $botcha_element;
+    }
+    else {
+      // If we can't play with weights: insert the BOTCHA element at the right position.
+      // Because PHP lacks a function for this (array_splice() comes close,
+      // but it does not preserve the key of the inserted element), we do it by hand:
+      // chop of the end, append the BOTCHA element and put the end back.
+      $offset = array_search($target_key, array_keys($form_stepper));
+      $end = array_splice($form_stepper, $offset);
+      $form_stepper['botcha'] =  $botcha_element;
+      foreach ($end as $k => $v) {
+        $form_stepper[$k] = $v;
+      }
+    }
+  }
+}
+
+function _botcha_i18n() {
+  $variables = _botcha_variables(TRUE);
+  $i18n_variables = variable_get('i18n_variables', array());
+  if (in_array($variables[0], $i18n_variables)) {
+    return;
+  }
+  $i18n_variables = array_merge($i18n_variables, $variables);
+  variable_set('i18n_variables', $i18n_variables);
+}
+
+/**
+ * Helper function for searching the buttons in a form.
+ *
+ * @param $form the form to search button elements in
+ * @return an array of paths to the buttons.
+ *   A path is an array of keys leading to the button, the last
+ *   item in the path is the weight of the button element
+ *   (or NULL if undefined).
+ */
+function _botcha_search_buttons($form) {
+  $buttons = array();
+  foreach (element_children($form) as $key) {
+    // Look for submit or button type elements.
+    if (isset($form[$key]['#type']) && ($form[$key]['#type'] == 'submit' || $form[$key]['#type'] == 'button')) {
+      $weight = isset($form[$key]['#weight']) ? $form[$key]['#weight'] : NULL;
+      $buttons[] = array(
+        'path' => array(),
+        'key' => $key,
+        'weight' => $weight,
+      );
+    }
+    // Process children recurively.
+    $children_buttons = _botcha_search_buttons($form[$key]);
+    foreach ($children_buttons as $b) {
+      $b['path'] = array_merge(array($key), $b['path']);
+      $buttons[] = $b;
+    }
+  }
+  return $buttons;
+}
+
+/**
+ * Helper function - build a url (allows full URI in $url)
+ */
+function _botcha_url($url, $options = array()) {
+  global $base_url;
+  $path = '';
+  $query = '';
+  $abs_base = $base_url . '/';
+  $absolute = (0 === strpos($url, $abs_base)); // Figure out if absolute url is given to keep it that way.
+  $base = $absolute ? $abs_base_url : base_path();
+  $url = (0 === strpos($url, $base)) ? substr($url, strlen($base)) : ltrim($url, '/');
+  // convert to local variables:
+  // $scheme $host $port $user $pass $path $query $fragment
+  extract(parse_url(urldecode($url)));
+  // For non-clean URLs we need to convert query to array
+  if (!empty($query) && !is_array($query)) {
+    $params = explode('&', $query);
+    $query = array();
+    foreach ($params as $param) {
+      $param = explode('=', $param, 2);
+      $query[$param[0]] = isset($param[1]) ? rawurldecode($param[1]) : '';
+    }
+  }
+  foreach ($options as $key => $value) {
+    ${$key} = (is_array($value) && is_array(${$key}))
+      ? array_merge(${$key}, $value)
+      : $value;
+  }
+//  $result = url($path, array('query' => $query, 'fragment' => $fragment, 'absolute' => $absolute));
+  // Unfortunately, url() messes up when $path has language prefix already.
+  // Here we reproduce a part of url() to do the job right
+  $fragment = !empty($fragment) ? '#' . $fragment : '';
+  if (is_array($query)) {
+    // @todo Abstract it.
+    //$query = drupal_query_string_encode($query);
+    $query = drupal_http_build_query($query);
+  }
+  $prefix = !empty($prefix) ? $prefix : '';
+  $prefix = empty($path) ? rtrim($prefix, '/') : $prefix;
+  // @todo Abstract it.
+  //$path = drupal_urlencode($prefix . $path);
+  $path = drupal_encode_path($prefix . $path);
+  if (variable_get('clean_url', '0')) {
+    // With Clean URLs.
+    $result = !empty($query) ? ($base . $path . '?' . $query . $fragment) : $base . $path . $fragment;
+  }
+  else {
+    // Without Clean URLs.
+    $variables = array();
+    if (!empty($path)) {
+      $variables[] = 'q=' . $path;
+    }
+    if (!empty($query)) {
+      $variables[] = $query;
+    }
+    $query = join('&', $variables);
+    if (!empty($query)) {
+      static $script;
+      if (!isset($script)) {
+        // On some web servers, such as IIS, we can't omit "index.php". So, we
+        // generate "index.php?q=foo" instead of "?q=foo" on anything that is not
+        // Apache.
+        $script = (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') === FALSE) ? 'index.php' : '';
+      }
+      $result = $base . $script . '?' . $query . $fragment;
+    }
+    else {
+      $result = $base . $fragment;
+    }
+  }
+  return $result;
+}
+
+function _botcha_variables($i18n = FALSE) {
+  $ret = array(
+//    'botcha_i18n_translatable_name',
+  );
+  if (!$i18n) {
+    $ret += array(
+      'botcha_secret',
+      'botcha_loglevel',
+      'botcha_form_passed_counter',
+      'botcha_form_blocked_counter',
+    );
+  }
+  return $ret;
+}
+
+/**
+ * Implements hook_boot().
+ *
+ * Implementing hook_boot() is a must, to force drupal to load this module as
+ * early as possible. During hook_init phase moopapi_init() will initialize all
+ * the oop method wrappers and execute hook oop->boot().
+ * @see application/botcha.application.inc
+ */
+function botcha_boot() {
+  module_invoke('moopapi', 'register', 'botcha');
+}
+
+// @todo Refactor operations: make them just an individual implementation of available operations (access, load, view, edit, delete, etc.)
+/**
+ * Check for restriction.
+ * @param BotchaForm $botcha_form
+ */
+function botcha_form_access($botcha_form) {
+  $access = user_access('administer BOTCHA settings');
+  // @todo Remove hardcode.
+  if (in_array($botcha_form->id, array('update_script_selection_form', 'user_login', 'user_login_block'))
+    && in_array($botcha_form->getRecipebook(), array('forbidden_forms'))) {
+    $access = FALSE;
+  }
+  return $access;
+}
+
+// @todo Refactor operations: make them just an individual implementation of available operations (access, load, view, edit, delete, etc.)
+/**
+ * @todo Move to an Application.
+ * Load an object of form.
+ */
+function botcha_form_load($form_id) {
+  $app = ComponentFactory::get('Botcha', Component::TYPE_CONTROLLER, Component::ID_APPLICATION);
+  //return $this->getController(Botcha::CONTROLLER_TYPE_FORM)->getForm($form_id, FALSE);
+  $botcha_form = $app->getController(Botcha::CONTROLLER_TYPE_FORM)->getForm($form_id, FALSE);
+  return $botcha_form;
+}
+
+// @todo Refactor operations: make them just an individual implementation of available operations (access, load, view, edit, delete, etc.)
+/**
+ * Check for restriction.
+ */
+function botcha_recipebook_access($recipebook) {
+  $access = user_access('administer BOTCHA settings');
+  // @todo Remove hardcode.
+  if (in_array($recipebook->id, array('forbidden_forms'))) {
+    $access = FALSE;
+  }
+  return $access;
+}
+
+// @todo Refactor operations: make them just an individual implementation of available operations (access, load, view, edit, delete, etc.)
+/**
+ * @todo Move to an Application.
+ * Load an object of recipe book.
+ */
+function botcha_recipebook_load($rbid) {
+  $app = ComponentFactory::get('Botcha', Component::TYPE_CONTROLLER, Component::ID_APPLICATION);
+  //return $this->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK)->getRecipebook($rbid, FALSE);
+  return $app->getController(Botcha::CONTROLLER_TYPE_RECIPEBOOK)->getRecipebook($rbid, FALSE);
+}
+
+/**
+ * Implements hook_theme().
+ * @todo Move to an Application.
+ */
+function botcha_theme() {
+  return array(
+    'botcha_forms_form_botcha_forms' => array(
+      'render element' => 'form',
+    ),
+    'botcha_recipebooks_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+//@todo Refactor theme functions, making them a part of Application class.
+/**
+ * Custom theme function for a table of (form_id -> BOTCHA type) settings
+ */
+function theme_botcha_forms_form_botcha_forms($variables) {
+  $form = $variables['form'];
+  // Prepare header before pass to theme.
+  $header = $form['#header'];
+  $rows = array();
+  // Existing BOTCHA points.
+  foreach (element_children($form['botcha_forms']) as $id) {
+    $row = array();
+    foreach (element_children($form['botcha_forms'][$id]) as $col) {
+      $row[$col] = drupal_render($form['botcha_forms'][$id][$col]);
+    }
+    $rows[$id] = $row;
+  }
+  $output = theme('table', array('header' => $header, 'rows' => $rows));
+  return $output;
+}
+
+/**
+ * Theme botcha_recipebooks_form().
+ */
+function theme_botcha_recipebooks_form($variables) {
+  $form = $variables['form'];
+  // Iterate through all recipebooks and build a table.
+  $rows = array();
+  //foreach (array('enabled', 'disabled') as $type) {
+  //  if (isset($form[$type])) {
+      foreach (element_children($form['recipebooks']) as $id) {
+        $row = array();
+        foreach (element_children($form['recipebooks'][$id]) as $col) {
+          $row[$col] = array(
+            'data' => drupal_render($form['recipebooks'][$id][$col]),
+          );
+        }
+        $rows[] = array(
+          'data' => $row,
+        );
+      }
+  //  }
+  //}
+  $output = theme('table', array(
+    'header' => $form['#header'],
+    'rows' => $rows,
+    'empty' => t('No recipebooks available.'),
+  ));
+  if (!empty($rows)) {
+    $output .= drupal_render_children($form);
+  }
+  return $output;
+}
