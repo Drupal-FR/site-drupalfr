@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * Implements hook_boot().
+ */
+function moopapi_boot() {
+  /**
+   * This empty hook is absolutely necessary to force drupal to load this module early on.
+   * All contrib oop modules will fail to execute properly if we fail to load this module before them.
+   */
+}
+
+/**
+ * Implements of hook_init().
+ */
+function moopapi_init() {
+  $classes = moopapi_register();    //fetch all registered classes
+  foreach ($classes as $class) {
+    $methods = get_class_methods($class);
+    foreach ($methods as $method) {
+      moopapi_create_wrapper($class, $method);
+    }
+  }
+}
+
+/**
+ * Api function that will create function wrapper to a class method
+ *
+ * @param stdClass $class
+ * @param method $method
+ */
+function moopapi_create_wrapper($class, $method) {
+  if (in_array($method, moopapi_hook_ignore_list())) {
+    /**
+     * I am assuming that developer wants this method to be executed
+     * Because developer explicitly implemented this hook both in function and in method.
+     *
+     * WARNING: we cannot predict the type of arguments to be passed here. so we pass none.
+     * This limitation is to the developer to figure out how to bypass
+     */
+    moopapi_object($class)->$method();
+    return ;
+  }
+  elseif (function_exists($class . '_' . $method)) {
+    /**
+     * This could mean that developer chose to create function on his own, so we respect his wishes and skip re-implementing it
+     * If in this step function does not exist it means that it was not created by the developer or previously by us.
+     * lets create it.
+     */
+    return ;  // do not create it again
+  }
+
+  /**
+   * To enable passing proper parameters (and parameters by reference)
+   * We must use PHP Reflection ( Ref: http://us.php.net/language.oop5.reflection )
+   * to auto-discover certain properties, in this case number of arguments a method expects
+   */
+  $ref_method = new ReflectionMethod($class, $method);
+  $parameters = $ref_method->getParameters();
+  $args = moopapi_create_args($parameters);
+  $function = "
+function {$class}_{$method}({$args}) {
+  // To pass additional params that are not declared.
+  \$full_args = func_get_args();
+  \$ref_method = new ReflectionMethod('{$class}', '{$method}');
+  \$parameters = \$ref_method->getParameters();
+  foreach (\$parameters as \$number => \$parameter) {
+    \$var_name = 'var' . \$parameter->getPosition();
+    if (\$parameter->isPassedByReference()) {
+      // Right part is a reference to a variable, which is called \$var_name.
+      \$full_args[\$number] = &\$\$var_name;
+    }
+  }
+  \$application = moopapi_object('{$class}');
+  return call_user_func_array(array(\$application, '{$method}'), \$full_args);
+}";
+  // This is what makes the magic possible create function in runtime that calls
+  // our objects.
+  eval($function);
+}
+
+/**
+ * API to create arguments' string.
+ *
+ * @param array $parameters
+ * @param boolean $clean
+ * @return arg_string
+ */
+function moopapi_create_args($parameters, $clean = FALSE) {
+  $args = array();
+  foreach ($parameters as $i => $parameter) {
+    $prefix = '';
+    if (!$clean) {
+      $prefix = ($parameter->isPassedByReference()) ? '&' : '';
+    }
+    $args[$i] = "{$prefix}\$var{$i}";
+  }
+  $args = implode(', ', $args);
+  return $args;
+}
+
+/**
+ * Central pool of all of existent and loaded oop module objects.
+ */
+function moopapi_object($class = NULL) {
+  static $objects;
+  if ($class !== NULL) {
+    // @todo Replace hardcode with a constant.
+    $class_lower = strtolower($class);
+    $new_object = ComponentFactory::get($class, Component::TYPE_CONTROLLER, Component::ID_APPLICATION, unserialize(variable_get("{$class_lower}_decorators", serialize(array()))));
+    if (!isset($objects[$class]) || get_class($objects[$class]) != get_class($new_object)) {
+      $objects[$class] = $new_object;
+    }
+  }
+  return $objects[$class];
+}
+
+/**
+ * OOP modules must register themselves before they can be initialized
+ * Modules can use this API function during boot and init hooks to register themselves so moopapi
+ * can integrate them with the framework
+ */
+function moopapi_register($class = NULL) {
+  static $classes;
+  if (!isset($classes)) {
+    $classes = array();
+  }
+  if ($class !== NULL && !isset($classes[$class])) {
+    // Unify all classnames as follows: Application, Foo, Bar,...
+    $classes[ucfirst(strtolower($class))] = ucfirst(strtolower($class));
+  }
+  return $classes;
+}
+
+/**
+ * Return list of hooks which must not be created as wrappers.
+ */
+function moopapi_hook_ignore_list() {
+  return array('boot');
+}
+
