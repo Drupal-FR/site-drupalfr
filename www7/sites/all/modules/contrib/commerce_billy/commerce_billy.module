@@ -91,7 +91,7 @@ function commerce_billy_invoice_nr($order) {
   // Check if we have a unique order number. If not, write a watchdog error and
   // do not change the order number.
   if (!commerce_order_validate_number_unique($invoice_nr, $order->order_id)) {
-    watchdog('commerce_billy', t('Error: Order number %number for order %id already exists.', array('%number' => $invoice_nr, '%id' => $order->order_id)), WATCHDOG_ERROR);
+    watchdog('commerce_billy', 'Error: Order number %number for order %id already exists.', array('%number' => $invoice_nr, '%id' => $order->order_id), WATCHDOG_ERROR);
   }
   else {
     $order->order_number = $invoice_nr;

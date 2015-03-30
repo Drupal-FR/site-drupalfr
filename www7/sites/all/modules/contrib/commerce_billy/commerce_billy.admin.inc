@@ -81,6 +81,10 @@ function commerce_billy_admin_form($form, &$form_state) {
  * Validation handler for Commerce Billy admin form.
  */
 function commerce_billy_admin_form_validate($form, &$form_state) {
+  // If we on confirm form just skip validation.
+  if (!empty($form_state['values']['nr_override'])) {
+    return;
+  }
   $pattern = $form_state['values']['commerce_billy_invoice_nr_pattern'];
   if (strpos($pattern, '{id}') === FALSE) {
     form_set_error('commerce_billy_invoice_nr_pattern', t('Invalid pattern. {id} is missing.'));
