@@ -18,10 +18,11 @@ libraries[dompdf][destination] = "libraries"
 
 dompdf needs write access to its font directory.
 Copy "libraries/dompdf/lib/fonts" to your public files directory:
-  public://fonts/
+  public://fonts (example: sites/default/files/fonts)
 
 To check if everything is at the right place, you should find
-public://fonts/fonts/Courier.afm (for example).
+  public://fonts/Courier.afm (for example at
+  sites/default/files/fonts/Courier.afm).
 
 
 Administration

@@ -25,6 +25,16 @@ function commerce_billy_pdf_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'commerce_billy_pdf.admin.inc',
   );
+  $items['admin/commerce/orders/%commerce_order/pdf-invoice'] = array(
+    'title' => 'Invoice (PDF)',
+    'page callback' => 'commerce_billy_pdf',
+    'page arguments' => array(3),
+    'access callback' => 'commerce_billy_pdf_view_access',
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => 10,
+  );
   return $items;
 }
 
@@ -170,12 +180,13 @@ function commerce_billy_pdf_commerce_order_view($order, $view_mode) {
     $order->content['invoice_text'] = array(
       '#markup' => isset($settings['invoice_text']) ? $settings['invoice_text'] : '',
     );
-    $invoice_date = format_date($order->field_commerce_billy_i_date[LANGUAGE_NONE][0]['value'], 'custom', $custom_date_format);
+    $date_field_name = $view_mode == 'pdf' ? 'field_commerce_billy_i_date' : 'field_commerce_billy_cancel_date';
+    $date_formatted = format_date($order->{$date_field_name}[LANGUAGE_NONE][0]['value'], 'custom', $custom_date_format);
     if (!empty($settings['invoice_location'])) {
-      $invoice_header_date_text = t('@location, @date', array('@location' => $settings['invoice_location'], '@date' => $invoice_date));
+      $invoice_header_date_text = t('@location, @date', array('@location' => $settings['invoice_location'], '@date' => $date_formatted));
     }
     else {
-      $invoice_header_date_text = $invoice_date;
+      $invoice_header_date_text = $date_formatted;
     }
     $order->content['invoice_header_date'] = array(
       '#markup' => $invoice_header_date_text,
@@ -188,11 +199,6 @@ function commerce_billy_pdf_commerce_order_view($order, $view_mode) {
     );
     $order->content['invoice_logo'] = array(
       '#value' => variable_get('commerce_billy_pdf_logo', 'misc/druplicon.png'),
-    );
-  }
-  if ($view_mode == "canceled") {
-    $order->content['invoice_header_date'] = array(
-      '#markup' => t('@location, @date', array('@location' => $location, '@date' => format_date($order->field_commerce_billy_cancel_date[LANGUAGE_NONE][0]['value'], 'custom', $custom_date_format))),
     );
   }
 }
