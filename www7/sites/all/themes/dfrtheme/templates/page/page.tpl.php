@@ -69,121 +69,125 @@
  */
 ?>
 <div id="page-wrapper">
+  <div id="page">
+    <header id="header" role="banner" class="clearfix">
+      <div class="inner">
+        <div class="branding">
+          <?php if ($logo): ?>
+            <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" id="logo">
+              <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" />
+            </a>
+          <?php endif; ?>
 
-	<div id="page">
-		
-		<header id="header" role="banner" class="clearfix"><div class="inner">
+          <?php if ($site_name || $site_slogan): ?>
+            <div id="site-name-and-slogan">
+            <?php if ($site_name): ?>
+              <div id="site-name">
+                <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home">
+                  <?php print $site_name; ?>
+                </a>
+              </div><!-- /#site-name -->
+            <?php endif; ?>
 
-				<div class="branding">
-					<?php if ($logo): ?>
-						<a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" id="logo">
-							<img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" />
-						</a>
-					<?php endif; ?>
-				
-					<?php if ($site_name || $site_slogan): ?>
-						<div id="site-name-and-slogan">
-						<?php if ($site_name): ?>
-							<div id="site-name">
-								<a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home">
-									<?php print $site_name; ?>
-								</a>
-							</div><!-- /#site-name -->
-						<?php endif; ?>
+            <?php if ($site_slogan): ?>
+              <p id="site-slogan"><?php print $site_slogan; ?></p>
+            <?php endif; ?>
+            </div>
+          <?php endif; ?>
+        </div><!-- /.branding -->
 
-						<?php if ($site_slogan): ?>
-							<p id="site-slogan"><?php print $site_slogan; ?></p>
-						<?php endif; ?>
-					</div>
-					<?php endif; ?>
-				</div><!-- /.branding -->
+        <?php if ($page['menu']): ?>
+          <?php print render($page['menu']); ?>
+        <?php endif; ?>
+      </div>
+    </header><!-- /#header -->
 
-				<?php if ($page['menu']): ?>
-					<?php print render($page['menu']); ?>
-				<?php endif; ?>
+    <?php if ($page['header_bottom']): ?>
+      <aside id="header-bottom" role="complementary">
+        <div class="inner">
+          <?php print render($page['header_bottom']); ?>
+        </div>
+      </aside><!-- /#header-bottom -->
+    <?php endif; ?>
 
-		</div></header><!-- /#header -->
+    <div id="main-wrapper">
+      <div class="inner">
+      <?php if ($is_front): ?>
+        <div class="push-drupalcamp"><a href="http://montpellier2015.drupaldays.org/" title="Site dédié des Drupal Dev Days Montpellier 2015">Visiter le site dédié aux Drupal Dev Days Montpellier du 13 au 19 avril 2015.</a></div>
+      <?php endif; ?>
 
-		<?php if ($page['header_bottom']): ?>
-		<aside id="header-bottom" role="complementary"><div class="inner">
-				<?php print render($page['header_bottom']); ?>
-		</div></aside><!-- /#header-bottom -->
-		<?php endif; ?>
+      <?php print render($page['content_top']); ?>
 
-		<div id="main-wrapper"><div class="inner">
-			<?php if ($is_front): ?>
-			    <div class="push-drupalcamp"><a href="http://montpellier2015.drupaldays.org/" title="Site dédié des Drupal Dev Days Montpellier 2015">Visiter le site dédié aux Drupal Dev Days Montpellier du 13 au 19 avril 2015.</a></div>
-			<?php endif; ?>
+      <?php if ($breadcrumb && !$is_front): ?>
+        <div id="breadcrumb" class="clearfix"><?php print $breadcrumb; ?></div>
+      <?php endif; ?>
 
-			<?php print render($page['content_top']); ?>
+      <div id="main" class="clearfix">
+        <div id="content" class="column" role="main">
+          <div class="section">
+            <?php if ($messages): ?>
+              <div id="messages">
+                <div class="section clearfix">
+                  <?php print $messages; ?>
+                </div>
+              </div> <!-- /.section, /#messages -->
+            <?php endif; ?>
 
-			<?php if ($breadcrumb && !$is_front): ?>
-				<div id="breadcrumb" class="clearfix"><?php print $breadcrumb; ?></div>
-			<?php endif; ?>
-			
-			<div id="main" class="clearfix">
-				  
-				<div id="content" class="column" role="main">
-					<div class="section">
+            <?php print render($title_prefix); ?>
+            <?php if ($title): ?>
+              <h1 class="title" id="page-title"><?php print $title; ?></h1>
+            <?php endif; ?>
+            <?php print render($title_suffix); ?>
 
-						<?php if ($messages): ?>
-							<div id="messages"><div class="section clearfix">
-								<?php print $messages; ?>
-							</div></div> <!-- /.section, /#messages -->
-						<?php endif; ?>
+            <?php if ($tabs): ?>
+              <div class="tabs"><?php print render($tabs); ?></div>
+            <?php endif; ?>
 
-						<?php print render($title_prefix); ?>
-						<?php if ($title): ?>
-							<h1 class="title" id="page-title"><?php print $title; ?></h1>
-						<?php endif; ?>
-						<?php print render($title_suffix); ?>
+            <?php print render($page['help']); ?>
 
-						<?php if ($tabs): ?>
-							<div class="tabs"><?php print render($tabs); ?></div>
-						<?php endif; ?>
+            <?php if ($action_links): ?>
+              <ul class="action-links"><?php print render($action_links); ?></ul>
+            <?php endif; ?>
 
-						<?php print render($page['help']); ?>
+            <?php print render($page['content']); ?>
+          </div><!-- /.section -->
+        </div><!-- /#content -->
 
-						<?php if ($action_links): ?>
-							<ul class="action-links"><?php print render($action_links); ?></ul>
-						<?php endif; ?>
+        <?php if ($page['sidebar_first']): ?>
+          <aside id="sidebar-first" class="column sidebar" role="complementary">
+            <div class="section">
+              <?php print render($page['sidebar_first']); ?>
+            </div><!-- /.section -->
+          </aside><!-- /#sidebar-first -->
+        <?php endif; ?>
+      </div><!-- /#main -->
 
-						<?php print render($page['content']); ?>
+      <?php if ($page['content_bottom']): ?>
+        <div class="content-bottom">
+          <div class="content-bottom-wrap clearfix">
+            <?php print render($page['content_bottom']); ?>
+          </div>
+        </div><!-- /.section -->
+      <?php endif; ?>
 
-					</div><!-- /.section -->
-				</div><!-- /#content -->
+      </div>
+    </div><!-- /#main-wrapper -->
 
-				<?php if ($page['sidebar_first']): ?>
-					<aside id="sidebar-first" class="column sidebar" role="complementary">
-						<div class="section">
-							<?php print render($page['sidebar_first']); ?>
-						</div><!-- /.section -->
-					</aside><!-- /#sidebar-first -->
-				<?php endif; ?>
+    <?php if ($page['footer_top']): ?>
+      <aside id="footer-top" role="complementary">
+        <div class="inner">
+          <?php print render($page['footer_top']); ?>
+        </div>
+      </aside>
+    <?php endif; ?>
 
-			</div><!-- /#main -->
-			
-			<?php if ($page['content_bottom']): ?>
-				<div class="content-bottom">
-					<div class="content-bottom-wrap clearfix">
-						<?php print render($page['content_bottom']); ?>
-					</div>
-				</div><!-- /.section -->
-			<?php endif; ?>
-			
-		</div></div><!-- /#main-wrapper -->
-		
-		<?php if ($page['footer_top']): ?>
-		<aside id="footer-top" role="complementary"><div class="inner">
-			<?php print render($page['footer_top']); ?>
-		</div></aside>
-		<?php endif; ?>
+    <?php if ($page['footer']): ?>
+      <footer id="footer" role="contentinfo">
+        <div class="inner">
+          <?php print render($page['footer']); ?>
+        </div>
+      </footer><!-- /#footer -->
+    <?php endif; ?>
 
-		<?php if ($page['footer']): ?>
-		<footer id="footer" role="contentinfo"><div class="inner">
-			<?php print render($page['footer']); ?>
-		</div></footer><!-- /#footer -->
-		<?php endif; ?>
-
-	</div><!-- /#page -->
+  </div><!-- /#page -->
 </div><!-- /#page-wrapper -->

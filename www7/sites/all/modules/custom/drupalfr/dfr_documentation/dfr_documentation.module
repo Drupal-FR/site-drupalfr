@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Code for the dfr_emploi feature.
+ * Code for the dfr_documentation feature.
  */
 
 include_once 'dfr_documentation.features.inc';
@@ -37,7 +37,6 @@ function dfr_documentation_page() {
   );
 }
 
-
 /**
  * Implements hook_field_extra_fields().
  */
@@ -47,14 +46,13 @@ function dfr_documentation_field_extra_fields() {
       'book_children' => array(
         'label' => t("Book children"),
         'description' => t("Links to book children."),
-        'weight' => 10, // Default weight
+        'weight' => 10, // Default weight.
       ),
-    )
+    ),
   );
   return $extra;
 }
- 
- 
+
 /**
  * Implements hook_node_view().
  */
@@ -65,4 +63,3 @@ function dfr_documentation_node_view($node, $view_mode, $langcode) {
     );
   }
 }
-

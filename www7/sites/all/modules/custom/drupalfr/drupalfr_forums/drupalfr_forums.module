@@ -36,9 +36,10 @@ function drupalfr_forums_permission() {
  *
  * @param int $forum_tid
  *   The forum section tid.
+ *
  * @return bool
- *   TRUE if this forum is restricted and the user have no  bypass permission,
- * else FALSE.
+ *   TRUE if this forum is restricted and the user have no bypass permission,
+ *   else FALSE.
  */
 function _drupalfr_forums_forum_is_restricted($forum_tid) {
   $restricted_forums = array_filter(variable_get('drupalfr_forums_restricted_forums_list', array()));
@@ -55,6 +56,7 @@ function _drupalfr_forums_forum_is_restricted($forum_tid) {
  *   The forum section tid.
  * @param mixed $uid
  *   The user uid.
+ *
  * @return bool
  *   TRUE if the user can post in this forum section, else FALSE.
  */
@@ -131,8 +133,6 @@ function drupalfr_forums_menu_local_tasks_alter(&$data, $router_item, $root_path
  * not have enough karma.
  */
 function drupalfr_forums_form_forum_node_form_alter(&$form, &$form_state, $form_id) {
-  global $user;
-
   foreach ($form['taxonomy_forums'][LANGUAGE_NONE]['#options'] as $tid => $name) {
     if (!_drupalfr_forums_forum_can_post($tid)) {
       unset($form['taxonomy_forums'][LANGUAGE_NONE]['#options'][$tid]);
@@ -177,4 +177,3 @@ function drupalfr_forums_form_forum_admin_settings_alter(&$form, &$form_state, $
     }
   }
 }
-

@@ -4,7 +4,7 @@
  * Implements hook_install().
  */
 function dfr_emploi_install() {
-  // Must execute after scheduler
+  // Must execute after scheduler.
   $weight = db_select('system', 's')
     ->fields('s', array('weight'))
     ->condition('name', 'scheduler', '=')
@@ -30,7 +30,7 @@ function dfr_emploi_enable() {
   _features_restore('rebuild', $items);
   drupal_static_reset();
 
-  // Create the terms for type de contrat
+  // Create the terms for type de contrat.
   $machine_name = 'type_contrat';
   $vocabulary = taxonomy_vocabulary_machine_name_load($machine_name);
   if (!count(taxonomy_get_tree($vocabulary->vid))) {
@@ -51,7 +51,7 @@ function dfr_emploi_enable() {
     }
   }
 
-  // Create the terms for nature du poste
+  // Create the terms for nature du poste.
   $machine_name = 'nature_poste';
   $vocabulary = taxonomy_vocabulary_machine_name_load($machine_name);
   if (!count(taxonomy_get_tree($vocabulary->vid))) {

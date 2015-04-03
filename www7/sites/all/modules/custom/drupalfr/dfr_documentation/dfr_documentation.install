@@ -10,8 +10,7 @@ function dfr_documentation_update_7000() {
   $instances = field_info_instances('node', 'doc');
 
   foreach ($instances as $field_name => $instance) {
-
-    // Hide all fields except body
+    // Hide all fields except body.
     if ('body' !== $field_name) {
       $instance['display']['teaser']['type'] = 'hidden';
     }
@@ -19,4 +18,3 @@ function dfr_documentation_update_7000() {
     field_update_instance($instance);
   }
 }
-

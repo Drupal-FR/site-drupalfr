@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Implements template_html_head_alter();
  *
@@ -8,16 +7,16 @@
  */
 function dfrtheme_html_head_alter(&$head_elements) {
   $head_elements['system_meta_content_type']['#attributes'] = array(
-    'charset' => 'utf-8'
+    'charset' => 'utf-8',
   );
 }
 
 /**
- * Implements template_proprocess_search_block_form().
+ * Implements template_preprocess_search_block_form().
  *
  * Changes the search form to use the HTML5 "search" input attribute.
  * This is mostly duplicated from template_preprocess_search_block_form().
- * 
+ *
  * @see template_preprocess_search_block_form()
  */
 function dfrtheme_preprocess_drupalfr_search_form(&$variables) {
@@ -53,7 +52,7 @@ function dfrtheme_preprocess_html(&$variables) {
   }
 
   if (!$variables['is_front']) {
-    // Add unique classes for each page and website section
+    // Add unique classes for each page and website section.
     $path = drupal_get_path_alias($_GET['q']);
     $temp = explode('/', $path, 2);
     $section = array_shift($temp);
@@ -65,21 +64,22 @@ function dfrtheme_preprocess_html(&$variables) {
 
     $variables['classes_array'][] = dfrtheme_id_safe('section-' . $section);
 
-    // add template suggestions
+    // Add template suggestions.
     $variables['theme_hook_suggestions'][] = "page__section__" . $section;
     $variables['theme_hook_suggestions'][] = "page__" . $page_name;
 
     if (arg(0) == 'node') {
       if (arg(1) == 'add') {
         if ($section == 'node') {
-          array_pop($variables['classes_array']); // Remove 'section-node'
+          array_pop($variables['classes_array']); // Remove 'section-node'.
         }
-        $body_classes[] = 'section-node-add'; // Add 'section-node-add'
-      } elseif (is_numeric(arg(1)) && (arg(2) == 'edit' || arg(2) == 'delete')) {
+        $body_classes[] = 'section-node-add'; // Add 'section-node-add'.
+      }
+      elseif (is_numeric(arg(1)) && (arg(2) == 'edit' || arg(2) == 'delete')) {
         if ($section == 'node') {
-          array_pop($variables['classes_array']); // Remove 'section-node'
+          array_pop($variables['classes_array']); // Remove 'section-node'.
         }
-        $body_classes[] = 'section-node-' . arg(2); // Add 'section-node-edit' or 'section-node-delete'
+        $body_classes[] = 'section-node-' . arg(2); // Add 'section-node-edit' or 'section-node-delete'.
       }
     }
   }
@@ -101,7 +101,7 @@ function dfrtheme_preprocess_page(&$variables) {
     }
   }
 
-  // Adding classes wether #navigation is here or not
+  // Adding classes whether #navigation is here or not.
   if (!empty($variables['main_menu']) or !empty($variables['sub_menu'])) {
     $variables['classes_array'][] = 'with-navigation';
   }
@@ -146,10 +146,10 @@ function dfrtheme_preprocess_maintenance_page(&$variables) {
 /**
  * Implements template_preprocess_node().
  *
- * Adds extra classes to node container for advanced theming
+ * Adds extra classes to node container for advanced theming.
  */
 function dfrtheme_preprocess_node(&$variables) {
-  // Add view_mode classs
+  // Add view_mode class.
   $variables['classes_array'][] = 'node-' . $variables['view_mode'];
 
   $variables['submitted'] = t('Submitted by !username on ', array('!username' => $variables['name']));
@@ -166,7 +166,7 @@ function dfrtheme_preprocess_node(&$variables) {
 /**
  * Implements template_preprocess_user().
  *
- * Adds extra classes to node container for advanced theming
+ * Adds extra classes to node container for advanced theming.
  */
 function dfrtheme_preprocess_user_profile(&$variables) {
   if ($variables['elements']['#view_mode'] == 'planete_author') {
@@ -174,21 +174,22 @@ function dfrtheme_preprocess_user_profile(&$variables) {
     $variables['theme_hook_suggestions'][] = 'user_profile__' . $variables['elements']['#view_mode'];
   }
 }
+
 /**
  * Implements template_preprocess_block().
  */
-function dfrtheme_preprocess_block(&$variables, $hook) {
-  // Add a striping class & id
+function dfrtheme_preprocess_block(&$variables) {
+  // Add a striping class & id.
   $variables['classes_array'][] = 'block-' . $variables['zebra'];
   $variables['classes_array'][] = 'block-' . $variables['block_id'];
 
-  // Title class
+  // Title class.
   $variables['title_attributes_array']['class'][] = 'block-title';
 
   // In the header region visually hide block titles.
    if (in_array($variables['block']->region, array('menu'))) {
     $variables['title_attributes_array']['class'][] = 'element-invisible';
-  } 
+  }
 }
 
 /**
@@ -204,17 +205,17 @@ function dfrtheme_menu_tree($variables) {
 function dfrtheme_breadcrumb($variables) {
   $breadcrumb = isset($variables['breadcrumb']) ? $variables['breadcrumb'] : array();
 
-  // Append title to breadcrumb  
-	$title = drupal_get_title();
-	if(!empty($title)) {
-	  $breadcrumb[] = '<span class="current" title="Vous êtes ici">'.$title.'</span>';
-	}
-	return implode(' &raquo; ', $breadcrumb);
+  // Append title to breadcrumb.
+  $title = drupal_get_title();
+  if (!empty($title)) {
+    $breadcrumb[] = '<span class="current" title="Vous êtes ici">' . $title . '</span>';
+  }
+
+  return implode(' &raquo; ', $breadcrumb); // >>.
 }
 
-
 /**
- * Determine whether to show floating tabs
+ * Determine whether to show floating tabs.
  *
  * @return bool
  */
@@ -230,24 +231,22 @@ function dfrtheme_tabs_float() {
 }
 
 /**
- * 	Converts a string to a suitable html ID attribute.
- *  Taken from "basic"
+ * Converts a string to a suitable html ID attribute. Taken from "basic".
  *
- * 	 http://www.w3.org/TR/html4/struct/global.html#h-7.5.2 specifies what makes a
- * 	 valid ID attribute in HTML. This function:
+ * http://www.w3.org/TR/html4/struct/global.html#h-7.5.2 specifies what makes a
+ * valid ID attribute in HTML. This function:
+ * - Ensures an ID starts with an alpha character by optionally adding an 'n'.
+ * - Replaces any character except A-Z, numbers, and underscores with dashes.
+ * - Converts entire string to lowercase.
  *
- * 	- Ensure an ID starts with an alpha character by optionally adding an 'n'.
- * 	- Replaces any character except A-Z, numbers, and underscores with dashes.
- * 	- Converts entire string to lowercase.
+ * @param string $string
+ *   The string.
  *
- * 	@param $string
- * 	  The string
- * 	@return
- * 	  The converted string
+ * @return string
+ *   The converted string.
  */
-
 function dfrtheme_id_safe($string) {
-  // Strip accents
+  // Strip accents.
   $accents = '/&([A-Za-z]{1,2})(tilde|grave|acute|circ|cedil|uml|lig);/';
   $string = preg_replace($accents, '$1', htmlentities(utf8_decode($string)));
   // Replace with dashes anything that isn't A-Z, numbers, dashes, or underscores.
@@ -260,7 +259,7 @@ function dfrtheme_id_safe($string) {
 }
 
 /**
- * Generate doctype for templates
+ * Generate doctype for templates.
  */
 function _dfrtheme_doctype() {
   return (module_exists('rdf')) ? '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML+RDFa 1.1//EN"' . "\n" . '"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">' : '<!DOCTYPE html>' . "\n";
@@ -273,7 +272,7 @@ function _dfrtheme_doctype() {
  *   An associative array containing:
  *   - element: Structured array data for a menu link.
  *
- * @return
+ * @return string
  *   A themed HTML string.
  *
  * @ingroup themeable
@@ -287,14 +286,17 @@ function dfrtheme_menu_link(array $variables) {
   }
 
   $output = l($element['#title'], $element['#href'], $element['#localized_options']);
-  // Adding a class depending on the TITLE of the link (not constant)
+  // Adding a class depending on the TITLE of the link (not constant).
   $element['#attributes']['class'][] = dfrtheme_id_safe($element['#title']);
-  // Adding a class depending on the ID of the link (constant)
+  // Adding a class depending on the ID of the link (constant).
   $element['#attributes']['class'][] = 'mid-' . $element['#original_link']['mlid'];
+
   return '<li' . drupal_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
 }
 
 /**
+ * Implements theme_preprocess_menu_local_task().
+ *
  * Override or insert variables into theme_menu_local_task().
  */
 function dfrtheme_preprocess_menu_local_task(&$variables) {
@@ -311,7 +313,7 @@ function dfrtheme_preprocess_menu_local_task(&$variables) {
 }
 
 /**
- *  Duplicate of theme_menu_local_tasks() but adds clearfix to tabs.
+ * Duplicate of theme_menu_local_tasks() but adds clearfix to tabs.
  */
 function dfrtheme_menu_local_tasks(&$variables) {
   $output = '';
@@ -332,14 +334,13 @@ function dfrtheme_menu_local_tasks(&$variables) {
   return $output;
 }
 
-
 /**
  * Implements hook_form_alter().
  */
 function dfrtheme_form_alter(&$form, &$form_state, $form_id) {
-  // User login form (block & page)
+  // User login form (block & page).
   if ($form_id == 'user_login_block' || $form_id == 'user_login') {
-    // Re-order fields
+    // Re-order fields.
     $form['openid_identifier']['#weight'] = 0;
     $form['name']['#weight'] = 0;
     $form['pass']['#weight'] = 1;
@@ -347,8 +348,11 @@ function dfrtheme_form_alter(&$form, &$form_state, $form_id) {
     $form['openid_links']['#weight'] = 3;
     $form['links']['#weight'] = 4;
   }
-} // dfrtheme_form_alter
+}
 
+/**
+ * Implements theme_field().
+ */
 function dfrtheme_field($variables) {
   $output = '';
 

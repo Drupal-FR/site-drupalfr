@@ -1,7 +1,5 @@
 <?php
 
-// Drupal needs this blank file.
-
 /**
  * Implements hook_menu().
  */
@@ -62,7 +60,8 @@ function drupalfr_user_migration() {
     'field_picture_list' => array ( // origin field
       'table' => 'field_data_field_picture', // destination table
       'field' => '', // destination field
-    ),*/
+    ),
+    */
     'field_realname_value' => array ( // origin field
       'table' => 'field_data_field_realname', // destination table
       'field' => 'field_realname_value', // destination field
@@ -73,13 +72,11 @@ function drupalfr_user_migration() {
     ),
   );
 
-
   $result = db_query_range("SELECT p.*, b.body_value, n.uid FROM {node} n
                       INNER JOIN {content_type_profile} p ON n.nid = p.nid AND n.vid = p.vid
                       INNER JOIN {field_data_body} b ON b.entity_id = n.nid AND b.revision_id = n.vid
                       WHERE n.type = 'profile' AND n.uid = 1084", 0, 1);
 
-  global $language;
   foreach ($result as $record) {
     $user = user_load($record->uid, TRUE);
     $edit = (array)$user;
@@ -90,13 +87,13 @@ function drupalfr_user_migration() {
       }
     }
     $edit['field_biography']['und'][0]['value'] = $record->body_value;
-dpm($edit);
     user_save($user, $edit);
-/*
-    if($saved_user = user_save($user, $edit)) {
+
+    /*
+    if ($saved_user = user_save($user, $edit)) {
       dpm($saved_user);
     }
-  */
+    */
   }
 
   return 'done';

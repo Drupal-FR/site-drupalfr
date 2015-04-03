@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Implements hook_block_info().
  */
@@ -34,8 +33,7 @@ function dfr_blocks_block_info() {
   );
 
   return $blocks;
-} // dfr_blocks_block_info
-
+}
 
 /**
  * Implements hook_block_view().
@@ -43,7 +41,7 @@ function dfr_blocks_block_info() {
 function dfr_blocks_block_view($delta = '') {
   switch($delta) {
 
-    // Homepage
+    // Homepage.
     case 'home_events':
       return dfr_blocks_block_home_events();
       break;
@@ -54,21 +52,20 @@ function dfr_blocks_block_view($delta = '') {
       return dfr_blocks_block_home_trad();
       break;
 
-    // Téléchargement
+    // Téléchargement.
     case 'download':
       return dfr_blocks_block_download();
       break;
-    // Qui sommes nous
+    // Qui sommes nous.
     case 'about_us':
       return dfr_blocks_block_about_us();
       break;
-    // Twitter asso
+    // Twitter asso.
     case 'twitter_asso':
       return dfr_blocks_block_twitter_asso();
       break;
   }
-} // dfr_blocks_block_view
-
+}
 
 /**
  * Implements hook_block_configure().
@@ -109,7 +106,7 @@ function dfr_blocks_block_configure($delta = '') {
 }
 
 /**
- * Implements hook_block_save($delta = '', $edit = array().
+ * Implements hook_block_save().
  */
 function dfr_blocks_block_save($delta = '', $edit = array()) {
   if ($delta == 'home_events') {
@@ -122,7 +119,6 @@ function dfr_blocks_block_save($delta = '', $edit = array()) {
     variable_set('home_trad_content', $edit['home_trad_content']);
   }
 }
-
 
 /** ******************************************************* **/
 /** Callback functions                                      **/
@@ -143,9 +139,9 @@ function dfr_blocks_block_home_events() {
         '#path' => 'prochains-evenements',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
-          'html' => FALSE
+          'html' => FALSE,
         ),
-      )
+      ),
     ),
   );
 }
@@ -165,9 +161,9 @@ function dfr_blocks_block_home_help() {
         '#path' => 'node/705',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
-          'html' => FALSE
+          'html' => FALSE,
         ),
-      )
+      ),
     ),
   );
 }
@@ -187,13 +183,12 @@ function dfr_blocks_block_home_trad() {
         '#path' => 'node/695',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
-          'html' => FALSE
+          'html' => FALSE,
         ),
-      )
+      ),
     ),
   );
 }
-
 
 function dfr_blocks_block_download() {
   $current_version = 'Drupal ' . variable_get('drupalfr_current_version', 7) . ' [FR]';
@@ -206,11 +201,10 @@ function dfr_blocks_block_download() {
     'subject' => "Obtenir la dernière version",
     'content' => array(
       '#theme' => 'item_list',
-      '#items' => $items
-    )
+      '#items' => $items,
+    ),
   );
-} // dfr_blocks_block_download
-
+}
 
 function dfr_blocks_block_about_us() {
   $content = '<p>';
@@ -228,7 +222,7 @@ function dfr_blocks_block_about_us() {
         '#path' => 'association',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
-          'html' => FALSE
+          'html' => FALSE,
         ),
       ),
       'link_2' => array(
@@ -237,13 +231,12 @@ function dfr_blocks_block_about_us() {
         '#path' => 'contact',
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
-          'html' => FALSE
+          'html' => FALSE,
         ),
-      )
-    )
+      ),
+    ),
   );
-} // dfr_blocks_block_about_us
-
+}
 
 function dfr_blocks_block_twitter_asso() {
   $content = twitter_pull_render('#drupalfr');
@@ -263,6 +256,6 @@ function dfr_blocks_block_twitter_asso() {
           'absolute' => TRUE,
         ),
       ),
-    )
+    ),
   );
-} // dfr_blocks_block_twitter_asso
+}
