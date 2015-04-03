@@ -3,7 +3,7 @@
 /**
  * Implements hook_install()
  */
-function drupalfr_ressource_install () {
+function drupalfr_ressource_install() {
   $default_theme = variable_get('theme_default', 'dfrtheme');
   $searcher = 'search_api@node_content';
   $realm = 'block';

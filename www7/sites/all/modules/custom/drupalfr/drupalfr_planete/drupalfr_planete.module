@@ -57,7 +57,7 @@ function drupalfr_planete_block_view($delta = '') {
 function drupalfr_planete_url_inbound_alter(&$path, $original_path, $path_language) {
   if (variable_get('drupalfr_planete_rewrite_urls', TRUE)) {
     // Ne travailler que sur le chemin courant, pas sur les autres appels à ce
-    // hook, also: don't mess with the form
+    // hook, also: don't mess with the form.
     if (current_path() !== $original_path || $_SERVER['REQUEST_METHOD'] == 'POST') {
       return;
     }
@@ -107,7 +107,7 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
       $options['external'] = TRUE;
     }
     // Dans le cas du outbound, la seule URL valable pour accéder au planete
-    // est /planete, cas dans leque on va gentillement réécrire la requête,
+    // est /planete, cas dans lequel on va gentillement réécrire la requête,
     // tout autre path sera renvoyé vers le site d'origine.
     else if ('planete' === $path) {
       $options['absolute'] = TRUE;
@@ -116,16 +116,16 @@ function drupalfr_planete_url_outbound_alter(&$path, &$options, $original_path) 
         $path = $scheme . '://' . $url;
       }
       else {
-        // Verifions qu'on est pas dans un autre sous-domaine, genre emploi
+        // Verifions qu'on est pas dans un autre sous-domaine, genre emploi.
         if (substr_count($url, '.') == 2) {
-          // Si oui on ne prend que les deux derniers élément de base url
+          // Si oui on ne prend que les deux derniers élément de base url.
           $url = substr($url, strpos($url, '.') + 1);
         }
         $path = $scheme . '://planete.' . $url;
       }
     }
     else if (0 === strpos($url, 'planete.')) {
-      // On est pas sur le planete on enleve notre sous-domaine
+      // On est pas sur le planete on enleve notre sous-domaine.
       $options['base_url'] = $scheme . '://' . substr($url, strlen('planete.'));
       $options['absolute'] = TRUE;
     }

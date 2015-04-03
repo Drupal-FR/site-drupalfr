@@ -1,19 +1,11 @@
 <?php
 
-
-/**
- * Implements hook_install().
- */
-function dfr_blocks_install() {
-
-}
-
 /**
  * Implements hook_enable().
  */
 function dfr_blocks_enable() {
 
-  // Update default twitter_block module
+  // Update default twitter_block module.
   db_update('twitter_block')
     ->fields(array(
       'search_type' => 'searchHashtag',
@@ -21,11 +13,11 @@ function dfr_blocks_enable() {
       'default_title' => 'Twitter #drupalfr',
       'results_per_page' => '6',
       'lang' => 'fr',
-      ))
+    ))
     ->condition('delta', 'default')
     ->execute();
 
-  // Disable all block for dfrtheme
+  // Disable all block for dfrtheme.
   db_query("DELETE FROM {block} WHERE theme = 'dfrtheme'");
 
   // Set blocks
@@ -39,16 +31,16 @@ function dfr_blocks_enable() {
   // BLOCK_VISIBILITY_LISTED :1
 
   $values = array(
-    // Header bottom
+    // Header bottom.
     array(
       'module' => 'dfr_blocks', 'delta' => 'download',
       'theme' => 'dfrtheme', 'region' => 'header_bottom',
       'weight' => 0, 'cache' => DRUPAL_CACHE_GLOBAL,
       'title' => "", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
 
-    // Menu
+    // Menu.
     array(
       'module' => 'system', 'delta' => 'main-menu',
       'theme' => 'dfrtheme', 'region' => 'menu',
@@ -56,7 +48,7 @@ function dfr_blocks_enable() {
       'title' => "", 'status' => 1,
     ),
 
-    // Content
+    // Content.
     array(
       'module' => 'system', 'delta' => 'main',
       'theme' => 'dfrtheme', 'region' => 'content',
@@ -68,28 +60,28 @@ function dfr_blocks_enable() {
       'theme' => 'dfrtheme', 'region' => 'content',
       'weight' => 10, 'cache' => DRUPAL_CACHE_GLOBAL,
       'title' => "", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
     array(
       'module' => 'views', 'delta' => 'planete-block_1',
       'theme' => 'dfrtheme', 'region' => 'content',
       'weight' => 12, 'cache' => DRUPAL_NO_CACHE,
       'title' => "Planète", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
     array(
       'module' => 'views', 'delta' => 'drupalfr-block_1',
       'theme' => 'dfrtheme', 'region' => 'content',
       'weight' => 14, 'cache' => DRUPAL_NO_CACHE,
       'title' => "", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
     array(
       'module' => 'views', 'delta' => 'planete_user-block',
       'theme' => 'dfrtheme', 'region' => 'content',
       'weight' => 14, 'cache' => DRUPAL_NO_CACHE,
       'title' => "", 'status' => 1,
-      'visibility' => 1, 'pages' => 'profil/*>'
+      'visibility' => 1, 'pages' => 'profil/*>',
     ),
     array(
       'module' => 'views', 'delta' => 'offres-block_2',
@@ -98,8 +90,7 @@ function dfr_blocks_enable() {
       'title' => "", 'status' => 1,
     ),
 
-
-    // Sidebar
+    // Sidebar.
     array(
       'module' => 'drupalfr_search', 'delta' => 'solr-search',
       'theme' => 'dfrtheme', 'region' => 'sidebar_first',
@@ -141,7 +132,7 @@ function dfr_blocks_enable() {
       'theme' => 'dfrtheme', 'region' => 'sidebar_first',
       'weight' => -18, 'cache' => DRUPAL_CACHE_GLOBAL,
       'title' => "Twitter #drupalfr", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
     array(
       'module' => 'book', 'delta' => 'navigation',
@@ -149,7 +140,7 @@ function dfr_blocks_enable() {
       'weight' => -17, 'cache' => DRUPAL_CACHE_GLOBAL,
       'title' => "Documentation", 'status' => 1,
       'visibility' => 1, 'pages' => 'documentation
-documentation/*'
+documentation/*',
     ),
     array(
       'module' => 'forum', 'delta' => 'new',
@@ -157,7 +148,7 @@ documentation/*'
       'weight' => -16, 'cache' => DRUPAL_CACHE_GLOBAL,
       'title' => "", 'status' => 1,
       'visibility' => 1, 'pages' => 'forum
-forum/*'
+forum/*',
     ),
     array(
       'module' => 'dfr_emploi', 'delta' => 'creer-offre',
@@ -166,13 +157,13 @@ forum/*'
       'title' => "", 'status' => 1,
       'visibility' => 1, 'pages' => 'emploi*',
     ),
-    // Content top
+    // Content top.
     array(
       'module' => 'dfr_blocks', 'delta' => 'home_events',
       'theme' => 'dfrtheme', 'region' => 'content_top',
       'weight' => -25, 'cache' => DRUPAL_NO_CACHE,
       'title' => "", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
     array(
       'module' => 'dfr_blocks', 'delta' => 'home_help',
@@ -186,10 +177,10 @@ forum/*'
       'theme' => 'dfrtheme', 'region' => 'content_top',
       'weight' => -23, 'cache' => DRUPAL_NO_CACHE,
       'title' => "", 'status' => 1,
-      'visibility' => 1, 'pages' => '<front>'
+      'visibility' => 1, 'pages' => '<front>',
     ),
 
-    // Footer top
+    // Footer top.
     array(
       'module' => 'dfr_blocks', 'delta' => 'about_us',
       'theme' => 'dfrtheme', 'region' => 'footer_top',
@@ -203,22 +194,21 @@ forum/*'
       'title' => "", 'status' => 1,
     ),
 
-    // Footer
+    // Footer.
     array(
       'module' => 'block', 'delta' => '10',
       'theme' => 'dfrtheme', 'region' => 'footer',
       'weight' => -10, 'cache' => DRUPAL_CACHE_GLOBAL,
       'title' => "", 'status' => 1,
     ),
-
   );
 
   $query = db_insert('block')
     ->fields(array(
       'module', 'delta', 'theme', 'status', 'weight', 'region', 'pages', 'title', 'cache', 'visibility'
-      ));
+    ));
   foreach ($values as $record) {
-    // Default values
+    // Default values.
     $record += array(
       'title' => "",
       'cache' => DRUPAL_CACHE_PER_ROLE,
@@ -245,15 +235,8 @@ forum/*'
 
 }
 
-
 /**
- * Implements hook_uninstall().
- */
-function dfr_blocks_uninstall() {
-}
-
-/**
- * Implements hook_update_N().
+ * Set current and previous version of drupalfr.
  */
 function dfr_blocks_update_7100() {
   variable_set('drupalfr_current_version' , 7);

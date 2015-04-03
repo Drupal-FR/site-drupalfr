@@ -12,7 +12,6 @@ function drupalfr_events_theme() {
   );
 }
 
-
 /**
  * Implements hook_block_info().
  */
@@ -37,7 +36,7 @@ function drupalfr_events_block_view($delta = '') {
         'subject' => t('6 prochains évènements meetup.com'),
         'content' => array(
           'events' => drupalfr_events_display_events($events, 'teaser'),
-          'link' => array('#markup' => l(t("Programme détaillé"), 'prochains-evenements', array('attributes' => array('class'=>array('more-link')))))
+          'link' => array('#markup' => l(t("Programme détaillé"), 'prochains-evenements', array('attributes' => array('class'=>array('more-link'))))),
         )
       );
       break;
