@@ -28,7 +28,7 @@ function drupalfr_forums_uninstall() {
 /**
  * Set the weight of the forum.module to 2 so it is loaded after the forum.module.
  */
-function drupalfr_forums_update_7002(&$sandbox) {
+function drupalfr_forums_update_7001(&$sandbox) {
   db_update('system')
     ->fields(array('weight' => 2))
     ->condition('name', 'drupalfr_forums')
