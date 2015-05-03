@@ -487,9 +487,9 @@ function userpoints_tokens($type, $tokens, array $data = array(), array $options
       if ($name == 'all') {
         $tid = 'all';
       }
-      else if (strpos($name, 'category-') === 0) {
+      elseif (strpos($name, 'category-') === 0) {
         // Extract the category id from the string that looks like category-1.
-        list(,$tid) = explode('-', $name);
+        list(, $tid) = explode('-', $name);
       }
       if ($tid) {
         $replacements[$original] = userpoints_get_current_points($data['user']->uid, $tid);
@@ -504,9 +504,9 @@ function userpoints_tokens($type, $tokens, array $data = array(), array $options
       if ($name == 'all') {
         $tid = 'all';
       }
-      else if (strpos($name, 'category-') === 0) {
+      elseif (strpos($name, 'category-') === 0) {
         // Extract the category id from the string that looks like category-1.
-        list(,$tid) = explode('-', $name);
+        list(, $tid) = explode('-', $name);
       }
       if ($tid) {
         $replacements[$original] = userpoints_get_max_points($uid, $tid);
@@ -1238,7 +1238,7 @@ function userpoints_user_view($account, $view_mode) {
     if (!empty($details) || $points_list) {
       $account->content['userpoints'] = array(
         'title' => array(
-          '#markup' => '<h3>' .  t('!Points', userpoints_translation()) . '</h3>',
+          '#markup' => '<h3>' . t('!Points', userpoints_translation()) . '</h3>',
         ),
         '#weight' => 0,
       );
@@ -1656,6 +1656,7 @@ function userpoints_get_categories($account = NULL) {
             ->condition('t.vid', userpoints_get_vid())
             ->groupBy('t.tid')
             ->groupBy('t.name')
+            ->groupBy('t.weight')
             ->orderBy('t.weight');
           $query->join('userpoints_txn', 'p', 't.tid = p.tid AND p.uid = :uid', array(':uid' => $account->uid));
           $terms = $query->execute();
@@ -1688,6 +1689,16 @@ function userpoints_views_api() {
   return array(
       'api' => 2.0,
   );
+}
+
+/**
+ * Implements hook_migrate_api().
+ */
+function userpoints_migrate_api() {
+  $api = array(
+    'api' => 2,
+  );
+  return $api;
 }
 
 /**
@@ -1816,7 +1827,7 @@ function userpoints_create_description($transaction, array $options = array()) {
   // Link to the referenced entity, if available.
   if ($entity && $options['link']) {
     $uri = entity_uri($transaction->entity_type, $entity);
-    if ($uri) {
+    if (isset($uri['path'])) {
       $description = l($description, $uri['path'], $uri['options'] + array('html' => $safe, 'attributes' => $attributes));
     }
   }
@@ -1849,8 +1860,10 @@ function userpoints_userpoints_info() {
  *   A loaded userpoints transaction object.
  */
 function userpoints_transaction_load($txn_id) {
-  $transaction = db_query('SELECT * from {userpoints_txn} WHERE txn_id = :txn', array(':txn' => $txn_id))->fetchObject();
-  if (!$transaction) {
+  if (!empty($txn_id)) {
+    $transaction = db_query('SELECT * from {userpoints_txn} WHERE txn_id = :txn', array(':txn' => $txn_id))->fetchObject();
+  }
+  if (empty($transaction)) {
     return FALSE;
   }
 
@@ -1889,14 +1902,14 @@ function userpoints_get_transaction_actions($transaction, $show_view = TRUE) {
   }
 
   if ($show_view && userpoints_access_view_transaction($transaction)) {
-    $actions[] = l('view', $url_prefix . '/view');
+    $actions[] = l(t('view'), $url_prefix . '/view');
   }
   if (userpoints_admin_access('edit')) {
-    $actions[] = l('edit', $url_prefix . '/edit', $url_options);
+    $actions[] = l(t('edit'), $url_prefix . '/edit', $url_options);
   }
   if (userpoints_admin_access('moderate') && $transaction->status == USERPOINTS_TXN_STATUS_PENDING) {
-    $actions[] = l('approve', $url_prefix . '/approve', $url_options);
-    $actions[] = l('decline', $url_prefix . '/decline', $url_options);
+    $actions[] = l(t('approve'), $url_prefix . '/approve', $url_options);
+    $actions[] = l(t('decline'), $url_prefix . '/decline', $url_options);
   }
   return implode(' ', $actions);
 }
@@ -1963,7 +1976,7 @@ function userpoints_get_list_row($data) {
   if ($user->uid == $data->uid) {
     $details = "&nbsp;&nbsp;" . l(t("details"), 'myuserpoints');
   }
-  else if (userpoints_admin_access('edit')) {
+  elseif (userpoints_admin_access('edit')) {
     $details = "&nbsp;&nbsp;" . l(t("details"), 'user/' . $data->uid . '/points');
   }
 

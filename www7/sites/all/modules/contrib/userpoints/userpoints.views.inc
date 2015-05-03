@@ -112,6 +112,7 @@ function userpoints_views_data() {
       'help' => t("The last update timestamp for a User's current !points in a single category.", userpoints_translation()),
       'field' => array(
           'handler' => 'views_handler_field_date',
+          'click sortable' => TRUE,
       ),
       'sort' => array(
           'handler' => 'views_handler_sort_date',
@@ -215,6 +216,7 @@ function userpoints_views_data() {
       'help' => t("The last update timestamp for a user's !points across all categories.", userpoints_translation()),
       'field' => array(
           'handler' => 'views_handler_field_date',
+          'click sortable' => TRUE,
       ),
       'sort' => array(
           'handler' => 'views_handler_sort_date',
@@ -328,6 +330,7 @@ function userpoints_views_data() {
       'help' => t('The created timestamp for the transaction.'),
       'field' => array(
           'handler' => 'views_handler_field_date',
+          'click sortable' => TRUE,
       ),
       'sort' => array(
           'handler' => 'views_handler_sort_date',
@@ -342,6 +345,7 @@ function userpoints_views_data() {
       'help' => t('The changed timestamp for the transaction, for when the transaction is updated.'),
       'field' => array(
           'handler' => 'views_handler_field_date',
+          'click sortable' => TRUE,
       ),
       'sort' => array(
           'handler' => 'views_handler_sort_date',
@@ -392,6 +396,7 @@ function userpoints_views_data() {
       'help' => t('The expiration date for the transaction.'),
       'field' => array(
           'handler' => 'views_handler_field_date',
+          'click sortable' => TRUE,
       ),
       'sort' => array(
           'handler' => 'views_handler_sort_date',
@@ -417,7 +422,7 @@ function userpoints_views_data() {
 
   $data['userpoints_txn']['entity_id'] = array(
       'title' => t('Entity ID'),
-      'help' => t('The entity_id field. Used to relate to the node table.'),
+      'help' => t('The referenced entity ID.'),
       'field' => array(
           'handler' => 'views_handler_field',
       ),
@@ -425,12 +430,25 @@ function userpoints_views_data() {
           'handler' => 'views_handler_argument_numeric',
           'numeric' => TRUE,
       ),
-      'relationship' => array(
-          'base' => 'node',
-          'field' => 'nid',
-          'label' => t('Entity'),
-          'handler' => 'views_handler_relationship',
+  );
+
+  $data['userpoints_txn']['node'] = array(
+    'title' => t('Node'),
+    'help' => t('Used to relate to the node table.'),
+    'real field' => 'entity_id',
+    'relationship' => array(
+      'base' => 'node',
+      'base field' => 'nid',
+      'label' => t('Node'),
+      'handler' => 'views_handler_relationship',
+      'extra' => array(
+        array(
+          'field' => 'entity_type',
+          'value' => 'node',
+          'table' => 'userpoints_txn',
+        ),
       ),
+    ),
   );
 
   $data['userpoints_txn']['entity_type'] = array(
@@ -458,7 +476,20 @@ function userpoints_views_data() {
       ),
       'sort' => array(
           'handler' => 'views_handler_sort',
-      ),
+  ),
+  $data['userpoints_txn']['txn_id'] = array(
+    'title' => t('Transaction ID'),
+    'help' => t('Userpoints Transaction ID'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  ),
   );
 
   // Reverse join information. This should not be necessary.

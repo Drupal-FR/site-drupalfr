@@ -1,5 +1,10 @@
 <?php
 /**
+ * @file
+ * Views filter handler for the Userpoints category.
+ */
+
+/**
  * Filter by category
  */
 class userpoints_views_handler_filter_category extends views_handler_filter_in_operator {

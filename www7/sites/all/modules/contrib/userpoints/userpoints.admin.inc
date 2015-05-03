@@ -281,7 +281,7 @@ function userpoints_create_operation_autocomplete_label($operation, $info, $sear
   if (!empty($info['admin description'])) {
     $label = $info['admin description'];
   }
-  return preg_replace("/(" . preg_quote($search) . ")/i","<strong>$1</strong>", $label);
+  return preg_replace("/(" . preg_quote($search) . ")/i", "<strong>$1</strong>", $label);
 }
 
 /**
