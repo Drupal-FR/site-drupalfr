@@ -42,7 +42,7 @@ function userpoints_service_index($page, $tid, $sort, $dir) {
     }
     $select->condition('tid', $tid);
   }
-  services_resource_build_index_query($select, $page, 'uid, points, max_points', array());
+  services_resource_build_index_query($select, $page, 'uid, points, max_points', array(), 20);
 
   $results = $select->execute();
 
@@ -89,6 +89,7 @@ function userpoints_service_add($uid, $points, $tid, $operation, $description, $
     'entity_id' => $entity_id,
   );
   $result = userpoints_userpointsapi($params);
+  $total_points = userpoints_get_current_points($uid);
 
   if (!$result['status']) {
     return services_error(t('Adding points failed: @reason' ,array('@reason' => $result['reason'])));
@@ -96,6 +97,7 @@ function userpoints_service_add($uid, $points, $tid, $operation, $description, $
 
   return (object) array(
     'id' => $result['transaction']['txn_id'],
-    'uri' => services_resource_uri(array('userpoints_transaction', $result['transaction']['txn_id'])),
+    'uri' => services_resource_uri(array('userpoints_transaction', $result['transaction']['txn_id'], $total_points)),
+    'total_points' => $total_points,
   );
 }

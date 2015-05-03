@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Views field handler for the Userpoints category.
+ */
 
 /**
  * Field handler for categories.
@@ -7,7 +11,7 @@
  */
 class userpoints_views_handler_field_category extends views_handler_field {
 
-  function init(&$view, $options) {
+  function init(&$view, &$options) {
     parent::init($view, $options);
 
     $this->additional_fields['name'] = array('table' => 'taxonomy_term_data', 'field' => 'name');
@@ -21,7 +25,7 @@ class userpoints_views_handler_field_category extends views_handler_field {
     $this->add_additional_fields();
   }
 
-  function pre_render($values) {
+  function pre_render(&$values) {
     $this->field_alias = $this->aliases['name'];
   }
 

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Views argument handler for the Userpoints category.
+ */
 
 /**
  * Argument handler to accept a userpoints category.
