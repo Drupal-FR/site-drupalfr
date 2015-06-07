@@ -1,0 +1,43 @@
+From 77636d07dbbdb1216c240f8302516683d7254f94 Mon Sep 17 00:00:00 2001
+From: Florent Torregrosa <florent.torregrosa@gmail.com>
+Date: Fri, 3 Apr 2015 14:31:11 +0200
+Subject: [PATCH] Issue #2333803: Add signature extra field.
+
+---
+ field_group.module |   13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/field_group.module b/field_group.module
+index 772405d..4ae6765 100644
+--- a/field_group.module
++++ b/field_group.module
+@@ -1388,7 +1388,16 @@ function field_group_field_extra_fields() {
+     );
+   }
+ 
+-  // Field to itegrate with overlay module.
++  // User signature field to integrate with user module.
++  if (variable_get('user_signatures', 0)) {
++    $extra['user']['user']['form']['signature_settings'] = array(
++      'label' => t('Signature settings'),
++      'description' => t('User signature'),
++      'weight' => 5,
++    );
++  }
++
++  // Field to integrate with overlay module.
+   if (module_exists('overlay')) {
+     $extra['user']['user']['form']['overlay_control'] = array(
+       'label' => t('Administrative overlay'),
+@@ -1397,7 +1406,7 @@ function field_group_field_extra_fields() {
+     );
+   }
+ 
+-  // Field to itegrate with contact module.
++  // Field to integrate with contact module.
+   if (module_exists('contact')) {
+     $extra['user']['user']['form']['contact'] = array(
+       'label' => t('Contact'),
+-- 
+1.7.10.4
+
