@@ -171,7 +171,7 @@ function dfr_blocks_block_home_help() {
 function dfr_blocks_block_home_trad() {
   $content = variable_get(
     'home_trad_content',
-    array('value' => "Découvez comment installer et traduire Drupal en français grâce à la traduction maintenue par l'équipe de Drupalfr.org.", 'format' => NULL)
+    array('value' => "Découvrez comment installer et traduire Drupal en français grâce à la traduction maintenue par l'équipe de Drupalfr.org.", 'format' => NULL)
   );
   return array(
     'subject' => "Traduction",
@@ -194,8 +194,8 @@ function dfr_blocks_block_download() {
   $current_version = 'Drupal ' . variable_get('drupalfr_current_version', 7) . ' [FR]';
   $previous_version = 'Drupal ' . variable_get('drupalfr_previous_version', 6) . ' [FR]';
   $items = array(
-    'drupal_current' => $current_version . l("Télécharger", file_create_url('public://drupal-7.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
-    'drupal_previous' => $previous_version . l("Télécharger", file_create_url('public://drupal-6.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
+    'drupal_current' => $current_version . l(t('Télécharger'), file_create_url('public://drupal-7.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
+    'drupal_previous' => $previous_version . l(t('Télécharger'), file_create_url('public://drupal-6.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
   );
   return array(
     'subject' => "Obtenir la dernière version",
@@ -258,4 +258,25 @@ function dfr_blocks_block_twitter_asso() {
       ),
     ),
   );
+}
+
+/**
+ * Implements hook_block_view_alter().
+ *
+ * Add drupalfr link to twitter blocks.
+ */
+function dfr_blocks_block_view_alter(&$data, $block) {
+  if ($block->module == 'twitter_block') {
+    $data['content'] = array('original_content' => $data['content']);
+    $data['content']['link'] = array(
+      '#theme' => 'link',
+      '#text' => "Compte @drupalfr",
+      '#path' => 'http://twitter.com/drupalfr',
+      '#options' => array(
+        'attributes' => array('class' => array('btn-link')),
+        'html' => FALSE,
+        'absolute' => TRUE,
+      ),
+    );
+  }
 }
