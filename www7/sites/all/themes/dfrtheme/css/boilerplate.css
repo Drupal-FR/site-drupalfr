@@ -39,7 +39,11 @@ th, tr, td { padding: 0.1em 0.5em; vertical-align: middle; }
 hr { background:#666; border:none; clear:both; float:none; height:1px; margin: -1px 0 1.5em; width: 100%; }
 fieldset { border: 1px solid #ccc; margin: .5em 0; padding: 1em; }
 
-iframe { background:#fff}
+iframe {
+  background:#fff;
+  vertical-align: middle;
+  max-width: 100%;
+}
 
 /**
  * Responsive images & medias
@@ -47,7 +51,7 @@ iframe { background:#fff}
  * From reset.less by Twitter Bootstrap
  */
 img, table, td, blockquote, code, pre, textarea, input,
-iframe, embed, object, img {
+embed, object, img {
   vertical-align: middle;
   max-width: 100%;
   height:auto;
