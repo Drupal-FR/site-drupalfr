@@ -812,9 +812,9 @@ abstract class FeedsProcessor extends FeedsPlugin {
     include_once DRUPAL_ROOT . '/includes/utility.inc';
     $message = $e->getMessage();
     $message .= '<h3>Original item</h3>';
-    $message .= '<pre>' . drupal_var_export($item). '</pre>';
+    $message .= '<pre>' . check_plain(drupal_var_export($item)) . '</pre>';
     $message .= '<h3>Entity</h3>';
-    $message .= '<pre>' . drupal_var_export($entity) . '</pre>';
+    $message .= '<pre>' . check_plain(drupal_var_export($entity)) . '</pre>';
     return $message;
   }
 

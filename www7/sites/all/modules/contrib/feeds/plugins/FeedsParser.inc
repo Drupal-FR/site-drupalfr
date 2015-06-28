@@ -264,7 +264,27 @@ class FeedsGeoTermElement extends FeedsTermElement {
  * Enclosure element, can be part of the result array.
  */
 class FeedsEnclosure extends FeedsElement {
-  protected $mime_type;
+
+  /**
+   * The mime type of the enclosure.
+   *
+   * @param string
+   */
+   protected $mime_type;
+
+   /**
+   * The default list of allowed extensions.
+   *
+   * @param string
+   */
+  protected $allowedExtensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
+
+  /**
+   * The sanitized local file name.
+   *
+   * @var string
+   */
+  protected $safeFilename;
 
   /**
    * Constructor, requires MIME type.
@@ -288,6 +308,17 @@ class FeedsEnclosure extends FeedsElement {
   }
 
   /**
+   * Sets the list of allowed extensions.
+   *
+   * @param string $extensions
+   *   The list of allowed extensions separated by a space.
+   */
+  public function setAllowedExtensions($extensions) {
+    // Normalize whitespace so that empty extensions are not allowed.
+    $this->allowedExtensions = trim(preg_replace('/\s/', ' ', $extensions));
+  }
+
+  /**
    * Use this method instead of FeedsElement::getValue() when fetching the file
    * from the URL.
    *
@@ -301,20 +332,79 @@ class FeedsEnclosure extends FeedsElement {
   }
 
   /**
-   * Use this method instead of FeedsElement::getValue() to get the file name
-   * transformed for better local saving (underscores instead of spaces)
+   * Returns the full path to the file URI with a safe filen ame.
    *
-   * @return
+   * @return string
+   *   The safe file URI.
+   *
+   * @throws RuntimeException
+   *   Thrown if the file extension is invalid.
+   */
+  public function getSanitizedUri() {
+    return drupal_dirname($this->getValue()) . '/' . $this->getSafeFilename();
+  }
+
+  /**
+   * Returns the file name transformed for better local saving.
+   *
+   * @return string
    *   Value with space characters changed to underscores.
+   *
+   * @throws RuntimeException
+   *   Thrown if the file extension is invalid.
    *
    * @see FeedsElement::getValue()
    */
   public function getLocalValue() {
-    return str_replace(' ', '_', $this->getValue());
+    return str_replace(' ', '_', $this->getSafeFilename());
   }
 
   /**
-   * @return
+   * Returns the safe file name.
+   *
+   * @return string
+   *   A filename that is safe to save to the filesystem.
+   *
+   * @throws RuntimeException
+   *   Thrown if the file extension is invalid.
+   *
+   * @see FeedsElement::getValue()
+   */
+  protected function getSafeFilename() {
+    if (isset($this->safeFilename)) {
+      return $this->safeFilename;
+    }
+
+    $filename = rawurldecode(drupal_basename($this->getValue()));
+
+    if (module_exists('transliteration')) {
+      require_once drupal_get_path('module', 'transliteration') . '/transliteration.inc';
+      $filename = transliteration_clean_filename($filename);
+    }
+
+    // Remove leading and trailing whitespace and periods.
+    $filename = trim($filename, " \t\n\r\0\x0B.");
+
+    if (strpos($filename, '.') === FALSE) {
+      $extension = FALSE;
+    }
+    else {
+      $extension = substr($filename, strrpos($filename, '.') + 1);
+    }
+
+    if (!$extension || !in_array($extension, explode(' ', $this->allowedExtensions), TRUE)) {
+      throw new RuntimeException(t('The file @file has an invalid extension.', array('@file' => $filename)));
+    }
+
+    $this->safeFilename = file_munge_filename($filename, $this->allowedExtensions, FALSE);
+
+    return $this->safeFilename;
+  }
+
+  /**
+   * Downloads the content from the file URL.
+   *
+   * @return string
    *   The content of the referenced resource.
    */
   public function getContent() {
@@ -345,13 +435,14 @@ class FeedsEnclosure extends FeedsElement {
       // Prepare destination directory.
       file_prepare_directory($destination, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY);
       // Copy or save file depending on whether it is remote or local.
-      if (drupal_realpath($this->getValue())) {
+      if (drupal_realpath($this->getSanitizedUri())) {
         $file           = new stdClass();
         $file->uid      = 0;
-        $file->uri      = $this->getValue();
+        $file->uri      = $this->getSanitizedUri();
         $file->filemime = $this->mime_type;
-        $file->filename = basename($file->uri);
-        if (dirname($file->uri) != $destination) {
+        $file->filename = $this->getSafeFilename();
+
+        if (drupal_dirname($file->uri) !== $destination) {
           $file = file_copy($file, $destination);
         }
         else {
@@ -368,16 +459,11 @@ class FeedsEnclosure extends FeedsElement {
         }
       }
       else {
-        $filename = basename($this->getLocalValue());
-        if (module_exists('transliteration')) {
-          require_once drupal_get_path('module', 'transliteration') . '/transliteration.inc';
-          $filename = transliteration_clean_filename($filename);
-        }
         if (file_uri_target($destination)) {
           $destination = trim($destination, '/') . '/';
         }
         try {
-          $file = file_save_data($this->getContent(), $destination . $filename);
+          $file = file_save_data($this->getContent(), $destination . $this->getLocalValue());
         }
         catch (Exception $e) {
           watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
@@ -388,9 +474,11 @@ class FeedsEnclosure extends FeedsElement {
       if (!$file) {
         throw new Exception(t('Invalid enclosure %enclosure', array('%enclosure' => $this->getValue())));
       }
+
+      return $file;
     }
-    return $file;
   }
+
 }
 
 /**

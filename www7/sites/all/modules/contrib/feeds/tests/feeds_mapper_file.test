@@ -21,6 +21,10 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     );
   }
 
+  public function setUp() {
+    parent::setUp(array('dblog'));
+  }
+
   /**
    * Basic test loading a single entry CSV file.
    */
@@ -40,7 +44,14 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
       // Reset all the caches!
       $this->resetAll();
     }
-    $typename = $this->createContentType(array(), array('files' => 'file'));
+    $typename = $this->createContentType(array(), array(
+      'files' => array(
+        'type' => 'file',
+        'instance_settings' => array(
+          'instance[settings][file_extensions]' => 'png, gif, jpg, jpeg',
+        ),
+      ),
+    ));
 
     // 1) Test mapping remote resources to file field.
 
@@ -72,8 +83,7 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
       ->execute();
     foreach ($entities as $entity) {
       $this->drupalGet('node/' . $entity->entity_id . '/edit');
-      $f = new FeedsEnclosure(array_shift($files), NULL);
-      $this->assertText($f->getLocalValue());
+      $this->assertText(str_replace(' ', '_', array_shift($files)));
     }
 
     // 2) Test mapping local resources to file field.
@@ -118,8 +128,7 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
       ->execute();
     foreach ($entities as $entity) {
       $this->drupalGet('node/' . $entity->entity_id . '/edit');
-      $f = new FeedsEnclosure(array_shift($files), NULL);
-      $this->assertRaw('resources/' . $f->getUrlEncodedValue());
+      $this->assertRaw('resources/' . rawurlencode(array_shift($files)));
     }
 
     // 3) Test mapping of local resources, this time leave files in place.
@@ -144,8 +153,7 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
       ->execute();
     foreach ($entities as $entity) {
       $this->drupalGet('node/' . $entity->entity_id . '/edit');
-      $f = new FeedsEnclosure(array_shift($files), NULL);
-      $this->assertRaw('images/' . $f->getUrlEncodedValue());
+      $this->assertRaw('images/' . rawurlencode(array_shift($files)));
     }
 
     // Deleting all imported items will delete the files from the images/ dir.
@@ -154,6 +162,52 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
 //    foreach ($this->_testFiles() as $file) {
 //      $this->assertFalse(is_file("public://images/$file"));
 //    }
+  }
+
+  public function testInvalidFileExtension() {
+    variable_set('feeds_never_use_curl', TRUE);
+
+    $typename = $this->createContentType(array(), array(
+      'files' => array(
+        'type' => 'file',
+        'instance_settings' => array(
+          'instance[settings][file_extensions]' => 'txt',
+        ),
+      ),
+    ));
+
+    // Create a CSV importer configuration.
+    $this->createImporterConfiguration('Node import from CSV', 'invalid_extension');
+    $this->setPlugin('invalid_extension', 'FeedsCSVParser');
+    $this->setSettings('invalid_extension', 'FeedsNodeProcessor', array('bundle' => $typename));
+    $this->setSettings('invalid_extension', NULL, array('content_type' => ''));
+    $this->addMappings('invalid_extension', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'file',
+        'target' => 'field_files',
+      ),
+    ));
+
+    // Import.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files.csv', array('absolute' => TRUE)),
+    );
+    $this->drupalPost('import/invalid_extension', $edit, 'Import');
+    $this->assertText('Created 5 nodes');
+
+    foreach (range(1, 5) as $nid) {
+      $node = node_load($nid);
+      $this->assertTrue(empty($node->field_files));
+    }
+
+    foreach ($this->_testFiles() as $filename) {
+      $message = t('The file @file has an invalid extension.', array('@file' => $filename));
+      $this->assertTrue(db_query("SELECT 1 FROM {watchdog} WHERE message = :message", array(':message' => $message))->fetchField());
+    }
   }
 
   /**
