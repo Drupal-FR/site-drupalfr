@@ -509,7 +509,18 @@ class SearchApiSolrService extends SearchApiAbstractService {
     if (module_exists('search_api_multi') && module_exists('search_api_views')) {
       views_invalidate_cache();
     }
-    return TRUE;
+    // Find out if anything changed enough to need re-indexing.
+    $old_fields = isset($index->original->options['fields']) ? $index->original->options['fields'] : array();
+    $new_fields = isset($index->options['fields']) ? $index->options['fields'] : array();
+    if (!$old_fields && !$new_fields) {
+      return FALSE;
+    }
+    if (array_diff_key($old_fields, $new_fields) || array_diff_key($new_fields, $old_fields)) {
+      return TRUE;
+    }
+    $old_field_names = $this->getFieldNames($index->original, TRUE);
+    $new_field_names = $this->getFieldNames($index, TRUE);
+    return $old_field_names != $new_field_names;
   }
 
   /**
@@ -519,22 +530,8 @@ class SearchApiSolrService extends SearchApiAbstractService {
     if (module_exists('search_api_multi') && module_exists('search_api_views')) {
       views_invalidate_cache();
     }
-    $index_id = is_object($index) ? $index->machine_name : $index;
-    // Only delete the index's data if the index isn't read-only.
-    if (!is_object($index) || empty($index->read_only)) {
-      $this->connect();
-      $index_id = $this->getIndexId($index_id);
-      // Since the index ID we use for indexing can contain arbitrary
-      // prefixes, we have to escape it for use in the query.
-      $index_id = call_user_func(array($this->connection_class, 'phrase'), $index_id);
-      $query = "index_id:$index_id";
-      if (!empty($this->options['site_hash'])) {
-        // We don't need to escape the site hash, as that consists only of
-        // alphanumeric characters.
-        $query .= ' hash:' . search_api_solr_site_hash();
-      }
-      $this->solr->deleteByQuery($query);
-    }
+
+    parent::removeIndex($index);
   }
 
   /**
@@ -799,7 +796,7 @@ class SearchApiSolrService extends SearchApiAbstractService {
       if ($ids != 'all') {
         $query[] = $query ? "($ids)" : $ids;
       }
-      $this->solr->deleteByQuery($query ? implode(' ', $query) : '*:*');
+      $this->solr->deleteByQuery($query ? implode(' AND ', $query) : '*:*');
     }
     $this->scheduleCommit();
   }
