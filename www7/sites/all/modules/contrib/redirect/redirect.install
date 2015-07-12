@@ -275,15 +275,13 @@ function redirect_update_7000(&$sandbox) {
 }
 
 /**
- * Empty update hook.
+ * Rebuild the registry and clear the entity info cache.
  */
 function redirect_update_7100() {
-  // This update hook was added under the assumption it would trigger a registry
-  // rebuild / entity info rebuild to inform Drupal about ie. the new location
-  // of RedirectController. However, this only happens at the end of an update
-  // run.
-  // @todo: If we ever use redirect entities / the controller in update hooks,
-  // remember to do a manual registry / entity info rebuild.
+  if (!class_exists('RedirectController')) {
+    registry_rebuild();
+    entity_info_cache_clear();
+  }
 }
 
 /**
