@@ -315,7 +315,7 @@ class FeedsEnclosure extends FeedsElement {
    */
   public function setAllowedExtensions($extensions) {
     // Normalize whitespace so that empty extensions are not allowed.
-    $this->allowedExtensions = trim(preg_replace('/\s/', ' ', $extensions));
+    $this->allowedExtensions = drupal_strtolower(trim(preg_replace('/\s+/', ' ', $extensions)));
   }
 
   /**
@@ -332,7 +332,7 @@ class FeedsEnclosure extends FeedsElement {
   }
 
   /**
-   * Returns the full path to the file URI with a safe filen ame.
+   * Returns the full path to the file URI with a safe file name.
    *
    * @return string
    *   The safe file URI.
@@ -352,8 +352,6 @@ class FeedsEnclosure extends FeedsElement {
    *
    * @throws RuntimeException
    *   Thrown if the file extension is invalid.
-   *
-   * @see FeedsElement::getValue()
    */
   public function getLocalValue() {
     return str_replace(' ', '_', $this->getSafeFilename());
@@ -367,20 +365,17 @@ class FeedsEnclosure extends FeedsElement {
    *
    * @throws RuntimeException
    *   Thrown if the file extension is invalid.
-   *
-   * @see FeedsElement::getValue()
    */
   protected function getSafeFilename() {
     if (isset($this->safeFilename)) {
       return $this->safeFilename;
     }
 
-    $filename = rawurldecode(drupal_basename($this->getValue()));
+    // Strip any query string or fragment from file name.
+    list($filename) = explode('?', $this->getValue());
+    list($filename) = explode('#', $filename);
 
-    if (module_exists('transliteration')) {
-      require_once drupal_get_path('module', 'transliteration') . '/transliteration.inc';
-      $filename = transliteration_clean_filename($filename);
-    }
+    $filename = rawurldecode(drupal_basename($filename));
 
     // Remove leading and trailing whitespace and periods.
     $filename = trim($filename, " \t\n\r\0\x0B.");
@@ -389,7 +384,7 @@ class FeedsEnclosure extends FeedsElement {
       $extension = FALSE;
     }
     else {
-      $extension = substr($filename, strrpos($filename, '.') + 1);
+      $extension = drupal_strtolower(substr($filename, strrpos($filename, '.') + 1));
     }
 
     if (!$extension || !in_array($extension, explode(' ', $this->allowedExtensions), TRUE)) {
@@ -430,7 +425,7 @@ class FeedsEnclosure extends FeedsElement {
    *   If file object could not be created.
    */
   public function getFile($destination) {
-
+    $file = NULL;
     if ($this->getValue()) {
       // Prepare destination directory.
       file_prepare_directory($destination, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY);
@@ -439,7 +434,7 @@ class FeedsEnclosure extends FeedsElement {
         $file           = new stdClass();
         $file->uid      = 0;
         $file->uri      = $this->getSanitizedUri();
-        $file->filemime = $this->mime_type;
+        $file->filemime = $this->getMIMEType();
         $file->filename = $this->getSafeFilename();
 
         if (drupal_dirname($file->uri) !== $destination) {
@@ -463,7 +458,14 @@ class FeedsEnclosure extends FeedsElement {
           $destination = trim($destination, '/') . '/';
         }
         try {
-          $file = file_save_data($this->getContent(), $destination . $this->getLocalValue());
+          $filename = $this->getLocalValue();
+
+          if (module_exists('transliteration')) {
+            require_once drupal_get_path('module', 'transliteration') . '/transliteration.inc';
+            $filename = transliteration_clean_filename($filename);
+          }
+
+          $file = file_save_data($this->getContent(), $destination . $filename);
         }
         catch (Exception $e) {
           watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
@@ -478,7 +480,6 @@ class FeedsEnclosure extends FeedsElement {
       return $file;
     }
   }
-
 }
 
 /**
@@ -680,11 +681,16 @@ class FeedsDateTime extends DateTime {
    *   PHP DateTimeZone object, NULL allowed
    */
   public function __construct($time = '', $tz = NULL) {
-    // Assume UNIX timestamp if numeric.
     if (is_numeric($time)) {
-      // Make sure it's not a simple year
-      if ((is_string($time) && strlen($time) > 4) || is_int($time)) {
+      // Assume UNIX timestamp if it doesn't look like a simple year.
+      if (strlen($time) > 4) {
         $time = "@" . $time;
+      }
+      // If it's a year, add a default month too, because PHP's date functions
+      // won't parse standalone years after 2000 correctly (see explanation at
+      // http://aaronsaray.com/blog/2007/07/11/helpful-strtotime-reminders/#comment-47).
+      else {
+        $time = 'January ' . $time;
       }
     }
 
@@ -693,7 +699,7 @@ class FeedsDateTime extends DateTime {
     $time = str_replace("GMT+", "+", $time);
 
     // Some PHP 5.2 version's DateTime class chokes on invalid dates.
-    if (!strtotime($time)) {
+    if (!date_create($time)) {
       $time = 'now';
     }
 

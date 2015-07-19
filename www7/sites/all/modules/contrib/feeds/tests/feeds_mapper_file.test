@@ -2,17 +2,14 @@
 
 /**
  * @file
- * Test case for Filefield mapper mappers/filefield.inc.
+ * Contains FeedsMapperFileTestCase.
  */
 
 /**
- * Class for testing Feeds file mapper.
- *
- * @todo Add a test for enclosures using a local file that is
- *   a) in place and that
- *   b) needs to be copied from one location to another.
+ * Test case for Filefield mapper mappers/filefield.inc.
  */
 class FeedsMapperFileTestCase extends FeedsMapperTestCase {
+
   public static function getInfo() {
     return array(
       'name' => 'Mapper: File field',
@@ -29,12 +26,12 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
    * Basic test loading a single entry CSV file.
    */
   public function test() {
-    // If this is unset (or FALSE) http_request.inc will use curl, and will generate a 404
-    // for this feel url provided by feeds_tests. However, if feeds_tests was enabled in your
-    // site before running the test, it will work fine. Since it is truly screwy, lets just
-    // force it to use drupal_http_request for this test case.
+    // If this is unset (or FALSE) http_request.inc will use curl, and will
+    // generate a 404 for this feel url provided by feeds_tests. However, if
+    // feeds_tests was enabled in your site before running the test, it will
+    // work fine. Since it is truly screwy, lets just force it to use
+    // drupal_http_request for this test case.
     variable_set('feeds_never_use_curl', TRUE);
-    variable_set('clean_url', TRUE);
 
     // Only download simplepie if the plugin doesn't already exist somewhere.
     // People running tests locally might have it.
@@ -62,21 +59,21 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     $this->addMappings('syndication', array(
       0 => array(
         'source' => 'title',
-        'target' => 'title'
+        'target' => 'title',
       ),
       1 => array(
         'source' => 'timestamp',
-        'target' => 'created'
+        'target' => 'created',
       ),
       2 => array(
         'source' => 'enclosures',
-        'target' => 'field_files'
+        'target' => 'field_files:uri',
       ),
     ));
     $nid = $this->createFeedNode('syndication', $GLOBALS['base_url'] . '/testing/feeds/flickr.xml');
     $this->assertText('Created 5 nodes');
 
-    $files = $this->_testFiles();
+    $files = $this->listTestFiles();
     $entities = db_select('feeds_item')
       ->fields('feeds_item', array('entity_id'))
       ->condition('id', 'syndication')
@@ -105,27 +102,28 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     $this->addMappings('node', array(
       0 => array(
         'source' => 'title',
-        'target' => 'title'
+        'target' => 'title',
       ),
       1 => array(
         'source' => 'file',
-        'target' => 'field_files'
+        'target' => 'field_files:uri',
       ),
     ));
 
     // Import.
     $edit = array(
-      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/testing/feeds/files.csv',
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files.csv', array('absolute' => TRUE)),
     );
     $this->drupalPost('import/node', $edit, 'Import');
     $this->assertText('Created 5 nodes');
 
     // Assert: files should be in resources/.
-    $files = $this->_testFiles();
+    $files = $this->listTestFiles();
     $entities = db_select('feeds_item')
       ->fields('feeds_item', array('entity_id'))
       ->condition('id', 'node')
       ->execute();
+
     foreach ($entities as $entity) {
       $this->drupalGet('node/' . $entity->entity_id . '/edit');
       $this->assertRaw('resources/' . rawurlencode(array_shift($files)));
@@ -146,22 +144,83 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     $this->assertText('Created 5 nodes');
 
     // Assert: files should be in images/ now.
-    $files = $this->_testFiles();
+    $files = $this->listTestFiles();
     $entities = db_select('feeds_item')
       ->fields('feeds_item', array('entity_id'))
       ->condition('id', 'node')
       ->execute();
+
     foreach ($entities as $entity) {
       $this->drupalGet('node/' . $entity->entity_id . '/edit');
       $this->assertRaw('images/' . rawurlencode(array_shift($files)));
     }
 
     // Deleting all imported items will delete the files from the images/ dir.
-    // @todo: for some reason the first file does not get deleted.
-//    $this->drupalPost('import/node/delete-items', array(), 'Delete');
-//    foreach ($this->_testFiles() as $file) {
-//      $this->assertFalse(is_file("public://images/$file"));
-//    }
+    $this->drupalPost('import/node/delete-items', array(), 'Delete');
+    foreach ($this->listTestFiles() as $file) {
+      $this->assertFalse(is_file("public://images/$file"));
+    }
+  }
+
+  /**
+   * Tests mapping to an image field.
+   */
+  public function testImages() {
+    variable_set('feeds_never_use_curl', TRUE);
+
+    $typename = $this->createContentType(array(), array('images' => 'image'));
+
+    // Enable title and alt mapping.
+    $edit = array(
+      'instance[settings][alt_field]' => 1,
+      'instance[settings][title_field]' => 1,
+    );
+    $this->drupalPost("admin/structure/types/manage/$typename/fields/field_images", $edit, t('Save settings'));
+
+    // Create a CSV importer configuration.
+    $this->createImporterConfiguration('Node import from CSV', 'image_test');
+    $this->setPlugin('image_test', 'FeedsCSVParser');
+    $this->setSettings('image_test', 'FeedsNodeProcessor', array('bundle' => $typename));
+    $this->setSettings('image_test', NULL, array('content_type' => ''));
+    $this->addMappings('image_test', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'file',
+        'target' => 'field_images:uri',
+      ),
+      2 => array(
+        'source' => 'title2',
+        'target' => 'field_images:title',
+      ),
+      3 => array(
+        'source' => 'alt',
+        'target' => 'field_images:alt',
+      ),
+    ));
+
+    // Import.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files-remote.csv', array('absolute' => TRUE)),
+    );
+    $this->drupalPost('import/image_test', $edit, 'Import');
+    $this->assertText('Created 5 nodes');
+
+    // Assert files exist.
+    $files = $this->listTestFiles();
+    $entities = db_select('feeds_item')
+      ->fields('feeds_item', array('entity_id'))
+      ->condition('id', 'image_test')
+      ->execute();
+
+    foreach ($entities as $i => $entity) {
+      $this->drupalGet('node/' . $entity->entity_id . '/edit');
+      $this->assertRaw(str_replace(' ', '_', array_shift($files)));
+      $this->assertRaw("Alt text $i");
+      $this->assertRaw("Title text $i");
+    }
   }
 
   public function testInvalidFileExtension() {
@@ -188,13 +247,13 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
       ),
       1 => array(
         'source' => 'file',
-        'target' => 'field_files',
+        'target' => 'field_files:uri',
       ),
     ));
 
     // Import.
     $edit = array(
-      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files.csv', array('absolute' => TRUE)),
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files-remote.csv', array('absolute' => TRUE)),
     );
     $this->drupalPost('import/invalid_extension', $edit, 'Import');
     $this->assertText('Created 5 nodes');
@@ -204,28 +263,152 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
       $this->assertTrue(empty($node->field_files));
     }
 
-    foreach ($this->_testFiles() as $filename) {
+    foreach ($this->listTestFiles() as $filename) {
       $message = t('The file @file has an invalid extension.', array('@file' => $filename));
       $this->assertTrue(db_query("SELECT 1 FROM {watchdog} WHERE message = :message", array(':message' => $message))->fetchField());
+    }
+
+    // Test that query string and fragments are removed.
+    $enclosure = new FeedsEnclosure('http://example.com/image.jpg?thing=stuff', 'text/plain');
+    $this->assertEqual($enclosure->getLocalValue(), 'image.jpg');
+    $enclosure = new FeedsEnclosure('http://example.com/image.jpg#stuff', 'text/plain');
+    $this->assertEqual($enclosure->getLocalValue(), 'image.jpg');
+    $enclosure = new FeedsEnclosure('http://example.com/image.JPG?thing=stuff#stuff', 'text/plain');
+    $this->assertEqual($enclosure->getLocalValue(), 'image.JPG');
+  }
+
+  /**
+   * Tests if values are cleared out when an empty value or no value
+   * is provided.
+   */
+  public function testClearOutValues() {
+    variable_set('feeds_never_use_curl', TRUE);
+
+    $this->createContentType(array(), array('files' => 'file'));
+    $typename = $this->createContentType(array(), array(
+      'images' => 'image',
+    ));
+
+    // Enable title and alt mapping.
+    $edit = array(
+      'instance[settings][alt_field]' => 1,
+      'instance[settings][title_field]' => 1,
+    );
+    $this->drupalPost("admin/structure/types/manage/$typename/fields/field_images", $edit, t('Save settings'));
+
+    // Create and configure importer.
+    $this->createImporterConfiguration('Content CSV', 'csv');
+    $this->setSettings('csv', NULL, array(
+      'content_type' => '',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+    $this->setPlugin('csv', 'FeedsCSVParser');
+    $this->setSettings('csv', 'FeedsNodeProcessor', array(
+      'bundle' => $typename,
+      'update_existing' => 1,
+    ));
+    $this->addMappings('csv', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+      1 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      2 => array(
+        'source' => 'file',
+        'target' => 'field_images:uri',
+      ),
+      3 => array(
+        'source' => 'title2',
+        'target' => 'field_images:title',
+      ),
+      4 => array(
+        'source' => 'alt',
+        'target' => 'field_images:alt',
+      ),
+    ));
+
+    // Import.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files-remote.csv', array('absolute' => TRUE)),
+    );
+    $this->drupalPost('import/csv', $edit, 'Import');
+    $this->assertText('Created 5 nodes');
+
+    // Assert files exist.
+    $files = $this->listTestFiles();
+    foreach ($files as $file) {
+      $file_path = drupal_realpath('public://') . '/' . str_replace(' ', '_', $file);
+      $this->assertTrue(file_exists($file_path), format_string('The file %file exists.', array(
+        '%file' => $file_path,
+      )));
+    }
+
+    // Assert files exists with the expected alt/title on node edit form.
+    $entities = db_select('feeds_item')
+      ->fields('feeds_item', array('entity_id'))
+      ->condition('id', 'csv')
+      ->execute()
+      ->fetchAll();
+
+    foreach ($entities as $i => $entity) {
+      $this->drupalGet('node/' . $entity->entity_id . '/edit');
+      $this->assertRaw(str_replace(' ', '_', array_shift($files)));
+      $this->assertRaw("Alt text $i");
+      $this->assertRaw("Title text $i");
+    }
+
+    // Import CSV with empty alt/title fields and check if these are removed.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files-empty-alt-title.csv', array('absolute' => TRUE)),
+    );
+    $this->drupalPost('import/csv', $edit, 'Import');
+    $this->assertText('Updated 5 nodes');
+
+    $files = $this->listTestFiles();
+    foreach ($entities as $i => $entity) {
+      $this->drupalGet('node/' . $entity->entity_id . '/edit');
+      $this->assertRaw(str_replace(' ', '_', array_shift($files)));
+      $this->assertNoRaw("Alt text $i");
+      $this->assertNoRaw("Title text $i");
+    }
+
+    // Import CSV with empty file fields and check if all files are removed.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/feeds/files-empty.csv', array('absolute' => TRUE)),
+    );
+    $this->drupalPost('import/csv', $edit, 'Import');
+    $this->assertText('Updated 5 nodes');
+
+    // Assert files are removed.
+    $files = $this->listTestFiles();
+    foreach ($files as $file) {
+      $file_path = drupal_realpath('public://') . '/' . str_replace(' ', '_', $file);
+      $this->assertFalse(file_exists($file_path), format_string('The file %file no longer exists.', array(
+        '%file' => $file_path,
+      )));
+    }
+    // Check if the files are removed from the node edit form as well.
+    foreach ($entities as $i => $entity) {
+      $this->drupalGet('node/' . $entity->entity_id . '/edit');
+      $this->assertNoRaw(str_replace(' ', '_', array_shift($files)));
     }
   }
 
   /**
    * Lists test files.
    */
-  public function _testFiles() {
-    return array('tubing.jpeg', 'foosball.jpeg', 'attersee.jpeg', 'hstreet.jpeg', 'la fayette.jpeg');
+  protected function listTestFiles() {
+    return array(
+      'tubing.jpeg',
+      'foosball.jpeg',
+      'attersee.jpeg',
+      'hstreet.jpeg',
+      'la fayette.jpeg',
+    );
   }
 
-  /**
-   * Handle file field widgets.
-   */
-  public function selectFieldWidget($fied_name, $field_type) {
-    if ($field_type == 'file') {
-      return 'file_generic';
-    }
-    else {
-      return parent::selectFieldWidget($fied_name, $field_type);
-    }
-  }
 }
