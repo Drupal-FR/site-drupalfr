@@ -1,6 +1,20 @@
 <?php
 
 /**
+ * Implements hook_menu().
+ */
+function drupalfr_events_menu() {
+  return array(
+    'prochains-evenements' => array(
+      'title' => 'Prochains évènements',
+      'page callback' => 'drupalfr_events_upcoming_events',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    ),
+  );
+}
+
+/**
  * Implements hook_theme().
  */
 function drupalfr_events_theme() {
@@ -29,15 +43,23 @@ function drupalfr_events_block_info() {
  */
 function drupalfr_events_block_view($delta = '') {
   $block = array();
-  switch($delta) {
+  switch ($delta) {
     case 'next_events':
       $events = drupalfr_events_fetch_events(6);
       $block = array(
         'subject' => t('6 prochains évènements meetup.com'),
         'content' => array(
           'events' => drupalfr_events_display_events($events, 'teaser'),
-          'link' => array('#markup' => l(t("Programme détaillé"), 'prochains-evenements', array('attributes' => array('class'=>array('more-link'))))),
-        )
+          'link' => array(
+            '#markup' => l(t('Programme détaillé'), 'prochains-evenements', array(
+              'attributes' => array(
+                'class' => array(
+                  'more-link',
+                ),
+              ))
+            ),
+          ),
+        ),
       );
       break;
   }
@@ -47,9 +69,9 @@ function drupalfr_events_block_view($delta = '') {
 /**
  * Displays the upcoming events.
  *
- * @param $events
+ * @param array $events
  *   Array of events coming from the raw answer of meetup.com API response.
- * @param $display_mode
+ * @param string $display_mode
  *   Display mode to choose the render format. Can be either teaser of full.
  *
  * @return array
@@ -71,16 +93,20 @@ function drupalfr_events_display_events($events, $display_mode = 'teaser') {
 /**
  * Fetch the upcoming events from Meetup.com API.
  *
- * @param $items
- *   Number of items to extract from the feed.
+ * @param mixed $items
+ *   Number of items to extract from the feed. If not provided, all the meetups
+ *   will be fetched.
  *
  * @return mixed
  *   Returns FALSE if the feed is down or doesn't have any upcoming event.
  *   Returns the raw array of the upcoming events extracted from
  *   meetup.com API response.
  */
-function drupalfr_events_fetch_events($items = 5) {
-  $query_url = 'https://api.meetup.com/2/events?key=4051646f3d23a6114243d5834497d&sign=true&status=upcoming&group_urlname=drupal-france-francophonie&page=' . $items;
+function drupalfr_events_fetch_events($items = FALSE) {
+  $query_url = 'https://api.meetup.com/2/events?key=4051646f3d23a6114243d5834497d&sign=true&status=upcoming&group_urlname=drupal-france-francophonie';
+  if ($items) {
+    $query_url .= '&page=' . $items;
+  }
   $response = drupal_http_request($query_url);
   if ($response->code == 200) {
     // Extract the response data.
@@ -107,19 +133,6 @@ function drupalfr_events_preprocess_dfr_events_listing($variables) {
   $variables['classes'] = implode(' ', array('drupalfr-events-list', $variables['display_mode']));
 }
 
-/**
- * Implements hook_menu().
- */
-function drupalfr_events_menu() {
-  return array(
-    'prochains-evenements' => array(
-      'title' => 'Prochains évènements',
-      'page callback' => 'drupalfr_events_upcoming_events',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-    ),
-  );
-}
 
 /**
  * Page callback for prochains-evenements.
@@ -129,10 +142,50 @@ function drupalfr_events_upcoming_events() {
     return $content->data;
   }
   else {
-    $events = drupalfr_events_fetch_events(5);
-    $content['events'] = drupalfr_events_display_events($events, 'full');
-    $content['infos'] = array('#markup' => '<p>' . l('Voir tous les évènements', 'http://www.meetup.com/drupal-france-francophonie') . '</p>');
+    $events = drupalfr_events_fetch_events();
+    $map = leaflet_map_get_info('OSM Mapnik');
+    $features = drupalfr_events_prepare_leaflet_features($events);
+
+    // Keep only 5 meetups for the list.
+    $list_events = array_slice($events, 0, 5);
+
+    $content['map'] = array(
+      '#markup' => leaflet_render_map($map, $features, '600px'),
+    );
+    $content['events'] = drupalfr_events_display_events($list_events, 'full');
+    $content['infos'] = array(
+      '#markup' => '<p>' . l(t('Voir tous les évènements'), 'http://www.meetup.com/drupal-france-francophonie') . '</p>',
+    );
     cache_set('upcoming-events-full', $content, 'cache', 3600);
     return $content;
   }
+}
+
+/**
+ * Helper function.
+ *
+ * Prepare leaflet features from meetups events.
+ *
+ * @param array $events
+ *   An array of events from meetup as retrieved with
+ *   drupalfr_events_fetch_events().
+ *
+ * @return array
+ *   An array of leaflet features to give to leaflet_render_map().
+ */
+function drupalfr_events_prepare_leaflet_features($events) {
+  $features = array();
+
+  foreach ($events as $event) {
+    if (isset($event['venue'])) {
+      $features[] = array(
+        'type' => 'point',
+        'lat' => $event['venue']['lat'],
+        'lon' => $event['venue']['lon'],
+        'popup' => l($event['name'], $event['event_url'], array('absolute' => TRUE)),
+      );
+    }
+  }
+
+  return $features;
 }

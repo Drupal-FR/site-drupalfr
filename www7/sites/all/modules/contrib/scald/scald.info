@@ -1,0 +1,30 @@
+name = Scald Core
+description = "Scald is Content, Attribution, Licensing, Distribution.  This is the core of the framework."
+package = Scald
+core = 7.x
+
+dependencies[] = taxonomy
+dependencies[] = ctools
+dependencies[] = image
+dependencies[] = text
+
+test_dependencies[] = i18n
+test_dependencies[] = i18n_string
+
+files[] = includes/scald_views_handler_field_actions.inc
+files[] = includes/scald_views_handler_field_data.inc
+files[] = includes/scald_views_handler_field_representation.inc
+files[] = includes/scald_views_handler_filter_actions.inc
+files[] = includes/scald_views_handler_filter_atom_provider.inc
+files[] = includes/scald_views_handler_filter_atom_type.inc
+files[] = includes/ScaldAtom.inc
+files[] = includes/ScaldAtomController.inc
+files[] = tests/scald.test
+files[] = scald.features.inc
+
+; Information added by Drupal.org packaging script on 2015-05-21
+version = "7.x-1.4"
+core = "7.x"
+project = "scald"
+datestamp = "1432202882"
+

@@ -914,7 +914,7 @@ class SearchApiSolrConnection implements SearchApiSolrConnectionInterface {
           }
         }
         if ($qalt) {
-          $params['q.alt'] = implode(' ', $qalt);
+          $params['q.alt'] = implode(' AND ', $qalt);
         }
         if (empty($params['fq'])) {
           unset($params['fq']);

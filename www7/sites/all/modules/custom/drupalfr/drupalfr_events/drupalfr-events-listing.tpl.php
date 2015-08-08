@@ -1,3 +1,9 @@
+<?php
+/**
+ * @file
+ * Template for meetups.
+ */
+?>
 <div class="<?php print $classes; ?>">
 <?php foreach($events as $event): ?>
   <div class="drupalfr-event-details drupalfr-event-<?php print $display_mode; ?>">
@@ -13,8 +19,9 @@
         <span class="event-date"><?php print format_date($event['time'] / 1000, 'short'); ?></span> //
         <span class="event-attendees"><?php print $event['yes_rsvp_count']; ?> participants</span>
       </div>
-      <div class="event-description"><?php print $event['description']; ?></div>
-    </p>
+      <?php if (isset($event['description'])): ?>
+        <div class="event-description"><?php print $event['description']; ?></div>
+      <?php endif; ?>
   <?php endif; ?>
   </div>
 <?php endforeach; ?>

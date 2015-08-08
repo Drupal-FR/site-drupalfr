@@ -13,26 +13,38 @@ UPDATE content_type_profile     SET field_link_url       = 'http://drupalfr.org'
 UPDATE content_type_profile     SET field_realname_value = 'REAL NAME'                     WHERE field_realname_value IS NOT NULL;
 
 -- User fields.
-UPDATE field_data_field_msn       SET field_msn_email       = CONCAT(entity_id, '@localhost.local') WHERE field_msn_email       IS NOT NULL;
-UPDATE field_data_field_mail      SET field_mail_email      = CONCAT(entity_id, '@localhost.local') WHERE field_mail_email      IS NOT NULL;
-UPDATE field_data_field_icq       SET field_icq_value       = entity_id                             WHERE field_icq_value       IS NOT NULL;
-UPDATE field_data_field_jabber    SET field_jabber_value    = entity_id                             WHERE field_jabber_value    IS NOT NULL;
-UPDATE field_data_field_link      SET field_link_url        = 'http://drupalfr.org'                 WHERE field_link_url        IS NOT NULL;
-UPDATE field_data_field_realname  SET field_realname_value  = 'REAL NAME'                           WHERE field_realname_value  IS NOT NULL;
-UPDATE field_data_field_nickname  SET field_nickname_value  = 'NICK NAME'                           WHERE field_nickname_value  IS NOT NULL;
-UPDATE field_data_field_biography SET field_biography_value = 'Biography'                           WHERE field_biography_value IS NOT NULL;
+UPDATE field_data_field_msn         SET field_msn_email         = CONCAT(entity_id, '@localhost.local') WHERE field_msn_email         IS NOT NULL;
+UPDATE field_data_field_mail        SET field_mail_email        = CONCAT(entity_id, '@localhost.local') WHERE field_mail_email        IS NOT NULL;
+UPDATE field_data_field_icq         SET field_icq_value         = entity_id                             WHERE field_icq_value         IS NOT NULL;
+UPDATE field_data_field_jabber      SET field_jabber_value      = entity_id                             WHERE field_jabber_value      IS NOT NULL;
+UPDATE field_data_field_facebook    SET field_facebook_value    = entity_id                             WHERE field_facebook_value    IS NOT NULL;
+UPDATE field_data_field_twitter     SET field_twitter_value     = entity_id                             WHERE field_twitter_value     IS NOT NULL;
+UPDATE field_data_field_linkedin    SET field_linkedin_value    = entity_id                             WHERE field_linkedin_value    IS NOT NULL;
+UPDATE field_data_field_viadeo      SET field_viadeo_value      = entity_id                             WHERE field_viadeo_value      IS NOT NULL;
+UPDATE field_data_field_google_plus SET field_google_plus_value = entity_id                             WHERE field_google_plus_value IS NOT NULL;
+UPDATE field_data_field_drupal_org  SET field_drupal_org_value  = entity_id                             WHERE field_drupal_org_value  IS NOT NULL;
+UPDATE field_data_field_link        SET field_link_url          = 'http://drupalfr.org'                 WHERE field_link_url          IS NOT NULL;
+UPDATE field_data_field_realname    SET field_realname_value    = 'REAL NAME'                           WHERE field_realname_value    IS NOT NULL;
+UPDATE field_data_field_nickname    SET field_nickname_value    = 'NICK NAME'                           WHERE field_nickname_value    IS NOT NULL;
+UPDATE field_data_field_biography   SET field_biography_value   = 'Biography'                           WHERE field_biography_value   IS NOT NULL;
 -- field_planete_rss?
 -- field_membership_number?
 
 -- User field revisions.
-UPDATE field_revision_field_msn       SET field_msn_email       = CONCAT(entity_id, '@localhost.local') WHERE field_msn_email       IS NOT NULL;
-UPDATE field_revision_field_mail      SET field_mail_email      = CONCAT(entity_id, '@localhost.local') WHERE field_mail_email      IS NOT NULL;
-UPDATE field_revision_field_icq       SET field_icq_value       = entity_id                             WHERE field_icq_value       IS NOT NULL;
-UPDATE field_revision_field_jabber    SET field_jabber_value    = entity_id                             WHERE field_jabber_value    IS NOT NULL;
-UPDATE field_revision_field_link      SET field_link_url        = 'http://drupalfr.org'                 WHERE field_link_url        IS NOT NULL;
-UPDATE field_revision_field_realname  SET field_realname_value  = 'REAL NAME'                           WHERE field_realname_value  IS NOT NULL;
-UPDATE field_revision_field_nickname  SET field_nickname_value  = 'NICK NAME'                           WHERE field_nickname_value  IS NOT NULL;
-UPDATE field_revision_field_biography SET field_biography_value = 'Biography'                           WHERE field_biography_value IS NOT NULL;
+UPDATE field_revision_field_msn         SET field_msn_email         = CONCAT(entity_id, '@localhost.local') WHERE field_msn_email         IS NOT NULL;
+UPDATE field_revision_field_mail        SET field_mail_email        = CONCAT(entity_id, '@localhost.local') WHERE field_mail_email        IS NOT NULL;
+UPDATE field_revision_field_icq         SET field_icq_value         = entity_id                             WHERE field_icq_value         IS NOT NULL;
+UPDATE field_revision_field_jabber      SET field_jabber_value      = entity_id                             WHERE field_jabber_value      IS NOT NULL;
+UPDATE field_revision_field_facebook    SET field_facebook_value    = entity_id                             WHERE field_facebook_value    IS NOT NULL;
+UPDATE field_revision_field_twitter     SET field_twitter_value     = entity_id                             WHERE field_twitter_value     IS NOT NULL;
+UPDATE field_revision_field_linkedin    SET field_linkedin_value    = entity_id                             WHERE field_linkedin_value    IS NOT NULL;
+UPDATE field_revision_field_viadeo      SET field_viadeo_value      = entity_id                             WHERE field_viadeo_value      IS NOT NULL;
+UPDATE field_revision_field_google_plus SET field_google_plus_value = entity_id                             WHERE field_google_plus_value IS NOT NULL;
+UPDATE field_revision_field_drupal_org  SET field_drupal_org_value  = entity_id                             WHERE field_drupal_org_value  IS NOT NULL;
+UPDATE field_revision_field_link        SET field_link_url          = 'http://drupalfr.org'                 WHERE field_link_url          IS NOT NULL;
+UPDATE field_revision_field_realname    SET field_realname_value    = 'REAL NAME'                           WHERE field_realname_value    IS NOT NULL;
+UPDATE field_revision_field_nickname    SET field_nickname_value    = 'NICK NAME'                           WHERE field_nickname_value    IS NOT NULL;
+UPDATE field_revision_field_biography   SET field_biography_value   = 'Biography'                           WHERE field_biography_value   IS NOT NULL;
 
 -- User commerce address.
 UPDATE field_data_commerce_customer_address SET

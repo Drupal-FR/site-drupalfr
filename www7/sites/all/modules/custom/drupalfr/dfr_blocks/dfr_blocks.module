@@ -27,10 +27,6 @@ function dfr_blocks_block_info() {
     'info' => "DrupalFR : Qui sommes nous",
     'cache' => DRUPAL_CACHE_PER_PAGE,
   );
-  $blocks['twitter_asso'] = array(
-    'info' => "DrupalFR : Twitter #drupalfr",
-    'cache' => DRUPAL_CACHE_GLOBAL,
-  );
 
   return $blocks;
 }
@@ -59,10 +55,6 @@ function dfr_blocks_block_view($delta = '') {
     // Qui sommes nous.
     case 'about_us':
       return dfr_blocks_block_about_us();
-      break;
-    // Twitter asso.
-    case 'twitter_asso':
-      return dfr_blocks_block_twitter_asso();
       break;
   }
 }
@@ -232,28 +224,6 @@ function dfr_blocks_block_about_us() {
         '#options' => array(
           'attributes' => array('class' => array('btn-link')),
           'html' => FALSE,
-        ),
-      ),
-    ),
-  );
-}
-
-function dfr_blocks_block_twitter_asso() {
-  $content = twitter_pull_render('#drupalfr');
-  return array(
-    'subject' => "Twitter #drupalfr",
-    'content' => array(
-      'text' => array(
-        '#markup' => $content,
-      ),
-      'link' => array(
-        '#theme' => 'link',
-        '#text' => "Compte @drupalfr",
-        '#path' => 'http://twitter.com/drupalfr',
-        '#options' => array(
-          'attributes' => array('class' => array('btn-link')),
-          'html' => FALSE,
-          'absolute' => TRUE,
         ),
       ),
     ),
