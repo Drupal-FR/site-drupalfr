@@ -149,9 +149,7 @@ function drupalfr_events_upcoming_events() {
     // Keep only 5 meetups for the list.
     $list_events = array_slice($events, 0, 5);
 
-    $content['map'] = array(
-      '#markup' => leaflet_render_map($map, $features, '600px'),
-    );
+    $content['map'] = leaflet_build_map($map, $features, '600px');
     $content['events'] = drupalfr_events_display_events($list_events, 'full');
     $content['infos'] = array(
       '#markup' => '<p>' . l(t('Voir tous les évènements'), 'http://www.meetup.com/drupal-france-francophonie') . '</p>',
