@@ -231,3 +231,45 @@ function dfr_emploi_approve_job_offer(&$node, $context) {
   $node->field_flag_moderation[LANGUAGE_NONE][0]['value'] = 'approved';
   $node->status = 1;
 }
+
+/**
+ * Implements hook_comment_view().
+ *
+ * Removes comments and comment links on job offer for non-moderator.
+ */
+function dfr_emploi_comment_view($comment, $view_mode, $langcode) {
+  if ($comment->node_type == 'comment_node_offre' && !user_access('access job offer comments')) {
+    $comment->content['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_node_view_alter().
+ *
+ * Hides comments and comment links on job offer for non-moderator.
+ */
+function dfr_emploi_node_view_alter(&$build) {
+  if ($build['#bundle'] == 'offre' && !user_access('access job offer comments')) {
+    // Hides comment links.
+    if (isset($build['links']) && isset($build['links']['comment'])) {
+      $build['links']['comment']['#access'] = FALSE;
+    }
+
+    // Hides comments.
+    if (isset($build['comments'])) {
+      $build['comments']['#access'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function dfr_emploi_permission() {
+  return array(
+    'access job offer comments' => array(
+      'title' => t('Access job offer comments'),
+      'description' => t('Display the comments on job offers for moderators.'),
+    ),
+  );
+}
