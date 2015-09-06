@@ -99,7 +99,8 @@ function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
     global $base_url;
     // On arrive sur emploi.*
     if (preg_match('|^https?:\/\/emploi\.(.+)|', $base_url)) {
-      // On veut que le path interne remette emploi en front, sauf s'il y est déjà
+      // On veut que le path interne remette emploi en front, sauf s'il y est
+      // déjà.
       if (0 !== strpos($original_path, 'emploi')) {
         if (!$original_path || $original_path == variable_get('site_frontpage', 'node')) {
           $path = 'emploi';
@@ -117,7 +118,8 @@ function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
         0 === strpos($alias, 'emploi'))
     ) {
       // Quand on est pas sur emploi.*, on regarde si notre path interne ou son
-      // alias commence par emploi, si oui, on tronque et on redirige sur emploi.*
+      // alias commence par emploi, si oui, on tronque et on redirige sur
+      // emploi.*
       if (!isset($alias)) {
         $alias = drupal_lookup_path('alias', $path, $path_language);
       }
@@ -137,7 +139,7 @@ function dfr_emploi_url_inbound_alter(&$path, $original_path, $path_language) {
  */
 function dfr_emploi_block_info() {
   $blocks['creer-offre'] = array(
-    'info' => t('Lien création offre d\'emploi'),
+    'info' => t("Lien création offre d'emploi"),
     'cache' => DRUPAL_CACHE_GLOBAL,
   );
 
@@ -151,7 +153,7 @@ function dfr_emploi_block_view($delta = '') {
   $block = array();
 
   $block['subject'] = '';
-  $block['content'] = l('Déposer une offre', 'node/add/offre', array(
+  $block['content'] = l(t('Déposer une offre'), 'node/add/offre', array(
     'attributes' => array('class' => 'btn-link'),
   ));
   if (user_is_anonymous()) {
@@ -173,7 +175,7 @@ function dfr_emploi_cron() {
     ->fetchAllKeyed();
   $nodes = node_load_multiple(array_keys($results));
   foreach ($nodes as $node) {
-    $lifetime = (int)$node->field_temps_publication['und'][0]['value'] * 30 * 24 * 3600;
+    $lifetime = (int) $node->field_temps_publication['und'][0]['value'] * 30 * 24 * 3600;
     if (REQUEST_TIME > $node->changed + $lifetime) {
       $node->status = 0;
       node_save($node);
