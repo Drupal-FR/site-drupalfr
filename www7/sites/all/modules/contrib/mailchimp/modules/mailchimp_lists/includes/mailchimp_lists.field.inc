@@ -98,17 +98,27 @@ function mailchimp_lists_field_settings_form($this_field, $instance, $has_data) 
   );
   $form['double_opt_in'] = array(
     '#type' => 'checkbox',
-    '#title' => 'Require subscribers to Double Opt-in',
-    '#description' => 'New subscribers will be sent a link with an email they must follow to confirm their subscription.',
+    '#title' => t('Require subscribers to Double Opt-in'),
+    '#description' => t('New subscribers will be sent a link with an email they must follow to confirm their subscription.'),
     '#default_value' => isset($this_field['settings']['double_opt_in']) ? $this_field['settings']['double_opt_in'] : FALSE,
     '#disabled' => $disabled,
   );
   $form['send_welcome'] = array(
     '#type' => 'checkbox',
-    '#title' => 'Send a welcome email to new subscribers',
-    '#description' => 'New subscribers will be sent a welcome email once they are confirmed.',
+    '#title' => t('Send a welcome email to new subscribers'),
+    '#description' => t('New subscribers will be sent a welcome email once they are confirmed.'),
     '#default_value' => isset($this_field['settings']['send_welcome']) ? $this_field['settings']['send_welcome'] : FALSE,
     '#disabled' => $disabled,
+  );
+  $form['unsubscribe_action'] = array(
+    '#type' => 'radios',
+    '#title' => t('Action to take when unchecking this field'),
+    '#description' => t('When this field gets unchecked you can choose if the subscriber gets unsubscribed (to keep the subscriber data in MailChimp) or completely removed from the Mailchimp list.'),
+    '#options' => array(
+      'unsubscribe' => t('Unsubscribe from list'),
+      'remove' => t('Remove from list'),
+    ),
+    '#default_value' => isset($this_field['settings']['unsubscribe_action']) ? $this_field['settings']['unsubscribe_action'] : 'remove',
   );
 
   return $form;
@@ -121,13 +131,13 @@ function mailchimp_lists_field_instance_settings_form($field, $instance) {
   $form = array();
   $mc_list_id = $field['settings']['mc_list_id'];
   $form['show_interest_groups'] = array(
-    '#title' => "Enable Interest Groups",
-    '#type' => "checkbox",
+    '#title' => t('Enable Interest Groups'),
+    '#type' => 'checkbox',
     '#default_value' => $instance['settings']['show_interest_groups'],
   );
   $form['interest_groups_title'] = array(
-    '#title' => "Interest Groups Label",
-    '#type' => "textfield",
+    '#title' => t('Interest Groups Label'),
+    '#type' => 'textfield',
     '#default_value' => isset($instance['settings']['interest_groups_title']) ? $instance['settings']['interest_groups_title'] : "Interest Groups",
   );
 
@@ -146,8 +156,8 @@ function mailchimp_lists_field_instance_settings_form($field, $instance) {
   );
 
   $form['unsubscribe_on_delete'] = array(
-    '#title' => "Unsubscribe on deletion",
-    '#type' => "checkbox",
+    '#title' => t('Unsubscribe on deletion'),
+    '#type' => 'checkbox',
     '#description' => t('Unsubscribe entities from this list when they are deleted.'),
     '#default_value' => $instance['settings']['unsubscribe_on_delete'],
   );
@@ -358,7 +368,40 @@ function mailchimp_lists_field_widget_form(&$form, &$form_state, $field, $instan
       $element['interest_groups'] += mailchimp_interest_groups_form_elements($mc_list, $groups_default, $email);
     }
   }
+
+  // Make a distinction between whether the field is edited by the system or the user.
+  // This is important to prevent unwanted subscription overwrites.
+  // @see _mailchimp_lists_field_postsave()
+  if (isset($element['#entity'])) {
+    // The field is edited via the UI.
+    $element['is_default'] = array(
+      '#type' => 'value',
+      '#value' => FALSE,
+    );
+  }
+  else {
+    // The field is NOT edited via the UI.
+    $element['is_default'] = array(
+      '#type' => 'value',
+      '#value' => TRUE,
+    );
+  }
+
+  $element['#element_validate'] = array('mailchimp_lists_field_widget_form_validate');
+
   return $element;
+}
+
+/**
+ * Validation callback for mailchimp_lists_select widget.
+ */
+function mailchimp_lists_field_widget_form_validate(&$element, &$form_state) {
+  if (isset($element['#access']) && !$element['#access']) {
+    // When the field is not accessible, do not accept any values.
+    // Else the default value will be send to MailChimp, which causes
+    // an existing subscription to be overwritten.
+    form_set_value($element, NULL, $form_state);
+  }
 }
 
 /**
@@ -593,7 +636,17 @@ function _mailchimp_lists_field_postsave($entity_type, $entity, $field, $instanc
       $entity->is_new = (($entity_wrapper->getIdentifier() === FALSE) || ($entity_wrapper->getIdentifier() === NULL));
     }
 
-    if ($entity->is_new && empty($entity->{$instance['field_name']})) {
+    // Check if the field is empty or is set by the system via field_get_default_value().
+    if (empty($items[0]) || !empty($item[0]['is_default'])) {
+      // Check if this email is already subscribed.
+      $email = mailchimp_lists_load_email($instance, $entity);
+      $list_id = $field['settings']['mc_list_id'];
+      $subscribed = mailchimp_is_subscribed($list_id, $email);
+      if ($subscribed) {
+        // The mail address is already subscribed. Do not overwrite the subscription.
+        return;
+      }
+
       $choices = $instance['default_value'][0];
     }
 

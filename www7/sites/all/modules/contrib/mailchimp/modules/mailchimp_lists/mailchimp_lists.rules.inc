@@ -10,7 +10,7 @@
 function mailchimp_lists_rules_action_info() {
   $items = array();
   $items['mailchimp_lists_user_subscribe'] = array(
-    'label' => t('Subscribe or unsubscribe entity from a mailchimp list'),
+    'label' => t('Subscribe or unsubscribe entity from a MailChimp list'),
     'parameter' => array(
       'entity' => array(
         'type' => 'entity',
@@ -19,7 +19,7 @@ function mailchimp_lists_rules_action_info() {
       ),
       'field' => array(
         'type' => '*',
-        'label' => t('Mailchimp List Subscription Field'),
+        'label' => t('MailChimp List Subscription Field'),
         'description' => t('Subscription Field connected to the desired Mailchimp List.'),
         'restriction' => 'selector',
         'wrapped' => TRUE,
@@ -31,7 +31,7 @@ function mailchimp_lists_rules_action_info() {
         'description' => t('True to subscribe, False to unsubscribe'),
       ),
     ),
-    'group' => t('Mailchimp'),
+    'group' => t('MailChimp'),
     'access callback' => 'mailchimp_lists_rules_access_callback',
     'base' => 'mailchimp_lists_rules_action_entity_subscribe',
   );
@@ -45,7 +45,7 @@ function mailchimp_lists_rules_action_entity_subscribe($entity, $field, $subscri
   $field_info = $field->info();
   $choices = reset($field_info['instance']['default_value']);
   $choices['subscribe'] = $subscribe;
-  mailchimp_lists_process_subscribe_form_choices($choices, $field_info['instance'], $field_info['field'], $entity->raw());
+  mailchimp_lists_process_subscribe_form_choices($choices, $field_info['instance'], $field_info['field'], $entity->value());
 }
 
 /**
