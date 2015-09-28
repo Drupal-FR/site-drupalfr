@@ -10,7 +10,7 @@
  */
 function twitter_block_cron() {
   // Regenerate the JavaScript file every day.
-  if (REQUEST_TIME - variable_get('twitter_block_last_cache', 0) >= 86400 && variable_get('twitter_block_cache', TRUE)) {
+  if (REQUEST_TIME - variable_get('twitter_block_last_cache', 0) >= 86400 && variable_get('twitter_block_cache', 0)) {
     // Synchronize the widget code and update it if remote file have changed.
     twitter_block_cache(TRUE);
 
@@ -26,7 +26,21 @@ function twitter_block_help($path, $arg) {
   switch ($path) {
     case 'admin/structure/block/add-twitter-block':
       return '<p>' . t('Use this page to create a new custom Twitter block.') . '</p>';
+    case 'admin/config/system/twitter-block':
+      return '<p>' . t('Configure global settings for Twitter blocks.') . '</p>';
   }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function twitter_block_permission() {
+  return array(
+    'administer twitter block' => array(
+      'title' => t('Administer Twitter Block'),
+      'description' => t('Perform maintenance tasks for Twitter Block.'),
+    ),
+  );
 }
 
 /**
@@ -69,6 +83,17 @@ function twitter_block_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'twitter_block.admin.inc',
   );
+
+  $items['admin/config/system/twitter-block'] = array(
+    'title' => 'Twitter Block',
+    'description' => 'Configure cache settings for Twitter blocks.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('twitter_block_admin_settings_form'),
+    'access arguments' => array('administer twitter block'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'twitter_block.admin.inc',
+  );
+
   return $items;
 }
 
@@ -406,7 +431,7 @@ function twitter_block_block_view($delta) {
   );
 
   // Use a locally cached copy of widgets.js by default.
-  if (variable_get('twitter_block_cache', TRUE) && $url = twitter_block_cache()) {
+  if (variable_get('twitter_block_cache', 0) && $url = twitter_block_cache()) {
     $block['content']['#attached']['js'] = array(
       array(
         'data' => $url,

@@ -6,6 +6,28 @@
  */
 
 /**
+ * Implements hook_admin_settings() for module settings configuration.
+ */
+function twitter_block_admin_settings_form($form, &$form_state) {
+  // Advanced feature configurations.
+  $form['advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['advanced']['twitter_block_cache'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Locally cache widget code'),
+    '#description' => t("If checked, the widget code is retrieved from Twitter and cached locally. It is updated daily from Twitter's servers to ensure updates to widget code are reflected in the local copy."),
+    '#default_value' => variable_get('twitter_block_cache', 0),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
  * Form constructor for the add block form.
  *
  * @see twitter_block_add_block_form_validate()

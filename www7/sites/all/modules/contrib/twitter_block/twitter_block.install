@@ -72,12 +72,15 @@ function twitter_block_uninstall() {
   // Remove variables.
   variable_del('twitter_block_cache');
   variable_del('twitter_block_last_cache');
+}
 
-  // Remove the cache directory.
+/**
+ * Implements hook_disable().
+ *
+ * Remove cache directory if module is disabled (or uninstalled).
+ */
+function twitter_block_disable() {
   twitter_block_clear_js_cache();
-
-  // Clear the site cache.
-  cache_clear_all();
 }
 
 /**
