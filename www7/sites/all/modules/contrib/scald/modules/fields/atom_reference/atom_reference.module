@@ -39,7 +39,7 @@ function atom_reference_field_info() {
       'instance_settings' => array(
         'referencable_types' => array(),
       ),
-      'default_widget' => 'textfield',
+      'default_widget' => 'atom_reference_textfield',
       'default_formatter' => 'title',
       'property_type' => 'scald_atom',
     )
@@ -157,15 +157,13 @@ function atom_reference_field_is_empty($item, $field) {
 function atom_reference_field_formatter_info() {
   // Expose all the Scald Contexts as formatters for the Atom Reference field.
   $formatters = array();
-  $contexts = scald_contexts();
+  $contexts = scald_contexts_public();
   foreach ($contexts as $name => $context) {
-    if (empty($context['hidden'])) {
-      $formatters[$name] = array(
-        'label' => $context['title'],
-        'field types' => array('atom_reference'),
-        'settings' => array('link' => 0, 'override' => 0),
-      );
-    }
+    $formatters[$name] = array(
+      'label' => $context['title'],
+      'field types' => array('atom_reference'),
+      'settings' => array('link' => 0, 'override' => 0),
+    );
   }
 
   return $formatters;
@@ -276,9 +274,12 @@ function atom_reference_field_widget_settings_form($field, $instance) {
     '#description' => t('Scald preview context to be displayed in the edit form.'),
   );
 
-  $contexts = scald_contexts();
+  $contexts = scald_contexts_public();
   foreach ($contexts as $name => $context) {
-    if (empty($context['hidden']) && !empty($context['parseable'])) {
+    // TODO: Atom reference shouldn't need the context to be parsable, there's
+    // nothing converting back and forth between the SAS and the rendered
+    // representation.
+    if (!empty($context['parseable'])) {
       $form['context']['#options'][$name] = $context['title'];
     }
   }
@@ -338,10 +339,10 @@ function atom_reference_field_widget_form(&$form, &$form_state, $field, $instanc
     );
     $context_element['#weight'] = 20;
 
-    $contexts = scald_contexts();
+    $contexts = scald_contexts_public();
     $context_element['#options']['use_the_default'] = t('Use the default');
     foreach ($contexts as $name => $context) {
-      if (empty($context['hidden']) && $name !== 'sdl_library_item') {
+      if ($name !== 'sdl_library_item') {
         $context_element['#options'][$name] = $context['title'];
       }
     }
@@ -404,4 +405,104 @@ function atom_reference_field_widget_form_process(&$element) {
 function atom_reference_field_widget_error($element, $error, $form, &$form_state) {
   $name = implode('][', $element['sid']['#array_parents']);
   form_set_error($name, $error['message']);
+}
+
+/**
+ * Provide default field comparison options.
+ */
+function atom_reference_field_diff_default_options($field_type) {
+  return array(
+    'show_id' => 0,
+    'show_type' => 1,
+    'entity_title' => 'Atom',
+  );
+}
+
+/**
+ * Provide a form for setting the field comparison options.
+ */
+function atom_reference_field_diff_options_form($field_type, $settings) {
+  $options_form = array();
+  $options_form['show_id'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show atom id'),
+    '#default_value' => $settings['show_id'],
+  );
+
+  $options_form['show_type'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show atom type'),
+    '#default_value' => $settings['show_type'],
+  );
+
+  $options_form['entity_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('The title to use for the atom entity'),
+    '#default_value' => $settings['entity_title'],
+    '#description' => t('This can be useful if you call Atoms differently on your website, such as Resources.')
+  );
+
+  return $options_form;
+}
+
+/**
+ * Diff field callback for preloading the scald atom entities.
+ */
+function atom_reference_field_diff_view_prepare(&$old_items, &$new_items, $context) {
+  $sids = array();
+  foreach (array_merge_recursive($old_items, $new_items) as $info) {
+    $sids[$info['sid']] = $info['sid'];
+  }
+  $atoms = scald_atom_load_multiple($sids);
+
+  foreach ($old_items as $delta => $info) {
+    $old_items[$delta]['atom'] = isset($atoms[$info['sid']]) ? $atoms[$info['sid']] : NULL;
+  }
+  foreach ($new_items as $delta => $info) {
+    $new_items[$delta]['atom'] = isset($atoms[$info['sid']]) ? $atoms[$info['sid']] : NULL;
+  }
+}
+
+/**
+ * Diff field callback for parsing atom_reference field comparative values.
+ */
+function atom_reference_field_diff_view($items, $context) {
+  $instance = $context['instance'];
+  $settings = $context['settings'];
+
+  $diff_items = array();
+  foreach ($items as $delta => $item) {
+    if (!isset($item['atom'])) {
+      continue;
+    }
+
+    $diff_items[$delta] = $item['atom']->title;
+
+    if ($settings['show_id'] || $settings['show_type']) {
+      $diff_items[$delta] .= ' (';
+    }
+
+    if ($settings['show_type']) {
+      $diff_items[$delta] .= t('!type', array('!type' => ucfirst($item['atom']->type)));
+    }
+
+    if ($settings['show_id']) {
+      if ($settings['show_type']) {
+        $diff_items[$delta] .= ', ';
+      }
+      $diff_items[$delta] .= t(
+        '@entity_name ID: !id',
+        array(
+          '@entity_name' => $settings['entity_title'],
+          '!id' => $item['atom']->sid
+        )
+      );
+    }
+
+    if ($settings['show_id'] || $settings['show_type']) {
+      $diff_items[$delta] .= ')';
+    }
+  }
+
+  return $diff_items;
 }

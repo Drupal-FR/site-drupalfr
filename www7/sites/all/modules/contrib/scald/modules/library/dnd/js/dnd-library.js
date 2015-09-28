@@ -220,7 +220,8 @@ Drupal.theme.prototype.scaldEmbed = function(atom, context, options) {
 
   // If there are options, update the SAS representation.
   if (options) {
-    output = output.replace(/<!-- scald=\d+(.+?) -->/, '<!-- scald=' + atom.sid + ':' + context + ' ' + JSON.stringify(options) + ' -->');
+    options = (typeof options === 'string') ? options.trim() : JSON.stringify(options);
+    output = output.replace(/<!-- scald=\d+(.+?) -->/, '<!-- scald=' + atom.sid + ':' + context + ' ' + options + ' -->');
   }
 
   return output;

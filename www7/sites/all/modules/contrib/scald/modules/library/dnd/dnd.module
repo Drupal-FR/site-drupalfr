@@ -42,30 +42,62 @@ function dnd_theme() {
 }
 
 /**
+ * Get the list of Scald contexts that can be used in a WYSIWYG, keyed by type.
+ *
+ * @return array
+ *   Returns an associative array, keyed by the atom type machine name and whose
+ *   values are associative arrays, each keyed by the context machine name and
+ *   whose values are the user facing name of this context for this atom type.
+ */
+function dnd_scald_wysiwyg_context_list() {
+  $contexts = &drupal_static(__FUNCTION__, NULL);
+  if (!isset($contexts)) {
+    $types = scald_types();
+    foreach (scald_contexts_public() as $name => $definition) {
+      if (empty($definition['parseable'])) {
+        continue;
+      }
+
+      // There "formats" is actually used nowhere in Scald. Every context is
+      // available to all atom types.
+      $definition['formats'] = $types;
+
+      foreach ($definition['formats'] as $type => $data) {
+        $contexts[$type][$name] = $definition['title'];
+      }
+    }
+    drupal_alter('scald_wysiwyg_context_list', $contexts);
+  }
+
+  return $contexts;
+}
+
+/**
+ * Get the list of Scald contexts machine names that are allowed in WYSIWYG.
+ */
+function dnd_scald_wysiwyg_context_slugs() {
+  $contexts_type = dnd_scald_wysiwyg_context_list();
+  $slugs = array();
+  foreach ($contexts_type as $contexts) {
+    foreach ($contexts as $slug => $label) {
+      $slugs[$slug] = $slug;
+    }
+  }
+
+  return array_values($slugs);
+}
+
+/**
  * Implements hook_library().
  */
 function dnd_library() {
   $path = drupal_get_path('module', 'dnd');
-  $types = scald_types();
-  $contexts = array();
+  $contexts = dnd_scald_wysiwyg_context_list();
   $config = array();
 
-  foreach (scald_contexts() as $name => $definition) {
-    if (!empty($definition['hidden']) || empty($definition['parseable'])) {
-      continue;
-    }
-
-    // There "formats" is actually used nowhere in Scald. Every context is
-    // available to all atom types.
-    $definition['formats'] = $types;
-
-    foreach ($definition['formats'] as $type => $data) {
-      $contexts[$type][$name] = $definition['title'];
-    }
-
-    $config[$name] = scald_context_config_load($name);
+  foreach (dnd_scald_wysiwyg_context_slugs() as $slug) {
+    $config[$slug] = scald_context_config_load($slug);
   }
-  drupal_alter('scald_wysiwyg_context_list', $contexts);
 
   $qtip_settings = '';
   if (function_exists('qtip_fetch_instances_field')) {
@@ -74,6 +106,8 @@ function dnd_library() {
       $qtip_settings = qtip_clean_settings(qtip_load($instance));
     }
   }
+
+  $plugin = mee_store_format() !== 'embed_div' ? 'ckeditor' : 'dndck4';
 
   $libraries['library'] = array(
     'title' => 'DnD Library',
@@ -90,7 +124,7 @@ function dnd_library() {
       // This file is included automatically if the CKEditor plugin is enabled.
       // However we need to load it directly in Drupal so that strings can be
       // translated.
-      $path . '/plugins/ckeditor/lang/en.js' => array(),
+      $path . '/plugins/' . $plugin . '/lang/en.js' => array(),
       // Settings for the library url.
       array(
         'type' => 'setting',
@@ -99,6 +133,7 @@ function dnd_library() {
             'url' => url(dnd_get_library()),
             'contexts' => $contexts,
             'contextDefault' => variable_get('dnd_context_default', 'sdl_editor_representation'),
+            'usesCaptionDefault' => variable_get('dnd_uses_caption_default', TRUE),
             'contexts_config' => $config,
             'qTipSettings' => $qtip_settings,
           ),
@@ -208,26 +243,43 @@ function dnd_library_alter(&$libraries, $module) {
 }
 
 /**
- * Implements hook_edit_editor_attachments_alter().
+ * Implements hook_entity_view_alter().
+ *
+ * Adds the dnd library in case we have quickedit enabled and dnd enabled on the entity.
  */
-function dnd_edit_editor_attachments_alter(&$attachments, $editor, $metadata) {
-  // When Edit module uses CKEditor editor widget, add DnD library if necessary.
-  if ($editor == 'ckeditor') {
-    // If there is at least one field with CKEditor + DnD enabled, add the DnD
-    // library.
-    foreach ($metadata as $field => $data) {
-      if ($data['editor'] == 'ckeditor') {
-        list($entity_type, $entity_id, $field_name, $language, $view_mode) = explode('/', $field);
-        $entity = entity_load_single($entity_type, $entity_id);
-        list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-        $instance_info = field_info_instance($entity_type, $field_name, $bundle);
-        if (!empty($instance_info['settings']['dnd_enabled'])) {
-          $attachments['library'][] = array('dnd', 'library');
-          return;
-        }
+function dnd_entity_view_alter(&$build, $type) {
+  if (!module_exists('quickedit')) {
+    return;
+  }
+
+  if (!user_access('access in-place editing')) {
+    return;
+  }
+
+  // In-place editing is only supported on the front-end.
+  if (path_is_admin(current_path())) {
+    return;
+  }
+
+  $dnd_enabled = FALSE;
+  foreach ($build as $item) {
+    if (!is_array($item)) {
+      continue;
+    }
+    if (isset($item['#field_name'])) {
+      $instance_info = field_info_instance($type, $item['#field_name'], $build['#bundle']);
+      if (!empty($instance_info['settings']['dnd_enabled'])) {
+        $dnd_enabled = TRUE;
+      }
+      if (isset($item['#field_type']) && $item['#field_type'] === 'atom_reference') {
+        $dnd_enabled = TRUE;
       }
     }
   }
+  if ($dnd_enabled) {
+    $build['#attached']['library'][] = array('dnd', 'library');
+  }
+  return;
 }
 
 /**

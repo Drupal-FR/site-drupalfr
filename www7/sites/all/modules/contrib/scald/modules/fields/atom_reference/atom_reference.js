@@ -16,14 +16,14 @@ Drupal.behaviors.atom_reference = {
     var this_behavior_attach = this;
 
     // Record if the edit target link modal frame is updated
-    $('.ctools-modal-content form').bind('formUpdated', function() {
+    $('.ctools-modal-content form', context).bind('formUpdated', function() {
       this_behavior_attach['update_atom_reference_drop_zone'] = true;
     });
 
     // Update drop zone (especially when returning from the edit modal frame).
     if (typeof(this.update_atom_reference_drop_zone) !== 'undefined') {
       this.update_atom_reference_drop_zone = undefined;
-      $('div.atom_reference_drop_zone.atom_reference_processed').each(function() {
+      $('div.atom_reference_drop_zone.atom_reference_processed', context).each(function() {
         var $this = $(this);
         var rendering_context = $this.attr('data-rendering-context');
         var match_atom_id = /<!-- scald=(\d+):.*-->/g.exec($this.html());
