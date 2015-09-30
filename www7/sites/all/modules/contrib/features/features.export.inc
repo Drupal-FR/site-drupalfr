@@ -891,6 +891,9 @@ function features_get_default_map($component, $attribute = NULL, $callback = NUL
  * Retrieve an array of features/components and their current states.
  */
 function features_get_component_states($features = array(), $rebuild_only = TRUE, $reset = FALSE) {
+  // Ensure that the export will be created in the english language.
+  _features_set_export_language();
+
   if ($reset) {
     drupal_static_reset(__FUNCTION__);
   }
