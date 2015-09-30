@@ -54,18 +54,18 @@ function dfr_emploi_views_default_views() {
   );
   $handler->display->display_options['row_options']['separator'] = ' - ';
   $handler->display->display_options['row_options']['hide_empty'] = TRUE;
-  /* Pied de page: Global: Text area */
+  /* Footer: Global: Text area */
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
-  /* Comportement en l'absence de résultats: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre n\'est en attente de modération.';
   $handler->display->display_options['empty']['area']['format'] = '1';
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -74,32 +74,32 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Content: Type de contrat */
+  /* Field: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['label'] = '';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Content: Société */
+  /* Field: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['label'] = '';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_societe']['type'] = 'node_reference_plain';
-  /* Critère de tri: Content: Post date */
+  /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
-  /* Critère de filtrage: Content: Published */
+  /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = 1;
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -118,7 +118,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['row_options']['links'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -126,28 +126,28 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre d\'emploi n\'est disponible selon vos critères de sélection, essayez de les élargir pour voir plus de résultats.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Critère de tri: Content: Post date */
+  /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Content: Published */
+  /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = 1;
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Content: Région (field_region) */
+  /* Filter criterion: Content: Région (field_region) */
   $handler->display->display_options['filters']['field_region_value']['id'] = 'field_region_value';
   $handler->display->display_options['filters']['field_region_value']['table'] = 'field_data_field_region';
   $handler->display->display_options['filters']['field_region_value']['field'] = 'field_region_value';
@@ -166,7 +166,7 @@ function dfr_emploi_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Critère de filtrage: Content: Type de contrat (field_type_contrat) */
+  /* Filter criterion: Content: Type de contrat (field_type_contrat) */
   $handler->display->display_options['filters']['field_type_contrat_tid']['id'] = 'field_type_contrat_tid';
   $handler->display->display_options['filters']['field_type_contrat_tid']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['filters']['field_type_contrat_tid']['field'] = 'field_type_contrat_tid';
@@ -211,14 +211,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '9';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['defaults']['footer'] = FALSE;
-  /* Pied de page: Global: Text area */
+  /* Footer: Global: Text area */
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['content'] = 'Voir template.php pour configuration du texte.';
   $handler->display->display_options['footer']['area']['format'] = '1';
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -226,7 +226,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Voir template.php pour configuration du texte.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Critère de tri: Global: Random */
+  /* Sort criterion: Global: Random */
   $handler->display->display_options['sorts']['random']['id'] = 'random';
   $handler->display->display_options['sorts']['random']['table'] = 'views';
   $handler->display->display_options['sorts']['random']['field'] = 'random';
@@ -291,12 +291,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relation: Content: Author */
+  /* Relationship: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Bulk operations: Content */
+  /* Field: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
@@ -330,7 +330,7 @@ function dfr_emploi_views_default_views() {
       'label' => 'Supprimer offres',
     ),
   );
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -339,47 +339,47 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Content: Post date */
+  /* Field: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Date de création';
   $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
-  /* Champ: Content: Type de contrat */
+  /* Field: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Content: Société */
+  /* Field: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
-  /* Champ: User: Name */
+  /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: User: E-mail */
+  /* Field: User: E-mail */
   $handler->display->display_options['fields']['mail']['id'] = 'mail';
   $handler->display->display_options['fields']['mail']['table'] = 'users';
   $handler->display->display_options['fields']['mail']['field'] = 'mail';
   $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
   $handler->display->display_options['fields']['mail']['label'] = 'Courriel';
-  /* Champ: Content: Flag modération */
+  /* Field: Content: Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['field'] = 'field_flag_moderation';
-  /* Champ: Content: Published */
+  /* Field: Content: Published */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'node';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['label'] = 'Statut';
   $handler->display->display_options['fields']['status']['type'] = 'published-notpublished';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Champ: Content: Edit link */
+  /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
@@ -387,14 +387,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Content: Published */
+  /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status_1']['id'] = 'status_1';
   $handler->display->display_options['filters']['status_1']['table'] = 'node';
   $handler->display->display_options['filters']['status_1']['field'] = 'status';
@@ -416,7 +416,7 @@ function dfr_emploi_views_default_views() {
     15 => 0,
     16 => 0,
   );
-  /* Critère de filtrage: Content: Flag modération (field_flag_moderation) */
+  /* Filter criterion: Content: Flag modération (field_flag_moderation) */
   $handler->display->display_options['filters']['field_flag_moderation_value']['id'] = 'field_flag_moderation_value';
   $handler->display->display_options['filters']['field_flag_moderation_value']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['filters']['field_flag_moderation_value']['field'] = 'field_flag_moderation_value';
@@ -448,13 +448,13 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['row_options']['hide_empty'] = TRUE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['header'] = FALSE;
-  /* Entête: Global: Result summary */
+  /* Header: Global: Result summary */
   $handler->display->display_options['header']['result']['id'] = 'result';
   $handler->display->display_options['header']['result']['table'] = 'views';
   $handler->display->display_options['header']['result']['field'] = 'result';
   $handler->display->display_options['header']['result']['content'] = 'Nous avons actuellement @total poste(s) à pourvoir';
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -462,7 +462,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Cette société n\'a aucune offre d\'emploi disponible pour le moment. <a href="internal:emploi">Consultez les autres offres</a>';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -471,7 +471,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Content: Type de contrat */
+  /* Field: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
@@ -481,7 +481,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Filtre contextuel: Content: Société (field_societe) */
+  /* Contextual filter: Content: Société (field_societe) */
   $handler->display->display_options['arguments']['field_societe_nid']['id'] = 'field_societe_nid';
   $handler->display->display_options['arguments']['field_societe_nid']['table'] = 'field_data_field_societe';
   $handler->display->display_options['arguments']['field_societe_nid']['field'] = 'field_societe_nid';
@@ -561,7 +561,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -569,12 +569,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre n\'a été rejetée.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relation: Content: Author */
+  /* Relationship: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Bulk operations: Content */
+  /* Field: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
@@ -606,7 +606,7 @@ function dfr_emploi_views_default_views() {
       'label' => 'Dépublier les offres',
     ),
   );
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -615,47 +615,47 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Content: Post date */
+  /* Field: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Date de création';
   $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
-  /* Champ: Content: Type de contrat */
+  /* Field: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Content: Société */
+  /* Field: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
-  /* Champ: User: Name */
+  /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: User: E-mail */
+  /* Field: User: E-mail */
   $handler->display->display_options['fields']['mail']['id'] = 'mail';
   $handler->display->display_options['fields']['mail']['table'] = 'users';
   $handler->display->display_options['fields']['mail']['field'] = 'mail';
   $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
   $handler->display->display_options['fields']['mail']['label'] = 'Courriel';
-  /* Champ: Content: Flag modération */
+  /* Field: Content: Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['field'] = 'field_flag_moderation';
-  /* Champ: Content: Published */
+  /* Field: Content: Published */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'node';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['label'] = 'Statut';
   $handler->display->display_options['fields']['status']['type'] = 'published-notpublished';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Champ: Content: Edit link */
+  /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
@@ -663,14 +663,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Content: Flag modération (field_flag_moderation) */
+  /* Filter criterion: Content: Flag modération (field_flag_moderation) */
   $handler->display->display_options['filters']['field_flag_moderation_value']['id'] = 'field_flag_moderation_value';
   $handler->display->display_options['filters']['field_flag_moderation_value']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['filters']['field_flag_moderation_value']['field'] = 'field_flag_moderation_value';
@@ -749,7 +749,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -757,12 +757,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre n\'a été approuvée.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relation: Content: Author */
+  /* Relationship: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Bulk operations: Content */
+  /* Field: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
@@ -794,7 +794,7 @@ function dfr_emploi_views_default_views() {
       'label' => 'Dépublier les offres',
     ),
   );
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -803,47 +803,47 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Content: Post date */
+  /* Field: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Date de création';
   $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
-  /* Champ: Content: Type de contrat */
+  /* Field: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Content: Société */
+  /* Field: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
-  /* Champ: User: Name */
+  /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: User: E-mail */
+  /* Field: User: E-mail */
   $handler->display->display_options['fields']['mail']['id'] = 'mail';
   $handler->display->display_options['fields']['mail']['table'] = 'users';
   $handler->display->display_options['fields']['mail']['field'] = 'mail';
   $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
   $handler->display->display_options['fields']['mail']['label'] = 'Courriel';
-  /* Champ: Content: Flag modération */
+  /* Field: Content: Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['field'] = 'field_flag_moderation';
-  /* Champ: Content: Published */
+  /* Field: Content: Published */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'node';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['label'] = 'Statut';
   $handler->display->display_options['fields']['status']['type'] = 'published-notpublished';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Champ: Content: Edit link */
+  /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
@@ -851,14 +851,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Content: Flag modération (field_flag_moderation) */
+  /* Filter criterion: Content: Flag modération (field_flag_moderation) */
   $handler->display->display_options['filters']['field_flag_moderation_value']['id'] = 'field_flag_moderation_value';
   $handler->display->display_options['filters']['field_flag_moderation_value']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['filters']['field_flag_moderation_value']['field'] = 'field_flag_moderation_value';

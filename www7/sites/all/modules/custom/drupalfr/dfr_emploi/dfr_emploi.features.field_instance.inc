@@ -10,6 +10,39 @@
 function dfr_emploi_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'comment-comment_node_offre-comment_body'
+  $field_instances['comment-comment_node_offre-comment_body'] = array(
+    'bundle' => 'comment_node_offre',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'comment',
+    'field_name' => 'comment_body',
+    'label' => 'Comment',
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 0,
+    ),
+  );
+
   // Exported field_instance: 'node-offre-body'
   $field_instances['node-offre-body'] = array(
     'bundle' => 'offre',
@@ -414,6 +447,7 @@ function dfr_emploi_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('<b>Message envoyé par mail à la personne ayant créé l\'offre d\'emploi lors de la validation/rejet de l\'offre.</b>');
   t('Cette annonce restera publiée pendant ce laps de temps.');
+  t('Comment');
   t('Description');
   t('Flag modération');
   t('Informations de contact');
