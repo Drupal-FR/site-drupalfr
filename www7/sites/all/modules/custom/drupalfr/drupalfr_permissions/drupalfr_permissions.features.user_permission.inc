@@ -10,6 +10,17 @@
 function drupalfr_permissions_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: 'access administration menu'.
+  $permissions['access administration menu'] = array(
+    'name' => 'access administration menu',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+      'node administrateurs' => 'node administrateurs',
+    ),
+    'module' => 'admin_menu',
+  );
+
   // Exported permission: 'access administration pages'.
   $permissions['access administration pages'] = array(
     'name' => 'access administration pages',
@@ -29,6 +40,17 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'views',
+  );
+
+  // Exported permission: 'access checkout'.
+  $permissions['access checkout'] = array(
+    'name' => 'access checkout',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_checkout',
   );
 
   // Exported permission: 'access comments'.
@@ -71,6 +93,34 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'contextual',
   );
 
+  // Exported permission: 'access job offer comments'.
+  $permissions['access job offer comments'] = array(
+    'name' => 'access job offer comments',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'dfr_emploi',
+  );
+
+  // Exported permission: 'access mailchimp signup pages'.
+  $permissions['access mailchimp signup pages'] = array(
+    'name' => 'access mailchimp signup pages',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'mailchimp_signup',
+  );
+
+  // Exported permission: 'access mollom statistics'.
+  $permissions['access mollom statistics'] = array(
+    'name' => 'access mollom statistics',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'mollom',
+  );
+
   // Exported permission: 'access printer-friendly version'.
   $permissions['access printer-friendly version'] = array(
     'name' => 'access printer-friendly version',
@@ -78,6 +128,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'book',
+  );
+
+  // Exported permission: 'access private fields'.
+  $permissions['access private fields'] = array(
+    'name' => 'access private fields',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
   );
 
   // Exported permission: 'access rules debug'.
@@ -194,6 +253,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'bueditor',
   );
 
+  // Exported permission: 'administer checkout'.
+  $permissions['administer checkout'] = array(
+    'name' => 'administer checkout',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_checkout',
+  );
+
   // Exported permission: 'administer comments'.
   $permissions['administer comments'] = array(
     'name' => 'administer comments',
@@ -203,6 +271,33 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'comment',
+  );
+
+  // Exported permission: 'administer commerce_customer_profile entities'.
+  $permissions['administer commerce_customer_profile entities'] = array(
+    'name' => 'administer commerce_customer_profile entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'administer commerce_order entities'.
+  $permissions['administer commerce_order entities'] = array(
+    'name' => 'administer commerce_order entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'administer commerce_product entities'.
+  $permissions['administer commerce_product entities'] = array(
+    'name' => 'administer commerce_product entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
   );
 
   // Exported permission: 'administer contact forms'.
@@ -223,6 +318,33 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'administer contexts'.
+  $permissions['administer contexts'] = array(
+    'name' => 'administer contexts',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'context_ui',
+  );
+
+  // Exported permission: 'administer customer profile types'.
+  $permissions['administer customer profile types'] = array(
+    'name' => 'administer customer profile types',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'administer facets'.
+  $permissions['administer facets'] = array(
+    'name' => 'administer facets',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'facetapi',
+  );
+
   // Exported permission: 'administer features'.
   $permissions['administer features'] = array(
     'name' => 'administer features',
@@ -239,6 +361,24 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'feeds',
+  );
+
+  // Exported permission: 'administer field permissions'.
+  $permissions['administer field permissions'] = array(
+    'name' => 'administer field permissions',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'administer fieldgroups'.
+  $permissions['administer fieldgroups'] = array(
+    'name' => 'administer fieldgroups',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_group',
   );
 
   // Exported permission: 'administer filters'.
@@ -268,6 +408,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'forum',
   );
 
+  // Exported permission: 'administer google analytics'.
+  $permissions['administer google analytics'] = array(
+    'name' => 'administer google analytics',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'googleanalytics',
+  );
+
   // Exported permission: 'administer image styles'.
   $permissions['administer image styles'] = array(
     'name' => 'administer image styles',
@@ -286,6 +435,51 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'locale',
   );
 
+  // Exported permission: 'administer licenses'.
+  $permissions['administer licenses'] = array(
+    'name' => 'administer licenses',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_license',
+  );
+
+  // Exported permission: 'administer line item types'.
+  $permissions['administer line item types'] = array(
+    'name' => 'administer line item types',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_line_item',
+  );
+
+  // Exported permission: 'administer line items'.
+  $permissions['administer line items'] = array(
+    'name' => 'administer line items',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_line_item',
+  );
+
+  // Exported permission: 'administer mailchimp'.
+  $permissions['administer mailchimp'] = array(
+    'name' => 'administer mailchimp',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'mailchimp',
+  );
+
+  // Exported permission: 'administer mailchimp signup entities'.
+  $permissions['administer mailchimp signup entities'] = array(
+    'name' => 'administer mailchimp signup entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'mailchimp_signup',
+  );
+
   // Exported permission: 'administer menu'.
   $permissions['administer menu'] = array(
     'name' => 'administer menu',
@@ -295,6 +489,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'menu',
   );
 
+  // Exported permission: 'administer menu_trail_by_path'.
+  $permissions['administer menu_trail_by_path'] = array(
+    'name' => 'administer menu_trail_by_path',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'menu_trail_by_path',
+  );
+
+  // Exported permission: 'administer module filter'.
+  $permissions['administer module filter'] = array(
+    'name' => 'administer module filter',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'module_filter',
+  );
+
   // Exported permission: 'administer modules'.
   $permissions['administer modules'] = array(
     'name' => 'administer modules',
@@ -302,6 +514,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'system',
+  );
+
+  // Exported permission: 'administer mollom'.
+  $permissions['administer mollom'] = array(
+    'name' => 'administer mollom',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'mollom',
   );
 
   // Exported permission: 'administer nodes'.
@@ -323,6 +544,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'pathauto',
   );
 
+  // Exported permission: 'administer payment methods'.
+  $permissions['administer payment methods'] = array(
+    'name' => 'administer payment methods',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_payment',
+  );
+
+  // Exported permission: 'administer payments'.
+  $permissions['administer payments'] = array(
+    'name' => 'administer payments',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_payment',
+  );
+
   // Exported permission: 'administer permissions'.
   $permissions['administer permissions'] = array(
     'name' => 'administer permissions',
@@ -330,6 +569,24 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'user',
+  );
+
+  // Exported permission: 'administer product pricing'.
+  $permissions['administer product pricing'] = array(
+    'name' => 'administer product pricing',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product_pricing_ui',
+  );
+
+  // Exported permission: 'administer product types'.
+  $permissions['administer product types'] = array(
+    'name' => 'administer product types',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
   );
 
   // Exported permission: 'administer redirects'.
@@ -350,6 +607,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'rules',
   );
 
+  // Exported permission: 'administer scald'.
+  $permissions['administer scald'] = array(
+    'name' => 'administer scald',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'administer scald atoms'.
+  $permissions['administer scald atoms'] = array(
+    'name' => 'administer scald atoms',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
   // Exported permission: 'administer search'.
   $permissions['administer search'] = array(
     'name' => 'administer search',
@@ -357,6 +632,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'search',
+  );
+
+  // Exported permission: 'administer search_api'.
+  $permissions['administer search_api'] = array(
+    'name' => 'administer search_api',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'search_api',
   );
 
   // Exported permission: 'administer site configuration'.
@@ -395,6 +679,13 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'system',
   );
 
+  // Exported permission: 'administer twitter block'.
+  $permissions['administer twitter block'] = array(
+    'name' => 'administer twitter block',
+    'roles' => array(),
+    'module' => 'twitter_block',
+  );
+
   // Exported permission: 'administer url aliases'.
   $permissions['administer url aliases'] = array(
     'name' => 'administer url aliases',
@@ -411,6 +702,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'userpoints',
+  );
+
+  // Exported permission: 'administer userprotect'.
+  $permissions['administer userprotect'] = array(
+    'name' => 'administer userprotect',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'userprotect',
   );
 
   // Exported permission: 'administer users'.
@@ -441,6 +741,27 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'system',
   );
 
+  // Exported permission: 'bypass atom access restrictions'.
+  $permissions['bypass atom access restrictions'] = array(
+    'name' => 'bypass atom access restrictions',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'bypass mollom protection'.
+  $permissions['bypass mollom protection'] = array(
+    'name' => 'bypass mollom protection',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur documentation' => 'modérateur documentation',
+      'modérateur forum' => 'modérateur forum',
+      'node administrateurs' => 'node administrateurs',
+    ),
+    'module' => 'mollom',
+  );
+
   // Exported permission: 'bypass node access'.
   $permissions['bypass node access'] = array(
     'name' => 'bypass node access',
@@ -449,6 +770,15 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'bypass restricted forums'.
+  $permissions['bypass restricted forums'] = array(
+    'name' => 'bypass restricted forums',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'drupalfr_forums',
   );
 
   // Exported permission: 'bypass rules access'.
@@ -470,6 +800,33 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'user',
   );
 
+  // Exported permission: 'change own e-mail'.
+  $permissions['change own e-mail'] = array(
+    'name' => 'change own e-mail',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'userprotect',
+  );
+
+  // Exported permission: 'change own openid'.
+  $permissions['change own openid'] = array(
+    'name' => 'change own openid',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'userprotect',
+  );
+
+  // Exported permission: 'change own password'.
+  $permissions['change own password'] = array(
+    'name' => 'change own password',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'userprotect',
+  );
+
   // Exported permission: 'change own username'.
   $permissions['change own username'] = array(
     'name' => 'change own username',
@@ -488,6 +845,33 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'feeds',
   );
 
+  // Exported permission: 'configure order settings'.
+  $permissions['configure order settings'] = array(
+    'name' => 'configure order settings',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'configure store'.
+  $permissions['configure store'] = array(
+    'name' => 'configure store',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce',
+  );
+
+  // Exported permission: 'context ajax block access'.
+  $permissions['context ajax block access'] = array(
+    'name' => 'context ajax block access',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'context_ui',
+  );
+
   // Exported permission: 'create annuaire content'.
   $permissions['create annuaire content'] = array(
     'name' => 'create annuaire content',
@@ -497,6 +881,96 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'create atom of any type'.
+  $permissions['create atom of any type'] = array(
+    'name' => 'create atom of any type',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'create atom of audio type'.
+  $permissions['create atom of audio type'] = array(
+    'name' => 'create atom of audio type',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'create atom of file type'.
+  $permissions['create atom of file type'] = array(
+    'name' => 'create atom of file type',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'create commerce_customer_profile entities'.
+  $permissions['create commerce_customer_profile entities'] = array(
+    'name' => 'create commerce_customer_profile entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'create commerce_customer_profile entities of bundle billing'.
+  $permissions['create commerce_customer_profile entities of bundle billing'] = array(
+    'name' => 'create commerce_customer_profile entities of bundle billing',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'create commerce_order entities'.
+  $permissions['create commerce_order entities'] = array(
+    'name' => 'create commerce_order entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'create commerce_order entities of bundle commerce_order'.
+  $permissions['create commerce_order entities of bundle commerce_order'] = array(
+    'name' => 'create commerce_order entities of bundle commerce_order',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'create commerce_product entities'.
+  $permissions['create commerce_product entities'] = array(
+    'name' => 'create commerce_product entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'create commerce_product entities of bundle individual_membership'.
+  $permissions['create commerce_product entities of bundle individual_membership'] = array(
+    'name' => 'create commerce_product entities of bundle individual_membership',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'create commerce_product entities of bundle product'.
+  $permissions['create commerce_product entities of bundle product'] = array(
+    'name' => 'create commerce_product entities of bundle product',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
   // Exported permission: 'create doc content'.
   $permissions['create doc content'] = array(
     'name' => 'create doc content',
@@ -504,6 +978,75 @@ function drupalfr_permissions_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'create field_facebook'.
+  $permissions['create field_facebook'] = array(
+    'name' => 'create field_facebook',
+    'roles' => array(
+      'admin' => 'admin',
+      'anonymous user' => 'anonymous user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'create field_google_plus'.
+  $permissions['create field_google_plus'] = array(
+    'name' => 'create field_google_plus',
+    'roles' => array(
+      'admin' => 'admin',
+      'anonymous user' => 'anonymous user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'create field_linkedin'.
+  $permissions['create field_linkedin'] = array(
+    'name' => 'create field_linkedin',
+    'roles' => array(
+      'admin' => 'admin',
+      'anonymous user' => 'anonymous user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'create field_membership_number'.
+  $permissions['create field_membership_number'] = array(
+    'name' => 'create field_membership_number',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'create field_message_moderation'.
+  $permissions['create field_message_moderation'] = array(
+    'name' => 'create field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'create field_twitter'.
+  $permissions['create field_twitter'] = array(
+    'name' => 'create field_twitter',
+    'roles' => array(
+      'admin' => 'admin',
+      'anonymous user' => 'anonymous user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'create field_viadeo'.
+  $permissions['create field_viadeo'] = array(
+    'name' => 'create field_viadeo',
+    'roles' => array(
+      'admin' => 'admin',
+      'anonymous user' => 'anonymous user',
+    ),
+    'module' => 'field_permissions',
   );
 
   // Exported permission: 'create forum content'.
@@ -531,6 +1074,33 @@ function drupalfr_permissions_user_default_permissions() {
     'roles' => array(
       'admin' => 'admin',
       'node administrateurs' => 'node administrateurs',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'create payments'.
+  $permissions['create payments'] = array(
+    'name' => 'create payments',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_payment',
+  );
+
+  // Exported permission: 'create planete content'.
+  $permissions['create planete content'] = array(
+    'name' => 'create planete content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'create planete_feed_source content'.
+  $permissions['create planete_feed_source content'] = array(
+    'name' => 'create planete_feed_source content',
+    'roles' => array(
+      'admin' => 'admin',
     ),
     'module' => 'node',
   );
@@ -564,6 +1134,15 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'delete any atom'.
+  $permissions['delete any atom'] = array(
+    'name' => 'delete any atom',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
   );
 
   // Exported permission: 'delete any doc content'.
@@ -608,6 +1187,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'delete any planete content'.
+  $permissions['delete any planete content'] = array(
+    'name' => 'delete any planete content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'delete any planete_feed_source content'.
+  $permissions['delete any planete_feed_source content'] = array(
+    'name' => 'delete any planete_feed_source content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'delete any story content'.
   $permissions['delete any story content'] = array(
     'name' => 'delete any story content',
@@ -626,6 +1223,15 @@ function drupalfr_permissions_user_default_permissions() {
       'contributeur annonces' => 'contributeur annonces',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'delete own atom'.
+  $permissions['delete own atom'] = array(
+    'name' => 'delete own atom',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
   );
 
   // Exported permission: 'delete own doc content'.
@@ -665,6 +1271,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'delete own planete content'.
+  $permissions['delete own planete content'] = array(
+    'name' => 'delete own planete content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'delete own planete_feed_source content'.
+  $permissions['delete own planete_feed_source content'] = array(
+    'name' => 'delete own planete_feed_source content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'delete own story content'.
   $permissions['delete own story content'] = array(
     'name' => 'delete own story content',
@@ -673,6 +1297,15 @@ function drupalfr_permissions_user_default_permissions() {
       'contributeur annonces' => 'contributeur annonces',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'delete payments'.
+  $permissions['delete payments'] = array(
+    'name' => 'delete payments',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_payment',
   );
 
   // Exported permission: 'delete revisions'.
@@ -691,6 +1324,20 @@ function drupalfr_permissions_user_default_permissions() {
     'roles' => array(
       'admin' => 'admin',
     ),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'delete terms in scald_authors'.
+  $permissions['delete terms in scald_authors'] = array(
+    'name' => 'delete terms in scald_authors',
+    'roles' => array(),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'delete terms in scald_tags'.
+  $permissions['delete terms in scald_tags'] = array(
+    'name' => 'delete terms in scald_tags',
+    'roles' => array(),
     'module' => 'taxonomy',
   );
 
@@ -775,6 +1422,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'taxonomy',
   );
 
+  // Exported permission: 'display drupal links'.
+  $permissions['display drupal links'] = array(
+    'name' => 'display drupal links',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'admin_menu',
+  );
+
   // Exported permission: 'edit any annuaire content'.
   $permissions['edit any annuaire content'] = array(
     'name' => 'edit any annuaire content',
@@ -784,6 +1440,78 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'edit any atom'.
+  $permissions['edit any atom'] = array(
+    'name' => 'edit any atom',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'edit any commerce_customer_profile entity'.
+  $permissions['edit any commerce_customer_profile entity'] = array(
+    'name' => 'edit any commerce_customer_profile entity',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'edit any commerce_customer_profile entity of bundle billing'.
+  $permissions['edit any commerce_customer_profile entity of bundle billing'] = array(
+    'name' => 'edit any commerce_customer_profile entity of bundle billing',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'edit any commerce_order entity'.
+  $permissions['edit any commerce_order entity'] = array(
+    'name' => 'edit any commerce_order entity',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'edit any commerce_order entity of bundle commerce_order'.
+  $permissions['edit any commerce_order entity of bundle commerce_order'] = array(
+    'name' => 'edit any commerce_order entity of bundle commerce_order',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'edit any commerce_product entity'.
+  $permissions['edit any commerce_product entity'] = array(
+    'name' => 'edit any commerce_product entity',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'edit any commerce_product entity of bundle individual_membership'.
+  $permissions['edit any commerce_product entity of bundle individual_membership'] = array(
+    'name' => 'edit any commerce_product entity of bundle individual_membership',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'edit any commerce_product entity of bundle product'.
+  $permissions['edit any commerce_product entity of bundle product'] = array(
+    'name' => 'edit any commerce_product entity of bundle product',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
   );
 
   // Exported permission: 'edit any doc content'.
@@ -830,6 +1558,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'edit any planete content'.
+  $permissions['edit any planete content'] = array(
+    'name' => 'edit any planete content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'edit any planete_feed_source content'.
+  $permissions['edit any planete_feed_source content'] = array(
+    'name' => 'edit any planete_feed_source content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'edit any story content'.
   $permissions['edit any story content'] = array(
     'name' => 'edit any story content',
@@ -838,6 +1584,85 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'edit field_facebook'.
+  $permissions['edit field_facebook'] = array(
+    'name' => 'edit field_facebook',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit field_google_plus'.
+  $permissions['edit field_google_plus'] = array(
+    'name' => 'edit field_google_plus',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit field_linkedin'.
+  $permissions['edit field_linkedin'] = array(
+    'name' => 'edit field_linkedin',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit field_membership_number'.
+  $permissions['edit field_membership_number'] = array(
+    'name' => 'edit field_membership_number',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit field_message_moderation'.
+  $permissions['edit field_message_moderation'] = array(
+    'name' => 'edit field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit field_twitter'.
+  $permissions['edit field_twitter'] = array(
+    'name' => 'edit field_twitter',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit field_viadeo'.
+  $permissions['edit field_viadeo'] = array(
+    'name' => 'edit field_viadeo',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own account'.
+  $permissions['edit own account'] = array(
+    'name' => 'edit own account',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'contributeur annonces' => 'contributeur annonces',
+      'modérateur documentation' => 'modérateur documentation',
+      'modérateur emploi' => 'modérateur emploi',
+      'modérateur forum' => 'modérateur forum',
+      'node administrateurs' => 'node administrateurs',
+    ),
+    'module' => 'userprotect',
   );
 
   // Exported permission: 'edit own annuaire content'.
@@ -850,6 +1675,16 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'edit own atom'.
+  $permissions['edit own atom'] = array(
+    'name' => 'edit own atom',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'scald',
+  );
+
   // Exported permission: 'edit own comments'.
   $permissions['edit own comments'] = array(
     'name' => 'edit own comments',
@@ -857,6 +1692,75 @@ function drupalfr_permissions_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'comment',
+  );
+
+  // Exported permission: 'edit own commerce_customer_profile entities'.
+  $permissions['edit own commerce_customer_profile entities'] = array(
+    'name' => 'edit own commerce_customer_profile entities',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'edit own commerce_customer_profile entities of bundle billing'.
+  $permissions['edit own commerce_customer_profile entities of bundle billing'] = array(
+    'name' => 'edit own commerce_customer_profile entities of bundle billing',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'edit own commerce_order entities'.
+  $permissions['edit own commerce_order entities'] = array(
+    'name' => 'edit own commerce_order entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'edit own commerce_order entities of bundle commerce_order'.
+  $permissions['edit own commerce_order entities of bundle commerce_order'] = array(
+    'name' => 'edit own commerce_order entities of bundle commerce_order',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'edit own commerce_product entities'.
+  $permissions['edit own commerce_product entities'] = array(
+    'name' => 'edit own commerce_product entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'edit own commerce_product entities of bundle individual_membership'.
+  $permissions['edit own commerce_product entities of bundle individual_membership'] = array(
+    'name' => 'edit own commerce_product entities of bundle individual_membership',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'edit own commerce_product entities of bundle product'.
+  $permissions['edit own commerce_product entities of bundle product'] = array(
+    'name' => 'edit own commerce_product entities of bundle product',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
   );
 
   // Exported permission: 'edit own doc content'.
@@ -868,6 +1772,75 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'edit own field_facebook'.
+  $permissions['edit own field_facebook'] = array(
+    'name' => 'edit own field_facebook',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_google_plus'.
+  $permissions['edit own field_google_plus'] = array(
+    'name' => 'edit own field_google_plus',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_linkedin'.
+  $permissions['edit own field_linkedin'] = array(
+    'name' => 'edit own field_linkedin',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_membership_number'.
+  $permissions['edit own field_membership_number'] = array(
+    'name' => 'edit own field_membership_number',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_message_moderation'.
+  $permissions['edit own field_message_moderation'] = array(
+    'name' => 'edit own field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_twitter'.
+  $permissions['edit own field_twitter'] = array(
+    'name' => 'edit own field_twitter',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_viadeo'.
+  $permissions['edit own field_viadeo'] = array(
+    'name' => 'edit own field_viadeo',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
   );
 
   // Exported permission: 'edit own forum content'.
@@ -889,6 +1862,24 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'edit own planete content'.
+  $permissions['edit own planete content'] = array(
+    'name' => 'edit own planete content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'edit own planete_feed_source content'.
+  $permissions['edit own planete_feed_source content'] = array(
+    'name' => 'edit own planete_feed_source content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'edit own story content'.
   $permissions['edit own story content'] = array(
     'name' => 'edit own story content',
@@ -906,6 +1897,20 @@ function drupalfr_permissions_user_default_permissions() {
     'roles' => array(
       'admin' => 'admin',
     ),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'edit terms in scald_authors'.
+  $permissions['edit terms in scald_authors'] = array(
+    'name' => 'edit terms in scald_authors',
+    'roles' => array(),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'edit terms in scald_tags'.
+  $permissions['edit terms in scald_tags'] = array(
+    'name' => 'edit terms in scald_tags',
+    'roles' => array(),
     'module' => 'taxonomy',
   );
 
@@ -999,6 +2004,49 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'userpoints',
   );
 
+  // Exported permission: 'fetch any atom'.
+  $permissions['fetch any atom'] = array(
+    'name' => 'fetch any atom',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'fetch own atom'.
+  $permissions['fetch own atom'] = array(
+    'name' => 'fetch own atom',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'flag accepted_answer'.
+  $permissions['flag accepted_answer'] = array(
+    'name' => 'flag accepted_answer',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'flag',
+  );
+
+  // Exported permission: 'flush caches'.
+  $permissions['flush caches'] = array(
+    'name' => 'flush caches',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'admin_menu',
+  );
+
+  // Exported permission: 'generate features'.
+  $permissions['generate features'] = array(
+    'name' => 'generate features',
+    'roles' => array(),
+    'module' => 'features',
+  );
+
   // Exported permission: 'import planet feeds'.
   $permissions['import planet feeds'] = array(
     'name' => 'import planet feeds',
@@ -1033,6 +2081,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'pathauto',
+  );
+
+  // Exported permission: 'opt-in or out of tracking'.
+  $permissions['opt-in or out of tracking'] = array(
+    'name' => 'opt-in or out of tracking',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'googleanalytics',
   );
 
   // Exported permission: 'post comments'.
@@ -1072,6 +2129,13 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
+  // Exported permission: 'publish editable content'.
+  $permissions['publish editable content'] = array(
+    'name' => 'publish editable content',
+    'roles' => array(),
+    'module' => 'publishcontent',
+  );
+
   // Exported permission: 'publish editable offre content'.
   $permissions['publish editable offre content'] = array(
     'name' => 'publish editable offre content',
@@ -1106,6 +2170,29 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'publishcontent',
+  );
+
+  // Exported permission: 'rename features'.
+  $permissions['rename features'] = array(
+    'name' => 'rename features',
+    'roles' => array(),
+    'module' => 'features',
+  );
+
+  // Exported permission: 'report to mollom'.
+  $permissions['report to mollom'] = array(
+    'name' => 'report to mollom',
+    'roles' => array(),
+    'module' => 'mollom',
+  );
+
+  // Exported permission: 'restrict atom access'.
+  $permissions['restrict atom access'] = array(
+    'name' => 'restrict atom access',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'scald',
   );
 
   // Exported permission: 'revert revisions'.
@@ -1157,6 +2244,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'locale',
   );
 
+  // Exported permission: 'unflag accepted_answer'.
+  $permissions['unflag accepted_answer'] = array(
+    'name' => 'unflag accepted_answer',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'flag',
+  );
+
   // Exported permission: 'unlock planet feeds'.
   $permissions['unlock planet feeds'] = array(
     'name' => 'unlock planet feeds',
@@ -1194,6 +2290,13 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
+  // Exported permission: 'unpublish editable content'.
+  $permissions['unpublish editable content'] = array(
+    'name' => 'unpublish editable content',
+    'roles' => array(),
+    'module' => 'publishcontent',
+  );
+
   // Exported permission: 'unpublish editable offre content'.
   $permissions['unpublish editable offre content'] = array(
     'name' => 'unpublish editable offre content',
@@ -1221,6 +2324,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'publishcontent',
   );
 
+  // Exported permission: 'update payments'.
+  $permissions['update payments'] = array(
+    'name' => 'update payments',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_payment',
+  );
+
   // Exported permission: 'use PHP for settings'.
   $permissions['use PHP for settings'] = array(
     'name' => 'use PHP for settings',
@@ -1228,6 +2340,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'php',
+  );
+
+  // Exported permission: 'use PHP for tracking visibility'.
+  $permissions['use PHP for tracking visibility'] = array(
+    'name' => 'use PHP for tracking visibility',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'googleanalytics',
   );
 
   // Exported permission: 'use advanced search'.
@@ -1238,6 +2359,13 @@ function drupalfr_permissions_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'search',
+  );
+
+  // Exported permission: 'use ctools import'.
+  $permissions['use ctools import'] = array(
+    'name' => 'use ctools import',
+    'roles' => array(),
+    'module' => 'ctools',
   );
 
   // Exported permission: 'use flag import'.
@@ -1304,6 +2432,396 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'filter',
   );
 
+  // Exported permission: 'view any atom'.
+  $permissions['view any atom'] = array(
+    'name' => 'view any atom',
+    'roles' => array(
+      'admin' => 'admin',
+      'anonymous user' => 'anonymous user',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'view any commerce_customer_profile entity'.
+  $permissions['view any commerce_customer_profile entity'] = array(
+    'name' => 'view any commerce_customer_profile entity',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'view any commerce_customer_profile entity of bundle billing'.
+  $permissions['view any commerce_customer_profile entity of bundle billing'] = array(
+    'name' => 'view any commerce_customer_profile entity of bundle billing',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'view any commerce_order entity'.
+  $permissions['view any commerce_order entity'] = array(
+    'name' => 'view any commerce_order entity',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'view any commerce_order entity of bundle commerce_order'.
+  $permissions['view any commerce_order entity of bundle commerce_order'] = array(
+    'name' => 'view any commerce_order entity of bundle commerce_order',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'view any commerce_product entity'.
+  $permissions['view any commerce_product entity'] = array(
+    'name' => 'view any commerce_product entity',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view any commerce_product entity of bundle individual_membership'.
+  $permissions['view any commerce_product entity of bundle individual_membership'] = array(
+    'name' => 'view any commerce_product entity of bundle individual_membership',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view any commerce_product entity of bundle product'.
+  $permissions['view any commerce_product entity of bundle product'] = array(
+    'name' => 'view any commerce_product entity of bundle product',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view any unpublished annuaire content'.
+  $permissions['view any unpublished annuaire content'] = array(
+    'name' => 'view any unpublished annuaire content',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished content'.
+  $permissions['view any unpublished content'] = array(
+    'name' => 'view any unpublished content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished doc content'.
+  $permissions['view any unpublished doc content'] = array(
+    'name' => 'view any unpublished doc content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished forum content'.
+  $permissions['view any unpublished forum content'] = array(
+    'name' => 'view any unpublished forum content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished offre content'.
+  $permissions['view any unpublished offre content'] = array(
+    'name' => 'view any unpublished offre content',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished page content'.
+  $permissions['view any unpublished page content'] = array(
+    'name' => 'view any unpublished page content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished planete content'.
+  $permissions['view any unpublished planete content'] = array(
+    'name' => 'view any unpublished planete content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished planete_feed_source content'.
+  $permissions['view any unpublished planete_feed_source content'] = array(
+    'name' => 'view any unpublished planete_feed_source content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view any unpublished story content'.
+  $permissions['view any unpublished story content'] = array(
+    'name' => 'view any unpublished story content',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'view_unpublished',
+  );
+
+  // Exported permission: 'view field_facebook'.
+  $permissions['view field_facebook'] = array(
+    'name' => 'view field_facebook',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view field_google_plus'.
+  $permissions['view field_google_plus'] = array(
+    'name' => 'view field_google_plus',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view field_linkedin'.
+  $permissions['view field_linkedin'] = array(
+    'name' => 'view field_linkedin',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view field_membership_number'.
+  $permissions['view field_membership_number'] = array(
+    'name' => 'view field_membership_number',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view field_message_moderation'.
+  $permissions['view field_message_moderation'] = array(
+    'name' => 'view field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view field_twitter'.
+  $permissions['view field_twitter'] = array(
+    'name' => 'view field_twitter',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view field_viadeo'.
+  $permissions['view field_viadeo'] = array(
+    'name' => 'view field_viadeo',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own atom'.
+  $permissions['view own atom'] = array(
+    'name' => 'view own atom',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'scald',
+  );
+
+  // Exported permission: 'view own commerce_customer_profile entities'.
+  $permissions['view own commerce_customer_profile entities'] = array(
+    'name' => 'view own commerce_customer_profile entities',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'view own commerce_customer_profile entities of bundle billing'.
+  $permissions['view own commerce_customer_profile entities of bundle billing'] = array(
+    'name' => 'view own commerce_customer_profile entities of bundle billing',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_customer',
+  );
+
+  // Exported permission: 'view own commerce_order entities'.
+  $permissions['view own commerce_order entities'] = array(
+    'name' => 'view own commerce_order entities',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'view own commerce_order entities of bundle commerce_order'.
+  $permissions['view own commerce_order entities of bundle commerce_order'] = array(
+    'name' => 'view own commerce_order entities of bundle commerce_order',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+      'bureau' => 'bureau',
+    ),
+    'module' => 'commerce_order',
+  );
+
+  // Exported permission: 'view own commerce_product entities'.
+  $permissions['view own commerce_product entities'] = array(
+    'name' => 'view own commerce_product entities',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view own commerce_product entities of bundle individual_membership'.
+  $permissions['view own commerce_product entities of bundle individual_membership'] = array(
+    'name' => 'view own commerce_product entities of bundle individual_membership',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view own commerce_product entities of bundle product'.
+  $permissions['view own commerce_product entities of bundle product'] = array(
+    'name' => 'view own commerce_product entities of bundle product',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view own field_facebook'.
+  $permissions['view own field_facebook'] = array(
+    'name' => 'view own field_facebook',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_google_plus'.
+  $permissions['view own field_google_plus'] = array(
+    'name' => 'view own field_google_plus',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_linkedin'.
+  $permissions['view own field_linkedin'] = array(
+    'name' => 'view own field_linkedin',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_membership_number'.
+  $permissions['view own field_membership_number'] = array(
+    'name' => 'view own field_membership_number',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_message_moderation'.
+  $permissions['view own field_message_moderation'] = array(
+    'name' => 'view own field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_twitter'.
+  $permissions['view own field_twitter'] = array(
+    'name' => 'view own field_twitter',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_viadeo'.
+  $permissions['view own field_viadeo'] = array(
+    'name' => 'view own field_viadeo',
+    'roles' => array(
+      'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own licenses'.
+  $permissions['view own licenses'] = array(
+    'name' => 'view own licenses',
+    'roles' => array(
+      'adhérent' => 'adhérent',
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_license',
+  );
+
   // Exported permission: 'view own unpublished content'.
   $permissions['view own unpublished content'] = array(
     'name' => 'view own unpublished content',
@@ -1321,6 +2839,15 @@ function drupalfr_permissions_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'userpoints',
+  );
+
+  // Exported permission: 'view payments'.
+  $permissions['view payments'] = array(
+    'name' => 'view payments',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'commerce_payment',
   );
 
   // Exported permission: 'view revisions'.
