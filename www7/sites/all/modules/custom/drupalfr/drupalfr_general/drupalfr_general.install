@@ -6,3 +6,10 @@
 function drupalfr_general_install() {
   db_query("UPDATE {system} SET weight = 11 WHERE name = 'drupalfr_general'");
 }
+
+/**
+ * Enable drupalfr_commerce feature module.
+ */
+function drupalfr_general_update_7000() {
+  module_enable(array('drupalfr_commerce'));
+}
