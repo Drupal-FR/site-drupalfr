@@ -190,41 +190,6 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_region'
-  $field_bases['field_region'] = array(
-    'active' => 1,
-    'cardinality' => -1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_region',
-    'indexes' => array(
-      'value' => array(
-        0 => 'value',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'list',
-    'settings' => array(
-      'allowed_values' => array(
-        '01 Île de France' => '01 Île de France',
-        '02 Nord Ouest' => '02 Nord Ouest',
-        '03 Nord Est' => '03 Nord Est',
-        '04 Sud Est' => '04 Sud Est',
-        '05 Sud Ouest' => '05 Sud Ouest',
-        'Outre mer' => 'Outre mer',
-        'Belgique' => 'Belgique',
-        'Suisse' => 'Suisse',
-        'Autre' => 'Autre',
-      ),
-      'allowed_values_function' => '',
-      'allowed_values_php' => '',
-      'text_processing' => 0,
-    ),
-    'translatable' => 0,
-    'type' => 'list_text',
-    'type_name' => 'annuaire',
-  );
-
   // Exported field_base: 'field_showcase'
   $field_bases['field_showcase'] = array(
     'active' => 1,
