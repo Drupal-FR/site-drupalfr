@@ -54,18 +54,18 @@ function dfr_emploi_views_default_views() {
   );
   $handler->display->display_options['row_options']['separator'] = ' - ';
   $handler->display->display_options['row_options']['hide_empty'] = TRUE;
-  /* Pied de page: Global : Zone de texte */
+  /* Pied de page: Global: Text area */
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
-  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  /* Comportement en l'absence de résultats: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre n\'est en attente de modération.';
   $handler->display->display_options['empty']['area']['format'] = '1';
-  /* Champ: Contenu : Titre */
+  /* Champ: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -74,32 +74,32 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Contenu : Type de contrat */
+  /* Champ: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['label'] = '';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Contenu : Société */
+  /* Champ: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['label'] = '';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_societe']['type'] = 'node_reference_plain';
-  /* Critère de tri: Contenu : Date de publication */
+  /* Critère de tri: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
-  /* Critère de filtrage: Contenu : Publié */
+  /* Critère de filtrage: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = 1;
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Critère de filtrage: Contenu : Type */
+  /* Critère de filtrage: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -118,7 +118,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['row_options']['links'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  /* Comportement en l'absence de résultats: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -126,28 +126,28 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre d\'emploi n\'est disponible selon vos critères de sélection, essayez de les élargir pour voir plus de résultats.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Critère de tri: Contenu : Date de publication */
+  /* Critère de tri: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Contenu : Publié */
+  /* Critère de filtrage: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = 1;
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Critère de filtrage: Contenu : Type */
+  /* Critère de filtrage: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Contenu : Région (field_region) */
+  /* Critère de filtrage: Content: Région (field_region) */
   $handler->display->display_options['filters']['field_region_value']['id'] = 'field_region_value';
   $handler->display->display_options['filters']['field_region_value']['table'] = 'field_data_field_region';
   $handler->display->display_options['filters']['field_region_value']['field'] = 'field_region_value';
@@ -166,7 +166,7 @@ function dfr_emploi_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Critère de filtrage: Contenu : Type de contrat (field_type_contrat) */
+  /* Critère de filtrage: Content: Type de contrat (field_type_contrat) */
   $handler->display->display_options['filters']['field_type_contrat_tid']['id'] = 'field_type_contrat_tid';
   $handler->display->display_options['filters']['field_type_contrat_tid']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['filters']['field_type_contrat_tid']['field'] = 'field_type_contrat_tid';
@@ -211,14 +211,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '9';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['defaults']['footer'] = FALSE;
-  /* Pied de page: Global : Zone de texte */
+  /* Pied de page: Global: Text area */
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['content'] = 'Voir template.php pour configuration du texte.';
   $handler->display->display_options['footer']['area']['format'] = '1';
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  /* Comportement en l'absence de résultats: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -226,7 +226,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Voir template.php pour configuration du texte.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Critère de tri: Global : Au hasard */
+  /* Critère de tri: Global: Random */
   $handler->display->display_options['sorts']['random']['id'] = 'random';
   $handler->display->display_options['sorts']['random']['table'] = 'views';
   $handler->display->display_options['sorts']['random']['field'] = 'random';
@@ -243,6 +243,19 @@ function dfr_emploi_views_default_views() {
   );
   $handler->display->display_options['defaults']['cache'] = FALSE;
   $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '25';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_label'] = 'Éléments par page';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_options_all_label'] = '- Tout -';
+  $handler->display->display_options['pager']['options']['expose']['offset_label'] = 'Décalage';
+  $handler->display->display_options['pager']['options']['tags']['first'] = '« premier';
+  $handler->display->display_options['pager']['options']['tags']['previous'] = '‹ précédent';
+  $handler->display->display_options['pager']['options']['tags']['next'] = 'suivant ›';
+  $handler->display->display_options['pager']['options']['tags']['last'] = 'dernier »';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
@@ -278,18 +291,20 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relation: Contenu : Auteur */
+  /* Relation: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Opérations en masse : Contenu */
+  /* Champ: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['label'] = 'Contenu';
   $handler->display->display_options['fields']['views_bulk_operations']['empty'] = 'Aucune offre en attente de modération.';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '1';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['row_clickable'] = 1;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
@@ -298,120 +313,14 @@ function dfr_emploi_views_default_views() {
       'postpone_processing' => 0,
       'skip_confirmation' => 0,
       'override_label' => 1,
-      'label' => 'Publier offres',
-    ),
-    'action::node_assign_owner_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_unpublish_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 1,
-      'label' => 'Dépublier les offres',
-    ),
-    'action::node_unpublish_by_keyword_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_save_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::system_send_email_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_script_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::flag_node_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::pathauto_node_update_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_modify_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'show_all_tokens' => 1,
-        'display_values' => array(
-          '_all_' => '_all_',
-        ),
-      ),
-    ),
-    'action::views_bulk_operations_argument_selector_action' => array(
-      'selected' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'url' => '',
-      ),
-    ),
-    'action::node_promote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_publish_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 1,
-      'label' => 'Publier les offres',
+      'label' => 'Publier et approuver offres',
     ),
     'action::dfr_emploi_reject_job_offer' => array(
       'selected' => 1,
       'postpone_processing' => 0,
       'skip_confirmation' => 0,
       'override_label' => 1,
-      'label' => 'Rejeter offres',
-    ),
-    'action::node_unpromote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_unsticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
+      'label' => 'Rejeter et dépublier offres',
     ),
     'action::views_bulk_operations_delete_item' => array(
       'selected' => 1,
@@ -420,15 +329,8 @@ function dfr_emploi_views_default_views() {
       'override_label' => 1,
       'label' => 'Supprimer offres',
     ),
-    'action::node_make_sticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
   );
-  /* Champ: Contenu : Titre */
+  /* Champ: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -437,39 +339,47 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Contenu : Date de publication */
+  /* Champ: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Date de création';
   $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
-  /* Champ: Contenu : Type de contrat */
+  /* Champ: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Contenu : Société */
+  /* Champ: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
-  /* Champ: Utilisateur : Nom */
+  /* Champ: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: Utilisateur : Courriel */
+  /* Champ: User: E-mail */
   $handler->display->display_options['fields']['mail']['id'] = 'mail';
   $handler->display->display_options['fields']['mail']['table'] = 'users';
   $handler->display->display_options['fields']['mail']['field'] = 'mail';
   $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
-  /* Champ: Contenu : Flag modération */
+  $handler->display->display_options['fields']['mail']['label'] = 'Courriel';
+  /* Champ: Content: Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['field'] = 'field_flag_moderation';
-  /* Champ: Contenu : Lien de modification */
+  /* Champ: Content: Published */
+  $handler->display->display_options['fields']['status']['id'] = 'status';
+  $handler->display->display_options['fields']['status']['table'] = 'node';
+  $handler->display->display_options['fields']['status']['field'] = 'status';
+  $handler->display->display_options['fields']['status']['label'] = 'Statut';
+  $handler->display->display_options['fields']['status']['type'] = 'published-notpublished';
+  $handler->display->display_options['fields']['status']['not'] = 0;
+  /* Champ: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
@@ -477,24 +387,23 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Contenu : Type */
+  /* Critère de filtrage: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Contenu : Publié */
+  /* Critère de filtrage: Content: Published */
   $handler->display->display_options['filters']['status_1']['id'] = 'status_1';
   $handler->display->display_options['filters']['status_1']['table'] = 'node';
   $handler->display->display_options['filters']['status_1']['field'] = 'status';
-  $handler->display->display_options['filters']['status_1']['value'] = '0';
+  $handler->display->display_options['filters']['status_1']['value'] = 'All';
   $handler->display->display_options['filters']['status_1']['exposed'] = TRUE;
   $handler->display->display_options['filters']['status_1']['expose']['operator_id'] = '';
   $handler->display->display_options['filters']['status_1']['expose']['label'] = 'Publié';
   $handler->display->display_options['filters']['status_1']['expose']['operator'] = 'status_1_op';
   $handler->display->display_options['filters']['status_1']['expose']['identifier'] = 'status_1';
-  $handler->display->display_options['filters']['status_1']['expose']['required'] = TRUE;
   $handler->display->display_options['filters']['status_1']['expose']['remember_roles'] = array(
     2 => '2',
     4 => 0,
@@ -504,8 +413,10 @@ function dfr_emploi_views_default_views() {
     7 => 0,
     12 => 0,
     14 => 0,
+    15 => 0,
+    16 => 0,
   );
-  /* Critère de filtrage: Contenu : Flag modération (field_flag_moderation) */
+  /* Critère de filtrage: Content: Flag modération (field_flag_moderation) */
   $handler->display->display_options['filters']['field_flag_moderation_value']['id'] = 'field_flag_moderation_value';
   $handler->display->display_options['filters']['field_flag_moderation_value']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['filters']['field_flag_moderation_value']['field'] = 'field_flag_moderation_value';
@@ -537,13 +448,13 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['row_options']['hide_empty'] = TRUE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['header'] = FALSE;
-  /* Entête: Global : Résumé des résultats */
+  /* Entête: Global: Result summary */
   $handler->display->display_options['header']['result']['id'] = 'result';
   $handler->display->display_options['header']['result']['table'] = 'views';
   $handler->display->display_options['header']['result']['field'] = 'result';
   $handler->display->display_options['header']['result']['content'] = 'Nous avons actuellement @total poste(s) à pourvoir';
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  /* Comportement en l'absence de résultats: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -551,7 +462,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Cette société n\'a aucune offre d\'emploi disponible pour le moment. <a href="internal:emploi">Consultez les autres offres</a>';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Contenu : Titre */
+  /* Champ: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -560,7 +471,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Contenu : Type de contrat */
+  /* Champ: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
@@ -570,7 +481,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Filtre contextuel: Contenu : Société (field_societe) */
+  /* Filtre contextuel: Content: Société (field_societe) */
   $handler->display->display_options['arguments']['field_societe_nid']['id'] = 'field_societe_nid';
   $handler->display->display_options['arguments']['field_societe_nid']['table'] = 'field_data_field_societe';
   $handler->display->display_options['arguments']['field_societe_nid']['field'] = 'field_societe_nid';
@@ -602,6 +513,19 @@ function dfr_emploi_views_default_views() {
   );
   $handler->display->display_options['defaults']['cache'] = FALSE;
   $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '25';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_label'] = 'Éléments par page';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_options_all_label'] = '- Tout -';
+  $handler->display->display_options['pager']['options']['expose']['offset_label'] = 'Décalage';
+  $handler->display->display_options['pager']['options']['tags']['first'] = '« premier';
+  $handler->display->display_options['pager']['options']['tags']['previous'] = '‹ précédent';
+  $handler->display->display_options['pager']['options']['tags']['next'] = 'suivant ›';
+  $handler->display->display_options['pager']['options']['tags']['last'] = 'dernier »';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
@@ -637,7 +561,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  /* Comportement en l'absence de résultats: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -645,12 +569,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre n\'a été rejetée.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relation: Contenu : Auteur */
+  /* Relation: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Opérations en masse : Contenu */
+  /* Champ: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
@@ -660,83 +584,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
-    'action::node_assign_owner_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
     'action::views_bulk_operations_delete_item' => array(
       'selected' => 1,
       'postpone_processing' => 0,
       'skip_confirmation' => 0,
       'override_label' => 1,
       'label' => 'Supprimer l\'offre',
-    ),
-    'action::system_send_email_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_script_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::flag_node_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_sticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_unsticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_modify_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'show_all_tokens' => 1,
-        'display_values' => array(
-          '_all_' => '_all_',
-        ),
-      ),
-    ),
-    'action::views_bulk_operations_argument_selector_action' => array(
-      'selected' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'url' => '',
-      ),
-    ),
-    'action::node_promote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
     ),
     'action::node_publish_action' => array(
       'selected' => 1,
@@ -745,20 +598,6 @@ function dfr_emploi_views_default_views() {
       'override_label' => 1,
       'label' => 'Publier les offres',
     ),
-    'action::node_unpromote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_save_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
     'action::node_unpublish_action' => array(
       'selected' => 1,
       'postpone_processing' => 0,
@@ -766,22 +605,8 @@ function dfr_emploi_views_default_views() {
       'override_label' => 1,
       'label' => 'Dépublier les offres',
     ),
-    'action::node_unpublish_by_keyword_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::pathauto_node_update_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
   );
-  /* Champ: Contenu : Titre */
+  /* Champ: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -790,39 +615,47 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Contenu : Date de publication */
+  /* Champ: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Date de création';
   $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
-  /* Champ: Contenu : Type de contrat */
+  /* Champ: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Contenu : Société */
+  /* Champ: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
-  /* Champ: Utilisateur : Nom */
+  /* Champ: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: Utilisateur : Courriel */
+  /* Champ: User: E-mail */
   $handler->display->display_options['fields']['mail']['id'] = 'mail';
   $handler->display->display_options['fields']['mail']['table'] = 'users';
   $handler->display->display_options['fields']['mail']['field'] = 'mail';
   $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
-  /* Champ: Contenu : Flag modération */
+  $handler->display->display_options['fields']['mail']['label'] = 'Courriel';
+  /* Champ: Content: Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['field'] = 'field_flag_moderation';
-  /* Champ: Contenu : Lien de modification */
+  /* Champ: Content: Published */
+  $handler->display->display_options['fields']['status']['id'] = 'status';
+  $handler->display->display_options['fields']['status']['table'] = 'node';
+  $handler->display->display_options['fields']['status']['field'] = 'status';
+  $handler->display->display_options['fields']['status']['label'] = 'Statut';
+  $handler->display->display_options['fields']['status']['type'] = 'published-notpublished';
+  $handler->display->display_options['fields']['status']['not'] = 0;
+  /* Champ: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
@@ -830,14 +663,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Contenu : Type */
+  /* Critère de filtrage: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Contenu : Flag modération (field_flag_moderation) */
+  /* Critère de filtrage: Content: Flag modération (field_flag_moderation) */
   $handler->display->display_options['filters']['field_flag_moderation_value']['id'] = 'field_flag_moderation_value';
   $handler->display->display_options['filters']['field_flag_moderation_value']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['filters']['field_flag_moderation_value']['field'] = 'field_flag_moderation_value';
@@ -868,6 +701,19 @@ function dfr_emploi_views_default_views() {
   );
   $handler->display->display_options['defaults']['cache'] = FALSE;
   $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '25';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_label'] = 'Éléments par page';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_options_all_label'] = '- Tout -';
+  $handler->display->display_options['pager']['options']['expose']['offset_label'] = 'Décalage';
+  $handler->display->display_options['pager']['options']['tags']['first'] = '« premier';
+  $handler->display->display_options['pager']['options']['tags']['previous'] = '‹ précédent';
+  $handler->display->display_options['pager']['options']['tags']['next'] = 'suivant ›';
+  $handler->display->display_options['pager']['options']['tags']['last'] = 'dernier »';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
@@ -903,7 +749,7 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* Comportement en l'absence de résultats: Global : Zone de texte */
+  /* Comportement en l'absence de résultats: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -911,12 +757,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['empty']['area']['content'] = 'Aucune offre n\'a été approuvée.';
   $handler->display->display_options['empty']['area']['format'] = '1';
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relation: Contenu : Auteur */
+  /* Relation: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Opérations en masse : Contenu */
+  /* Champ: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
@@ -926,83 +772,12 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
-    'action::node_assign_owner_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
     'action::views_bulk_operations_delete_item' => array(
       'selected' => 1,
       'postpone_processing' => 0,
       'skip_confirmation' => 0,
       'override_label' => 1,
       'label' => 'Supprimer l\'offre',
-    ),
-    'action::system_send_email_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_script_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::flag_node_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_sticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_unsticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_modify_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'show_all_tokens' => 1,
-        'display_values' => array(
-          '_all_' => '_all_',
-        ),
-      ),
-    ),
-    'action::views_bulk_operations_argument_selector_action' => array(
-      'selected' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'url' => '',
-      ),
-    ),
-    'action::node_promote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
     ),
     'action::node_publish_action' => array(
       'selected' => 1,
@@ -1011,20 +786,6 @@ function dfr_emploi_views_default_views() {
       'override_label' => 1,
       'label' => 'Publier les offres',
     ),
-    'action::node_unpromote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_save_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
     'action::node_unpublish_action' => array(
       'selected' => 1,
       'postpone_processing' => 0,
@@ -1032,22 +793,8 @@ function dfr_emploi_views_default_views() {
       'override_label' => 1,
       'label' => 'Dépublier les offres',
     ),
-    'action::node_unpublish_by_keyword_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::pathauto_node_update_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
   );
-  /* Champ: Contenu : Titre */
+  /* Champ: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -1056,39 +803,47 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['element_wrapper_type'] = 'h3';
-  /* Champ: Contenu : Date de publication */
+  /* Champ: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Date de création';
   $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
-  /* Champ: Contenu : Type de contrat */
+  /* Champ: Content: Type de contrat */
   $handler->display->display_options['fields']['field_type_contrat']['id'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['table'] = 'field_data_field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['field'] = 'field_type_contrat';
   $handler->display->display_options['fields']['field_type_contrat']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_type_contrat']['type'] = 'taxonomy_term_reference_plain';
-  /* Champ: Contenu : Société */
+  /* Champ: Content: Société */
   $handler->display->display_options['fields']['field_societe']['id'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['table'] = 'field_data_field_societe';
   $handler->display->display_options['fields']['field_societe']['field'] = 'field_societe';
   $handler->display->display_options['fields']['field_societe']['element_label_colon'] = FALSE;
-  /* Champ: Utilisateur : Nom */
+  /* Champ: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
   $handler->display->display_options['fields']['name']['label'] = 'Rédigé par';
-  /* Champ: Utilisateur : Courriel */
+  /* Champ: User: E-mail */
   $handler->display->display_options['fields']['mail']['id'] = 'mail';
   $handler->display->display_options['fields']['mail']['table'] = 'users';
   $handler->display->display_options['fields']['mail']['field'] = 'mail';
   $handler->display->display_options['fields']['mail']['relationship'] = 'uid';
-  /* Champ: Contenu : Flag modération */
+  $handler->display->display_options['fields']['mail']['label'] = 'Courriel';
+  /* Champ: Content: Flag modération */
   $handler->display->display_options['fields']['field_flag_moderation']['id'] = 'field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['fields']['field_flag_moderation']['field'] = 'field_flag_moderation';
-  /* Champ: Contenu : Lien de modification */
+  /* Champ: Content: Published */
+  $handler->display->display_options['fields']['status']['id'] = 'status';
+  $handler->display->display_options['fields']['status']['table'] = 'node';
+  $handler->display->display_options['fields']['status']['field'] = 'status';
+  $handler->display->display_options['fields']['status']['label'] = 'Statut';
+  $handler->display->display_options['fields']['status']['type'] = 'published-notpublished';
+  $handler->display->display_options['fields']['status']['not'] = 0;
+  /* Champ: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
@@ -1096,14 +851,14 @@ function dfr_emploi_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Contenu : Type */
+  /* Critère de filtrage: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'offre' => 'offre',
   );
-  /* Critère de filtrage: Contenu : Flag modération (field_flag_moderation) */
+  /* Critère de filtrage: Content: Flag modération (field_flag_moderation) */
   $handler->display->display_options['filters']['field_flag_moderation_value']['id'] = 'field_flag_moderation_value';
   $handler->display->display_options['filters']['field_flag_moderation_value']['table'] = 'field_data_field_flag_moderation';
   $handler->display->display_options['filters']['field_flag_moderation_value']['field'] = 'field_flag_moderation_value';
@@ -1137,7 +892,7 @@ function dfr_emploi_views_default_views() {
     t('dernier »'),
     t('Aucune offre n\'est en attente de modération.'),
     t('Page'),
-    t('plus'),
+    t('more'),
     t('Aucune offre d\'emploi n\'est disponible selon vos critères de sélection, essayez de les élargir pour voir plus de résultats.'),
     t('Région'),
     t('Type de contrat'),
@@ -1145,15 +900,22 @@ function dfr_emploi_views_default_views() {
     t('Dernières offres d\'emploi'),
     t('Voir template.php pour configuration du texte.'),
     t('Moderation des offres'),
-    t('auteur'),
+    t('author'),
     t('Contenu'),
     t('Aucune offre en attente de modération.'),
+    t('- Choose an operation -'),
+    t('Publier et approuver offres'),
+    t('Dépublier les offres'),
+    t('Publier les offres'),
+    t('Rejeter et dépublier offres'),
+    t('Supprimer offres'),
     t('Intitulé de l\'offre'),
     t('Date de création'),
     t('Société'),
     t('Rédigé par'),
     t('Courriel'),
     t('Flag modération'),
+    t('Statut'),
     t('Page d\'édition'),
     t('Publié'),
     t('Offres d\'une boite'),
@@ -1165,6 +927,8 @@ function dfr_emploi_views_default_views() {
     t('Moderation des offres (rejetées)'),
     t('Offres rejetées'),
     t('Aucune offre n\'a été rejetée.'),
+    t('Content'),
+    t('Supprimer l\'offre'),
     t('Moderation des offres (approuvées)'),
     t('Offres acceptées'),
     t('Aucune offre n\'a été approuvée.'),
