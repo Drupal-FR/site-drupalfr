@@ -13,9 +13,9 @@ function drupalfr_planete_taxonomy_default_vocabularies() {
       'name' => 'Tags',
       'machine_name' => 'vocabulary_5',
       'description' => '',
-      'hierarchy' => '1',
+      'hierarchy' => 0,
       'module' => 'taxonomy',
-      'weight' => '-4',
+      'weight' => -4,
     ),
   );
 }
