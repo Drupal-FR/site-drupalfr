@@ -13,6 +13,61 @@ function drupalfr_user_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_user_drupal_settings|user|user|form';
+  $field_group->group_name = 'group_user_drupal_settings';
+  $field_group->entity_type = 'user';
+  $field_group->bundle = 'user';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Paramètres Drupal',
+    'weight' => '0',
+    'children' => array(
+      0 => 'googleanalytics',
+      1 => 'mollom',
+      2 => 'redirect',
+      3 => 'account',
+      4 => 'timezone',
+      5 => 'signature_settings',
+      6 => 'contact',
+      7 => 'locale',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-user-drupal-settings field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_user_drupal_settings|user|user|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_user_drupal_settings|user|user|full';
+  $field_group->group_name = 'group_user_drupal_settings';
+  $field_group->entity_type = 'user';
+  $field_group->bundle = 'user';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Paramètres Drupal',
+    'weight' => '5',
+    'children' => array(),
+    'format_type' => 'hidden',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(),
+    ),
+  );
+  $export['group_user_drupal_settings|user|user|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_user_drupal|user|user|form';
   $field_group->group_name = 'group_user_drupal';
   $field_group->entity_type = 'user';
@@ -129,6 +184,56 @@ function drupalfr_user_field_group_info() {
     ),
   );
   $export['group_user_information|user|user|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_user_newsletter|user|user|form';
+  $field_group->group_name = 'group_user_newsletter';
+  $field_group->entity_type = 'user';
+  $field_group->bundle = 'user';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Newsletters',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_newsletter_adff',
+      1 => 'field_newsletter_dc_soleil_2014',
+      2 => 'field_newsletter_ddd_2015',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-user-newsletter field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_user_newsletter|user|user|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_user_planet|user|user|full';
+  $field_group->group_name = 'group_user_planet';
+  $field_group->entity_type = 'user';
+  $field_group->bundle = 'user';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Planète',
+    'weight' => '6',
+    'children' => array(),
+    'format_type' => 'hidden',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(),
+    ),
+  );
+  $export['group_user_planet|user|user|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */

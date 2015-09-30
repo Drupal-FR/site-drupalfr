@@ -108,6 +108,53 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'user-user-field_drupal_org'
+  $field_instances['user-user-field_drupal_org'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 17,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_drupal_org',
+    'label' => 'Drupal.org',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 19,
+    ),
+  );
+
   // Exported field_instance: 'user-user-field_events'
   $field_instances['user-user-field_events'] = array(
     'bundle' => 'user',
@@ -148,6 +195,100 @@ function drupalfr_user_field_default_field_instances() {
       'settings' => array(),
       'type' => 'options_buttons',
       'weight' => 20,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_facebook'
+  $field_instances['user-user-field_facebook'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 13,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_facebook',
+    'label' => 'Facebook',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 14,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_google_plus'
+  $field_instances['user-user-field_google_plus'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 16,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 16,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_google_plus',
+    'label' => 'Google +',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 18,
     ),
   );
 
@@ -245,6 +386,98 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'user-user-field_linkedin'
+  $field_instances['user-user-field_linkedin'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 14,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 14,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_linkedin',
+    'label' => 'LinkedIn',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 16,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_membership_number'
+  $field_instances['user-user-field_membership_number'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_membership_number',
+    'label' => 'Numéro adhérent',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 10,
+    ),
+  );
+
   // Exported field_instance: 'user-user-field_msn'
   $field_instances['user-user-field_msn'] = array(
     'bundle' => 'user',
@@ -288,6 +521,187 @@ function drupalfr_user_field_default_field_instances() {
       ),
       'type' => 'email_textfield',
       'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_newsletter_adff'
+  $field_instances['user-user-field_newsletter_adff'] = array(
+    'bundle' => 'user',
+    'default_value' => array(
+      0 => array(
+        'subscribe' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_newsletter_adff',
+    'label' => 'Newsletter ADFF',
+    'required' => 0,
+    'settings' => array(
+      'interest_groups_title' => 'Interest Groups',
+      'mergefields' => array(
+        'EMAIL' => '[user:mail]',
+        'FNAME' => '[user:field-realname]',
+        'LNAME' => '',
+        'MMERGE3' => '',
+        'MMERGE4' => '',
+        'advanced' => 0,
+      ),
+      'options' => array(
+        'interest_groups' => array(),
+        'subscribe' => FALSE,
+      ),
+      'show_interest_groups' => 0,
+      'unsubscribe_on_delete' => 1,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'mailchimp_lists',
+      'settings' => array(),
+      'type' => 'mailchimp_lists_select',
+      'weight' => 21,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_newsletter_dc_soleil_2014'
+  $field_instances['user-user-field_newsletter_dc_soleil_2014'] = array(
+    'bundle' => 'user',
+    'default_value' => array(
+      0 => array(
+        'subscribe' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_newsletter_dc_soleil_2014',
+    'label' => 'Newsletter DC Soleil 2014',
+    'required' => 0,
+    'settings' => array(
+      'interest_groups_title' => 'Interest Groups',
+      'mergefields' => array(
+        'EMAIL' => '[user:mail]',
+        'FNAME' => '[user:field-realname]',
+        'LNAME' => '',
+        'MMERGE3' => '',
+        'MMERGE4' => '',
+        'advanced' => 0,
+      ),
+      'options' => array(
+        'interest_groups' => array(),
+        'subscribe' => FALSE,
+      ),
+      'show_interest_groups' => 0,
+      'unsubscribe_on_delete' => 1,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'mailchimp_lists',
+      'settings' => array(),
+      'type' => 'mailchimp_lists_select',
+      'weight' => 22,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_newsletter_ddd_2015'
+  $field_instances['user-user-field_newsletter_ddd_2015'] = array(
+    'bundle' => 'user',
+    'default_value' => array(
+      0 => array(
+        'subscribe' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_newsletter_ddd_2015',
+    'label' => 'Newsletter Drupal Dev Days 2015',
+    'required' => 0,
+    'settings' => array(
+      'interest_groups_title' => 'Interest Groups',
+      'mergefields' => array(
+        'EMAIL' => '[user:mail]',
+        'FNAME' => '[user:field-realname]',
+        'LNAME' => '',
+        'advanced' => 0,
+      ),
+      'options' => array(
+        'interest_groups' => array(),
+        'subscribe' => FALSE,
+      ),
+      'show_interest_groups' => 0,
+      'unsubscribe_on_delete' => 1,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'mailchimp_lists',
+      'settings' => array(),
+      'type' => 'mailchimp_lists_select',
+      'weight' => 23,
     ),
   );
 
@@ -450,6 +864,100 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'user-user-field_twitter'
+  $field_instances['user-user-field_twitter'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 13,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_twitter',
+    'label' => 'Twitter',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 15,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_viadeo'
+  $field_instances['user-user-field_viadeo'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 15,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 15,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_viadeo',
+    'label' => 'Viadeo',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 17,
+    ),
+  );
+
   // Exported field_instance: 'user-user-field_website'
   $field_instances['user-user-field_website'] = array(
     'bundle' => 'user',
@@ -514,14 +1022,24 @@ function drupalfr_user_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('Avatar');
   t('Biographie');
+  t('Drupal.org');
   t('Evénements');
+  t('Facebook');
+  t('Google +');
   t('ICQ');
   t('ID Jabber');
+  t('LinkedIn');
   t('MSN');
+  t('Newsletter ADFF');
+  t('Newsletter DC Soleil 2014');
+  t('Newsletter Drupal Dev Days 2015');
   t('Nom réel');
+  t('Numéro adhérent');
   t('Site Internet');
   t('Société');
   t('Surnom IRC');
+  t('Twitter');
+  t('Viadeo');
   t('Votre nom complet. Ce champ sera visible publiquement, ne le remplissez pas si vous ne souhaitez pas révéler cette information.');
   t('Votre société doit être inscrite dans <a href="/annuaire-pro">notre annuaire</a> pour pouvoir être référencée ici.');
   t('Votre surnom (nickname) sur notre canal IRC (<a href="irc://irc.freenode.net/#drupalfr.org">#drupalfr.org sur freenode</a>).');

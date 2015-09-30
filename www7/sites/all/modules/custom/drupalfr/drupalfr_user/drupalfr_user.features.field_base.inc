@@ -59,6 +59,30 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
+  // Exported field_base: 'field_drupal_org'
+  $field_bases['field_drupal_org'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_drupal_org',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_events'
   $field_bases['field_events'] = array(
     'active' => 1,
@@ -104,6 +128,54 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'list_text',
   );
 
+  // Exported field_base: 'field_facebook'
+  $field_bases['field_facebook'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_facebook',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_google_plus'
+  $field_bases['field_google_plus'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_google_plus',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_icq'
   $field_bases['field_icq'] = array(
     'active' => 1,
@@ -146,6 +218,54 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_linkedin'
+  $field_bases['field_linkedin'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_linkedin',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_membership_number'
+  $field_bases['field_membership_number'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_membership_number',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_msn'
   $field_bases['field_msn'] = array(
     'active' => 1,
@@ -159,6 +279,72 @@ function drupalfr_user_field_default_field_bases() {
     'settings' => array(),
     'translatable' => 1,
     'type' => 'email',
+  );
+
+  // Exported field_base: 'field_newsletter_adff'
+  $field_bases['field_newsletter_adff'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_newsletter_adff',
+    'field_permissions' => array(
+      'type' => 1,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'mailchimp_lists',
+    'settings' => array(
+      'double_opt_in' => 0,
+      'mc_list_id' => '27e99cb1af',
+      'send_welcome' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'mailchimp_lists_subscription',
+  );
+
+  // Exported field_base: 'field_newsletter_dc_soleil_2014'
+  $field_bases['field_newsletter_dc_soleil_2014'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_newsletter_dc_soleil_2014',
+    'field_permissions' => array(
+      'type' => 1,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'mailchimp_lists',
+    'settings' => array(
+      'double_opt_in' => 0,
+      'mc_list_id' => 'd9b1f5353a',
+      'send_welcome' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'mailchimp_lists_subscription',
+  );
+
+  // Exported field_base: 'field_newsletter_ddd_2015'
+  $field_bases['field_newsletter_ddd_2015'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_newsletter_ddd_2015',
+    'field_permissions' => array(
+      'type' => 1,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'mailchimp_lists',
+    'settings' => array(
+      'double_opt_in' => 0,
+      'mc_list_id' => '450c6dc6d6',
+      'send_welcome' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'mailchimp_lists_subscription',
   );
 
   // Exported field_base: 'field_nickname'
@@ -222,6 +408,54 @@ function drupalfr_user_field_default_field_bases() {
       'max_length' => 255,
     ),
     'translatable' => 1,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_twitter'
+  $field_bases['field_twitter'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_twitter',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_viadeo'
+  $field_bases['field_viadeo'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_viadeo',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
     'type' => 'text',
   );
 
