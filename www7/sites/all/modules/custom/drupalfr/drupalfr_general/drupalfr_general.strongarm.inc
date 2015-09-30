@@ -81,15 +81,8 @@ Avancé<br/>
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'mollom_fallback';
-  $strongarm->value = '0';
+  $strongarm->value = '1';
   $export['mollom_fallback'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_moderation_redirect';
-  $strongarm->value = 0;
-  $export['mollom_moderation_redirect'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -111,16 +104,6 @@ Avancé<br/>
   $strongarm->name = 'mollom_public_key';
   $strongarm->value = 'd2a49d32eb10a577a0296ed1c788d1d5';
   $export['mollom_public_key'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_status';
-  $strongarm->value = array(
-    'keys' => TRUE,
-    'keys valid' => TRUE,
-  );
-  $export['mollom_status'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
