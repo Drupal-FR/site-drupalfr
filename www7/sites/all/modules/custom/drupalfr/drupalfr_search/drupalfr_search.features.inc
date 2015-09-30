@@ -7,8 +7,7 @@
 /**
  * Implements hook_ctools_plugin_api().
  */
-function drupalfr_search_ctools_plugin_api() {
-  list($module, $api) = func_get_args();
+function drupalfr_search_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "facetapi" && $api == "facetapi_defaults") {
     return array("version" => "1");
   }
@@ -17,8 +16,8 @@ function drupalfr_search_ctools_plugin_api() {
 /**
  * Implements hook_views_api().
  */
-function drupalfr_search_views_api() {
-  return array("version" => "3.0");
+function drupalfr_search_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
 }
 
 /**
@@ -47,11 +46,6 @@ function drupalfr_search_default_search_api_index() {
         "author" : { "type" : "integer", "entity_type" : "user" },
         "comment_count" : { "type" : "integer" },
         "taxonomy_vocabulary_5" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
-        "field_licence" : { "type" : "integer", "entity_type" : "taxonomy_term" },
-        "field_niveau" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
-        "field_public_cible" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
-        "field_ressource_type" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
-        "field_thematique" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "search_api_language" : { "type" : "string" },
         "search_api_aggregation_1" : { "type" : "text" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
@@ -69,7 +63,6 @@ function drupalfr_search_default_search_api_index() {
               "doc" : "doc",
               "offre" : "offre",
               "page" : "page",
-              "ressource" : "ressource",
               "annuaire" : "annuaire",
               "forum" : "forum"
             }
@@ -109,11 +102,6 @@ function drupalfr_search_default_search_api_index() {
             "tags" : "h1 = 5\\r\\nh2 = 3\\r\\nh3 = 2\\r\\nstrong = 2\\r\\nb = 2\\r\\nem = 1.5\\r\\nu = 1.5"
           }
         },
-        "search_api_transliteration" : {
-          "status" : 0,
-          "weight" : "15",
-          "settings" : { "fields" : { "title" : true, "search_api_aggregation_1" : true, "body:value" : true } }
-        },
         "search_api_tokenizer" : {
           "status" : 0,
           "weight" : "20",
@@ -130,17 +118,6 @@ function drupalfr_search_default_search_api_index() {
             "fields" : { "title" : true },
             "file" : "",
             "stopwords" : "but\\r\\ndid\\r\\nthe this that those\\r\\netc"
-          }
-        },
-        "search_api_highlighting" : {
-          "status" : 0,
-          "weight" : "35",
-          "settings" : {
-            "prefix" : "\\u003Cstrong\\u003E",
-            "suffix" : "\\u003C\\/strong\\u003E",
-            "excerpt" : 1,
-            "excerpt_length" : "256",
-            "highlight" : "always"
           }
         }
       }
