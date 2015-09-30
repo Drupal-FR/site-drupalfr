@@ -149,9 +149,7 @@ function drupalfr_events_upcoming_events() {
     // Keep only 5 meetups for the list.
     $list_events = array_slice($events, 0, 5);
 
-    $content['map'] = array(
-      '#markup' => leaflet_render_map($map, $features, '600px'),
-    );
+    $content['map'] = leaflet_build_map($map, $features, '600px');
     $content['events'] = drupalfr_events_display_events($list_events, 'full');
     $content['infos'] = array(
       '#markup' => '<p>' . l(t('Voir tous les évènements'), 'http://www.meetup.com/drupal-france-francophonie') . '</p>',
@@ -176,6 +174,11 @@ function drupalfr_events_upcoming_events() {
 function drupalfr_events_prepare_leaflet_features($events) {
   $features = array();
 
+  // Prepare city name extraction.
+  $main_cities = drupalfr_events_get_main_cities();
+  $main_cities_names = array_keys($main_cities);
+  $regex = '/(' . implode('|', $main_cities_names) . ')/i';
+
   foreach ($events as $event) {
     if (isset($event['venue'])) {
       $features[] = array(
@@ -185,7 +188,68 @@ function drupalfr_events_prepare_leaflet_features($events) {
         'popup' => l($event['name'], $event['event_url'], array('absolute' => TRUE)),
       );
     }
+    else {
+      // Extract coordinates from city name.
+      preg_match($regex, $event['name'], $event_city);
+
+      if (!empty($event_city)) {
+        $event_city = array_shift($event_city);
+        $event_city = drupal_strtolower($event_city);
+
+        $features[] = array(
+          'type' => 'point',
+          'lat' => $main_cities[$event_city]['lat'],
+          'lon' => $main_cities[$event_city]['lon'],
+          'popup' => l($event['name'], $event['event_url'], array('absolute' => TRUE)) . ' : ' . t("Ce meetup n'a pas encore de lieu précisément défini."),
+        );
+      }
+    }
   }
 
   return $features;
+}
+
+/**
+ * Helper function.
+ *
+ * Coordinates from http://www.coordonnees-gps.fr
+ *
+ * @return array
+ *   An array containing the coordinates of the main french cities.
+ */
+function drupalfr_events_get_main_cities() {
+  return array(
+    'bordeaux' => array(
+      'lat' => '44.837789',
+      'lon' => '-0.57918',
+    ),
+    'lille' => array(
+      'lat' => '50.62925',
+      'lon' => '3.057256',
+    ),
+    'lyon' => array(
+      'lat' => '45.764043',
+      'lon' => '4.835659',
+    ),
+    'marseille' => array(
+      'lat' => '43.296482',
+      'lon' => '5.36978',
+    ),
+    'montpellier' => array(
+      'lat' => '43.610769',
+      'lon' => '3.876716',
+    ),
+    'nantes' => array(
+      'lat' => '47.218371',
+      'lon' => '-1.553621',
+    ),
+    'paris' => array(
+      'lat' => '48.856614',
+      'lon' => '2.352222',
+    ),
+    'toulouse' => array(
+      'lat' => '43.604652',
+      'lon' => '1.444209',
+    ),
+  );
 }

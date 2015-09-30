@@ -40,12 +40,12 @@ function scald_file_scald_add_form(&$form, &$form_state) {
   $validators = array(
     'file_validate_extensions' => array(0 => 'ppt pptx xls xlsx doc docx odt pdf txt csv odg sxw ods rtf zip rar gz 7z tar'),
   );
-  $location = 'public://atoms/files/';
+  $location = 'public://atoms/files';
   if ($field && $instance) {
     $validators = file_field_widget_upload_validators($field, $instance);
     $directory = file_field_widget_uri($field, $instance);
     if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
-      $location = $directory . '/';
+      $location = $directory;
     }
   }
   $form['file'] = array(
@@ -249,8 +249,9 @@ function _scald_file_get_default_icon($file) {
  *   Atom.
  */
 function _scald_file_sync_file($atom) {
-  if ($atom->scald_file) {
-    $atom->base_id = $atom->scald_file[LANGUAGE_NONE][0]['fid'];
+  if (!empty($atom->scald_file)) {
+    $items = field_get_items('scald_atom', $atom, 'scald_file');
+    $atom->base_id = $items[0]['fid'];
   }
 }
 
@@ -432,6 +433,31 @@ function scald_file_scald_render($atom, $context, $options = array()) {
         ),
       )
     );
+  }
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function scald_file_action_info() {
+  return array(
+    'scald_file_generate_thumbnail' => array(
+      'type' => 'scald_atom',
+      'label' => t('Generate Thumbnail'),
+      'configurable' => FALSE,
+      'behavior' => array('changes_property'),
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
+ * Action callback for the thumbnail generation action.
+ */
+function scald_file_generate_thumbnail($entity, $context) {
+  if ($entity->provider === 'scald_file') {
+    $entity->data['scald_thumbnail_default'] = TRUE;
+    scald_atom_save($entity);
   }
 }
 

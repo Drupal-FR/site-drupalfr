@@ -132,6 +132,7 @@ function scald_video_scald_prerender($atom, $context, $options, $mode) {
           'video_height'  => check_plain($atom->data['video_height']),
           'thumbnail'     => $atom->thumbnail_source,
           'class'         => 'scald_video',
+          'context'       => $context,
         ),
       )
     );

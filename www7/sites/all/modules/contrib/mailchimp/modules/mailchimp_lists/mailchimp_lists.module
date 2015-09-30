@@ -14,8 +14,8 @@ function mailchimp_lists_menu() {
   $items = array();
 
   $items['admin/config/services/mailchimp/lists'] = array(
-    'title' => 'Lists',
-    'description' => 'Display MailChimp Lists and configure Webhooks.',
+    'title' => t('Lists'),
+    'description' => t('Display MailChimp Lists and configure Webhooks.'),
     'page callback' => 'mailchimp_lists_overview_page',
     'access callback' => 'mailchimp_apikey_ready_access',
     'access arguments' => array('administer mailchimp'),
@@ -24,8 +24,8 @@ function mailchimp_lists_menu() {
     'weight' => 10,
   );
   $items['admin/config/services/mailchimp/fields'] = array(
-    'title' => 'Fields',
-    'description' => 'Display MailChimp Subscription Fields and trigger merge variable updates.',
+    'title' => t('Fields'),
+    'description' => t('Display MailChimp Subscription Fields and trigger merge variable updates.'),
     'page callback' => 'mailchimp_lists_fields_overview_page',
     'access callback' => 'mailchimp_apikey_ready_access',
     'access arguments' => array('administer mailchimp'),
@@ -34,7 +34,7 @@ function mailchimp_lists_menu() {
     'weight' => 10,
   );
   $items['admin/config/services/mailchimp/lists/%/webhook/%'] = array(
-    'title' => 'Enable/disable Webhooks',
+    'title' => t('Enable/disable Webhooks'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_lists_webhook_form', 5, 7),
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -42,7 +42,7 @@ function mailchimp_lists_menu() {
     'file' => 'includes/mailchimp_lists.admin.inc',
   );
   $items['admin/config/services/mailchimp/lists/update_mergevars/%/%/%'] = array(
-    'title' => 'Mass Update Merge Variables',
+    'title' => t('Mass Update Merge Variables'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_lists_update_mergevars_form', 6, 7, 8),
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -88,7 +88,7 @@ function mailchimp_lists_load_email($instance, $entity, $log_errors = TRUE) {
 
   if (!isset($instance['settings']['mergefields']['EMAIL'])) {
     if ($log_errors) {
-      watchdog('mailchimp_lists', 'Mailchimp Lists field "@field" on @entity -> @bundle has no EMAIL field configured, subscription actions cannot take place.', array(
+      watchdog('mailchimp_lists', 'MailChimp Lists field "@field" on @entity -> @bundle has no EMAIL field configured, subscription actions cannot take place.', array(
         '@field' => $instance['field_name'],
         '@entity' => $instance['entity_type'],
         '@bundle' => $instance['bundle'],
@@ -170,7 +170,7 @@ function mailchimp_lists_subscribe_form($form, &$form_state, $instance, $setting
   // Add the title and description to lists for anonymous users or if requested:
   $form[$wrapper_key]['subscribe'] = array(
     '#type' => 'checkbox',
-    '#title' => 'Subscribe',
+    '#title' => t('Subscribe'),
     '#disabled' => $instance['required'],
     '#required' => $instance['required'],
     '#default_value' => $instance['required'] || $is_subscribed,
@@ -238,6 +238,9 @@ function mailchimp_lists_process_subscribe_form_choices($choices, $instance, $fi
     if ($choices['subscribe']) {
       $function = 'add';
     }
+    elseif (isset($field['settings']['unsubscribe_action'])) {
+      $function = $field['settings']['unsubscribe_action'];
+    }
     else {
       $function = 'remove';
     }
@@ -258,6 +261,10 @@ function mailchimp_lists_process_subscribe_form_choices($choices, $instance, $fi
     switch ($function) {
       case 'add':
         $ret = mailchimp_subscribe($list_id, $email, $mergevars, $field['settings']['double_opt_in'], $field['settings']['send_welcome']);
+        break;
+
+      case 'unsubscribe':
+        $ret = mailchimp_unsubscribe($list_id, $email, FALSE);
         break;
 
       case 'remove':
@@ -384,7 +391,7 @@ function mailchimp_lists_update_member_merge_values($entity_type, $bundle_name, 
     ),
     'finished' => 'mailchimp_lists_populate_member_batch_complete',
     'title' => t('Processing Merge Variable Updates'),
-    'init_message' => t('Starting Mailchimp Merge Variable Update.'),
+    'init_message' => t('Starting MailChimp Merge Variable Update.'),
     'progress_message' => t('Processed @current out of @total.'),
     'error_message' => t('MailChimp Merge Variable Update Failed.'),
   );
@@ -690,7 +697,7 @@ function mailchimp_lists_add_to_segment_action_form($context, &$form_state) {
   }
   $form['mailchimp_field'] = array(
     '#type' => 'select',
-    '#title' => "Select a Mailchimp List",
+    '#title' => t('Select a MailChimp List'),
     '#options' => $mailchimp_field_options,
     '#required' => TRUE,
     '#ajax' => array(
@@ -732,7 +739,7 @@ function mailchimp_lists_add_to_segment_action_form($context, &$form_state) {
         ':input[name="segment"]' => array('value' => 0),
       ),
       'invisible' => array(
-        ':input[name="mc_list_id"]' => array('value' => ''),
+        ':input[name="mailchimp_field"]' => array('value' => ''),
       ),
     ),
   );
@@ -794,10 +801,10 @@ function mailchimp_lists_add_to_segment_action_views_bulk_operations_form($optio
   }
   $form['mailchimp_field'] = array(
     '#type' => 'select',
-    '#title' => t('REQUIRED: Mailchimp List Field(s)'),
+    '#title' => t('REQUIRED: MailChimp List Field(s)'),
     '#options' => $field_options,
     '#multiple' => TRUE,
-    '#description' => t('Select the mailchimp fields for which to allow segmentation.'),
+    '#description' => t('Select the MailChimp fields for which to allow segmentation.'),
     '#default_value' => isset($options['mailchimp_field']) ? $options['mailchimp_field'] : NULL,
     '#states' => array(
       'required' => array(

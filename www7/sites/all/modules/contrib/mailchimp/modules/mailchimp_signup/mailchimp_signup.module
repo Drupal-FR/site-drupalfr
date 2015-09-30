@@ -251,7 +251,9 @@ function mailchimp_signup_forms($form_id, $args) {
 function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
   $form['#attributes'] = array('class' => array('mailchimp-signup-subscribe-form'));
   $form['description'] = array(
-    '#markup' => filter_xss($signup->settings['description']),
+    '#markup' => filter_xss_admin($signup->settings['description']),
+    '#prefix' => '<div class="mailchimp-signup-subscribe-form-description">',
+    '#suffix' => '</div>'
   );
   $form['mailchimp_lists'] = array('#tree' => TRUE);
   $lists = mailchimp_get_lists($signup->mc_lists);
@@ -304,6 +306,7 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
   );
   foreach ($signup->settings['mergefields'] as $tag => $mergevar) {
     if (!empty($mergevar)) {
+      $mergevar['name'] = mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:mergefield:$tag", $mergevar['name']);
       $form['mergevars'][$tag] = mailchimp_insert_drupal_form_tag($mergevar);
       if (empty($lists)) {
         $form['mergevars'][$tag]['#disabled'] = TRUE;
@@ -311,7 +314,8 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
     }
   }
 
-  $form['submit'] = array(
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#weight' => 10,
     '#value' => $signup->settings['submit_button'],
@@ -382,7 +386,8 @@ function mailchimp_signup_subscribe_form_submit($form, &$form_state) {
     }
   }
   if (count($successes) && isset($signup->settings['confirmation_message']) && strlen($signup->settings['confirmation_message'])) {
-    drupal_set_message(check_plain($signup->settings['confirmation_message']), 'status');
+    $message = mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:confirmation_message", check_plain($signup->settings['confirmation_message']));
+    drupal_set_message($message, 'status');
   }
   if (!empty($signup->settings['destination'])) {
     $form_state['redirect'] = $signup->settings['destination'];
@@ -397,6 +402,22 @@ function mailchimp_signup_entity_delete($entity, $type) {
     if ($entity->mode & MAILCHIMP_SIGNUP_PAGE) {
       menu_rebuild();
     }
+  }
+}
+
+/**
+ * Wrapper function for i18n_string() if i18nstrings enabled.
+ */
+function mailchimp_signup_tt($name, $string, $langcode = NULL, $update = FALSE) {
+  if (function_exists('i18n_string')) {
+    $options = array(
+      'langcode' => $langcode,
+      'update' => $update,
+    );
+    return i18n_string($name, $string, $options);
+  }
+  else {
+    return $string;
   }
 }
 

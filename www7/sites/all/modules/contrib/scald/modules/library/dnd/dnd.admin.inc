@@ -37,6 +37,14 @@ function dnd_admin_form() {
   }
   $mee_store_format = (module_exists('mee')) ? mee_store_format() : '';
   if (!empty($mee_store_format)) {
+    if ($mee_store_format === 'embed_div') {
+      $form['dnd_uses_caption_default'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable captions by default'),
+        '#default_value' => variable_get('dnd_uses_caption_default', TRUE),
+        '#description' => t('If enabled, captions in CKEditor will show up under Atoms by default.'),
+      );
+    }
     $form['mee_store_format'] = array(
       '#type' => 'select',
       '#options' => array(

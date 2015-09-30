@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implements template_html_head_alter();
+ * Implements template_html_head_alter().
  *
  * Changes the default meta content-type tag to the shorter HTML5 version
  */
@@ -23,7 +23,8 @@ function dfrtheme_preprocess_drupalfr_search_form(&$variables) {
   $variables['search'] = array();
   $hidden = array();
 
-  // Provide variables named after form keys so themers can print each element independently.
+  // Provide variables named after form keys so themers can print each element
+  // independently.
   foreach (element_children($variables['form']) as $key) {
     $type = $variables['form'][$key]['#type'];
     if ($type == 'hidden' || $type == 'token') {
@@ -71,15 +72,19 @@ function dfrtheme_preprocess_html(&$variables) {
     if (arg(0) == 'node') {
       if (arg(1) == 'add') {
         if ($section == 'node') {
-          array_pop($variables['classes_array']); // Remove 'section-node'.
+          // Remove 'section-node'.
+          array_pop($variables['classes_array']);
         }
-        $body_classes[] = 'section-node-add'; // Add 'section-node-add'.
+        // Add 'section-node-add'.
+        $body_classes[] = 'section-node-add';
       }
       elseif (is_numeric(arg(1)) && (arg(2) == 'edit' || arg(2) == 'delete')) {
         if ($section == 'node') {
-          array_pop($variables['classes_array']); // Remove 'section-node'.
+          // Remove 'section-node'.
+          array_pop($variables['classes_array']);
         }
-        $body_classes[] = 'section-node-' . arg(2); // Add 'section-node-edit' or 'section-node-delete'.
+        // Add 'section-node-edit' or 'section-node-delete'.
+        $body_classes[] = 'section-node-' . arg(2);
       }
     }
   }
@@ -113,7 +118,8 @@ function dfrtheme_preprocess_page(&$variables) {
   // Since the title and the shortcut link are both block level elements,
   // positioning them next to each other is much simpler with a wrapper div.
   if (!empty($variables['title_suffix']['add_or_remove_shortcut']) && $variables['title']) {
-    // Add a wrapper div using the title_prefix and title_suffix render elements.
+    // Add a wrapper div using the title_prefix and title_suffix render
+    // elements.
     $variables['title_prefix']['shortcut_wrapper'] = array(
       '#markup' => '<div class="shortcut-wrapper clearfix">',
       '#weight' => 100,
@@ -132,7 +138,8 @@ function dfrtheme_preprocess_page(&$variables) {
  * Implements template_preprocess_maintenance_page().
  */
 function dfrtheme_preprocess_maintenance_page(&$variables) {
-  // Manually include these as they're not available outside template_preprocess_page().
+  // Manually include these as they're not available outside
+  // template_preprocess_page().
   $variables['grddl_profile'] = 'http://www.w3.org/1999/xhtml/vocab';
 
   $variables['doctype'] = _dfrtheme_doctype();
@@ -187,7 +194,7 @@ function dfrtheme_preprocess_block(&$variables) {
   $variables['title_attributes_array']['class'][] = 'block-title';
 
   // In the header region visually hide block titles.
-   if (in_array($variables['block']->region, array('menu'))) {
+  if (in_array($variables['block']->region, array('menu'))) {
     $variables['title_attributes_array']['class'][] = 'element-invisible';
   }
 }
@@ -200,7 +207,7 @@ function dfrtheme_menu_tree($variables) {
 }
 
 /**
- *  Return a themed breadcrumb trail
+ * Return a themed breadcrumb trail.
  */
 function dfrtheme_breadcrumb($variables) {
   $breadcrumb = isset($variables['breadcrumb']) ? $variables['breadcrumb'] : array();
@@ -211,7 +218,8 @@ function dfrtheme_breadcrumb($variables) {
     $breadcrumb[] = '<span class="current" title="Vous êtes ici">' . $title . '</span>';
   }
 
-  return implode(' &raquo; ', $breadcrumb); // >>.
+  // >>.
+  return implode(' &raquo; ', $breadcrumb);
 }
 
 /**
@@ -249,10 +257,12 @@ function dfrtheme_id_safe($string) {
   // Strip accents.
   $accents = '/&([A-Za-z]{1,2})(tilde|grave|acute|circ|cedil|uml|lig);/';
   $string = preg_replace($accents, '$1', htmlentities(utf8_decode($string)));
-  // Replace with dashes anything that isn't A-Z, numbers, dashes, or underscores.
+  // Replace with dashes anything that isn't A-Z, numbers, dashes, or
+  // underscores.
   $string = strtolower(preg_replace('/[^a-zA-Z0-9_-]+/', '-', $string));
   // If the first character is not a-z, add 'n' in front.
-  if (strlen($string) > 0 && !ctype_lower($string{0})) { // Don't use ctype_alpha since its locale aware.
+  // Don't use ctype_alpha since its locale aware.
+  if (strlen($string) > 0 && !ctype_lower($string{0})) {
     $string = 'id' . $string;
   }
   return $string;
@@ -268,7 +278,7 @@ function _dfrtheme_doctype() {
 /**
  * Generate the HTML output for a menu link and submenu.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: Structured array data for a menu link.
  *
@@ -389,14 +399,14 @@ function dfrtheme_preprocess_views_view(&$variables) {
       $options['query'] = array('destination' => 'node/add/offre');
     }
 
-    $variables['empty'] = "<p>Il n'y a aucune offre pour le moment, pourquoi ne pas " . l('proposer la vôtre', $path, $options) . " ?</p>";
-    $link_create_offer = l('Déposer une offre', 'node/add/offre', array('attributes' => array('class' => array('btn-link'))));
-    $link_see_offers = l('Voir toutes les offres', 'emploi/', array('attributes' => array('class' => array('btn-link'))));
+    $variables['empty'] = "<p>Il n'y a aucune offre pour le moment, pourquoi ne pas " . l(t('proposer la vôtre'), $path, $options) . " ?</p>";
+    $link_create_offer = l(t('Déposer une offre'), 'node/add/offre', array('attributes' => array('class' => array('btn-link'))));
+    $link_see_offers = l(t('Voir toutes les offres'), 'emploi/', array('attributes' => array('class' => array('btn-link'))));
 
     // Update link path if you are logged in or not.
     if ($variables['view']->total_rows > 0) {
       if (user_is_anonymous()) {
-        $link_create_offer = l('Déposer une offre', 'user/login', array('query' => array('destination' => 'node/add/offre'), 'attributes' => array('class' => array('btn-link'))));
+        $link_create_offer = l(t('Déposer une offre'), 'user/login', array('query' => array('destination' => 'node/add/offre'), 'attributes' => array('class' => array('btn-link'))));
       }
     }
     $footer = $link_create_offer . ' ' . $link_see_offers;

@@ -31,7 +31,7 @@ CKEDITOR.dialog.add('atomProperties', function(editor) {
     contents: [
       {
         id: 'info',
-        label: '',
+        label: lang.tab_info,
         title: '',
         expand: true,
         padding: 0,
@@ -81,6 +81,31 @@ CKEDITOR.dialog.add('atomProperties', function(editor) {
             },
             commit: function(widget) {
               widget.setData('usesCaption', this.getValue());
+            }
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        label: lang.tab_advanced,
+        title: '',
+        expand: true,
+        padding: 0,
+        elements: [
+          {
+            id: 'txtClasses',
+            type: 'text',
+            label: lang.properties_classes,
+            setup: function(widget) {
+              var options = JSON.parse(widget.data.options);
+              if (options.additionalClasses) {
+                this.setValue(options.additionalClasses);
+              }
+            },
+            commit: function(widget) {
+              var options = JSON.parse(widget.data.options);
+              options.additionalClasses = this.getValue();
+              widget.setData('options', JSON.stringify(options));
             }
           }
         ]

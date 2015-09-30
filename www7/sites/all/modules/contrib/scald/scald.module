@@ -121,6 +121,21 @@ function scald_contexts($reset = FALSE) {
 }
 
 /**
+ * Returns the list of public context.
+ */
+function scald_contexts_public($reset = FALSE) {
+  $public = array();
+  $contexts = scald_contexts($reset);
+  foreach ($contexts as $name => $context) {
+    if (empty($context['hidden'])) {
+      $public[$name] = $context;
+    }
+  }
+
+  return $public;
+}
+
+/**
  * Implements hook_scald_contexts_alter().
  *
  * Adds informations on the configured transcoder formats to
@@ -812,6 +827,9 @@ function scald_search($query = array(), $fuzzy = FALSE, $singular = FALSE) {
  * @param bool $override
  *   A boolean used to determine if the Scald Context specified in the SAS
  *    should be used or not.
+ * @param string[] $allowed_contexts
+ *   An array of contexts slugs that are allowed to be used in the passed-in
+ *   string. If empty, any context that's not hidden will be allowed.
  *
  * @return string
  *   The same text string, but with all the Scald Atom Shorthands replaced with
@@ -820,31 +838,49 @@ function scald_search($query = array(), $fuzzy = FALSE, $singular = FALSE) {
  *
  * @see scald_rendered_to_sas()
  */
-function scald_sas_to_rendered($string, $context = NULL, $override = FALSE) {
-  if (empty($context)) {
+function scald_sas_to_rendered($string, $context = NULL, $override = FALSE, $allowed_contexts = array()) {
+  if (empty($context) || !array_key_exists($context, scald_contexts())) {
     $context = 'title';
   }
 
-  global $_scald_override;
-  $_scald_override = $override;
+  if (empty($allowed_contexts)) {
+    $allowed_contexts = array_keys(scald_contexts_public());
+  }
+
+  _scald_sas_to_rendered_callback('set', $context, $override, $allowed_contexts);
   $rendered = preg_replace_callback(
     SCALD_SAS_MATCH_PATTERN,
-    create_function(
-      '$matches',
-      '
-        global $_scald_override;
-        return scald_render(
-          $matches[1],
-          (!empty($matches[2]) && !$_scald_override ? $matches[2] : \'' . $context . '\'),
-          (!empty($matches[3]) ? $matches[3] : NULL)
-        );
-      '
-    ),
+    '_scald_sas_to_rendered_callback',
     $string
   );
 
-  unset($_scald_override);
   return $rendered;
+}
+
+function _scald_sas_to_rendered_callback($matches, $context = NULL, $override = NULL, $allowed_contexts = NULL) {
+  // Not using drupal_static here, because those static will
+  // always be reset by the parent using a 'set' call before
+  // they're value is actually used.
+  static $callback_context, $callback_override, $callback_allowed_contexts;
+
+  if ($matches === 'set') {
+    $callback_context = $context;
+    $callback_override = $override;
+    $callback_allowed_contexts = $allowed_contexts;
+  }
+  else {
+    if ($callback_override || empty($matches[2]) || !in_array($matches[2], $callback_allowed_contexts, TRUE)) {
+      $render_context = $callback_context;
+    }
+    else {
+      $render_context = $matches[2];
+    }
+    return scald_render(
+      $matches[1],
+      $render_context,
+      !empty($matches[3]) ? $matches[3] : NULL
+    );
+  }
 }
 
 /**
@@ -1445,16 +1481,6 @@ function _scald_context_fallback($type, $context) {
  */
 function _scald_system_contexts() {
   return array(
-    'debug' => array(
-      'title'           => t('Debugging Display'),
-      'description'     => t('A useful debugging display of a Scald Atom.'),
-      'render_language' => 'XHTML',
-      'parseable'       => FALSE,
-      'hidden'          => TRUE,
-      'formats'         => array(
-        '<all>' => 'passthrough',
-      ),
-    ),
     'no-access' => array(
       'title'           => t('No Access'),
       'description'     => t('Built-in Context used when an Atom cannot be viewed by the current User.'),
@@ -1557,8 +1583,8 @@ function scald_scald_actions() {
  * Implements hook_scald_prerender().
  *
  * Scald Core implements this hook for its role as a Scald Context Provider of
- * Scald Contexts 'debug', 'no-access', 'invalid-id', 'deleted', 'title' and
- * UI-created contexts, and for its role as a Scald Transcoder Provider of Scald
+ * Scald Contexts 'no-access', 'invalid-id', 'deleted', 'title' and UI-created
+ * contexts, and for its role as a Scald Transcoder Provider of Scald
  * Transcoder 'passthrough'.
  */
 function scald_scald_prerender($atom, $context, $options, $mode) {
@@ -1589,10 +1615,6 @@ function scald_scald_prerender($atom, $context, $options, $mode) {
  */
 function scald_scald_render($atom, $context, $options = array()) {
   switch ($context) {
-    case 'debug':
-      $output = '<pre class="debug">' . print_r($atom, TRUE) . '</pre>';
-      break;
-
     case 'no-access':
       $output = theme('scald_render_error', array('context' => $context, 'message' => t('You do not have access to view this Atom.'), 'atom' => $atom));
       break;
@@ -1649,6 +1671,27 @@ function scald_scald_atom_access($atom, $action, $account = NULL) {
  * Define a new entity type for the Atoms.
  */
 function scald_entity_info() {
+  $translatable_field = array(
+    'type' => 'text',
+    'cardinality' => 1,
+    'translatable' => TRUE,
+  );
+
+  $translatable_field_instance = array(
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 0,
+    ),
+    'widget' => array(
+      'weight' => -5,
+    ),
+    'display' => array(
+      'default' => array(
+        'type' => 'hidden',
+      ),
+    ),
+  );
+
   $return = array(
     'scald_atom' => array(
       'label' => t('Atoms'),
@@ -1674,11 +1717,22 @@ function scald_entity_info() {
       'save callback' => 'scald_atom_save',
       'translation' => array(
         'entity_translation' => array(
+          'class' => 'EntityTranslationScaldHandler',
           'base path' => 'atom/%scald_atom',
           'edit path' => 'atom/%scald_atom/edit/%ctools_js',
           'edit form' => 'atom',
         ),
       ),
+      'field replacement' => array(
+        'title' => array(
+          'field' => $translatable_field,
+          'instance' => array(
+            'label' => t('Title'),
+            'description' => '',
+          ) + $translatable_field_instance,
+        ),
+      ),
+      'efq bundle conditions' => TRUE,
     ),
   );
 
@@ -2083,17 +2137,6 @@ function scald_menu() {
     'access callback' => TRUE,
     'file' => 'includes/scald.pages.inc',
     'theme callback' => 'ajax_base_page_theme',
-  );
-
-  $items['atom/%/debug'] = array(
-    'title' => 'Debug',
-    'page callback' => 'scald_debug_console',
-    'page arguments' => array(1),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer scald'),
-    'file' => 'includes/scald.debug.inc',
-    'weight' => 90,
-    'type' => MENU_LOCAL_TASK,
   );
 
   // Optional devel module integration.
@@ -2509,6 +2552,29 @@ function scald_form_user_admin_permissions_alter(&$form, &$form_state, $form_id)
   $form['#submit'][] = 'scald_permissions_submit';
 }
 
+/*
+ * Implements hook_form_FORM_ID_alter().
+ * In case the title module is used the title field has to be populated from the title
+ * attribute when the user comes from the add step.
+ */
+function scald_form_scald_atom_add_form_options_alter(&$form, &$form_state, $form_id) {
+  if (module_exists('title')) {
+    $scald = $form_state['scald'];
+    if (isset($scald['type']) && title_field_replacement_enabled('scald_atom', $scald['type']->type, 'title')) {
+      // Setting default values for each created atom
+      $fr_info = title_field_replacement_info('scald_atom', 'title');
+      foreach($form as $key => $data) {
+        if (strpos($key, 'atom') === 0) {
+          if (!empty($form[$key]['title']['#default_value'])) {
+            $langcode = $form['language']['#value'];
+            $form[$key][$fr_info['field']['field_name']][$langcode][0]['value']['#default_value'] = $form[$key]['title']['#default_value'];
+          }
+        }
+      }
+    }
+  }
+}
+
 /**
  * Handles the permissions form submission.
  */
@@ -2560,6 +2626,8 @@ function scald_atom_user_build_actions_links($atom, $query = NULL) {
       }
     }
   }
+
+  drupal_alter('scald_atom_user_build_actions_links', $links, $atom);
 
   return $links;
 }

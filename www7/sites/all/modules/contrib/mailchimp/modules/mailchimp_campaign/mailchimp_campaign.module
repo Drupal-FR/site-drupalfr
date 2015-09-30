@@ -51,8 +51,8 @@ function mailchimp_campaign_permission() {
  */
 function mailchimp_campaign_menu() {
   $items['admin/config/services/mailchimp/campaigns'] = array(
-    'title' => 'Campaigns',
-    'description' => 'Manage MailChimp Campaigns.',
+    'title' => t('Campaigns'),
+    'description' => t('Manage MailChimp Campaigns.'),
     'page callback' => 'mailchimp_campaign_overview_page',
     'access callback' => 'mailchimp_apikey_ready_access',
     'access arguments' => array('administer mailchimp campaigns'),
@@ -60,8 +60,8 @@ function mailchimp_campaign_menu() {
     'weight' => 10,
   );
   $items['admin/config/services/mailchimp/campaigns/add'] = array(
-    'title' => 'Add a Campaign',
-    'description' => 'Add a new MailChimp campaign.',
+    'title' => t('Add a Campaign'),
+    'description' => t('Add a new MailChimp campaign.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_campaign_campaign_form'),
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -78,12 +78,12 @@ function mailchimp_campaign_menu() {
     'load arguments' => array(5),
   );
   $items['admin/config/services/mailchimp/campaigns/%mailchimp_campaign/view'] = array(
-    'title' => 'View',
+    'title' => t('View'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
   );
   $items['admin/config/services/mailchimp/campaigns/%mailchimp_campaign/send'] = array(
-    'title' => 'Send',
+    'title' => t('Send'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_campaign_send_form', 5),
     'access callback' => 'mailchimp_campaign_access',
@@ -92,9 +92,19 @@ function mailchimp_campaign_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
+  $items['admin/config/services/mailchimp/campaigns/%mailchimp_campaign/send-test'] = array(
+    'title' => 'Send Test',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mailchimp_campaign_send_test_form', 5),
+    'access callback' => 'mailchimp_campaign_access',
+    'access arguments' => array(5, FALSE),
+    'file' => 'includes/mailchimp_campaign.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
   $items['admin/config/services/mailchimp/campaigns/%mailchimp_campaign/edit'] = array(
-    'title' => 'Edit',
-    'description' => 'Edit a MailChimp campaign.',
+    'title' => t('Edit'),
+    'description' => t('Edit a MailChimp campaign.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_campaign_campaign_form', 5),
     'access callback' => 'mailchimp_campaign_access',
@@ -104,7 +114,7 @@ function mailchimp_campaign_menu() {
     'weight' => 2,
   );
   $items['admin/config/services/mailchimp/campaigns/%mailchimp_campaign/delete'] = array(
-    'title' => 'Delete',
+    'title' => t('Delete'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_campaign_delete_form', 5),
     'access callback' => 'mailchimp_campaign_access',
@@ -114,7 +124,7 @@ function mailchimp_campaign_menu() {
     'weight' => 3,
   );
   $items['admin/config/services/mailchimp/campaigns/%mailchimp_campaign/stats'] = array(
-    'title' => 'Stats',
+    'title' => t('Stats'),
     'page callback' => 'mailchimp_campaign_stats_page',
     'page arguments' => array(5),
     'access callback' => 'mailchimp_campaign_access',
@@ -412,6 +422,41 @@ function mailchimp_campaign_send_campaign(MailChimpCampaign $campaign) {
 }
 
 /**
+ * Send MailChimp campaign.
+ */
+function mailchimp_campaign_send_test_campaign(MailChimpCampaign $campaign, $recipients = array()) {
+  $mcapi = mailchimp_get_api_object();
+
+  // Send campaign.
+  try {
+    if (!$mcapi) {
+      throw new MailchimpException('Cannot send campaign without Mailchimp API. Check API key has been entered.');
+    }
+    $result = $mcapi->campaigns->sendTest($campaign->mc_campaign_id, $recipients);
+  }
+  catch (Mailchimp_Error $e) {
+    drupal_set_message($e->getMessage(), 'error');
+    watchdog('mailchimp_campaign',
+      'An error occurred while sending a test of this campaign: @msg', array('@msg' => $e->getMessage()), WATCHDOG_ERROR);
+    return FALSE;
+  }
+
+  if (isset($result['complete']) && ($result['complete'] === TRUE)) {
+    // Log action, and notify the user.
+    watchdog('mailchimp_campaign', 'MailChimp test message for campaign %name has been sent to %recipients.',
+      array('%name' => $campaign->label(), '%recipients' => implode(', ', $recipients))
+    );
+    return TRUE;
+  }
+  elseif (isset($result['status']) && ($result['status'] == 'error')) {
+    // Display and log error, if any.
+    $message = 'MailChimp error. The campaign was not sent.';
+    _mailchimp_campaign_mcapi_error_message($result, $message);
+  }
+  return FALSE;
+}
+
+/**
  * Delete a MailChimp campaign and the local entity.
  */
 function mailchimp_campaign_delete_campaign($cid) {
@@ -645,10 +690,19 @@ function mailchimp_campaign_process_callback($matches = array()) {
 
   $entities = entity_load($entity_type, array($entity_id));
   if (!empty($entities)) {
+    // Prevent session information from being rendered.
+    drupal_save_session(FALSE);
+    // Force the current user to anonymous to prevent access bypass.
+    $original_user = $GLOBALS['user'];
+    $GLOBALS['user'] = drupal_anonymous_user();
+    // Render the entity.
     $render_array = entity_view($entity_type, $entities, $view_mode, NULL, TRUE);
     // Remove contextual links.
     _mailchimp_campaign_recursive_unset($render_array[$entity_type][$entity_id], '#contextual_links');
     $content = render($render_array);
+    // Restore the user.
+    $GLOBALS['user'] = $original_user;
+    drupal_save_session(TRUE);
   }
 
   return $content;

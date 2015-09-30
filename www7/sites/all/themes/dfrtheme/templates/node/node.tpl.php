@@ -77,7 +77,7 @@
  */
 ?>
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
-    
+
   <?php if ($user_picture || !$page || $display_submitted): ?>
     <header>
       <?php print $user_picture; ?>
@@ -89,7 +89,7 @@
       <?php print render($title_suffix); ?>
 
       <?php if ($display_submitted): ?>
-      
+
       <p class="submitted">
         <?php print $submitted; ?>
         <time pubdate datetime="<?php print $submitted_pubdate; ?>">

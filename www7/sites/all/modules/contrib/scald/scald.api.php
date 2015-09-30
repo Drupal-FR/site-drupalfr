@@ -378,6 +378,19 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
 }
 
 /**
+ * Alters links that show up in the drag and drop library.
+ *
+ * @param array $links
+ *   List of built action links.
+ *
+ * @param $atom
+ *   The atom that user action links are being built.
+ */
+function hook_scald_atom_user_build_actions_links_alter(&$links, $atom) {
+  unset($links['delete']);
+}
+
+/**
  * Control access to an atom.
  *
  * This hook can be used to grant or deny access for a specific atom and
@@ -396,6 +409,54 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
  *   The user object of the current user. This is an optional parameter.
  */
 function hook_scald_atom_access($atom, $action, $account = NULL) {
+}
+
+/**
+ * Act on an atom being inserted or updated.
+ *
+ * This hook is invoked from ScaldAtomController::save() before the atom is
+ * saved to the database. Like any other hook_ENTITY_TYPE_presave() hook, it is
+ * invoked before hook_entity_presave().
+ *
+ * @param $atom
+ */
+function hook_scald_atom_presave($atom) {
+}
+
+/**
+ * Act on an atom being inserted.
+ *
+ * This hook is invoked from ScaldAtomController::save() after a new atom is
+ * saved to the database, after field_attach_insert() and before
+ * hook_entity_insert() is called.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_insert($atom) {
+}
+
+/**
+ * Act on an atom being updated.
+ *
+ * This hook is invoked from ScaldAtomController::save() after an existing atom
+ * is saved to the database, after field_attach_update() and before
+ * hook_entity_update() is called.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_update($atom) {
+}
+
+/**
+ * Act on an atom being deleted.
+ *
+ * This hook is invoked from scald_atom_delete_multiple() after the atom is
+ * unregistered, before hook_entity_delete() is called and before the atom is
+ * removed from scald_atoms table in the database.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_delete($atom) {
 }
 
 /**

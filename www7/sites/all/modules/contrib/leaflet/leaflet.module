@@ -118,14 +118,14 @@ function leaflet_build_map($map, $features = array(), $height = '400px') {
   );
 
   // Load the leaflet library, which includes integration files.
-  libraries_load('leaflet');
+  $build['#attached']['libraries_load'][] = array('leaflet');
 
   return $build;
 }
 
 /**
  * DEPRECATED. Use leaflet_build_map() instead.
- * 
+ *
  * Load all Leaflet required client files and return markup for a map.
  *
  * @param array $map
