@@ -13,3 +13,10 @@ function drupalfr_general_install() {
 function drupalfr_general_update_7000() {
   module_enable(array('drupalfr_commerce'));
 }
+
+/**
+ * Enable drupalfr_media feature module.
+ */
+function drupalfr_general_update_7001() {
+  module_enable(array('drupalfr_media'));
+}
