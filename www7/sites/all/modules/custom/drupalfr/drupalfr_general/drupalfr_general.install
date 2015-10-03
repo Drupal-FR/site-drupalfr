@@ -20,3 +20,10 @@ function drupalfr_general_update_7000() {
 function drupalfr_general_update_7001() {
   module_enable(array('drupalfr_media'));
 }
+
+/**
+ * Enable commerce_cart_expiration module.
+ */
+function drupalfr_general_update_7002() {
+  module_enable(array('commerce_cart_expiration'));
+}

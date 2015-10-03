@@ -52,6 +52,30 @@ function drupalfr_commerce_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'commerce_cart_expiration_cart_expiration_content';
+  $strongarm->value = '<p>Votre panier expire dans [commerce-order:expiration-formatted].<p>';
+  $export['commerce_cart_expiration_cart_expiration_content'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'commerce_cart_expiration_cart_expiration_content_format';
+  $strongarm->value = '3';
+  $export['commerce_cart_expiration_cart_expiration_content_format'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'commerce_cart_expiration_explanation_page';
+  $strongarm->value = array(
+    'value' => '<p>Désolé, vous avez passé trop de temps dans le processus de commande.</p><p><a href="[site:url]">Retournez à la page d\'accueil</a></p>',
+    'format' => '3',
+  );
+  $export['commerce_cart_expiration_explanation_page'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'commerce_checkout_completion_message';
   $strongarm->value = array(
     'value' => 'Votre numéro de commande est [commerce-order:order-number]. Vous pouvez voir votre commande sur la page de votre compte lorsque vous êtes connectés.',
