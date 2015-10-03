@@ -1,0 +1,391 @@
+<?php
+
+/**
+ * @file
+ * Provides a time-based cart expiration feature.
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function commerce_cart_expiration_cron() {
+  // Invoke our cron Rules event.
+  rules_invoke_all('commerce_cart_expiration_cron');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_cart_expiration_menu() {
+  $items = array();
+
+  $items['commerce_cart_expiration/expire/%commerce_order'] = array(
+    'page callback' => 'commerce_cart_expiration_expire_ajax',
+    'page arguments' => array(2),
+    'access callback' => 'commerce_cart_expiration_access',
+    'access arguments' => array('ajax_expire', 2),
+    'type' => MENU_CALLBACK,
+  );
+  $items['cart/expired'] = array(
+    'title' => 'Shopping cart expired',
+    'page callback' => 'commerce_cart_expiration_page_explanation',
+    'access arguments' => array('ajax order expiration'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/commerce/config/commerce_cart_expiration'] = array(
+    'title' => 'Cart expiration',
+    'description' => 'Configure cart expiration settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_cart_expiration_admin_settings'),
+    'access arguments' => array('configure store'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'commerce_cart_expiration.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_cart_expiration_permission() {
+  $permissions = array(
+    'ajax order expiration' => array(
+      'title' => t('Ajax order expiration'),
+      'description' => t('Enables deletion of an order by an ajax callback when the order has expired.'),
+      'restrict access' => TRUE,
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Access callback.
+ */
+function commerce_cart_expiration_access($op, $arg) {
+  global $user;
+  $access = FALSE;
+
+  switch ($op) {
+    case 'ajax_expire':
+      // We compare the users current cart with the one that may get deleted.
+      $order_user = commerce_cart_order_load($user->uid);
+      $access = user_access('administer commerce_order entities') || ($arg->order_id == $order_user->order_id && user_access('ajax order expiration'));
+      break;
+  }
+
+  return $access;
+}
+
+/**
+ * Retrieves expired cart orders.
+ *
+ * @param int $interval
+ *   Time span (in seconds) until shopping carts are considered expired.
+ * @param int $limit
+ *   Number of expired carts to get.
+ *
+ * @return array
+ *   An array of commerce order IDs. When no results are found, an empty array
+ *   is returned.
+ */
+function commerce_cart_expiration_get_expired_carts($interval, $limit = 0) {
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'commerce_order', '=')
+    ->propertyCondition('status', array_keys(commerce_order_statuses(array('cart' => TRUE))), 'IN')
+    ->propertyCondition('changed', REQUEST_TIME - $interval, '<');
+
+  if ($limit) {
+    $query->range(0, $limit);
+  }
+
+  $result = $query->execute();
+
+  return !empty($result) ? array_keys(reset($result)) : array();
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_cart_expiration_theme() {
+  return array(
+    'commerce_cart_expiration_block' => array(
+      'variables' => array('order' => NULL, 'contents_view' => NULL),
+      'path' => drupal_get_path('module', 'commerce_cart_expiration') . '/theme',
+      'template' => 'commerce-cart-expiration-block',
+    ),
+    'commerce_cart_expiration' => array(
+      'variables' => array(
+        'expires_in' => 0,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function commerce_cart_expiration_block_info() {
+  $blocks = array();
+
+  $blocks['cart_expiration'] = array(
+    'info' => t('Cart expiration'),
+    'cache' => DRUPAL_NO_CACHE,
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => "checkout*\r\ncart",
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function commerce_cart_expiration_block_configure($delta = '') {
+  $form = array();
+
+  if ($delta == 'cart_expiration') {
+    // Provide a field to format output.
+    $form['cart_expiration_block_content_format'] = array(
+      '#type' => 'text_format',
+      '#title' => t('Content format'),
+      '#default_value' => variable_get('commerce_cart_expiration_'. $delta .'_content', '<p>'. t('Your cart expires in [commerce-order:expiration-formatted].') .'<p>'),
+      '#format' => variable_get('commerce_cart_expiration_'. $delta .'_content_format', NULL),
+      '#description' => t('Use [commerce-order:expiration-formatted] to get a javascript compatible replacement.'),
+    );
+
+    $form['token_help'] = array(
+      '#title' => t('Replacement patterns'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['token_help']['help'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => array('commerce-order', 'user', 'site'),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function commerce_cart_expiration_block_save($delta = '', $edit = array()) {
+  variable_set('commerce_cart_expiration_'. $delta .'_content', $edit['cart_expiration_block_content_format']['value']);
+  variable_set('commerce_cart_expiration_'. $delta .'_content_format', $edit['cart_expiration_block_content_format']['format']);
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function commerce_cart_expiration_block_view($delta) {
+  global $user;
+
+  if ($delta == 'cart_expiration') {
+    $content = '';
+
+    if ($order = commerce_cart_order_load($user->uid)) {
+      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+      // Only show the block content if we found product line items.
+      if (commerce_line_items_quantity($order_wrapper->commerce_line_items, commerce_product_line_item_types()) > 0) {
+        $interval = _commerce_cart_expiration_get_interval();
+
+        // If an interval is set.
+        if ($interval) {
+          $statuses = commerce_order_statuses(array('cart' => TRUE));
+
+          if (isset($statuses[$order->status])) {
+            // This order is in cart status.
+            $expire_in = _commerce_cart_expiration_get_expiration($order, $interval);
+
+            // Get text from block configuration.
+            $text = variable_get('commerce_cart_expiration_'. $delta .'_content', '<p>'. t('Your cart expires in [commerce-order:expiration-formatted].') .'<p>');
+            $text = check_markup($text, variable_get('commerce_cart_expiration_'. $delta .'_content_format', NULL));
+
+            // Apply token values.
+            $text = token_replace($text, array('commerce-order' => $order, 'site' => NULL, 'user' => $user));
+
+            $variables = array(
+              'order' => $order,
+              'expire_in' => $expire_in,
+              'content' => $text,
+            );
+            $content = theme('commerce_cart_expiration_block', $variables);
+          }
+        }
+      }
+    }
+
+    return array('subject' => t('Cart expiration'), 'content' => $content);
+  }
+}
+
+/**
+ * Preprocess template for commerce_cart_expiration_block.
+ */
+function commerce_cart_expiration_preprocess_commerce_cart_expiration_block(&$variables) {
+  if (!empty($variables['content'])) {
+    // Add javascript file.
+    drupal_add_js(drupal_get_path('module', 'commerce_cart_expiration') .'/js/commerce_cart_expiration.js');
+
+    // Add javascript settings.
+    $settings = array(
+      'expire_in' => $variables['expire_in'],
+      'url_ajax' => url('commerce_cart_expiration/expire/'. $variables['order']->order_id),
+      'url_redirect' => url('cart/expired'),
+    );
+    drupal_add_js(array('commerce_cart_expiration' => $settings), 'setting');
+  }
+}
+
+/**
+ * Ajax callback for commerce_cart_expiration/expire/%commerce_order.
+ *
+ * Triggers order deletion instantly when javascript recognizes its expiration.
+ */
+function commerce_cart_expiration_expire_ajax($order) {
+  global $user;
+
+  // Return status to calling ajax function.
+  // 0: Order was not deleted as it was processed in the meantime.
+  // 1: Order deleted; redirect to the explanation page.
+  $status = 0;
+
+  // Since the user may have processed the order in another browser tab we need
+  // to check its status again.
+  $statuses = commerce_order_statuses(array('cart' => TRUE));
+  if (isset($statuses[$order->status])) {
+    // Replace explanation page tokens here because this is the last point
+    // where we can use the order.
+    $explanation_content = variable_get('commerce_cart_expiration_explanation_page', array('value' => '<p>'. t('Sorry, you took too much time in the checkout process.') .'</p><p>'. t('<a href="[site:url]">Return to the front page.</a>') .'</p>', 'format' => NULL));
+    $text = check_markup($explanation_content['value'], $explanation_content['format']);
+    $text = token_replace($text, array('commerce-order' => $order, 'site' => NULL, 'user' => $user));
+
+    // Store this text in user session:
+    $_SESSION['commerce_cart_expiration_text'] = $text;
+
+    commerce_order_delete($order->order_id);
+    $status = 1;
+  }
+
+  drupal_json_output(array('status' => $status));
+  exit;
+}
+
+/**
+ * Callback for cart/expired.
+ */
+function commerce_cart_expiration_page_explanation() {
+  global $user;
+
+  // Return prerendered content if available.
+  if (isset($_SESSION['commerce_cart_expiration_text'])) {
+    $text = $_SESSION['commerce_cart_expiration_text'];
+    unset($_SESSION['commerce_cart_expiration_text']);
+    return $text;
+  }
+
+  // Otherwhise create content here without replacing commerce_order tokens.
+  $explanation_content = variable_get('commerce_cart_expiration_explanation_page', '<p>'. array('value' => t('Sorry, you took too much time in the checkout process.') .'</p><p>'. t('<a href="[site:url]">Return to the front page.</a>') .'</p>', 'format' => NULL));
+  $text = check_markup($explanation_content['value'], $explanation_content['format']);
+
+  return token_replace($text, array('site' => NULL, 'user' => $user));
+}
+
+/**
+ * Get the interval configured in Rules, if any.
+ *
+ * @return number
+ *   The expiration interval in seconds.
+ */
+function _commerce_cart_expiration_get_interval() {
+  module_load_include('inc', 'commerce_cart_expiration', 'commerce_cart_expiration.rules');
+
+  $interval = 0;
+  $config = rules_config_load('commerce_cart_expiration_delete_expired_carts');
+  foreach ($config->actions() as $action) {
+    if ($action->getElementName() == 'commerce_cart_expiration_delete_orders') {
+      $interval = $action->settings['interval'];
+    }
+  }
+
+  return $interval;
+}
+
+/**
+ * Returns formatted expiration time.
+ *
+ * Overwrite with caution! Ajax replaces the $('.time-left') selector with its
+ * own calculation.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *     - expires_in: Time left in seconds.
+ */
+function theme_commerce_cart_expiration($variables) {
+  return '<span class="time-left">'. format_interval($variables['expires_in']) .'</span>';
+}
+
+/**
+ * Get seconds left until an order expires.
+ *
+ * @param $order
+ *   An commerce_order object.
+ * @param $interval
+ *   (optional) Seconds until a cart expires.
+ *
+ * @return number
+ *   Seconds until the given order expires.
+ */
+function _commerce_cart_expiration_get_expiration($order, $interval = NULL) {
+  if (!isset($interval)) {
+    $interval = _commerce_cart_expiration_get_interval();
+  }
+  $expire_in = $order->changed + $interval - REQUEST_TIME;
+  return $expire_in;
+}
+
+/**
+ * Implements hook_token_info_alter().
+ */
+function commerce_cart_expiration_token_info_alter(&$data) {
+  if (isset($data['tokens']['commerce-order'])) {
+    $data['tokens']['commerce-order']['expiration-formatted'] = array(
+      'name' => 'Expiration (formatted)',
+      'description' => 'The time left until this order expires. Formatted by theme_commerce_cart_expiration().',
+    );
+    $data['tokens']['commerce-order']['expiration-raw'] = array(
+      'name' => 'Expiration (raw)',
+      'description' => 'The raw time left until this order expires in seconds.',
+    );
+  }
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function commerce_cart_expiration_tokens($type, $tokens, $data = array(), $options = array()) {
+  $replacements = array();
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $order = $data['commerce-order'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'expiration-formatted':
+          $interval = _commerce_cart_expiration_get_interval();
+          $expires_in = _commerce_cart_expiration_get_expiration($order, $interval);
+          $replacements[$original] = theme('commerce_cart_expiration', array('expires_in' => $expires_in));
+          break;
+        case 'expiration-raw':
+          $interval = _commerce_cart_expiration_get_interval();
+          $replacements[$original] = _commerce_cart_expiration_get_expiration($order, $interval);
+          break;
+      }
+    }
+  }
+  return $replacements;
+}
