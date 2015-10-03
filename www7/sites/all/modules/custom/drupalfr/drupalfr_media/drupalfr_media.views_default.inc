@@ -46,17 +46,17 @@ function drupalfr_media_views_default_views() {
   $handler->display->display_options['style_options']['columns'] = '2';
   $handler->display->display_options['row_plugin'] = 'entity';
   $handler->display->display_options['row_options']['view_mode'] = 'media';
-  /* Field: Atom: Scald ID */
+  /* Champ: Atom: Scald ID */
   $handler->display->display_options['fields']['sid']['id'] = 'sid';
   $handler->display->display_options['fields']['sid']['table'] = 'scald_atoms';
   $handler->display->display_options['fields']['sid']['field'] = 'sid';
-  /* Sort criterion: Atom: Created date */
+  /* Critère de tri: Atom: Created date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'scald_atoms';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   $handler->display->display_options['sorts']['created']['granularity'] = 'minute';
-  /* Filter criterion: Atoms: Tags (scald_tags) */
+  /* Critère de filtrage: Atoms: Tags (scald_tags) */
   $handler->display->display_options['filters']['scald_tags_tid']['id'] = 'scald_tags_tid';
   $handler->display->display_options['filters']['scald_tags_tid']['table'] = 'field_data_scald_tags';
   $handler->display->display_options['filters']['scald_tags_tid']['field'] = 'scald_tags_tid';
@@ -78,7 +78,7 @@ function drupalfr_media_views_default_views() {
   );
   $handler->display->display_options['filters']['scald_tags_tid']['type'] = 'select';
   $handler->display->display_options['filters']['scald_tags_tid']['vocabulary'] = 'scald_tags';
-  /* Filter criterion: Atom: Type */
+  /* Critère de filtrage: Atom: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'scald_atoms';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -101,7 +101,7 @@ function drupalfr_media_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'médiathèque';
+  $handler->display->display_options['path'] = 'mediatheque';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Médiathèque';
   $handler->display->display_options['menu']['weight'] = '0';
