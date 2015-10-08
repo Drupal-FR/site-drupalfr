@@ -44,9 +44,22 @@ function hook_leaflet_map_info() {
       ),
       'layers' => array(
         'earth' => array(
-          'urlTemplate' => 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'urlTemplate' => '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           'options' => array(
             'attribution' => 'OSM Mapnik',
+            // The switchZoom controls require multiple layers, referencing one
+            // another as "switchLayer".
+            'switchZoomBelow' => 15,
+            'switchLayer' => 'satellite',
+          ),
+        ),
+        'satellite' => array(
+          'urlTemplate' => '//otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
+          'options' => array(
+            'attribution' => 'OSM Mapnik',
+            'subdomains' => '1234',
+            'switchZoomAbove' => 15,
+            'switchLayer' => 'earth',
           ),
         ),
       ),
@@ -62,4 +75,21 @@ function hook_leaflet_map_info() {
       // ),
     ),
   );
+}
+
+/**
+ * Alters the js settings passed to the leaflet map.
+ *
+ * This hook is called when the leaflet map is being rendered and attaching the
+ * client side javascript settings.
+ *
+ * @param $settings
+ *  A javascript settings array used for building the leaflet map.
+ *
+ * @see leaflet_map_get_info()
+ * @see hook_leaflet_map_info()
+ */
+function hook_leaflet_map_prebuild_alter(&$settings) {
+  $settings['mapId'] = 'my-map-id';
+  $settings['features']['icon'] = 'my-icon-url';
 }
