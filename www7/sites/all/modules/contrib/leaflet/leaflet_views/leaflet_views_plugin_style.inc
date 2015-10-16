@@ -266,6 +266,7 @@ class leaflet_views_plugin_style extends views_plugin_style {
     $map = leaflet_map_get_info($this->options['map']);
     // Is there a geofield selected?
     if ($this->options['data_source']) {
+      $name_field = empty($this->options['name_field']) ? NULL : $this->options['name_field'];
       $this->render_fields($this->view->result);
       foreach ($this->view->result as $id => $result) {
         $geofield = $this->get_field_value($id, $this->options['data_source']);
@@ -288,8 +289,8 @@ class leaflet_views_plugin_style extends views_plugin_style {
             // Normal rendering via fields:
             else {
               $description = '';
-              if ($this->options['name_field']) {
-                $description = $this->rendered_fields[$id][$this->options['name_field']];
+              if ($name_field) {
+                $description = $this->rendered_fields[$id][$name_field];
               }
               if ($this->options['description_field']) {
                 $description .= $this->rendered_fields[$id][$this->options['description_field']];
@@ -304,9 +305,11 @@ class leaflet_views_plugin_style extends views_plugin_style {
             }
           }
           // Attach also titles & entities, they might be used later on.
-          if ($this->options['name_field']) {
+          if ($name_field) {
             foreach ($points as &$point) {
-              $point['label'] = htmlspecialchars_decode(strip_tags($this->rendered_fields[$id][$this->options['name_field']]));
+              if (isset($this->rendered_fields[$id][$name_field])) {
+                $point['label'] = htmlspecialchars_decode(strip_tags($this->rendered_fields[$id][$name_field]));
+              }
               if ($entity !== FALSE) {
                 $point['entity'] = $entity;
               }

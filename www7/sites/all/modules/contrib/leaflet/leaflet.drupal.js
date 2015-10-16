@@ -200,6 +200,10 @@
 
   Drupal.leaflet = {
 
+    isOldVersion: function () {
+      return !(parseInt(L.version) >= 1); // version may start with '0' or '.'
+    },
+
     create_layer: function (layer, key) {
       // Use a Zoomswitch Layer extension to enable zoom-switch option.
       var map_layer = new L.TileLayerZoomSwitch(layer.urlTemplate);
@@ -232,24 +236,18 @@
       var latLng = new L.LatLng(circle.lat, circle.lon);
       latLng = latLng.wrap();
       lMap.bounds.push(latLng);
-      if (circle.options) {
-        return new L.Circle(latLng, circle.radius, circle.options);
+      if (circle.radius) {
+        // @deprecated
+        return L.circle(latLng, circle.radius, circle.options);
       }
-      else {
-        return new L.Circle(latLng, circle.radius);
-      }
+      return new L.Circle(latLng, circle.options);
     },
 
     create_circlemarker: function(circle, lMap) {
       var latLng = new L.LatLng(circle.lat, circle.lon);
       latLng = latLng.wrap();
       lMap.bounds.push(latLng);
-      if (circle.options) {
-        return new L.CircleMarker(latLng, circle.options);
-      }
-      else {
-        return new L.CircleMarker(latLng, circle.radius);
-      }
+      return new L.CircleMarker(latLng, circle.options);
     },
 
     create_rectangle: function(box, lMap) {
@@ -363,12 +361,10 @@
         }
         polygons.push(latlngs);
       }
-      if (multipoly.multipolyline) {
-        return new L.MultiPolyline(polygons);
+      if (this.isOldVersion()) {
+        return multipoly.multipolyline ? new L.MultiPolyline(polygons) : new L.MultiPolygon(polygons);
       }
-      else {
-        return new L.MultiPolygon(polygons);
-      }
+      return multipoly.multipolyline ? new L.Polyline(polygons): new L.Polygon(polygons);
     },
 
     create_json:function(json, lMap) {
