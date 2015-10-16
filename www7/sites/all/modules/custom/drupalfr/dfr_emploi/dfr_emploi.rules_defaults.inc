@@ -113,7 +113,7 @@ function dfr_emploi_default_rules_configuration() {
       ],
       "DO" : [
         { "mail_to_users_of_role" : {
-            "roles" : { "value" : { "4" : "4", "14" : "14" } },
+            "roles" : { "value" : { "14" : "14" } },
             "subject" : "Offre d\\u0027emploi en attente de mod\\u00e9ration",
             "message" : "Bonjour,\\r\\n\\r\\nUne nouvelle offre d\\u0027emploi vient d\\u0027\\u00eatre post\\u00e9e dans la section emploi, nous vous invitons \\u00e0 y jeter un oeil afin de la mod\\u00e9rer, tant que vous ne la publierez pas l\\u0027offre ne sera pas visible.\\r\\n\\r\\nPour voir l\\u0027offre, rendez-vous ici : [node:url]\\r\\nPour modifier l\\u0027offre, rendez-vous ici : [node:edit-url]\\r\\nPage d\\u0027administration des offres d\\u0027emploi : [site:url]\\/admin\\/content\\/emploi\\r\\n\\r\\nBonne journ\\u00e9e."
           }
@@ -133,7 +133,7 @@ function dfr_emploi_default_rules_configuration() {
       ],
       "DO" : [
         { "mail_to_users_of_role" : {
-            "roles" : { "value" : { "4" : "4", "14" : "14" } },
+            "roles" : { "value" : { "14" : "14" } },
             "subject" : "Offre d\\u0027emploi mise \\u00e0 jour par son auteur.",
             "message" : "Bonjour,\\r\\n\\r\\nL\\u0027auteur d\\u0027une offre d\\u0027emploi en attente de validation ou refus\\u00e9e la mise \\u00e0 jour, nous vous invitons \\u00e0 y jeter un oeil afin de la mod\\u00e9rer, tant que vous ne la publierez pas l\\u0027offre ne sera pas visible.\\r\\n\\r\\nPour voir l\\u0027offre, rendez-vous ici : [node:url]\\r\\nPour modifier l\\u0027offre, rendez-vous ici : [node:edit-url]\\r\\nPage d\\u0027administration des offres d\\u0027emploi : [site:url]\\/admin\\/content\\/emploi\\r\\n\\r\\nBonne journ\\u00e9e."
           }
