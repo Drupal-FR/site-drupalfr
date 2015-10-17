@@ -37,12 +37,12 @@ function drupalfr_media_strongarm() {
       'display' => array(
         'atom' => array(
           'default' => array(
-            'weight' => '-2',
+            'weight' => '0',
             'visible' => TRUE,
           ),
           'media' => array(
-            'weight' => '0',
-            'visible' => TRUE,
+            'weight' => '2',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -84,11 +84,11 @@ function drupalfr_media_strongarm() {
       'display' => array(
         'atom' => array(
           'default' => array(
-            'weight' => '-2',
-            'visible' => TRUE,
+            'weight' => '4',
+            'visible' => FALSE,
           ),
           'media' => array(
-            'weight' => '4',
+            'weight' => '5',
             'visible' => FALSE,
           ),
         ),

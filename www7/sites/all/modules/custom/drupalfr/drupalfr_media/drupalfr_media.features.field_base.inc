@@ -10,7 +10,7 @@
 function drupalfr_media_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_media_description'
+  // Exported field_base: 'field_media_description'.
   $field_bases['field_media_description'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -32,7 +32,7 @@ function drupalfr_media_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'scald_author_url'
+  // Exported field_base: 'scald_author_url'.
   $field_bases['scald_author_url'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -54,13 +54,16 @@ function drupalfr_media_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'scald_authors'
+  // Exported field_base: 'scald_authors'.
   $field_bases['scald_authors'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_authors',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -81,7 +84,7 @@ function drupalfr_media_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'scald_file'
+  // Exported field_base: 'scald_file'.
   $field_bases['scald_file'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -107,13 +110,16 @@ function drupalfr_media_field_default_field_bases() {
     'type' => 'file',
   );
 
-  // Exported field_base: 'scald_tags'
+  // Exported field_base: 'scald_tags'.
   $field_bases['scald_tags'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_tags',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -134,7 +140,7 @@ function drupalfr_media_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'scald_thumbnail'
+  // Exported field_base: 'scald_thumbnail'.
   $field_bases['scald_thumbnail'] = array(
     'active' => 1,
     'cardinality' => 1,

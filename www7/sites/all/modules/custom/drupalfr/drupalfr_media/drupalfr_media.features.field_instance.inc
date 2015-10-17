@@ -10,7 +10,7 @@
 function drupalfr_media_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'scald_atom-audio-scald_authors'
+  // Exported field_instance: 'scald_atom-audio-scald_authors'.
   $field_instances['scald_atom-audio-scald_authors'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
@@ -18,7 +18,7 @@ function drupalfr_media_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
@@ -28,17 +28,18 @@ function drupalfr_media_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'scald_atom',
     'field_name' => 'scald_authors',
-    'label' => 'Authors',
-    'required' => FALSE,
+    'label' => 'Auteurs',
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
     'widget' => array(
+      'active' => 0,
       'module' => 'taxonomy',
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
@@ -49,7 +50,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-scald_tags'
+  // Exported field_instance: 'scald_atom-audio-scald_tags'.
   $field_instances['scald_atom-audio-scald_tags'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
@@ -57,14 +58,14 @@ function drupalfr_media_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
         'weight' => 2,
       ),
       'media' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
@@ -73,12 +74,13 @@ function drupalfr_media_field_default_field_instances() {
     ),
     'entity_type' => 'scald_atom',
     'field_name' => 'scald_tags',
-    'label' => 'Tags',
-    'required' => FALSE,
+    'label' => 'Étiquettes',
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
     'widget' => array(
+      'active' => 0,
       'module' => 'taxonomy',
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
@@ -89,23 +91,27 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-scald_thumbnail'
+  // Exported field_instance: 'scald_atom-audio-scald_thumbnail'.
   $field_instances['scald_atom-audio-scald_thumbnail'] = array(
     'bundle' => 'audio',
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'media' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 3,
+      ),
+      'media' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => 'content',
+          'image_style' => 'thumbnail',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
     ),
     'entity_type' => 'scald_atom',
@@ -134,7 +140,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-field_media_description'
+  // Exported field_instance: 'scald_atom-file-field_media_description'.
   $field_instances['scald_atom-file-field_media_description'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -146,14 +152,13 @@ function drupalfr_media_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'media' => array(
         'label' => 'hidden',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 0,
+        'type' => 'hidden',
+        'weight' => 1,
       ),
     ),
     'entity_type' => 'scald_atom',
@@ -175,7 +180,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_authors'
+  // Exported field_instance: 'scald_atom-file-scald_authors'.
   $field_instances['scald_atom-file-scald_authors'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -183,11 +188,11 @@ function drupalfr_media_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'media' => array(
         'label' => 'inline',
@@ -199,12 +204,13 @@ function drupalfr_media_field_default_field_instances() {
     ),
     'entity_type' => 'scald_atom',
     'field_name' => 'scald_authors',
-    'label' => 'Authors',
-    'required' => FALSE,
+    'label' => 'Auteurs',
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
     'widget' => array(
+      'active' => 0,
       'module' => 'taxonomy',
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
@@ -215,7 +221,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_file'
+  // Exported field_instance: 'scald_atom-file-scald_file'.
   $field_instances['scald_atom-file-scald_file'] = array(
     'bundle' => 'file',
     'deleted' => 0,
@@ -226,14 +232,14 @@ function drupalfr_media_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'media' => array(
         'label' => 'above',
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 1,
+        'weight' => 4,
       ),
     ),
     'entity_type' => 'scald_atom',
@@ -258,7 +264,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_tags'
+  // Exported field_instance: 'scald_atom-file-scald_tags'.
   $field_instances['scald_atom-file-scald_tags'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -266,11 +272,11 @@ function drupalfr_media_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 2,
+        'weight' => 1,
       ),
       'media' => array(
         'label' => 'inline',
@@ -282,12 +288,13 @@ function drupalfr_media_field_default_field_instances() {
     ),
     'entity_type' => 'scald_atom',
     'field_name' => 'scald_tags',
-    'label' => 'Tags',
-    'required' => FALSE,
+    'label' => 'Étiquettes',
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
     'widget' => array(
+      'active' => 0,
       'module' => 'taxonomy',
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
@@ -298,7 +305,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_thumbnail'
+  // Exported field_instance: 'scald_atom-file-scald_thumbnail'.
   $field_instances['scald_atom-file-scald_thumbnail'] = array(
     'bundle' => 'file',
     'deleted' => 0,
@@ -308,13 +315,17 @@ function drupalfr_media_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 5,
       ),
       'media' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 5,
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => 'content',
+          'image_style' => 'thumbnail',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
     ),
     'entity_type' => 'scald_atom',
@@ -343,7 +354,7 @@ function drupalfr_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'taxonomy_term-scald_authors-scald_author_url'
+  // Exported field_instance: 'taxonomy_term-scald_authors-scald_author_url'.
   $field_instances['taxonomy_term-scald_authors-scald_author_url'] = array(
     'bundle' => 'scald_authors',
     'default_value' => NULL,
@@ -378,13 +389,13 @@ function drupalfr_media_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Authors');
+  t('Auteurs');
   t('Description');
   t('Fichiers');
   t('Homepage of the Author');
-  t('Tags');
   t('Thumbnail');
   t('URL');
+  t('Étiquettes');
 
   return $field_instances;
 }

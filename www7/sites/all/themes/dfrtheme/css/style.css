@@ -714,8 +714,25 @@ div.vertical-tabs .vertical-tabs-list li {
 /** ******************************************************* **/
 /** Media                                                   **/
 /** ******************************************************* **/
+/** For the file atoms. */
 .view-media td {
   width: 50%;
 }
 
+.view-media .scald_atom h2 {
+  font-size: 20px;
+}
+.scald_atom .field-type-taxonomy-term-reference .field-item {
+  display: inline-block;
+  padding-right: 5px;
+}
+.scald_atom .field-type-taxonomy-term-reference .field-item:not(:last-child):after {
+  content: ',';
+}
 
+/** ******************************************************* **/
+/** Views                                                   **/
+/** ******************************************************* **/
+.view-filters {
+  margin-bottom: 15px;
+}

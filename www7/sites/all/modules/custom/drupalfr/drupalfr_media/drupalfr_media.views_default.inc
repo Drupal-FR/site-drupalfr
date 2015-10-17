@@ -46,17 +46,17 @@ function drupalfr_media_views_default_views() {
   $handler->display->display_options['style_options']['columns'] = '2';
   $handler->display->display_options['row_plugin'] = 'entity';
   $handler->display->display_options['row_options']['view_mode'] = 'media';
-  /* Champ: Atom: Scald ID */
+  /* Field: Atom: Scald ID */
   $handler->display->display_options['fields']['sid']['id'] = 'sid';
   $handler->display->display_options['fields']['sid']['table'] = 'scald_atoms';
   $handler->display->display_options['fields']['sid']['field'] = 'sid';
-  /* Critère de tri: Atom: Created date */
+  /* Sort criterion: Atom: Created date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'scald_atoms';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   $handler->display->display_options['sorts']['created']['granularity'] = 'minute';
-  /* Critère de filtrage: Atoms: Tags (scald_tags) */
+  /* Filter criterion: Atoms: Étiquettes (scald_tags) */
   $handler->display->display_options['filters']['scald_tags_tid']['id'] = 'scald_tags_tid';
   $handler->display->display_options['filters']['scald_tags_tid']['table'] = 'field_data_scald_tags';
   $handler->display->display_options['filters']['scald_tags_tid']['field'] = 'scald_tags_tid';
@@ -75,10 +75,11 @@ function drupalfr_media_views_default_views() {
     12 => 0,
     14 => 0,
     15 => 0,
+    16 => 0,
   );
   $handler->display->display_options['filters']['scald_tags_tid']['type'] = 'select';
   $handler->display->display_options['filters']['scald_tags_tid']['vocabulary'] = 'scald_tags';
-  /* Critère de filtrage: Atom: Type */
+  /* Filter criterion: Atom: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'scald_atoms';
   $handler->display->display_options['filters']['type']['field'] = 'type';
