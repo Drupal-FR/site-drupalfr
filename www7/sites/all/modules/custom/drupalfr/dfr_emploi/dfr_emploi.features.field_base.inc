@@ -10,7 +10,7 @@
 function dfr_emploi_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'comment_body'
+  // Exported field_base: 'comment_body'.
   $field_bases['comment_body'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -31,7 +31,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_flag_moderation'
+  // Exported field_base: 'field_flag_moderation'.
   $field_bases['field_flag_moderation'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -60,7 +60,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_info_contact'
+  // Exported field_base: 'field_info_contact'.
   $field_bases['field_info_contact'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -79,7 +79,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_message_moderation'
+  // Exported field_base: 'field_message_moderation'.
   $field_bases['field_message_moderation'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -101,7 +101,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_nature_poste'
+  // Exported field_base: 'field_nature_poste'.
   $field_bases['field_nature_poste'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -127,7 +127,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_region'
+  // Exported field_base: 'field_region'.
   $field_bases['field_region'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -162,7 +162,7 @@ function dfr_emploi_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_societe'
+  // Exported field_base: 'field_societe'.
   $field_bases['field_societe'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -197,7 +197,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_teletravail'
+  // Exported field_base: 'field_teletravail'.
   $field_bases['field_teletravail'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -222,7 +222,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
-  // Exported field_base: 'field_temps_publication'
+  // Exported field_base: 'field_temps_publication'.
   $field_bases['field_temps_publication'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -248,7 +248,7 @@ function dfr_emploi_field_default_field_bases() {
     'type' => 'list_integer',
   );
 
-  // Exported field_base: 'field_type_contrat'
+  // Exported field_base: 'field_type_contrat'.
   $field_bases['field_type_contrat'] = array(
     'active' => 1,
     'cardinality' => 1,

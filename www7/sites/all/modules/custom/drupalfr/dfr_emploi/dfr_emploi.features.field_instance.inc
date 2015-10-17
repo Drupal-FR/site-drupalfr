@@ -10,7 +10,7 @@
 function dfr_emploi_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'comment-comment_node_offre-comment_body'
+  // Exported field_instance: 'comment-comment_node_offre-comment_body'.
   $field_instances['comment-comment_node_offre-comment_body'] = array(
     'bundle' => 'comment_node_offre',
     'default_value' => NULL,
@@ -43,7 +43,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-body'
+  // Exported field_instance: 'node-offre-body'.
   $field_instances['node-offre-body'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,
@@ -85,7 +85,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_flag_moderation'
+  // Exported field_instance: 'node-offre-field_flag_moderation'.
   $field_instances['node-offre-field_flag_moderation'] = array(
     'bundle' => 'offre',
     'default_value' => array(
@@ -126,7 +126,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_info_contact'
+  // Exported field_instance: 'node-offre-field_info_contact'.
   $field_instances['node-offre-field_info_contact'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,
@@ -166,7 +166,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_message_moderation'
+  // Exported field_instance: 'node-offre-field_message_moderation'.
   $field_instances['node-offre-field_message_moderation'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,
@@ -205,7 +205,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_nature_poste'
+  // Exported field_instance: 'node-offre-field_nature_poste'.
   $field_instances['node-offre-field_nature_poste'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,
@@ -242,7 +242,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_region'
+  // Exported field_instance: 'node-offre-field_region'.
   $field_instances['node-offre-field_region'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,
@@ -280,7 +280,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_societe'
+  // Exported field_instance: 'node-offre-field_societe'.
   $field_instances['node-offre-field_societe'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,
@@ -324,7 +324,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_teletravail'
+  // Exported field_instance: 'node-offre-field_teletravail'.
   $field_instances['node-offre-field_teletravail'] = array(
     'bundle' => 'offre',
     'default_value' => array(
@@ -365,7 +365,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_temps_publication'
+  // Exported field_instance: 'node-offre-field_temps_publication'.
   $field_instances['node-offre-field_temps_publication'] = array(
     'bundle' => 'offre',
     'default_value' => array(
@@ -405,7 +405,7 @@ function dfr_emploi_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-offre-field_type_contrat'
+  // Exported field_instance: 'node-offre-field_type_contrat'.
   $field_instances['node-offre-field_type_contrat'] = array(
     'bundle' => 'offre',
     'default_value' => NULL,

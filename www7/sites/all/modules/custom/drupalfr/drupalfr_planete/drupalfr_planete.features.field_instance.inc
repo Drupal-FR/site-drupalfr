@@ -10,7 +10,7 @@
 function drupalfr_planete_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-planete-body'
+  // Exported field_instance: 'node-planete-body'.
   $field_instances['node-planete-body'] = array(
     'bundle' => 'planete',
     'default_value' => NULL,
@@ -52,7 +52,7 @@ function drupalfr_planete_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-planete-field_planete_tags'
+  // Exported field_instance: 'node-planete-field_planete_tags'.
   $field_instances['node-planete-field_planete_tags'] = array(
     'bundle' => 'planete',
     'default_value' => NULL,
@@ -93,7 +93,7 @@ function drupalfr_planete_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-planete-field_planete_url'
+  // Exported field_instance: 'node-planete-field_planete_url'.
   $field_instances['node-planete-field_planete_url'] = array(
     'bundle' => 'planete',
     'default_value' => NULL,
@@ -147,7 +147,7 @@ function drupalfr_planete_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-planete-field_planete_user'
+  // Exported field_instance: 'node-planete-field_planete_user'.
   $field_instances['node-planete-field_planete_user'] = array(
     'bundle' => 'planete',
     'default_value' => NULL,
@@ -190,7 +190,7 @@ function drupalfr_planete_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-planete_feed_source-body'
+  // Exported field_instance: 'node-planete_feed_source-body'.
   $field_instances['node-planete_feed_source-body'] = array(
     'bundle' => 'planete_feed_source',
     'default_value' => NULL,
@@ -234,7 +234,7 @@ function drupalfr_planete_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_planete_rss'
+  // Exported field_instance: 'user-user-field_planete_rss'.
   $field_instances['user-user-field_planete_rss'] = array(
     'bundle' => 'user',
     'default_value' => NULL,

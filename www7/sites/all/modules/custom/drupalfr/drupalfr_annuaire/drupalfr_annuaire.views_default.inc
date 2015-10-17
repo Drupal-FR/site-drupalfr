@@ -61,7 +61,7 @@ function drupalfr_annuaire_views_default_views() {
     ),
   );
   $handler->display->display_options['style_options']['override'] = FALSE;
-  /* Entête: Global: Text area */
+  /* Header: Global: Text area */
   $handler->display->display_options['header']['text']['id'] = 'area';
   $handler->display->display_options['header']['text']['table'] = 'views';
   $handler->display->display_options['header']['text']['field'] = 'area';
@@ -73,19 +73,19 @@ function drupalfr_annuaire_views_default_views() {
   
   ';
   $handler->display->display_options['header']['text']['format'] = '2';
-  /* Pied de page: Global: Text area */
+  /* Footer: Global: Text area */
   $handler->display->display_options['footer']['text']['id'] = 'text';
   $handler->display->display_options['footer']['text']['table'] = 'views';
   $handler->display->display_options['footer']['text']['field'] = 'area';
   $handler->display->display_options['footer']['text']['content'] = 'Vous êtes un prestataire de service Drupal et vous voulez apparaître dans l\'annuaire ?
 <a href="node/add/annuaire">Ajoutez votre fiche</a> dès aujourd\'hui ! (vous devrez vous identifier pour cela)';
   $handler->display->display_options['footer']['text']['format'] = '1';
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = 'Société';
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -99,7 +99,7 @@ function drupalfr_annuaire_views_default_views() {
   $handler = $view->new_display('page', 'Annuaire', 'page_2');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Champ: Content: Logo */
+  /* Field: Content: Logo */
   $handler->display->display_options['fields']['field_logo']['id'] = 'field_logo';
   $handler->display->display_options['fields']['field_logo']['table'] = 'field_data_field_logo';
   $handler->display->display_options['fields']['field_logo']['field'] = 'field_logo';
@@ -108,30 +108,30 @@ function drupalfr_annuaire_views_default_views() {
     'image_style' => 'large',
     'image_link' => '',
   );
-  /* Champ: Content: Title */
+  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = 'Société';
-  /* Champ: Content: Type de service */
+  /* Field: Content: Type de service */
   $handler->display->display_options['fields']['field_type_de_service']['id'] = 'field_type_de_service';
   $handler->display->display_options['fields']['field_type_de_service']['table'] = 'field_data_field_type_de_service';
   $handler->display->display_options['fields']['field_type_de_service']['field'] = 'field_type_de_service';
-  /* Champ: Content: Région */
+  /* Field: Content: Région */
   $handler->display->display_options['fields']['field_region']['id'] = 'field_region';
   $handler->display->display_options['fields']['field_region']['table'] = 'field_data_field_region';
   $handler->display->display_options['fields']['field_region']['field'] = 'field_region';
-  /* Champ: Content: Effectif */
+  /* Field: Content: Effectif */
   $handler->display->display_options['fields']['field_taille']['id'] = 'field_taille';
   $handler->display->display_options['fields']['field_taille']['table'] = 'field_data_field_taille';
   $handler->display->display_options['fields']['field_taille']['field'] = 'field_taille';
-  /* Champ: Content: Forme juridique */
+  /* Field: Content: Forme juridique */
   $handler->display->display_options['fields']['field_forme_juridique']['id'] = 'field_forme_juridique';
   $handler->display->display_options['fields']['field_forme_juridique']['table'] = 'field_data_field_forme_juridique';
   $handler->display->display_options['fields']['field_forme_juridique']['field'] = 'field_forme_juridique';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Critère de filtrage: Content: Type */
+  /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -140,7 +140,7 @@ function drupalfr_annuaire_views_default_views() {
   );
   $handler->display->display_options['filters']['type']['group'] = '0';
   $handler->display->display_options['filters']['type']['expose']['operator'] = FALSE;
-  /* Critère de filtrage: Content: Effectif (field_taille) */
+  /* Filter criterion: Content: Effectif (field_taille) */
   $handler->display->display_options['filters']['field_taille_value']['id'] = 'field_taille_value';
   $handler->display->display_options['filters']['field_taille_value']['table'] = 'field_data_field_taille';
   $handler->display->display_options['filters']['field_taille_value']['field'] = 'field_taille_value';
@@ -159,7 +159,7 @@ function drupalfr_annuaire_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Critère de filtrage: Content: Forme juridique (field_forme_juridique) */
+  /* Filter criterion: Content: Forme juridique (field_forme_juridique) */
   $handler->display->display_options['filters']['field_forme_juridique_value']['id'] = 'field_forme_juridique_value';
   $handler->display->display_options['filters']['field_forme_juridique_value']['table'] = 'field_data_field_forme_juridique';
   $handler->display->display_options['filters']['field_forme_juridique_value']['field'] = 'field_forme_juridique_value';
@@ -178,7 +178,7 @@ function drupalfr_annuaire_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Critère de filtrage: Content: Région (field_region) */
+  /* Filter criterion: Content: Région (field_region) */
   $handler->display->display_options['filters']['field_region_value']['id'] = 'field_region_value';
   $handler->display->display_options['filters']['field_region_value']['table'] = 'field_data_field_region';
   $handler->display->display_options['filters']['field_region_value']['field'] = 'field_region_value';
@@ -197,7 +197,7 @@ function drupalfr_annuaire_views_default_views() {
     7 => 0,
     12 => 0,
   );
-  /* Critère de filtrage: Content: Type de service (field_type_de_service) */
+  /* Filter criterion: Content: Type de service (field_type_de_service) */
   $handler->display->display_options['filters']['field_type_de_service_value']['id'] = 'field_type_de_service_value';
   $handler->display->display_options['filters']['field_type_de_service_value']['table'] = 'field_data_field_type_de_service';
   $handler->display->display_options['filters']['field_type_de_service_value']['field'] = 'field_type_de_service_value';

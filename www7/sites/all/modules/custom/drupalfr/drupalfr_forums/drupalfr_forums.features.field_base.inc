@@ -10,7 +10,7 @@
 function drupalfr_forums_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_workflow_status'
+  // Exported field_base: 'field_workflow_status'.
   $field_bases['field_workflow_status'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -39,7 +39,7 @@ function drupalfr_forums_field_default_field_bases() {
     'type_name' => 'forum',
   );
 
-  // Exported field_base: 'taxonomy_forums'
+  // Exported field_base: 'taxonomy_forums'.
   $field_bases['taxonomy_forums'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -66,7 +66,7 @@ function drupalfr_forums_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'taxonomy_vocabulary_4'
+  // Exported field_base: 'taxonomy_vocabulary_4'.
   $field_bases['taxonomy_vocabulary_4'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -93,7 +93,7 @@ function drupalfr_forums_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'taxonomy_vocabulary_5'
+  // Exported field_base: 'taxonomy_vocabulary_5'.
   $field_bases['taxonomy_vocabulary_5'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -120,7 +120,7 @@ function drupalfr_forums_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'upload'
+  // Exported field_base: 'upload'.
   $field_bases['upload'] = array(
     'active' => 1,
     'cardinality' => -1,

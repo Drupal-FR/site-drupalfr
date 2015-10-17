@@ -10,7 +10,7 @@
 function drupalfr_annuaire_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-annuaire-field_adresse'
+  // Exported field_instance: 'node-annuaire-field_adresse'.
   $field_instances['node-annuaire-field_adresse'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',
@@ -61,7 +61,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'text_textarea',
   );
 
-  // Exported field_instance: 'node-annuaire-field_asso_member'
+  // Exported field_instance: 'node-annuaire-field_asso_member'.
   $field_instances['node-annuaire-field_asso_member'] = array(
     'bundle' => 'annuaire',
     'default_value' => array(
@@ -112,7 +112,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'optionwidgets_buttons',
   );
 
-  // Exported field_instance: 'node-annuaire-field_description'
+  // Exported field_instance: 'node-annuaire-field_description'.
   $field_instances['node-annuaire-field_description'] = array(
     'bundle' => 'annuaire',
     'default_value' => array(
@@ -166,7 +166,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'text_textarea',
   );
 
-  // Exported field_instance: 'node-annuaire-field_forme_juridique'
+  // Exported field_instance: 'node-annuaire-field_forme_juridique'.
   $field_instances['node-annuaire-field_forme_juridique'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',
@@ -215,7 +215,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'optionwidgets_select',
   );
 
-  // Exported field_instance: 'node-annuaire-field_logo'
+  // Exported field_instance: 'node-annuaire-field_logo'.
   $field_instances['node-annuaire-field_logo'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',
@@ -302,7 +302,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'imagefield_widget',
   );
 
-  // Exported field_instance: 'node-annuaire-field_mail'
+  // Exported field_instance: 'node-annuaire-field_mail'.
   $field_instances['node-annuaire-field_mail'] = array(
     'bundle' => 'annuaire',
     'default_value' => array(
@@ -354,7 +354,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'email_textfield',
   );
 
-  // Exported field_instance: 'node-annuaire-field_member'
+  // Exported field_instance: 'node-annuaire-field_member'.
   $field_instances['node-annuaire-field_member'] = array(
     'bundle' => 'annuaire',
     'default_value' => array(
@@ -405,7 +405,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'optionwidgets_buttons',
   );
 
-  // Exported field_instance: 'node-annuaire-field_region'
+  // Exported field_instance: 'node-annuaire-field_region'.
   $field_instances['node-annuaire-field_region'] = array(
     'bundle' => 'annuaire',
     'default_value' => NULL,
@@ -442,7 +442,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-annuaire-field_showcase'
+  // Exported field_instance: 'node-annuaire-field_showcase'.
   $field_instances['node-annuaire-field_showcase'] = array(
     'bundle' => 'annuaire',
     'default_value' => array(
@@ -510,7 +510,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'link',
   );
 
-  // Exported field_instance: 'node-annuaire-field_siren'
+  // Exported field_instance: 'node-annuaire-field_siren'.
   $field_instances['node-annuaire-field_siren'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',
@@ -572,7 +572,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'number',
   );
 
-  // Exported field_instance: 'node-annuaire-field_taille'
+  // Exported field_instance: 'node-annuaire-field_taille'.
   $field_instances['node-annuaire-field_taille'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',
@@ -622,7 +622,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'optionwidgets_select',
   );
 
-  // Exported field_instance: 'node-annuaire-field_telephone'
+  // Exported field_instance: 'node-annuaire-field_telephone'.
   $field_instances['node-annuaire-field_telephone'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',
@@ -675,7 +675,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'phone_textfield',
   );
 
-  // Exported field_instance: 'node-annuaire-field_type_de_service'
+  // Exported field_instance: 'node-annuaire-field_type_de_service'.
   $field_instances['node-annuaire-field_type_de_service'] = array(
     'bundle' => 'annuaire',
     'default_value' => NULL,
@@ -723,7 +723,7 @@ function drupalfr_annuaire_field_default_field_instances() {
     'widget_type' => 'optionwidgets_buttons',
   );
 
-  // Exported field_instance: 'node-annuaire-field_url'
+  // Exported field_instance: 'node-annuaire-field_url'.
   $field_instances['node-annuaire-field_url'] = array(
     'bundle' => 'annuaire',
     'default_value' => '',

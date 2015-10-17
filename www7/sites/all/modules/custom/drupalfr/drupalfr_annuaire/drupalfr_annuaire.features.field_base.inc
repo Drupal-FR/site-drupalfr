@@ -10,7 +10,7 @@
 function drupalfr_annuaire_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_adresse'
+  // Exported field_base: 'field_adresse'.
   $field_bases['field_adresse'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -35,7 +35,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_asso_member'
+  // Exported field_base: 'field_asso_member'.
   $field_bases['field_asso_member'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -63,7 +63,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_description'
+  // Exported field_base: 'field_description'.
   $field_bases['field_description'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -88,7 +88,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_forme_juridique'
+  // Exported field_base: 'field_forme_juridique'.
   $field_bases['field_forme_juridique'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -120,7 +120,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_logo'
+  // Exported field_base: 'field_logo'.
   $field_bases['field_logo'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -146,7 +146,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_mail'
+  // Exported field_base: 'field_mail'.
   $field_bases['field_mail'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -162,7 +162,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_member'
+  // Exported field_base: 'field_member'.
   $field_bases['field_member'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -190,7 +190,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_showcase'
+  // Exported field_base: 'field_showcase'.
   $field_bases['field_showcase'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -220,7 +220,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_siren'
+  // Exported field_base: 'field_siren'.
   $field_bases['field_siren'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -244,7 +244,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_taille'
+  // Exported field_base: 'field_taille'.
   $field_bases['field_taille'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -276,7 +276,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_telephone'
+  // Exported field_base: 'field_telephone'.
   $field_bases['field_telephone'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -295,7 +295,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_type_de_service'
+  // Exported field_base: 'field_type_de_service'.
   $field_bases['field_type_de_service'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -329,7 +329,7 @@ function drupalfr_annuaire_field_default_field_bases() {
     'type_name' => 'annuaire',
   );
 
-  // Exported field_base: 'field_url'
+  // Exported field_base: 'field_url'.
   $field_bases['field_url'] = array(
     'active' => 1,
     'cardinality' => 1,

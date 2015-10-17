@@ -10,7 +10,7 @@
 function drupalfr_user_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'user-user-field_biography'
+  // Exported field_instance: 'user-user-field_biography'.
   $field_instances['user-user-field_biography'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -60,7 +60,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_company'
+  // Exported field_instance: 'user-user-field_company'.
   $field_instances['user-user-field_company'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -108,7 +108,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_drupal_org'
+  // Exported field_instance: 'user-user-field_drupal_org'.
   $field_instances['user-user-field_drupal_org'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -155,7 +155,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_events'
+  // Exported field_instance: 'user-user-field_events'.
   $field_instances['user-user-field_events'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -198,7 +198,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_facebook'
+  // Exported field_instance: 'user-user-field_facebook'.
   $field_instances['user-user-field_facebook'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -245,7 +245,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_google_plus'
+  // Exported field_instance: 'user-user-field_google_plus'.
   $field_instances['user-user-field_google_plus'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -292,7 +292,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_icq'
+  // Exported field_instance: 'user-user-field_icq'.
   $field_instances['user-user-field_icq'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -339,7 +339,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_jabber'
+  // Exported field_instance: 'user-user-field_jabber'.
   $field_instances['user-user-field_jabber'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -386,7 +386,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_linkedin'
+  // Exported field_instance: 'user-user-field_linkedin'.
   $field_instances['user-user-field_linkedin'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -433,7 +433,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_membership_number'
+  // Exported field_instance: 'user-user-field_membership_number'.
   $field_instances['user-user-field_membership_number'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -478,7 +478,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_msn'
+  // Exported field_instance: 'user-user-field_msn'.
   $field_instances['user-user-field_msn'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -524,7 +524,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_newsletter_adff'
+  // Exported field_instance: 'user-user-field_newsletter_adff'.
   $field_instances['user-user-field_newsletter_adff'] = array(
     'bundle' => 'user',
     'default_value' => array(
@@ -585,7 +585,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_newsletter_dc_soleil_2014'
+  // Exported field_instance: 'user-user-field_newsletter_dc_soleil_2014'.
   $field_instances['user-user-field_newsletter_dc_soleil_2014'] = array(
     'bundle' => 'user',
     'default_value' => array(
@@ -646,7 +646,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_newsletter_ddd_2015'
+  // Exported field_instance: 'user-user-field_newsletter_ddd_2015'.
   $field_instances['user-user-field_newsletter_ddd_2015'] = array(
     'bundle' => 'user',
     'default_value' => array(
@@ -705,7 +705,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_nickname'
+  // Exported field_instance: 'user-user-field_nickname'.
   $field_instances['user-user-field_nickname'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -752,7 +752,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_picture'
+  // Exported field_instance: 'user-user-field_picture'.
   $field_instances['user-user-field_picture'] = array(
     'bundle' => 'user',
     'deleted' => 0,
@@ -816,7 +816,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_realname'
+  // Exported field_instance: 'user-user-field_realname'.
   $field_instances['user-user-field_realname'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -864,7 +864,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_twitter'
+  // Exported field_instance: 'user-user-field_twitter'.
   $field_instances['user-user-field_twitter'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -911,7 +911,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_viadeo'
+  // Exported field_instance: 'user-user-field_viadeo'.
   $field_instances['user-user-field_viadeo'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
@@ -958,7 +958,7 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_website'
+  // Exported field_instance: 'user-user-field_website'.
   $field_instances['user-user-field_website'] = array(
     'bundle' => 'user',
     'default_value' => NULL,

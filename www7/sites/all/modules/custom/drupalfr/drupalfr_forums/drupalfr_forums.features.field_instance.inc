@@ -10,7 +10,7 @@
 function drupalfr_forums_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-forum-body'
+  // Exported field_instance: 'node-forum-body'.
   $field_instances['node-forum-body'] = array(
     'bundle' => 'forum',
     'default_value' => NULL,
@@ -54,7 +54,7 @@ function drupalfr_forums_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-forum-field_workflow_status'
+  // Exported field_instance: 'node-forum-field_workflow_status'.
   $field_instances['node-forum-field_workflow_status'] = array(
     'bundle' => 'forum',
     'default_value' => array(
@@ -155,7 +155,7 @@ function drupalfr_forums_field_default_field_instances() {
     'widget_type' => 'optionwidgets_select',
   );
 
-  // Exported field_instance: 'node-forum-taxonomy_forums'
+  // Exported field_instance: 'node-forum-taxonomy_forums'.
   $field_instances['node-forum-taxonomy_forums'] = array(
     'bundle' => 'forum',
     'default_value' => NULL,
@@ -191,7 +191,7 @@ function drupalfr_forums_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-forum-taxonomy_vocabulary_4'
+  // Exported field_instance: 'node-forum-taxonomy_vocabulary_4'.
   $field_instances['node-forum-taxonomy_vocabulary_4'] = array(
     'bundle' => 'forum',
     'default_value' => NULL,
@@ -227,7 +227,7 @@ function drupalfr_forums_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-forum-taxonomy_vocabulary_5'
+  // Exported field_instance: 'node-forum-taxonomy_vocabulary_5'.
   $field_instances['node-forum-taxonomy_vocabulary_5'] = array(
     'bundle' => 'forum',
     'default_value' => NULL,
@@ -267,7 +267,7 @@ function drupalfr_forums_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-forum-upload'
+  // Exported field_instance: 'node-forum-upload'.
   $field_instances['node-forum-upload'] = array(
     'bundle' => 'forum',
     'deleted' => 0,

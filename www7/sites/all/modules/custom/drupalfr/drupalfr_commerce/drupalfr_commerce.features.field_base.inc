@@ -10,7 +10,7 @@
 function drupalfr_commerce_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'commerce_customer_address'
+  // Exported field_base: 'commerce_customer_address'.
   $field_bases['commerce_customer_address'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -30,7 +30,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'addressfield',
   );
 
-  // Exported field_base: 'commerce_customer_billing'
+  // Exported field_base: 'commerce_customer_billing'.
   $field_bases['commerce_customer_billing'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -57,7 +57,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_customer_profile_reference',
   );
 
-  // Exported field_base: 'commerce_display_path'
+  // Exported field_base: 'commerce_display_path'.
   $field_bases['commerce_display_path'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -80,7 +80,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'commerce_license'
+  // Exported field_base: 'commerce_license'.
   $field_bases['commerce_license'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -103,7 +103,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'commerce_license_duration'
+  // Exported field_base: 'commerce_license_duration'.
   $field_bases['commerce_license_duration'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -118,7 +118,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
-  // Exported field_base: 'commerce_license_role'
+  // Exported field_base: 'commerce_license_role'.
   $field_bases['commerce_license_role'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -140,7 +140,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'commerce_license_type'
+  // Exported field_base: 'commerce_license_type'.
   $field_bases['commerce_license_type'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -162,7 +162,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'commerce_line_items'
+  // Exported field_base: 'commerce_line_items'.
   $field_bases['commerce_line_items'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -183,7 +183,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_line_item_reference',
   );
 
-  // Exported field_base: 'commerce_order_total'
+  // Exported field_base: 'commerce_order_total'.
   $field_bases['commerce_order_total'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -205,7 +205,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_price',
   );
 
-  // Exported field_base: 'commerce_price'
+  // Exported field_base: 'commerce_price'.
   $field_bases['commerce_price'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -227,7 +227,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_price',
   );
 
-  // Exported field_base: 'commerce_product'
+  // Exported field_base: 'commerce_product'.
   $field_bases['commerce_product'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -250,7 +250,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_product_reference',
   );
 
-  // Exported field_base: 'commerce_total'
+  // Exported field_base: 'commerce_total'.
   $field_bases['commerce_total'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -272,7 +272,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_price',
   );
 
-  // Exported field_base: 'commerce_unit_price'
+  // Exported field_base: 'commerce_unit_price'.
   $field_bases['commerce_unit_price'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -294,7 +294,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'commerce_price',
   );
 
-  // Exported field_base: 'field_commerce_billy_cancel_date'
+  // Exported field_base: 'field_commerce_billy_cancel_date'.
   $field_bases['field_commerce_billy_cancel_date'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -321,7 +321,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'datestamp',
   );
 
-  // Exported field_base: 'field_commerce_billy_i_date'
+  // Exported field_base: 'field_commerce_billy_i_date'.
   $field_bases['field_commerce_billy_i_date'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -348,7 +348,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'datestamp',
   );
 
-  // Exported field_base: 'field_receive_membership_card'
+  // Exported field_base: 'field_receive_membership_card'.
   $field_bases['field_receive_membership_card'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -376,7 +376,7 @@ function drupalfr_commerce_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
-  // Exported field_base: 'num_renewals'
+  // Exported field_base: 'num_renewals'.
   $field_bases['num_renewals'] = array(
     'active' => 1,
     'cardinality' => 1,

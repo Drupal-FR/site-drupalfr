@@ -10,7 +10,7 @@
 function drupalfr_user_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_biography'
+  // Exported field_base: 'field_biography'.
   $field_bases['field_biography'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -29,7 +29,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_company'
+  // Exported field_base: 'field_company'.
   $field_bases['field_company'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -59,7 +59,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_drupal_org'
+  // Exported field_base: 'field_drupal_org'.
   $field_bases['field_drupal_org'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -83,7 +83,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_events'
+  // Exported field_base: 'field_events'.
   $field_bases['field_events'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -128,7 +128,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_facebook'
+  // Exported field_base: 'field_facebook'.
   $field_bases['field_facebook'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -152,7 +152,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_google_plus'
+  // Exported field_base: 'field_google_plus'.
   $field_bases['field_google_plus'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -176,7 +176,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_icq'
+  // Exported field_base: 'field_icq'.
   $field_bases['field_icq'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -197,7 +197,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_jabber'
+  // Exported field_base: 'field_jabber'.
   $field_bases['field_jabber'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -218,7 +218,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_linkedin'
+  // Exported field_base: 'field_linkedin'.
   $field_bases['field_linkedin'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -242,7 +242,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_membership_number'
+  // Exported field_base: 'field_membership_number'.
   $field_bases['field_membership_number'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -266,7 +266,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_msn'
+  // Exported field_base: 'field_msn'.
   $field_bases['field_msn'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -281,7 +281,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'email',
   );
 
-  // Exported field_base: 'field_newsletter_adff'
+  // Exported field_base: 'field_newsletter_adff'.
   $field_bases['field_newsletter_adff'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -303,7 +303,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'mailchimp_lists_subscription',
   );
 
-  // Exported field_base: 'field_newsletter_dc_soleil_2014'
+  // Exported field_base: 'field_newsletter_dc_soleil_2014'.
   $field_bases['field_newsletter_dc_soleil_2014'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -325,7 +325,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'mailchimp_lists_subscription',
   );
 
-  // Exported field_base: 'field_newsletter_ddd_2015'
+  // Exported field_base: 'field_newsletter_ddd_2015'.
   $field_bases['field_newsletter_ddd_2015'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -347,7 +347,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'mailchimp_lists_subscription',
   );
 
-  // Exported field_base: 'field_nickname'
+  // Exported field_base: 'field_nickname'.
   $field_bases['field_nickname'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -368,7 +368,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_picture'
+  // Exported field_base: 'field_picture'.
   $field_bases['field_picture'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -390,7 +390,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'image',
   );
 
-  // Exported field_base: 'field_realname'
+  // Exported field_base: 'field_realname'.
   $field_bases['field_realname'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -411,7 +411,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_twitter'
+  // Exported field_base: 'field_twitter'.
   $field_bases['field_twitter'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -435,7 +435,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_viadeo'
+  // Exported field_base: 'field_viadeo'.
   $field_bases['field_viadeo'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -459,7 +459,7 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_website'
+  // Exported field_base: 'field_website'.
   $field_bases['field_website'] = array(
     'active' => 1,
     'cardinality' => 1,

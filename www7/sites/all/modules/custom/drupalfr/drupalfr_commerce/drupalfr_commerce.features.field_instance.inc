@@ -11,7 +11,7 @@ function drupalfr_commerce_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
-  // 'commerce_customer_profile-billing-commerce_customer_address'
+  // 'commerce_customer_profile-billing-commerce_customer_address'.
   $field_instances['commerce_customer_profile-billing-commerce_customer_address'] = array(
     'bundle' => 'billing',
     'default_value' => NULL,
@@ -84,7 +84,7 @@ function drupalfr_commerce_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_license-role-num_renewals'
+  // Exported field_instance: 'commerce_license-role-num_renewals'.
   $field_instances['commerce_license-role-num_renewals'] = array(
     'bundle' => 'role',
     'default_value' => NULL,
@@ -136,7 +136,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_line_item-individual_membership-commerce_display_path'
+  // 'commerce_line_item-individual_membership-commerce_display_path'.
   $field_instances['commerce_line_item-individual_membership-commerce_display_path'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -177,7 +177,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_line_item-individual_membership-commerce_license'
+  // 'commerce_line_item-individual_membership-commerce_license'.
   $field_instances['commerce_line_item-individual_membership-commerce_license'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -214,7 +214,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_line_item-individual_membership-commerce_product'
+  // 'commerce_line_item-individual_membership-commerce_product'.
   $field_instances['commerce_line_item-individual_membership-commerce_product'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -270,7 +270,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_line_item-individual_membership-commerce_total'
+  // 'commerce_line_item-individual_membership-commerce_total'.
   $field_instances['commerce_line_item-individual_membership-commerce_total'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -341,7 +341,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_line_item-individual_membership-commerce_unit_price'
+  // 'commerce_line_item-individual_membership-commerce_unit_price'.
   $field_instances['commerce_line_item-individual_membership-commerce_unit_price'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -412,7 +412,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_line_item-individual_membership-field_receive_membership_card'
+  // 'commerce_line_item-individual_membership-field_receive_membership_card'.
   $field_instances['commerce_line_item-individual_membership-field_receive_membership_card'] = array(
     'bundle' => 'individual_membership',
     'commerce_cart_settings' => array(
@@ -452,7 +452,8 @@ function drupalfr_commerce_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_line_item-product-commerce_display_path'
+  // Exported field_instance:
+  // 'commerce_line_item-product-commerce_display_path'.
   $field_instances['commerce_line_item-product-commerce_display_path'] = array(
     'bundle' => 'product',
     'default_value' => NULL,
@@ -492,7 +493,7 @@ function drupalfr_commerce_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_line_item-product-commerce_product'
+  // Exported field_instance: 'commerce_line_item-product-commerce_product'.
   $field_instances['commerce_line_item-product-commerce_product'] = array(
     'bundle' => 'product',
     'default_value' => NULL,
@@ -547,7 +548,7 @@ function drupalfr_commerce_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_line_item-product-commerce_total'
+  // Exported field_instance: 'commerce_line_item-product-commerce_total'.
   $field_instances['commerce_line_item-product-commerce_total'] = array(
     'bundle' => 'product',
     'default_value' => NULL,
@@ -617,7 +618,7 @@ function drupalfr_commerce_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_line_item-product-commerce_unit_price'
+  // Exported field_instance: 'commerce_line_item-product-commerce_unit_price'.
   $field_instances['commerce_line_item-product-commerce_unit_price'] = array(
     'bundle' => 'product',
     'default_value' => NULL,
@@ -688,7 +689,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_order-commerce_order-commerce_customer_billing'
+  // 'commerce_order-commerce_order-commerce_customer_billing'.
   $field_instances['commerce_order-commerce_order-commerce_customer_billing'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -733,7 +734,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_order-commerce_order-commerce_line_items'
+  // 'commerce_order-commerce_order-commerce_line_items'.
   $field_instances['commerce_order-commerce_order-commerce_line_items'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -783,7 +784,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_order-commerce_order-commerce_order_total'
+  // 'commerce_order-commerce_order-commerce_order_total'.
   $field_instances['commerce_order-commerce_order-commerce_order_total'] = array(
     'bundle' => 'commerce_order',
     'default_value' => NULL,
@@ -863,7 +864,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_order-commerce_order-field_commerce_billy_cancel_date'
+  // 'commerce_order-commerce_order-field_commerce_billy_cancel_date'.
   $field_instances['commerce_order-commerce_order-field_commerce_billy_cancel_date'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -912,7 +913,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_order-commerce_order-field_commerce_billy_i_date'
+  // 'commerce_order-commerce_order-field_commerce_billy_i_date'.
   $field_instances['commerce_order-commerce_order-field_commerce_billy_i_date'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -961,7 +962,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_product-individual_membership-commerce_license_duration'
+  // 'commerce_product-individual_membership-commerce_license_duration'.
   $field_instances['commerce_product-individual_membership-commerce_license_duration'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -1007,7 +1008,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_product-individual_membership-commerce_license_role'
+  // 'commerce_product-individual_membership-commerce_license_role'.
   $field_instances['commerce_product-individual_membership-commerce_license_role'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -1044,7 +1045,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_product-individual_membership-commerce_license_type'
+  // 'commerce_product-individual_membership-commerce_license_type'.
   $field_instances['commerce_product-individual_membership-commerce_license_type'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -1081,7 +1082,7 @@ function drupalfr_commerce_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_product-individual_membership-commerce_price'
+  // 'commerce_product-individual_membership-commerce_price'.
   $field_instances['commerce_product-individual_membership-commerce_price'] = array(
     'bundle' => 'individual_membership',
     'default_value' => NULL,
@@ -1187,7 +1188,7 @@ function drupalfr_commerce_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_product-product-commerce_price'
+  // Exported field_instance: 'commerce_product-product-commerce_price'.
   $field_instances['commerce_product-product-commerce_price'] = array(
     'bundle' => 'product',
     'default_value' => NULL,

@@ -10,7 +10,7 @@
 function dfr_documentation_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-doc-body'
+  // Exported field_instance: 'node-doc-body'.
   $field_instances['node-doc-body'] = array(
     'bundle' => 'doc',
     'default_value' => NULL,
@@ -54,7 +54,7 @@ function dfr_documentation_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-doc-taxonomy_vocabulary_4'
+  // Exported field_instance: 'node-doc-taxonomy_vocabulary_4'.
   $field_instances['node-doc-taxonomy_vocabulary_4'] = array(
     'bundle' => 'doc',
     'default_value' => NULL,
@@ -90,7 +90,7 @@ function dfr_documentation_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-doc-upload'
+  // Exported field_instance: 'node-doc-upload'.
   $field_instances['node-doc-upload'] = array(
     'bundle' => 'doc',
     'deleted' => 0,

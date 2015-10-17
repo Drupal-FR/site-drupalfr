@@ -10,7 +10,7 @@
 function drupalfr_planete_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_planete_rss'
+  // Exported field_base: 'field_planete_rss'.
   $field_bases['field_planete_rss'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -39,7 +39,7 @@ function drupalfr_planete_field_default_field_bases() {
     'type' => 'link_field',
   );
 
-  // Exported field_base: 'field_planete_tags'
+  // Exported field_base: 'field_planete_tags'.
   $field_bases['field_planete_tags'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -65,7 +65,7 @@ function drupalfr_planete_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_planete_url'
+  // Exported field_base: 'field_planete_url'.
   $field_bases['field_planete_url'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -94,7 +94,7 @@ function drupalfr_planete_field_default_field_bases() {
     'type' => 'link_field',
   );
 
-  // Exported field_base: 'field_planete_user'
+  // Exported field_base: 'field_planete_user'.
   $field_bases['field_planete_user'] = array(
     'active' => 1,
     'cardinality' => 1,
