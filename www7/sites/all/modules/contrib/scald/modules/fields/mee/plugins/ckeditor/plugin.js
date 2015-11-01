@@ -148,7 +148,7 @@ CKEDITOR.plugins.add('dnd', {
 
       // Prevent paste, so the new clipboard plugin will not double insert the Atom.
       editor.on('paste', function (evt) {
-        if (Drupal.dnd.sas2array(evt.data.dataTransfer.getData('Text'))) {
+        if (typeof evt.data.dataTransfer !== 'undefined' && Drupal.dnd.sas2array(evt.data.dataTransfer.getData('Text'))) {
           return false;
         }
       });

@@ -6,7 +6,7 @@
           infoTab.add({
             id: 'txtLink',
             type: 'text',
-            label: 'Link',
+            label: Drupal.t('Link'),
             // "Link" edits the 'link' property in the options JSON string.
             setup: function (widget) {
               var options = JSON.parse(widget.data.options);

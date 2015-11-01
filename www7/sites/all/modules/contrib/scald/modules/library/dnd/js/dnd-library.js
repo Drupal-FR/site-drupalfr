@@ -64,9 +64,12 @@ Drupal.dnd = {
     atom_ids = [].concat(atom_ids);
 
     for (var i= 0, len=atom_ids.length; i<len; i++) {
-      // Remove atom from the list if it is already available.
-      if ((atom_ids[i] in Drupal.dnd.Atoms) && (context in Drupal.dnd.Atoms[atom_ids[i]].contexts)) {
-        delete atom_ids[i];
+      // Check if the atom is already available and has a contexts property.
+      if ((atom_ids[i] in Drupal.dnd.Atoms) && (typeof Drupal.dnd.Atoms[atom_ids[i]].contexts !== 'undefined')) {
+        // Remove atom from the list if the required context is already available in the atom's contexts property.
+        if (context in Drupal.dnd.Atoms[atom_ids[i]].contexts) {
+          delete atom_ids[i];
+        }
       }
     }
 

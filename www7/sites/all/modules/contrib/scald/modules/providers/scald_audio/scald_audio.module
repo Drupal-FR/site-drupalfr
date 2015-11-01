@@ -166,6 +166,19 @@ function scald_audio_scald_atom_insert($atom) {
 }
 
 /**
+ * Implements hook_scald_player().
+ */
+function scald_audio_scald_player() {
+  return array(
+    'html5_player' => array(
+      'name' => 'HTML5 Audio player',
+      'description' => 'The HTML5 player for audio atoms.',
+      'type' => array('audio'),
+    ),
+  );
+}
+
+/**
  * Implements hook_scald_prerender().
  */
 function scald_audio_scald_prerender($atom, $context, $options, $mode) {
@@ -180,8 +193,18 @@ function scald_audio_scald_prerender($atom, $context, $options, $mode) {
       )
     );
   }
+  elseif ($mode == 'player') {
+    $atom->rendered->player = theme('scald_audio_html5',
+      array('vars' =>
+        array(
+          'atom'          => $atom,
+          'audio_uri'     => $atom->file_source,
+          'thumbnail'     => $atom->thumbnail_source,
+        ),
+      )
+    );
+  }
 }
-
 
 /**
  * Implements hook_theme().
@@ -191,7 +214,11 @@ function scald_audio_theme() {
     'scald_audio_player' => array(
       'variables' => array('vars' => NULL),
       'template' => 'scald_audio_player'
-    )
+    ),
+    'scald_audio_html5' => array(
+      'variables' => array('vars' => NULL),
+      'template' => 'scald_audio_html5'
+    ),
   );
 }
 

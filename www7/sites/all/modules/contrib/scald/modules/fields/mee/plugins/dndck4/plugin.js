@@ -514,6 +514,7 @@ Drupal.dndck4 = {
   insertNewWidget: function(editor, range, data, caption) {
     var widget = Drupal.dndck4.createNewWidget(editor, data, caption);
     Drupal.dndck4.insertWidget(widget, editor, range);
+    widget.refreshAtom();
   },
 
   // Heavily inspired from CKE widget plugin's onBlockWidgetDrag().
