@@ -404,22 +404,26 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['header']['result']['table'] = 'views';
   $handler->display->display_options['header']['result']['field'] = 'result';
   $handler->display->display_options['header']['result']['content'] = 'Afichage @start - @end sur @total';
-  /* Relationship: Commerce Order: Owner */
-  $handler->display->display_options['relationships']['uid']['id'] = 'uid';
-  $handler->display->display_options['relationships']['uid']['table'] = 'commerce_order';
-  $handler->display->display_options['relationships']['uid']['field'] = 'uid';
-  $handler->display->display_options['relationships']['uid']['required'] = TRUE;
   /* Relationship: Commerce Order: Referenced line items */
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['id'] = 'commerce_line_items_line_item_id';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['table'] = 'field_data_commerce_line_items';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['field'] = 'commerce_line_items_line_item_id';
+  $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['label'] = 'Line items';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['required'] = TRUE;
-  /* Relationship: User: Commerce License */
-  $handler->display->display_options['relationships']['commerce_license']['id'] = 'commerce_license';
-  $handler->display->display_options['relationships']['commerce_license']['table'] = 'users';
-  $handler->display->display_options['relationships']['commerce_license']['field'] = 'commerce_license';
-  $handler->display->display_options['relationships']['commerce_license']['relationship'] = 'uid';
-  $handler->display->display_options['relationships']['commerce_license']['required'] = TRUE;
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['commerce_license_target_id']['id'] = 'commerce_license_target_id';
+  $handler->display->display_options['relationships']['commerce_license_target_id']['table'] = 'field_data_commerce_license';
+  $handler->display->display_options['relationships']['commerce_license_target_id']['field'] = 'commerce_license_target_id';
+  $handler->display->display_options['relationships']['commerce_license_target_id']['relationship'] = 'commerce_line_items_line_item_id';
+  $handler->display->display_options['relationships']['commerce_license_target_id']['label'] = 'Licence';
+  $handler->display->display_options['relationships']['commerce_license_target_id']['required'] = TRUE;
+  /* Relationship: Commerce License: Owner uid */
+  $handler->display->display_options['relationships']['owner']['id'] = 'owner';
+  $handler->display->display_options['relationships']['owner']['table'] = 'commerce_license';
+  $handler->display->display_options['relationships']['owner']['field'] = 'owner';
+  $handler->display->display_options['relationships']['owner']['relationship'] = 'commerce_license_target_id';
+  $handler->display->display_options['relationships']['owner']['label'] = 'Utilisateur';
+  $handler->display->display_options['relationships']['owner']['required'] = TRUE;
   /* Field: Commerce Order: Order ID */
   $handler->display->display_options['fields']['order_id']['id'] = 'order_id';
   $handler->display->display_options['fields']['order_id']['table'] = 'commerce_order';
@@ -430,24 +434,24 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['license_id']['id'] = 'license_id';
   $handler->display->display_options['fields']['license_id']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['license_id']['field'] = 'license_id';
-  $handler->display->display_options['fields']['license_id']['relationship'] = 'commerce_license';
+  $handler->display->display_options['fields']['license_id']['relationship'] = 'commerce_license_target_id';
   $handler->display->display_options['fields']['license_id']['label'] = 'License';
   /* Field: User: Numéro adhérent */
   $handler->display->display_options['fields']['field_membership_number']['id'] = 'field_membership_number';
   $handler->display->display_options['fields']['field_membership_number']['table'] = 'field_data_field_membership_number';
   $handler->display->display_options['fields']['field_membership_number']['field'] = 'field_membership_number';
-  $handler->display->display_options['fields']['field_membership_number']['relationship'] = 'uid';
+  $handler->display->display_options['fields']['field_membership_number']['relationship'] = 'owner';
   /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
-  $handler->display->display_options['fields']['name']['relationship'] = 'uid';
+  $handler->display->display_options['fields']['name']['relationship'] = 'owner';
   $handler->display->display_options['fields']['name']['label'] = 'Pseudo';
   /* Field: User: E-mail */
   $handler->display->display_options['fields']['mail_1']['id'] = 'mail_1';
   $handler->display->display_options['fields']['mail_1']['table'] = 'users';
   $handler->display->display_options['fields']['mail_1']['field'] = 'mail';
-  $handler->display->display_options['fields']['mail_1']['relationship'] = 'uid';
+  $handler->display->display_options['fields']['mail_1']['relationship'] = 'owner';
   $handler->display->display_options['fields']['mail_1']['label'] = 'Courriel';
   $handler->display->display_options['fields']['mail_1']['link_to_user'] = 'user';
   /* Field: Commerce Order: Adresse de facturation */
@@ -467,7 +471,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['granted']['id'] = 'granted';
   $handler->display->display_options['fields']['granted']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
-  $handler->display->display_options['fields']['granted']['relationship'] = 'commerce_license';
+  $handler->display->display_options['fields']['granted']['relationship'] = 'commerce_license_target_id';
   $handler->display->display_options['fields']['granted']['label'] = 'Date adhésion';
   $handler->display->display_options['fields']['granted']['date_format'] = 'custom';
   $handler->display->display_options['fields']['granted']['custom_date_format'] = 'd/m/Y';
@@ -476,7 +480,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['rid']['id'] = 'rid';
   $handler->display->display_options['filters']['rid']['table'] = 'users_roles';
   $handler->display->display_options['filters']['rid']['field'] = 'rid';
-  $handler->display->display_options['filters']['rid']['relationship'] = 'uid';
+  $handler->display->display_options['filters']['rid']['relationship'] = 'owner';
   $handler->display->display_options['filters']['rid']['value'] = array(
     15 => '15',
   );
@@ -495,12 +499,13 @@ function drupalfr_commerce_views_default_views() {
     12 => 0,
     14 => 0,
     15 => 0,
+    16 => 0,
   );
   /* Filter criterion: User: Active */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'users';
   $handler->display->display_options['filters']['status']['field'] = 'status';
-  $handler->display->display_options['filters']['status']['relationship'] = 'uid';
+  $handler->display->display_options['filters']['status']['relationship'] = 'owner';
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['exposed'] = TRUE;
   $handler->display->display_options['filters']['status']['expose']['operator_id'] = '';
@@ -518,6 +523,7 @@ function drupalfr_commerce_views_default_views() {
     12 => 0,
     14 => 0,
     15 => 0,
+    16 => 0,
   );
   /* Filter criterion: Commerce Order: Order status */
   $handler->display->display_options['filters']['status_1']['id'] = 'status_1';
@@ -531,7 +537,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['mail']['id'] = 'mail';
   $handler->display->display_options['filters']['mail']['table'] = 'users';
   $handler->display->display_options['filters']['mail']['field'] = 'mail';
-  $handler->display->display_options['filters']['mail']['relationship'] = 'uid';
+  $handler->display->display_options['filters']['mail']['relationship'] = 'owner';
   $handler->display->display_options['filters']['mail']['operator'] = 'contains';
   $handler->display->display_options['filters']['mail']['exposed'] = TRUE;
   $handler->display->display_options['filters']['mail']['expose']['operator_id'] = 'mail_op';
@@ -555,7 +561,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['uid']['id'] = 'uid';
   $handler->display->display_options['filters']['uid']['table'] = 'users';
   $handler->display->display_options['filters']['uid']['field'] = 'uid';
-  $handler->display->display_options['filters']['uid']['relationship'] = 'uid';
+  $handler->display->display_options['filters']['uid']['relationship'] = 'owner';
   $handler->display->display_options['filters']['uid']['value'] = '';
   $handler->display->display_options['filters']['uid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['uid']['expose']['operator_id'] = 'uid_op';
@@ -578,7 +584,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['status_2']['id'] = 'status_2';
   $handler->display->display_options['filters']['status_2']['table'] = 'commerce_license';
   $handler->display->display_options['filters']['status_2']['field'] = 'status';
-  $handler->display->display_options['filters']['status_2']['relationship'] = 'commerce_license';
+  $handler->display->display_options['filters']['status_2']['relationship'] = 'commerce_license_target_id';
   $handler->display->display_options['filters']['status_2']['value'] = array(
     2 => '2',
   );
@@ -621,9 +627,9 @@ function drupalfr_commerce_views_default_views() {
     t('suivant ›'),
     t('dernier »'),
     t('Afichage @start - @end sur @total'),
-    t('Order owner'),
-    t('Line items referenced by commerce_line_items'),
-    t('Commerce License'),
+    t('Line items'),
+    t('Licence'),
+    t('Utilisateur'),
     t('Commande'),
     t('License'),
     t('.'),
@@ -678,7 +684,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['header']['area']['content'] = '<p>Adhérer en tant que personne physique. L\'adhésion est annuelle.</p>
 <p>L\'adhésion pour les personnes morales n\'est pas disponible en ligne pour l\'instant, veuillez nous <a href="/contact">contacter</a> pour toute demande.</p>';
   $handler->display->display_options['header']['area']['format'] = '3';
-  /* Field: Commerce Product: Prix */
+  /* Field: Commerce Product: Price */
   $handler->display->display_options['fields']['commerce_price']['id'] = 'commerce_price';
   $handler->display->display_options['fields']['commerce_price']['table'] = 'field_data_commerce_price';
   $handler->display->display_options['fields']['commerce_price']['field'] = 'commerce_price';
