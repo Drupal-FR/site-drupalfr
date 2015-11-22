@@ -671,6 +671,13 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '1';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
+  /* Header: Global: Text area */
+  $handler->display->display_options['header']['area']['id'] = 'area';
+  $handler->display->display_options['header']['area']['table'] = 'views';
+  $handler->display->display_options['header']['area']['field'] = 'area';
+  $handler->display->display_options['header']['area']['content'] = '<p>Adhérer en tant que personne physique. L\'adhésion est annuelle.</p>
+<p>L\'adhésion pour les personnes morales n\'est pas disponible en ligne pour l\'instant, veuillez nous <a href="/contact">contacter</a> pour toute demande.</p>';
+  $handler->display->display_options['header']['area']['format'] = '3';
   /* Field: Commerce Product: Prix */
   $handler->display->display_options['fields']['commerce_price']['id'] = 'commerce_price';
   $handler->display->display_options['fields']['commerce_price']['table'] = 'field_data_commerce_price';
@@ -719,6 +726,8 @@ function drupalfr_commerce_views_default_views() {
     t('Trier par'),
     t('Asc'),
     t('Desc'),
+    t('<p>Adhérer en tant que personne physique. L\'adhésion est annuelle.</p>
+<p>L\'adhésion pour les personnes morales n\'est pas disponible en ligne pour l\'instant, veuillez nous <a href="/contact">contacter</a> pour toute demande.</p>'),
     t('Block adhésion individuelle sidebar'),
     t('more'),
     t('Block adhésion individuelle profile'),
