@@ -6,7 +6,7 @@
 function drupalfr_events_menu() {
   return array(
     'prochains-evenements' => array(
-      'title' => 'Prochains évènements',
+      'title' => 'Les prochains événements et meetups en France',
       'page callback' => 'drupalfr_events_upcoming_events',
       'access arguments' => array('access content'),
       'type' => MENU_CALLBACK,
@@ -20,7 +20,10 @@ function drupalfr_events_menu() {
 function drupalfr_events_theme() {
   return array(
     'dfr_events_listing' => array(
-      'variables' => array('display_mode' => NULL, 'events' => array()),
+      'variables' => array(
+        'display_mode' => NULL,
+        'events' => array(),
+      ),
       'template' => 'drupalfr-events-listing',
     ),
   );
@@ -46,9 +49,13 @@ function drupalfr_events_block_view($delta = '') {
   switch ($delta) {
     case 'next_events':
       $events = drupalfr_events_fetch_events(6);
+      $map = leaflet_map_get_info('OSM Mapnik');
+      $features = drupalfr_events_prepare_leaflet_features($events);
+
       $block = array(
-        'subject' => t('6 prochains évènements meetup.com'),
+        'subject' => t('Les 6 prochains événements'),
         'content' => array(
+          'map' => leaflet_build_map($map, $features, '300px'),
           'events' => drupalfr_events_display_events($events, 'teaser'),
           'link' => array(
             '#markup' => l(t('Programme détaillé'), 'prochains-evenements', array(
@@ -61,6 +68,7 @@ function drupalfr_events_block_view($delta = '') {
           ),
         ),
       );
+      $block['content']['map']['#attributes']['class'] = array('event-listing-map-teaser');
       break;
   }
   return $block;
@@ -112,6 +120,10 @@ function drupalfr_events_fetch_events($items = FALSE) {
     // Extract the response data.
     $data = drupal_json_decode($response->data);
     if (count($data['results']) > 0) {
+      // Calculate the number of inscriptions.
+      foreach ($data['results'] as $key => $meetup) {
+        $data['results'][$key]['drupalfr_inscription_count'] = $data['results'][$key]['yes_rsvp_count'] + $data['results'][$key]['waitlist_count'];
+      }
       return $data['results'];
     }
     else {
@@ -142,14 +154,15 @@ function drupalfr_events_upcoming_events() {
     return $content->data;
   }
   else {
-    $events = drupalfr_events_fetch_events();
     $map = leaflet_map_get_info('OSM Mapnik');
+    $events = drupalfr_events_fetch_events();
     $features = drupalfr_events_prepare_leaflet_features($events);
 
     // Keep only 5 meetups for the list.
     $list_events = array_slice($events, 0, 5);
 
     $content['map'] = leaflet_build_map($map, $features, '600px');
+    $content['map']['#attributes']['class'] = array('event-listing-map');
     $content['events'] = drupalfr_events_display_events($list_events, 'full');
     $content['infos'] = array(
       '#markup' => '<p>' . l(t('Voir tous les évènements'), 'http://www.meetup.com/drupal-france-francophonie') . '</p>',
@@ -181,11 +194,12 @@ function drupalfr_events_prepare_leaflet_features($events) {
 
   foreach ($events as $event) {
     if (isset($event['venue'])) {
+      $popup_content = '[' . $event['venue']['city'] . '] - ' . $event['name'];
       $features[] = array(
         'type' => 'point',
         'lat' => $event['venue']['lat'],
         'lon' => $event['venue']['lon'],
-        'popup' => l($event['name'], $event['event_url'], array('absolute' => TRUE)),
+        'popup' => l($popup_content, $event['event_url'], array('absolute' => TRUE)),
       );
     }
     else {
@@ -194,13 +208,14 @@ function drupalfr_events_prepare_leaflet_features($events) {
 
       if (!empty($event_city)) {
         $event_city = array_shift($event_city);
-        $event_city = drupal_strtolower($event_city);
+        $event_city_lowered = drupal_strtolower($event_city);
 
+        $popup_content = '[' . $event_city . '] - ' . $event['name'];
         $features[] = array(
           'type' => 'point',
-          'lat' => $main_cities[$event_city]['lat'],
-          'lon' => $main_cities[$event_city]['lon'],
-          'popup' => l($event['name'], $event['event_url'], array('absolute' => TRUE)) . ' : ' . t("Ce meetup n'a pas encore de lieu précisément défini."),
+          'lat' => $main_cities[$event_city_lowered]['lat'],
+          'lon' => $main_cities[$event_city_lowered]['lon'],
+          'popup' => l($popup_content, $event['event_url'], array('absolute' => TRUE)) . ' : ' . t("Ce meetup n'a pas encore de lieu précisément défini."),
         );
       }
     }
@@ -252,4 +267,31 @@ function drupalfr_events_get_main_cities() {
       'lon' => '1.444209',
     ),
   );
+}
+
+/**
+ * Implements hook_date_format_types().
+ */
+function drupalfr_events_date_format_types() {
+  return array(
+    'medium_with_at' => t('Medium with at'),
+  );
+}
+
+/**
+ * Implements hook_date_formats().
+ */
+function drupalfr_events_date_formats() {
+  $formats = array();
+  $formats[] = array(
+    'type'    => 'medium_with_at',
+    'format'  => 'd F Y \a\t H\hi',
+    'locales' => array('en'),
+  );
+  $formats[] = array(
+    'type'    => 'medium_with_at',
+    'format'  => 'd F Y \à H\hi',
+    'locales' => array('fr'),
+  );
+  return $formats;
 }
