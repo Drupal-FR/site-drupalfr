@@ -145,11 +145,14 @@ function commentrss_preprocess_page(&$variables) {
  */
 function commentrss_node_view($node, $view_mode = 'full', $langcode = NULL) {
   if ($view_mode == 'full' && node_is_page($node) && commentrss_node_feed_access($node, FALSE)) {
-    // Expose node's comment feed on node view page.
-    drupal_add_feed(
-      url('crss/node/' . $node->nid, array('absolute' => TRUE)),
-      t('Comments for "@title"', array('@title' => $node->title))
-    );
+    $commentrss_node_type = variable_get('commentrss_node_type', array());
+      if (count($commentrss_node_type) == 0 || in_array($node->type, $commentrss_node_type)) {
+        // Expose a node comment feed on the node view page.
+        drupal_add_feed(
+          url('crss/node/' . $node->nid, array('absolute' => TRUE)),
+          t('Comments for "@title"', array('@title' => $node->title))
+        );
+      }
   }
   elseif ($view_mode == 'rss' && commentrss_node_feed_access($node, FALSE)) {
     // Add a wfw:commentRss element to the node when viewed in a node RSS feed.

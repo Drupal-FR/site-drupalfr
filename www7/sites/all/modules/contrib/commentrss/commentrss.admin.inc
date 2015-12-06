@@ -21,12 +21,30 @@ function commentrss_admin_settings() {
     '#description' => t('Where should the site comment feed be exposed, if at all enabled. If enabled, feed will be accessible at @url.', array('@url' => url('crss', array('absolute' => TRUE)))),
     '#default_value' => variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE),
   );
-  $form['commentrss_node'] = array(
+
+  $form['individual_comment_feeds'] = array(
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#title' => t('Individual comment feeds'),
+  );
+
+  $form['individual_comment_feeds']['commentrss_node'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable individual comment feeds for each post on the website'),
     '#description' => t('Feeds will be accessible on @url type of URLs.', array('@url' => url('crss/node/...', array('absolute' => TRUE)))),
     '#default_value' => variable_get('commentrss_node', TRUE),
   );
+
+  $form['individual_comment_feeds']['commentrss_node_type'] = array(
+    '#type' => 'select',
+    '#options' => node_type_get_names(),
+    '#title' => t('Show the feed icon to specific content types:'),
+    '#description' => t('Select which content types will present an individual feed icon. If blank, will show up for all content types.'),
+    '#default_value' => variable_get('commentrss_node_type', array()),
+    '#multiple' => TRUE,
+  );
+
   $form['commentrss_term'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable individual comment feeds for each taxonomy term listing on the website'),
