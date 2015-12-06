@@ -1,4 +1,7 @@
-/* $Id: fullcalendar.custom.css,v 1.3.2.1 2011/02/10 14:00:21 timplunkett Exp $ */
+/* Force contents to wrap */
+.fc-event {
+  word-wrap: break-word;
+}
 
 /* Undo Drupal default theme link colors */
 .fc-content a:link,
@@ -9,7 +12,8 @@
 
 /* Reset FullCalendar generic style */
 .fc-event,
-.fc-agenda .fc-event-time,
+.fc-event .fc-event-skin,
+.fc-event .fc-event-time,
 .fc-event a {
   border-style: none;
   background-color: transparent;
@@ -18,7 +22,8 @@
 
 /* Set FullCalendar default style */
 .fc-event-default,
-.fc-agenda .fc-event-default .fc-event-time,
+.fc-event-default .fc-event-skin,
+.fc-event-default .fc-event-time,
 .fc-event-default a {
   border-color: #36c;
   border-style: solid;
@@ -65,4 +70,17 @@ table.fc-header {
 .fc-header .fc-state-default,
 .fc-header .ui-state-default {
   margin-bottom: 0;
+}
+
+/* Hide plain text events when javascript is enabled */
+.js .fullcalendar-content {
+  display: none;
+}
+
+/* Reposition the throbber. */
+.fullcalendar .ajax-progress {
+  left: 50%;
+  position: absolute;
+  top: 1.6em;
+  z-index: 1;
 }

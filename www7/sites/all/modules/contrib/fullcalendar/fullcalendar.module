@@ -1,5 +1,4 @@
 <?php
-// $Id: fullcalendar.module,v 1.10.2.14 2011/02/13 04:12:36 timplunkett Exp $
 
 /**
  * @file
@@ -7,22 +6,45 @@
  */
 
 /**
- * The default path to the FullCalender plugin.
+ * The default path to the FullCalendar plugin.
  */
-define('FULLCALENDAR_PATH', 'sites/all/libraries/fullcalendar');
+function fullcalendar_default_path() {
+  return module_exists('libraries') ? libraries_get_path('fullcalendar') : 'sites/all/libraries/fullcalendar';
+}
 
 /**
- * The minimum supported version of the FullCalender plugin.
+ * The minimum supported version of the FullCalendar plugin.
  */
 define('FULLCALENDAR_MIN_PLUGIN_VERSION', '1.4.10');
+
+/**
+ * The recommended version of the FullCalendar plugin.
+ */
+define('FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION', '1.5.1');
 
 /**
  * Implements hook_views_api().
  */
 function fullcalendar_views_api() {
   return array(
-    'api' => '2',
-    'path' => drupal_get_path('module', 'fullcalendar'),
+    'api' => '3',
+    'path' => drupal_get_path('module', 'fullcalendar') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function fullcalendar_theme($existing, $type, $theme, $path) {
+  return array(
+    'fullcalendar_event' => array(
+      'variables' => array(
+        'event' => NULL,
+        'entity' => NULL,
+      ),
+      'file' => 'theme.inc',
+      'path' => $path . '/theme',
+    ),
   );
 }
 
@@ -30,23 +52,23 @@ function fullcalendar_views_api() {
  * Implements hook_library().
  */
 function fullcalendar_library() {
+  $path = variable_get('fullcalendar_path', fullcalendar_default_path());
+  $css_files = array($path . '/fullcalendar.css' => array('media' => 'screen'));
+
+  // Add fullcalendar.print.css if it is available.
+  if (version_compare(fullcalendar_get_version(), '1.5.0', '>=')) {
+    $css_files[$path . '/fullcalendar.print.css'] = array('media' => 'print');
+  }
+
   $libraries['fullcalendar'] = array(
     'title' => 'FullCalendar',
     'website' => 'http://arshaw.com/fullcalendar',
     'version' => FULLCALENDAR_MIN_PLUGIN_VERSION,
     'js' => array(
       fullcalendar_get_js_path() => array(),
+      $path . '/gcal.js' => array(),
     ),
-    'css' => array(
-      variable_get('fullcalendar_path', FULLCALENDAR_PATH) . '/fullcalendar.css' => array(
-        'type' => 'file',
-        'media' => 'screen',
-      ),
-      drupal_get_path('module', 'fullcalendar') . '/fullcalendar.custom.css' => array(
-        'type' => 'file',
-        'media' => 'screen',
-      ),
-    ),
+    'css' => $css_files,
     'dependencies' => array(
       array('system', 'ui.draggable'),
       array('system', 'ui.droppable'),
@@ -60,7 +82,7 @@ function fullcalendar_library() {
 /**
  * Implements hook_permission().
  *
- * @return
+ * @return array
  *   An array of valid permissions for the FullCalendar module.
  */
 function fullcalendar_permission() {
@@ -75,27 +97,27 @@ function fullcalendar_permission() {
 /**
  * Implements hook_menu().
  *
- * @return
+ * @return array
  *   An array of menu items.
  */
 function fullcalendar_menu() {
   $items = array();
 
-  $items['admin/config/calendar'] = array(
-    'title' => 'Calendar',
-    'description' => 'Settings for calendars.',
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('access administration pages'),
-    'file' => 'system.admin.inc',
-    'file path' => drupal_get_path('module', 'system'),
-  );
-  $items['admin/config/calendar/fullcalendar'] = array(
+  $items['admin/config/user-interface/fullcalendar'] = array(
     'title' => 'FullCalendar',
     'description' => 'Adjust FullCalendar settings.',
     'file' => 'fullcalendar.admin.inc',
+    'file path' => drupal_get_path('module', 'fullcalendar') . '/includes',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('fullcalendar_admin_settings'),
     'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 0,
+  );
+  $items['admin/config/user-interface/fullcalendar/default'] = array(
+    'title' => 'FullCalendar',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
   );
   $items['fullcalendar/ajax/update/%/%'] = array(
     'title' => 'Update event',
@@ -106,6 +128,15 @@ function fullcalendar_menu() {
     'access arguments' => array(4),
     'type' => MENU_CALLBACK,
   );
+  $items['fullcalendar/ajax/results'] = array(
+    'title' => 'Events',
+    'description' => 'Get events from views with arguments',
+    'page callback' => 'fullcalendar_results',
+    'access arguments' => array('access content'),
+    'delivery callback' => 'ajax_deliver',
+    'theme callback' => 'ajax_base_page_theme',
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
@@ -113,342 +144,204 @@ function fullcalendar_menu() {
 /**
  * Saves the updated FullCalendar event's datetime.
  *
- * @param $action
+ * @param string $action
  *   Value can be 'drop' or 'resize'.
- * @param $node
- *   The node that will be updated.
+ * @param int $eid
+ *   The id of the entity that will be updated.
  */
 function fullcalendar_update($action, $eid) {
-  // Retrieve the post vars form the ajax call.
-  $field = $_POST['field'];
-  $index = $_POST['index'];
-  $dom_id = $_POST['dom_id'];
-  $all_day = isset($_POST['all_day']) ? $_POST['all_day'] : '';
-  $day_delta = $_POST['day_delta'];
-  $minute_delta = $_POST['minute_delta'];
-  $entity_type = $_POST['entity_type'];
-  $entity = entity_load($entity_type, array($eid));
-  $entity = reset($entity);
-
-  if (!empty($field) && isset($index)) {
-    $langcode = field_language($entity_type, $entity, $field);
-    $old_start = $entity->{$field}[$langcode][$index]['value'];
-    $old_end = $entity->{$field}[$langcode][$index]['value2'];
-
-    switch ($action) {
-      case 'drop':
-        $entity->{$field}[$langcode][$index]['value'] = date('Y-m-d H:i:s', strtotime($old_start . ' ' . $day_delta . ' days ' . $minute_delta . ' minutes'));
-        $entity->{$field}[$langcode][$index]['value2'] = date('Y-m-d H:i:s', strtotime($old_end . ' ' . $day_delta . ' days ' . $minute_delta . ' minutes'));
-        break;
-      case 'resize':
-        $entity->{$field}[$langcode][$index]['value2'] = date('Y-m-d H:i:s', strtotime($old_end . ' ' . $day_delta . ' days ' . $minute_delta . ' minutes'));
-        break;
-    }
-
-    // Save the new start/end values.
-    field_attach_update($entity_type, $entity);
-
-    drupal_json_output(array('msg' => t('The new event time has been saved.') . ' [' . l(t('Close'), NULL, array('attributes' => array('class' => array('fullcalendar-status-close')))) . ']', 'dom_id' => $dom_id));
-  }
-}
-
-/**
- * Implements hook_theme().
- */
-function fullcalendar_theme() {
-  return array(
-    'fullcalendar_classname' => array(
-      'variables' => array('entity' => NULL),
-    ),
-  );
-}
-
-/**
- * Constructs CSS classes for a entity.
- *
- * @param $node
- *   An object representing the entity.
- *
- * @return
- *   A string suitable for use as a CSS class.
- */
-function theme_fullcalendar_classname($variables) {
-  $entity = $variables['entity'];
-  $className = array(
-    'fc-event-default',
-    $entity->bundle,
-  );
-  return implode(' ', $className);
-}
-
-/**
- * Passes options to the FullCalendar plugin as JavaScript settings.
- */
-function template_preprocess_views_view_fullcalendar(&$vars) {
-  $gcal = array();
-  foreach ($vars['view']->field as $field) {
-    if ($field->field == 'gcal') {
-      $gcal[] = $field->render(array());
-    }
-  }
-  $vars['options']['gcal'] = $gcal;
-  $vars['options']['dom_id'] = '.view-dom-id-' . $vars['id'];
-  fullcalendar_get_settings($vars['options']);
-}
-function fullcalendar_get_settings($options) {
-  global $language;
-
-  $settings = array(
-    $options['dom_id'] => array(
-      'defaultView' => $options['display']['fc_view'],
-      'firstDay' => $options['display']['fc_firstday'],
-      'weekMode' => $options['display']['fc_weekmode'],
-      'theme' => $options['modules']['fc_theme'],
-      'sameWindow' => $options['modules']['fc_window'],
-      'colorbox' => $options['modules']['fc_url_colorbox'],
-      'colorboxClass' => $options['modules']['fc_url_colorbox_class'],
-      'colorboxWidth' => $options['modules']['fc_url_colorbox_width'],
-      'colorboxHeight' => $options['modules']['fc_url_colorbox_height'],
-      'left' => $options['header']['fc_left'],
-      'center' => $options['header']['fc_center'],
-      'right' => $options['header']['fc_right'],
-      'agenda' => $options['times']['fc_timeformat'],
-      'clock' => $options['times']['fc_clock'],
-      'monthNames' => array_values(date_month_names(TRUE)),
-      'monthNamesShort' => array_values(date_month_names_abbr(TRUE)),
-      'dayNames' => date_week_days(TRUE),
-      'dayNamesShort' => date_week_days_abbr(TRUE),
-      'allDayText' => t('All day'),
-      'dayString' => t('Day'),
-      'weekString' => t('Week'),
-      'monthString' => t('Month'),
-      'todayString' => t('Today'),
-      'isRTL' => $language->direction,
-      'gcal' => $options['gcal'],
-    ),
-  );
-
-  if ($options['times']['fc_default_date']) {
-    $settings[$options['dom_id']]['year'] = $options['times']['fc_date']['year'];
-    $settings[$options['dom_id']]['month'] = $options['times']['fc_date']['month'];
-    $settings[$options['dom_id']]['day'] = $options['times']['fc_date']['day'];
-  }
-
-  drupal_add_library('fullcalendar', 'fullcalendar');
-  drupal_add_js(array('fullcalendar' => $settings), 'setting');
-  drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.views.js');
-  drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/gcal.js');
-}
-
-/**
- * Prepares variables for template file invoked for node row type.
- */
-function template_preprocess_views_view_node_fullcalendar(&$vars) {
-  // Check if we have field data.
-  if (empty($vars['row'])) {
+  if (empty($_POST['field']) || !isset($_POST['index'])) {
     return;
   }
 
-  foreach ($vars['view']->field as $id => $field) {
-    $fields[$id] = $vars['view']->style_plugin->get_field($vars['view']->row_index, $id);
-    if (method_exists($field, 'fullcalendar_render')) {
-      $date_fields[$id] = $field->fullcalendar_render($vars['row']);
-    }
+  // Retrieve the post vars form the ajax call.
+  $field = check_plain($_POST['field']);
+  $index = check_plain($_POST['index']);
+
+  $all_day = isset($_POST['all_day']) ? check_plain($_POST['all_day']) : '';
+  $delta = ' ' . check_plain($_POST['day_delta']) . ' days ' . check_plain($_POST['minute_delta']) . ' minutes';
+  $entity_type = check_plain($_POST['entity_type']);
+  $entity = entity_load($entity_type, array($eid));
+  $entity = reset($entity);
+
+  $langcode = field_language($entity_type, $entity, $field);
+  $item = &$entity->{$field}[$langcode][$index];
+  $old_start = $item['value'];
+  $old_end = $item['value2'];
+
+  // Adjust for different date formats.
+  $format = date_type_format($item['date_type']);
+
+  // Datestamp can't combine with words for strtotime, convert to ISO for now.
+  if ($format == DATE_FORMAT_UNIX) {
+    $old_start = date(DATE_FORMAT_ISO, $old_start);
+    $old_end = date(DATE_FORMAT_ISO, $old_end);
   }
 
-  $vars['data'] = array(); // Contains the start, end & allDay values.
+  // No break after 'drop' so it will reuse the code of 'resize'.
+  switch ($action) {
+    case 'drop':
+      $item['value'] = date($format, strtotime($old_start . $delta));
+    case 'resize':
+      $item['value2'] = date($format, strtotime($old_end . $delta));
+      break;
+  }
 
-  $eid = $vars['row']->{$vars['view']->base_field};
-  if (isset($vars['row']->_field_data)) {
-    $entity = $vars['row']->_field_data[$vars['view']->base_field]['entity'];
-    $entity_type = $vars['row']->_field_data[$vars['view']->base_field]['entity_type'];
+  // Save the new start/end values.
+  if (module_exists('entity')) {
+    entity_save($entity_type, $entity);
   }
   else {
-    foreach (entity_get_info() as $entity_type => $entity_info) {
-      if ($entity_info['base table'] == $vars['view']->base_table) {
-        break;
-      }
-    }
-    $entity = entity_load($entity_type, array($eid));
-    $entity = reset($entity);
-  }
-  $entity->eid = $eid;
-
-  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
-  $entity->bundle = $bundle;
-  $entity->class = theme('fullcalendar_classname', array('entity' => $entity));
-  $entity->editable = _fullcalendar_update_access($entity);
-
-  // Default URL.
-  $uri = entity_uri($entity_type, $entity);
-  $entity->url = $uri['path'];
-  // Fetch custom URL if needed.
-  if (!empty($vars['options']['custom']['fc_url'])) {
-    $field_name = $vars['options']['custom']['fc_url_field'];
-    if (!empty($fields[$field_name])) {
-      $entity->url = ltrim($fields[$field_name], '/');
-    }
+    field_attach_presave($entity_type, $entity);
+    field_attach_update($entity_type, $entity);
   }
 
-  // Fetch custom title if needed.
-  if (!isset($entity->title)) {
-    $entity->title = '';
-  }
-  if (!empty($vars['options']['custom']['fc_title'])) {
-    $field_name = $vars['options']['custom']['fc_title_field'];
-    if (!empty($fields[$field_name])) {
-      $entity->title = $fields[$field_name];
-    }
-  }
-
-  // Entity is build, add it to the preprocess variables
-  $vars['entity'] = $entity;
-
-  // Fetch custom dates if needed.
-  if (!empty($vars['options']['custom']['fc_date'])) {
-    $date_fields = array_intersect_key($date_fields, $vars['options']['custom']['fc_date_field']);
-  }
-
-  // Iterate through all available fields.
-  foreach ($date_fields as $field) {
-    $instance = field_info_instance($entity_type, $field['field_name'], $bundle);
-    $field_data = field_info_field($field['field_name']);
-    // Filter fields without value.
-    if (!empty($field['value'])) {
-      foreach ($field['value'] as $index => $item) {
-        $vars['data'][] = _fullcalendar_set_display_times($entity_type, $entity, $instance, $field_data, $item, $index);
-      }
-    }
-  }
+  drupal_json_output(array('msg' => t('The new event time has been saved.') . ' [' . l(t('Close'), NULL, array('attributes' => array('class' => array('fullcalendar-status-close')))) . ']', 'dom_id' => $_POST['dom_id']));
 }
 
 /**
- * Translates times to the right display times.
- *
- * This is done by passing times through date modules date_formatter_process
- * function.
- *
- * @param $entity
- *   The entity that will be updated.
- * @param $field_name
- *   The name of the date field.
- * @param $field
- *   The field structure for the date field.
- * @param $item
- *   The field value for the date field.
- *
- * @return
- *   Array of event attributes to pass to the FullCalendar plugin.
+ * Implements hook_fullcalendar_classes().
  */
-function _fullcalendar_set_display_times($entity_type, $entity, $instance, $field, $item, $index) {
-  if (!isset($item['raw']['date_type'])) {
-    $date1 = new DateObject($item['raw']['value'], date_default_timezone(), DATE_FORMAT_UNIX);
-    $date2 = $date1;
-    $all_day = FALSE;
-    $entity->editable = FALSE;
+function fullcalendar_fullcalendar_classes($entity) {
+  $classes = array(
+    'fc-event-default',
+    $entity->bundle,
+  );
+
+  // Add a class for the date field being used.
+  if (isset($entity->fullcalendar_date_field)) {
+    $classes[] = "fc-event-field-$entity->fullcalendar_date_field";
+  }
+
+  return $classes;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for views_ui_edit_display_form().
+ *
+ * Since we force the query to be distinct, reflect that in the UI.
+ */
+function fullcalendar_form_views_ui_edit_display_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_state['view']->display_handler->get_option('style_plugin') != 'fullcalendar' || empty($form['options']['query']['options']['distinct'])) {
+    return;
+  }
+
+  $distinct = &$form['options']['query']['options']['distinct'];
+
+  if (!isset($distinct['#description'])) {
+    $distinct['#description'] = '';
   }
   else {
-    $date = date_formatter_process($instance['display']['default']['type'], $entity_type, $entity, $field, $instance, LANGUAGE_NONE, $item['raw'], $instance['display']['default']);
-    $date1 = $date['value']['local']['object'];
-    $date2 = $date['value2']['local']['object'];
-    $all_day = date_field_all_day($field, $instance, $date1, $date2);
+    $distinct['#description'] .= '<br>';
   }
-  $attributes = array(
-    'field' => $field['field_name'],
-    'allDay' => $all_day,
-    'start' => $date1->format(DATE_FORMAT_DATETIME),
-    'end' => $date2->format(DATE_FORMAT_DATETIME),
-    'index' => $index,
-    'eid' => $entity->eid,
-    'entity_type' => $entity_type,
-    'cn' => $entity->class,
-    'title' => $entity->title,
-    'class' => array('fullcalendar-event-details'),
-    'editable' => $entity->editable,
+
+  $distinct['#disabled'] = TRUE;
+  $distinct['#description'] .= '<strong>' . t('FullCalendar requires that the query be distinct.') . '</strong>';
+}
+
+/**
+ * Returns events for FullCalendar.
+ */
+function fullcalendar_results($view_name = NULL, $view_display = NULL) {
+  // Bail out if no view_name or view_display is passed.
+  if (empty($view_name) || empty($view_display) || empty($_POST['dom_id'])) {
+    return;
+  }
+
+  // Find Views arguments.
+  $args = func_get_args();
+  unset($args[0], $args[1]);
+  $args = array_values($args);
+
+  $dom_id = check_plain($_POST['dom_id']);
+  $view_name = check_plain($view_name);
+  $view_display = check_plain($view_display);
+
+  // Add all $_POST data, because AJAX is always a post and many things,
+  // such as tablesorts, exposed filters and paging assume $_GET.
+  $_GET += $_POST;
+
+  // Get the view and check access.
+  $view = views_get_view($view_name);
+  if (!$view || !$view->access($view_display)) {
+    return;
+  }
+
+  if (!$view->set_display($view_display)) {
+    return;
+  }
+
+  $view->dom_id = $dom_id;
+  $view->fullcalendar_ajax = TRUE;
+  $view->pre_execute($args);
+  $view->init_style();
+  $view->execute($view_display);
+  $output = $view->style_plugin->render();
+  $view->post_execute();
+
+  return array(
+    '#type' => 'ajax',
+    '#commands' => array(
+      array('command' => 'fullcalendar_results_response', 'data' => $output),
+    ),
   );
-  return l($item['rendered']['#markup'], $entity->url, array('attributes' => $attributes, 'html' => TRUE));
 }
 
 /**
  * Checks if the user has access to update the given FullCalendar event.
  *
- * @param $entity
+ * @param object $entity
  *   The entity that will be updated.
  *
- * @return
+ * @return bool
  *   TRUE if the user is allowed to update the entity;
  *   FALSE if the user is not permitted to update the entity.
  */
 function _fullcalendar_update_access($entity) {
   global $user;
 
-  if (!empty($entity) && (user_access('administer content')
+  if (!empty($entity) && ((user_access('administer content')
       || user_access('update any fullcalendar event')
       || user_access('edit any ' . $entity->bundle . ' content')
-      || (user_access('edit own ' . $entity->bundle . ' content') && $entity->uid == $user->uid))) {
-        return TRUE;
+      || (user_access('edit own ' . $entity->bundle . ' content') && $entity->uid == $user->uid)))) {
+    return TRUE;
   }
 
   return FALSE;
 }
 
 /**
- * Filters the date fields.
+ * Implements hook_fullcalendar_editable().
  *
- * @param $fields
- *   Array of possible date fields.
- *
- * @return
- *   Array of valid date fields.
+ * Use our access callback as the editable setting.
  */
-function fullcalendar_date_fields($fields) {
-  foreach ($fields as $id => $field_name) {
-    switch ($id) {
-      case 'created':
-      case 'changed':
-      case 'access':
-      case 'login':
-      case 'timestamp':
-      case 'gcal':
-        break;
-      default:
-        $field = field_info_field($field_name);
-        if (!in_array($field['type'], array('date', 'datestamp', 'datetime'))) {
-          unset($fields[$id]);
-        }
-    }
-  }
-  return $fields;
+function fullcalendar_fullcalendar_editable($entity, $view) {
+  return _fullcalendar_update_access($entity);
 }
 
 /**
- * Helper function to resolve entity_id, field_name, and field_label.
+ * Determines if a given field is a date field.
  *
- * @param $fields
- *   Array of Views fields.
- * @param $labels
- *   Array of Views field labels.
+ * @param object $field
+ *   A Views field handler object.
+ * @param bool $include_gcal
+ *   Boolean indicating whether or not to count gcal fields as a date field.
  *
- * @return
- *  Array of date field labels, keyed by entity_id.
+ * @return bool
+ *   Boolean, TRUE if the field is a date field, FALSE otherwise.
  */
-function _fullcalendar_parse_fields($fields, $labels) {
-  $field_options = array();
-  foreach ($fields as $id => $field) {
-    if (isset($field->definition['field_name'])) {
-      $field_options[$id] = $field->definition['field_name'];
-    }
-    else {
-      $field_options[$id] = $field->definition['title'];
-    }
+function fullcalendar_field_is_date($field, $include_gcal = FALSE) {
+  if ($include_gcal && $field->field == 'gcal') {
+    return TRUE;
   }
-  return array_intersect_key($labels, fullcalendar_date_fields($field_options));
+
+  return !empty($field->definition['is date']) && isset($field->field_info);
 }
 
 /**
  * Checks FullCalendar dependencies.
  *
- * @return
+ * @return bool
  *   Array with TRUE/FALSE for each dependency.
  *
  * @see fullcalendar_requirements()
@@ -457,7 +350,12 @@ function _fullcalendar_status() {
   $status = array();
   $status['fullcalendar_plugin'] = FALSE;
 
-  if (version_compare(fullcalendar_get_version(), FULLCALENDAR_MIN_PLUGIN_VERSION, '>=')) {
+  $path = fullcalendar_get_js_path();
+  if (!file_exists($path)) {
+    return FALSE;
+  }
+
+  if (version_compare(fullcalendar_get_version($path), FULLCALENDAR_MIN_PLUGIN_VERSION, '>=')) {
     $status['fullcalendar_plugin'] = TRUE;
   }
 
@@ -465,35 +363,78 @@ function _fullcalendar_status() {
 }
 
 /**
- * Returns the version of FullCalender plugin that is installed.
+ * Returns the version of FullCalendar plugin that is installed.
  *
  * This can be used by other modules' hook_requirements() to ensure that the
- * proper version of Colorbox plugin is installed.
+ * proper version of FullCalendar plugin is installed.
  *
- * @see version_compare
+ * @see version_compare()
  */
 function fullcalendar_get_version($fullcalendar_path = NULL) {
-  $version = 0;
-  $pattern = '#FullCalendar v([0-9\.a-z]+)#';
+  $version = &drupal_static(__FUNCTION__);
 
-  // No file is passed in so use the default location.
-  if (is_null($fullcalendar_path)) {
-    $fullcalendar_path = fullcalendar_get_js_path();
-  }
+  if (empty($version)) {
+    $version = 0;
+    $pattern = '#FullCalendar v([0-9\.a-z]+)#';
 
-  // Return the version of FullCalendar plugin.
-  $fullcalendar_plugin = file_get_contents($fullcalendar_path, NULL, NULL, 0, 40);
-  if (preg_match($pattern, $fullcalendar_plugin, $matches)) {
-    $version = $matches[1];
+    // No file is passed in so use the default location.
+    if (is_null($fullcalendar_path)) {
+      $fullcalendar_path = fullcalendar_get_js_path();
+    }
+
+    // Return the version of FullCalendar plugin.
+    $fullcalendar_plugin = file_get_contents($fullcalendar_path, NULL, NULL, 0, 40);
+    if (preg_match($pattern, $fullcalendar_plugin, $matches)) {
+      $version = $matches[1];
+    }
   }
 
   return $version;
 }
 
 /**
- * Returns the path to the FullCalender plugin.
+ * Returns the path to the FullCalendar plugin.
  */
 function fullcalendar_get_js_path() {
   $fullcalendar_file = array('none' => 'fullcalendar.js', 'min' => 'fullcalendar.min.js');
-  return variable_get('fullcalendar_path', FULLCALENDAR_PATH) . '/' . $fullcalendar_file[variable_get('fullcalendar_compression_type', 'min')];
+  return variable_get('fullcalendar_path', fullcalendar_default_path()) . '/' . $fullcalendar_file[variable_get('fullcalendar_compression_type', 'min')];
+}
+
+/**
+ * Includes all FullCalendar API plugins.
+ */
+function fullcalendar_include_api() {
+  ctools_include('plugins');
+  return ctools_plugin_api_include('fullcalendar', 'fullcalendar', fullcalendar_api_version(), fullcalendar_api_minimum_version());
+}
+
+/**
+ * Implements hook_ctools_plugin_api_hook_name().
+ */
+function fullcalendar_ctools_plugin_api_hook_name() {
+  return 'fullcalendar_api';
+}
+
+/**
+ * Declares the current FullCalendar API version.
+ */
+function fullcalendar_api_version() {
+  return '1';
+}
+
+/**
+ * Declares the minimum FullCalendar API version.
+ */
+function fullcalendar_api_minimum_version() {
+  return '1';
+}
+
+/**
+ * Implements hook_fullcalendar_api().
+ */
+function fullcalendar_fullcalendar_api() {
+  return array(
+    'api' => fullcalendar_api_version(),
+    'path' => drupal_get_path('module', 'fullcalendar') . '/includes',
+  );
 }

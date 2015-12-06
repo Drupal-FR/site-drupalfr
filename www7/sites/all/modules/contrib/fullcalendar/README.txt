@@ -1,16 +1,18 @@
 This module requires the 3rd party library for FullCalendar located at
-http://arshaw.com/fullcalendar. Download and unzip this library into the
-sites/all/libraries/fullcalendar directory, or use the Libraries API module for
-site specific libraries.
+http://arshaw.com/fullcalendar.
 
-To use the fullcalendar module:
-  1) Install Views, Date, Date API, and Date Timezone modules
-  2) Create a new content type that has either a date or a datetime field
-  3) Create a view for the content type
-  4) Change the view style plugin to "FullCalendar"
-  5) Change the view row style plugin to "Node - FullCalendar"
+Download the most recent version of the plugin. When unzipped, the plugin
+contains several directories. The fullcalendar/fullcalendar directory should be
+moved to sites/all/libraries/fullcalendar
+(e.g., sites/all/libraries/fullcalendar/fullcalendar.min.js). Do not include
+the demos or jQuery directories.
 
-KNOWN ISSUES:
-When displaying a repeating date field, each event might show up multiple times
-on each repeat instance. To solve this problem, change the 'Distinct' setting
-to yes in the Views display settings. This is not a bug in FullCalendar.
+If you are using drush, using `drush fullcalendar-plugin` will download the
+correct version of the plugin and move the files accordingly.
+
+To use the FullCalendar module:
+  1) Install Views, Date, Date API, and Date Views modules
+  2) Create a new entity that has a date field
+  3) Create a view and add filters for the entity
+  4) In the "Format" section, change the "Format" to "FullCalendar"
+  5) Optionally, enable the "Use AJAX" option under "Advanced"
