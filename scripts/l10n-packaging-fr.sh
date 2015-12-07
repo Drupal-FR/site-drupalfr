@@ -16,8 +16,22 @@ DIR="$RESULT/.."
 DRUSH="/usr/local/bin/drush"
 
 #############
-# Version 7
+# Version 8
 #############
+# Telechargement Drupal
+#$DRUSH dl drupal-8 -q --drupal-project-rename=drupal8 --destination=$DIR
+
+# Detection de version
+VERSION=`cat drupal8/core/lib/Drupal.php | grep "const VERSION = " | tail -n 1`
+stringlen=$(( ${#VERSION} - 19 - 2 ))
+VERSION=${VERSION:19:$stringlen}
+
+# Stockage du numéro de version dans une variable pour affichage sur le site.
+$DRUSH -r $DIR/www7 vset drupalfr_current_version -q --yes --exact --format="string" "$VERSION"
+
+##############
+## Version 7
+##############
 # Telechargement Drupal
 $DRUSH dl drupal-7 -q --drupal-project-rename=drupal7 --destination=$DIR
 
