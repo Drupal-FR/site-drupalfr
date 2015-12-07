@@ -16,29 +16,6 @@ DIR="$RESULT/.."
 DRUSH="/usr/local/bin/drush"
 
 #############
-# Version 8
-#############
-# Telechargement Drupal
-$DRUSH dl drupal-8 -q --drupal-project-rename=drupal8 --destination=$DIR
-
-# Detection de version
-VERSION=`$DRUSH core-status drupal-version --format=list -r $DIR/drupal8`
-
-# Recuperation + copie de la trad de la version
-wget http://ftp.drupal.org/files/translations/8.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
-mkdir -p $DIR/drupal8/sites/default/files/translations
-cp $DIR/drupal-$VERSION.fr.po $DIR/drupal8/sites/default/files/translations/
-rm $DIR/drupal-$VERSION.fr.po
-mv $DIR/drupal8 $DIR/drupal-$VERSION
-
-# Tarball
-tar cpzf $DIR/scripts/drupal-8.latest.tar.gz --directory $DIR drupal-$VERSION
-rm -r $DIR/drupal-$VERSION
-
-# Stockage du numéro de version dans une variable pour affichage sur le site.
-$DRUSH -r $DIR/www7 vset drupalfr_next_version -q --yes --exact --format="string" "$VERSION"
-
-#############
 # Version 7
 #############
 # Telechargement Drupal
@@ -56,29 +33,6 @@ mv $DIR/drupal7 $DIR/drupal-$VERSION
 
 # Tarball
 tar cpzf $DIR/scripts/drupal-7.latest.tar.gz --directory $DIR drupal-$VERSION
-rm -r $DIR/drupal-$VERSION
-
-# Stockage du numéro de version dans une variable pour affichage sur le site.
-$DRUSH -r $DIR/www7 vset drupalfr_current_version -q --yes --exact --format="string" "$VERSION"
-
-#############
-# Version 6
-#############
-# Telechargement Drupal
-$DRUSH dl drupal-6 -q --drupal-project-rename=drupal6 --destination=$DIR
-
-# Detection de version
-VERSION=`$DRUSH core-status drupal-version --format=list -r $DIR/drupal6`
-
-# Recuperation + copie de la trad de la version
-wget http://ftp.drupal.org/files/translations/6.x/drupal/drupal-$VERSION.fr.po --output-document=$DIR/drupal-$VERSION.fr.po --quiet
-mkdir $DIR/drupal6/profiles/default/translations
-cp $DIR/drupal-$VERSION.fr.po $DIR/drupal6/profiles/default/translations/fr.po
-rm $DIR/drupal-$VERSION.fr.po
-mv $DIR/drupal6 $DIR/drupal-$VERSION
-
-# Tarball
-tar cpzf $DIR/scripts/drupal-6.latest.tar.gz --directory $DIR drupal-$VERSION
 rm -r $DIR/drupal-$VERSION
 
 # Stockage du numéro de version dans une variable pour affichage sur le site.
