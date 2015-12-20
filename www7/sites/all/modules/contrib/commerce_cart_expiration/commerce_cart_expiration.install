@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_cart_expiration_uninstall() {
+  $variables = array(
+    'commerce_cart_expiration_explanation_page',
+    'commerce_cart_expiration_cart_expiration_content',
+    'commerce_cart_expiration_cart_expiration_content_format',
+  );
+
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}

@@ -97,11 +97,6 @@ function scald_atom_add_page($js, $type, $step = NULL, $atom_id = NULL) {
       'source' => isset($source) ? $source : NULL,
       'provider' => $provider,
     );
-
-    if ($step === 'options') {
-      $form = array();
-      scald_atom_add_form_add_submit($form, $form_state);
-    }
   }
 
   $form_state['scald']['step'] = $step;
@@ -204,7 +199,6 @@ function scald_atom_add_form_source_submit(&$form, &$form_state) {
   $provider = $providers[$type][$source];
   $form_state['scald']['provider'] = $provider;
   if (isset($form_state['scald']['provider']['starting_step']) && $form_state['scald']['provider']['starting_step'] == 'options') {
-    scald_atom_add_form_add_submit($form, $form_state);
     $form_state['clicked_button']['#next'] = 'options';
   }
 }
@@ -266,6 +260,9 @@ function scald_atom_add_form_add_submit(&$form, &$form_state) {
  * Options form.
  */
 function scald_atom_add_form_options($form, &$form_state) {
+  if (empty($form_state['scald']['atoms'])) {
+    scald_atom_add_form_add_submit($form, $form_state);
+  }
   $atoms = $form_state['scald']['atoms'];
 
   $actions = scald_actions();

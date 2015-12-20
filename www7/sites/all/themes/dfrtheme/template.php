@@ -1,13 +1,20 @@
 <?php
 
 /**
- * Implements template_html_head_alter().
- *
- * Changes the default meta content-type tag to the shorter HTML5 version
+ * Implements hook_theme().
  */
-function dfrtheme_html_head_alter(&$head_elements) {
-  $head_elements['system_meta_content_type']['#attributes'] = array(
-    'charset' => 'utf-8',
+function dfrtheme_theme() {
+  return array(
+    'forum_list' => array(
+      'template' => 'forum-list',
+      'path' => drupal_get_path('theme', 'dfrtheme') . '/templates/forum/',
+      'variables' => array('forums' => NULL, 'parents' => NULL, 'tid' => NULL),
+    ),
+    'forum_submitted' => array(
+      'template' => 'forum-submitted',
+      'path' => drupal_get_path('theme', 'dfrtheme') . '/templates/forum/',
+      'variables' => array('topic' => NULL),
+    ),
   );
 }
 
@@ -200,6 +207,53 @@ function dfrtheme_preprocess_block(&$variables) {
 }
 
 /**
+ * Implements hook_preprocess_views_view().
+ */
+function dfrtheme_preprocess_views_view(&$variables) {
+  if ($variables['view']->name == 'offres' && $variables['view']->current_display == 'block_1') {
+    $path = 'node/add/offre';
+    $options = array();
+
+    // Force users to login first and then bring them back to the form.
+    if (user_is_anonymous()) {
+      $path = 'user/login';
+      $options['query'] = array('destination' => 'node/add/offre');
+    }
+
+    $variables['empty'] = "<p>Il n'y a aucune offre pour le moment, pourquoi ne pas " . l(t('proposer la vôtre'), $path, $options) . " ?</p>";
+    $link_create_offer = l(t('Déposer une offre'), 'node/add/offre', array('attributes' => array('class' => array('btn-link'))));
+    $link_see_offers = l(t('Voir toutes les offres'), 'emploi/', array('attributes' => array('class' => array('btn-link'))));
+
+    // Update link path if you are logged in or not.
+    if ($variables['view']->total_rows > 0) {
+      if (user_is_anonymous()) {
+        $link_create_offer = l(t('Déposer une offre'), 'user/login', array('query' => array('destination' => 'node/add/offre'), 'attributes' => array('class' => array('btn-link'))));
+      }
+    }
+    $footer = $link_create_offer . ' ' . $link_see_offers;
+    $variables['footer'] = $footer;
+  }
+}
+
+/**
+ * Implements theme_preprocess_menu_local_task().
+ *
+ * Override or insert variables into theme_menu_local_task().
+ */
+function dfrtheme_preprocess_menu_local_task(&$variables) {
+  $link = & $variables['element']['#link'];
+
+  // If the link does not contain HTML already, check_plain() it now.
+  // After we set 'html'=TRUE the link will not be sanitized by l().
+  if (empty($link['localized_options']['html'])) {
+    $link['title'] = check_plain($link['title']);
+  }
+
+  $link['localized_options']['html'] = TRUE;
+  $link['title'] = '<span class="tab">' . $link['title'] . '</span>';
+}
+
+/**
  * Implements theme_menu_tree().
  */
 function dfrtheme_menu_tree($variables) {
@@ -207,6 +261,8 @@ function dfrtheme_menu_tree($variables) {
 }
 
 /**
+ * Implements theme_breadcrumb().
+ *
  * Return a themed breadcrumb trail.
  */
 function dfrtheme_breadcrumb($variables) {
@@ -276,6 +332,8 @@ function _dfrtheme_doctype() {
 }
 
 /**
+ * Implements theme_menu_link().
+ *
  * Generate the HTML output for a menu link and submenu.
  *
  * @param array $variables
@@ -305,24 +363,8 @@ function dfrtheme_menu_link(array $variables) {
 }
 
 /**
- * Implements theme_preprocess_menu_local_task().
+ * Implements theme_menu_local_tasks().
  *
- * Override or insert variables into theme_menu_local_task().
- */
-function dfrtheme_preprocess_menu_local_task(&$variables) {
-  $link = & $variables['element']['#link'];
-
-  // If the link does not contain HTML already, check_plain() it now.
-  // After we set 'html'=TRUE the link will not be sanitized by l().
-  if (empty($link['localized_options']['html'])) {
-    $link['title'] = check_plain($link['title']);
-  }
-
-  $link['localized_options']['html'] = TRUE;
-  $link['title'] = '<span class="tab">' . $link['title'] . '</span>';
-}
-
-/**
  * Duplicate of theme_menu_local_tasks() but adds clearfix to tabs.
  */
 function dfrtheme_menu_local_tasks(&$variables) {
@@ -342,22 +384,6 @@ function dfrtheme_menu_local_tasks(&$variables) {
     $output .= drupal_render($variables['secondary']);
   }
   return $output;
-}
-
-/**
- * Implements hook_form_alter().
- */
-function dfrtheme_form_alter(&$form, &$form_state, $form_id) {
-  // User login form (block & page).
-  if ($form_id == 'user_login_block' || $form_id == 'user_login') {
-    // Re-order fields.
-    $form['openid_identifier']['#weight'] = 0;
-    $form['name']['#weight'] = 0;
-    $form['pass']['#weight'] = 1;
-    $form['actions']['#weight'] = 2;
-    $form['openid_links']['#weight'] = 3;
-    $form['links']['#weight'] = 4;
-  }
 }
 
 /**
@@ -386,48 +412,28 @@ function dfrtheme_field($variables) {
 }
 
 /**
- * Implements hook_preprocess_views_view().
+ * Implements hook_form_alter().
  */
-function dfrtheme_preprocess_views_view(&$variables) {
-  if ($variables['view']->name == 'offres' && $variables['view']->current_display == 'block_1') {
-    $path = 'node/add/offre';
-    $options = array();
-
-    // Force users to login first and then bring them back to the form.
-    if (user_is_anonymous()) {
-      $path = 'user/login';
-      $options['query'] = array('destination' => 'node/add/offre');
-    }
-
-    $variables['empty'] = "<p>Il n'y a aucune offre pour le moment, pourquoi ne pas " . l(t('proposer la vôtre'), $path, $options) . " ?</p>";
-    $link_create_offer = l(t('Déposer une offre'), 'node/add/offre', array('attributes' => array('class' => array('btn-link'))));
-    $link_see_offers = l(t('Voir toutes les offres'), 'emploi/', array('attributes' => array('class' => array('btn-link'))));
-
-    // Update link path if you are logged in or not.
-    if ($variables['view']->total_rows > 0) {
-      if (user_is_anonymous()) {
-        $link_create_offer = l(t('Déposer une offre'), 'user/login', array('query' => array('destination' => 'node/add/offre'), 'attributes' => array('class' => array('btn-link'))));
-      }
-    }
-    $footer = $link_create_offer . ' ' . $link_see_offers;
-    $variables['footer'] = $footer;
+function dfrtheme_form_alter(&$form, &$form_state, $form_id) {
+  // User login form (block & page).
+  if ($form_id == 'user_login_block' || $form_id == 'user_login') {
+    // Re-order fields.
+    $form['openid_identifier']['#weight'] = 0;
+    $form['name']['#weight'] = 0;
+    $form['pass']['#weight'] = 1;
+    $form['actions']['#weight'] = 2;
+    $form['openid_links']['#weight'] = 3;
+    $form['links']['#weight'] = 4;
   }
 }
 
 /**
- * Implements hook_theme().
+ * Implements template_html_head_alter().
+ *
+ * Changes the default meta content-type tag to the shorter HTML5 version
  */
-function dfrtheme_theme() {
-  return array(
-    'forum_list' => array(
-      'template' => 'forum-list',
-      'path' => drupal_get_path('theme', 'dfrtheme') . '/templates/forum/',
-      'variables' => array('forums' => NULL, 'parents' => NULL, 'tid' => NULL),
-    ),
-    'forum_submitted' => array(
-      'template' => 'forum-submitted',
-      'path' => drupal_get_path('theme', 'dfrtheme') . '/templates/forum/',
-      'variables' => array('topic' => NULL),
-    ),
+function dfrtheme_html_head_alter(&$head_elements) {
+  $head_elements['system_meta_content_type']['#attributes'] = array(
+    'charset' => 'utf-8',
   );
 }

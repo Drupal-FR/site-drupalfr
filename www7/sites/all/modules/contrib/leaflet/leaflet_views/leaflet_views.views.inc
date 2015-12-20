@@ -25,7 +25,7 @@ function leaflet_views_views_plugins() {
         'uses options' => TRUE,
         'uses grouping' => FALSE,
         'type' => 'normal',
-        'even empty' => TRUE,
+        'even empty' => FALSE,
       ),
     ),
   );

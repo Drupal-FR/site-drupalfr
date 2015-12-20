@@ -107,8 +107,6 @@ function dnd_library() {
     }
   }
 
-  $plugin = mee_store_format() !== 'embed_div' ? 'ckeditor' : 'dndck4';
-
   $libraries['library'] = array(
     'title' => 'DnD Library',
     'website' => 'http://drupal.org/project/scald',
@@ -121,10 +119,6 @@ function dnd_library() {
       $path . '/js/dnd-library.js' => array(),
       // Javascript workaround for the continue button.
       $path . '/js/dnd-modal.js' => array(),
-      // This file is included automatically if the CKEditor plugin is enabled.
-      // However we need to load it directly in Drupal so that strings can be
-      // translated.
-      $path . '/plugins/' . $plugin . '/lang/en.js' => array(),
       // Settings for the library url.
       array(
         'type' => 'setting',
@@ -302,53 +296,6 @@ function dnd_suppress_library($set = TRUE) {
     drupal_add_js(array('dnd' => array('suppress' => 1)), 'setting');
   }
   return $suppress;
-}
-
-/**
- * Implements hook_wywiwyg_plugin().
- */
-function dnd_wysiwyg_plugin($editor, $version) {
-  $plugins = array();
-  switch ($editor) {
-    case 'ckeditor':
-      $plugins['dnd'] = array(
-        'path' => drupal_get_path('module', 'dnd') . '/plugins/ckeditor',
-        'filename' => 'plugin.js',
-        'buttons' => array(
-          'dnd' => t('Scald DnD integration'),
-        ),
-        'load' => TRUE,
-      );
-      break;
-  }
-
-  return $plugins;
-}
-
-/**
- * Implements hook_ckeditor_plugin().
- */
-function dnd_ckeditor_plugin() {
-  $plugins = array();
-  $mee_store_format = (module_exists('mee')) ? mee_store_format() : '';
-  if ($mee_store_format == 'sas') {
-    $plugins['dnd'] = array(
-      'name' => 'dnd',
-      'desc' => t('Scald Drag and Drop integration'),
-      'path' =>  drupal_get_path('module', 'dnd') . '/plugins/ckeditor/',
-      'buttons' => array(),
-    );
-  }
-  elseif ($mee_store_format == 'embed_div' && version_compare(ckeditor_get_version(), '4.3.0') >= 0) {
-    $plugins['dndck4'] = array(
-      'name' => 'dndck4',
-      'desc' => t('Scald Drag and Drop integration - CKEditor 4 widgets'),
-      'path' =>  drupal_get_path('module', 'dnd') . '/plugins/dndck4/',
-      'buttons' => array(),
-    );
-  }
-
-  return $plugins;
 }
 
 /**

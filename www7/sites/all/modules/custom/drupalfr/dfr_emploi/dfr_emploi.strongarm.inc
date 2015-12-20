@@ -13,6 +13,13 @@ function dfr_emploi_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'additional_settings__active_tab_offre';
+  $strongarm->value = 'edit-comment';
+  $export['additional_settings__active_tab_offre'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_anonymous_offre';
   $strongarm->value = 0;
   $export['comment_anonymous_offre'] = $strongarm;
@@ -42,7 +49,7 @@ function dfr_emploi_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_offre';
-  $strongarm->value = '1';
+  $strongarm->value = '2';
   $export['comment_offre'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -148,6 +155,13 @@ function dfr_emploi_strongarm() {
   $strongarm->name = 'node_submitted_offre';
   $strongarm->value = 0;
   $export['node_submitted_offre'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'publishcontent_offre';
+  $strongarm->value = 1;
+  $export['publishcontent_offre'] = $strongarm;
 
   return $export;
 }

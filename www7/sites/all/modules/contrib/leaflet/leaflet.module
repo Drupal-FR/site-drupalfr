@@ -27,11 +27,11 @@ function leaflet_libraries_info() {
     // Only used in administrative UI of Libraries API.
     'name' => 'Leaflet JavaScript Library',
     'vendor url' => 'http://leafletjs.com/',
-    'download url' => 'http://leaflet-cdn.s3.amazonaws.com/build/leaflet-0.7.1.zip',
-    // .7: version="0.7"
+    'download url' => 'http://cdn.leafletjs.com/downloads/leaflet-0.7.5.zip',
     'version arguments' => array(
       'file' => 'leaflet.js',
-      'pattern' => '/version="([\d+\.]*\d+)"/',
+      // Handle things like  version:"1.0.0-beta.2"
+      'pattern' => '/version[=: ]*[\'"]([\d+\.]+[\-a-z\.\d]*)[\'"]/',
     ),
     'files' => array(
       'js' => array(
@@ -40,12 +40,15 @@ function leaflet_libraries_info() {
           'type' => 'inline',
           'data' => 'L_ROOT_URL = "' . base_path() . libraries_get_path('leaflet') . '/";',
           'group' => JS_LIBRARY,
-          'preprocess' => FALSE,
         ),
         'leaflet.js' => array(
           'type' => 'file',
           'group' => JS_LIBRARY,
-          'preprocess' => FALSE,
+        ),
+        // For AdvAgg module. See [#2294639] This runs after leaflet.js.
+        'leaflet_imagepath' => array(
+          'type' => 'inline',
+          'data' => 'L.Icon.Default.imagePath = "' . base_path() . libraries_get_path('leaflet') . '/images";',
         ),
       ),
       'css' => array(
@@ -116,9 +119,17 @@ function leaflet_build_map($map, $features = array(), $height = '400px') {
     'data' => array('leaflet' => array($settings)),
     'type' => 'setting',
   );
+  $build['#attached']['css'][] = array(
+    'data' => drupal_get_path('module', 'leaflet') . '/leaflet_extras.css',
+  );
 
   // Load the leaflet library, which includes integration files.
+  // libraries_load('leaflet');
+  // See [2460643]
   $build['#attached']['libraries_load'][] = array('leaflet');
+
+  // Let other modules properly attach libraries as well [#2567387]
+  drupal_alter('leaflet_build_map', $build);
 
   return $build;
 }
@@ -186,32 +197,46 @@ function leaflet_map_get_info($map = NULL) {
 function leaflet_leaflet_map_info() {
   return array(
     'OSM Mapnik' =>
-    array(
-      'label' => 'OSM Mapnik',
-      'description' => t('Leaflet default map.'),
-      'settings' => array(
-        // 'zoom' => 18,
-        'minZoom' => 0,
-        'maxZoom' => 18,
-        'dragging' => TRUE,
-        'touchZoom' => TRUE,
-        'scrollWheelZoom' => TRUE,
-        'doubleClickZoom' => TRUE,
-        'zoomControl' => TRUE,
-        'attributionControl' => TRUE,
-        'trackResize' => TRUE,
-        'fadeAnimation' => TRUE,
-        'zoomAnimation' => TRUE,
-        'closePopupOnClick' => TRUE,
-      ),
-      'layers' => array(
-        'earth' => array(
-          'urlTemplate' => 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          'options' => array(
-            'attribution' => 'OSM Mapnik',
+      array(
+        'label' => 'OSM Mapnik',
+        'description' => t('Leaflet default map.'),
+        // 'center' is used when map contains no features, or every time the map
+        // is loaded if "force" is TRUE. Otherwise, the map will center itself
+        // intelligently based on the features in the map.
+        // RdB: bad things happen when 'center' is specified and Leaflet
+        // MarkerCluster is used, see https://drupal.org/node/2144935
+        // Also, a hard-coded center is not a great idea.
+        //'center' => array(
+        //  'lat' => 45.526513,
+        //  'lon' => -122.674833,
+        //  'force' => FALSE,
+        //),
+        'settings' => array(
+          // Setting "zoom" forces a zoom level on every map load.
+          //'zoom' => 17,
+          // The "zoomDefault" is only used when no features are present.
+          'zoomDefault' => 10,
+          'minZoom' => 0,
+          'maxZoom' => 18,
+          'dragging' => TRUE,
+          'touchZoom' => TRUE,
+          'scrollWheelZoom' => TRUE,
+          'doubleClickZoom' => TRUE,
+          'zoomControl' => TRUE,
+          'attributionControl' => TRUE,
+          'trackResize' => TRUE,
+          'fadeAnimation' => TRUE,
+          'zoomAnimation' => TRUE,
+          'closePopupOnClick' => TRUE,
+        ),
+        'layers' => array(
+          'earth' => array(
+            'urlTemplate' => '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            'options' => array(
+              'attribution' => 'OSM Mapnik',
+            ),
           ),
         ),
       ),
-    ),
   );
 }

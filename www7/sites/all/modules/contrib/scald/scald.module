@@ -1337,7 +1337,15 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
   $cache_parts[] = $GLOBALS['is_https'] ? 'secure' : 'plain';
 
   if (!empty($options)) {
-    $cache_parts[] = $options;
+    if (is_array($options)) {
+      $cache_parts[] = md5(drupal_json_encode($options));
+    }
+    elseif (is_string($options)) {
+      $cache_parts[] = md5($options);
+    }
+    else {
+      $cache_parts[] = $options;
+    }
   }
   $cache_id = implode(':', $cache_parts);
 
@@ -1362,7 +1370,7 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
 
   // If $options is not a JSON string or a single value, give other modules a
   // chance to handle it.
-  if ($options) {
+  if ($options && !is_array($options)) {
     if (!is_array($decoded = drupal_json_decode($options))) {
       $options = array('option' => $options);
       drupal_alter('scald_render_options', $options, $atom, $context);

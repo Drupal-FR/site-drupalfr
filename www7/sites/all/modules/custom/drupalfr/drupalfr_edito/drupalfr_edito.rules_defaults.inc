@@ -12,8 +12,9 @@ function drupalfr_edito_default_rules_configuration() {
   $items['rules_comment_is_created'] = entity_import('rules_config', '{ "rules_comment_is_created" : {
       "LABEL" : "Comment is created",
       "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
       "REQUIRES" : [ "userpoints_rules", "comment" ],
-      "ON" : [ "comment_insert" ],
+      "ON" : { "comment_insert" : [] },
       "DO" : [
         { "userpoints_action_grant_points" : {
             "user" : [ "comment:author" ],
@@ -31,8 +32,9 @@ function drupalfr_edito_default_rules_configuration() {
   $items['rules_comment_is_flagged'] = entity_import('rules_config', '{ "rules_comment_is_flagged" : {
       "LABEL" : "Comment is flagged",
       "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
       "REQUIRES" : [ "rules", "userpoints_rules", "flag" ],
-      "ON" : [ "flag_flagged_accepted_answer" ],
+      "ON" : { "flag_flagged_accepted_answer" : [] },
       "DO" : [
         { "entity_fetch" : {
             "USING" : { "type" : "user", "id" : [ "flagged-comment:author:uid" ] },
@@ -65,8 +67,9 @@ function drupalfr_edito_default_rules_configuration() {
   $items['rules_comment_is_published'] = entity_import('rules_config', '{ "rules_comment_is_published" : {
       "LABEL" : "Comment is published",
       "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
       "REQUIRES" : [ "rules", "userpoints_rules", "comment" ],
-      "ON" : [ "comment_update" ],
+      "ON" : { "comment_update" : [] },
       "IF" : [
         { "data_is" : { "data" : [ "comment-unchanged:status" ], "value" : "0" } },
         { "data_is" : { "data" : [ "comment:status" ], "value" : "1" } }
@@ -88,8 +91,9 @@ function drupalfr_edito_default_rules_configuration() {
   $items['rules_comment_is_unflagged'] = entity_import('rules_config', '{ "rules_comment_is_unflagged" : {
       "LABEL" : "Comment is unflagged",
       "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
       "REQUIRES" : [ "rules", "userpoints_rules", "flag" ],
-      "ON" : [ "flag_unflagged_accepted_answer" ],
+      "ON" : { "flag_unflagged_accepted_answer" : [] },
       "DO" : [
         { "entity_fetch" : {
             "USING" : { "type" : "user", "id" : [ "flagged-comment:author:uid" ] },
@@ -112,8 +116,9 @@ function drupalfr_edito_default_rules_configuration() {
   $items['rules_comment_is_unpublished'] = entity_import('rules_config', '{ "rules_comment_is_unpublished" : {
       "LABEL" : "Comment is unpublished",
       "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
       "REQUIRES" : [ "rules", "userpoints_rules", "comment" ],
-      "ON" : [ "comment_update" ],
+      "ON" : { "comment_update" : [] },
       "IF" : [
         { "data_is" : { "data" : [ "comment:status" ], "value" : "0" } },
         { "data_is" : { "data" : [ "comment-unchanged:status" ], "value" : "1" } }
@@ -135,8 +140,9 @@ function drupalfr_edito_default_rules_configuration() {
   $items['rules_forum_post_is_published'] = entity_import('rules_config', '{ "rules_forum_post_is_published" : {
       "LABEL" : "Forum post is published",
       "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
       "REQUIRES" : [ "rules", "userpoints_rules" ],
-      "ON" : [ "node_insert" ],
+      "ON" : { "node_insert" : [] },
       "IF" : [
         { "node_is_of_type" : {
             "node" : [ "node" ],

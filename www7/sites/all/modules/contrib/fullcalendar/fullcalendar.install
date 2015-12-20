@@ -1,13 +1,12 @@
 <?php
-// $Id: fullcalendar.install,v 1.3.2.1 2011/01/26 21:53:27 timplunkett Exp $
 
 /**
  * @file
- * Install, update and uninstall functions for the fullcalendar module.
+ * Install, update and uninstall functions for the FullCalendar module.
  */
 
 /**
- * Implements of hook_requirements().
+ * Implements hook_requirements().
  */
 function fullcalendar_requirements($phase) {
   $requirements = array();
@@ -25,10 +24,15 @@ function fullcalendar_requirements($phase) {
       );
     }
     else {
+      $plugin_version = fullcalendar_get_version();
+      if (version_compare(FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION, $plugin_version) > 0) {
+        $plugin_version .= ' (Recommended version: ' . FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION . ')';
+      }
+
       $requirements['fullcalendar_plugin'] = array(
         'title' => $t('FullCalendar plugin'),
         'severity' => REQUIREMENT_OK,
-        'value' => fullcalendar_get_version(),
+        'value' => $plugin_version,
       );
     }
   }
@@ -42,4 +46,11 @@ function fullcalendar_requirements($phase) {
 function fullcalendar_uninstall() {
   variable_del('fullcalendar_path');
   variable_del('fullcalendar_compression_type');
+}
+
+/**
+ * Force full cache clear to forget about old handlers and plugins.
+ */
+function fullcalendar_update_7200(&$sandbox) {
+  drupal_flush_all_caches();
 }

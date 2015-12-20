@@ -30,13 +30,39 @@
           layers[key] = map_layer;
 
           // keep the reference of first layer
+          // Distinguish between "base layers" and "overlays", fallback to "base"
+          // in case "layer_type" has not been defined in hook_leaflet_map_info()
+          layer.layer_type = (typeof layer.layer_type === 'undefined') ? 'base' : layer.layer_type;
           // as written in the doc (http://leafletjs.com/examples/layers-control.html)
-          // "Also note that when using multiple base layers, only one of them should be added to the map at instantiation, but all of them should be present in the base layers object when creating the layers control.""
-          if (i == 0) {
-            // add first layer to the map
-            lMap.addLayer(map_layer);
+          // Always add overlays layers when instantiate, and keep track of
+          // them for Control.Layers.
+          // Only add the very first "base layer" when instantiating the map
+          // if we have map controls enabled
+          switch (layer.layer_type) {
+            case 'overlay':
+              lMap.addLayer(map_layer);
+              overlays[key] = map_layer;
+              break;
+            default:
+              if (i === 0 || !this.map.settings.layerControl) {
+                lMap.addLayer(map_layer);
+                i++;
+              }
+              layers[key] = map_layer;
+              break;
           }
           i++;
+        }
+        // We loop through the layers once they have all been created to connect them to their switchlayer if necessary.
+        var switchEnable = false;
+        for (var key in layers) {
+          if (layers[key].options.switchLayer) {
+            layers[key].setSwitchLayer(layers[layers[key].options.switchLayer]);
+            switchEnable = true;
+          }
+        }
+        if (switchEnable) {
+          switchManager = new SwitchLayerManager(lMap, {baseLayers: layers});
         }
 
         // keep an instance of leaflet layers
@@ -90,17 +116,15 @@
         }
 
         // center the map
-        if (this.map.center) {
-          lMap.setView(new L.LatLng(this.map.center.lat, this.map.center.lon), this.map.settings.zoom);
+        var zoom = this.map.settings.zoom ? this.map.settings.zoom : this.map.settings.zoomDefault;
+        if (this.map.center && (this.map.center.force || this.features.length === 0)) {
+          lMap.setView(new L.LatLng(this.map.center.lat, this.map.center.lon), zoom);
         }
-        // if we have provided a zoom level, then use it after fitting bounds
-        else if (this.map.settings.zoom && this.features.length > 0) {
+        else if (this.features.length > 0) {
           Drupal.leaflet.fitbounds(lMap);
-          lMap.setZoom(this.map.settings.zoom);
-        }
-        // fit to bounds
-        else {
-          Drupal.leaflet.fitbounds(lMap);
+          if (this.map.settings.zoom) { // or: if (zoom) ?
+            lMap.setZoom(zoom);
+          }
         }
 
         // add attribution
@@ -132,8 +156,10 @@
           case 'polygon':
             lFeature = Drupal.leaflet.create_polygon(feature, lMap);
             break;
-          case 'multipolygon':
           case 'multipolyline':
+            feature.multipolyline = true;
+            // no break;
+          case 'multipolygon':
             lFeature = Drupal.leaflet.create_multipoly(feature, lMap);
             break;
           case 'json':
@@ -144,6 +170,12 @@
             break;
           case 'circle':
             lFeature = Drupal.leaflet.create_circle(feature, lMap);
+            break;
+          case 'circlemarker':
+            lFeature = Drupal.leaflet.create_circlemarker(feature, lMap);
+            break;
+          case 'rectangle':
+            lFeature = Drupal.leaflet.create_rectangle(feature, lMap);
             break;
         }
 
@@ -168,8 +200,13 @@
 
   Drupal.leaflet = {
 
+    isOldVersion: function () {
+      return !(parseInt(L.version) >= 1); // version may start with '0' or '.'
+    },
+
     create_layer: function (layer, key) {
-      var map_layer = new L.TileLayer(layer.urlTemplate);
+      // Use a Zoomswitch Layer extension to enable zoom-switch option.
+      var map_layer = new L.TileLayerZoomSwitch(layer.urlTemplate);
       map_layer._leaflet_id = key;
 
       if (layer.options) {
@@ -199,12 +236,27 @@
       var latLng = new L.LatLng(circle.lat, circle.lon);
       latLng = latLng.wrap();
       lMap.bounds.push(latLng);
-      if (circle.options) {
-        return new L.Circle(latLng, circle.radius, circle.options);
+      if (circle.radius) {
+        // @deprecated
+        return L.circle(latLng, circle.radius, circle.options);
       }
-      else {
-        return new L.Circle(latLng, circle.radius);
-      }
+      return new L.Circle(latLng, circle.options);
+    },
+
+    create_circlemarker: function(circle, lMap) {
+      var latLng = new L.LatLng(circle.lat, circle.lon);
+      latLng = latLng.wrap();
+      lMap.bounds.push(latLng);
+      return new L.CircleMarker(latLng, circle.options);
+    },
+
+    create_rectangle: function(box, lMap) {
+      var bounds = box.bounds,
+        southWest = new L.LatLng(bounds.s, bounds.w),
+        northEast = new L.LatLng(bounds.n, bounds.e),
+        latLng = new L.LatLngBounds(southWest, northEast);
+      lMap.bounds.push(latLng);
+      return new L.Rectangle(latLng, box.settings);
     },
 
     create_point: function(marker, lMap) {
@@ -253,6 +305,9 @@
         }
         if (marker.icon.zIndexOffset) {
           icon.options.zIndexOffset = marker.icon.zIndexOffset;
+        }
+        if (marker.icon.className) {
+          icon.options.className = marker.icon.className;
         }
         var options = {icon:icon};
         if (marker.zIndexOffset) {
@@ -306,12 +361,10 @@
         }
         polygons.push(latlngs);
       }
-      if (multipoly.multipolyline) {
-        return new L.MultiPolyline(polygons);
+      if (this.isOldVersion()) {
+        return multipoly.multipolyline ? new L.MultiPolyline(polygons) : new L.MultiPolygon(polygons);
       }
-      else {
-        return new L.MultiPolygon(polygons);
-      }
+      return multipoly.multipolyline ? new L.Polyline(polygons): new L.Polygon(polygons);
     },
 
     create_json:function(json, lMap) {
@@ -326,7 +379,7 @@
 
           for (var layer_id in layer._layers) {
             for (var i in layer._layers[layer_id]._latlngs) {
-              Drupal.leaflet.bounds.push(layer._layers[layer_id]._latlngs[i]);
+              lMap.bounds.push(layer._layers[layer_id]._latlngs[i]);
             }
           }
 
@@ -360,5 +413,88 @@
       }
     }
   };
+
+  // Zoomswitch method cribbed liberally from:
+  // http://www.makina-corpus.org/blog/leaflet-zoom-switcher
+  L.TileLayerZoomSwitch = L.TileLayer.extend({
+    includes: L.Mixin.Events,
+
+    options: {
+      // switchZoomUnder: when zoom < switchZoomUnder, then switch to switchLayer
+      switchZoomUnder: -1,
+      // switchZoomAbove: when zoom >= switchZoomAbove, then switch to switchLayer
+      switchZoomAbove: -1,
+      switchLayer: null
+    },
+
+    setSwitchLayer: function (layer) {
+      this.options.switchLayer = layer;
+    },
+
+    getSwitchZoomUnder: function () {
+      return this.options.switchZoomUnder;
+    },
+
+    getSwitchZoomAbove: function () {
+      return this.options.switchZoomAbove;
+    },
+
+    getSwitchLayer: function () {
+      return this.options.switchLayer;
+    }
+
+  });
+
+  L.tileLayerZoomSwitch = function (url, options) {
+    return new L.TileLayerZoomSwitch(url, options);
+  };
+
+  /*
+   * SwitchLayerManager is a custom class for managing base layer automatic switching according to the current zoom level
+   */
+
+  SwitchLayerManager = L.Class.extend({
+
+    _map: null,
+
+    options: {
+      baseLayers: null
+    },
+
+    initialize: function (map, options) {
+      this._map = map;
+      L.Util.setOptions(this, options);
+
+      this._map.on({
+        'zoomend': this._update
+      }, this)
+
+    },
+
+    _update: function (e) {
+      var zoom = this._map.getZoom();
+
+      for (var i in this.options.baseLayers) {
+        var curBL = this.options.baseLayers[i];
+        var zoomUnder = curBL.getSwitchZoomUnder();
+        var zoomAbove = curBL.getSwitchZoomAbove();
+        var switchLayer = curBL.getSwitchLayer();
+
+        // If layer got a switchlayer, and if layer actually displayed
+        if (switchLayer && curBL._map != null) {
+        //if (switchLayer) {
+          if(zoomUnder != -1 && zoom < zoomUnder) {
+            this._map.removeLayer(curBL);
+            this._map.addLayer(switchLayer, false);
+          }
+
+          if(zoomAbove != -1 && zoom >= zoomAbove) {
+            this._map.removeLayer(curBL);
+            this._map.addLayer(switchLayer, false);
+          }
+        }
+      }
+    }
+  });
 
 })(jQuery);

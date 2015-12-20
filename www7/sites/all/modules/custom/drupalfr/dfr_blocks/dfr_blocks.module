@@ -183,11 +183,12 @@ function dfr_blocks_block_home_trad() {
 }
 
 function dfr_blocks_block_download() {
-  $current_version = 'Drupal ' . variable_get('drupalfr_current_version', 7) . ' [FR]';
-  $previous_version = 'Drupal ' . variable_get('drupalfr_previous_version', 6) . ' [FR]';
+  $current_version_number = variable_get('drupalfr_current_version', '8.0.1');
+  $current_version = 'Drupal ' . $current_version_number . ' [FR]';
+  $previous_version = 'Drupal ' . variable_get('drupalfr_previous_version', 7) . ' [FR]';
   $items = array(
-    'drupal_current' => $current_version . l(t('Télécharger'), file_create_url('public://drupal-7.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
-    'drupal_previous' => $previous_version . l(t('Télécharger'), file_create_url('public://drupal-6.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
+    'drupal_current' => $current_version . l(t('Télécharger'), 'http://ftp.drupal.org/files/projects/drupal-' . $current_version_number . '.tar.gz', array('attributes' => array('class' => 'btn-link'), 'absolute' => TRUE)),
+    'drupal_previous' => $previous_version . l(t('Télécharger'), file_create_url('public://drupal-7.latest.tar.gz'), array('attributes' => array('class' => 'btn-link'))),
   );
   return array(
     'subject' => "Obtenir la dernière version",

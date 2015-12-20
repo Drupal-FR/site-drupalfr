@@ -13,17 +13,17 @@ function dfr_emploi_taxonomy_default_vocabularies() {
       'name' => 'Nature du poste',
       'machine_name' => 'nature_poste',
       'description' => '',
-      'hierarchy' => '0',
+      'hierarchy' => 0,
       'module' => 'taxonomy',
-      'weight' => '0',
+      'weight' => 0,
     ),
     'type_contrat' => array(
       'name' => 'Type de contrat',
       'machine_name' => 'type_contrat',
       'description' => '',
-      'hierarchy' => '0',
+      'hierarchy' => 0,
       'module' => 'taxonomy',
-      'weight' => '0',
+      'weight' => 0,
     ),
   );
 }

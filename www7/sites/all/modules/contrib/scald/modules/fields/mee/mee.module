@@ -64,7 +64,73 @@ function mee_library() {
     ),
   );
 
+  // This file is included automatically if the CKEditor plugin is enabled.
+  // However we need to load it directly in Drupal so that strings can be
+  // translated.
+  $plugin = mee_store_format() !== 'embed_div' ? 'ckeditor' : 'dndck4';
+  $libraries['library']['js'][$path . '/plugins/' . $plugin . '/lang/en.js'] = array();
+
   return $libraries;
+}
+
+/**
+ * Implements hook_wywiwyg_plugin().
+ */
+function mee_wysiwyg_plugin($editor, $version) {
+  $plugins = array();
+  $mee_store_format = mee_store_format();
+  switch ($editor) {
+    case 'ckeditor':
+      if ($mee_store_format == 'sas') {
+        $plugins['dnd'] = array(
+          'path' => drupal_get_path('module', 'mee') . '/plugins/ckeditor',
+          'filename' => 'plugin.js',
+          'buttons' => array(
+            'dnd' => t('Scald DnD integration'),
+          ),
+          'load' => TRUE,
+        );
+      }
+      elseif ($mee_store_format == 'embed_div') {
+        $plugins['dndck4'] = array(
+          'path' =>  drupal_get_path('module', 'mee') . '/plugins/dndck4',
+          'filename' => 'plugin.js',
+          'buttons' => array(
+            'dndck4' => t('Scald DnD integration - CKEditor 4 widgets'),
+          ),
+          'load' => TRUE,
+        );
+      }
+      break;
+  }
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ckeditor_plugin().
+ */
+function mee_ckeditor_plugin() {
+  $plugins = array();
+  $mee_store_format = mee_store_format();
+  if ($mee_store_format == 'sas') {
+    $plugins['dnd'] = array(
+      'name' => 'dnd',
+      'desc' => t('Scald Drag and Drop integration'),
+      'path' =>  drupal_get_path('module', 'mee') . '/plugins/ckeditor/',
+      'buttons' => array(),
+    );
+  }
+  elseif ($mee_store_format == 'embed_div' && version_compare(ckeditor_get_version(), '4.3.0') >= 0) {
+    $plugins['dndck4'] = array(
+      'name' => 'dndck4',
+      'desc' => t('Scald Drag and Drop integration - CKEditor 4 widgets'),
+      'path' =>  drupal_get_path('module', 'mee') . '/plugins/dndck4/',
+      'buttons' => array(),
+    );
+  }
+
+  return $plugins;
 }
 
 /**

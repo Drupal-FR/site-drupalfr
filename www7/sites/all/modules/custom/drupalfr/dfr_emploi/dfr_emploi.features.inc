@@ -7,8 +7,7 @@
 /**
  * Implements hook_ctools_plugin_api().
  */
-function dfr_emploi_ctools_plugin_api() {
-  list($module, $api) = func_get_args();
+function dfr_emploi_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => "1");
   }
@@ -17,8 +16,8 @@ function dfr_emploi_ctools_plugin_api() {
 /**
  * Implements hook_views_api().
  */
-function dfr_emploi_views_api() {
-  return array("version" => "3.0");
+function dfr_emploi_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
 }
 
 /**
@@ -38,5 +37,6 @@ function dfr_emploi_node_info() {
 Si après une semaine votre offre n\'est pas en ligne, merci de nous le signaler via le formulaire de contact.'),
     ),
   );
+  drupal_alter('node_info', $items);
   return $items;
 }
