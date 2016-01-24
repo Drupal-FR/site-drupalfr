@@ -85,16 +85,27 @@ function commerce_cart_expiration_access($op, $arg) {
  *   Time span (in seconds) until shopping carts are considered expired.
  * @param int $limit
  *   Number of expired carts to get.
+ * @param string $ignore_status
+ *   (optional) Orders in this status will never be considered expired. Defaults
+ *   to NULL.
  *
  * @return array
  *   An array of commerce order IDs. When no results are found, an empty array
  *   is returned.
  */
-function commerce_cart_expiration_get_expired_carts($interval, $limit = 0) {
+function commerce_cart_expiration_get_expired_carts($interval, $limit = 0, $ignore_status = NULL) {
+  // If we're resetting order statuses (instead of deleting orders), ignore
+  // orders already in the desired status, to make sure we process as many
+  // orders that need resetting as possible.
+  $statuses = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+  if ($ignore_status && ($key = array_search($ignore_status, $statuses)) !== FALSE) {
+    unset($statuses[$key]);
+  }
+
   $query = new EntityFieldQuery();
   $query
     ->entityCondition('entity_type', 'commerce_order', '=')
-    ->propertyCondition('status', array_keys(commerce_order_statuses(array('cart' => TRUE))), 'IN')
+    ->propertyCondition('status', $statuses, 'IN')
     ->propertyCondition('changed', REQUEST_TIME - $interval, '<');
 
   if ($limit) {
@@ -262,13 +273,19 @@ function commerce_cart_expiration_expire_ajax($order) {
   if (isset($statuses[$order->status])) {
     // Replace explanation page tokens here because this is the last point
     // where we can use the order.
-    $explanation_content = variable_get('commerce_cart_expiration_explanation_page', array('value' => '<p>'. t('Sorry, you took too much time in the checkout process.') .'</p><p>'. t('<a href="[site:url]">Return to the front page.</a>') .'</p>', 'format' => NULL));
-    $text = check_markup($explanation_content['value'], $explanation_content['format']);
+    $text = variable_get('commerce_cart_expiration_explanation_page', '<p>'. t('Sorry, you took too much time in the checkout process.') .'</p><p>'. t('<a href="[site:url]">Return to the front page.</a>') .'</p>');
+    if (is_array($text)) {
+      $text = check_markup($text['value'], $text['format']);
+    }
     $text = token_replace($text, array('commerce-order' => $order, 'site' => NULL, 'user' => $user));
 
     // Store this text in user session:
     $_SESSION['commerce_cart_expiration_text'] = $text;
 
+    // Invoke a Rules event for deleting an expired cart order.
+    rules_invoke_all('commerce_cart_expiration_delete_order', $order);
+
+    // Delete the order.
     commerce_order_delete($order->order_id);
     $status = 1;
   }
@@ -291,8 +308,10 @@ function commerce_cart_expiration_page_explanation() {
   }
 
   // Otherwhise create content here without replacing commerce_order tokens.
-  $explanation_content = variable_get('commerce_cart_expiration_explanation_page', '<p>'. array('value' => t('Sorry, you took too much time in the checkout process.') .'</p><p>'. t('<a href="[site:url]">Return to the front page.</a>') .'</p>', 'format' => NULL));
-  $text = check_markup($explanation_content['value'], $explanation_content['format']);
+  $text = variable_get('commerce_cart_expiration_explanation_page', '<p>'. t('Sorry, you took too much time in the checkout process.') .'</p><p>'. t('<a href="[site:url]">Return to the front page.</a>') .'</p>');
+  if (is_array($text)) {
+    $text = check_markup($text['value'], $text['format']);
+  }
 
   return token_replace($text, array('site' => NULL, 'user' => $user));
 }
