@@ -2342,15 +2342,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'commerce_payment',
   );
 
-  // Exported permission: 'use PHP for settings'.
-  $permissions['use PHP for settings'] = array(
-    'name' => 'use PHP for settings',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'php',
-  );
-
   // Exported permission: 'use PHP for tracking visibility'.
   $permissions['use PHP for tracking visibility'] = array(
     'name' => 'use PHP for tracking visibility',

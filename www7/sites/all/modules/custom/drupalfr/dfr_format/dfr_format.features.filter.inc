@@ -77,30 +77,6 @@ function dfr_format_filter_default_formats() {
     ),
   );
 
-  // Exported format: PHP code.
-  $formats[2] = array(
-    'format' => 2,
-    'name' => 'PHP code',
-    'cache' => 0,
-    'status' => 1,
-    'weight' => 0,
-    'filters' => array(
-      'php_code' => array(
-        'weight' => 0,
-        'status' => 1,
-        'settings' => array(),
-      ),
-      'pathologic' => array(
-        'weight' => 50,
-        'status' => 1,
-        'settings' => array(
-          'local_paths' => '',
-          'protocol_style' => 'path',
-        ),
-      ),
-    ),
-  );
-
   // Exported format: Full HTML.
   $formats[3] = array(
     'format' => 3,

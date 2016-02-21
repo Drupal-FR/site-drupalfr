@@ -8,7 +8,7 @@
  * Implements hook_field_group_info().
  */
 function drupalfr_user_field_group_info() {
-  $export = array();
+  $field_groups = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -42,7 +42,7 @@ function drupalfr_user_field_group_info() {
       ),
     ),
   );
-  $export['group_user_drupal_settings|user|user|form'] = $field_group;
+  $field_groups['group_user_drupal_settings|user|user|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -63,7 +63,7 @@ function drupalfr_user_field_group_info() {
       'instance_settings' => array(),
     ),
   );
-  $export['group_user_drupal_settings|user|user|full'] = $field_group;
+  $field_groups['group_user_drupal_settings|user|user|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -91,7 +91,7 @@ function drupalfr_user_field_group_info() {
       ),
     ),
   );
-  $export['group_user_drupal|user|user|form'] = $field_group;
+  $field_groups['group_user_drupal|user|user|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -119,7 +119,7 @@ function drupalfr_user_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_user_drupal|user|user|full'] = $field_group;
+  $field_groups['group_user_drupal|user|user|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -151,7 +151,7 @@ function drupalfr_user_field_group_info() {
       ),
     ),
   );
-  $export['group_user_information|user|user|form'] = $field_group;
+  $field_groups['group_user_information|user|user|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -183,7 +183,7 @@ function drupalfr_user_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_user_information|user|user|full'] = $field_group;
+  $field_groups['group_user_information|user|user|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -212,7 +212,7 @@ function drupalfr_user_field_group_info() {
       ),
     ),
   );
-  $export['group_user_newsletter|user|user|form'] = $field_group;
+  $field_groups['group_user_newsletter|user|user|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -233,7 +233,7 @@ function drupalfr_user_field_group_info() {
       'instance_settings' => array(),
     ),
   );
-  $export['group_user_planet|user|user|full'] = $field_group;
+  $field_groups['group_user_planet|user|user|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -268,7 +268,7 @@ function drupalfr_user_field_group_info() {
       ),
     ),
   );
-  $export['group_user_social|user|user|form'] = $field_group;
+  $field_groups['group_user_social|user|user|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -303,7 +303,16 @@ function drupalfr_user_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_user_social|user|user|full'] = $field_group;
+  $field_groups['group_user_social|user|user|full'] = $field_group;
 
-  return $export;
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Drupal');
+  t('Informations');
+  t('Newsletters');
+  t('Paramètres Drupal');
+  t('Planète');
+  t('Social');
+
+  return $field_groups;
 }

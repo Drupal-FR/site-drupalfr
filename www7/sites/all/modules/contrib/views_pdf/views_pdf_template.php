@@ -406,161 +406,167 @@ class PdfTemplate extends FPDI {
   }
 
   protected function renderRow($x, $y, $row, $options, &$view = NULL, $key = NULL, $printLabels = TRUE) {
+      if ($options['position']['object'] !== 'header_footer') {
+        $pageDim = $this->getPageDimensions();
 
-    $pageDim = $this->getPageDimensions();
-
-    // Render the content if it is not already:
-    if (is_object($view) && $key != NULL && isset($view->field[$key]) && is_object($view->field[$key]) && !is_string($row)) {
-      $content = $view->field[$key]->theme($row);
-    }
-    elseif (is_string($row)) {
-      $content = $row;
-    }
-    else {
-      // We got bad data. So return.
-      return;
-    }
-
-    if (empty($key) || !empty($view->field[$key]->options['exclude']) || (empty($content) && $view->field[$key]->options['hide_empty'])) {
-      return '';
-    }
-
-    // Apply the hyphenation patterns to the content:
-    if (!isset($options['text']['hyphenate']) && is_object($view) && is_object($view->display_handler)) {
-      $options['text']['hyphenate'] = $view->display_handler->get_option('default_text_hyphenate');
-    }
-
-    if (isset($options['text']['hyphenate']) && $options['text']['hyphenate'] != 'none') {
-      $patternFile = $options['text']['hyphenate'];
-      if ($options['text']['hyphenate'] == 'auto' && is_object($row)) {
-
-        // Workaround:
-        // Since "$nodeLanguage = $row->node_language;" does not work anymore,
-        // we using this:
-        if (isset($row->_field_data['nid']['entity']->language)) {
-          $nodeLanguage = $row->_field_data['nid']['entity']->language;
-
-          foreach (self::getAvailableHyphenatePatterns() as $file => $pattern) {
-            if (stristr($pattern, $nodeLanguage) !== FALSE) {
-              $patternFile = $file;
-              break;
-            }
-          }
+        // Render the content if it is not already:
+        if (is_object($view) && $key != NULL && isset($view->field[$key]) && is_object($view->field[$key]) && !is_string($row)) {
+          $content = $view->field[$key]->theme($row);
         }
-      }
-
-      $patternFile = views_pdf_get_library('tcpdf') . '/hyphenate_patterns/' . $patternFile;
-
-      if (file_exists($patternFile)) {
-        if (method_exists('TCPDF_STATIC', 'getHyphenPatternsFromTEX')) {
-          $hyphen_patterns = TCPDF_STATIC::getHyphenPatternsFromTEX($patternFile);
+        elseif (is_string($row)) {
+          $content = $row;
         }
         else {
-          $hyphen_patterns = $this->getHyphenPatternsFromTEX($patternFile);
+          // We got bad data. So return.
+          return;
         }
 
-        // Bugfix if you like to print some html code to the PDF, we
-        // need to prevent the replacement of this tags.
-        $content = str_replace('&gt;', '&amp;gt;', $content);
-        $content = str_replace('&lt;', '&amp;lt;', $content);
-        $content = $this->hyphenateText($content, $hyphen_patterns);
+        if (empty($key) || !empty($view->field[$key]->options['exclude']) || (empty($content) && $view->field[$key]->options['hide_empty'])) {
+          return '';
+        }
 
+        // Apply the hyphenation patterns to the content:
+        if (!isset($options['text']['hyphenate']) && is_object($view) && is_object($view->display_handler)) {
+          $options['text']['hyphenate'] = $view->display_handler->get_option('default_text_hyphenate');
+        }
+
+        if (isset($options['text']['hyphenate']) && $options['text']['hyphenate'] != 'none') {
+          $patternFile = $options['text']['hyphenate'];
+          if ($options['text']['hyphenate'] == 'auto' && is_object($row)) {
+
+            // Workaround:
+            // Since "$nodeLanguage = $row->node_language;" does not work anymore,
+            // we using this:
+            if (isset($row->_field_data['nid']['entity']->language)) {
+              $nodeLanguage = $row->_field_data['nid']['entity']->language;
+
+              foreach (self::getAvailableHyphenatePatterns() as $file => $pattern) {
+                if (stristr($pattern, $nodeLanguage) !== FALSE) {
+                  $patternFile = $file;
+                  break;
+                }
+              }
+            }
+          }
+
+          $patternFile = views_pdf_get_library('tcpdf') . '/hyphenate_patterns/' . $patternFile;
+
+          if (file_exists($patternFile)) {
+            if (method_exists('TCPDF_STATIC', 'getHyphenPatternsFromTEX')) {
+              $hyphen_patterns = TCPDF_STATIC::getHyphenPatternsFromTEX($patternFile);
+            }
+            else {
+              $hyphen_patterns = $this->getHyphenPatternsFromTEX($patternFile);
+            }
+
+            // Bugfix if you like to print some html code to the PDF, we
+            // need to prevent the replacement of this tags.
+            $content = str_replace('&gt;', '&amp;gt;', $content);
+            $content = str_replace('&lt;', '&amp;lt;', $content);
+            $content = $this->hyphenateText($content, $hyphen_patterns);
+
+          }
+        }
+
+        // Set css variable
+        if (is_object($view) && is_object($view->display_handler)) {
+          $css_file = $view->display_handler->get_option('css_file');
+        }
+
+        // Render Labels
+        $prefix = '';
+        if ($printLabels && !empty($view->field[$key]->options['label'])) {
+          $prefix = $view->field[$key]->options['label'];
+          if ($view->field[$key]->options['element_label_colon']) {
+            $prefix .= ':';
+          }
+          $prefix .= ' ';
+        }
+
+        $font_size = empty($options['text']['font_size']) ? $this->defaultFontSize : $options['text']['font_size'] ;
+        $font_family = ($options['text']['font_family'] == 'default' || empty($options['text']['font_family'])) ? $this->defaultFontFamily : $options['text']['font_family'];
+        $font_style = is_array($options['text']['font_style']) ? $options['text']['font_style'] : $this->defaultFontStyle;
+        $textColor = !empty($options['text']['color']) ? $this->parseColor($options['text']['color']) : $this->parseColor($this->defaultFontColor);
+
+
+        $w = $options['position']['width'];
+        $h = $options['position']['height'];
+        $border = 0;
+        $align = isset($options['text']['align']) ? $options['text']['align'] : $this->defaultTextAlign;
+        $fill = 0;
+        $ln = 1;
+        $reseth = TRUE;
+        $stretch = 0;
+        $ishtml = isset($options['render']['is_html']) ? $options['render']['is_html'] : 1;
+        $stripHTML = !$ishtml;
+        $autopadding = TRUE;
+        $maxh = 0;
+        $valign = 'T';
+        $fitcell = FALSE;
+
+        // Run eval before.
+        if (VIEWS_PDF_PHP) {
+          if (!empty($options['render']['bypass_eval_before']) && !empty($options['render']['eval_before'])) {
+            eval($options['render']['eval_before']);
+          }
+          elseif (!empty($options['render']['eval_before']))  {
+            $content = php_eval($options['render']['eval_before']);
+          }
+        }
+
+        // Add css if there is a css file set and stripHTML is not active.
+        if (!empty($css_file) && is_string($css_file) && !$stripHTML && $ishtml && !empty($content)) {
+          $content = '<link type="text/css" rel="stylesheet" media="all" href="' . $css_file . '" />' . PHP_EOL . $content;
+        }
+
+        // Set Text Color.
+        $this->SetTextColorArray($textColor);
+
+        // Set font.
+        $this->SetFont($font_family, implode('', $font_style), $font_size);
+
+        // Save the last page before starting writing, this
+        // is needed to dected if we write over a page. Then we need
+        // to reset the y coordinate for the 'last_writing' position option.
+        $this->lastWritingPage = $this->getPage();
+
+        if ($stripHTML) {
+          $content = strip_tags($content);
+        }
+
+        // Write the content of a field to the pdf file:
+        if (!empty($content)) {
+          $this->MultiCell($w, $h, $prefix . $content, $border, $align, $fill, $ln, $x, $y, $reseth, $stretch, $ishtml, $autopadding, $maxh, $valign, $fitcell);
+        }
+        else {
+          $this->MultiCell($w, $h, $prefix, $border, $align, $fill, $ln, $x, $y, $reseth, $stretch, $ishtml, $autopadding, $maxh, $valign, $fitcell);
+        }
+
+        // Reset font to default.
+        $this->SetFont($this->defaultFontFamily, implode('', $this->defaultFontStyle), $this->defaultFontSize);
+
+        // Run eval after.
+        if (VIEWS_PDF_PHP) {
+          if (!empty($options['render']['bypass_eval_after']) && !empty($options['render']['eval_after'])) {
+            eval($options['render']['eval_after']);
+          }
+          elseif (!empty($options['render']['eval_after'])) {
+            $content = php_eval($options['render']['eval_after']);
+          }
+        }
+
+        // Write Coordinates of element.
+        $this->elements[$key] = array(
+          'x' => $x,
+          'y' => $y,
+          'width' => empty($w) ? ($pageDim['wk'] - $this->rMargin-$x) : $w,
+          'height' => $this->y - $y,
+          'page' => $this->lastWritingPage,
+        );
+
+        $this->lastWritingElement = $key;
       }
-    }
 
-    // Set css variable
-    if (is_object($view) && is_object($view->display_handler)) {
-      $css_file = $view->display_handler->get_option('css_file');
-    }
-
-    // Render Labels
-    $prefix = '';
-    if ($printLabels && !empty($view->field[$key]->options['label'])) {
-      $prefix = $view->field[$key]->options['label'];
-      if ($view->field[$key]->options['element_label_colon']) {
-        $prefix .= ':';
-      }
-      $prefix .= ' ';
-    }
-
-    $font_size = empty($options['text']['font_size']) ? $this->defaultFontSize : $options['text']['font_size'] ;
-    $font_family = ($options['text']['font_family'] == 'default' || empty($options['text']['font_family'])) ? $this->defaultFontFamily : $options['text']['font_family'];
-    $font_style = is_array($options['text']['font_style']) ? $options['text']['font_style'] : $this->defaultFontStyle;
-    $textColor = !empty($options['text']['color']) ? $this->parseColor($options['text']['color']) : $this->parseColor($this->defaultFontColor);
-
-
-    $w = $options['position']['width'];
-    $h = $options['position']['height'];
-    $border = 0;
-    $align = isset($options['text']['align']) ? $options['text']['align'] : $this->defaultTextAlign;
-    $fill = 0;
-    $ln = 1;
-    $reseth = TRUE;
-    $stretch = 0;
-    $ishtml = isset($options['render']['is_html']) ? $options['render']['is_html'] : 1;
-    $stripHTML = !$ishtml;
-    $autopadding = TRUE;
-    $maxh = 0;
-    $valign = 'T';
-    $fitcell = FALSE;
-
-    // Run eval before.
-    if (!empty($options['render']['bypass_eval_before']) && !empty($options['render']['eval_before'])) {
-      eval($options['render']['eval_before']);
-    }
-    elseif (!empty($options['render']['eval_before']))  {
-      $content = php_eval($options['render']['eval_before']);
-    }
-
-    // Add css if there is a css file set and stripHTML is not active.
-    if (!empty($css_file) && is_string($css_file) && !$stripHTML && $ishtml && !empty($content)) {
-      $content = '<link type="text/css" rel="stylesheet" media="all" href="' . $css_file . '" />' . PHP_EOL . $content;
-    }
-
-    // Set Text Color.
-    $this->SetTextColorArray($textColor);
-
-    // Set font.
-    $this->SetFont($font_family, implode('', $font_style), $font_size);
-
-    // Save the last page before starting writing, this
-    // is needed to dected if we write over a page. Then we need
-    // to reset the y coordinate for the 'last_writing' position option.
-    $this->lastWritingPage = $this->getPage();
-
-    if ($stripHTML) {
-      $content = strip_tags($content);
-    }
-
-    // Write the content of a field to the pdf file:
-    if (!empty($content)) {
-      $this->MultiCell($w, $h, $prefix . $content, $border, $align, $fill, $ln, $x, $y, $reseth, $stretch, $ishtml, $autopadding, $maxh, $valign, $fitcell);
-    }
-    else {
-      $this->MultiCell($w, $h, $prefix, $border, $align, $fill, $ln, $x, $y, $reseth, $stretch, $ishtml, $autopadding, $maxh, $valign, $fitcell);
-    }
-
-    // Reset font to default.
-    $this->SetFont($this->defaultFontFamily, implode('', $this->defaultFontStyle), $this->defaultFontSize);
-
-    // Run eval after.
-    if (!empty($options['render']['bypass_eval_after']) && !empty($options['render']['eval_after'])) {
-      eval($options['render']['eval_after']);
-    }
-    elseif (!empty($options['render']['eval_after'])) {
-      $content = php_eval($options['render']['eval_after']);
-    }
-
-    // Write Coordinates of element.
-    $this->elements[$key] = array(
-      'x' => $x,
-      'y' => $y,
-      'width' => empty($w) ? ($pageDim['wk'] - $this->rMargin-$x) : $w,
-      'height' => $this->y - $y,
-      'page' => $this->lastWritingPage,
-    );
-
-    $this->lastWritingElement = $key;
   }
 
   /**
@@ -773,6 +779,7 @@ class PdfTemplate extends FPDI {
 
       $rowY += $options['position']['row_height'];
 
+      $view->row_index++;
     }
 
     $this->SetY($rowY + $options['position']['row_height']);

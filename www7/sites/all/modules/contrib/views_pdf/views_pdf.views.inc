@@ -54,7 +54,7 @@ function views_pdf_views_plugins() {
         'uses hook menu' => TRUE,
         'use ajax' => FALSE,
         'use pager' => FALSE,
-        'use_more' => FALSE,
+        'use more' => FALSE,
         'accept attachments' => FALSE,
         'admin' => t('PDF Page'),
       ),

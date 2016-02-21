@@ -1,3 +1,5 @@
+#!/bin/bash
+
 currentscriptpath ()
 {
 local fullpath=`echo "$(readlink -f $0)"`
@@ -19,10 +21,11 @@ DRUSH="/usr/local/bin/drush"
 # Version 8
 #############
 # Telechargement Drupal
-$DRUSH dl drupal-8 -q --drupal-project-rename=drupal8 --destination=$DIR
+$DRUSH dl drupal-8 -q -y --drupal-project-rename=drupal8 --destination=$DIR
 
 # Detection de version
 VERSION=`cat $DIR/drupal8/core/lib/Drupal.php | grep "const VERSION = " | tail -n 1`
+# Example of $VERSION: "const VERSION = '8.0.3';"
 stringlen=$(( ${#VERSION} - 19 - 2 ))
 VERSION=${VERSION:19:$stringlen}
 
@@ -35,7 +38,7 @@ rm -rf $DIR/drupal8
 ## Version 7
 ##############
 # Telechargement Drupal
-$DRUSH dl drupal-7 -q --drupal-project-rename=drupal7 --destination=$DIR
+$DRUSH dl drupal-7 -q -y --drupal-project-rename=drupal7 --destination=$DIR
 
 # Detection de version
 VERSION=`$DRUSH core-status drupal-version --format=list -r $DIR/drupal7`

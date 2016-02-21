@@ -373,6 +373,15 @@ class views_pdf_plugin_display extends views_plugin_display_page {
           '#title' => t('Upload New Template File'),
         );
 
+        $form['#attached']['js'][] = array(
+          'type' => 'setting',
+          'data' => array(
+            'urlIsAjaxTrusted' => array(
+              $GLOBALS['base_url'] . '/' . current_path() => TRUE,
+            ),
+          ),
+        );
+
         break;
 
       case 'displays':

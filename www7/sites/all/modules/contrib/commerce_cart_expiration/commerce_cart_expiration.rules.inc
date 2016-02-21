@@ -34,6 +34,32 @@ function commerce_cart_expiration_rules_action_info() {
     ),
   );
 
+  $actions['commerce_cart_expiration_reset_orders'] = array(
+    'label' => t('Resets status of all expired cart orders'),
+    'parameter' => array(
+      'interval' => array(
+        'type' => 'duration',
+        'label' => t('Cart expiration interval'),
+        'description' => t('Time span until shopping carts are considered expired.'),
+      ),
+      'limit' => array(
+        'type' => 'integer',
+        'label' => t('Number of shopping carts to process'),
+        'description' => t('Number of shopping carts to process at a time. Useful for sites having a considerable amount of orders. Set to 0 for unlimited.'),
+      ),
+      'status' => array(
+        'label' => t('Status'),
+        'type' => 'text',
+        'options list' => 'commerce_order_status_options_list',
+        'description' => t('Expired orders will be reset to this order status.'),
+      ),
+    ),
+    'group' => t('Commerce Cart'),
+    'callbacks' => array(
+      'execute' => 'commerce_cart_expiration_reset_orders',
+    ),
+  );
+
   return $actions;
 }
 
@@ -61,6 +87,18 @@ function commerce_cart_expiration_rules_event_info() {
     'access callback' => 'commerce_order_rules_access',
   );
 
+  $events['commerce_cart_expiration_reset_order'] = array(
+    'label' => t('Before resetting the status of an expired cart'),
+    'group' => t('Commerce Cart'),
+    'variables' => array(
+      'commerce_order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Expired cart', array(), array('context' => 'a drupal commerce order')),
+      ),
+    ),
+    'access callback' => 'commerce_order_rules_access',
+  );
+
   return $events;
 }
 
@@ -77,6 +115,24 @@ function commerce_cart_expiration_delete_orders($interval = 0, $limit = 0) {
         rules_invoke_all('commerce_cart_expiration_delete_order', $order);
       }
       commerce_order_delete_multiple($expired_order_ids);
+    }
+  }
+}
+
+/**
+ * Rules action: resets status of expired cart orders based on the provided interval and limit.
+ */
+function commerce_cart_expiration_reset_orders($interval = 0, $limit = 0, $status = 'cart') {
+  if ($interval > 0) {
+    $expired_order_ids = commerce_cart_expiration_get_expired_carts($interval, $limit, $status);
+    if (!empty($expired_order_ids)) {
+      $expired_orders = commerce_order_load_multiple($expired_order_ids);
+      foreach ($expired_orders as $order) {
+        // Invoke a Rules event for resetting status of an expired cart order.
+        rules_invoke_all('commerce_cart_expiration_reset_order', $order);
+        $order->status = $status;
+        commerce_order_save($order);
+      }
     }
   }
 }

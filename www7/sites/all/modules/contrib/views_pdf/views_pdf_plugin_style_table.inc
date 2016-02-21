@@ -164,17 +164,31 @@ class views_pdf_plugin_style_table extends views_plugin_style {
         '#default_value' => isset($this->options['info'][$field]['header_style']['render']['is_html']) ? $this->options['info'][$field]['header_style']['render']['is_html'] : 1,
       );
 
-      $form['info'][$field]['header_style']['render']['eval_before'] = array(
-        '#type' => 'textarea',
-        '#title' => t('PHP Code Before Output'),
-        '#default_value' => isset($this->options['info'][$field]['header_style']['render']['eval_before']) ? $this->options['info'][$field]['header_style']['render']['eval_before'] : '',
-      );
+      if (user_access('allow php in views pdf') && VIEWS_PDF_PHP) {
+        $form['info'][$field]['header_style']['render']['eval_before'] = array(
+          '#type' => 'textarea',
+          '#title' => t('PHP Code Before Output'),
+          '#default_value' => isset($this->options['info'][$field]['header_style']['render']['eval_before']) ? $this->options['info'][$field]['header_style']['render']['eval_before'] : '',
+        );
+        $form['info'][$field]['header_style']['render']['bypass_eval_before'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use the PHP eval function instead php_eval.'),
+          '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
+          '#default_value' => !empty($this->options['info'][$field]['header_style']['render']['bypass_eval_before']) ? $this->options['info'][$field]['header_style']['render']['bypass_eval_before'] : FALSE,
+        );
 
-      $form['info'][$field]['header_style']['render']['eval_after'] = array(
-        '#type' => 'textarea',
-        '#title' => t('PHP Code After Output'),
-        '#default_value' => isset($this->options['info'][$field]['header_style']['render']['eval_after']) ? $this->options['info'][$field]['header_style']['render']['eval_after'] : '',
-      );
+        $form['info'][$field]['header_style']['render']['eval_after'] = array(
+          '#type' => 'textarea',
+          '#title' => t('PHP Code After Output'),
+          '#default_value' => isset($this->options['info'][$field]['header_style']['render']['eval_after']) ? $this->options['info'][$field]['header_style']['render']['eval_after'] : '',
+        );
+        $form['info'][$field]['header_style']['render']['bypass_eval_after'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use the PHP eval function instead php_eval.'),
+          '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
+          '#default_value' => !empty($this->options['info'][$field]['header_style']['render']['bypass_eval_after']) ? $this->options['info'][$field]['header_style']['render']['bypass_eval_after'] : FALSE,
+        );
+      }
 
       $form['info'][$field]['body_style']['text'] = array(
         '#type' => 'fieldset',
@@ -241,17 +255,31 @@ class views_pdf_plugin_style_table extends views_plugin_style {
         '#default_value' => isset($this->options['info'][$field]['body_style']['render']['is_html']) ? $this->options['info'][$field]['body_style']['render']['is_html'] : 1,
       );
 
-      $form['info'][$field]['body_style']['render']['eval_before'] = array(
-        '#type' => 'textarea',
-        '#title' => t('PHP Code Before Output'),
-        '#default_value' => isset($this->options['info'][$field]['body_style']['render']['eval_before']) ? $this->options['info'][$field]['body_style']['render']['eval_before'] : '',
-      );
+      if (user_access('allow php in views pdf') && VIEWS_PDF_PHP) {
+        $form['info'][$field]['body_style']['render']['eval_before'] = array(
+          '#type' => 'textarea',
+          '#title' => t('PHP Code Before Output'),
+          '#default_value' => isset($this->options['info'][$field]['body_style']['render']['eval_before']) ? $this->options['info'][$field]['body_style']['render']['eval_before'] : '',
+        );
+        $form['info'][$field]['body_style']['render']['bypass_eval_before'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use the PHP eval function instead php_eval.'),
+          '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
+          '#default_value' => !empty($this->options['info'][$field]['body_style']['render']['bypass_eval_before']) ? $this->options['info'][$field]['body_style']['render']['bypass_eval_before'] : FALSE,
+        );
 
-      $form['info'][$field]['body_style']['render']['eval_after'] = array(
-        '#type' => 'textarea',
-        '#title' => t('PHP Code After Output'),
-        '#default_value' => isset($this->options['info'][$field]['body_style']['render']['eval_after']) ? $this->options['info'][$field]['body_style']['render']['eval_after'] : '',
-      );
+        $form['info'][$field]['body_style']['render']['eval_after'] = array(
+          '#type' => 'textarea',
+          '#title' => t('PHP Code After Output'),
+          '#default_value' => isset($this->options['info'][$field]['body_style']['render']['eval_after']) ? $this->options['info'][$field]['body_style']['render']['eval_after'] : '',
+        );
+        $form['info'][$field]['body_style']['render']['bypass_eval_after'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use the PHP eval function instead php_eval.'),
+          '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
+          '#default_value' => !empty($this->options['info'][$field]['body_style']['render']['bypass_eval_after']) ? $this->options['info'][$field]['body_style']['render']['bypass_eval_after'] : FALSE,
+        );
+      }
 
       $form['info'][$field]['position']['width'] = array(
         '#type' => 'textfield',

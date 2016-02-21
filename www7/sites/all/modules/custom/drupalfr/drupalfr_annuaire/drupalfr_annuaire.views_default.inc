@@ -61,18 +61,13 @@ function drupalfr_annuaire_views_default_views() {
     ),
   );
   $handler->display->display_options['style_options']['override'] = FALSE;
-  /* Header: Global: Text area */
-  $handler->display->display_options['header']['text']['id'] = 'area';
-  $handler->display->display_options['header']['text']['table'] = 'views';
-  $handler->display->display_options['header']['text']['field'] = 'area';
-  $handler->display->display_options['header']['text']['content'] = '<h3>Vous recherchez un prestataire en France&nbsp;?</h3>
-  
-  <p><strong>Nous avons aujourd\'hui <?php print $GLOBALS[\'pager_total_items\'][0]; ?> prestataires inscrits dans notre annuaire. Ils sont prêts à vous aider pour tirer le meilleur de votre solution Drupal&nbsp;!</strong></p>
-  
-  <p><cite>Remarque&nbsp;: Cet annuaire est libre d\'accès. Pensez donc à vérifier par vous-même les références et compétences du prestataire que vous choisissez.</cite></p>
-  
-  ';
-  $handler->display->display_options['header']['text']['format'] = '2';
+  /* Header: Global: Result summary */
+  $handler->display->display_options['header']['result']['id'] = 'result';
+  $handler->display->display_options['header']['result']['table'] = 'views';
+  $handler->display->display_options['header']['result']['field'] = 'result';
+  $handler->display->display_options['header']['result']['content'] = '<h3>Vous recherchez un prestataire en France&nbsp;?</h3>
+  <p><strong>Nous avons aujourd\'hui @total prestataires inscrits dans notre annuaire. Ils sont prêts à vous aider pour tirer le meilleur de votre solution Drupal&nbsp;!</strong></p>
+  <p><cite>Remarque&nbsp;: Cet annuaire est libre d\'accès. Pensez donc à vérifier par vous-même les références et compétences du prestataire que vous choisissez.</cite></p>';
   /* Footer: Global: Text area */
   $handler->display->display_options['footer']['text']['id'] = 'text';
   $handler->display->display_options['footer']['text']['table'] = 'views';
@@ -238,12 +233,8 @@ function drupalfr_annuaire_views_default_views() {
     t('suivant ›'),
     t('dernier »'),
     t('<h3>Vous recherchez un prestataire en France&nbsp;?</h3>
-  
-  <p><strong>Nous avons aujourd\'hui <?php print $GLOBALS[\'pager_total_items\'][0]; ?> prestataires inscrits dans notre annuaire. Ils sont prêts à vous aider pour tirer le meilleur de votre solution Drupal&nbsp;!</strong></p>
-  
-  <p><cite>Remarque&nbsp;: Cet annuaire est libre d\'accès. Pensez donc à vérifier par vous-même les références et compétences du prestataire que vous choisissez.</cite></p>
-  
-  '),
+  <p><strong>Nous avons aujourd\'hui @total prestataires inscrits dans notre annuaire. Ils sont prêts à vous aider pour tirer le meilleur de votre solution Drupal&nbsp;!</strong></p>
+  <p><cite>Remarque&nbsp;: Cet annuaire est libre d\'accès. Pensez donc à vérifier par vous-même les références et compétences du prestataire que vous choisissez.</cite></p>'),
     t('Vous êtes un prestataire de service Drupal et vous voulez apparaître dans l\'annuaire ?
 <a href="node/add/annuaire">Ajoutez votre fiche</a> dès aujourd\'hui ! (vous devrez vous identifier pour cela)'),
     t('Société'),

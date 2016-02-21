@@ -264,30 +264,31 @@ class views_pdf_plugin_row_fields extends views_plugin_row {
         '#description' => t('Specify here the minimal space, which is needed on the page, that the content is placed on the page.'),
         '#default_value' => isset($this->options['formats'][$field]['render']['minimal_space']) ? $this->options['formats'][$field]['render']['minimal_space'] : 1,
       );
+      if (user_access('allow php in views pdf') && VIEWS_PDF_PHP) {
+        $form['formats'][$field]['render']['eval_before'] = array(
+          '#type' => 'textarea',
+          '#title' => t('PHP Code Before Output'),
+          '#default_value' => isset($this->options['formats'][$field]['render']['eval_before']) ? $this->options['formats'][$field]['render']['eval_before'] : '',
+        );
+        $form['formats'][$field]['render']['bypass_eval_before'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use the PHP eval function instead php_eval.'),
+          '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
+          '#default_value' => !empty($this->options['formats'][$field]['render']['bypass_eval_before']) ? $this->options['formats'][$field]['render']['bypass_eval_before'] : FALSE,
+        );
 
-      $form['formats'][$field]['render']['eval_before'] = array(
-        '#type' => 'textarea',
-        '#title' => t('PHP Code Before Output'),
-        '#default_value' => isset($this->options['formats'][$field]['render']['eval_before']) ? $this->options['formats'][$field]['render']['eval_before'] : '',
-      );
-      $form['formats'][$field]['render']['bypass_eval_before'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Use the PHP eval function instead php_eval.'),
-        '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
-        '#default_value' => !empty($this->options['formats'][$field]['render']['bypass_eval_before']) ? $this->options['formats'][$field]['render']['bypass_eval_before'] : FALSE,
-      );
-
-      $form['formats'][$field]['render']['eval_after'] = array(
-        '#type' => 'textarea',
-        '#title' => t('PHP Code After Output'),
-        '#default_value' => isset($this->options['formats'][$field]['render']['eval_after']) ? $this->options['formats'][$field]['render']['eval_after'] : '',
-      );
-      $form['formats'][$field]['render']['bypass_eval_after'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Use the PHP eval function instead php_eval.'),
-        '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
-        '#default_value' => !empty($this->options['formats'][$field]['render']['bypass_eval_after']) ? $this->options['formats'][$field]['render']['bypass_eval_after'] : FALSE,
-      );
+        $form['formats'][$field]['render']['eval_after'] = array(
+          '#type' => 'textarea',
+          '#title' => t('PHP Code After Output'),
+          '#default_value' => isset($this->options['formats'][$field]['render']['eval_after']) ? $this->options['formats'][$field]['render']['eval_after'] : '',
+        );
+        $form['formats'][$field]['render']['bypass_eval_after'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use the PHP eval function instead php_eval.'),
+          '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
+          '#default_value' => !empty($this->options['formats'][$field]['render']['bypass_eval_after']) ? $this->options['formats'][$field]['render']['bypass_eval_after'] : FALSE,
+        );
+      }
 
     }
 
@@ -324,6 +325,15 @@ class views_pdf_plugin_row_fields extends views_plugin_row {
       '#type' => 'file',
       '#title' => t('Upload New Template File'),
     );
+
+    $form['#attached']['js'][] = array(
+          'type' => 'setting',
+          'data' => array(
+            'urlIsAjaxTrusted' => array(
+              $GLOBALS['base_url'] . '/' . current_path() => TRUE,
+            ),
+          ),
+        );
 
 
   }
