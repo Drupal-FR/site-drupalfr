@@ -682,7 +682,9 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'administer twitter block'.
   $permissions['administer twitter block'] = array(
     'name' => 'administer twitter block',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'twitter_block',
   );
 
@@ -1339,14 +1341,18 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'delete terms in scald_authors'.
   $permissions['delete terms in scald_authors'] = array(
     'name' => 'delete terms in scald_authors',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'taxonomy',
   );
 
   // Exported permission: 'delete terms in scald_tags'.
   $permissions['delete terms in scald_tags'] = array(
     'name' => 'delete terms in scald_tags',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'taxonomy',
   );
 
@@ -1912,14 +1918,18 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'edit terms in scald_authors'.
   $permissions['edit terms in scald_authors'] = array(
     'name' => 'edit terms in scald_authors',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'taxonomy',
   );
 
   // Exported permission: 'edit terms in scald_tags'.
   $permissions['edit terms in scald_tags'] = array(
     'name' => 'edit terms in scald_tags',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'taxonomy',
   );
 
@@ -2052,7 +2062,9 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'generate features'.
   $permissions['generate features'] = array(
     'name' => 'generate features',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'features',
   );
 
@@ -2141,7 +2153,9 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'publish editable content'.
   $permissions['publish editable content'] = array(
     'name' => 'publish editable content',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'publishcontent',
   );
 
@@ -2184,14 +2198,18 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'rename features'.
   $permissions['rename features'] = array(
     'name' => 'rename features',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'features',
   );
 
   // Exported permission: 'report to mollom'.
   $permissions['report to mollom'] = array(
     'name' => 'report to mollom',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'mollom',
   );
 
@@ -2302,7 +2320,9 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'unpublish editable content'.
   $permissions['unpublish editable content'] = array(
     'name' => 'unpublish editable content',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'publishcontent',
   );
 
@@ -2364,7 +2384,9 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'use ctools import'.
   $permissions['use ctools import'] = array(
     'name' => 'use ctools import',
-    'roles' => array(),
+    'roles' => array(
+      'admin' => 'admin',
+    ),
     'module' => 'ctools',
   );
 
