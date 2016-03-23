@@ -13,16 +13,6 @@ function drupalfr_commerce_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'commerce_billy_invoice_nr_last';
-  $strongarm->value = array(
-    'year' => '2015',
-    'id' => 58,
-  );
-  $export['commerce_billy_invoice_nr_last'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'commerce_billy_pdf_css_files';
   $strongarm->value = array(
     0 => 'sites/all/modules/contrib/commerce_billy/modules/commerce_billy_pdf/css/pdf.css',
