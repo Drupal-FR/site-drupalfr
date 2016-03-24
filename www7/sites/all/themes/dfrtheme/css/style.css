@@ -336,7 +336,17 @@ div.vertical-tabs .vertical-tabs-list li {
   background: #00090c;
   background: rgba(0, 178, 215, 0.9);
 }
-
+.push-drupalcamp {
+  padding-top: 1em;
+}
+.push-drupalcamp a {
+  background: transparent no-repeat 0px 0px url("../images/push-dc-medium.jpg");
+  display: block;
+  margin: auto;
+  text-indent: -1000px;
+  height: 147px;
+  /*width: 434px;*/
+}
 @media screen and (min-width:480px) {
   #block-system-main-menu .menu {
   }
@@ -357,6 +367,11 @@ div.vertical-tabs .vertical-tabs-list li {
 }
 
 @media screen and (min-width:900px) {
+  .push-drupalcamp a {
+    background-image: url("../images/push-dc-medium.jpg");
+    height: 147px;
+    /*width: 890px;*/
+  }
   .branding {
     padding-right: 3%;
     min-width: 30%;
@@ -366,6 +381,13 @@ div.vertical-tabs .vertical-tabs-list li {
   }
   #block-system-main-menu {
     margin: 1em 0;
+  }
+}
+@media screen and (min-width:1280px) {
+  .push-drupalcamp a {
+    background-image: url("../images/push-dc-medium.jpg");
+    height: 147px;
+    /*width: 1270px;*/
   }
 }
 
