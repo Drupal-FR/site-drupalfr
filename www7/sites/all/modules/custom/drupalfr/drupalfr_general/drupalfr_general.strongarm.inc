@@ -112,5 +112,43 @@ Avancé<br/>
   $strongarm->value = 0;
   $export['mollom_testing_mode'] = $strongarm;
 
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'site_name';
+  $strongarm->value = 'Drupal France';
+  $export['site_name'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'site_slogan';
+  $strongarm->value = 'Site Officiel';
+  $export['site_slogan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'theme_dfrtheme_settings';
+  $strongarm->value = array(
+    'toggle_logo' => 1,
+    'toggle_name' => 0,
+    'toggle_slogan' => 0,
+    'toggle_node_user_picture' => 1,
+    'toggle_comment_user_picture' => 1,
+    'toggle_comment_user_verification' => 1,
+    'toggle_favicon' => 1,
+    'toggle_main_menu' => 1,
+    'toggle_secondary_menu' => 1,
+    'default_logo' => 0,
+    'logo_path' => 'sites/all/themes/dfrtheme/drupal-france-site-officiel-logo.png',
+    'logo_upload' => '',
+    'default_favicon' => 0,
+    'favicon_path' => 'sites/all/themes/dfrtheme/favicon.png',
+    'favicon_upload' => '',
+    'favicon_mimetype' => 'image/png',
+  );
+  $export['theme_dfrtheme_settings'] = $strongarm;
+
   return $export;
 }

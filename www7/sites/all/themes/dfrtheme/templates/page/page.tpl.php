@@ -105,6 +105,10 @@
     <?php if ($page['header_bottom']): ?>
       <aside id="header-bottom" role="complementary">
         <div class="inner">
+          <?php if ($is_front): ?>
+            <div class="push-drupalcamp"><a href="http://nantes2016.drupalcamp.fr/" title="Site dédié au Drupalcamp Nantes du 10 au 12 juin 2016">Visiter le site dédié au Drupalcamp Nantes du 10 au 12 juin 2016.</a></div>
+          <?php endif; ?>
+
           <?php print render($page['header_bottom']); ?>
         </div>
       </aside><!-- /#header-bottom -->

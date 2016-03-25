@@ -422,7 +422,6 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['relationships']['owner']['table'] = 'commerce_license';
   $handler->display->display_options['relationships']['owner']['field'] = 'owner';
   $handler->display->display_options['relationships']['owner']['relationship'] = 'commerce_license_target_id';
-  $handler->display->display_options['relationships']['owner']['label'] = 'Utilisateur';
   $handler->display->display_options['relationships']['owner']['required'] = TRUE;
   /* Field: Commerce Order: Order ID */
   $handler->display->display_options['fields']['order_id']['id'] = 'order_id';
@@ -452,7 +451,6 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['mail_1']['table'] = 'users';
   $handler->display->display_options['fields']['mail_1']['field'] = 'mail';
   $handler->display->display_options['fields']['mail_1']['relationship'] = 'owner';
-  $handler->display->display_options['fields']['mail_1']['label'] = 'Courriel';
   $handler->display->display_options['fields']['mail_1']['link_to_user'] = 'user';
   /* Field: Commerce Order: Adresse de facturation */
   $handler->display->display_options['fields']['commerce_customer_billing']['id'] = 'commerce_customer_billing';
@@ -512,7 +510,6 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['status']['expose']['label'] = 'Actif';
   $handler->display->display_options['filters']['status']['expose']['operator'] = 'status_op';
   $handler->display->display_options['filters']['status']['expose']['identifier'] = 'status';
-  $handler->display->display_options['filters']['status']['expose']['required'] = TRUE;
   $handler->display->display_options['filters']['status']['expose']['remember_roles'] = array(
     2 => '2',
     4 => 0,
@@ -588,6 +585,29 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['status_2']['value'] = array(
     2 => '2',
   );
+  /* Filter criterion: User: Numéro adhérent (field_membership_number) */
+  $handler->display->display_options['filters']['field_membership_number_value']['id'] = 'field_membership_number_value';
+  $handler->display->display_options['filters']['field_membership_number_value']['table'] = 'field_data_field_membership_number';
+  $handler->display->display_options['filters']['field_membership_number_value']['field'] = 'field_membership_number_value';
+  $handler->display->display_options['filters']['field_membership_number_value']['relationship'] = 'owner';
+  $handler->display->display_options['filters']['field_membership_number_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_membership_number_value']['expose']['operator_id'] = 'field_membership_number_value_op';
+  $handler->display->display_options['filters']['field_membership_number_value']['expose']['label'] = 'Numéro adhérent';
+  $handler->display->display_options['filters']['field_membership_number_value']['expose']['use_operator'] = TRUE;
+  $handler->display->display_options['filters']['field_membership_number_value']['expose']['operator'] = 'field_membership_number_value_op';
+  $handler->display->display_options['filters']['field_membership_number_value']['expose']['identifier'] = 'field_membership_number_value';
+  $handler->display->display_options['filters']['field_membership_number_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    4 => 0,
+    1 => 0,
+    13 => 0,
+    11 => 0,
+    7 => 0,
+    12 => 0,
+    14 => 0,
+    15 => 0,
+    16 => 0,
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -629,20 +649,21 @@ function drupalfr_commerce_views_default_views() {
     t('Afichage @start - @end sur @total'),
     t('Line items'),
     t('Licence'),
-    t('Utilisateur'),
+    t('User'),
     t('Commande'),
     t('License'),
     t('.'),
     t(','),
     t('Numéro adhérent'),
     t('Pseudo'),
-    t('Courriel'),
+    t('E-mail'),
     t('Adresse de facturation'),
     t('Invoice PDF'),
     t('Recevoir carte adhérent'),
     t('Date adhésion'),
     t('Rôles'),
     t('Actif'),
+    t('Courriel'),
     t('Nom'),
     t('Page'),
     t('more'),
@@ -684,7 +705,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['header']['area']['content'] = '<p>Adhérer en tant que personne physique. L\'adhésion est annuelle.</p>
 <p>L\'adhésion pour les personnes morales n\'est pas disponible en ligne pour l\'instant, veuillez nous <a href="/contact">contacter</a> pour toute demande.</p>';
   $handler->display->display_options['header']['area']['format'] = '3';
-  /* Field: Commerce Product: Price */
+  /* Field: Commerce Product: Prix */
   $handler->display->display_options['fields']['commerce_price']['id'] = 'commerce_price';
   $handler->display->display_options['fields']['commerce_price']['table'] = 'field_data_commerce_price';
   $handler->display->display_options['fields']['commerce_price']['field'] = 'commerce_price';

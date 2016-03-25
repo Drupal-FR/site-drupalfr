@@ -176,13 +176,17 @@ function _scald_file_pdf_thumbnail($atom, $file) {
       $temp = file_directory_temp() . '/pdf_thumb.png';
       if (scald_file_is_exec_available()) {
         if (scald_file_command_exists('pdfdraw')) {
-          exec('pdfdraw -o ' . $temp . ' ' . $uri . ' 1');
+          exec('pdfdraw -o ' . escapeshellarg($temp) . ' ' . escapeshellarg($uri) . ' 1');
         }
-        else if (scald_file_command_exists('convert')) {
-          exec('convert ' . $uri . '[0] ' . $temp);
+        elseif (scald_file_command_exists('mudraw')) {
+          exec('mudraw -o ' . escapeshellarg($temp) . ' ' . escapeshellarg($uri) . ' 1');
+        }
+        elseif (scald_file_command_exists('convert')) {
+          $uri = $uri . '[0]';
+          exec('convert ' . escapeshellarg($uri) . ' ' . escapeshellarg($temp));
         }
       }
-      else if (extension_loaded('imagick') && class_exists("Imagick")) {
+      elseif (extension_loaded('imagick') && class_exists("Imagick")) {
         $im = new Imagick($uri . '[0]');
         $im = $im->flattenImages();
         $im->setImageFormat("png");
