@@ -32,13 +32,13 @@ function drupalfr_user_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'googleanalytics' => array(
-          'weight' => '7',
-        ),
-        'mollom' => array(
           'weight' => '6',
         ),
-        'redirect' => array(
+        'mollom' => array(
           'weight' => '5',
+        ),
+        'redirect' => array(
+          'weight' => '4',
         ),
         'account' => array(
           'weight' => '0',
@@ -47,7 +47,7 @@ function drupalfr_user_strongarm() {
           'weight' => '3',
         ),
         'signature_settings' => array(
-          'weight' => '4',
+          'weight' => '7',
         ),
         'contact' => array(
           'weight' => '1',

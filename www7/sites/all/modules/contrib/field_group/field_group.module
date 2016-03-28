@@ -1390,7 +1390,16 @@ function field_group_field_extra_fields() {
     );
   }
 
-  // Field to itegrate with overlay module.
+  // User signature field to integrate with user module.
+  if (variable_get('user_signatures', 0)) {
+    $extra['user']['user']['form']['signature_settings'] = array(
+      'label' => t('Signature settings'),
+      'description' => t('User signature'),
+      'weight' => 5,
+    );
+  }
+
+  // Field to integrate with overlay module.
   if (module_exists('overlay')) {
     $extra['user']['user']['form']['overlay_control'] = array(
       'label' => t('Administrative overlay'),

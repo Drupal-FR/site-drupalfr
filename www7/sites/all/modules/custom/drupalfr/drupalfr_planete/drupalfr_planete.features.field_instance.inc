@@ -245,7 +245,7 @@ function drupalfr_planete_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'full' => array(
         'label' => 'above',
