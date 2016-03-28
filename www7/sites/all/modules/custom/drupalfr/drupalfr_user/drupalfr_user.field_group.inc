@@ -201,6 +201,7 @@ function drupalfr_user_field_group_info() {
       0 => 'field_newsletter_adff',
       1 => 'field_newsletter_dc_soleil_2014',
       2 => 'field_newsletter_ddd_2015',
+      3 => 'field_newsletter_drupalcamp',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -252,11 +253,11 @@ function drupalfr_user_field_group_info() {
       1 => 'field_jabber',
       2 => 'field_msn',
       3 => 'field_nickname',
-      4 => 'field_twitter',
-      5 => 'field_facebook',
+      4 => 'field_facebook',
+      5 => 'field_google_plus',
       6 => 'field_linkedin',
-      7 => 'field_viadeo',
-      8 => 'field_google_plus',
+      7 => 'field_twitter',
+      8 => 'field_viadeo',
     ),
     'format_type' => 'tab',
     'format_settings' => array(

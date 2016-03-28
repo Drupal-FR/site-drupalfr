@@ -347,6 +347,29 @@ function drupalfr_user_field_default_field_bases() {
     'type' => 'mailchimp_lists_subscription',
   );
 
+  // Exported field_base: 'field_newsletter_drupalcamp'.
+  $field_bases['field_newsletter_drupalcamp'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_newsletter_drupalcamp',
+    'field_permissions' => array(
+      'type' => 1,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'mailchimp_lists',
+    'settings' => array(
+      'double_opt_in' => 0,
+      'mc_list_id' => '26bff72b56',
+      'send_welcome' => 0,
+      'unsubscribe_action' => 'remove',
+    ),
+    'translatable' => 0,
+    'type' => 'mailchimp_lists_subscription',
+  );
+
   // Exported field_base: 'field_nickname'.
   $field_bases['field_nickname'] = array(
     'active' => 1,

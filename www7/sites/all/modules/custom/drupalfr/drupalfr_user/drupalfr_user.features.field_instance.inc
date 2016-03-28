@@ -166,7 +166,7 @@ function drupalfr_user_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'full' => array(
         'label' => 'inline',
@@ -444,7 +444,7 @@ function drupalfr_user_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'full' => array(
         'label' => 'above',
@@ -642,7 +642,7 @@ function drupalfr_user_field_default_field_instances() {
       'module' => 'mailchimp_lists',
       'settings' => array(),
       'type' => 'mailchimp_lists_select',
-      'weight' => 22,
+      'weight' => 24,
     ),
   );
 
@@ -661,7 +661,7 @@ function drupalfr_user_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'full' => array(
         'label' => 'above',
@@ -702,6 +702,66 @@ function drupalfr_user_field_default_field_instances() {
       'settings' => array(),
       'type' => 'mailchimp_lists_select',
       'weight' => 23,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_newsletter_drupalcamp'.
+  $field_instances['user-user-field_newsletter_drupalcamp'] = array(
+    'bundle' => 'user',
+    'default_value' => array(
+      0 => array(
+        'subscribe' => 0,
+        'is_default' => TRUE,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'planete_author' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_newsletter_drupalcamp',
+    'label' => 'Newsletter Drupalcamp',
+    'required' => 0,
+    'settings' => array(
+      'interest_groups_title' => 'Interest Groups',
+      'mergefields' => array(
+        'EMAIL' => '[user:mail]',
+        'FNAME' => '[user:field-realname]',
+        'LNAME' => '',
+        'advanced' => 0,
+      ),
+      'options' => array(
+        'interest_groups' => array(),
+        'subscribe' => FALSE,
+      ),
+      'show_interest_groups' => 0,
+      'unsubscribe_on_delete' => 1,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'mailchimp_lists',
+      'settings' => array(),
+      'type' => 'mailchimp_lists_select',
+      'weight' => 22,
     ),
   );
 
@@ -1033,6 +1093,7 @@ function drupalfr_user_field_default_field_instances() {
   t('Newsletter ADFF');
   t('Newsletter DC Soleil 2014');
   t('Newsletter Drupal Dev Days 2015');
+  t('Newsletter Drupalcamp');
   t('Nom réel');
   t('Numéro adhérent');
   t('Site Internet');
