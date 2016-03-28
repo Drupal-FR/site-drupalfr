@@ -30,9 +30,32 @@ INSTALLATION
 4. (optionally) Edit your theme to provide a div.codeblock style for blocks of
    code.
 
+PRISM SUPPORT
+-------------
+
+This module package includes support for the Prism highlighting library, which
+you can learn more about at http://prismjs.com.
+
+To enable Prism:
+
+1. Enable the codefilter_prism module.
+
+2. Download prism.js and prism.css from prismjs.com and add them to a folder at
+   sites/all/libraries/prism or sites/<sitename>/libraries/prism.
+
+3. Following the instructions above to add codefilter parsing to your text
+   format.
+
+4. For each format you want Prism support for, check the 'Prism Library Support'
+   checkbox.
+
+codefilter_prism will automatically parse code wrapped in <?php ?> and <code>
+</code> tags into a Prism compatible format.
 
 CREDITS
 -------
 
 This mini-module was originally made by Steven Wittens <unconed@drupal.org>,
 based on the PHP filter in Kjartan Mannes's <kjartan@drupal.org> project.module.
+
+Prism integration was incorporated by Joel Pittet and Jakob Perry.

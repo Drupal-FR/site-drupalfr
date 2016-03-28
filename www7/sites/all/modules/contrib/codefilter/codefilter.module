@@ -16,7 +16,7 @@ function codefilter_process_php($text) {
   // Trim leading and trailing linebreaks.
   $text = trim($text, "\r\n");
   // Highlight as PHP.
-  $text = '<div class="codeblock">' . highlight_string("<?php\n$text\n?>", 1) . '</div>';
+  $text = '<div class="codeblock"><pre>' . highlight_string("<?php\n$text\n?>", 1) . '</pre></div>';
   // Remove newlines to avoid clashing with the linebreak filter.
   $text = str_replace("\n", '', $text);
   return codefilter_fix_spaces($text);
@@ -33,7 +33,7 @@ function _codefilter_process_php_callback($matches) {
  * Helper function for codefilter_process_code().
  */
 function codefilter_process_php_inline($matches) {
-  // Undo nl2br
+  // Undo nl2br.
   $text = str_replace('<br />', '', $matches[0]);
   // Decode entities (the highlighter re-entifies) and highlight text.
   $text = highlight_string(decode_entities($text), 1);
@@ -45,7 +45,7 @@ function codefilter_process_php_inline($matches) {
 /**
  * Processes chunks of escaped code into HTML.
  */
-function codefilter_process_code($text) {
+function codefilter_process_code($text, $attributes = NULL) {
   // Undo linebreak escaping.
   $text = str_replace('&#10;', "\n", $text);
   // Inline or block level piece?
@@ -60,7 +60,7 @@ function codefilter_process_code($text) {
   // PHP code in regular code.
   $text = preg_replace_callback('/&lt;\?php.+?\?&gt;/s', 'codefilter_process_php_inline', $text);
 
-  $text = '<code>' . codefilter_fix_spaces(str_replace(' ', '&nbsp;', $text)) . '</code>';
+  $text = '<code' . $attributes . '>' . codefilter_fix_spaces(str_replace(' ', '&nbsp;', $text)) . '</code>';
   $text = $multiline ? '<div class="codeblock">' . $text . '</div>' : $text;
   // Remove newlines to avoid clashing with the linebreak filter.
   return str_replace("\n", '', $text);
@@ -76,7 +76,7 @@ function codefilter_process_code($text) {
  *   A formatted string.
  */
 function _codefilter_process_code_callback($matches) {
-  return codefilter_process_code($matches[1]);
+  return codefilter_process_code($matches[2], $matches[1]);
 }
 
 /**
@@ -103,19 +103,26 @@ function codefilter_fix_spaces($text) {
  *   The string to escape.
  * @param string $type
  *   The type of code block, either 'code' or 'php'.
+ * @param string|null $attributes
+ *   (optional) The HTML attributes of the code block.
  *
  * @return string
  *   The escaped string.
  */
-function codefilter_escape($text, $type = 'code') {
+function codefilter_escape($text, $type = 'code', $attributes = NULL) {
   // Note, pay attention to odd preg_replace-with-/e behaviour on slashes.
   $text = check_plain(str_replace('\"', '"', $text));
 
   // Protect newlines from line break converter.
   $text = str_replace(array("\r", "\n"), array('', '&#10;'), $text);
 
+  // Prepare the class HTML attribute for the codefilter tag.
+  if (isset($attributes)) {
+    $attributes = ' ' . $attributes;
+  }
+
   // Add codefilter escape tags.
-  $text = "[codefilter_$type]{$text}[/codefilter_$type]";
+  $text = "[codefilter_{$type}{$attributes}]{$text}[/codefilter_$type]";
 
   return $text;
 }
@@ -124,7 +131,12 @@ function codefilter_escape($text, $type = 'code') {
  * Callback to escape content of <code> elements.
  */
 function _codefilter_escape_code_tag_callback($matches) {
-  return codefilter_escape($matches[1], 'code');
+  // Extract a potentially existing class HTML attribute.
+  $attributes = NULL;
+  if (!empty($matches[1]) && preg_match('@class="[^"]+"@', $matches[1], $class_matches)) {
+    $attributes = $class_matches[0];
+  }
+  return codefilter_escape($matches[2], 'code', $attributes);
 }
 
 /**
@@ -146,6 +158,7 @@ function codefilter_filter_info() {
     'settings callback' => '_codefilter_settings',
     'default settings' => array(
       'nowrap_expand' => FALSE,
+      'codefilter_prism' => FALSE,
     ),
     'tips callback' => '_codefilter_tips',
   );
@@ -159,8 +172,9 @@ function codefilter_filter_info() {
  * <code> </code>, <?php ?>, [?php ?], <% %>, and [% %] tags are escaped.
  */
 function _codefilter_prepare($text, $format) {
-  $text = preg_replace_callback('@<code>(.+?)</code>@s', '_codefilter_escape_code_tag_callback', $text);
-  $text = preg_replace_callback('@[\[<](\?php)(.+?)(\?)[\]>]@s', '_codefilter_escape_php_tag_callback', $text);
+  $callback_prefix = $format->settings['codefilter_prism'] ? '_codefilter_prism' : '_codefilter';
+  $text = preg_replace_callback('@<code([^>]*)>(.+?)</code>@s', "{$callback_prefix}_escape_code_tag_callback", $text);
+  $text = preg_replace_callback('@[\[<](\?php)(.+?)(\?)[\]>]@s', "{$callback_prefix}_escape_php_tag_callback", $text);
   return $text;
 }
 
@@ -168,13 +182,20 @@ function _codefilter_prepare($text, $format) {
  * Implements hook_filter_FILTER_process().
  */
 function _codefilter_process($text, $format) {
-  $text = preg_replace_callback('@\[codefilter_code\](.+?)\[/codefilter_code\]@s', '_codefilter_process_code_callback', $text);
-  $text = preg_replace_callback('@\[codefilter_php\](.+?)\[/codefilter_php\]@s', '_codefilter_process_php_callback', $text);
+  if ($format->settings['codefilter_prism'] && function_exists('_codefilter_prism_process_code_callback')) {
+    $text = preg_replace_callback('@\[codefilter_prism_code( [^\]]+)?\](.+?)\[/codefilter_prism_code\]@s', '_codefilter_prism_process_code_callback', $text);
+    $text = preg_replace_callback('@\[codefilter_prism_php\](.+?)\[/codefilter_prism_php\]@s', '_codefilter_prism_process_php_callback', $text);
+  }
+  else {
+    $text = preg_replace_callback('@\[codefilter_code( [^\]]+)?\](.+?)\[/codefilter_code\]@s', '_codefilter_process_code_callback', $text);
+    $text = preg_replace_callback('@\[codefilter_php\](.+?)\[/codefilter_php\]@s', '_codefilter_process_php_callback', $text);
+  }
   // A hack, so we can conditionally nowrap based on filter settings.
   // @todo Refactor how replacements are done so we can do this more cleanly.
   if ($format->settings['nowrap_expand']) {
     $text = str_replace('class="codeblock"', 'class="codeblock nowrap-expand"', $text);
   }
+
   return $text;
 }
 
@@ -206,5 +227,14 @@ function _codefilter_settings($form, &$form_state, $filter, $format, $defaults) 
     '#description' => t('By default, code boxes inherit text wrapping from the active theme. With this setting, code boxes will not wrap, but will expand to full width on hover (with Javascript).'),
     '#default_value' => $filter->settings['nowrap_expand'],
   );
+
+  if (module_exists('codefilter_prism')) {
+    $elements['codefilter_prism'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Prism Library Support'),
+      '#description' => t('Enable code styling using the <a href="http://prismjs.com/">Prism library</a> (requires Javascript). To enable highlighting, download the prism.js and prism.js and add them to your site\'s libraries folder.'),
+      '#default_value' => $filter->settings['codefilter_prism'],
+    );
+  }
   return $elements;
 }
