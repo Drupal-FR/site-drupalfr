@@ -126,3 +126,10 @@ function drupalfr_user_update_7000() {
 function drupalfr_user_update_7001() {
   variable_set('drupalfr_user_next_membership_number', 231);
 }
+
+/**
+ * Remove field_newsletter_dc_soleil_2014.
+ */
+function drupalfr_user_update_7002() {
+  field_delete_field('field_newsletter_dc_soleil_2014');
+}

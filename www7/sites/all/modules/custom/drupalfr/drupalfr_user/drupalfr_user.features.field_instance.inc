@@ -585,67 +585,6 @@ function drupalfr_user_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-field_newsletter_dc_soleil_2014'.
-  $field_instances['user-user-field_newsletter_dc_soleil_2014'] = array(
-    'bundle' => 'user',
-    'default_value' => array(
-      0 => array(
-        'subscribe' => 0,
-      ),
-    ),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 19,
-      ),
-      'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'planete_author' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'user',
-    'field_name' => 'field_newsletter_dc_soleil_2014',
-    'label' => 'Newsletter DC Soleil 2014',
-    'required' => 0,
-    'settings' => array(
-      'interest_groups_title' => 'Interest Groups',
-      'mergefields' => array(
-        'EMAIL' => '[user:mail]',
-        'FNAME' => '[user:field-realname]',
-        'LNAME' => '',
-        'MMERGE3' => '',
-        'MMERGE4' => '',
-        'advanced' => 0,
-      ),
-      'options' => array(
-        'interest_groups' => array(),
-        'subscribe' => FALSE,
-      ),
-      'show_interest_groups' => 0,
-      'unsubscribe_on_delete' => 1,
-      'user_register_form' => 0,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'mailchimp_lists',
-      'settings' => array(),
-      'type' => 'mailchimp_lists_select',
-      'weight' => 24,
-    ),
-  );
-
   // Exported field_instance: 'user-user-field_newsletter_ddd_2015'.
   $field_instances['user-user-field_newsletter_ddd_2015'] = array(
     'bundle' => 'user',
@@ -1091,7 +1030,6 @@ function drupalfr_user_field_default_field_instances() {
   t('LinkedIn');
   t('MSN');
   t('Newsletter ADFF');
-  t('Newsletter DC Soleil 2014');
   t('Newsletter Drupal Dev Days 2015');
   t('Newsletter Drupalcamp');
   t('Nom réel');
