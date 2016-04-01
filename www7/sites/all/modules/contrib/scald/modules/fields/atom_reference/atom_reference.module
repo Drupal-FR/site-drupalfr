@@ -80,6 +80,7 @@ function atom_reference_field_instance_settings_form($field, $instance) {
 function atom_reference_field_views_data($field) {
   $data = field_views_field_default_views_data($field);
   $current_table = _field_sql_storage_tablename($field);
+  $revision_table = _field_sql_storage_revision_tablename($field);
   $column = _field_sql_storage_columnname($field['field_name'], 'sid');
 
   // Relationship: add a relationship for related atom.
@@ -88,6 +89,15 @@ function atom_reference_field_views_data($field) {
     'field' => $column,
     'handler' => 'views_handler_relationship',
     'label' => $data[$current_table][$field['field_name']]['title'],
+    'field_name' => $field['field_name'],
+  );
+
+  // Relationship: add a relationship for revisions.
+  $data[$revision_table][$column]['relationship'] = array(
+    'base' => 'scald_atoms',
+    'field' => $column,
+    'handler' => 'views_handler_relationship',
+    'label' => t('Atom reference item revision from !field_name', array('!field_name' => $field['field_name'])),
     'field_name' => $field['field_name'],
   );
 

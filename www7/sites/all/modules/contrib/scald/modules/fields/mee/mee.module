@@ -118,7 +118,12 @@ function mee_ckeditor_plugin() {
       'name' => 'dnd',
       'desc' => t('Scald Drag and Drop integration'),
       'path' =>  drupal_get_path('module', 'mee') . '/plugins/ckeditor/',
-      'buttons' => array(),
+      'buttons' => array(
+        'ScaldAtom' => array(
+          'icon' => 'icons/atom.png',
+          'label' => t('Edit atom properties'),
+        ),
+      ),
     );
   }
   elseif ($mee_store_format == 'embed_div' && version_compare(ckeditor_get_version(), '4.3.0') >= 0) {
@@ -126,7 +131,12 @@ function mee_ckeditor_plugin() {
       'name' => 'dndck4',
       'desc' => t('Scald Drag and Drop integration - CKEditor 4 widgets'),
       'path' =>  drupal_get_path('module', 'mee') . '/plugins/dndck4/',
-      'buttons' => array(),
+      'buttons' => array(
+        'ScaldAtom' => array(
+          'icon' => 'icons/atom.png',
+          'label' => t('Edit atom properties'),
+        ),
+      ),
     );
   }
 
@@ -921,7 +931,7 @@ function _mee_extract_widget_embed_info($dom) {
 
   // Collect the DOM nodes and the corresponding embed data.
   $xpath = new DOMXPath($dom);
-  $nodes = $xpath->query("//div[@class='dnd-atom-wrapper']");
+  $nodes = $xpath->query("//div[@class='dnd-atom-wrapper']|//figure[@class='dnd-atom-wrapper']|//span[@class='dnd-atom-wrapper']");
   foreach ($nodes as $node) {
     $info = array(
       'node' => $node,
@@ -932,7 +942,7 @@ function _mee_extract_widget_embed_info($dom) {
       'caption' => '',
     );
     // Extract the caption if present.
-    $result = $xpath->query("div[@class='dnd-caption-wrapper']", $node);
+    $result = $xpath->query("div[@class='dnd-caption-wrapper']|figcaption[@class='dnd-caption-wrapper']", $node);
     if ($result->length) {
       foreach ($result->item(0)->childNodes as $child) {
         $info['caption'] .= $dom->saveXML($child);

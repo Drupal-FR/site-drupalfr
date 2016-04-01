@@ -534,5 +534,27 @@ function hook_scald_add_form_fill(&$atoms, $form, $form_state) {
 }
 
 /**
+ * Alter atoms after the data being filled by provider.
+ *
+ * Providers that do extra work to get more data (e.g. from external source) can
+ * leave the temporary data in `$atom->_info`. Other module can reuse the data
+ * to prefill atom fields to make them available in the next step.
+ *
+ * @param array $atoms
+ *   Atoms created by the source hook_scald_add_form_fill() callback. For
+ *   providers not implementing count this will still be an array but with
+ *   one atom.
+ * @param array $context
+ *   A keyed array with 'form', and 'form_state'.
+ */
+function hook_scald_add_form_fill_alter(&$atoms, $context) {
+  if ($context['form_state']['scald']['source'] == 'scald_soundcloud') {
+    foreach ($atoms as $atom) {
+      $atom->field_atom_license[LANGUAGE_NONE][0]['value'] = $atom->_info->license;
+    }
+  }
+}
+
+/**
  * @} End of "defgroup scald_atom_provider".
  */

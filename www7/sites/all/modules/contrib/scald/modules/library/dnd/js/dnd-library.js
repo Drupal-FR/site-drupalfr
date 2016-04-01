@@ -77,7 +77,7 @@ Drupal.dnd = {
     atom_ids = atom_ids.filter(Number);
 
     if (atom_ids.length) {
-      $.getJSON(Drupal.settings.basePath + 'atom/fetch/' + atom_ids.join() + '?context=' + context, function(data) {
+      $.getJSON(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/fetch/' + atom_ids.join() + '?context=' + context, function(data) {
         for (var atom_id in data) {
           if (Drupal.dnd.Atoms[atom_id]) {
             // Merge old data into the new return atom.
@@ -362,14 +362,8 @@ renderLibrary: function(data, editor) {
         return Drupal.dnd.insertAtom($(this).data('atom-id'));
       })
       .bind('dragstart', function(e) {
-        var dt = e.originalEvent.dataTransfer, id = e.target.id, $this = $(this);
-        var $img;
-        if ($this.is('img')) {
-          $img = $this;
-        }
-        else {
-          $this.find('img');
-        }
+        var dt = e.originalEvent.dataTransfer, $this = $(this);
+        var $img = $this.is('img') ? $this : $this.find('img');
         var id = $img.data('atom-id');
         dt.dropEffect = 'copy';
         dt.setData("Text", Drupal.dnd.Atoms[id].sas);
@@ -390,7 +384,7 @@ renderLibrary: function(data, editor) {
       });
   });
   // Makes pager links refresh the library instead of opening it in the browser window
-  library_wrapper.find('.pager a').click(function() {
+  library_wrapper.find('.pager a, .pagination a').click(function() {
     $.getJSON(this.href, function(data) {
       Drupal.behaviors.dndLibrary.renderLibrary.call(library_wrapper.get(0), data, $(editor));
     });
