@@ -32,6 +32,12 @@ function dnd_admin_form() {
     '#default_value' => variable_get('dnd_modal_height', 300),
     '#description' => t('The height of the modal window opened from the library in pixels or percentage. Example: 100 for 100 pixels, 0.5 for 50%.'),
   );
+  $form['dnd_modal_admin'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use the admin theme'),
+    '#default_value' => variable_get('dnd_modal_admin', FALSE),
+    '#description' => t('If enabled, the library will be considered to be administrative.'),
+  );
   if (function_exists('qtip_fetch_instances_field')) {
     $form['dnd_qtip_instance'] = qtip_fetch_instances_field(variable_get('dnd_qtip_instance', ''));
   }

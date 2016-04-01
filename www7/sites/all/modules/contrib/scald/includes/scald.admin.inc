@@ -65,7 +65,7 @@ function scald_admin_dashboard() {
 
   // Display a context listing.
   $content .= '<h3>' . t('Scald Contexts') . '</h3>';
-  $content .= '<p>' . t('List of all Scald Contexts, thoses created through the UI and even those hidden or defined by other modules.') . '</p>';
+  $content .= '<p>' . t('List of all Scald Contexts, those created through the UI and even those hidden or defined by other modules.') . '</p>';
   $content .= '<ul class="action-links"><li>' . l(t('Add context'), 'admin/structure/scald/context/add') . '</li></ul>';
 
   $list = array('type' => 'ul', 'items' => array());

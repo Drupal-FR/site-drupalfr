@@ -251,7 +251,14 @@ function scald_atom_add_form_add_submit(&$form, &$form_state) {
     else {
       $function($atoms[0], $form, $form_state);
     }
+
+    $context = array(
+      'form' => $form,
+      'form_state' => $form_state,
+    );
+    drupal_alter('scald_add_form_fill', $atoms, $context);
   }
+
   // And put it in the form_state.
   $form_state['scald']['atoms'] = $atoms;
 }

@@ -35,7 +35,7 @@ CKEDITOR.plugins.add('dndck4', {
           allowedContent: 'a[href]; strong; em'
         }
       },
-      requiredContent: 'div[data-scald-sid](dnd-atom-wrapper)',
+      requiredContent: 'div span figure[data-scald-sid](dnd-atom-wrapper)',
       allowedContent: {},
 
       /**
@@ -134,6 +134,7 @@ CKEDITOR.plugins.add('dndck4', {
       icon: this.path + 'icons/atom.png'
     });
     editor.addCommand('atomProperties', {
+      allowedContent: 'div span figure figcaption[data-scald-sid,data-scald-align,data-scald-context,data-scald-options,data-scald-type](dnd-atom-wrapper,dnd-caption-wrapper)',
       exec: function (editor) {
         var widget = editor.widgets.focused;
         if (widget && widget.name == 'dndck4') {
@@ -155,7 +156,7 @@ CKEDITOR.plugins.add('dndck4', {
     editor.addCommand('atomView', {
       exec: function (editor) {
         var widget = editor.widgets.focused;
-        window.open(Drupal.settings.basePath + 'atom/' + widget.data.sid);
+        window.open(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/' + widget.data.sid);
       }
     });
 
@@ -167,7 +168,7 @@ CKEDITOR.plugins.add('dndck4', {
         });
         var $link = $("<a></a>", {
           'target' : '_blank',
-          'href' : Drupal.settings.basePath + 'atom/' + widget.data.sid + '/edit/nojs',
+          'href' : Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/' + widget.data.sid + '/edit/nojs',
           'class' : 'ctools-use-modal ctools-modal-custom-style'
         }).appendTo($wrapper);
         Drupal.behaviors.ZZCToolsModal.attach($wrapper);
@@ -464,8 +465,8 @@ Drupal.dndck4 = {
   },
 
   getDefaultInsertData: function (editor, atomInfo) {
-    var sasData = Drupal.dnd.sas2array(atomInfo.sas);
-    return {
+    var sasData = Drupal.dnd.sas2array(atomInfo.sas), data;
+    data = {
       sid : atomInfo.sid,
       type: atomInfo.meta.type,
       // The default context for newly embedded atoms is a setting of the text
@@ -480,6 +481,10 @@ Drupal.dndck4 = {
       align : 'none',
       usesCaption : Drupal.settings.dnd.usesCaptionDefault
     };
+
+    Drupal.dndck4.invokeCallbacks('GetDefaultInsertData', data);
+
+    return data;
   },
 
   createNewWidget: function(editor, data, caption) {
@@ -652,7 +657,7 @@ Drupal.dndck4 = {
     // framework lets us retrieve out-of-band assets (JS, CSS) and attach
     // behaviors.
     var ajax = new Drupal.ajax('dnd-library', $('#dnd-library'), {
-      url: Drupal.settings.basePath + 'atom/ajax-widget-expand/' + data.sid + '?' + $.param({
+      url: Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/ajax-widget-expand/' + data.sid + '?' + $.param({
         context: data.context,
         options: encodeURIComponent(data.options),
         align: data.align

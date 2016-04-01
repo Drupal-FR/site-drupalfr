@@ -92,6 +92,13 @@ function scald_context_type_features_rebuild($module) {
   foreach ($contexts as $key => $context) {
     $context_name = _scald_context_type_extract($key, 'context');
 
+    // Ensure there's at least a stub for each of the exported properties.
+    $context = array_merge_recursive($context, array(
+      'player' => array(),
+      'transcoder' => array(),
+      'data' => array(),
+    ));
+
     if (!isset($regroup[$context_name])) {
       // Initialize this context.
       $regroup[$context_name] = $context;
@@ -100,6 +107,7 @@ function scald_context_type_features_rebuild($module) {
       // Merge types data.
       $regroup[$context_name]['player']      = array_merge_recursive($regroup[$context_name]['player'], $context['player']);
       $regroup[$context_name]['transcoder']  = array_merge_recursive($regroup[$context_name]['transcoder'], $context['transcoder']);
+      $regroup[$context_name]['data']        = array_merge_recursive($regroup[$context_name]['data'], $context['data']);
     }
   }
 
@@ -114,6 +122,14 @@ function scald_context_type_features_rebuild($module) {
 
       if (isset($data['player'][$type->type])) {
         $config->player[$type->type] = $data['player'][$type->type];
+      }
+
+      // At this point data is per-context, not per-context-per-bundle so this
+      // is a little redundant to store on every bundle.  But if #2600088 is
+      // resolved then this framework should support existing exports without
+      // needing to change.
+      if (isset($data['data'][$type->type])) {
+        $config->data = $data['data'][$type->type];
       }
     }
 
@@ -166,6 +182,13 @@ function _scald_context_type_clean($name, $type) {
     ),
     'transcoder' => array(
       $type => $config->transcoder[$type]
+    ),
+    // At this point data is per-context, not per-context-per-bundle so this
+    // is a little redundant to store on every bundle.  But if #2600088 is
+    // resolved then this framework should support existing exports without
+    // needing to change.
+    'data' => array(
+      $type => $config->data
     ),
   );
 }

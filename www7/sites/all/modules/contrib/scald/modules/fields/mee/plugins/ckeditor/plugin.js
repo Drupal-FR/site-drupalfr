@@ -100,7 +100,7 @@ CKEDITOR.plugins.add('dnd', {
           })
           .replace(/^<!--\s+scald=(.+?)\s+-->[\s\S]*$/, '$1');
         var sid = data.split(':', 1)[0];
-        window.open(Drupal.settings.basePath + 'atom/' + sid);
+        window.open(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/' + sid);
       }
     });
 
@@ -117,7 +117,7 @@ CKEDITOR.plugins.add('dnd', {
         });
         var $link = $("<a></a>", {
           'target' : '_blank',
-          'href' : Drupal.settings.basePath + 'atom/' + sid + '/edit/nojs',
+          'href' : Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/' + sid + '/edit/nojs',
           'class' : 'ctools-use-modal ctools-modal-custom-style'
         }).appendTo($wrapper);
         Drupal.behaviors.ZZCToolsModal.attach($wrapper);

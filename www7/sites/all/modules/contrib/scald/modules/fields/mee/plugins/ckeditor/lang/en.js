@@ -13,10 +13,15 @@ if (typeof CKEDITOR !== 'undefined' && typeof CKEDITOR.plugins !== 'undefined') 
     properties_legend: Drupal.t('Legend'),
     properties_context: Drupal.t('Context'),
     properties_alignment: Drupal.t('Alignment'),
+    properties_link: Drupal.t('Link'),
+    properties_link_target: Drupal.t('Link Target'),
     alignment_none: Drupal.t('None'),
     alignment_left: Drupal.t('Left'),
     alignment_right: Drupal.t('Right'),
     alignment_center: Drupal.t('Center'),
+    link_target_none: Drupal.t('None'),
+    link_target_blank: Drupal.t('Blank'),
+    link_target_parent: Drupal.t('Parent'),
     link_image_only: Drupal.t('This option is currently available for Image Atoms only.')
   });
 }
