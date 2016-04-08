@@ -144,9 +144,9 @@ Avancé<br/>
     'logo_path' => 'sites/all/themes/dfrtheme/drupal-france-site-officiel-logo.png',
     'logo_upload' => '',
     'default_favicon' => 0,
-    'favicon_path' => 'sites/all/themes/dfrtheme/favicon.png',
+    'favicon_path' => 'sites/all/themes/dfrtheme/favicon.ico',
     'favicon_upload' => '',
-    'favicon_mimetype' => 'image/png',
+    'favicon_mimetype' => 'image/vnd.microsoft.icon',
   );
   $export['theme_dfrtheme_settings'] = $strongarm;
 
