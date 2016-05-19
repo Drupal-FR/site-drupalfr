@@ -30,7 +30,7 @@ class scald_views_handler_field_actions extends views_handler_field {
       $links = scald_atom_user_build_actions_links($atom, drupal_get_destination());
     }
     else {
-      $links = [];
+      $links = array();
       foreach (scald_actions() as $action) {
         if ($atom->actions & $action['bitmask']) {
           $links[] = array('title' => $action['title']);

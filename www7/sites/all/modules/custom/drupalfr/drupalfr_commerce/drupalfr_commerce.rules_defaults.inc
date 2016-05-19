@@ -42,7 +42,7 @@ function drupalfr_commerce_default_rules_configuration() {
         { "mail" : {
             "to" : "[member:mail]",
             "subject" : "Votre adh\\u00e9sion \\u00e0 l\\u0027association Drupalfr expirera dans 1 mois",
-            "message" : "Bonjour [member:name],\\r\\n\\r\\nVotre adh\\u00e9sion \\u00e0 l\\u0027association Drupal France et francophonie expirera dans 1 mois.\\r\\n\\r\\nN\\u0027oubliez pas de r\\u00e9adh\\u00e9rer si vous le souhaiter.\\r\\n\\r\\nCordialement,\\r\\nl\\u0027association Drupal France et francophonie",
+            "message" : "Bonjour [member:name],\\r\\n\\r\\nVotre adh\\u00e9sion \\u00e0 l\\u0027association Drupal France et francophonie expirera dans 1 mois.\\r\\n\\r\\nN\\u0027oubliez pas de r\\u00e9adh\\u00e9rer si vous le souhaitez.\\r\\n\\r\\nCordialement,\\r\\nl\\u0027association Drupal France et francophonie",
             "language" : [ "member:language" ]
           }
         }
