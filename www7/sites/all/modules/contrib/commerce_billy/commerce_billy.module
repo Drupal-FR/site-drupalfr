@@ -223,6 +223,10 @@ function commerce_billy_menu() {
 function commerce_billy_flush_caches() {
   $entity_info = entity_get_info('commerce_order');
   $order_types = array_keys($entity_info['bundles']);
+
+  // Allow modules to alter the list of order types to which invoice fields
+  // will be added. Some order types might not need the invoice fields.
+  drupal_alter('commerce_billy_order_types', $order_types);
   $field_definition = array(
     'type' => 'datestamp',
     'locked' => FALSE,
