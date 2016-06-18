@@ -17,6 +17,16 @@ function commerce_billy_pdf_menu() {
     'access arguments' => array(1),
     'type' => MENU_CALLBACK,
   );
+  // Add a HTML version of the invoice for easier debugging for themers and
+  // printing.
+  $items['invoice-pdf/%commerce_order/print'] = array(
+    'title' => 'HTML Invoice',
+    'page callback' => 'commerce_billy_pdf_html_page',
+    'page arguments' => array(1),
+    'access callback' => 'commerce_billy_pdf_view_access',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
   $items['admin/commerce/config/billy-invoice/pdf'] = array(
     'title' => 'PDF',
     'page callback' => 'drupal_get_form',
@@ -36,6 +46,15 @@ function commerce_billy_pdf_menu() {
     'weight' => 10,
   );
   return $items;
+}
+
+/**
+ * Implements hook_admin_paths_alter().
+ *
+ * Render PDF using default theme.
+ */
+function commerce_billy_pdf_admin_paths_alter(&$paths) {
+  $paths['admin/commerce/orders/*/pdf-invoice'] = FALSE;
 }
 
 /**
@@ -137,6 +156,15 @@ function commerce_billy_pdf($order) {
 }
 
 /**
+ * Page callback for the HTML version of the invoice.
+ */
+function commerce_billy_pdf_html_page($order) {
+  $html = commerce_billy_pdf_html($order);
+  print $html;
+  drupal_exit();
+}
+
+/**
  * Helper function that returns the generated HTML for the invoice PDFs.
  *
  * @param object[] $orders
@@ -229,13 +257,26 @@ function commerce_billy_pdf_prepare_dompdf($html, $filename) {
     // dompdf needs write access to its font directory.
     // Copy "libraries/dompdf/lib/fonts" to your public files directory in order
     // for this to work.
-    $dir = drupal_realpath('public://');
-    define('DOMPDF_FONT_DIR', $dir . '/fonts/');
-    define('DOMPDF_TEMP_DIR', file_directory_temp());
-    require_once DRUPAL_ROOT . '/' . $path . '/dompdf_config.inc.php';
-    spl_autoload_register('DOMPDF_autoload');
+    if (!defined('DOMPDF_FONT_DIR')) {
+      $dir = drupal_realpath('public://');
+      define('DOMPDF_FONT_DIR', $dir . '/fonts/');
+    }
+    if (!defined('DOMPDF_TEMP_DIR')) {
+      define('DOMPDF_TEMP_DIR', file_directory_temp());
+    }
 
-    $dompdf = new DOMPDF();
+    // Support for Dompdf 0.7.0 and newer, using PHP 5.3 namespaces.
+    if (file_exists(DRUPAL_ROOT . '/' . $path . '/autoload.inc.php')) {
+      require_once DRUPAL_ROOT . '/' . $path . '/autoload.inc.php';
+      $dompdf = new \Dompdf\Dompdf();
+    }
+    // Support for Dompdf 0.6.*, using custom autoloader.
+    else {
+      require_once DRUPAL_ROOT . '/' . $path . '/dompdf_config.inc.php';
+      spl_autoload_register('DOMPDF_autoload');
+      $dompdf = new DOMPDF();
+    }
+
     $dompdf->set_paper('a4', 'portrait');
 
     $html = htmlspecialchars_decode(htmlentities($html, ENT_NOQUOTES, 'UTF-8'), ENT_NOQUOTES);
