@@ -1,0 +1,52 @@
+{% extends "layout.nunjucks" %}
+
+{% block content %}
+
+<div class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-9 col-md-push-3">
+
+        <ul class="breadcrumb">
+          <li><a href="#">Accueil</a></li>
+          <li class="active">Groupes locaux</li>
+        </ul>
+
+        <h1>Groupes locaux</h1>
+        <div class="row">
+          <div class="col-md-6">
+            <iframe scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=2.358391284942627%2C48.86618277284446%2C2.3654723167419434%2C48.869242167070894&amp;layer=mapnik&amp;marker=48.867713375517354%2C2.361931800842285" style="border: 1px solid black" width="100%" frameborder="0" height="400"></iframe>
+          </div>
+          <div class="col-md-6">
+            <p>
+              Description de ce que sont les groupes locaux.
+            </p>
+          </div>
+
+        </div>
+
+        {% for groupe_local in groupes_locaux %}
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">{{ groupe_local.ville }}</h3>
+          </div>
+          <div class="panel-body">
+            <p>Animateurs : Nom Prénom, Nom Prénom, Nom prénom</p>
+            <p>Régularité : Meetup régulier, tous les X du mois.</p>
+            <p>Zone couverte : Telle ville, telle ville, telle ville.</p>
+            <p>Actions : Sprints, présentation, etc.</p>
+          </div>
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+      {% include "partials/sidebar.nunjucks" %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
