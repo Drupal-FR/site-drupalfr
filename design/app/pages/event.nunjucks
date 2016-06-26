@@ -1,0 +1,199 @@
+{% extends "layout.nunjucks" %}
+
+{% block content %}
+
+<div class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-9 col-md-push-3">
+
+        <ul class="breadcrumb">
+          <li><a href="#">Accueil</a></li>
+          <li><a href="#">Communauté</a></li>
+          <li><a href="#">Événements</a></li>
+          <li class="active">Titre de l'événement</li>
+        </ul>
+
+
+        <h1 class="text-center">Titre de l'événement</h1>
+        <div class="row">
+          <div class="col-md-12">
+            {% include "partials/carousel.nunjucks" %}
+          </div>
+        </div>
+
+        <div class="row well">
+          <div class="col-md-6">
+            <iframe scrolling="no" marginheight="0" marginwidth="0"
+                    src="http://www.openstreetmap.org/export/embed.html?bbox=2.358391284942627%2C48.86618277284446%2C2.3654723167419434%2C48.869242167070894&amp;layer=mapnik&amp;marker=48.867713375517354%2C2.361931800842285"
+                    style="border: 1px solid black" width="100%" frameborder="0"
+                    height="300"></iframe>
+          </div>
+
+          <div class="col-md-6">
+            <div class="col-md-12 text-center">
+              <a href="#" class="btn btn-primary">Visiter le site</a>
+            </div>
+
+            <h3>En chiffres :</h3>
+            <ul>
+              <li>350 participants</li>
+              <li>50 sessions</li>
+              <li>3 keynotes</li>
+              <li>400 litres de bière</li>
+              <li>3 jours</li>
+              <li>200 commits</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="row">
+          <div class="col-md-12"><h2 class="text-center">Sponsors</h2>
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png"
+                    class="center-block img-responsive">
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png"
+                    class="center-block img-responsive">
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png"
+                    class="center-block img-responsive">
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png"
+                    class="center-block img-responsive">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12"><h2 class="text-center">Organisateurs</h2>
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png"
+                    class="center-block img-circle img-responsive">
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png"
+                    class="center-block img-circle img-responsive">
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png"
+                    class="center-block img-circle img-responsive">
+          </div>
+          <div class="col-md-3">
+            <img
+                    src="http://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png"
+                    class="center-block img-circle img-responsive">
+          </div>
+        </div>
+
+        <h3>Résumé</h3>
+        <p>
+          Donec sodales nibh lacus. Maecenas eu odio vel lectus feugiat
+          vestibulum a vel leo. Pellentesque quis odio ligula? Donec at purus
+          nec eros dictum efficitur. Nunc sed ligula sit amet lacus iaculis
+          tristique. Donec commodo et lacus eget luctus. Integer eu tortor
+          quis enim consequat porttitor. Etiam lacinia, ante sed dictum
+          venenatis; nulla quam sodales nisi, non vestibulum est urna non
+          erat. Phasellus at nisl iaculis, hendrerit lectus gravida, rhoncus
+          magna. Integer metus mi, tristique quis neque in, semper lobortis
+          nunc. Curabitur bibendum eros ut augue fermentum; sed vulputate
+          turpis sodales! In eu dictum elit. Etiam tincidunt dui rutrum lacus
+          efficitur blandit. Nulla tincidunt augue dolor, eu malesuada lorem
+          mollis eu. In pellentesque, sapien at vestibulum pharetra; felis
+          dolor rutrum lectus, vitae faucibus libero augue et ex. Duis
+          tincidunt fermentum ipsum, vel commodo quam!
+        </p>
+
+        <ul class="list-unstyled">
+          <li>
+            <span class="file file--mime-application-pdf file--application-pdf icon-before">
+          <span class="file-icon">
+            <span class="icon glyphicon glyphicon-file text-primary"
+                  aria-hidden="true"></span>
+          </span>
+          <span class="file-link">
+            <a href="#" type="application/pdf; length=8645956">Pièce jointe</a></span>
+        </span>
+          </li>
+          <li>
+            <span class="file file--mime-application-pdf file--application-pdf icon-before">
+          <span class="file-icon">
+            <span class="icon glyphicon glyphicon-file text-primary"
+                  aria-hidden="true"></span>
+          </span>
+          <span class="file-link">
+            <a href="#" type="application/pdf; length=8645956">Pièce jointe</a></span>
+        </span>
+          </li>
+          <li>
+            <span class="file file--mime-application-pdf file--application-pdf icon-before">
+          <span class="file-icon">
+            <span class="icon glyphicon glyphicon-file text-primary"
+                  aria-hidden="true"></span>
+          </span>
+          <span class="file-link">
+            <a href="#" type="application/pdf; length=8645956">Pièce jointe</a></span>
+        </span>
+          </li>
+          <li>
+            <span class="file file--mime-application-pdf file--application-pdf icon-before">
+          <span class="file-icon">
+            <span class="icon glyphicon glyphicon-file text-primary"
+                  aria-hidden="true"></span>
+          </span>
+          <span class="file-link">
+            <a href="#" type="application/pdf; length=8645956">Pièce jointe</a></span>
+        </span>
+          </li>
+        </ul>
+
+
+
+        <div class="row">
+          <div class="col-md-12"><h2 class="text-center">Participants</h2>
+          </div>
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+          {% include "partials/event_attendee.nunjucks" %}
+        </div>
+
+
+      </div>
+
+
+      {% include "partials/sidebar.nunjucks" %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
