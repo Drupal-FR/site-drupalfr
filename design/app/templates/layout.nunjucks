@@ -1,0 +1,16 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap/3.3.5/js/bootstrap.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.5/css/bootstrap.css" media="all" />
+</head>
+<body>
+{% include "partials/navigation.nunjucks" %}
+
+{% block content %} {% endblock %}
+
+{% include "partials/footer.nunjucks" %}
+</body>
+</html>
