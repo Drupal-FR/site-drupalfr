@@ -27,8 +27,10 @@ UPDATE field_data_field_link        SET field_link_url          = 'http://drupal
 UPDATE field_data_field_realname    SET field_realname_value    = 'REAL NAME'                           WHERE field_realname_value    IS NOT NULL;
 UPDATE field_data_field_nickname    SET field_nickname_value    = 'NICK NAME'                           WHERE field_nickname_value    IS NOT NULL;
 UPDATE field_data_field_biography   SET field_biography_value   = 'Biography'                           WHERE field_biography_value   IS NOT NULL;
+UPDATE field_data_field_website     SET field_website_url       = 'http://drupalfr.org'                 WHERE field_website_url       IS NOT NULL;
+UPDATE field_data_field_website     SET field_website_title     = 'Drupal France'                       WHERE field_website_title     IS NOT NULL;
+UPDATE field_data_field_membership_number   SET field_membership_number_value = '1'                     WHERE field_membership_number_value     IS NOT NULL;
 -- field_planete_rss?
--- field_membership_number?
 
 -- User field revisions.
 UPDATE field_revision_field_msn         SET field_msn_email         = CONCAT(entity_id, '@localhost.local') WHERE field_msn_email         IS NOT NULL;
@@ -45,6 +47,9 @@ UPDATE field_revision_field_link        SET field_link_url          = 'http://dr
 UPDATE field_revision_field_realname    SET field_realname_value    = 'REAL NAME'                           WHERE field_realname_value    IS NOT NULL;
 UPDATE field_revision_field_nickname    SET field_nickname_value    = 'NICK NAME'                           WHERE field_nickname_value    IS NOT NULL;
 UPDATE field_revision_field_biography   SET field_biography_value   = 'Biography'                           WHERE field_biography_value   IS NOT NULL;
+UPDATE field_revision_field_website     SET field_website_url       = 'http://drupalfr.org'                 WHERE field_website_url       IS NOT NULL;
+UPDATE field_revision_field_website     SET field_website_title     = 'Drupal France'                       WHERE field_website_title     IS NOT NULL;
+UPDATE field_revision_field_membership_number   SET field_membership_number_value = '1'                     WHERE field_membership_number_value     IS NOT NULL;
 
 -- User commerce address.
 UPDATE field_data_commerce_customer_address SET

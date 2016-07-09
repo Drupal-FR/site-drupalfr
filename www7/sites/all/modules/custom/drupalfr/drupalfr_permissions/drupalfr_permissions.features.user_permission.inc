@@ -381,6 +381,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'field_group',
   );
 
+  // Exported permission: 'administer fields'.
+  $permissions['administer fields'] = array(
+    'name' => 'administer fields',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field',
+  );
+
   // Exported permission: 'administer filters'.
   $permissions['administer filters'] = array(
     'name' => 'administer filters',
@@ -496,6 +505,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'menu_trail_by_path',
+  );
+
+  // Exported permission: 'administer meta tags'.
+  $permissions['administer meta tags'] = array(
+    'name' => 'administer meta tags',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'metatag',
   );
 
   // Exported permission: 'administer module filter'.
@@ -1663,6 +1681,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit meta tags'.
+  $permissions['edit meta tags'] = array(
+    'name' => 'edit meta tags',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'metatag',
   );
 
   // Exported permission: 'edit own account'.
