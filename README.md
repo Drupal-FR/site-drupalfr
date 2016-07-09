@@ -18,6 +18,8 @@ $databases['default']['default'] = array(
   'username' => '<db_username>',
   'password' => '<db_password>',
   'prefix' => '',
+  'charset' => 'utf8mb4',
+  'collation' => 'utf8mb4_general_ci',
 );
 $conf['cron_key'] = 'zMT41f2ar4tCNxVS_SN1mcWKNlQbIz9_se7KdzQlZHo';
 $conf['dfr_emploi_rewrite_urls'] = FALSE;
