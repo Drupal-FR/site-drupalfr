@@ -113,8 +113,8 @@ And now some code:
  */
 function _filter_markdown($text, $format) {
   if (!empty($text)) {
-    module_load_include('php', 'markdown', 'markdown');
-    $text = Markdown($text);
+    module_load_include('inc.php', 'markdown', 'includes/MarkdownExtra');
+    $text = \Michelf\MarkdownExtra::defaultTransform($text);
   }
 
   return $text;
@@ -124,15 +124,14 @@ function _filter_markdown($text, $format) {
  * Filter settings callback. Just provides a version overview.
  */
 function _filter_markdown_settings($form, &$form_state, $filter, $format, $defaults) {
-  module_load_include('php', 'markdown', 'markdown');
+  module_load_include('inc.php', 'markdown', 'includes/MarkdownExtra');
 
   $settings['markdown_wrapper'] = array(
     '#type' => 'fieldset',
     '#title' => t('Markdown'),
   );
   $links = array(
-    'Markdown PHP Version: <a href="http://michelf.com/projects/php-markdown/">' . MARKDOWN_VERSION . '</a>',
-    'Markdown Extra Version: <a href="http://michelf.com/projects/php-markdown/">' . MARKDOWNEXTRA_VERSION . '</a>',
+    'PHP Markdown Lib Version: <a href="http://michelf.com/projects/php-markdown/">' . \Michelf\MarkdownExtra::MARKDOWNLIB_VERSION . '</a>',
   );
   $settings['markdown_wrapper']['markdown_status'] = array(
     '#title' => t('Versions'),
