@@ -1,41 +1,26 @@
-Bienvenue sur le dépôt de Drupalfr.org.
+# Drupal.fr
 
-Structure des dossiers :
+Bienvenue sur le dépôt du site drupal.fr
 
-/scripts/ scripts to handle drupalfr exploitation
-/www7/ drupal sources
-
-To deploy localy, create a settings.local.php file in /www7/sites/default/
-
-With the following data:
-
-```php
-<?php
-$databases['default']['default'] = array(
-  'driver' => 'mysql',
-  'host' => 'localhost',
-  'database' => '<databasename>',
-  'username' => '<db_username>',
-  'password' => '<db_password>',
-  'prefix' => '',
-);
-$conf['cron_key'] = 'zMT41f2ar4tCNxVS_SN1mcWKNlQbIz9_se7KdzQlZHo';
-$conf['dfr_emploi_rewrite_urls'] = FALSE;
-$conf['drupalfr_planete_rewrite_urls'] = FALSE;
-
-// Change cookie domain, example: .drupalfr.org .
-$cookie_domain = '';
-
-// If devel is enabled, uncomment this line to catch the emails. 
-// $conf['mail_system'] = array('default-system' => 'DevelMailLog');
-
-
-// SOLR configuration if you want to play with search.
-$conf['drupalfr_solr_server_options'] = array(
-  'host' => 'localhost',
-  'port' => '8983',
-  'path' => '/solr',
-);
-```
+Si vous avez envie de contribuer au site, n'hésitez pas à nous contacter. La contribution ce n'est pas que du code, il y a de quoi faire pour tout le monde :).
 
 Merci pour votre aide !
+
+## Requirements
+
+* Composer
+
+## Installation
+
+* Copy/paste **scripts/example.script-parameters.sh** into **scripts/script-parameters.sh and adapt it to your configuration.**
+* Copy/paste **www/sites/default/example.settings/local.php** into **www/sites/default/settings.local.php and adapt it to your configuration.**
+* Create **www/sites/default/files** folder.
+* Execute **scripts/install.sh**
+
+### Additional steps to install with Docker compose
+
+* Do not execute scripts/install.sh from your computer.
+* Copy/paste the example.docker-compose.yml into docker-compose.yml and adapt it to your configuration to use the docker image you want.
+* Execute: **docker-compose up**
+* In another tab, get a command-line in the container: **docker exec -it container_name_web_1 /bin/bash**
+* Execute scripts/install.sh

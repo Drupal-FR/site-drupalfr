@@ -1,0 +1,83 @@
+name: Drupalfr
+description: 'drupal.fr site.'
+type: profile
+core: 8.x
+dependencies:
+  # Core modules.
+#  - automated_cron
+  - block
+  - block_content
+  - breakpoint
+  - ckeditor
+#  - color
+#  - comment
+  - config
+#  - config_translation
+  - contact
+#  - content_translation
+  - contextual
+  - datetime
+  - dynamic_page_cache
+  - editor
+  - entity_reference
+  - field
+  - file
+  - filter
+  - help
+  - image
+  - inline_form_errors
+  - language
+  - link
+  - locale
+  - menu_link_content
+  - menu_ui
+  - node
+  - options
+  - page_cache
+  - path
+  - quickedit
+  - rdf
+  - responsive_image
+  - search
+#  - shortcut
+  - syslog
+  - system
+  - taxonomy
+  - telephone
+  - text
+  - toolbar
+  - tour
+  - update
+  - user
+  - views
+
+  # Contrib modules.
+  - admin_toolbar
+  - admin_toolbar_tools
+  - features
+  - honeypot
+  - pathauto
+  - r4032login
+
+  # Custom modules
+  - drupalfr_core
+  - drupalfr_site
+  - drupalfr_user
+  - drupalfr_homepage
+
+  # Development modules. Enabled in the install/update scripts.
+#  - config_inspector
+#  - dblog
+#  - devel
+#  - devel_a11y
+#  - features_ui
+#  - field_ui
+#  - views_ui
+#  - webprofiler
+#  - drupalfr_migrate
+themes:
+  - bartik
+  - seven
+package: 'Drupalfr'
+#distribution:
+#  name: Drupalfr
