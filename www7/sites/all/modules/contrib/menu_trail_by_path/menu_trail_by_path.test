@@ -1,0 +1,330 @@
+<?php
+
+/**
+ * @file
+ * Tests for menu_trail_by_path module.
+ */
+class MenuTrailByPathTestCase extends DrupalWebTestCase {
+
+  /**
+   * Array key's should be the menu title's, if multi-level than separated by ' » '.
+   *
+   * @var array()
+   */
+  protected $menuUrls = array();
+
+  /**
+   * @var object
+   */
+  protected $adminUser;
+
+  /**
+   * @var object
+   */
+  protected $authenticatedUser;
+
+  /**
+   * Make the test available to the Simpletest testing interface.
+   *
+   * @return array
+   */
+  public static function getInfo() {
+    return array(
+      'name'        => 'Menu Trail By Path',
+      'description' => 'Tests for menu_trail_by_path module.',
+      'group'       => 'Menu',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp(array('menu_trail_by_path'));
+
+    // Create users
+    $this->adminUser         = $this->drupalCreateUser(array('administer blocks', 'access administration pages'));
+    $this->authenticatedUser = $this->drupalCreateUser();
+
+    // Create nodes
+    $node1 = $this->drupalCreateNode();
+    $node2 = $this->drupalCreateNode();
+
+    // Create aliases
+    $node1_path = array('source' => 'node/' . $node1->nid, 'alias' => 'news');
+    $node2_path = array('source' => 'node/' . $node2->nid, 'alias' => 'news/category-a');
+    path_save($node1_path);
+    path_save($node2_path);
+
+    // Set menuUrls
+    $this->menuUrls = array(
+      'Home'                 => '<front>',
+      'User password'        => 'user/password',
+      'User login'           => 'user/login',
+      'User'                 => 'user',
+      'News'                 => 'node/' . $node1->nid,
+      'News » News overview' => 'node/' . $node1->nid,
+      'News » Category A'    => 'node/' . $node2->nid,
+    );
+
+    // Build the main menu.
+    $this->buildMenu();
+    $this->moveDrupalBlock('system_main-menu', 'header');
+  }
+
+  // TODO: CURRENTLY THE MODULE IS NOT CAPABLE OF PASSING THIS TEST
+  ///**
+  // * Test url: Home
+  // */
+  //public function testUrlHome() {
+  //  $this->drupalGet($this->menuUrls['Home']);
+  //  $this->assertMenuActiveTrail(
+  //    array(
+  //      $this->menuUrlBasePath('Home') => 'Home',
+  //    ), TRUE
+  //  );
+  //}
+
+  // TODO: CURRENTLY THE MODULE IS NOT CAPABLE OF PASSING THIS TEST
+  ///**
+  // * Test url: User password
+  // */
+  //public function testUrlUserPassword() {
+  //  $this->drupalGet($this->menuUrls['User password']);
+  //  $this->assertMenuActiveTrail(
+  //    array(
+  //      $this->menuUrlBasePath('User password') => 'User password',
+  //    ), TRUE
+  //  );
+  //}
+
+  // TODO: CURRENTLY THE MODULE IS NOT CAPABLE OF PASSING THIS TEST
+  ///**
+  // * Test url: User login
+  // */
+  //public function testUrlUserLogin() {
+  //  $this->drupalGet($this->menuUrls['User login']);
+  //  $this->assertMenuActiveTrail(
+  //    array(
+  //      $this->menuUrlBasePath('User login') => 'User login',
+  //    ), TRUE
+  //  );
+  //}
+
+  /**
+   * Test url: User
+   */
+  public function testUrlUser() {
+    $this->drupalLogin($this->authenticatedUser);
+    $this->drupalGet($this->menuUrls['User']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('User') => 'User',
+      ), FALSE
+    );
+  }
+
+  /**
+   * Test url: News
+   */
+  public function testUrlNews() {
+    $this->drupalGet($this->menuUrls['News']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('News') => 'News',
+      ), TRUE
+    );
+  }
+
+  /**
+   * Test url: News » News overview
+   */
+  public function testUrlNewsNewsOverview() {
+    $this->drupalGet($this->menuUrls['News » News overview']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('News » News overview') => 'News overview',
+      ), TRUE
+    );
+
+    // Also test the parent item, due to the tree url key construction of assertMenuActiveTrail we need two separate calls
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('News') => 'News',
+      ), TRUE
+    );
+  }
+
+  /**
+   * Test url: News » Category A
+   */
+  public function testUrlNewsCategorya() {
+    $this->drupalGet($this->menuUrls['News » Category A']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('News') => 'News',
+        $this->menuUrlBasePath('News » Category A') => 'Category A',
+      ), TRUE
+    );
+  }
+
+  /**
+   * Test url: News » Category A » Item A
+   */
+  public function testUrlNewsCategoryaItema() {
+    $node3 = $this->drupalCreateNode();
+    $node3_path = array('source' => 'node/' . $node3->nid, 'alias' => 'news/category-a/item-a');
+    path_save($node3_path);
+
+    $this->drupalGet('node/' . $node3->nid);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('News') => 'News',
+        $this->menuUrlBasePath('News » Category A') => 'Category A',
+      ), FALSE
+    );
+  }
+
+  /**
+   * Helper for getting the base: "link_path" that assertMenuActiveTrail expects.
+   *
+   * @param $name
+   * @return string
+   */
+  protected function menuUrlBasePath($name) {
+    $link_path = $this->menuUrls[$name];
+    return $link_path;
+  }
+
+  /**
+   * Build a menu with the data of $this->menuUrls
+   *
+   * @param string $menu_name
+   */
+  protected function buildMenu($menu_name = 'main-menu') {
+    menu_delete_links($menu_name);
+
+    $menuLinks = array();
+    $parents   = array();
+    $weight    = -30;
+
+    // Add menu links
+    foreach ($this->menuUrls as $link_title => $link_path) {
+      $parent     = NULL;
+      $titles     = explode(' » ', $link_title);
+      $titleShort = array_pop($titles);
+      if ($titles) {
+        $parents[] = $parent = $menuLinks[implode(' » ', $titles)]['mlid'];
+      }
+
+      $menuLinks[$link_title] = array(
+        'menu_name'    => $menu_name,
+        'link_title'   => $titleShort,
+        'link_path'    => $link_path,
+        'plid'         => $parent,
+        'weight'       => $weight,
+        'expanded'     => 1,
+      );
+      menu_link_save($menuLinks[$link_title]);
+      $weight++;
+    }
+
+    // Check if menu links have children
+    foreach ($menuLinks as &$menuLink) {
+      if(in_array($menuLink['mlid'], $parents)) {
+        $menuLink['has_children'] = 1;
+        menu_link_save($menuLink);
+      }
+    }
+    unset($menuLink);
+
+    // In a "normal-ish" situation _menu_clear_page_cache, called by menu_link_save,
+    // "clears the page and block caches", BUT it does that "at most twice per page load".
+    // So we have to do it ourselves...
+    cache_clear_all();
+    _menu_set_expanded_menus();
+  }
+
+  /**
+   * Based on: public/modules/simpletest/tests/menu.test:61
+   *
+   * Assert that active trail exists in a menu tree output.
+   *
+   * @param array $tree
+   *   An associative array whose keys are link paths and whose
+   *   values are link titles (not sanitized) of an expected active trail in a
+   *   menu tree output on the page.
+   * @param bool $last_active
+   *   Whether the last link in $tree is expected to be active (TRUE)
+   *   or just to be in the active trail (FALSE).
+   */
+  protected function assertMenuActiveTrail($tree, $last_active) {
+    end($tree);
+    $active_link_path  = key($tree);
+    $active_link_title = array_pop($tree);
+    $xpath             = '';
+    if ($tree) {
+      $i = 0;
+      foreach ($tree as $link_path => $link_title) {
+        $part_xpath = (!$i ? '//' : '/following-sibling::ul/descendant::');
+        $part_xpath .= 'li[contains(@class, :class)]/a[contains(@href, :href) and contains(text(), :title)]';
+        $part_args = array(
+          ':class' => 'active-trail',
+          ':href'  => url($link_path),
+          ':title' => $link_title,
+        );
+        $xpath .= $this->buildXPathQuery($part_xpath, $part_args);
+        $i++;
+      }
+      $elements = $this->xpath($xpath);
+      $this->assertTrue(!empty($elements), 'Active trail to current page was found in menu tree.');
+
+      // Append prefix for active link asserted below.
+      $xpath .= '/following-sibling::ul/descendant::';
+    }
+    else {
+      $xpath .= '//';
+    }
+    $xpath_last_active = ($last_active ? 'and contains(@class, :class-active)' : '');
+    $xpath .= 'li[contains(@class, :class-trail)]/a[contains(@href, :href) ' . $xpath_last_active . 'and contains(text(), :title)]';
+    $args     = array(
+      ':class-trail'  => 'active-trail',
+      ':class-active' => 'active',
+      ':href'         => url($active_link_path),
+      ':title'        => $active_link_title,
+    );
+    $elements = $this->xpath($xpath, $args);
+    $this->assertTrue(
+      !empty($elements), format_string(
+        'Active link %title was found in menu tree, including active trail links %tree.', array(
+          '%title' => $active_link_title,
+          '%tree'  => implode(' » ', $tree),
+        )
+      )
+    );
+  }
+
+  /**
+   * Move a block to a given region
+   *
+   * @param $block_name
+   * @param $region
+   */
+  protected function moveDrupalBlock($block_name, $region) {
+    // Login
+    $this->drupalLogin($this->adminUser);
+
+    // Place the block
+    $edit                                        = array();
+    $edit['blocks[' . $block_name . '][region]'] = $region;
+    $this->drupalPost('admin/structure/block', $edit, t('Save blocks'));
+    $this->assertText(t('The block settings have been updated.'), t('Block successfully moved to @region region.', array('@region' => $region)));
+
+    // Confirm that the block is being displayed.
+    $this->drupalGet('node');
+    $this->assertRaw('id="block-' . str_replace('_', '-', $block_name) . '"', t('Block successfully being displayed on the page.'));
+
+    // Logout
+    $this->drupalLogout();
+  }
+}
