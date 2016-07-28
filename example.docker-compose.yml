@@ -1,17 +1,19 @@
 version: "2"
-services:
 
+services:
   web:
-    image: lune/dev-drupal:php7
-    ports:
-      - 3012:80
-    environment:
-      DRUPAL_URI: http://172.17.0.1:3012/
-      MYSQL_ENV_MYSQL_USER: drupal
-      MYSQL_ENV_MYSQL_PASSWORD: drupal
-      MYSQL_ENV_MYSQL_DATABASE: drupal
+    image: florenttorregrosa/docker-drupal-dev:php7
+    depends_on:
+      - mysql
+      - redis
+      - mail
+      - solr
     volumes:
       - .:/project
+    networks:
+      default:
+        ipv4_address: 172.18.0.2
+
 
   mysql:
     image: mysql:5.6
@@ -22,9 +24,44 @@ services:
       MYSQL_DATABASE: drupal
     volumes:
       - ./data/db:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
 
-  # http://172.17.0.1:1080/#/
+
+  solr:
+    image: solr:6.1.0-alpine
+    volumes:
+      - ./conf/solr:/solr-drupal/conf
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - drupal
+      - /solr-drupal
+    networks:
+      default:
+        ipv4_address: 172.18.0.4
+
+
+  redis:
+    image: redis:3.2.1-alpine
+    networks:
+      default:
+        ipv4_address: 172.18.0.5
+
+
   mail:
     image: djfarrelly/maildev
-    ports:
-      - 1080:80
+    networks:
+      default:
+        ipv4_address: 172.18.0.6
+
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.18.0.0/16
+        gateway: 172.18.0.1

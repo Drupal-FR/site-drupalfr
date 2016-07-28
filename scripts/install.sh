@@ -30,6 +30,9 @@ cd $WWW_PATH
 # Database backup.
 $DRUSH sql-dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip
 
+# Disable external cache.
+rm -f $WWW_PATH/sites/default/.cache_activated
+
 # Install Drupal.
 $DRUSH site-install $PROFILE \
   --account-mail=$ACCOUNT_MAIL \
@@ -60,6 +63,10 @@ fi
 # Translation updates.
 $DRUSH locale-check
 $DRUSH locale-update
+
+# Enable external cache.
+touch $WWW_PATH/sites/default/.cache_activated
+$DRUSH cr
 
 # Back to the current directory.
 cd $CURRENT_PATH
