@@ -13,6 +13,8 @@ $settings['install_profile'] = 'drupalfr';
 $settings['hash_salt'] = 'drupalfr';
 $settings['trusted_host_patterns'] = array(
   '^drupalfr\.local$',
+  '^172\.18\.0\.2$',
+  '^172\.18\.0\.3$',
 );
 
 // External cache.
