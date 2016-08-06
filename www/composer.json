@@ -25,11 +25,11 @@
   "require": {
     "composer/installers": "^1.0.21",
     "cweagans/composer-patches": "~1.0",
-    "drupal/core": "8.1.7",
+    "drupal/core": "8.1.8",
     "drush/drush": "8.1.3",
     "drupal/admin_toolbar": "8.1.16",
     "drupal/eu_cookie_compliance": "8.1.0-beta5",
-    "drupal/features": "8.3.0-beta6",
+    "drupal/features": "8.3.0-beta7",
     "drupal/honeypot": "8.1.23",
     "drupal/pathauto": "8.1.0-alpha3",
     "drupal/r4032login": "8.1.*",
@@ -63,6 +63,9 @@
         "Not detecting overrides in profile config files": "https://www.drupal.org/files/issues/features-not_detecting_profile_files-2668562-2.patch",
         "Drush export features do not overwrite the existing feature": "https://www.drupal.org/files/issues/features-drush_export_overwrite-2672406-5.patch",
         "Warning uasort in Features UI": "https://www.drupal.org/files/issues/features-warning_uasort-2672470-10.patch"
+      },
+      "drupal/redis": {
+        "Currently Drush Cr or Cache Clear UI does not flush Redis cache": "https://www.drupal.org/files/issues/redis-drush_cr-2765895-4.patch"
       }
     }
   }
