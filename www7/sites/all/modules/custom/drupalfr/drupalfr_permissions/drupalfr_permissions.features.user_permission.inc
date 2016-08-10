@@ -195,6 +195,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'user',
   );
 
+  // Exported permission: 'add JS snippets for google analytics'.
+  $permissions['add JS snippets for google analytics'] = array(
+    'name' => 'add JS snippets for google analytics',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'googleanalytics',
+  );
+
   // Exported permission: 'add content to books'.
   $permissions['add content to books'] = array(
     'name' => 'add content to books',
@@ -496,15 +505,6 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'menu',
-  );
-
-  // Exported permission: 'administer menu_trail_by_path'.
-  $permissions['administer menu_trail_by_path'] = array(
-    'name' => 'administer menu_trail_by_path',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'menu_trail_by_path',
   );
 
   // Exported permission: 'administer meta tags'.
