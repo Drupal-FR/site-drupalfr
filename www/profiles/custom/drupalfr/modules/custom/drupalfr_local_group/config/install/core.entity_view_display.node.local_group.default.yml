@@ -1,0 +1,32 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.local_group.body
+    - field.field.node.local_group.field_local_group_organizer
+    - node.type.local_group
+  module:
+    - text
+    - user
+id: node.local_group.default
+targetEntityType: node
+bundle: local_group
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+  field_local_group_organizer:
+    weight: 102
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  links:
+    weight: 100
+hidden:
+  langcode: true

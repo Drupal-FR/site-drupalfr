@@ -1,0 +1,21 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.local_group
+  module:
+    - text
+id: node.local_group.body
+field_name: body
+entity_type: node
+bundle: local_group
+label: Informations
+description: 'Indiquer des informations sur le groupe local comme la régularité des rencontres et ce qui s''y fait.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary
