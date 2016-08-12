@@ -4,6 +4,11 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.showcase.body
+    - field.field.node.showcase.field_showcase_category
+    - field.field.node.showcase.field_showcase_company
+    - field.field.node.showcase.field_showcase_contributor
+    - field.field.node.showcase.field_showcase_technology
+    - field.field.node.showcase.field_showcase_website
     - node.type.showcase
   module:
     - text
@@ -23,4 +28,9 @@ content:
   links:
     weight: 100
 hidden:
+  field_showcase_category: true
+  field_showcase_company: true
+  field_showcase_contributor: true
+  field_showcase_technology: true
+  field_showcase_website: true
   langcode: true

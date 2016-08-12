@@ -4,6 +4,12 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.job_offer.body
+    - field.field.node.job_offer.field_job_company
+    - field.field.node.job_offer.field_job_contract_type
+    - field.field.node.job_offer.field_job_nature
+    - field.field.node.job_offer.field_job_teleworking
+    - field.field.node.job_offer.field_job_validity
+    - field.field.node.job_offer.field_region
     - node.type.job_offer
   module:
     - text
@@ -23,4 +29,10 @@ content:
   links:
     weight: 100
 hidden:
+  field_job_company: true
+  field_job_contract_type: true
+  field_job_nature: true
+  field_job_teleworking: true
+  field_job_validity: true
+  field_region: true
   langcode: true

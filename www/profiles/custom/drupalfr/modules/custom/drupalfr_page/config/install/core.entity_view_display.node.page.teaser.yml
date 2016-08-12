@@ -4,6 +4,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.page.body
+    - field.field.node.page.field_drupal_version
     - node.type.page
   module:
     - text
@@ -23,4 +24,5 @@ content:
   links:
     weight: 100
 hidden:
+  field_drupal_version: true
   langcode: true

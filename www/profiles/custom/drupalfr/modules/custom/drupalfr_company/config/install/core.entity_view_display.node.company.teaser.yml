@@ -4,6 +4,13 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.company.body
+    - field.field.node.company.field_company_contact_info
+    - field.field.node.company.field_company_legal_form
+    - field.field.node.company.field_company_logo
+    - field.field.node.company.field_company_service_type
+    - field.field.node.company.field_company_size
+    - field.field.node.company.field_company_website
+    - field.field.node.company.field_region
     - node.type.company
   module:
     - text
@@ -23,4 +30,11 @@ content:
   links:
     weight: 100
 hidden:
+  field_company_contact_info: true
+  field_company_legal_form: true
+  field_company_logo: true
+  field_company_service_type: true
+  field_company_size: true
+  field_company_website: true
+  field_region: true
   langcode: true

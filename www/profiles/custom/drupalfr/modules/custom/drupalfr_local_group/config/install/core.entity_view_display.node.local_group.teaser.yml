@@ -4,6 +4,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.local_group.body
+    - field.field.node.local_group.field_local_group_organizer
     - node.type.local_group
   module:
     - text
@@ -23,4 +24,5 @@ content:
   links:
     weight: 100
 hidden:
+  field_local_group_organizer: true
   langcode: true
