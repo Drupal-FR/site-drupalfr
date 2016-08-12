@@ -2,16 +2,68 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - field.field.user.user.field_user_biography
+    - field.field.user.user.field_user_company
+    - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_membership_number
+    - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_social_link
     - field.field.user.user.user_picture
     - image.style.thumbnail
   module:
     - image
+    - link
     - user
 id: user.user.default
 targetEntityType: user
 bundle: user
 mode: default
 content:
+  field_user_biography:
+    weight: 4
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+  field_user_company:
+    weight: 3
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_user_event:
+    weight: 5
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_user_membership_number:
+    weight: 2
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+  field_user_realname:
+    weight: 1
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+  field_user_social_link:
+    weight: 6
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
   user_picture:
     type: image
     weight: 0
