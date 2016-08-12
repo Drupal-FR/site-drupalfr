@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_job_teleworking
+    - node.type.job_offer
+id: node.job_offer.field_job_teleworking
+field_name: field_job_teleworking
+entity_type: node
+bundle: job_offer
+label: Télétravail
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Oui
+  off_label: Non
+field_type: boolean

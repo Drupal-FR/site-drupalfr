@@ -1,0 +1,110 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.job_offer.body
+    - field.field.node.job_offer.field_job_company
+    - field.field.node.job_offer.field_job_contract_type
+    - field.field.node.job_offer.field_job_nature
+    - field.field.node.job_offer.field_job_teleworking
+    - field.field.node.job_offer.field_job_validity
+    - field.field.node.job_offer.field_region
+    - node.type.job_offer
+  module:
+    - inline_entity_form
+    - path
+    - text
+id: node.job_offer.default
+targetEntityType: node
+bundle: job_offer
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 31
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+  field_job_company:
+    weight: 32
+    settings:
+      form_mode: default
+      label_singular: ''
+      label_plural: ''
+      allow_new: true
+      allow_existing: true
+      match_operator: CONTAINS
+      override_labels: false
+    third_party_settings: {  }
+    type: inline_entity_form_complex
+  field_job_contract_type:
+    weight: 34
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+  field_job_nature:
+    weight: 33
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+  field_job_teleworking:
+    weight: 35
+    settings:
+      display_label: false
+    third_party_settings: {  }
+    type: boolean_checkbox
+  field_job_validity:
+    weight: 37
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+  field_region:
+    weight: 36
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+  langcode:
+    type: language_select
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 30
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 15
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 16
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }
