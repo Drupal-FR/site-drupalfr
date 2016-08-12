@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_showcase_technology
+    - node.type.showcase
+  module:
+    - link
+id: node.showcase.field_showcase_technology
+field_name: field_showcase_technology
+entity_type: node
+bundle: showcase
+label: 'Principaux modules / technologies'
+description: 'Indiquer les principaux modules ou technologies employés sur ce site.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 1
+field_type: link

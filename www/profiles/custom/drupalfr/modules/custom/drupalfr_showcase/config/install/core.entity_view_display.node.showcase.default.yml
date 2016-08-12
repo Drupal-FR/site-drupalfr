@@ -1,0 +1,73 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.showcase.body
+    - field.field.node.showcase.field_showcase_category
+    - field.field.node.showcase.field_showcase_company
+    - field.field.node.showcase.field_showcase_contributor
+    - field.field.node.showcase.field_showcase_technology
+    - field.field.node.showcase.field_showcase_website
+    - node.type.showcase
+  module:
+    - link
+    - text
+    - user
+id: node.showcase.default
+targetEntityType: node
+bundle: showcase
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+  field_showcase_category:
+    weight: 103
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_showcase_company:
+    weight: 105
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_showcase_contributor:
+    weight: 106
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_showcase_technology:
+    weight: 104
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+  field_showcase_website:
+    weight: 102
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+  links:
+    weight: 100
+hidden:
+  langcode: true

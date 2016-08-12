@@ -1,0 +1,27 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_showcase_category
+    - node.type.showcase
+    - taxonomy.vocabulary.website_types
+id: node.showcase.field_showcase_category
+field_name: field_showcase_category
+entity_type: node
+bundle: showcase
+label: 'Catégories de site'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      website_types: website_types
+    sort:
+      field: _none
+    auto_create: true
+    auto_create_bundle: ''
+field_type: entity_reference
