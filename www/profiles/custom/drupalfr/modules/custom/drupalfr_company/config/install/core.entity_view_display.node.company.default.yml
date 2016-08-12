@@ -1,0 +1,83 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.company.body
+    - field.field.node.company.field_company_contact_info
+    - field.field.node.company.field_company_legal_form
+    - field.field.node.company.field_company_logo
+    - field.field.node.company.field_company_service_type
+    - field.field.node.company.field_company_size
+    - field.field.node.company.field_company_website
+    - field.field.node.company.field_region
+    - node.type.company
+  module:
+    - image
+    - link
+    - options
+    - text
+    - user
+id: node.company.default
+targetEntityType: node
+bundle: company
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+  field_company_contact_info:
+    weight: 108
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+  field_company_legal_form:
+    weight: 106
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+  field_company_logo:
+    weight: 102
+    label: above
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+  field_company_service_type:
+    weight: 103
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+  field_company_size:
+    weight: 105
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+  field_company_website:
+    weight: 107
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+  field_region:
+    weight: 104
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+  links:
+    weight: 100
+hidden:
+  langcode: true

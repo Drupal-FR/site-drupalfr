@@ -1,0 +1,47 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_region
+field_name: field_region
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: '01 Île de France'
+      label: '01 Île de France'
+    -
+      value: '02 Nord Ouest'
+      label: '02 Nord Ouest'
+    -
+      value: '03 Nord Est'
+      label: '03 Nord Est'
+    -
+      value: '04 Sud Est'
+      label: '04 Sud Est'
+    -
+      value: '05 Sud Ouest'
+      label: '05 Sud Ouest'
+    -
+      value: 'Outre mer'
+      label: 'Outre mer'
+    -
+      value: Belgique
+      label: Belgique
+    -
+      value: Suisse
+      label: Suisse
+    -
+      value: Autre
+      label: Autre
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
