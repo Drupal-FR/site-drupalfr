@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "95b16fec3ab019f3a630eee9c5d4dfae",
-    "content-hash": "16f8d03317fd4a6fd76608b51b6045e8",
+    "hash": "d1783520817a55392356d9d1eb2ed98d",
+    "content-hash": "85d1a635a984ce9ed7030894089fc631",
     "packages": [
         {
             "name": "composer/installers",
@@ -1075,6 +1075,50 @@
             "time": "2016-07-27 13:27:03"
         },
         {
+            "name": "drupal/facets",
+            "version": "8.1.0-alpha4",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/facets.git",
+                "reference": "5cede43cb11eb5232479c5f6532ec660fa36d1b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/facets-8.x-1.0-alpha4.zip",
+                "reference": "5cede43cb11eb5232479c5f6532ec660fa36d1b2",
+                "shasum": null
+            },
+            "require": {
+                "drupal/core": "8.*"
+            },
+            "replace": {
+                "drupal/core_search_facets": "self.version"
+            },
+            "suggest": {
+                "drupal/core": "Required by drupal/core_search_facets",
+                "drupal/search": "Required by drupal/core_search_facets"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-8.x-1.x": "8.1.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.drupal-composer.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "See all contributors",
+                    "homepage": "https://www.drupal.org/node/2348769/committers"
+                }
+            ],
+            "description": "Faceted search interfaces that can be used on Search API searchers.",
+            "homepage": "https://www.drupal.org/project/facets",
+            "time": "2016-07-06 17:08:55"
+        },
+        {
             "name": "drupal/features",
             "version": "8.3.0-beta7",
             "source": {
@@ -1085,7 +1129,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/features-8.x-3.0-beta7.zip",
-                "reference": null,
+                "reference": "fd22277b68a2aa06ff0d86af954e694db68677a9",
                 "shasum": null
             },
             "require": {
@@ -1164,6 +1208,37 @@
             "time": "2016-02-29 21:34:17"
         },
         {
+            "name": "drupal/inline_entity_form",
+            "version": "8.1.0-alpha6",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/inline_entity_form",
+                "reference": "27af4de9fd961fa6ae1369604d05fec8b06db867"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/inline_entity_form-8.x-1.0-alpha6.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "drupal/core": "8.*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-8.x-1.x": "8.1.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.drupal-composer.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "description": "Provides a widget for inline management (creation, modification, removal) of referenced entities. ",
+            "homepage": "https://www.drupal.org/project/inline_entity_form",
+            "time": "2016-04-18 21:57:48"
+        },
+        {
             "name": "drupal/pathauto",
             "version": "8.1.0-alpha3",
             "source": {
@@ -1233,7 +1308,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/redis-8.x-1.0-alpha1.zip",
-                "reference": null,
+                "reference": "5e5a43dfabe32fd84438edaef20df2974cef5b3b",
                 "shasum": null
             },
             "require": {
@@ -1260,6 +1335,98 @@
             "description": "Provide a module placeholder, for using as dependency for module that needs Redis.",
             "homepage": "https://www.drupal.org/project/redis",
             "time": "2016-05-23 14:56:31"
+        },
+        {
+            "name": "drupal/search_api",
+            "version": "8.1.0-alpha16",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/search_api",
+                "reference": "895b50787d54cd3f6bc3f8d4833cec809a8d021d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/search_api-8.x-1.0-alpha16.zip",
+                "reference": "895b50787d54cd3f6bc3f8d4833cec809a8d021d",
+                "shasum": null
+            },
+            "require": {
+                "drupal/core": "8.*",
+                "drupal/system": ">=8.1.0"
+            },
+            "replace": {
+                "drupal/search_api_db": "self.version",
+                "drupal/search_api_db_defaults": "self.version"
+            },
+            "suggest": {
+                "drupal/core": "Required by drupal/search_api_db, drupal/search_api_db_defaults"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-8.x-1.x": "8.1.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.drupal-composer.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Seidl",
+                    "homepage": "https://www.drupal.org/u/drunken-monkey"
+                },
+                {
+                    "name": "Nick Veenhof",
+                    "homepage": "https://www.drupal.org/u/nick_vh"
+                },
+                {
+                    "name": "See other contributors",
+                    "homepage": "https://www.drupal.org/node/790418/committers"
+                }
+            ],
+            "description": "Provides a generic framework for modules offering search capabilities.",
+            "homepage": "https://www.drupal.org/project/search_api",
+            "time": "2016-07-05 14:54:42"
+        },
+        {
+            "name": "drupal/search_api_solr",
+            "version": "8.1.0-alpha5",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/search_api_solr",
+                "reference": "220cbdf1ddb83252777e13951f5b649c14d2a5e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/search_api_solr-8.x-1.0-alpha5.zip",
+                "reference": "220cbdf1ddb83252777e13951f5b649c14d2a5e7",
+                "shasum": null
+            },
+            "require": {
+                "drupal/core": "8.*",
+                "drupal/search_api": "8.*",
+                "solarium/solarium": "3.6.*"
+            },
+            "replace": {
+                "drupal/search_api_solr_defaults": "self.version"
+            },
+            "suggest": {
+                "drupal/core": "Required by drupal/search_api_solr_defaults"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-8.x-1.x": "8.1.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.drupal-composer.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "description": "Offers an implementation of the Search API that uses an Apache Solr server for indexing content.",
+            "homepage": "https://www.drupal.org/project/search_api_solr",
+            "time": "2016-07-07 17:49:37"
         },
         {
             "name": "drupal/token",
@@ -2235,6 +2402,60 @@
                 "shell"
             ],
             "time": "2016-03-09 05:03:14"
+        },
+        {
+            "name": "solarium/solarium",
+            "version": "3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/solariumphp/solarium.git",
+                "reference": "b945cbe4e8f96b639d82c4d1e2cae4ef3ab6fce5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/solariumphp/solarium/zipball/b945cbe4e8f96b639d82c4d1e2cae4ef3ab6fce5",
+                "reference": "b945cbe4e8f96b639d82c4d1e2cae4ef3ab6fce5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "symfony/event-dispatcher": "~2.3|~3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7",
+                "satooshi/php-coveralls": "~1.0",
+                "squizlabs/php_codesniffer": "~1.4",
+                "zendframework/zendframework1": "~1.12"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "3.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Solarium\\": "library/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "See GitHub contributors",
+                    "homepage": "https://github.com/basdenooijer/solarium/contributors"
+                }
+            ],
+            "description": "PHP Solr client",
+            "homepage": "http://www.solarium-project.org",
+            "keywords": [
+                "php",
+                "search",
+                "solr"
+            ],
+            "time": "2016-05-03 07:08:49"
         },
         {
             "name": "stack/builder",
