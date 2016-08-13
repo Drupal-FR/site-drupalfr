@@ -64,6 +64,19 @@ fi
 $DRUSH locale-check
 $DRUSH locale-update
 
+# Import content.
+$DRUSH en drupalfr_migrate -y
+$DRUSH migrate-import drupalfr_file --update
+$DRUSH migrate-import drupalfr_user --update
+$DRUSH migrate-import drupalfr_website_type --update
+$DRUSH migrate-import drupalfr_drupal_version --update
+$DRUSH migrate-import drupalfr_page --update
+$DRUSH migrate-import drupalfr_company --update
+$DRUSH migrate-import drupalfr_job_offer --update
+$DRUSH migrate-import drupalfr_showcase --update
+$DRUSH migrate-import drupalfr_local_group --update
+$DRUSH migrate-import drupalfr_event --update
+
 # Enable external cache.
 touch $WWW_PATH/sites/default/.cache_activated
 $DRUSH cr

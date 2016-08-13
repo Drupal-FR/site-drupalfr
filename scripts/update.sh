@@ -47,9 +47,40 @@ if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
     -y
 fi
 
+# Revert features.
+$DRUSH features-import -y --bundle=drupalfr core
+$DRUSH features-import -y --bundle=drupalfr site
+$DRUSH features-import -y --bundle=drupalfr user
+$DRUSH features-import -y --bundle=drupalfr homepage
+$DRUSH features-import -y --bundle=drupalfr page
+$DRUSH features-import -y --bundle=drupalfr company
+$DRUSH features-import -y --bundle=drupalfr job_offer
+$DRUSH features-import -y --bundle=drupalfr showcase
+$DRUSH features-import -y --bundle=drupalfr local_group
+$DRUSH features-import -y --bundle=drupalfr event
+# Waiting for https://www.drupal.org/node/2672490
+#$DRUSH features-import -y --bundle=drupalfr drupalfr
+
 # Translation updates.
 $DRUSH locale-check
 $DRUSH locale-update
+
+# Import content.
+# For update.sh import only content if the environment is dev to not risk
+# breaking prod.
+if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
+  $DRUSH en drupalfr_migrate -y
+  $DRUSH migrate-import drupalfr_file --update
+  $DRUSH migrate-import drupalfr_user --update
+  $DRUSH migrate-import drupalfr_website_type --update
+  $DRUSH migrate-import drupalfr_drupal_version --update
+  $DRUSH migrate-import drupalfr_page --update
+  $DRUSH migrate-import drupalfr_company --update
+  $DRUSH migrate-import drupalfr_job_offer --update
+  $DRUSH migrate-import drupalfr_showcase --update
+  $DRUSH migrate-import drupalfr_local_group --update
+  $DRUSH migrate-import drupalfr_event --update
+fi
 
 # Back to the current directory.
 cd $CURRENT_PATH
