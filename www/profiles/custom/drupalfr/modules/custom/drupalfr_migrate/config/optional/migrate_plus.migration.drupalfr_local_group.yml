@@ -1,0 +1,59 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+id: drupalfr_local_group
+migration_tags:
+  - drupalfr
+label: 'Local group import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/local_group.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      published: Published
+    -
+      organizers: Organizers
+    -
+      body_value: Body
+    -
+      body_format: 'Body format'
+process:
+  type:
+    plugin: default_value
+    default_value: local_group
+  uuid: uuid
+  title: title
+  body/value: body_value
+  body/format: body_format
+  field_local_group_organizer:
+    -
+      plugin: explode
+      source: organizers
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_user
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1
+destination:
+  plugin: 'entity:node'
+  type: local_group
+  bundle: local_group
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
