@@ -1,0 +1,78 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+id: drupalfr_company
+migration_tags:
+  - drupalfr
+label: 'Company import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/company.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      published: Published
+    -
+      size: Size
+    -
+      legal_form: 'Legal form'
+    -
+      contact_info: 'Contact info'
+    -
+      websites_uri: 'Websites URI'
+    -
+      websites_title: 'Websites title'
+    -
+      region: Region
+    -
+      service_type: 'Service type'
+    -
+      body_value: Body
+    -
+      body_format: 'Body format'
+process:
+  type:
+    plugin: default_value
+    default_value: company
+  uuid: uuid
+  title: title
+  body/value: body_value
+  body/format: body_format
+  field_company_size: size
+  field_company_legal_form: legal_form
+  field_company_contact_info: contact_info
+  field_company_website/uri:
+    -
+      plugin: explode
+      source: websites_uri
+      delimiter: ;
+  field_company_website/title:
+    -
+      plugin: explode
+      source: websites_title
+      delimiter: ;
+  field_region: region
+  field_company_service_type: service_type
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1
+destination:
+  plugin: 'entity:node'
+  type: company
+  bundle: company
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
