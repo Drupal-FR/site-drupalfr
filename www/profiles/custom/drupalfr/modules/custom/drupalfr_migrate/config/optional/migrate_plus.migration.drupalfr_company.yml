@@ -53,15 +53,11 @@ process:
   field_company_size: size
   field_company_legal_form: legal_form
   field_company_contact_info: contact_info
-  field_company_website/uri:
+  field_company_website:
     -
-      plugin: explode
-      source: websites_uri
-      delimiter: ;
-  field_company_website/title:
-    -
-      plugin: explode
-      source: websites_title
+      plugin: drupalfr_multilinks
+      uri_property: websites_uri
+      title_property: websites_title
       delimiter: ;
   field_region:
     -

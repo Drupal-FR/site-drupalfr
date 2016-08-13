@@ -80,6 +80,8 @@ if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
   $DRUSH migrate-import drupalfr_showcase --update
   $DRUSH migrate-import drupalfr_local_group --update
   $DRUSH migrate-import drupalfr_event --update
+  # Re-import users to update references as we do not create stub.
+  $DRUSH migrate-import drupalfr_user --update
 fi
 
 # Back to the current directory.

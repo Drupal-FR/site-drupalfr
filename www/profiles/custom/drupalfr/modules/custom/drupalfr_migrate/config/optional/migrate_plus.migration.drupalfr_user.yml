@@ -47,21 +47,18 @@ process:
   name: login
   field_user_realname: realname
   field_user_biography: biography
-  field_user_social_link/uri:
+  field_user_social_link:
     -
-      plugin: explode
-      source: social_links_uri
-      delimiter: ;
-  field_user_social_link/title:
-    -
-      plugin: explode
-      source: social_links_title
+      plugin: drupalfr_multilinks
+      uri_property: social_links_uri
+      title_property: social_links_title
       delimiter: ;
   field_user_membership_number: membership_number
   field_user_company:
     -
       plugin: migration
       migration: drupalfr_company
+      no_stub: true
       source: company
   field_user_event:
     -
@@ -71,6 +68,7 @@ process:
     -
       plugin: migration
       migration: drupalfr_event
+      no_stub: true
 destination:
   plugin: 'entity:user'
 template: null

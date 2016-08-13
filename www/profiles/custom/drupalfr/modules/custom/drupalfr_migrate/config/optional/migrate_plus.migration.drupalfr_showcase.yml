@@ -66,15 +66,11 @@ process:
     -
       plugin: migration
       migration: drupalfr_user
-  field_showcase_technology/uri:
+  field_showcase_technology:
     -
-      plugin: explode
-      source: technologies_uri
-      delimiter: ;
-  field_showcase_technology/title:
-    -
-      plugin: explode
-      source: technologies_title
+      plugin: drupalfr_multilinks
+      uri_property: technologies_uri
+      title_property: technologies_title
       delimiter: ;
   field_showcase_company:
     -
