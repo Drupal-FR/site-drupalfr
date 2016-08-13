@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b56f905cc570d481498d3efe46ee809e",
-    "content-hash": "999f9c96915c3ecb8530b099608999b2",
+    "hash": "3fadf09b34c5633272be4c88c40c6a4b",
+    "content-hash": "10193e85becd108a305af44b9b597e43",
     "packages": [
         {
             "name": "composer/installers",
@@ -1239,6 +1239,49 @@
             "time": "2016-04-18 21:57:48"
         },
         {
+            "name": "drupal/mailchimp",
+            "version": "8.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/mailchimp",
+                "reference": "9be504ef0dc81200ec385f58f90eb41a5adf8001"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/mailchimp-8.x-1.2.zip",
+                "reference": "9be504ef0dc81200ec385f58f90eb41a5adf8001",
+                "shasum": null
+            },
+            "require": {
+                "drupal/core": "8.*"
+            },
+            "replace": {
+                "drupal/mailchimp_campaign": "self.version",
+                "drupal/mailchimp_lists": "self.version",
+                "drupal/mailchimp_signup": "self.version"
+            },
+            "suggest": {
+                "drupal/core": "Required by drupal/mailchimp_campaign, drupal/mailchimp_lists, drupal/mailchimp_signup",
+                "drupal/field": "Required by drupal/mailchimp_lists",
+                "drupal/filter": "Required by drupal/mailchimp_campaign",
+                "drupal/mailchimp_lists": "Required by drupal/mailchimp_campaign",
+                "drupal/options": "Required by drupal/mailchimp_lists"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-8.x-1.x": "8.1.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.drupal-composer.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "description": "MailChimp email service integration.",
+            "homepage": "http://drupal.org/project/mailchimp",
+            "time": "2016-08-01 22:43:58"
+        },
+        {
             "name": "drupal/migrate_plus",
             "version": "8.2.0-beta2",
             "source": {
@@ -1249,7 +1292,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/migrate_plus-8.x-2.0-beta2.zip",
-                "reference": null,
+                "reference": "fc622f3d89cb99151a372cbf3068c2c2617cb75f",
                 "shasum": null
             },
             "require": {
@@ -1339,7 +1382,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/migrate_tools-8.x-2.0-beta1.zip",
-                "reference": null,
+                "reference": "e23d12cefc71fb35800878078fdb247d1b05307d",
                 "shasum": null
             },
             "require": {
