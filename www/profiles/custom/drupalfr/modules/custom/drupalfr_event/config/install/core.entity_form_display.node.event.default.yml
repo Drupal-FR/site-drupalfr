@@ -3,7 +3,6 @@ status: true
 dependencies:
   config:
     - field.field.node.event.body
-    - field.field.node.event.field_event_attendee
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_sponsor
     - node.type.event
@@ -28,14 +27,6 @@ content:
     weight: 10
     settings: {  }
     third_party_settings: {  }
-  field_event_attendee:
-    weight: 34
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
   field_event_organizer:
     weight: 33
     settings:
