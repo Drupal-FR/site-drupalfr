@@ -3,10 +3,15 @@ status: true
 dependencies:
   config:
     - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
     - node.type.event
   module:
+    - datetime
+    - link
     - path
     - text
 id: node.event.default
@@ -27,6 +32,16 @@ content:
     weight: 10
     settings: {  }
     third_party_settings: {  }
+  field_event_date_end:
+    weight: 36
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+  field_event_date_start:
+    weight: 35
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
   field_event_organizer:
     weight: 33
     settings:
@@ -43,6 +58,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+  field_event_website:
+    weight: 37
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
   langcode:
     type: language_select
     weight: 2

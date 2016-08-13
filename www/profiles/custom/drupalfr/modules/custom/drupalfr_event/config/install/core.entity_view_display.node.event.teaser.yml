@@ -4,8 +4,11 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
     - node.type.event
   module:
     - text
@@ -24,7 +27,12 @@ content:
     third_party_settings: {  }
   links:
     weight: 100
+    settings: {  }
+    third_party_settings: {  }
 hidden:
+  field_event_date_end: true
+  field_event_date_start: true
   field_event_organizer: true
   field_event_sponsor: true
+  field_event_website: true
   langcode: true

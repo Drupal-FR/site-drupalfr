@@ -3,10 +3,15 @@ status: true
 dependencies:
   config:
     - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
     - node.type.event
   module:
+    - datetime
+    - link
     - text
     - user
 id: node.event.default
@@ -20,6 +25,22 @@ content:
     weight: 101
     settings: {  }
     third_party_settings: {  }
+  field_event_date_end:
+    weight: 106
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+  field_event_date_start:
+    weight: 105
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
   field_event_organizer:
     weight: 103
     label: above
@@ -34,7 +55,20 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+  field_event_website:
+    weight: 107
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
   links:
     weight: 100
+    settings: {  }
+    third_party_settings: {  }
 hidden:
   langcode: true

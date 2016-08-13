@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_event_website
+    - node.type.event
+  module:
+    - link
+id: node.event.field_event_website
+field_name: field_event_website
+entity_type: node
+bundle: event
+label: 'Site internet'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 1
+field_type: link
