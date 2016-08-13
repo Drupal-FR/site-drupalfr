@@ -1,0 +1,47 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+id: drupalfr_file
+migration_tags:
+  - drupalfr
+label: 'File import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/file.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      filename: Filename
+    -
+      filepath: Filepath
+    -
+      filemime: Filemime
+    -
+      status: Status
+    -
+      uri: URI
+process:
+  uuid: uuid
+  filename: filename
+  uri: uri
+  filemime: filemime
+  status: status
+  uid:
+    plugin: default_value
+    default_value: 1
+destination:
+  plugin: entity:file
+  source_path_property: filepath
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
