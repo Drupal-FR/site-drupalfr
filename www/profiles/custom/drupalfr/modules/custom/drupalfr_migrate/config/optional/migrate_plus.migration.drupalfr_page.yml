@@ -1,0 +1,63 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+id: drupalfr_page
+migration_tags:
+  - drupalfr
+label: 'Page import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/page.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      path: Path
+    -
+      published: Published
+    -
+      drupal_version: 'Drupal version'
+    -
+      body_value: Body
+    -
+      body_format: 'Body format'
+process:
+  type:
+    plugin: default_value
+    default_value: page
+  uuid: uuid
+  title: title
+  field_drupal_version:
+    -
+      plugin: migration
+      migration: drupalfr_drupal_version
+      source: drupal_version
+  body/value: body_value
+  body/format: body_format
+  path:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: path
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1
+destination:
+  plugin: 'entity:node'
+  type: page
+  bundle: page
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
