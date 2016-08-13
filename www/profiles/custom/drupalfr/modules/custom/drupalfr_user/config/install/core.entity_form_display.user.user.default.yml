@@ -6,6 +6,8 @@ dependencies:
     - field.field.user.user.field_user_company
     - field.field.user.user.field_user_event
     - field.field.user.user.field_user_membership_number
+    - field.field.user.user.field_user_newsletter_adff
+    - field.field.user.user.field_user_newsletter_drupalcamp
     - field.field.user.user.field_user_realname
     - field.field.user.user.field_user_social_link
     - field.field.user.user.user_picture
@@ -13,6 +15,7 @@ dependencies:
   module:
     - image
     - link
+    - mailchimp_lists
     - user
 id: user.user.default
 targetEntityType: user
@@ -53,6 +56,16 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textfield
+  field_user_newsletter_adff:
+    weight: 12
+    settings: {  }
+    third_party_settings: {  }
+    type: mailchimp_lists_select
+  field_user_newsletter_drupalcamp:
+    weight: 13
+    settings: {  }
+    third_party_settings: {  }
+    type: mailchimp_lists_select
   field_user_realname:
     weight: 6
     settings:

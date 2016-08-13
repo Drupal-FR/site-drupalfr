@@ -17,6 +17,9 @@ $settings['trusted_host_patterns'] = array(
   '^172\.18\.0\.3$',
 );
 
+// Mailchimp.
+$config['mailchimp.settings']['api_key'] = '';
+
 // External cache.
 if (file_exists(__DIR__ . '/.cache_activated')) {
   $settings['redis.connection']['interface'] = 'PhpRedis';

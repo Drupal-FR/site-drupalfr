@@ -1,0 +1,34 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_user_newsletter_adff
+  module:
+    - mailchimp_lists
+    - user
+id: user.user.field_user_newsletter_adff
+field_name: field_user_newsletter_adff
+entity_type: user
+bundle: user
+label: 'Newsletter Drupal France'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value:
+      subscribe: 0
+    subscribe: null
+    interest_groups: null
+default_value_callback: ''
+settings:
+  show_interest_groups: 0
+  interest_groups_label: 'Interest Groups'
+  merge_fields:
+    EMAIL: mail
+    FNAME: field_user_realname
+    LNAME: ''
+    MMERGE3: ''
+    MMERGE4: ''
+  unsubscribe_on_delete: 1
+field_type: mailchimp_lists_subscription
