@@ -1,0 +1,78 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - user
+id: drupalfr_user
+migration_tags:
+  - drupalfr
+label: 'User import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/user.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      mail: Mail
+    -
+      status: Status
+    -
+      login: Login
+    -
+      realname: Realname
+    -
+      social_links_uri: 'Social links URI'
+    -
+      social_links_title: 'Social links title'
+    -
+      membership_number: 'Membership number'
+    -
+      company: Company
+    -
+      events: Events
+    -
+      biography: Biography
+process:
+  uuid: uuid
+  mail: mail
+  status: status
+  name: login
+  field_user_realname: realname
+  field_user_biography: biography
+  field_user_social_link/uri:
+    -
+      plugin: explode
+      source: social_links_uri
+      delimiter: ;
+  field_user_social_link/title:
+    -
+      plugin: explode
+      source: social_links_title
+      delimiter: ;
+  field_user_membership_number: membership_number
+  field_user_company:
+    -
+      plugin: migration
+      migration: drupalfr_company
+      source: company
+  field_user_event:
+    -
+      plugin: explode
+      source: events
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_event
+destination:
+  plugin: 'entity:user'
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
