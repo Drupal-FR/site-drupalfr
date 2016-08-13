@@ -1,0 +1,99 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+id: drupalfr_showcase
+migration_tags:
+  - drupalfr
+label: 'Showcase import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/showcase.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      published: Published
+    -
+      categories: Categories
+    -
+      contributors: Contributors
+    -
+      technologies_uri: 'Technologies URI'
+    -
+      technologies_title: 'Technologies title'
+    -
+      website_uri: 'Website URI'
+    -
+      website_title: 'Website title'
+    -
+      company: Company
+    -
+      body_value: Body
+    -
+      body_format: 'Body format'
+process:
+  type:
+    plugin: default_value
+    default_value: showcase
+  uuid: uuid
+  title: title
+  body/value: body_value
+  body/format: body_format
+  field_showcase_category:
+    -
+      plugin: explode
+      source: categories
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_website_type
+  field_showcase_contributor:
+    -
+      plugin: explode
+      source: contributors
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_user
+  field_showcase_technology/uri:
+    -
+      plugin: explode
+      source: technologies_uri
+      delimiter: ;
+  field_showcase_technology/title:
+    -
+      plugin: explode
+      source: technologies_title
+      delimiter: ;
+  field_showcase_company:
+    -
+      plugin: explode
+      source: company
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_company
+  field_showcase_website/uri: website_uri
+  field_showcase_website/title: website_title
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1
+destination:
+  plugin: 'entity:node'
+  type: showcase
+  bundle: showcase
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
