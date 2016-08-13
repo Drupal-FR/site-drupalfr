@@ -39,10 +39,13 @@ process:
   uuid: uuid
   title: title
   field_drupal_version:
+      -
+        plugin: explode
+        source: drupal_version
+        delimiter: ;
     -
       plugin: migration
       migration: drupalfr_drupal_version
-      source: drupal_version
   body/value: body_value
   body/format: body_format
   path:
