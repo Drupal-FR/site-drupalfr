@@ -39,10 +39,10 @@ process:
   uuid: uuid
   title: title
   field_drupal_version:
-      -
-        plugin: explode
-        source: drupal_version
-        delimiter: ;
+    -
+      plugin: explode
+      source: drupal_version
+      delimiter: ;
     -
       plugin: migration
       migration: drupalfr_drupal_version
