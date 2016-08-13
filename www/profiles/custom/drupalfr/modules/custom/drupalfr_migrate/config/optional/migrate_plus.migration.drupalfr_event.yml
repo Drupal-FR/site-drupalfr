@@ -1,0 +1,81 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+id: drupalfr_event
+migration_tags:
+  - drupalfr
+label: 'Event import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/event.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      published: Published
+    -
+      organizers: Organizers
+    -
+      sponsors: Sponsors
+    -
+      website_uri: 'Website URI'
+    -
+      website_title: 'Website title'
+    -
+      start_date: 'Start date (yyyy-MM-dd)'
+    -
+      end_date: 'End date (yyyy-MM-dd)'
+    -
+      body_value: Body
+    -
+      body_format: 'Body format'
+process:
+  type:
+    plugin: default_value
+    default_value: event
+  uuid: uuid
+  title: title
+  body/value: body_value
+  body/format: body_format
+  field_event_sponsor:
+    -
+      plugin: explode
+      source: sponsors
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_company
+  field_event_organizer:
+    -
+      plugin: explode
+      source: organizers
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_user
+  field_event_date_start: start_date
+  field_event_date_end: end_date
+  field_event_website/uri: website_uri
+  field_event_website/title: website_title
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1
+destination:
+  plugin: 'entity:node'
+  type: event
+  bundle: event
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
