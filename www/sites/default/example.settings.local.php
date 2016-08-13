@@ -17,9 +17,6 @@ $settings['trusted_host_patterns'] = array(
   '^172\.18\.0\.3$',
 );
 
-// Mailchimp.
-$config['mailchimp.settings']['api_key'] = '';
-
 // External cache.
 if (file_exists(__DIR__ . '/.cache_activated')) {
   $settings['redis.connection']['interface'] = 'PhpRedis';
@@ -32,6 +29,16 @@ if (file_exists(__DIR__ . '/.cache_activated')) {
   $settings['cache']['bins']['discovery'] = 'cache.backend.chainedfast';
   $settings['cache']['bins']['config'] = 'cache.backend.chainedfast';
 }
+
+// Twitter.
+// Go to https://apps.twitter.com to get these tokens.
+$config['drupalfr_social.twitter']['consumer_key'] = '';
+$config['drupalfr_social.twitter']['consumer_secret'] = '';
+$config['drupalfr_social.twitter']['access_token'] = '';
+$config['drupalfr_social.twitter']['access_token_secret'] = '';
+
+// Mailchimp.
+$config['mailchimp.settings']['api_key'] = '';
 
 if (file_exists(__DIR__ . '/../development.settings.php')) {
   include __DIR__ . '/../development.settings.php';

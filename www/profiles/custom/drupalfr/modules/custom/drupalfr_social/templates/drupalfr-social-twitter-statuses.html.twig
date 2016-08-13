@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display twitter block.
+ *
+ * Available variables:
+ * - statuses: A list of Twitter statuses provided by the Abraham\TwitterOAuth
+     library.
+ *
+ * @ingroup themeable
+ */
+#}
+{% if statuses is not empty %}
+  <div>
+    {% for status in statuses %}
+      <div>
+        <p>{{ status.text }}</p>
+        <img src="{{ status.user.profile_image_url_https }}"
+             class="img-circle pull-left" height="50" width="50">
+        <h4>{{ status.user.name }}</h4>
+        <span>{{ status.created_at }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
