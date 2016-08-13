@@ -35,9 +35,9 @@ source:
     -
       websites_title: 'Websites title'
     -
-      region: Region
+      regions: Regions
     -
-      service_type: 'Service type'
+      service_types: 'Service types'
     -
       body_value: Body
     -
@@ -63,8 +63,16 @@ process:
       plugin: explode
       source: websites_title
       delimiter: ;
-  field_region: region
-  field_company_service_type: service_type
+  field_region:
+    -
+      plugin: explode
+      source: regions
+      delimiter: ;
+  field_company_service_type:
+    -
+      plugin: explode
+      source: service_types
+      delimiter: ;
   status: published
   uid:
     plugin: default_value
