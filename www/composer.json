@@ -31,13 +31,15 @@
     "drupal/eu_cookie_compliance": "8.1.0-beta5",
     "drupal/facets": "8.1.0-alpha4",
     "drupal/features": "8.3.0-beta7",
+    "drupal/geofield": "8.1.0-alpha2",
     "drupal/honeypot": "8.1.23",
     "drupal/inline_entity_form": "8.1.0-alpha6",
-    "drupal/pathauto": "8.1.0-alpha3",
+    "drupal/leaflet": "8.1.0-alpha1",
     "drupal/mailchimp": "8.1.2",
     "drupal/migrate_plus": "8.2.0-beta2",
     "drupal/migrate_source_csv": "8.2.*",
     "drupal/migrate_tools": "8.2.0-beta1",
+    "drupal/pathauto": "8.1.0-alpha3",
     "drupal/r4032login": "8.1.*",
     "drupal/redis": "8.1.0-alpha1",
     "drupal/search_api": "8.1.0-alpha16",
@@ -72,6 +74,10 @@
         "Not detecting overrides in profile config files": "https://www.drupal.org/files/issues/features-not_detecting_profile_files-2668562-2.patch",
         "Drush export features do not overwrite the existing feature": "https://www.drupal.org/files/issues/features-drush_export_overwrite-2672406-5.patch",
         "Warning uasort in Features UI": "https://www.drupal.org/files/issues/features-warning_uasort-2672470-10.patch"
+      },
+      "drupal/leaflet": {
+        "New version of geofield uses composer for the geophp dependency, call to geophp_load() in leaflet_process_geofield() not needed": "https://www.drupal.org/files/issues/leaflet-remove_geophp_load_call-2731917-2.patch",
+        "Error in leaflet_process_geofield() when twig debug is active.": "https://www.drupal.org/files/issues/leaflet-error_when_debug_active-2783843-2.patch"
       },
       "drupal/redis": {
         "Currently Drush Cr or Cache Clear UI does not flush Redis cache": "https://www.drupal.org/files/issues/redis-drush_cr-2765895-4.patch"
