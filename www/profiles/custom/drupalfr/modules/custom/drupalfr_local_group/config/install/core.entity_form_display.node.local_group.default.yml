@@ -4,8 +4,10 @@ dependencies:
   config:
     - field.field.node.local_group.body
     - field.field.node.local_group.field_local_group_organizer
+    - field.field.node.local_group.field_local_group_place
     - node.type.local_group
   module:
+    - geofield
     - path
     - text
 id: node.local_group.default
@@ -34,6 +36,11 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+  field_local_group_place:
+    weight: 33
+    settings: {  }
+    third_party_settings: {  }
+    type: geofield_default
   langcode:
     type: language_select
     weight: 2

@@ -4,8 +4,10 @@ dependencies:
   config:
     - field.field.node.local_group.body
     - field.field.node.local_group.field_local_group_organizer
+    - field.field.node.local_group.field_local_group_place
     - node.type.local_group
   module:
+    - leaflet
     - text
     - user
 id: node.local_group.default
@@ -26,7 +28,38 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+  field_local_group_place:
+    weight: 103
+    label: above
+    settings:
+      leaflet_map: 'OSM Mapnik'
+      height: 400
+      zoom: 10
+      minPossibleZoom: 0
+      maxPossibleZoom: 18
+      minZoom: 0
+      maxZoom: 18
+      popup: false
+      icon:
+        icon_url: ''
+        shadow_url: ''
+        icon_size:
+          x: 0
+          'y': 0
+        icon_anchor:
+          x: 0
+          'y': 0
+        shadow_anchor:
+          x: 0
+          'y': 0
+        popup_anchor:
+          x: 0
+          'y': 0
+    third_party_settings: {  }
+    type: leaflet_formatter_default
   links:
     weight: 100
+    settings: {  }
+    third_party_settings: {  }
 hidden:
   langcode: true

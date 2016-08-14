@@ -1,0 +1,20 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_local_group_place
+    - node.type.local_group
+  module:
+    - geofield
+id: node.local_group.field_local_group_place
+field_name: field_local_group_place
+entity_type: node
+bundle: local_group
+label: 'Zones concernées'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield
