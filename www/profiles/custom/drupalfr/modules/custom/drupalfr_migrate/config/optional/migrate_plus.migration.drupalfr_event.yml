@@ -37,6 +37,8 @@ source:
     -
       end_date: 'End date (yyyy-MM-dd)'
     -
+      place: Place
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -68,6 +70,7 @@ process:
   field_event_date_end: end_date
   field_event_website/uri: website_uri
   field_event_website/title: website_title
+  field_event_place/value: place
   status: published
   uid:
     plugin: default_value

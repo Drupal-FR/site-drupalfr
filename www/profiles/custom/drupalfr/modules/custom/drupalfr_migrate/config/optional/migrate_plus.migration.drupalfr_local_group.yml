@@ -27,6 +27,8 @@ source:
     -
       organizers: Organizers
     -
+      places: Places
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -46,6 +48,11 @@ process:
     -
       plugin: migration
       migration: drupalfr_user
+  field_local_group_place:
+    -
+      plugin: drupalfr_multigeofields
+      source: places
+      delimiter: ;
   status: published
   uid:
     plugin: default_value
