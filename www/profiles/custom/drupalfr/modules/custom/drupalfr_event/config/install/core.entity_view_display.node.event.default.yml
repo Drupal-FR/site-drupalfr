@@ -6,11 +6,13 @@ dependencies:
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
     - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
     - field.field.node.event.field_event_sponsor
     - field.field.node.event.field_event_website
     - node.type.event
   module:
     - datetime
+    - leaflet
     - link
     - text
     - user
@@ -48,6 +50,35 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+  field_event_place:
+    weight: 108
+    label: above
+    settings:
+      leaflet_map: 'OSM Mapnik'
+      zoom: '10'
+      minZoom: '0'
+      maxZoom: '18'
+      height: '400'
+      popup: '1'
+      icon:
+        icon_url: ''
+        shadow_url: ''
+        icon_size:
+          x: '0'
+          'y': '0'
+        icon_anchor:
+          x: '0'
+          'y': '0'
+        shadow_anchor:
+          x: '0'
+          'y': '0'
+        popup_anchor:
+          x: '0'
+          'y': '0'
+      minPossibleZoom: 0
+      maxPossibleZoom: 18
+    third_party_settings: {  }
+    type: leaflet_formatter_default
   field_event_sponsor:
     weight: 102
     label: above

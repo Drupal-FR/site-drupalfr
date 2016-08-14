@@ -6,11 +6,13 @@ dependencies:
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
     - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
     - field.field.node.event.field_event_sponsor
     - field.field.node.event.field_event_website
     - node.type.event
   module:
     - datetime
+    - geofield
     - link
     - path
     - text
@@ -50,6 +52,12 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+  field_event_place:
+    weight: 38
+    settings:
+      html5_geolocation: false
+    third_party_settings: {  }
+    type: geofield_latlon
   field_event_sponsor:
     weight: 32
     settings:
