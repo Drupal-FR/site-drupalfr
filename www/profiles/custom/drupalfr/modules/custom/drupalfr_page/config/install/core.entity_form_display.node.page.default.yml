@@ -3,9 +3,11 @@ status: true
 dependencies:
   config:
     - field.field.node.page.body
+    - field.field.node.page.field_attachment
     - field.field.node.page.field_drupal_version
     - node.type.page
   module:
+    - entity_browser
     - path
     - text
 id: node.page.default
@@ -26,6 +28,18 @@ content:
     weight: 10
     settings: {  }
     third_party_settings: {  }
+  field_attachment:
+    weight: 33
+    settings:
+      entity_browser: attachment_files
+      field_widget_edit: '1'
+      field_widget_remove: '1'
+      open: '1'
+      selection_mode: append
+      view_mode: default
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: entity_browser_file
   field_drupal_version:
     weight: 32
     settings:

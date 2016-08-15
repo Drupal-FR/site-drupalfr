@@ -1,0 +1,26 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_attachment
+    - node.type.page
+  module:
+    - file
+id: node.page.field_attachment
+field_name: field_attachment
+entity_type: node
+bundle: page
+label: 'Pièces jointes'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: 'attachments/[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'txt pdf odt odp ods doc docx ppt pptx xls xlsx'
+  max_filesize: ''
+  description_field: true
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: file
