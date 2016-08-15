@@ -5,6 +5,7 @@ dependencies:
     - field.field.node.event.body
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_image
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_place
     - field.field.node.event.field_event_sponsor
@@ -12,6 +13,7 @@ dependencies:
     - node.type.event
   module:
     - datetime
+    - image
     - leaflet
     - link
     - text
@@ -43,6 +45,14 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+  field_event_image:
+    weight: 109
+    label: above
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
   field_event_organizer:
     weight: 103
     label: above

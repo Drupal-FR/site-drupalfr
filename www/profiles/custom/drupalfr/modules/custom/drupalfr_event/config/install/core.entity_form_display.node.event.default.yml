@@ -5,6 +5,7 @@ dependencies:
     - field.field.node.event.body
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_image
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_place
     - field.field.node.event.field_event_sponsor
@@ -12,6 +13,7 @@ dependencies:
     - node.type.event
   module:
     - datetime
+    - entity_browser
     - geofield
     - link
     - path
@@ -44,6 +46,18 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
+  field_event_image:
+    weight: 39
+    settings:
+      entity_browser: event_images
+      field_widget_edit: '1'
+      field_widget_remove: '1'
+      open: '1'
+      selection_mode: append
+      view_mode: default
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: entity_browser_file
   field_event_organizer:
     weight: 33
     settings:

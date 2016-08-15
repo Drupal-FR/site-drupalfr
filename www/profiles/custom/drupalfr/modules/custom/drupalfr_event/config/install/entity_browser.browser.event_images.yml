@@ -1,0 +1,38 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - dropzonejs_eb_widget
+    - views
+name: images
+label: 'Images Event'
+display: modal
+display_configuration:
+  width: '800'
+  height: '700'
+  link_text: 'Sélectionner des images'
+selection_display: no_display
+selection_display_configuration: {  }
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  25a100dc-c57f-4fc2-8f69-7331137e2cd5:
+    settings:
+      upload_location: 'public://events/[date:custom:Y]-[date:custom:m]'
+      dropzone_description: 'Déposez les fichiers ici pour les télécharger'
+      max_filesize: 2M
+      extensions: 'jpg jpeg gif png'
+      submit_text: 'Sélectionner les entités'
+    uuid: 25a100dc-c57f-4fc2-8f69-7331137e2cd5
+    weight: 1
+    label: Dropzonejs
+    id: dropzonejs
+  61a3cb07-d2c5-419e-91a1-25b0de82362f:
+    settings:
+      view: files_entity_browser
+      view_display: entity_browser_1
+      submit_text: 'Sélectionner les entités'
+    uuid: 61a3cb07-d2c5-419e-91a1-25b0de82362f
+    weight: 2
+    label: 'Liste de fichiers'
+    id: view
