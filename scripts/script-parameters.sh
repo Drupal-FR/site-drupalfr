@@ -19,3 +19,4 @@ CURRENT_DATE=$(date "+%Y-%m-%d-%Hh%Mm%Ss")
 # External libraries version.
 HIGHLIGHT_JS_VERSION=9.3.0
 D3_VERSION=3.5.16
+DROPZONE_VERSION=4.3.0

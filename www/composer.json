@@ -16,18 +16,25 @@
     "source": "https://github.com/Drupal-FR/site-drupalfr",
     "docs": "https://github.com/Drupal-FR/site-drupalfr/blob/8.x-1.x/README.md"
   },
-  "repositories": [
-    {
+  "repositories": {
+    "drupal": {
       "type": "composer",
       "url": "https://packagist.drupal-composer.org"
+    },
+    "ows_slideshare": {
+      "type": "vcs",
+      "url": "git@github.com:OWS/ZendService_SlideShare.git"
     }
-  ],
+  },
   "require": {
     "composer/installers": "^1.0.21",
     "cweagans/composer-patches": "~1.0",
     "drupal/core": "8.1.8",
     "drush/drush": "8.1.3",
     "drupal/admin_toolbar": "8.1.16",
+    "drupal/dropzonejs": "8.1.0-alpha2",
+    "drupal/entity_browser": "8.1.0-alpha7",
+    "drupal/entity_embed": "8.1.0-alpha3",
     "drupal/eu_cookie_compliance": "8.1.0-beta5",
     "drupal/facets": "8.1.0-alpha4",
     "drupal/features": "8.3.0-beta7",
@@ -36,6 +43,10 @@
     "drupal/inline_entity_form": "8.1.0-alpha6",
     "drupal/leaflet": "8.1.0-alpha1",
     "drupal/mailchimp": "8.1.2",
+    "drupal/media_entity": "8.1.3",
+    "drupal/media_entity_document": "8.1.1",
+    "drupal/media_entity_image": "8.1.2",
+    "drupal/media_entity_slideshare": "8.1.3",
     "drupal/migrate_plus": "8.2.0-beta2",
     "drupal/migrate_source_csv": "8.2.*",
     "drupal/migrate_tools": "8.2.0-beta1",
@@ -44,6 +55,7 @@
     "drupal/redis": "8.1.0-alpha1",
     "drupal/search_api": "8.1.0-alpha16",
     "drupal/search_api_solr": "8.1.0-alpha5",
+    "drupal/video_embed_field": "8.1.3",
     "abraham/twitteroauth": "0.6.2"
   },
   "require-dev": {
