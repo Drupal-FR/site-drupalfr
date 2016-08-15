@@ -58,6 +58,7 @@ $DRUSH features-import -y --bundle=drupalfr job_offer
 $DRUSH features-import -y --bundle=drupalfr showcase
 $DRUSH features-import -y --bundle=drupalfr local_group
 $DRUSH features-import -y --bundle=drupalfr event
+$DRUSH features-import -y --bundle=drupalfr media
 # Waiting for https://www.drupal.org/node/2672490
 #$DRUSH features-import -y --bundle=drupalfr drupalfr
 
