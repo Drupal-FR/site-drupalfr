@@ -39,6 +39,8 @@ source:
     -
       place: Place
     -
+      images: Images
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -66,6 +68,14 @@ process:
     -
       plugin: migration
       migration: drupalfr_user
+  field_event_image:
+    -
+      plugin: explode
+      source: images
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_file
   field_event_date_start: start_date
   field_event_date_end: end_date
   field_event_website/uri: website_uri

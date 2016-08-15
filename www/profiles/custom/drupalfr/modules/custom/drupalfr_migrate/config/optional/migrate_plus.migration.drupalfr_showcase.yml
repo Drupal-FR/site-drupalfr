@@ -39,6 +39,8 @@ source:
     -
       company: Company
     -
+      images: Images
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -80,6 +82,14 @@ process:
     -
       plugin: migration
       migration: drupalfr_company
+  field_showcase_image:
+    -
+      plugin: explode
+      source: images
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_file
   field_showcase_website/uri: website_uri
   field_showcase_website/title: website_title
   status: published

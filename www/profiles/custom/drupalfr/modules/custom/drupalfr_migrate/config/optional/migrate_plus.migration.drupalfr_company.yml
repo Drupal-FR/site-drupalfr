@@ -39,6 +39,8 @@ source:
     -
       service_types: 'Service types'
     -
+      logo: Logo
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -69,6 +71,11 @@ process:
       plugin: explode
       source: service_types
       delimiter: ;
+  field_company_logo:
+    -
+      plugin: migration
+      migration: drupalfr_file
+      source: logo
   status: published
   uid:
     plugin: default_value

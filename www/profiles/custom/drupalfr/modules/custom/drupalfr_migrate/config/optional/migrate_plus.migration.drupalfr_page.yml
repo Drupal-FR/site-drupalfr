@@ -29,6 +29,8 @@ source:
     -
       drupal_version: 'Drupal version'
     -
+      attachments: Attachments
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -46,6 +48,14 @@ process:
     -
       plugin: migration
       migration: drupalfr_drupal_version
+  field_attachment:
+    -
+      plugin: explode
+      source: attachments
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_file
   body/value: body_value
   body/format: body_format
   path:
