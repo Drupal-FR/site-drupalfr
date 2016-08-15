@@ -6,10 +6,12 @@ dependencies:
     - field.field.node.showcase.field_showcase_category
     - field.field.node.showcase.field_showcase_company
     - field.field.node.showcase.field_showcase_contributor
+    - field.field.node.showcase.field_showcase_image
     - field.field.node.showcase.field_showcase_technology
     - field.field.node.showcase.field_showcase_website
     - node.type.showcase
   module:
+    - entity_browser
     - link
     - path
     - text
@@ -55,6 +57,18 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+  field_showcase_image:
+    weight: 37
+    settings:
+      entity_browser: showcase_images
+      field_widget_edit: '1'
+      field_widget_remove: '1'
+      open: '1'
+      selection_mode: append
+      view_mode: default
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: entity_browser_file
   field_showcase_technology:
     weight: 34
     settings:
