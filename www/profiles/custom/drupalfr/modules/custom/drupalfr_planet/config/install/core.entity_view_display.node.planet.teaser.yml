@@ -1,0 +1,51 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.planet.body
+    - field.field.node.planet.feeds_item
+    - field.field.node.planet.field_planet_tag
+    - field.field.node.planet.field_planet_url
+    - node.type.planet
+  module:
+    - link
+    - text
+    - user
+id: node.planet.teaser
+targetEntityType: node
+bundle: planet
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 0
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+  field_planet_tag:
+    type: entity_reference_label
+    weight: 1
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_planet_url:
+    type: link
+    weight: 2
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+  links:
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  feeds_item: true
+  langcode: true

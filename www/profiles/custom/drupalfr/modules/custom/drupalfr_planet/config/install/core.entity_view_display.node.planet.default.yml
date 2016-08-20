@@ -1,0 +1,49 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.planet.body
+    - field.field.node.planet.feeds_item
+    - field.field.node.planet.field_planet_tag
+    - field.field.node.planet.field_planet_url
+    - node.type.planet
+  module:
+    - link
+    - text
+    - user
+id: node.planet.default
+targetEntityType: node
+bundle: planet
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+  field_planet_tag:
+    weight: 2
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_planet_url:
+    weight: 3
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+  links:
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  feeds_item: true
+  langcode: true
