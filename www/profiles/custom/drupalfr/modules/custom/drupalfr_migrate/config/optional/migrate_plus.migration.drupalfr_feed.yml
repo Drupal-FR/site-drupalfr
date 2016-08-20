@@ -1,0 +1,56 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - feeds
+id: drupalfr_feed
+migration_tags:
+  - drupalfr
+label: 'Feed import'
+source:
+  plugin: csv
+  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/feed.csv
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: Identifier
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      source: Source
+    -
+      uid: 'Author'
+    -
+      website_uri: 'Website URL'
+    -
+      website_title: 'Website title'
+process:
+  type:
+    plugin: default_value
+    default_value: planet_feed_rss
+  uuid: uuid
+  title: title
+  source: source
+  uid:
+    -
+      plugin: explode
+      source: uid
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_user
+  field_feed_website/uri: website_uri
+  field_feed_website/title: website_title
+destination:
+  plugin: 'entity:feeds_feed'
+  type: planet_feed_rss
+  bundle: planet_feed_rss
+template: null
+migration_dependencies: {  }
+migration_group: drupalfr
