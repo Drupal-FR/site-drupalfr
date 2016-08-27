@@ -2,24 +2,22 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - views.view.search
+    - facets.facet.content_type
   module:
     - facets
-    - views
   theme:
     - drupalfr_theme
-id: drupalfr_theme_search
+id: drupalfr_theme_facet_content_type
 theme: drupalfr_theme
 region: sidebar_first
 weight: -10
 provider: null
-plugin: 'views_exposed_filter_block:search-page_1'
+plugin: 'facet_block:content_type'
 settings:
-  id: 'views_exposed_filter_block:search-page_1'
-  label: ''
-  provider: views
+  id: 'facet_block:content_type'
+  label: 'Type de contenu'
+  provider: facets
   label_display: visible
-  views_label: ''
 visibility:
   other_facet:
     id: other_facet

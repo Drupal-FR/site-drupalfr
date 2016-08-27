@@ -2,24 +2,22 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - views.view.search
+    - facets.facet.tag
   module:
     - facets
-    - views
   theme:
     - drupalfr_theme
-id: drupalfr_theme_search
+id: drupalfr_theme_facet_tag
 theme: drupalfr_theme
 region: sidebar_first
-weight: -10
+weight: -7
 provider: null
-plugin: 'views_exposed_filter_block:search-page_1'
+plugin: 'facet_block:tag'
 settings:
-  id: 'views_exposed_filter_block:search-page_1'
-  label: ''
-  provider: views
+  id: 'facet_block:tag'
+  label: Tags
+  provider: facets
   label_display: visible
-  views_label: ''
 visibility:
   other_facet:
     id: other_facet
