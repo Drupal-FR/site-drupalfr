@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f04f630e7f5216d411b1e56d719338a6",
-    "content-hash": "3ea6635dc1c1f0234dd4b9a4206c988f",
+    "hash": "344dcccdcaccb7d58f764414ecfefcdd",
+    "content-hash": "3095cb0cfb8ca80c7c8fee6d6b31be35",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -1082,16 +1082,16 @@
         },
         {
             "name": "drupal/ctools",
-            "version": "8.3.0-alpha26",
+            "version": "8.3.0-alpha27",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/ctools",
-                "reference": "c14a5eee970c3d0aab02e88f6c6a4d18091439b8"
+                "reference": "231e2649678d58901368a9e5681f36865ce84e73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/ctools-8.x-3.0-alpha26.zip",
-                "reference": "c14a5eee970c3d0aab02e88f6c6a4d18091439b8",
+                "url": "https://ftp.drupal.org/files/projects/ctools-8.x-3.0-alpha27.zip",
+                "reference": "231e2649678d58901368a9e5681f36865ce84e73",
                 "shasum": null
             },
             "require": {
@@ -1118,7 +1118,7 @@
             ],
             "description": "Provides a number of utility and helper APIs for Drupal developers and site builders.",
             "homepage": "https://www.drupal.org/project/ctools",
-            "time": "2016-05-06 18:51:13"
+            "time": "2016-08-20 19:59:03"
         },
         {
             "name": "drupal/dropzonejs",
@@ -1354,17 +1354,11 @@
         },
         {
             "name": "drupal/facets",
-            "version": "8.1.0-alpha4",
+            "version": "dev-8.x-1.x",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/facets.git",
-                "reference": "5cede43cb11eb5232479c5f6532ec660fa36d1b2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/facets-8.x-1.0-alpha4.zip",
-                "reference": "5cede43cb11eb5232479c5f6532ec660fa36d1b2",
-                "shasum": null
+                "reference": "d5c0117eb59ab2593f6430e3f3035d60bc084653"
             },
             "require": {
                 "drupal/core": "8.*"
@@ -1394,7 +1388,7 @@
             ],
             "description": "Faceted search interfaces that can be used on Search API searchers.",
             "homepage": "https://www.drupal.org/project/facets",
-            "time": "2016-07-06 17:08:55"
+            "time": "2016-08-24 17:38:22"
         },
         {
             "name": "drupal/features",
@@ -1446,7 +1440,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/feeds",
-                "reference": "cb85be64917cf4bc1e75a845b7fa2f99c9755f38"
+                "reference": "516a1e96ed44223ce3a0c2d4af271f0085e8f88c"
             },
             "require": {
                 "drupal/core": "8.*"
@@ -1463,7 +1457,7 @@
             ],
             "description": "Aggregates RSS/Atom/RDF feeds, imports CSV files and more.",
             "homepage": "https://www.drupal.org/project/feeds",
-            "time": "2016-07-27 14:59:37"
+            "time": "2016-08-26 12:18:59"
         },
         {
             "name": "drupal/geofield",
@@ -2054,16 +2048,16 @@
         },
         {
             "name": "drupal/search_api",
-            "version": "8.1.0-alpha16",
+            "version": "8.1.0-alpha17",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/search_api",
-                "reference": "895b50787d54cd3f6bc3f8d4833cec809a8d021d"
+                "reference": "dde5cecfbde386ae55b0aa799d1e146b509b3ffa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/search_api-8.x-1.0-alpha16.zip",
-                "reference": "895b50787d54cd3f6bc3f8d4833cec809a8d021d",
+                "url": "https://ftp.drupal.org/files/projects/search_api-8.x-1.0-alpha17.zip",
+                "reference": "dde5cecfbde386ae55b0aa799d1e146b509b3ffa",
                 "shasum": null
             },
             "require": {
@@ -2072,10 +2066,11 @@
             },
             "replace": {
                 "drupal/search_api_db": "self.version",
-                "drupal/search_api_db_defaults": "self.version"
+                "drupal/search_api_db_defaults": "self.version",
+                "drupal/search_api_views_taxonomy": "self.version"
             },
             "suggest": {
-                "drupal/core": "Required by drupal/search_api_db, drupal/search_api_db_defaults"
+                "drupal/core": "Required by drupal/search_api_db, drupal/search_api_db_defaults, drupal/search_api_views_taxonomy"
             },
             "type": "drupal-module",
             "extra": {
@@ -2103,20 +2098,20 @@
             ],
             "description": "Provides a generic framework for modules offering search capabilities.",
             "homepage": "https://www.drupal.org/project/search_api",
-            "time": "2016-07-05 14:54:42"
+            "time": "2016-08-25 08:47:35"
         },
         {
             "name": "drupal/search_api_solr",
-            "version": "8.1.0-alpha5",
+            "version": "8.1.0-alpha6",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/search_api_solr",
-                "reference": "220cbdf1ddb83252777e13951f5b649c14d2a5e7"
+                "reference": "1b949c59477031ce5880c13537eb73a5f3cb4096"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/search_api_solr-8.x-1.0-alpha5.zip",
-                "reference": "220cbdf1ddb83252777e13951f5b649c14d2a5e7",
+                "url": "https://ftp.drupal.org/files/projects/search_api_solr-8.x-1.0-alpha6.zip",
+                "reference": "1b949c59477031ce5880c13537eb73a5f3cb4096",
                 "shasum": null
             },
             "require": {
@@ -2142,7 +2137,7 @@
             ],
             "description": "Offers an implementation of the Search API that uses an Apache Solr server for indexing content.",
             "homepage": "https://www.drupal.org/project/search_api_solr",
-            "time": "2016-07-07 17:49:37"
+            "time": "2016-08-25 11:28:46"
         },
         {
             "name": "drupal/token",
@@ -5644,7 +5639,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/examples.git",
-                "reference": "88abab516874ed599a876b805ee514353c66cffa"
+                "reference": "9cb3ad3739f5c3ed29eb9692384883e39e5cf4d3"
             },
             "require": {
                 "drupal/core": "8.*",
@@ -5696,7 +5691,7 @@
             ],
             "description": "A variety of example code for you to learn from and hack upon.",
             "homepage": "https://www.drupal.org/project/examples",
-            "time": "2016-08-19 21:41:50"
+            "time": "2016-08-21 18:52:49"
         },
         {
             "name": "drupal/pistachio",
@@ -5726,7 +5721,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "drupal/facets": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
