@@ -84,7 +84,13 @@ if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
   $DRUSH migrate-import drupalfr_feed --update
   # Re-import users to update references as we do not create stub.
   $DRUSH migrate-import drupalfr_user --update
+
+  # Clear search_api indexes.
+  $DRUSH search-api-clear
 fi
+
+# Run CRON (index search_api, import feeds).
+$DRUSH cron
 
 # Back to the current directory.
 cd $CURRENT_PATH

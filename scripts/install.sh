@@ -80,6 +80,9 @@ $DRUSH migrate-import drupalfr_feed --update
 # Re-import users to update references as we do not create stub.
 $DRUSH migrate-import drupalfr_user --update
 
+# Run CRON (index search_api, import feeds).
+$DRUSH cron
+
 # Enable external cache.
 touch $WWW_PATH/sites/default/.cache_activated
 $DRUSH cr

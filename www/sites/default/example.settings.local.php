@@ -30,6 +30,9 @@ if (file_exists(__DIR__ . '/.cache_activated')) {
   $settings['cache']['bins']['config'] = 'cache.backend.chainedfast';
 }
 
+// Solr.
+$config['search_api.server.solr']['backend_config']['host'] = 'solr';
+
 // Twitter.
 // Go to https://apps.twitter.com to get these tokens.
 $config['drupalfr_social.twitter']['consumer_key'] = '';
