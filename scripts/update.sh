@@ -48,19 +48,7 @@ if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
 fi
 
 # Revert features.
-$DRUSH features-import -y --bundle=drupalfr core
-$DRUSH features-import -y --bundle=drupalfr site
-$DRUSH features-import -y --bundle=drupalfr user
-$DRUSH features-import -y --bundle=drupalfr homepage
-$DRUSH features-import -y --bundle=drupalfr page
-$DRUSH features-import -y --bundle=drupalfr company
-$DRUSH features-import -y --bundle=drupalfr job_offer
-$DRUSH features-import -y --bundle=drupalfr showcase
-$DRUSH features-import -y --bundle=drupalfr local_group
-$DRUSH features-import -y --bundle=drupalfr event
-$DRUSH features-import -y --bundle=drupalfr media
-# Waiting for https://www.drupal.org/node/2672490
-#$DRUSH features-import -y --bundle=drupalfr drupalfr
+$DRUSH features-import -y $PROFILE
 
 # Translation updates.
 $DRUSH locale-check
