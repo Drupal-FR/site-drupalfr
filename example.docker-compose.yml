@@ -2,17 +2,32 @@ version: "2"
 
 services:
   web:
-    image: florenttorregrosa/docker-drupal-dev:php7
+    image: httpd:2.4-alpine
+    volumes:
+      - ./conf/httpd/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./conf/httpd/extra/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - .:/project
     depends_on:
+      - php
       - mysql
       - redis
       - mail
       - solr
-    volumes:
-      - .:/project
     networks:
       default:
         ipv4_address: 172.18.0.2
+
+
+  php:
+    image: florenttorregrosa/drupal-php-dev:7.0-fpm-alpine
+    volumes:
+      - .:/project
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
+    expose:
+      - 9000
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
 
 
   varnish:
@@ -25,7 +40,7 @@ services:
       - ./conf/varnish:/varnish-drupal
     networks:
       default:
-        ipv4_address: 172.18.0.3
+        ipv4_address: 172.18.0.4
 
 
   mysql:
@@ -37,9 +52,10 @@ services:
       MYSQL_DATABASE: drupal
     volumes:
       - ./data/db:/var/lib/mysql
+      - ./conf/mysql:/etc/mysql/conf.d
     networks:
       default:
-        ipv4_address: 172.18.0.4
+        ipv4_address: 172.18.0.5
 
 
   solr:
@@ -53,21 +69,21 @@ services:
       - /solr-drupal
     networks:
       default:
-        ipv4_address: 172.18.0.5
+        ipv4_address: 172.18.0.6
 
 
   redis:
     image: redis:3.2.1-alpine
     networks:
       default:
-        ipv4_address: 172.18.0.6
+        ipv4_address: 172.18.0.7
 
 
   mail:
     image: djfarrelly/maildev
     networks:
       default:
-        ipv4_address: 172.18.0.7
+        ipv4_address: 172.18.0.8
 
 
 networks:

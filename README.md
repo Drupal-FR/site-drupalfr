@@ -22,5 +22,5 @@ Merci pour votre aide !
 * Do not execute scripts/install.sh from your computer.
 * Copy/paste the example.docker-compose.yml into docker-compose.yml and adapt it to your configuration to use the docker image you want.
 * Execute: **docker-compose up**
-* In another tab, get a command-line in the container: **docker exec -it container_name_web_1 /bin/bash**
+* In another tab, get a command-line in the container: **docker exec -it container_name_php_1 /bin/bash**
 * Execute scripts/install.sh
