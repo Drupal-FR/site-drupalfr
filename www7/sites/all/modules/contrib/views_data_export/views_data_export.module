@@ -31,6 +31,36 @@ function views_data_export_views_api() {
 }
 
 /**
+ * Implements hook_file_download().
+ */
+function views_data_export_file_download($uri) {
+  if (views_data_export_is_export_file($uri)) {
+    $result = -1;
+    // Allow only owners to access export files.
+    $file = current(entity_load('file', FALSE, array('uri' => $uri)));
+    if ($file && $file->uid == $GLOBALS['user']->uid) {
+      // This is only necessary for file_download_headers() to return a result
+      // evaluating to TRUE, in case no other module added any header.
+      $result = array('X-Drupal-ViewsDataExport' => 1);
+    }
+    return $result;
+  }
+}
+
+/**
+ * Checks whether the passed URI identifies an export file.
+ *
+ * @param string $uri
+ *   A file URI.
+ *
+ * @return bool
+ *   TRUE if the URI identifies an export file, FALSE otherwise.
+ */
+function views_data_export_is_export_file($uri) {
+  return file_uri_scheme($uri) == 'temporary' && strpos(file_uri_target($uri), 'views_data_export') === 0;
+}
+
+/**
  * Implementation of hook_theme().
  */
 function views_data_export_theme() {
@@ -275,7 +305,7 @@ function views_data_export_view_clear($export_id) {
 function views_data_export_file_presave($file) {
   // Ensure temporary files really are temporary.
   // @see: https://drupal.org/node/2198399
-  if (strpos($file->filename, 'views_data_export') === 0) {
+  if (views_data_export_is_export_file($file->uri)) {
     // There is no FILE_STATUS_TEMPORARY.
     $file->status = 0;
   }

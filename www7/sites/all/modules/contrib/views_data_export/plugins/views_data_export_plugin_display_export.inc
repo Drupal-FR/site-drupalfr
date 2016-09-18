@@ -297,8 +297,11 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     $this->initialize_index();
     //$this->batched_execution_state->fid = $this->outputfile_create();
 
-    // Initialize the progress counter
-    $this->batched_execution_state->sandbox['max'] = db_query('SELECT COUNT(*) FROM {' . $this->index_tablename() . '}')->fetchField();
+    // Initialize the progress counter.
+    if (db_table_exists($this->index_tablename())) {
+      $this->batched_execution_state->sandbox['max'] = db_query('SELECT COUNT(*) FROM {' . $this->index_tablename() . '}')->fetchField();
+    }
+
     // Record the time we started.
     list($usec, $sec) = explode(' ', microtime());
     $this->batched_execution_state->sandbox['started'] = (float) $usec + (float) $sec;
@@ -401,6 +404,9 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
         break;
 
       case VIEWS_DATA_EXPORT_FOOTER:
+        // Update the temporary file size, otherwise we would get a problematic
+        // "Content-Length: 0" HTTP header, that may break the export download.
+        $this->outputfile_update_size();
         $sandbox['finished'] = 1;
         $state->batch_state = VIEWS_DATA_EXPORT_FINISHED;
         break;
@@ -571,9 +577,28 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     if (!$this->view->init_style()) {
       $this->view->build_info['fail'] = TRUE;
     }
-    // Set the headers.
-    $this->add_http_headers();
-    file_transfer($this->outputfile_path(), array());
+
+    $uri = $this->outputfile_path();
+    $scheme = file_uri_scheme($uri);
+    if (file_stream_wrapper_valid_scheme($scheme) && file_exists($uri)) {
+      $headers = file_download_headers($uri);
+      if (count($headers)) {
+        // Set our headers and ensure no other one conflicts with them.
+        $this->add_http_headers();
+        $reserved_headers = array_flip(array('content-type', 'cache-control', 'content-disposition'));
+        foreach ($headers as $name => $value) {
+          if (isset($reserved_headers[drupal_strtolower($name)])) {
+            unset($headers[$name]);
+          }
+        }
+        file_transfer($uri, $headers);
+      }
+      drupal_access_denied();
+    }
+    else {
+      drupal_not_found();
+    }
+    drupal_exit();
   }
 
   /**
@@ -710,6 +735,18 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     $output_file = $this->outputfile_path();
     if (file_put_contents($output_file, $string, FILE_APPEND) === FALSE) {
       $this->abort_export(t('Could not write to temporary output file for result export (@file). Check permissions.', array ('@file' => $output_file)));
+    }
+  }
+
+  /**
+   * Updates the file size in the file entity.
+   */
+  protected function outputfile_update_size() {
+    $output_file = $this->outputfile_path();
+    $file = current(file_load_multiple(array(), array('uri' => $output_file)));
+    if ($file) {
+      $file->filesize = filesize($output_file);
+      file_save($file);
     }
   }
 
