@@ -1,20 +1,16 @@
 <?php
 
 /**
- * Test class for access checks for VDE downloads.
- *
- * Views Data Export enforces that a previously exported file may only be
- * re-downloaded by the user that created the export. We test for that with
- * this class.
+ * Test class for garbage collection of VDE export data.
  */
-class ViewsDataExportAccessTest extends ViewsDataExportBaseTest {
+class ViewsDataExportGarbageCollectionTest extends ViewsDataExportBaseTest {
 
   protected $profile = 'testing';
 
   public static function getInfo() {
     return array(
-      'name' => 'Access to temp files',
-      'description' => 'Check access to created export files.',
+      'name' => 'Garbage collection',
+      'description' => 'Checks garbage collection of batched exports',
       'group' => 'Views Data Export',
     );
   }
@@ -22,10 +18,7 @@ class ViewsDataExportAccessTest extends ViewsDataExportBaseTest {
   /**
    * Test that VDE export can only be downloaded by the user that created them.
    */
-  public function testExportedTempFileAccess() {
-    $this->admin_user1 = $this->drupalCreateUser();
-    $this->admin_user2 = $this->drupalCreateUser();
-
+  public function testExportedGarbageCollection() {
     // Run a batched export.
     $path = 'vde_test/' . $this->randomName();
     list($view, $expected) = $this->getExportView($path);
@@ -36,48 +29,34 @@ class ViewsDataExportAccessTest extends ViewsDataExportBaseTest {
     $view->save();
     // Ensure that the menu router system is rebuilt on the next page load.
     variable_set('menu_rebuild_needed', TRUE);
-
-    $this->drupalLogin($this->admin_user1);
-    // Catpure the session_id as the redirects in the request ditch it.
-    $session_id = $this->session_id;
+    $exports = $this->getNumberOfStoredExports();
+    $files = $this->getNumberOfFiles();
     $this->assertBatchedExportEqual($path, $expected, 'Batched access export matched expected output.');
+    // We should have created a new export and file.
+    $this->assertEqual($this->getNumberOfStoredExports(), $exports + 1, 'A single new batched export was created');
+    $this->assertEqual($this->getNumberOfFiles(), $files + 1, 'A single new temporary file was created');
 
-    // Remove all the test data, so future exports will be different.
-    db_truncate('views_test')->execute();
-    $this->resetAll();
+    $middle_timestamp = time();
+    sleep(1);
+    $this->assertBatchedExportEqual($path, $expected, 'Batched access export matched expected output.');
+    // We should have created a new export and file.
+    $this->assertEqual($this->getNumberOfStoredExports(), $exports + 2, 'A single new batched export was created');
+    $this->assertEqual($this->getNumberOfFiles(), $files + 2, 'A single new temporary file was created');
 
-    // Assert that we can re-download directly when supplying the token.
-    // We rely on this being the first export in this test class.
-    // Restore the session_id from above so we can use drupalGetToken.
-    $this->session_id = $session_id;
-    $token = $this->drupalGetToken('views_data_export/1');
-    $this->drupalGet($path, array('query' => array('eid' => 1, 'download' => 1, 'token' => $token)));
-    $output = $this->drupalGetContent();
-    $this->assertEqual($this->normaliseString($output), $expected, 'Re-download of export file by original user is possible with session token.');
-
-    // Assert that we cannot re-download directly without supplying the token.
-    // We rely on this being the first export in this test class.
-    $this->drupalGet($path, array('query' => array('eid' => 1, 'download' => 1)));
-    $output = $this->drupalGetContent();
-    $this->assertEqual($this->normaliseString($output), '', 'Re-download of export file by original user is not possible.');
-
-    // Assert that someone else can't download our file.
-    // We rely on this being the first export in this test class.
-    $this->drupalLogin($this->admin_user2);
-    $this->drupalGet($path, array('query' => array('eid' => 1, 'download' => 1, 'token' => $token)));
-    $output = $this->drupalGetContent();
-    $this->assertEqual($this->normaliseString($output), '', 'Re-download of export file by different user is not possible.');
+    // Garbage collect the first export only.
+    views_data_export_garbage_collect(REQUEST_TIME - $middle_timestamp);
+    $this->assertEqual($this->getNumberOfStoredExports(), $exports + 1, 'Garbage collection removed 1 old export');
+    $this->assertEqual($this->getNumberOfFiles(), $files + 1, 'Garbage collection removed 1 old temporary file');
   }
 
-  /**
-   * Overrides DrupalWebTestCase::drupalGetToken() to support the hash salt.
-   *
-   * @todo Remove when http://drupal.org/node/1555862 is fixed in core.
-   */
-  protected function drupalGetToken($value = '') {
-    $private_key = drupal_get_private_key();
-    return drupal_hmac_base64($value, $this->session_id . $private_key . drupal_get_hash_salt());
+  protected function getNumberOfStoredExports() {
+    return (int) db_select('views_data_export')->countQuery()->execute()->fetchField();
   }
+
+  protected function getNumberOfFiles() {
+    return (int) db_select('file_managed')->countQuery()->execute()->fetchField();
+  }
+
 
   /**
    * Build and return a basic view of the views_test table.

@@ -238,8 +238,17 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     }
 
     // Try and get a batch context if possible.
-    $eid = !empty($_GET['eid']) ? $_GET['eid'] :
-            (!empty($this->batched_execution_state->eid) ? $this->batched_execution_state->eid : FALSE);
+
+    if (!empty($_GET['eid']) && !empty($_GET['token']) && drupal_valid_token($_GET['token'], 'views_data_export/' . $_GET['eid'])) {
+      $eid = $_GET['eid'];
+    }
+    elseif (!empty($this->batched_execution_state->eid)) {
+      $eid = $this->batched_execution_state->eid;
+    }
+    else {
+      $eid = FALSE;
+    }
+
     if ($eid) {
       $this->batched_execution_state = views_data_export_get($eid);
     }
@@ -293,6 +302,9 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     $this->batched_execution_state = views_data_export_new($this->view->name, $this->view->current_display, $this->outputfile_create());
     views_data_export_view_store($this->batched_execution_state->eid, $this->view);
 
+    // Record a usage of our file, so we can identify our exports later.
+    file_usage_add(file_load($this->batched_execution_state->fid), 'views_data_export', 'eid', $this->batched_execution_state->eid);
+
     // We need to build the index right now, before we lose $_GET etc.
     $this->initialize_index();
     //$this->batched_execution_state->fid = $this->outputfile_create();
@@ -306,9 +318,13 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     list($usec, $sec) = explode(' ', microtime());
     $this->batched_execution_state->sandbox['started'] = (float) $usec + (float) $sec;
 
+    // Pop something into the session to ensure it stays aorund.
+    $_SESSION['views_data_export'][$this->batched_execution_state->eid] = TRUE;
+
     // Build up our querystring for the final page callback.
     $querystring = array(
       'eid' => $this->batched_execution_state->eid,
+      'token' => drupal_get_token('views_data_export/' . $this->batched_execution_state->eid),
       'return-url' => NULL,
     );
 
@@ -424,6 +440,13 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
   function execute_final() {
     // Should we download the file.
     if (!empty($_GET['download'])) {
+      // Clean up our session, if we need to.
+      if (isset($_SESSION)) {
+        unset($_SESSION['views_data_export'][$this->batched_execution_state->eid]);
+        if (empty($_SESSION['views_data_export'])) {
+          unset($_SESSION['views_data_export']);
+        }
+      }
       // This next method will exit.
       $this->transfer_file();
     }
@@ -532,6 +555,7 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     $query = array(
       'download' => 1,
       'eid' => $this->batched_execution_state->eid,
+      'token' => drupal_get_token('views_data_export/' . $this->batched_execution_state->eid),
     );
 
     return theme('views_data_export_complete_page', array(
@@ -577,28 +601,12 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     if (!$this->view->init_style()) {
       $this->view->build_info['fail'] = TRUE;
     }
-
-    $uri = $this->outputfile_path();
-    $scheme = file_uri_scheme($uri);
-    if (file_stream_wrapper_valid_scheme($scheme) && file_exists($uri)) {
-      $headers = file_download_headers($uri);
-      if (count($headers)) {
-        // Set our headers and ensure no other one conflicts with them.
-        $this->add_http_headers();
-        $reserved_headers = array_flip(array('content-type', 'cache-control', 'content-disposition'));
-        foreach ($headers as $name => $value) {
-          if (isset($reserved_headers[drupal_strtolower($name)])) {
-            unset($headers[$name]);
-          }
-        }
-        file_transfer($uri, $headers);
-      }
-      drupal_access_denied();
-    }
-    else {
-      drupal_not_found();
-    }
-    drupal_exit();
+    // Set the headers.
+    $this->add_http_headers();
+    $headers = array(
+      'Content-Length' => $this->outputfile_entity()->filesize,
+    );
+    file_transfer($this->outputfile_path(), $headers);
   }
 
   /**
@@ -691,9 +699,9 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
   }
 
   /**
-   * Get the output file path.
+   * Get the output file entity.
    */
-  function outputfile_path() {
+  public function outputfile_entity() {
     if (empty($this->_output_file)) {
       if (!empty($this->batched_execution_state->fid)) {
         // Return the filename associated with this file.
@@ -703,7 +711,16 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
         return NULL;
       }
     }
-    return $this->_output_file->uri;
+    return $this->_output_file;
+  }
+
+  /**
+   * Get the output file path.
+   */
+  public function outputfile_path() {
+    if ($file = $this->outputfile_entity()) {
+      return $file->uri;
+    }
   }
 
   /**
@@ -725,6 +742,11 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
     // Save the file into the DB.
     $file = $this->file_save_file($path);
 
+    // Make sure the file is marked as temporary.
+    // There is no FILE_STATUS_TEMPORARY constant.
+    $file->status = 0;
+    file_save($file);
+
     return $file->fid;
   }
 
@@ -742,10 +764,8 @@ class views_data_export_plugin_display_export extends views_plugin_display_feed 
    * Updates the file size in the file entity.
    */
   protected function outputfile_update_size() {
-    $output_file = $this->outputfile_path();
-    $file = current(file_load_multiple(array(), array('uri' => $output_file)));
-    if ($file) {
-      $file->filesize = filesize($output_file);
+    if ($file = $this->outputfile_entity()) {
+      $file->filesize = filesize($file->uri);
       file_save($file);
     }
   }
