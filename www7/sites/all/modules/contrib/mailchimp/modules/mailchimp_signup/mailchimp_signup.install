@@ -83,3 +83,26 @@ function mailchimp_signup_update_7000(&$sandbox) {
     $signup->save();
   }
 }
+
+/**
+ * Reformat mergevar data from an array to an object. This will fix the broken
+ * Signup Forms without needing to re-save.
+ */
+function mailchimp_signup_update_7001(&$sandbox) {
+  $signups = entity_load('mailchimp_signup');
+
+  foreach ($signups as $signup) {
+    $mc_lists = $signup->mc_lists;
+    $list_mergevars = mailchimp_get_mergevars($mc_lists);
+
+    $mergevars_array = [];
+    foreach ($list_mergevars as $list => $mergevars) {
+      foreach ($mergevars as $mergevar) {
+        $mergevars_array[$mergevar->tag] = $mergevar;
+      }
+    }
+
+    $signup->settings['mergefields'] = $mergevars_array;
+    $signup->save();
+  }
+}

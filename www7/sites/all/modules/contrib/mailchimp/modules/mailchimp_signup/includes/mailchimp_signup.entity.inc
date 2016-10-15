@@ -18,6 +18,21 @@ class MailchimpSignup extends Entity {
    * Override parent constructor to set the entity type.
    */
   public function __construct(array $values = array()) {
+    // The Features module calls the entity controller with all values cast to
+    // an array. The mergefields and its settings are returned by the Mailchimp
+    // API as objects. When constructing the entity from the Features import,
+    // cast the mergefields back to objects for a consistent data model.
+    if (!empty($values['settings']['mergefields'])) {
+      foreach ($values['settings']['mergefields'] as $tag => $mergefield) {
+        if (is_array($mergefield)) {
+          if (is_array($mergefield['options'])) {
+            $mergefield['options'] = (object) $mergefield['options'];
+          }
+          $values['settings']['mergefields'][$tag] = (object) $mergefield;
+        }
+      }
+    }
+
     parent::__construct($values, 'mailchimp_signup');
   }
 

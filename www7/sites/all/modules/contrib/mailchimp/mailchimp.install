@@ -23,23 +23,16 @@ function mailchimp_requirements($phase) {
   // Ensure translations don't break at install time:
   $t = get_t();
 
-  if ($phase == 'update') {
-    $path = drupal_get_path('module', 'libraries') . '/libraries.info';
-    $info = drupal_parse_info_file($path);
-    if (version_compare($info['version'], '7.x-2.0', '<')) {
-      $requirements['mailchimp'] = array(
-        'title' => $t('Mailchimp'),
-        'value' => '7.x-2.x',
-        'description' => $t('libraries 2.x is required for MailChimp 7.x-2.8 or higher.'),
-        'severity' => REQUIREMENT_ERROR,
-      );
-      return $requirements;
-    }
-  }
-
   // Report Drupal version:
   if (in_array($phase, array('runtime', 'update'))) {
-    $library = libraries_detect('mailchimp');
+    // Check to see if Libraries module is being used.
+    if (module_exists('libraries')) {
+      $library = libraries_detect('mailchimp');
+    }
+    // If not we set the variable to false
+    else {
+      $library = FALSE;
+    }
     $requirements['mailchimp'] = array(
       'title' => $t('MailChimp'),
     );
@@ -51,6 +44,15 @@ function mailchimp_requirements($phase) {
         'severity' => REQUIREMENT_OK,
       );
     }
+    // Check to see if the API library is being loaded by composer.
+    elseif (class_exists('Mailchimp\Mailchimp')) {
+      $requirements['mailchimp'] += array(
+        'value' => Mailchimp\Mailchimp::VERSION,
+        'description' => $t('The MailChimp MCAPI wrapper library is installed correctly.'),
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    // No API from libraries or composer, punt!
     else {
       $requirements['mailchimp'] += array(
         'value' => $library['error'],

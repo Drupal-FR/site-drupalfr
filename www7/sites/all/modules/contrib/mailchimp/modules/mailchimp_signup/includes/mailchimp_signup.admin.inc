@@ -113,7 +113,7 @@ function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
   $lists = mailchimp_get_lists();
   $options = array();
   foreach ($lists as $mc_list) {
-    $options[$mc_list['id']] = $mc_list['name'];
+    $options[$mc_list->id] = $mc_list->name;
   }
   $form['mc_lists_config']['mc_lists'] = array(
     '#type' => 'checkboxes',
@@ -154,20 +154,20 @@ function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
     $mergevar_settings = mailchimp_get_mergevars(array_filter($mc_lists));
     $form_state['mergevar_options'] = array();
     foreach ($mergevar_settings as $list_mergevars) {
-      foreach ($list_mergevars['merge_vars'] as $mergevar) {
-        $form_state['mergevar_options'][$mergevar['tag']] = $mergevar;
-        if (!$mergevar['public']) {
-          $form_state['mergevar_options'][$mergevar['tag']]['name'] .= ' (private)';
+      foreach ($list_mergevars as $mergevar) {
+        $form_state['mergevar_options'][$mergevar->tag] = $mergevar;
+        if (!$mergevar->public) {
+          $form_state['mergevar_options'][$mergevar->tag]->name .= ' (private)';
         };
       }
     }
     foreach ($form_state['mergevar_options'] as $mergevar) {
-      $form['mc_lists_config']['mergefields'][$mergevar['tag']] = array(
+      $form['mc_lists_config']['mergefields'][$mergevar->tag] = array(
         '#type' => 'checkbox',
-        '#title' => check_plain($mergevar['name']),
-        '#default_value' => isset($signup->settings['mergefields'][$mergevar['tag']]) ? !empty($signup->settings['mergefields'][$mergevar['tag']]) : TRUE,
-        '#required' => $mergevar['req'],
-        '#disabled' => $mergevar['req'],
+        '#title' => check_plain($mergevar->name),
+        '#default_value' => isset($signup->settings['mergefields'][$mergevar->tag]) ? !empty($signup->settings['mergefields'][$mergevar->tag]) : TRUE,
+        '#required' => $mergevar->required,
+        '#disabled' => $mergevar->required,
       );
     }
   }
@@ -184,13 +184,6 @@ function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
     '#title' => t('Require subscribers to Double Opt-in'),
     '#description' => t('New subscribers will be sent a link with an email they must follow to confirm their subscription.'),
     '#default_value' => isset($signup->settings['doublein']) ? $signup->settings['doublein'] : FALSE,
-  );
-
-  $form['subscription_settings']['send_welcome'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Send a welcome email to new subscribers'),
-    '#description' => t('New subscribers will be sent a welcome email once they are confirmed.'),
-    '#default_value' => isset($signup->settings['send_welcome']) ? $signup->settings['send_welcome'] : FALSE,
   );
 
   $form['subscription_settings']['include_interest_groups'] = array(
@@ -257,7 +250,6 @@ function mailchimp_signup_form_submit($form, &$form_state) {
   $signup->settings['mergefields'] = $mergefields;
   $signup->settings['description'] = $form_state['values']['description'];
   $signup->settings['doublein'] = $form_state['values']['doublein'];
-  $signup->settings['send_welcome'] = $form_state['values']['send_welcome'];
   $signup->settings['include_interest_groups'] = $form_state['values']['include_interest_groups'];
   if ($signup->save()) {
     if (isset($form_state['values']['settings']['path'])) {
@@ -266,6 +258,21 @@ function mailchimp_signup_form_submit($form, &$form_state) {
         menu_rebuild();
       }
     }
+
+    // update i18n translation sources
+    $language = language_default('language');
+    $t_strings = array('title', 'name', 'description');
+    foreach($t_strings as $key){
+      mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:$key", $form_state['values'][$key], $language, TRUE);
+    }
+    foreach ($mergefields as $id => $val) {
+      if ($val) {
+        mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:mergefield:$id", $val->name, $language, TRUE);
+      }
+    }
+    mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:confirmation_message", $form_state['values']['settings']['confirmation_message'], $language, TRUE);
+    mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:submit_button", $form_state['values']['settings']['submit_button'], $language, TRUE);
+
     drupal_set_message(t('Signup form @name has been saved.',
       array('@name' => $signup->name)));
     $form_state['redirect'] = 'admin/config/services/mailchimp/signup';

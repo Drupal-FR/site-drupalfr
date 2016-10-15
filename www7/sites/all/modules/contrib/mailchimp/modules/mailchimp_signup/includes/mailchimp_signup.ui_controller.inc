@@ -51,7 +51,7 @@ class MailChimpSignupUIController extends EntityDefaultUIController {
       }
       $list_labels = array();
       foreach ($signup->mc_lists as $list_id) {
-        $list_labels[] = l($mc_lists[$list_id]['name'], 'https://admin.mailchimp.com/lists/dashboard/overview?id=' . $mc_lists[$list_id]['web_id']);
+        $list_labels[] = l($mc_lists[$list_id]->name, 'https://admin.mailchimp.com/lists');
       }
       if ($block_only) {
         $access = t('N/A - this form only exists as a block');
