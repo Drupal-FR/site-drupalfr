@@ -35,51 +35,14 @@ function drupalfr_user_default_mailchimp_signup() {
       "confirmation_message" : "Vous avez \\u00e9t\\u00e9 enregistr\\u00e9 avec succ\\u00e8s.",
       "destination" : "",
       "mergefields" : {
-        "EMAIL" : {
-          "name" : "Adresse email",
-          "req" : true,
-          "field_type" : "email",
-          "public" : true,
-          "show" : true,
-          "order" : "1",
-          "default" : "",
-          "helptext" : "",
-          "size" : "25",
-          "tag" : "EMAIL",
-          "id" : 0
-        },
-        "FNAME" : {
-          "name" : "Pr\\u00e9nom",
-          "req" : false,
-          "field_type" : "text",
-          "public" : true,
-          "show" : true,
-          "order" : "2",
-          "default" : "",
-          "helptext" : "",
-          "size" : "25",
-          "tag" : "FNAME",
-          "id" : 1
-        },
-        "LNAME" : {
-          "name" : "Nom",
-          "req" : false,
-          "field_type" : "text",
-          "public" : true,
-          "show" : true,
-          "order" : "3",
-          "default" : "",
-          "helptext" : "",
-          "size" : "25",
-          "tag" : "LNAME",
-          "id" : 2
-        },
-        "MMERGE3" : 0,
-        "MMERGE4" : 0
+        "EMAIL" : {"tag":"EMAIL","name":"Email Address","type":"email","required":true,"default_value":"","public":true,"display_order":1,"options":{"size":25}},
+        "FNAME" : {"merge_id":1,"tag":"FNAME","name":"Pr\\u00e9nom","type":"text","required":false,"default_value":"","public":true,"display_order":2,"options":{"size":25},"help_text":"","list_id":"27e99cb1af","_links":[{"rel":"self","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/1","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"parent","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Collection.json","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/CollectionLinks\\/Lists\\/MergeFields.json"},{"rel":"update","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/1","method":"PATCH","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"delete","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/1","method":"DELETE"}]},
+        "LNAME" : {"merge_id":2,"tag":"LNAME","name":"Nom","type":"text","required":false,"default_value":"","public":true,"display_order":3,"options":{"size":25},"help_text":"","list_id":"27e99cb1af","_links":[{"rel":"self","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/2","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"parent","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Collection.json","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/CollectionLinks\\/Lists\\/MergeFields.json"},{"rel":"update","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/2","method":"PATCH","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"delete","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/2","method":"DELETE"}]},
+        "MMERGE3" : {"merge_id":3,"tag":"MMERGE3","name":"Contacted (private)","type":"text","required":false,"default_value":"","public":false,"display_order":4,"options":{"size":25},"help_text":"","list_id":"27e99cb1af","_links":[{"rel":"self","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/3","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"parent","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Collection.json","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/CollectionLinks\\/Lists\\/MergeFields.json"},{"rel":"update","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/3","method":"PATCH","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"delete","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/3","method":"DELETE"}]},
+        "MMERGE4" : {"merge_id":4,"tag":"MMERGE4","name":"ToSkip (private)","type":"text","required":false,"default_value":"","public":false,"display_order":5,"options":{"size":25},"help_text":"","list_id":"27e99cb1af","_links":[{"rel":"self","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/4","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"parent","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields","method":"GET","targetSchema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Collection.json","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/CollectionLinks\\/Lists\\/MergeFields.json"},{"rel":"update","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/4","method":"PATCH","schema":"https:\\/\\/us8.api.mailchimp.com\\/schema\\/3.0\\/Lists\\/MergeFields\\/Instance.json"},{"rel":"delete","href":"https:\\/\\/us8.api.mailchimp.com\\/3.0\\/lists\\/27e99cb1af\\/merge-fields\\/4","method":"DELETE"}]}
       },
       "description" : "",
       "doublein" : 1,
-      "send_welcome" : 0,
       "include_interest_groups" : 0
     }
   }');
