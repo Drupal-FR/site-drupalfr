@@ -1,263 +1,313 @@
 <?php
 
-require_once 'Mailchimp/Folders.php';
-require_once 'Mailchimp/Templates.php';
-require_once 'Mailchimp/Users.php';
-require_once 'Mailchimp/Helper.php';
-require_once 'Mailchimp/Mobile.php';
-require_once 'Mailchimp/Conversations.php';
-require_once 'Mailchimp/Ecomm.php';
-require_once 'Mailchimp/Neapolitan.php';
-require_once 'Mailchimp/Lists.php';
-require_once 'Mailchimp/Campaigns.php';
-require_once 'Mailchimp/Vip.php';
-require_once 'Mailchimp/Reports.php';
-require_once 'Mailchimp/Gallery.php';
-require_once 'Mailchimp/Goal.php';
-require_once 'Mailchimp/Exceptions.php';
+namespace Mailchimp;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
+/**
+ * Mailchimp library.
+ *
+ * @package Mailchimp
+ */
 class Mailchimp {
-    
-    public $apikey;
-    public $ch;
-    public $root  = 'https://api.mailchimp.com/2.0';
-    public $debug = false;
 
-    public static $error_map = array(
-        "ValidationError" => "Mailchimp_ValidationError",
-        "ServerError_MethodUnknown" => "Mailchimp_ServerError_MethodUnknown",
-        "ServerError_InvalidParameters" => "Mailchimp_ServerError_InvalidParameters",
-        "Unknown_Exception" => "Mailchimp_Unknown_Exception",
-        "Request_TimedOut" => "Mailchimp_Request_TimedOut",
-        "Zend_Uri_Exception" => "Mailchimp_Zend_Uri_Exception",
-        "PDOException" => "Mailchimp_PDOException",
-        "Avesta_Db_Exception" => "Mailchimp_Avesta_Db_Exception",
-        "XML_RPC2_Exception" => "Mailchimp_XML_RPC2_Exception",
-        "XML_RPC2_FaultException" => "Mailchimp_XML_RPC2_FaultException",
-        "Too_Many_Connections" => "Mailchimp_Too_Many_Connections",
-        "Parse_Exception" => "Mailchimp_Parse_Exception",
-        "User_Unknown" => "Mailchimp_User_Unknown",
-        "User_Disabled" => "Mailchimp_User_Disabled",
-        "User_DoesNotExist" => "Mailchimp_User_DoesNotExist",
-        "User_NotApproved" => "Mailchimp_User_NotApproved",
-        "Invalid_ApiKey" => "Mailchimp_Invalid_ApiKey",
-        "User_UnderMaintenance" => "Mailchimp_User_UnderMaintenance",
-        "Invalid_AppKey" => "Mailchimp_Invalid_AppKey",
-        "Invalid_IP" => "Mailchimp_Invalid_IP",
-        "User_DoesExist" => "Mailchimp_User_DoesExist",
-        "User_InvalidRole" => "Mailchimp_User_InvalidRole",
-        "User_InvalidAction" => "Mailchimp_User_InvalidAction",
-        "User_MissingEmail" => "Mailchimp_User_MissingEmail",
-        "User_CannotSendCampaign" => "Mailchimp_User_CannotSendCampaign",
-        "User_MissingModuleOutbox" => "Mailchimp_User_MissingModuleOutbox",
-        "User_ModuleAlreadyPurchased" => "Mailchimp_User_ModuleAlreadyPurchased",
-        "User_ModuleNotPurchased" => "Mailchimp_User_ModuleNotPurchased",
-        "User_NotEnoughCredit" => "Mailchimp_User_NotEnoughCredit",
-        "MC_InvalidPayment" => "Mailchimp_MC_InvalidPayment",
-        "List_DoesNotExist" => "Mailchimp_List_DoesNotExist",
-        "List_InvalidInterestFieldType" => "Mailchimp_List_InvalidInterestFieldType",
-        "List_InvalidOption" => "Mailchimp_List_InvalidOption",
-        "List_InvalidUnsubMember" => "Mailchimp_List_InvalidUnsubMember",
-        "List_InvalidBounceMember" => "Mailchimp_List_InvalidBounceMember",
-        "List_AlreadySubscribed" => "Mailchimp_List_AlreadySubscribed",
-        "List_NotSubscribed" => "Mailchimp_List_NotSubscribed",
-        "List_InvalidImport" => "Mailchimp_List_InvalidImport",
-        "MC_PastedList_Duplicate" => "Mailchimp_MC_PastedList_Duplicate",
-        "MC_PastedList_InvalidImport" => "Mailchimp_MC_PastedList_InvalidImport",
-        "Email_AlreadySubscribed" => "Mailchimp_Email_AlreadySubscribed",
-        "Email_AlreadyUnsubscribed" => "Mailchimp_Email_AlreadyUnsubscribed",
-        "Email_NotExists" => "Mailchimp_Email_NotExists",
-        "Email_NotSubscribed" => "Mailchimp_Email_NotSubscribed",
-        "List_MergeFieldRequired" => "Mailchimp_List_MergeFieldRequired",
-        "List_CannotRemoveEmailMerge" => "Mailchimp_List_CannotRemoveEmailMerge",
-        "List_Merge_InvalidMergeID" => "Mailchimp_List_Merge_InvalidMergeID",
-        "List_TooManyMergeFields" => "Mailchimp_List_TooManyMergeFields",
-        "List_InvalidMergeField" => "Mailchimp_List_InvalidMergeField",
-        "List_InvalidInterestGroup" => "Mailchimp_List_InvalidInterestGroup",
-        "List_TooManyInterestGroups" => "Mailchimp_List_TooManyInterestGroups",
-        "Campaign_DoesNotExist" => "Mailchimp_Campaign_DoesNotExist",
-        "Campaign_StatsNotAvailable" => "Mailchimp_Campaign_StatsNotAvailable",
-        "Campaign_InvalidAbsplit" => "Mailchimp_Campaign_InvalidAbsplit",
-        "Campaign_InvalidContent" => "Mailchimp_Campaign_InvalidContent",
-        "Campaign_InvalidOption" => "Mailchimp_Campaign_InvalidOption",
-        "Campaign_InvalidStatus" => "Mailchimp_Campaign_InvalidStatus",
-        "Campaign_NotSaved" => "Mailchimp_Campaign_NotSaved",
-        "Campaign_InvalidSegment" => "Mailchimp_Campaign_InvalidSegment",
-        "Campaign_InvalidRss" => "Mailchimp_Campaign_InvalidRss",
-        "Campaign_InvalidAuto" => "Mailchimp_Campaign_InvalidAuto",
-        "MC_ContentImport_InvalidArchive" => "Mailchimp_MC_ContentImport_InvalidArchive",
-        "Campaign_BounceMissing" => "Mailchimp_Campaign_BounceMissing",
-        "Campaign_InvalidTemplate" => "Mailchimp_Campaign_InvalidTemplate",
-        "Invalid_EcommOrder" => "Mailchimp_Invalid_EcommOrder",
-        "Absplit_UnknownError" => "Mailchimp_Absplit_UnknownError",
-        "Absplit_UnknownSplitTest" => "Mailchimp_Absplit_UnknownSplitTest",
-        "Absplit_UnknownTestType" => "Mailchimp_Absplit_UnknownTestType",
-        "Absplit_UnknownWaitUnit" => "Mailchimp_Absplit_UnknownWaitUnit",
-        "Absplit_UnknownWinnerType" => "Mailchimp_Absplit_UnknownWinnerType",
-        "Absplit_WinnerNotSelected" => "Mailchimp_Absplit_WinnerNotSelected",
-        "Invalid_Analytics" => "Mailchimp_Invalid_Analytics",
-        "Invalid_DateTime" => "Mailchimp_Invalid_DateTime",
-        "Invalid_Email" => "Mailchimp_Invalid_Email",
-        "Invalid_SendType" => "Mailchimp_Invalid_SendType",
-        "Invalid_Template" => "Mailchimp_Invalid_Template",
-        "Invalid_TrackingOptions" => "Mailchimp_Invalid_TrackingOptions",
-        "Invalid_Options" => "Mailchimp_Invalid_Options",
-        "Invalid_Folder" => "Mailchimp_Invalid_Folder",
-        "Invalid_URL" => "Mailchimp_Invalid_URL",
-        "Module_Unknown" => "Mailchimp_Module_Unknown",
-        "MonthlyPlan_Unknown" => "Mailchimp_MonthlyPlan_Unknown",
-        "Order_TypeUnknown" => "Mailchimp_Order_TypeUnknown",
-        "Invalid_PagingLimit" => "Mailchimp_Invalid_PagingLimit",
-        "Invalid_PagingStart" => "Mailchimp_Invalid_PagingStart",
-        "Max_Size_Reached" => "Mailchimp_Max_Size_Reached",
-        "MC_SearchException" => "Mailchimp_MC_SearchException",
-        "Goal_SaveFailed" => "Mailchimp_Goal_SaveFailed",
-        "Conversation_DoesNotExist" => "Mailchimp_Conversation_DoesNotExist",
-        "Conversation_ReplySaveFailed" => "Mailchimp_Conversation_ReplySaveFailed",
-        "File_Not_Found_Exception" => "Mailchimp_File_Not_Found_Exception",
-        "Folder_Not_Found_Exception" => "Mailchimp_Folder_Not_Found_Exception",
-        "Folder_Exists_Exception" => "Mailchimp_Folder_Exists_Exception"
-    );
+  const VERSION = '1.0.4';
+  const DEFAULT_DATA_CENTER = 'us1';
 
-    public function __construct($apikey=null, $opts=array()) {
-        if (!$apikey) {
-            $apikey = getenv('MAILCHIMP_APIKEY');
-        }
+  const ERROR_CODE_BAD_REQUEST = 'BadRequest';
+  const ERROR_CODE_INVALID_ACTION = 'InvalidAction';
+  const ERROR_CODE_INVALID_RESOURCE = 'InvalidResource';
+  const ERROR_CODE_JSON_PARSE_ERROR = 'JSONParseError';
+  const ERROR_CODE_API_KEY_MISSING = 'APIKeyMissing';
+  const ERROR_CODE_API_KEY_INVALID = 'APIKeyInvalid';
+  const ERROR_CODE_FORBIDDEN = 'Forbidden';
+  const ERROR_CODE_USER_DISABLED = 'UserDisabled';
+  const ERROR_CODE_WRONG_DATACENTER = 'WrongDatacenter';
+  const ERROR_CODE_RESOURCE_NOT_FOUND = 'ResourceNotFound';
+  const ERROR_CODE_METHOD_NOT_ALLOWED = 'MethodNotAllowed';
+  const ERROR_CODE_RESOURCE_NESTING_TOO_DEEP = 'ResourceNestingTooDeep';
+  const ERROR_CODE_INVALID_METHOD_OVERRIDE = 'InvalidMethodOverride';
+  const ERROR_CODE_REQUESTED_FIELDS_INVALID = 'RequestedFieldsInvalid';
+  const ERROR_CODE_TOO_MANY_REQUESTS = 'TooManyRequests';
+  const ERROR_CODE_INTERNAL_SERVER_ERROR = 'InternalServerError';
+  const ERROR_CODE_COMPLIANCE_RELATED = 'ComplianceRelated';
 
-        if (!$apikey) {
-            $apikey = $this->readConfigs();
-        }
+  /**
+   * API version.
+   *
+   * @var string $version
+   */
+  public $version = self::VERSION;
 
-        if (!$apikey) {
-            throw new Mailchimp_Error('You must provide a MailChimp API key');
-        }
+  /**
+   * The GuzzleHttp Client.
+   *
+   * @var Client $client
+   */
+  protected $client;
 
-        $this->apikey = $apikey;
-        $dc           = "us1";
+  /**
+   * The REST API endpoint.
+   *
+   * @var string $endpoint
+   */
+  protected $endpoint = 'https://us1.api.mailchimp.com/3.0';
 
-        if (strstr($this->apikey, "-")){
-            list($key, $dc) = explode("-", $this->apikey, 2);
-            if (!$dc) {
-                $dc = "us1";
-            }
-        }
+  /**
+   * The MailChimp API key to authenticate with.
+   *
+   * @var string $api_key
+   */
+  private $api_key;
 
-        $this->root = str_replace('https://api', 'https://' . $dc . '.api', $this->root);
-        $this->root = rtrim($this->root, '/') . '/';
+  /**
+   * The MailChimp API username to authenticate with.
+   *
+   * @var string $api_user
+   */
+  private $api_user;
 
-        if (!isset($opts['timeout']) || !is_int($opts['timeout'])){
-            $opts['timeout'] = 600;
-        }
-        if (isset($opts['debug'])){
-            $this->debug = true;
-        }
+  /**
+   * A MailChimp API error code to return with every API response.
+   *
+   * Used for testing / debugging error handling.
+   * See ERROR_CODE_* constants.
+   *
+   * @var string $debug_error_code
+   */
+  private $debug_error_code;
 
+  /**
+   * Array of pending batch operations.
+   *
+   * @var array $batch_operations
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/batches/#create-post_batches
+   */
+  private $batch_operations;
 
-        $this->ch = curl_init();
+  /**
+   * Mailchimp constructor.
+   *
+   * @param string $api_key
+   *   The MailChimp API key.
+   * @param string $api_user
+   *   The MailChimp API username.
+   * @param int $timeout
+   *   Maximum request time in seconds.
+   */
+  public function __construct($api_key, $api_user = 'apikey', $timeout = 10) {
+    $this->api_key = $api_key;
+    $this->api_user = $api_user;
 
-        if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
-            curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);    
-        }
+    $dc = $this->getDataCenter($this->api_key);
 
-        curl_setopt($this->ch, CURLOPT_USERAGENT, 'MailChimp-PHP/2.0.6');
-        curl_setopt($this->ch, CURLOPT_POST, true);
-        curl_setopt($this->ch, CURLOPT_HEADER, false);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $opts['timeout']);
+    $this->endpoint = str_replace(Mailchimp::DEFAULT_DATA_CENTER, $dc, $this->endpoint);
 
+    $this->client = new Client([
+      'timeout' => $timeout,
+    ]);
+  }
 
-        $this->folders = new Mailchimp_Folders($this);
-        $this->templates = new Mailchimp_Templates($this);
-        $this->users = new Mailchimp_Users($this);
-        $this->helper = new Mailchimp_Helper($this);
-        $this->mobile = new Mailchimp_Mobile($this);
-        $this->conversations = new Mailchimp_Conversations($this);
-        $this->ecomm = new Mailchimp_Ecomm($this);
-        $this->neapolitan = new Mailchimp_Neapolitan($this);
-        $this->lists = new Mailchimp_Lists($this);
-        $this->campaigns = new Mailchimp_Campaigns($this);
-        $this->vip = new Mailchimp_Vip($this);
-        $this->reports = new Mailchimp_Reports($this);
-        $this->gallery = new Mailchimp_Gallery($this);
-        $this->goal = new Mailchimp_Goal($this);
+  /**
+   * Sets a MailChimp error code to be returned by all requests.
+   *
+   * Used to test and debug error handling.
+   *
+   * @param string $error_code
+   *   The MailChimp error code.
+   */
+  public function setDebugErrorCode($error_code) {
+    $this->debug_error_code = $error_code;
+  }
+
+  /**
+   * Gets MailChimp account information for the authenticated account.
+   *
+   * @return object
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/root/#read-get_root
+   */
+  public function getAccount() {
+    return $this->request('GET', '/');
+  }
+
+  /**
+   * Processes all pending batch operations.
+   *
+   * @throws MailchimpAPIException
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/batches/#create-post_batches
+   */
+  public function processBatchOperations() {
+    $parameters = [
+      'operations' => $this->batch_operations,
+    ];
+
+    try {
+      $response = $this->request('POST', '/batches', NULL, $parameters);
+
+      // Reset batch operations.
+      $this->batch_operations = [];
+
+      return $response;
+
+    }
+    catch (MailchimpAPIException $e) {
+      $message = 'Failed to process batch operations: ' . $e->getMessage();
+      throw new MailchimpAPIException($message, $e->getCode(), $e);
+    }
+  }
+
+  /**
+   * Gets the status of a batch request.
+   *
+   * @param string $batch_id
+   *   The ID of the batch operation.
+   *
+   * @return object
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/batches/#read-get_batches_batch_id
+   */
+  public function getBatchOperation($batch_id) {
+    $tokens = [
+      'batch_id' => $batch_id,
+    ];
+
+    return $this->request('GET', '/batches/{batch_id}', $tokens);
+  }
+
+  /**
+   * Adds a pending batch operation.
+   *
+   * @param string $method
+   *   The HTTP method.
+   * @param string $path
+   *   The request path, relative to the API endpoint.
+   * @param array $parameters
+   *   Associative array of optional request parameters.
+   *
+   * @return object
+   *   The new batch operation object.
+   *
+   * @throws MailchimpAPIException
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/batches/#create-post_batches
+   */
+  protected function addBatchOperation($method, $path, $parameters = []) {
+    if (empty($method) || empty($path)) {
+      throw new MailchimpAPIException('Cannot add batch operation without a method and path.');
     }
 
-    public function __destruct() {
-        if(is_resource($this->ch)) {
-            curl_close($this->ch);
-        }
+    $op = (object) [
+      'method' => $method,
+      'path' => $path,
+    ];
+
+    if (!empty($parameters)) {
+      if ($method == 'GET') {
+        $op->params = (object) $parameters;
+      }
+      else {
+        $op->body = json_encode($parameters);
+      }
     }
 
-    public function call($url, $params) {
-        $params['apikey'] = $this->apikey;
-        
-        $params = json_encode($params);
-        $ch     = $this->ch;
-
-        curl_setopt($ch, CURLOPT_URL, $this->root . $url . '.json');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
-
-        $start = microtime(true);
-        $this->log('Call to ' . $this->root . $url . '.json: ' . $params);
-        if($this->debug) {
-            $curl_buffer = fopen('php://memory', 'w+');
-            curl_setopt($ch, CURLOPT_STDERR, $curl_buffer);
-        }
-
-        $response_body = curl_exec($ch);
-
-        $info = curl_getinfo($ch);
-        $time = microtime(true) - $start;
-        if($this->debug) {
-            rewind($curl_buffer);
-            $this->log(stream_get_contents($curl_buffer));
-            fclose($curl_buffer);
-        }
-        $this->log('Completed in ' . number_format($time * 1000, 2) . 'ms');
-        $this->log('Got response: ' . $response_body);
-
-        if(curl_error($ch)) {
-            throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
-        }
-        $result = json_decode($response_body, true);
-        
-        if(floor($info['http_code'] / 100) >= 4) {
-            throw $this->castError($result);
-        }
-
-        return $result;
+    if (empty($this->batch_operations)) {
+      $this->batch_operations = [];
     }
 
-    public function readConfigs() {
-        $paths = array('~/.mailchimp.key', '/etc/mailchimp.key');
-        foreach($paths as $path) {
-            if(file_exists($path)) {
-                $apikey = trim(file_get_contents($path));
-                if ($apikey) {
-                    return $apikey;
-                }
-            }
-        }
-        return false;
+    $this->batch_operations[] = $op;
+
+    return $op;
+  }
+
+  /**
+   * Makes a request to the MailChimp API.
+   *
+   * @param string $method
+   *   The REST method to use when making the request.
+   * @param string $path
+   *   The API path to request.
+   * @param array $tokens
+   *   Associative array of tokens and values to replace in the path.
+   * @param array $parameters
+   *   Associative array of parameters to send in the request body.
+   * @param bool $batch
+   *   TRUE if this request should be added to pending batch operations.
+   *
+   * @return object
+   *
+   * @throws MailchimpAPIException
+   */
+  protected function request($method, $path, $tokens = NULL, $parameters = NULL, $batch = FALSE) {
+    if (!empty($tokens)) {
+      foreach ($tokens as $key => $value) {
+        $path = str_replace('{' . $key . '}', $value, $path);
+      }
     }
 
-    public function castError($result) {
-        if ($result['status'] !== 'error' || !$result['name']) {
-            throw new Mailchimp_Error('We received an unexpected error: ' . json_encode($result));
-        }
-
-        $class = (isset(self::$error_map[$result['name']])) ? self::$error_map[$result['name']] : 'Mailchimp_Error';
-        return new $class($result['error'], $result['code']);
+    if ($batch) {
+      return $this->addBatchOperation($method, $path, $parameters);
     }
 
-    public function log($msg) {
-        if ($this->debug) {
-            error_log($msg);
-        }
+    // Set default request options with auth header.
+    $options = [
+      'headers' => [
+        'Authorization' => $this->api_user . ' ' . $this->api_key,
+      ],
+    ];
+
+    // Add trigger error header if a debug error code has been set.
+    if (!empty($this->debug_error_code)) {
+      $options['headers']['X-Trigger-Error'] = $this->debug_error_code;
     }
+
+    if (!empty($parameters)) {
+      if ($method == 'GET') {
+        // Send parameters as query string parameters.
+        $options['query'] = $parameters;
+      }
+      else {
+        // Send parameters as JSON in request body.
+        $options['json'] = (object) $parameters;
+      }
+    }
+
+    try {
+      $response = $this->client->request($method, $this->endpoint . $path, $options);
+      $data = json_decode($response->getBody());
+
+      return $data;
+
+    }
+    catch (RequestException $e) {
+      $response = $e->getResponse();
+      if (!empty($response)) {
+        $message = $e->getResponse()->getBody();
+      }
+      else {
+        $message = $e->getMessage();
+      }
+
+      throw new MailchimpAPIException($message, $e->getCode(), $e);
+    }
+  }
+
+  /**
+   * Gets the ID of the data center associated with an API key.
+   *
+   * @param string $api_key
+   *   The MailChimp API key.
+   *
+   * @return string
+   *   The data center ID.
+   */
+  private function getDataCenter($api_key) {
+    $api_key_parts = explode('-', $api_key);
+
+    return (isset($api_key_parts[1])) ? $api_key_parts[1] : Mailchimp::DEFAULT_DATA_CENTER;
+  }
+
 }
-
-

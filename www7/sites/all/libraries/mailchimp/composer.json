@@ -1,21 +1,25 @@
 {
-    "name": "mailchimp/mailchimp",
-    "type": "library",
-    "version": "2.0.6",
-    "description": "API client library for the MailChimp bulk email as a service platform",
-    "keywords": ["email", "api"],
-    "homepage": "https://bitbucket.org/mailchimp/mailchimp-api-php",
-    "license": "MIT",
-    "authors": [{"name": "MailChimp Devs", "email": "api@mailchimp.com", "homepage": "http://mailchimp.com", "role": "Developer"}],
-    "require": {
-        "php": ">=5.2.0"
-    },
-    "require-dev": {
-        "apigen/apigen": "dev-master"
-    },
-    "autoload": {
-        "psr-0": {
-            "Mailchimp": "src/"
-        }
+  "name": "thinkshout/mailchimp-api-php",
+  "version": "1.0.4",
+  "type": "library",
+  "description": "PHP library for v3 of the MailChimp API",
+  "keywords": ["mailchimp", "mail"],
+  "homepage": "https://github.com/thinkshout/mailchimp-api-php",
+  "require": {
+    "php": ">=5.5.0",
+    "guzzlehttp/guzzle": "6.2.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.8.21"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mailchimp\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mailchimp\\Tests\\": "tests/src/"
+    }
+  }
 }
