@@ -50,7 +50,7 @@ function mailchimp_menu() {
 
   $items['admin/config/services/mailchimp'] = array(
     'title' => 'MailChimp',
-    'description' => t('Manage MailChimp Settings.'),
+    'description' => 'Manage MailChimp Settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_admin_settings'),
     'access arguments' => array('administer mailchimp'),
@@ -58,7 +58,7 @@ function mailchimp_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
   $items['admin/config/services/mailchimp/global'] = array(
-    'title' => t('Global Settings'),
+    'title' => 'Global Settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
@@ -109,11 +109,13 @@ function mailchimp_apikey_ready_access($permission) {
  *
  * @param string $classname
  *   The MailChimp library class to instantiate.
+ * @param string $api_key
+ *   The MailChimp api key to use if not the default.
  *
  * @return Mailchimp
  *   Instance of the MailChimp library class. Can be overridden by $classname.
  */
-function mailchimp_get_api_object($classname = 'Mailchimp') {
+function mailchimp_get_api_object($classname = 'Mailchimp', $api_key = NULL) {
   // Set correct library class namespace depending on test mode.
   if (variable_get('mailchimp_test_mode', FALSE)) {
     $classname = '\Mailchimp\Tests\\' . $classname;
@@ -123,7 +125,7 @@ function mailchimp_get_api_object($classname = 'Mailchimp') {
   }
 
   $mailchimp = &drupal_static(__FUNCTION__);
-  if (isset($mailchimp) && $mailchimp instanceof $classname) {
+  if (!$api_key && isset($mailchimp) && $mailchimp instanceof $classname) {
     return $mailchimp;
   }
   if (module_exists('libraries')) {
@@ -146,9 +148,22 @@ function mailchimp_get_api_object($classname = 'Mailchimp') {
     return NULL;
   }
 
-  $api_key = variable_get('mailchimp_api_key', '');
+  $context = array(
+    'api_class' => $classname,
+  );
+  if (!$api_key) {
+    $api_key = $default_api_key = variable_get('mailchimp_api_key', '');
+    // Allow modules to alter the default.
+    drupal_alter('mailchimp_api_key', $api_key, $context);
+    // Check to see if the key was altered.
+    if ($api_key !== $default_api_key) {
+      // Invalidate all caches because the key was altered.
+      mailchimp_cache_clear_all();
+    }
+  }
+
   if (!strlen($api_key)) {
-    watchdog('mailchimp', t('MailChimp Error: API Key cannot be blank.'), array(), WATCHDOG_ERROR);
+    watchdog('mailchimp', 'MailChimp Error: API Key cannot be blank.', array(), WATCHDOG_ERROR);
     return NULL;
   }
   // Set the timeout to something that won't take down the Drupal site:
@@ -404,7 +419,7 @@ function mailchimp_get_memberinfo($list_id, $email, $reset = FALSE) {
  * @param string $list_id
  *   Unique string identifier for the list on your MailChimp account.
  * @param string $email
- *   Email address to check for on the identified MailChimp List
+ *   Email address to check for on the identified MailChimp List.
  * @param bool $reset
  *   Set to TRUE to ignore the cache. (Used heavily in testing functions.)
  *
@@ -446,12 +461,16 @@ function mailchimp_subscribe($list_id, $email, $merge_vars = NULL, $interests = 
 }
 
 /**
- * Wrapper around Mailchimp_Lists::subscribe().
+ * Wrapper around MailchimpLists::addOrUpdateMember().
  *
- * @see Mailchimp_Lists::subscribe()
+ * @see MailchimpLists::addOrUpdateMember()
  *
- * @return bool
- *   True on success.
+ * @return object
+ *   On success a result object will be returned from Mailchimp. On failure an
+ *   object will be returned with the property success set to FALSE, the
+ *   response code as a property, and the message as a property. To check for
+ *   a failure, look for the property 'success' of the object returned to
+ *   be set to FALSE.
  */
 function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $interests = array(), $double_optin = FALSE, $format = 'html') {
   $result = FALSE;
@@ -463,23 +482,14 @@ function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $inte
     }
 
     $parameters = array(
-      // If double opt-in is required, set member status to 'pending'
+      // If double opt-in is required, set member status to 'pending'.
       'status' => ($double_optin) ? \Mailchimp\MailchimpLists::MEMBER_STATUS_PENDING : \Mailchimp\MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
       'email_type' => $format,
     );
 
     // Set interests.
     if (!empty($interests)) {
-      $selected_interests = array();
-      foreach ($interests as $interest_group) {
-        foreach ($interest_group as $interest_id => $interest_status) {
-          $selected_interests[$interest_id] = ($interest_status !== 0);
-        }
-      }
-
-      if (!empty($selected_interests)) {
-        $parameters['interests'] = (object) $selected_interests;
-      }
+      $parameters['interests'] = (object) $interests;
     }
 
     // Set merge fields.
@@ -508,14 +518,20 @@ function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $inte
     }
   }
   catch (Exception $e) {
-    watchdog('mailchimp', 'An error occurred subscribing @email to list @list. "%message"', array(
+    watchdog('mailchimp', 'An error occurred subscribing @email to list @list. Status code @code. "%message"', array(
       '@email' => $email,
       '@list' => $list_id,
       '%message' => $e->getMessage(),
+      '@code' => $e->getCode(),
     ), WATCHDOG_ERROR);
+    $result = new stdClass();
+    $result->success = FALSE;
+    $result->status = $e->getCode();
+    $result->message = $e->getMessage();
   }
-
-  return $result;
+  finally {
+    return $result;
+  }
 }
 
 /**
@@ -580,6 +596,9 @@ function mailchimp_update_local_cache($function, $args) {
   if ($function == 'mailchimp_update_member_process' ||
       $function == 'mailchimp_subscribe_process') {
     // Update cached merge vars.
+    if (!isset($cache->merge_fields)) {
+      $cache->merge_fields = new stdClass();
+    }
     foreach ($args['merge_vars'] as $key => $value) {
       $cache->merge_fields->$key = $value;
     }
@@ -621,9 +640,9 @@ function mailchimp_update_member($list_id, $email, $merge_vars, $interests, $for
 }
 
 /**
- * Wrapper around Mailchimp_Lists::updateMember().
+ * Wrapper around MailchimpLists::updateMember().
  *
- * @see Mailchimp_Lists::updateMember()
+ * @see MailchimpLists::updateMember()
  *
  * @return bool
  *   Success or failure.
@@ -644,16 +663,7 @@ function mailchimp_update_member_process($list_id, $email, $merge_vars, $interes
 
     // Set interests.
     if (!empty($interests)) {
-      $selected_interests = array();
-      foreach ($interests as $interest_group) {
-        foreach ($interest_group as $interest_id => $interest_status) {
-          $selected_interests[$interest_id] = ($interest_status !== 0);
-        }
-      }
-
-      if (!empty($selected_interests)) {
-        $parameters['interests'] = (object) $selected_interests;
-      }
+      $parameters['interests'] = (object) $interests;
     }
 
     // Set merge fields.
@@ -661,10 +671,28 @@ function mailchimp_update_member_process($list_id, $email, $merge_vars, $interes
       $parameters['merge_fields'] = (object) $merge_vars;
     }
 
-    // Update member.
-    $result = $mc_lists->updateMember($list_id, $email, $parameters);
+    // If email address has changed, unsubscribe and create new subscription.
+    // @see http://stackoverflow.com/questions/32224697/mailchimp-api-v3-0-change-subscriber-email
+    if (isset($parameters['merge_fields']->EMAIL) && ($email != $parameters['merge_fields']->EMAIL)) {
+      $result = $mc_lists->removeMember($list_id, $email);
 
-    if (isset($result->id)) {
+      watchdog('mailchimp', '@email was removed from list @list_id.', array(
+        '@email' => $email,
+        '@list' => $list_id,
+      ), WATCHDOG_NOTICE);
+
+      module_invoke_all('mailchimp_unsubscribe_user', $list_id, $email);
+
+      $email = $parameters['merge_fields']->EMAIL;
+
+      $result = $mc_lists->addOrUpdateMember($list_id, $email, $parameters);
+    }
+    else {
+      // Update member.
+      $result = $mc_lists->updateMember($list_id, $email, $parameters);
+    }
+
+    if (!empty($result) && isset($result->id)) {
       watchdog('mailchimp', '@email was updated in list @list_id.', array(
         '@email' => $email,
         '@list' => $list_id,
@@ -775,10 +803,6 @@ function mailchimp_batch_update_members($list_id, $batch, $double_in = FALSE) {
  * @param bool $notify
  *   Indicates whether to send the unsubscribe notification email to the address
  *   defined in the list email notification settings.
- * @param object $mcapi
- *   MailChimp API object if one is already loaded.
- * @param bool $allow_async
- *   Set to TRUE to allow asynchronous processing using DrupalQueue.
  *
  * @return bool
  *   Indicates whether unsubscribe was successful.
@@ -890,7 +914,7 @@ function mailchimp_get_segments($list_id, $reset = NULL) {
  * @param string $name
  *   A label for the segment.
  * @param string $type
- *   'static' or 'saved'
+ *   Can be 'static' or 'saved'.
  * @param array $segment_options
  *   Array of options for 'saved' segments. See MailChimp API docs.
  *
@@ -933,11 +957,11 @@ function mailchimp_segment_create($list_id, $name, $type, $segment_options = NUL
  * Add a specific subscriber to a static segment of a list.
  *
  * @param string $list_id
- *   ID of a MailChimp list
+ *   ID of a MailChimp list.
  * @param string $segment_id
- *   ID of a segment of the MailChimp list
+ *   ID of a segment of the MailChimp list.
  * @param string $email
- *   Email address to add to the segment (does NOT subscribe to the list)
+ *   Email address to add to the segment (does NOT subscribe to the list).
  * @param bool $batch
  *   Whether to queue this for the batch processor. Defaults to TRUE.
  * @param string $queue_id
@@ -978,11 +1002,11 @@ function mailchimp_segment_add_subscriber($list_id, $segment_id, $email, $batch 
  * Add a batch of email addresses to a static segment of a list.
  *
  * @param string $list_id
- *   ID of a MailChimp list
+ *   ID of a MailChimp list.
  * @param string $segment_id
- *   ID of a segment of the MailChimp list
+ *   ID of a segment of the MailChimp list.
  * @param array $batch
- *   Batch of email addresses to add to the segment (does NOT subscribe new)
+ *   Batch of email addresses to add to the segment (does NOT subscribe new).
  *
  * @return int
  *   Successful subscribe count
@@ -1160,7 +1184,7 @@ function mailchimp_webhook_add($list_id, $url, $events = array(), $sources = arr
     return $result->id;
   }
   catch (Exception $e) {
-    watchdog('mailchimp', t('An error occurred adding webhook for list @list. "%message"'), array(
+    watchdog('mailchimp', 'An error occurred adding webhook for list @list. "%message"', array(
       '@list' => $list_id,
       '%message' => $e->getMessage(),
     ), WATCHDOG_ERROR);
@@ -1230,6 +1254,13 @@ function mailchimp_cache_clear_list_activity($list_id) {
  */
 function mailchimp_cache_clear_campaign($campaign_id) {
   cache_clear_all('mailchimp_campaign_' . $campaign_id, 'cache_mailchimp');
+}
+
+/**
+ * Clear all mailchimp caches.
+ */
+function mailchimp_cache_clear_all() {
+  cache_clear_all('*', 'cache_mailchimp', TRUE);
 }
 
 /**
@@ -1309,7 +1340,6 @@ function mailchimp_webhook_url() {
   return $GLOBALS['base_url'] . '/mailchimp/webhook/' . mailchimp_webhook_key();
 }
 
-
 /**
  * Helper function to generate form elements for a list's interest groups.
  *
@@ -1373,7 +1403,7 @@ function mailchimp_interest_groups_form_elements($list, $defaults = array(), $em
           $default_values[$group->id][] = $interest->id;
         }
       }
-      else if (!empty($defaults)) {
+      elseif (!empty($defaults)) {
         if (isset($defaults[$group->id][$interest->id]) && !empty($defaults[$group->id][$interest->id])) {
           $default_values[$group->id][] = $interest->id;
         }
@@ -1446,6 +1476,7 @@ function mailchimp_insert_drupal_form_tag($mergevar) {
         '#maxlength' => 2,
       );
       break;
+
     case 'dropdown':
       // Dropdown is mapped to <select> element in Drupal Form API.
       $input['#type'] = 'select';
