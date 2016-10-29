@@ -530,6 +530,7 @@ function drupalfr_user_field_default_field_instances() {
     'default_value' => array(
       0 => array(
         'subscribe' => 0,
+        'is_default' => TRUE,
       ),
     ),
     'deleted' => 0,
@@ -591,6 +592,7 @@ function drupalfr_user_field_default_field_instances() {
     'default_value' => array(
       0 => array(
         'subscribe' => 0,
+        'is_default' => TRUE,
       ),
     ),
     'deleted' => 0,

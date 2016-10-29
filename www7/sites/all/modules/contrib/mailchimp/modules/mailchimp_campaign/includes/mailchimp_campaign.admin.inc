@@ -18,13 +18,13 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     '#title' => t('Title'),
     '#description' => t('An internal name to use for this campaign. By default, the campaign subject will be used.'),
     '#required' => FALSE,
-    '#default_value' => ($campaign) ? $campaign->mc_data['title'] : '',
+    '#default_value' => ($campaign) ? $campaign->mc_data->settings->title : '',
   );
   $form['subject'] = array(
     '#type' => 'textfield',
     '#title' => t('Subject'),
     '#required' => TRUE,
-    '#default_value' => ($campaign) ? $campaign->mc_data['subject'] : '',
+    '#default_value' => ($campaign) ? $campaign->mc_data->settings->subject_line : '',
   );
   $mailchimp_lists = mailchimp_get_lists();
   $form['list_id'] = array(
@@ -32,7 +32,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     '#title' => t('List'),
     '#description' => t('Select the list this campaign should be sent to.'),
     '#options' => _mailchimp_campaign_build_option_list($mailchimp_lists),
-    '#default_value' => ($campaign) ? $campaign->mc_data['list_id'] : -1,
+    '#default_value' => ($campaign) ? $campaign->mc_data->recipients->list_id : -1,
     '#required' => TRUE,
     '#ajax' => array(
       'callback' => 'mailchimp_campaign_list_segment_callback',
@@ -45,9 +45,9 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     $list_id = $form_state['values']['list_id'];
   }
   elseif ($campaign && $campaign->mc_data) {
-    $list_id = $campaign->mc_data['list_id'];
-    if (isset($campaign->mc_data['saved_segment']['id'])) {
-      $segment_id = $campaign->mc_data['saved_segment']['id'];
+    $list_id = $campaign->mc_data->recipients->list_id;
+    if (isset($campaign->mc_data->recipients->segment_opts->saved_segment_id)) {
+      $segment_id = $campaign->mc_data->recipients->segment_opts->saved_segment_id;
     }
   }
 
@@ -75,7 +75,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     '#type' => 'textfield',
     '#title' => t('From Email'),
     '#description' => t('the From: email address for your campaign message.'),
-    '#default_value' => ($campaign) ? $campaign->mc_data['from_email'] : variable_get('site_mail'),
+    '#default_value' => ($campaign) ? $campaign->mc_data->settings->reply_to : variable_get('site_mail'),
     '#size' => 40,
     '#maxlength' => 255,
     '#required' => TRUE,
@@ -84,7 +84,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     '#type' => 'textfield',
     '#title' => t('From Name'),
     '#description' => t('the From: name for your campaign message (not an email address)'),
-    '#default_value' => ($campaign) ? $campaign->mc_data['from_name'] : variable_get('site_name'),
+    '#default_value' => ($campaign) ? $campaign->mc_data->settings->from_name : variable_get('site_name'),
     '#size' => 40,
     '#maxlength' => 255,
   );
@@ -98,7 +98,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     '#title' => t('Template'),
     '#description' => t('Select a MailChimp user template to use. Due to a limitation in the API, only templates that do not contain repeating sections are available. If empty, the default template will be applied.'),
     '#options' => _mailchimp_campaign_build_option_list(mailchimp_campaign_list_templates(), '-- Select --', $template_type_labels),
-    '#default_value' => ($campaign) ? $campaign->mc_data['template_id'] : -1,
+    '#default_value' => ($campaign) ? $campaign->mc_data->settings->template_id : -1,
     '#ajax' => array(
       'callback' => 'mailchimp_campaign_template_callback',
       'wrapper' => 'content-sections',
@@ -126,17 +126,19 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
 
   if (isset($list_id)) {
     $merge_vars_list = mailchimp_get_mergevars(array($list_id));
-    $merge_vars = $merge_vars_list[$list_id]['merge_vars'];
+    $merge_vars = $merge_vars_list[$list_id];
   }
   else {
     $merge_vars = array();
   }
 
   if ($mc_template) {
-    if (strpos($mc_template['info']['source'], 'mc:repeatable')) {
-      drupal_set_message(t('WARNING: This template has repeating sections, which are not supported. You may want to select a different template.'), 'warning');
+    foreach ($mc_template->info->sections as $section => $content) {
+      if (substr($section, 0, 6) == 'repeat') {
+        drupal_set_message(t('WARNING: This template has repeating sections, which are not supported. You may want to select a different template.'), 'warning');
+      }
     }
-    foreach ($mc_template['info']['default_content'] as $section => $content) {
+    foreach ($mc_template->info->sections as $section => $content) {
       // Set the default value and text format to either saved campaign values
       // or defaults coming from the MailChimp template.
       $default_value = $content;
@@ -162,7 +164,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
         $form_state['values']['content'][$section . '_wrapper']['entity_import']['entity_type'] : NULL;
 
       $form['content'][$section . '_wrapper'] += mailchimp_campaign_get_entity_import_form_elements($entity_type, $section);
-      $form['content'][$section . '_wrapper'] += mailchimp_campaign_get_merge_vars_form_elements($merge_vars, $mailchimp_lists[$list_id]['name']);
+      $form['content'][$section . '_wrapper'] += mailchimp_campaign_get_merge_vars_form_elements($merge_vars, $mailchimp_lists[$list_id]->name);
     }
   }
   else {
@@ -188,7 +190,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
 
     $form['content'][$section . '_wrapper'] += mailchimp_campaign_get_entity_import_form_elements($entity_type, $section);
 
-    $list_name = (!empty($list_id)) ? $mailchimp_lists[$list_id]['name'] : '';
+    $list_name = (!empty($list_id)) ? $mailchimp_lists[$list_id]->name : '';
     $form['content'][$section . '_wrapper'] += mailchimp_campaign_get_merge_vars_form_elements($merge_vars, $list_name);
   }
 
@@ -272,25 +274,28 @@ function mailchimp_campaign_campaign_form_validate($form, &$form_state) {
  */
 function mailchimp_campaign_campaign_form_submit($form, &$form_state) {
   $values = $form_state['values'];
-  $options = array(
-    'title' => $values['title'],
-    'subject' => $values['subject'],
+
+  $recipients = (object) array(
     'list_id' => $values['list_id'],
-    'from_email' => $values['from_email'],
-    'from_name' => check_plain($values['from_name']),
-    'template_id' => $values['template_id'],
   );
-  $segment_options = NULL;
+
   if (isset($values['list_segment_id']) && !empty($values['list_segment_id'])) {
-    $segment_options = array(
-      'saved_segment_id' => $values['list_segment_id'],
+    $recipients->segment_opts = (object) array(
+      'saved_segment_id' => (int) $values['list_segment_id'],
     );
   }
 
-  $template_content = _mailchimp_campaign_parse_template_content($values['content']);
+  $settings = (object) array(
+    'subject_line' => $values['subject'],
+    'title' => $values['title'],
+    'from_name' => check_plain($values['from_name']),
+    'reply_to' => $values['from_email'],
+  );
+
+  $template_content = (isset($values['content'])) ? _mailchimp_campaign_parse_template_content($values['content']) : array();
 
   $campaign_id = (isset($form_state['campaign']) ? $form_state['campaign']->mc_campaign_id : NULL);
-  mailchimp_campaign_save_campaign($template_content, $options, $segment_options, $campaign_id);
+  mailchimp_campaign_save_campaign($template_content, $recipients, $settings, $values['template_id'], $campaign_id);
 
   cache_clear_all('mailchimp_campaign_campaigns', 'cache');
 
@@ -358,7 +363,7 @@ function mailchimp_campaign_get_entity_import_form_elements($entity_type, $secti
       // Pass entity type as first parameter to autocomplete callback.
       '#autocomplete_path' => 'admin/config/services/mailchimp/campaigns/entities/' . $entity_type,
     );
-    $form['entity_import']['entity_id']['#attributes']['id'] = $section . '-entity-import-entity-id';
+    $form['entity_import']['entity_id']['#id'] = $section . '-entity-import-entity-id';
 
     $form['entity_import']['entity_view_mode'] = array(
       '#type' => 'select',
@@ -474,14 +479,14 @@ function _mailchimp_campaign_build_option_list($list, $no_selection_label = '-- 
     $options[''] = $no_selection_label;
   }
   foreach ($list as $index => $item) {
-    if (!isset($item['id'])) {
+    if (!isset($item->id)) {
       $label = isset($labels[$index]) ? $labels[$index] : $index;
       if (count($item)) {
         $options[$label] = _mailchimp_campaign_build_option_list($item, FALSE, $labels);
       }
     }
     else {
-      $options[$item['id']] = $item['name'];
+      $options[$item->id] = $item->name;
     }
   }
 
@@ -567,8 +572,8 @@ function _mailchimp_campaign_build_merge_vars_html($merge_vars) {
     $rows = array();
     foreach ($merge_vars as $var) {
       $rows[] = array(
-        $var['name'],
-        '<a id="merge-var-' . $var['tag'] . '" class="add-merge-var" href="javascript:void(0);">*|' . $var['tag'] . '|*</a>',
+        $var->name,
+        '<a id="merge-var-' . $var->tag . '" class="add-merge-var" href="javascript:void(0);">*|' . $var->tag . '|*</a>',
       );
     }
     $table = theme('table', array('rows' => $rows));

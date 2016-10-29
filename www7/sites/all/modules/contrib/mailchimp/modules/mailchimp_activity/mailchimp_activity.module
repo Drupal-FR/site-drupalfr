@@ -125,32 +125,29 @@ function mailchimp_activity_get_member_activity($list_id, $email, $reset = FALSE
   }
   // Query lists from the MailChimp API and store in cache:
   else {
-    $mcapi = mailchimp_get_api_object();
+    /* @var \Mailchimp\MailchimpLists $mc_lists */
+    $mc_lists = mailchimp_get_api_object('MailchimpLists');
 
-    $emails = array();
-    $emails[] = array('email' => $email);
     try {
-      if (!$mcapi) {
+      if (!$mc_lists) {
         throw new MailchimpException('Cannot get member activity without Mailchimp API. Check API key has been entered.');
       }
-      $result = $mcapi->lists->memberActivity($list_id, $emails);
-    }
-    catch (Mailchimp_Error $e) {
-      drupal_set_message($e->getMessage(), 'error');
-      watchdog('mailchimp_campaign', 'An error occurred while getting activity: ' . $e->getMessage(), WATCHDOG_ERROR);
-      return NULL;
-    }
-    if ($result['success_count'] > 0) {
-      $memberactivity = reset($result['data']);
-      cache_set('activity_' . $list_id . '_' . $email, $memberactivity, 'cache_mailchimp', CACHE_TEMPORARY);
-    }
-    if ($result['error_count'] > 0) {
-      foreach ($result['errors'] as $error) {
-        watchdog('mailchimp_activity',
-          'An error occurred getting activity for email "' . $error['email'] . '": ' . $error['error'], WATCHDOG_ERROR);
+
+      $result = $mc_lists->getMemberActivity($list_id, $email);
+
+      if ($result->total_items > 0) {
+        $memberactivity = $result->activity;
+        cache_set('activity_' . $list_id . '_' . $email, $memberactivity, 'cache_mailchimp', CACHE_TEMPORARY);
       }
     }
-
+    catch (Exception $e) {
+      drupal_set_message($e->getMessage(), 'error');
+      watchdog('mailchimp_activity', 'An error occurred while getting activity for email "%email": %message', array(
+        '%email' => $email,
+        '%message' => $e->getMessage(),
+        ), WATCHDOG_ERROR);
+      return NULL;
+    }
   }
 
   return $memberactivity;
@@ -201,10 +198,15 @@ function mailchimp_activity_page($entity, MailchimpActivityEntity $mailchimp_act
   $rows = array();
   // Loop through all activities, creating rows for each:
   $user_activity = mailchimp_activity_get_all_activity($email);
-  $campaigns = mailchimp_get_campaigns_for_email($email);
+
+  /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
+  $mc_campaigns = mailchimp_get_api_object('MailchimpCampaigns');
+  $result = $mc_campaigns->getCampaigns();
+  $campaigns = ($result->total_items > 0) ? $result->campaigns : array();
+
   $campaign_index = array();
   foreach ($campaigns as $campaign) {
-    $campaign_index[$campaign['id']] = $campaign;
+    $campaign_index[$campaign->id] = $campaign;
   }
   if (!empty($user_activity)) {
     foreach ($user_activity as $list_activity) {
@@ -212,33 +214,44 @@ function mailchimp_activity_page($entity, MailchimpActivityEntity $mailchimp_act
         'no_striping' => TRUE,
         'data' => array(
           array(
-            'data' => '<strong>List: ' . $list_activity['list']['name'] . '</strong>',
+            'data' => '<strong>List: ' . $list_activity['list']->name . '</strong>',
             'colspan' => count($header),
             'style' => 'text-align:center',
           ),
         ),
       );
 
-      foreach ($list_activity['activity']['activity'] as $activity) {
-        if (!empty($activity['campaign_id'])) {
-          if (empty($campaign_index[$activity['campaign_id']]['details'])) {
-            $campaign_index[$activity['campaign_id']]['details'] = mailchimp_get_campaign_data($activity['campaign_id']);
+      if (!empty($list_activity['activity'])) {
+        foreach ($list_activity['activity'] as $activity) {
+          if (!empty($activity->campaign_id)) {
+            $title = array(
+              'data' => array(
+                '#type' => 'link',
+                '#title' => $campaign_index[$activity->campaign_id]->settings->title,
+                '#href' => $campaign_index[$activity->campaign_id]->archive_url,
+              ),
+            );
           }
-          $title = array(
-            'data' => array(
-              '#type' => 'link',
-              '#title' => $campaign_index[$activity['campaign_id']]['title'],
-              '#href' => $campaign_index[$activity['campaign_id']]['details']['archive_url'],
-            ),
+          else {
+            $title = $activity->title;
+          }
+          $rows[] = array(
+            $title,
+            $activity->action,
+            $activity->timestamp,
           );
         }
-        else {
-          $title = $activity['title'];
-        }
+      }
+      else {
         $rows[] = array(
-          $title,
-          $activity['action'],
-          $activity['timestamp'],
+          'no_striping' => TRUE,
+          'data' => array(
+            array(
+              'data' => 'No activity yet.',
+              'colspan' => count($header),
+              'style' => 'text-align:center',
+            ),
+          ),
         );
       }
     }
@@ -265,10 +278,11 @@ function mailchimp_activity_get_all_activity($email) {
   $all_activity = array();
 
   $lists = mailchimp_get_lists_for_email($email);
+
   foreach ($lists as $list) {
-    $all_activity[$list['id']] = array(
+    $all_activity[$list->id] = array(
       'list' => $list,
-      'activity' => mailchimp_activity_get_member_activity($list['id'], $email),
+      'activity' => mailchimp_activity_get_member_activity($list->id, $email),
     );
   }
 

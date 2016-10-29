@@ -107,6 +107,7 @@ function commerce_cart_expiration_get_expired_carts($interval, $limit = 0, $igno
     ->entityCondition('entity_type', 'commerce_order', '=')
     ->propertyCondition('status', $statuses, 'IN')
     ->propertyCondition('changed', REQUEST_TIME - $interval, '<');
+  $query->addTag('skip_payment_transaction');
 
   if ($limit) {
     $query->range(0, $limit);
@@ -115,6 +116,14 @@ function commerce_cart_expiration_get_expired_carts($interval, $limit = 0, $igno
   $result = $query->execute();
 
   return !empty($result) ? array_keys(reset($result)) : array();
+}
+
+/**
+ * Implements hook_query_TAG_alter() for skip_payment_transaction.
+ */
+function commerce_cart_expiration_query_skip_payment_transaction_alter(QueryAlterableInterface $query) {
+  $query->leftJoin('commerce_payment_transaction', 'commerce_payment_transaction', 'commerce_order.order_id = commerce_payment_transaction.order_id');
+  $query->isNull('commerce_payment_transaction.transaction_id');
 }
 
 /**

@@ -56,3 +56,15 @@ function hook_mailchimp_subscribe_user($list_id, $email, $merge_vars) {
 function hook_mailchimp_unsubscribe_user($list_id, $email) {
 
 }
+
+/**
+ * Alter the key for a given api request.
+ *
+ * @string &$api_key
+ *   The MailChimp API key.
+ * @array $context
+ *   The MailChimp API classname of the API object.
+ */
+function hook_mailchimp_api_key_alter(&$api_key, $context) {
+
+}

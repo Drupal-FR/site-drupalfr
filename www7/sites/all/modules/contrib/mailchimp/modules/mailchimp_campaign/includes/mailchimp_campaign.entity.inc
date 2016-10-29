@@ -30,28 +30,33 @@ class MailChimpCampaign extends Entity {
     }
 
     // Get the template name:
-    $mc_template = mailchimp_campaign_get_template($this->mc_data['template_id']);
-    $mc_template_name = isset($mc_template) ? $mc_template['name'] : '';
+    $mc_template = mailchimp_campaign_get_template($this->mc_data->settings->template_id);
+    $mc_template_name = isset($mc_template) ? $mc_template->name : '';
 
     $list_segment_name = 'N/A';
 
-    $list_segments = mailchimp_campaign_get_list_segments($this->list['id'], 'saved');
-    if (isset($this->mc_data['saved_segment']['id'])) {
+    $list_segments = mailchimp_campaign_get_list_segments($this->list->id, 'saved');
+    if (isset($this->mc_data->recipients->segment_opts->saved_segment_id)) {
       foreach ($list_segments as $list_segment) {
-        if ($list_segment['id'] == $this->mc_data['saved_segment']['id']) {
-          $list_segment_name = $list_segment['name'];
+        if ($list_segment->id == $this->mc_data->recipients->segment_opts->saved_segment_id) {
+          $list_segment_name = $list_segment->name;
         }
       }
+    }
+
+    $send_time = 'N/A';
+    if (isset($this->mc_data->send_time) && $this->mc_data->send_time) {
+      $send_time = format_date(strtotime($this->mc_data->send_time), 'custom', 'F j, Y - g:ia');
     }
 
     $fields = array(
       'subject' => array(
         'label' => t('Subject'),
-        'value' => $this->mc_data['subject'],
+        'value' => $this->mc_data->settings->subject_line,
       ),
       'list' => array(
         'label' => t('MailChimp List'),
-        'value' => l($this->list['name'], 'https://admin.mailchimp.com/lists/dashboard/overview?id=' . $this->list['web_id'], array(
+        'value' => l($this->list->name, 'https://admin.mailchimp.com/lists/', array(
           'attributes' => array('target' => '_blank'),
         )),
       ),
@@ -61,11 +66,11 @@ class MailChimpCampaign extends Entity {
       ),
       'from_email' => array(
         'label' => t('From Email'),
-        'value' => $this->mc_data['from_email'],
+        'value' => $this->mc_data->settings->reply_to,
       ),
       'from_name' => array(
         'label' => t('From Name'),
-        'value' => $this->mc_data['from_name'],
+        'value' => $this->mc_data->settings->from_name,
       ),
       'template' => array(
         'label' => t('Template'),
@@ -73,24 +78,24 @@ class MailChimpCampaign extends Entity {
       ),
       'type' => array(
         'label' => t('List type'),
-        'value' => $this->mc_data['type'],
+        'value' => $this->mc_data->type,
       ),
       'status' => array(
         'label' => t('Status'),
-        'value' => $this->mc_data['status'],
+        'value' => $this->mc_data->status,
       ),
       'emails_sent' => array(
         'label' => t('Emails sent'),
-        'value' => $this->mc_data['emails_sent'],
+        'value' => $this->mc_data->emails_sent,
       ),
       'send_time' => array(
         'label' => t('Send time'),
-        'value' => $this->mc_data['send_time'],
+        'value' => $send_time,
       ),
       'content' => array(
         'label' => t('Rendered template HTML (!archive)',
           array(
-            '!archive' => l(t('View MailChimp archive'), $this->mc_data['archive_url'], array(
+            '!archive' => l(t('View MailChimp archive'), $this->mc_data->archive_url, array(
               'attributes' => array('target' => '_blank'),
             )),
           )),
@@ -113,7 +118,7 @@ class MailChimpCampaign extends Entity {
    * Provide a label based on the campaign title.
    */
   public function label() {
-    return $this->mc_data['title'];
+    return $this->mc_data->settings->title;
   }
 
 }
