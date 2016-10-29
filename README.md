@@ -25,7 +25,7 @@ $conf['cron_key'] = 'zMT41f2ar4tCNxVS_SN1mcWKNlQbIz9_se7KdzQlZHo';
 $conf['dfr_emploi_rewrite_urls'] = FALSE;
 $conf['drupalfr_planete_rewrite_urls'] = FALSE;
 
-// Change cookie domain, example: .drupalfr.org .
+// Change cookie domain, example: '.drupal.fr'.
 $cookie_domain = '';
 
 // If devel is enabled, uncomment this line to catch the emails. 
