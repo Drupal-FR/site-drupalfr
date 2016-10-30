@@ -31,7 +31,7 @@ if (file_exists(__DIR__ . '/.cache_activated')) {
 }
 
 // Solr.
-$config['search_api.server.solr']['backend_config']['host'] = 'solr';
+$config['search_api.server.solr']['backend_config']['connector_config']['host'] = 'solr';
 
 // Twitter.
 // Go to https://apps.twitter.com to get these tokens.
