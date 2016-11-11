@@ -57,7 +57,7 @@ function mailchimp_signup_menu() {
  */
 function mailchimp_signup_title($signup_id){
   $signup = mailchimp_signup_load($signup_id);
-  return mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:title", $signup->title);
+  return $signup->getTranslation('title');
 }
 
 /**
@@ -102,7 +102,7 @@ function mailchimp_signup_block_view($delta = '') {
   $signup = mailchimp_signup_load($delta);
   if ($signup) {
     $block = array(
-      'subject' => check_plain($signup->title),
+      'subject' => check_plain($signup->getTranslation('title')),
       'content' => drupal_get_form('mailchimp_signup_subscribe_block_' . $signup->name . '_form', $signup, 'mailchimp_signup_block'),
     );
   }
@@ -211,7 +211,7 @@ function mailchimp_signup_entity_info() {
  * Entity label callback.
  */
 function mailchimp_signup_entity_info_label($entity, $entity_type) {
-  return empty($entity) ? 'New MailChimp Signup' : $entity->title;
+  return empty($entity) ? t('New MailChimp Signup') : $entity->getTranslation('title');
 }
 
 /**
@@ -261,10 +261,9 @@ function mailchimp_signup_forms($form_id, $args) {
 function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
   $form['#attributes'] = array('class' => array('mailchimp-signup-subscribe-form'));
   $form['description'] = array(
-    '#markup' => mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:description", filter_xss($signup->settings['description'])),
-
+    '#markup' => mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:description", filter_xss($signup->settings['description'])),
     '#prefix' => '<div class="mailchimp-signup-subscribe-form-description">',
-    '#suffix' => '</div>'
+    '#suffix' => '</div>',
   );
   $form['mailchimp_lists'] = array('#tree' => TRUE);
   $lists = mailchimp_get_lists($signup->mc_lists);
@@ -317,7 +316,7 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
   );
   foreach ($signup->settings['mergefields'] as $tag => $mergevar) {
     if (!empty($mergevar)) {
-      $mergevar->name = mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:mergefield:$tag", $mergevar->name);
+      $mergevar->name = mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:mergefield:$tag", $mergevar->name);
       $form['mergevars'][$tag] = mailchimp_insert_drupal_form_tag($mergevar);
       if (empty($lists)) {
         $form['mergevars'][$tag]['#disabled'] = TRUE;
@@ -329,7 +328,7 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#weight' => 10,
-    '#value' => mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:submit_button", $signup->settings['submit_button']),
+    '#value' => mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:submit_button", $signup->settings['submit_button']),
     '#disabled' => (empty($lists)),
   );
 
@@ -391,7 +390,7 @@ function mailchimp_signup_subscribe_form_submit($form, &$form_state) {
     $result = mailchimp_subscribe($list_id, $email, $mergevars, $interests, $signup->settings['doublein']);
     // Let other modules act on the results in hook_form_alter.
     $form_state['mailchimp_results'] = $result;
-    if (empty($result)) {
+    if (empty($result) || ($result->success === FALSE)) {
       drupal_set_message(t('There was a problem with your newsletter signup to %list.', array(
         '%list' => $list_details[$list_id]->name,
       )), 'warning');
@@ -400,8 +399,8 @@ function mailchimp_signup_subscribe_form_submit($form, &$form_state) {
       $successes[] = $list_details[$list_id]->name;
     }
   }
-  if (count($successes) && isset($signup->settings['confirmation_message']) && strlen($signup->settings['confirmation_message'])) {
-    $message = mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:confirmation_message", check_plain($signup->settings['confirmation_message']));
+  if (count($successes) && !empty($signup->settings['confirmation_message'])) {
+    $message = mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:confirmation_message", check_plain($signup->settings['confirmation_message']));
     drupal_set_message($message, 'status');
   }
   if (!empty($signup->settings['destination'])) {

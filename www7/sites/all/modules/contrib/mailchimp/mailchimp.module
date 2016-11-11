@@ -21,7 +21,7 @@ function mailchimp_libraries_info() {
   $libraries['mailchimp'] = array(
     'name' => 'MailChimp API',
     'vendor url' => 'https://github.com/thinkshout/mailchimp-api-php',
-    'download url' => 'https://github.com/thinkshout/mailchimp-api-php/archive/v1.0.3.zip',
+    'download url' => 'https://github.com/thinkshout/mailchimp-api-php/archive/v1.0.5.zip',
     'version arguments' => array(
       'file' => 'composer.json',
       'pattern' => '/"version": "([0-9a-zA-Z.-]+)"/',
@@ -529,9 +529,8 @@ function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $inte
     $result->status = $e->getCode();
     $result->message = $e->getMessage();
   }
-  finally {
-    return $result;
-  }
+
+  return $result;
 }
 
 /**
@@ -807,7 +806,7 @@ function mailchimp_batch_update_members($list_id, $batch, $double_in = FALSE) {
  * @return bool
  *   Indicates whether unsubscribe was successful.
  */
-function mailchimp_unsubscribe($list_id, $email, $delete = FALSE, $goodbye = FALSE, $notify = FALSE) {
+function mailchimp_unsubscribe_member($list_id, $email, $delete = FALSE, $goodbye = FALSE, $notify = FALSE) {
   $result = FALSE;
 
   if (mailchimp_is_subscribed($list_id, $email)) {

@@ -272,11 +272,11 @@ function mailchimp_lists_process_subscribe_form_choices($choices, $instance, $fi
         break;
 
       case 'unsubscribe':
-        $ret = mailchimp_unsubscribe($list_id, $email, FALSE);
+        $ret = mailchimp_unsubscribe_member($list_id, $email, FALSE);
         break;
 
       case 'remove':
-        $ret = mailchimp_unsubscribe($list_id, $email, TRUE);
+        $ret = mailchimp_unsubscribe_member($list_id, $email, TRUE);
         break;
 
       case 'update':

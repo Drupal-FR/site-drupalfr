@@ -259,22 +259,7 @@ function mailchimp_signup_form_submit($form, &$form_state) {
       }
     }
 
-    // update i18n translation sources
-    $language = language_default('language');
-    $t_strings = array('title', 'name', 'description');
-    foreach($t_strings as $key){
-      mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:$key", $form_state['values'][$key], $language, TRUE);
-    }
-    foreach ($mergefields as $id => $val) {
-      if ($val) {
-        mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:mergefield:$id", $val->name, $language, TRUE);
-      }
-    }
-    mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:confirmation_message", $form_state['values']['settings']['confirmation_message'], $language, TRUE);
-    mailchimp_signup_tt("field:mailchimp_signup:form:$signup->mcs_id:submit_button", $form_state['values']['settings']['submit_button'], $language, TRUE);
-
-    drupal_set_message(t('Signup form @name has been saved.',
-      array('@name' => $signup->name)));
+    drupal_set_message(t('Signup form @name has been saved.', array('@name' => $signup->name)));
     $form_state['redirect'] = 'admin/config/services/mailchimp/signup';
   }
   else {

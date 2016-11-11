@@ -68,6 +68,9 @@ function mailchimp_signup_schema() {
     ),
     'primary key' => array('mcs_id'),
     'unique key' => array('name'),
+    'indexes' => array(
+      'name' => array('name'),
+    ),
   );
 
   return $schema;
@@ -97,6 +100,12 @@ function mailchimp_signup_update_7002(&$sandbox) {
 
     $sandbox['total'] = $record_count;
     $sandbox['processed'] = 0;
+
+    if ($sandbox['total'] == 0) {
+      // No signup forms found; update not required.
+      $sandbox['#finished'] = 1;
+      return;
+    }
   }
 
   $limit = 10;
@@ -170,4 +179,16 @@ function mailchimp_signup_update_7002(&$sandbox) {
   }
 
   $sandbox['#finished'] = ($sandbox['processed'] / $sandbox['total']);
+}
+
+/**
+ * Add index for the field looked up by it's entity controller.
+ */
+function mailchimp_signup_update_7003(&$sandbox) {
+  if (db_index_exists('mailchimp_signup', 'name')) {
+    return t('Database index for name column of the mailchimp_signup table existed already.');
+  }
+  db_add_index('mailchimp_signup', 'name', array('name'));
+
+  return t('Database index added to the name column of the mailchimp_signup table.');
 }

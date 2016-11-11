@@ -178,7 +178,7 @@ class MailchimpListsTestCase extends DrupalWebTestCase {
     $list_id = '57afe96172';
     $email = 'test@example.org';
 
-    $unsubscribed = mailchimp_unsubscribe($list_id, $email);
+    $unsubscribed = mailchimp_unsubscribe_member($list_id, $email);
 
     $this->assertTrue($unsubscribed, 'Tested user unsubscription.');
   }
