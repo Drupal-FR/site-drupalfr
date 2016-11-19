@@ -10,19 +10,11 @@ PROJECT_PATH=$(dirname $(dirname $FILE_PATH))
 . $PROJECT_PATH/scripts/script-parameters.sh
 . $PROJECT_PATH/scripts/script-parameters.local.sh
 
-# Test that composer is installed.
-if ! hash "composer" 2> /dev/null; then
-    echo "ERROR: Composer needs to be installed. Aborting.";
-    exit 1;
-fi
+# Put the site in maintenance mode.
+$DRUSH state-set system.maintenance_mode 1
 
-# Update source.
-if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
-    composer install --working-dir=$WWW_PATH
-else
-    composer install --working-dir=$WWW_PATH --no-dev
-fi
-composer dump-autoload --working-dir=$WWW_PATH --optimize
+# Install sources.
+. $SCRIPTS_PATH/tasks/composer_install.sh
 
 # Without drush alias, change temporarily directory to www.
 cd $WWW_PATH
@@ -34,50 +26,25 @@ $DRUSH sql-dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gz
 $DRUSH updb --entity-updates -y
 
 # Enable development modules.
-if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
-  $DRUSH en \
-    config_inspector \
-    dblog \
-    devel \
-    devel_a11y \
-    features_ui \
-    field_ui \
-    views_ui \
-    webprofiler \
-    -y
-fi
+. $SCRIPTS_PATH/tasks/development_modules.sh
 
 # Revert features.
 $DRUSH features-import -y $PROFILE
-
-# Translation updates.
-$DRUSH locale-check
-$DRUSH locale-update
 
 # Import content.
 # For update.sh import only content if the environment is dev to not risk
 # breaking prod.
 if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
-  $DRUSH en drupalfr_migrate -y
-  $DRUSH migrate-import drupalfr_file --update
-  $DRUSH migrate-import drupalfr_user --update
-  $DRUSH migrate-import drupalfr_website_type --update
-  $DRUSH migrate-import drupalfr_drupal_version --update
-  $DRUSH migrate-import drupalfr_page --update
-  $DRUSH migrate-import drupalfr_company --update
-  $DRUSH migrate-import drupalfr_job_offer --update
-  $DRUSH migrate-import drupalfr_showcase --update
-  $DRUSH migrate-import drupalfr_local_group --update
-  $DRUSH migrate-import drupalfr_event --update
-  $DRUSH migrate-import drupalfr_feed --update
-  # Re-import users to update references as we do not create stub.
-  $DRUSH migrate-import drupalfr_user --update
-
-  # Clear search_api indexes.
-  $DRUSH search-api-clear
+  . $SCRIPTS_PATH/tasks/migrate_imports.sh
 fi
 
-# Run CRON (index search_api, import feeds).
+# Translation updates.
+. $SCRIPTS_PATH/tasks/update_translations.sh
+
+# Remove the maintenance mode.
+$DRUSH state-set system.maintenance_mode 0
+
+# Run CRON.
 $DRUSH cron
 
 # Back to the current directory.

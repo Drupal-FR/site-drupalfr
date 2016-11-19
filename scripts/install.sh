@@ -10,19 +10,8 @@ PROJECT_PATH=$(dirname $(dirname $FILE_PATH))
 . $PROJECT_PATH/scripts/script-parameters.sh
 . $PROJECT_PATH/scripts/script-parameters.local.sh
 
-# Test that composer is installed.
-if ! hash "composer" 2> /dev/null; then
-    echo "ERROR: Composer needs to be installed. Aborting.";
-    exit 1;
-fi
-
-# Installation.
-if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
-    composer install --working-dir=$WWW_PATH
-else
-    composer install --working-dir=$WWW_PATH --no-dev
-fi
-composer dump-autoload --working-dir=$WWW_PATH --optimize
+# Install sources.
+. $SCRIPTS_PATH/tasks/composer_install.sh
 
 # Without drush alias, change temporarily directory to www.
 cd $WWW_PATH
@@ -40,47 +29,17 @@ $DRUSH site-install $PROFILE \
   --account-pass=$ACCOUNT_PASS \
   --site-mail=$SITE_MAIL \
   --site-name=$SITE_NAME \
-  --locale=fr \
+  --locale=$DEFAULT_LANGUAGE \
   -y
 
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updb --entity-updates -y
 
-# Enable development modules.
-if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
-  $DRUSH en \
-    config_inspector \
-    dblog \
-    devel \
-    devel_a11y \
-    features_ui \
-    field_ui \
-    views_ui \
-    webprofiler \
-    -y
-fi
+. $SCRIPTS_PATH/tasks/development_modules.sh
+. $SCRIPTS_PATH/tasks/migrate_imports.sh
+. $SCRIPTS_PATH/tasks/update_translations.sh
 
-# Translation updates.
-$DRUSH locale-check
-$DRUSH locale-update
-
-# Import content.
-$DRUSH en drupalfr_migrate -y
-$DRUSH migrate-import drupalfr_file --update
-$DRUSH migrate-import drupalfr_user --update
-$DRUSH migrate-import drupalfr_website_type --update
-$DRUSH migrate-import drupalfr_drupal_version --update
-$DRUSH migrate-import drupalfr_page --update
-$DRUSH migrate-import drupalfr_company --update
-$DRUSH migrate-import drupalfr_job_offer --update
-$DRUSH migrate-import drupalfr_showcase --update
-$DRUSH migrate-import drupalfr_local_group --update
-$DRUSH migrate-import drupalfr_event --update
-$DRUSH migrate-import drupalfr_feed --update
-# Re-import users to update references as we do not create stub.
-$DRUSH migrate-import drupalfr_user --update
-
-# Run CRON (index search_api, import feeds).
+# Run CRON.
 $DRUSH cron
 
 # Enable external cache.

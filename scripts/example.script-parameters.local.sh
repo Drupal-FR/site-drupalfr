@@ -13,7 +13,6 @@ ENVIRONMENT_MODE="dev"
 ENVIRONMENT_MODE="prod"
 
 # For Drush site-install.
-PROFILE=drupalfr
 ACCOUNT_MAIL=admin@example.com
 ACCOUNT_NAME=admin
 ACCOUNT_PASS=admin
