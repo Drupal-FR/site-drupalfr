@@ -1,0 +1,76 @@
+version: "2"
+
+services:
+  httpd:
+    image: httpd:2.4-alpine
+    volumes:
+      - ./conf/httpd/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./conf/httpd/extra/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - .:/project
+
+
+  nginx:
+    image: nginx:1.11-alpine
+    volumes:
+      - ./conf/nginx:/etc/nginx/conf.d/
+      - .:/project
+
+
+
+  # PHP + Apache.
+  drupal-php-apache-dev:
+    image: florenttorregrosa/docker-drupal-dev:php7
+    volumes:
+      - .:/project
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
+      - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf
+
+  drupal-php-apache:
+    image: florenttorregrosa/docker-drupal:php7
+    volumes:
+      - .:/project
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
+      - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf
+
+
+
+  # PHP.
+  drupal-php-dev:
+    image: florenttorregrosa/drupal-php-dev:7.0-fpm-alpine
+    volumes:
+      - .:/project
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
+
+  drupal-php:
+    image: florenttorregrosa/drupal-php:7.0-fpm-alpine
+    volumes:
+      - .:/project
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
+
+
+
+  varnish:
+    image: florenttorregrosa/docker-varnish:latest
+    environment:
+      VCL_CONFIG: /varnish-drupal/varnish.vcl
+    volumes:
+      - ./conf/varnish:/varnish-drupal
+
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./conf/mysql:/etc/mysql/conf.d
+
+
+  solr:
+    image: solr:6.2-alpine
+    volumes:
+      - ./conf/solr:/solr-drupal/conf
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - drupal
+      - /solr-drupal
