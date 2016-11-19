@@ -1,6 +1,9 @@
 langcode: fr
 status: true
 dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
   module:
     - migrate_plus
     - migrate_source_csv
@@ -14,10 +17,8 @@ source:
   path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/feed.csv
   header_row_count: 1
   keys:
-    - id
+    - uuid
   column_names:
-    -
-      id: Identifier
     -
       uuid: UUID
     -
