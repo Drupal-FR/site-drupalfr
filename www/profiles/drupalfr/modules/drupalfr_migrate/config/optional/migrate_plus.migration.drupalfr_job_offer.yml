@@ -8,13 +8,13 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_page
+id: drupalfr_job_offer
 migration_tags:
   - drupalfr
-label: 'Page import'
+label: 'Job offer import'
 source:
   plugin: csv
-  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/page.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/job_offer.csv
   header_row_count: 1
   keys:
     - uuid
@@ -24,13 +24,19 @@ source:
     -
       title: Title
     -
-      path: Path
-    -
       published: Published
     -
-      drupal_version: 'Drupal version'
+      nature: Nature
     -
-      attachments: Attachments
+      regions: Regions
+    -
+      company: Company
+    -
+      validity: Validity
+    -
+      contract_type: 'Contract type'
+    -
+      teleworking: Teleworking
     -
       body_value: Body
     -
@@ -38,40 +44,33 @@ source:
 process:
   type:
     plugin: default_value
-    default_value: page
+    default_value: job_offer
   uuid: uuid
   title: title
-  field_drupal_version:
-    -
-      plugin: explode
-      source: drupal_version
-      delimiter: ;
-    -
-      plugin: migration
-      migration: drupalfr_drupal_version
-  field_attachment:
-    -
-      plugin: explode
-      source: attachments
-      delimiter: ;
-    -
-      plugin: migration
-      migration: drupalfr_file
   body/value: body_value
   body/format: body_format
-  path:
+  field_job_nature: nature
+  field_region:
     -
-      plugin: skip_on_empty
-      method: process
-      source: path
+      plugin: explode
+      source: regions
+      delimiter: ;
+  field_job_company:
+    -
+      plugin: migration
+      migration: drupalfr_company
+      source: length
+  field_job_validity: validity
+  field_job_contract_type: contract_type
+  field_job_teleworking: teleworking
   status: published
   uid:
     plugin: default_value
     default_value: 1
 destination:
   plugin: 'entity:node'
-  type: page
-  bundle: page
+  type: job_offer
+  bundle: job_offer
 template: null
 migration_dependencies: {  }
 migration_group: drupalfr

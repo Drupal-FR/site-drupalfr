@@ -12,4 +12,4 @@ PROJECT_PATH=$(dirname $(dirname $FILE_PATH))
 
 $DRUSH locale-check
 $DRUSH locale-update
-$DRUSH language-import $DEFAULT_LANGUAGE $WWW_PATH/profiles/custom/$PROFILE/translations/$PROFILE.po --replace
+$DRUSH language-import $DEFAULT_LANGUAGE $WWW_PATH/profiles/$PROFILE/translations/$PROFILE.po --replace

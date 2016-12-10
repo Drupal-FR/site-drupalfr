@@ -8,13 +8,13 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_job_offer
+id: drupalfr_local_group
 migration_tags:
   - drupalfr
-label: 'Job offer import'
+label: 'Local group import'
 source:
   plugin: csv
-  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/job_offer.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/local_group.csv
   header_row_count: 1
   keys:
     - uuid
@@ -26,17 +26,9 @@ source:
     -
       published: Published
     -
-      nature: Nature
+      organizers: Organizers
     -
-      regions: Regions
-    -
-      company: Company
-    -
-      validity: Validity
-    -
-      contract_type: 'Contract type'
-    -
-      teleworking: Teleworking
+      places: Places
     -
       body_value: Body
     -
@@ -44,33 +36,32 @@ source:
 process:
   type:
     plugin: default_value
-    default_value: job_offer
+    default_value: local_group
   uuid: uuid
   title: title
   body/value: body_value
   body/format: body_format
-  field_job_nature: nature
-  field_region:
+  field_local_group_organizer:
     -
       plugin: explode
-      source: regions
+      source: organizers
       delimiter: ;
-  field_job_company:
     -
       plugin: migration
-      migration: drupalfr_company
-      source: length
-  field_job_validity: validity
-  field_job_contract_type: contract_type
-  field_job_teleworking: teleworking
+      migration: drupalfr_user
+  field_local_group_place:
+    -
+      plugin: drupalfr_multigeofields
+      source: places
+      delimiter: ;
   status: published
   uid:
     plugin: default_value
     default_value: 1
 destination:
   plugin: 'entity:node'
-  type: job_offer
-  bundle: job_offer
+  type: local_group
+  bundle: local_group
 template: null
 migration_dependencies: {  }
 migration_group: drupalfr

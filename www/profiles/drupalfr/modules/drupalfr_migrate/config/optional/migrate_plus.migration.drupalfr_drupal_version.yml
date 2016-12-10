@@ -8,13 +8,13 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - taxonomy
-id: drupalfr_website_type
+id: drupalfr_drupal_version
 migration_tags:
   - drupalfr
-label: 'Website type import'
+label: 'Drupal version import'
 source:
   plugin: csv
-  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/website_type.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/drupal_version.csv
   header_row_count: 1
   keys:
     - uuid
@@ -28,7 +28,7 @@ source:
 process:
   vid:
     plugin: default_value
-    default_value: website_types
+    default_value: drupal_versions
   uuid: uuid
   name: name
   weight: weight

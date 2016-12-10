@@ -8,13 +8,13 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_local_group
+id: drupalfr_page
 migration_tags:
   - drupalfr
-label: 'Local group import'
+label: 'Page import'
 source:
   plugin: csv
-  path: profiles/custom/drupalfr/modules/custom/drupalfr_migrate/migrations/data/local_group.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/page.csv
   header_row_count: 1
   keys:
     - uuid
@@ -24,11 +24,13 @@ source:
     -
       title: Title
     -
+      path: Path
+    -
       published: Published
     -
-      organizers: Organizers
+      drupal_version: 'Drupal version'
     -
-      places: Places
+      attachments: Attachments
     -
       body_value: Body
     -
@@ -36,32 +38,40 @@ source:
 process:
   type:
     plugin: default_value
-    default_value: local_group
+    default_value: page
   uuid: uuid
   title: title
-  body/value: body_value
-  body/format: body_format
-  field_local_group_organizer:
+  field_drupal_version:
     -
       plugin: explode
-      source: organizers
+      source: drupal_version
       delimiter: ;
     -
       plugin: migration
-      migration: drupalfr_user
-  field_local_group_place:
+      migration: drupalfr_drupal_version
+  field_attachment:
     -
-      plugin: drupalfr_multigeofields
-      source: places
+      plugin: explode
+      source: attachments
       delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_file
+  body/value: body_value
+  body/format: body_format
+  path:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: path
   status: published
   uid:
     plugin: default_value
     default_value: 1
 destination:
   plugin: 'entity:node'
-  type: local_group
-  bundle: local_group
+  type: page
+  bundle: page
 template: null
 migration_dependencies: {  }
 migration_group: drupalfr
