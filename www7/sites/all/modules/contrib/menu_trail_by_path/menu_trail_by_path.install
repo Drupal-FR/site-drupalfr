@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Installation file for menu_trail_by_path module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function menu_trail_by_path_install() {
+  // First version didn't have a install
+}
+
+/**
+ * Set module weight for it to run after i18n_menu.
+ */
+function menu_trail_by_path_update_7200() {
+  // Set module weight for it to run after i18n_menu, because we both inject into
+  // the static cache of the function menu_link_get_preferred().
+  db_query("UPDATE {system} SET weight = 7 WHERE name = 'menu_trail_by_path' AND type = 'module'");
+}
