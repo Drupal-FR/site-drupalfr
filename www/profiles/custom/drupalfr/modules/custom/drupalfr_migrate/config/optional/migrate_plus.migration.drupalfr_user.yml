@@ -28,6 +28,8 @@ source:
     -
       login: Login
     -
+      roles: Roles
+    -
       realname: Realname
     -
       social_links_uri: 'Social links URI'
@@ -46,6 +48,18 @@ process:
   mail: mail
   status: status
   name: login
+  roles:
+    -
+      plugin: explode
+      source: roles
+      delimiter: ;
+    -
+      plugin: static_map
+      map:
+        administrator: administrator
+        member: member
+        moderator: moderator
+      bypass: true
   field_user_realname: realname
   field_user_biography: biography
   field_user_social_link:
