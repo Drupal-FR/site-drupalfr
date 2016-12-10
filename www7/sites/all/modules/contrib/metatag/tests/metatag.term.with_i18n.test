@@ -4,15 +4,16 @@
  * Tests for the Metatag module to ensure i18n integration doesn't break.
  */
 
-class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
+class MetatagCoreTermWithI18nTest extends MetatagTestHelper {
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
-      'name' => 'Metatag core tests with i18n: node',
-      'description' => 'Test Metatag node config integration with the i18n module.',
+      'name' => 'Metatag core term tests with i18n',
+      'description' => 'Test Metatag taxonomy config integration with the i18n module.',
       'group' => 'Metatag',
+      'dependencies' => array('ctools', 'token', 'i18n'),
     );
   }
 
@@ -27,6 +28,9 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
     // Enable all of the modules that are needed.
     parent::setUp($modules);
 
+    // Add more locales.
+    $this->setupLocales();
+
     // Set up the locales.
     $perms = array(
       'administer languages',
@@ -36,7 +40,9 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
       'translate user-defined strings',
     );
     $this->adminUser = $this->createAdminUser($perms);
-    $this->setupLocales();
+
+    // Log in the admin user.
+    $this->drupalLogin($this->adminUser);
 
     // Reload the translations.
     drupal_flush_all_caches();
@@ -45,12 +51,12 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
   }
 
   /**
-   * Test translations of the main node configuration.
+   * Test translations of the main taxonomy term configuration.
    */
-  public function testI18nNodeConfig() {
+  public function testI18nTermConfig() {
     // Plan out the different translation string tests.
-    $string_en = 'It is a node page!';
-    $config_name = 'metatag_config:node:title';
+    $string_en = 'It is a term page!';
+    $config_name = 'metatag_config:taxonomy_term:title';
 
     // Confirm the translation page exists and has some Metatag strings.
     $this->searchTranslationPage('', $config_name);
@@ -59,7 +65,7 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
     $this->searchTranslationPage($string_en, $config_name, FALSE);
 
     // Load the meta tags.
-    $instance = 'node';
+    $instance = 'taxonomy_term';
     $config = metatag_config_load($instance);
 
     // Set something specific as the homepage.
@@ -69,18 +75,18 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
     // Confirm the string is present now.
     $this->searchTranslationPage($string_en, $config_name);
 
-    // Get the translation string lid for the node's title.
+    // Get the translation string lid for the term's title.
     $lid = $this->getTranslationLidByContext($config_name);
-    $this->assertNotEqual($lid, 0, 'Found the locales_source string for the node title tag.');
+    $this->assertNotEqual($lid, 0, 'Found the locales_source string for the taxonomy term title tag.');
   }
 
   /**
-   * Test translations of the 'page' content type configuration.
+   * Test translations of the 'tags' vocabulary configuration.
    */
-  public function testI18nNodePageConfig() {
+  public function testI18nTermTagsConfig() {
     // Plan out the different translation string tests.
-    $string_en = 'It is a node page page!';
-    $config_name = 'metatag_config:node:page:title';
+    $string_en = 'It is a taxonomy term Tags page!';
+    $config_name = 'metatag_config:taxonomy_term:tags:title';
 
     // Confirm the translation page exists and has some Metatag strings.
     $this->searchTranslationPage('', $config_name);
@@ -88,9 +94,9 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
     // Confirm the string is not present yet.
     $this->searchTranslationPage($string_en, $config_name, FALSE);
 
-    // Create a new config object for the node:page structure.
+    // Create a new config object for the taxonomy_term:tags structure.
     $config = new StdClass();
-    $config->instance = 'node:page';
+    $config->instance = 'taxonomy_term:tags';
 
     // Set an example tag.
     $config->config['title']['value'] = $string_en;
@@ -99,9 +105,9 @@ class MetatagCoreWithI18nNodeTest extends MetatagTestHelper {
     // Confirm the string is present now.
     $this->searchTranslationPage($string_en, $config_name);
 
-    // Get the translation string lid for the node's title.
+    // Get the translation string lid for the term's title.
     $lid = $this->getTranslationLidByContext($config_name);
-    $this->assertNotEqual($lid, 0, 'Found the locales_source string for the node title tag.');
+    $this->assertNotEqual($lid, 0, 'Found the locales_source string for the taxonomy term title tag.');
   }
 
 }

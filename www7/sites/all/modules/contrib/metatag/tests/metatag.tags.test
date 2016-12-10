@@ -1,0 +1,138 @@
+<?php
+/**
+ * @file
+ * Tests that each of the Metatag base tags work correctly.
+ */
+
+class MetatagTagsTest extends MetatagTagsTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Metatag tags: Basic',
+      'description' => 'Test the basic meta tags.',
+      'group' => 'Metatag',
+      'dependencies' => array('ctools', 'token'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public $tags = array(
+    'abstract',
+    'cache-control',
+    'canonical',
+    'content-language',
+    'description',
+    'expires',
+    'generator',
+    'geo.placename',
+    'geo.position',
+    'geo.region',
+    'icbm',
+    'image_src',
+    'keywords',
+    'news_keywords',
+    'next',
+    'original-source',
+    'pragma',
+    'prev',
+    'rating',
+    'referrer',
+    'refresh',
+    'revisit-after',
+    'rights',
+    'robots',
+    'shortlink',
+    'standout',
+    'title',
+  );
+
+  /**
+   * Implements {meta_tag_name}_test_xpath() for 'abstract'.
+   */
+  public function abstract_test_xpath() {
+    return "//textarea[@name='metatags[und][abstract][value]']";
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_xpath() for 'description'.
+   */
+  public function description_test_xpath() {
+    return "//textarea[@name='metatags[und][description][value]']";
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_key() for 'rating'.
+   */
+  public function rating_test_key() {
+    return 'metatags[und][rating][value]';
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_value() for 'general'.
+   */
+  public function rating_test_value() {
+    return 'general';
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_xpath() for 'rating'.
+   */
+  public function rating_test_xpath() {
+    return "//select[@name='metatags[und][rating][value]']";
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_key() for 'referrer'.
+   */
+  public function referrer_test_key() {
+    return 'metatags[und][referrer][value]';
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_value() for 'referrer'.
+   */
+  public function referrer_test_value() {
+    return 'origin';
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_xpath() for 'referrer'.
+   */
+  public function referrer_test_xpath() {
+    return "//select[@name='metatags[und][referrer][value]']";
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_value() for 'robots'.
+   */
+  public function robots_test_key() {
+    return 'metatags[und][robots][value][index]';
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_value() for 'robots'.
+   */
+  public function robots_test_value() {
+    return TRUE;
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_xpath() for 'robots'.
+   */
+  public function robots_test_xpath() {
+    return "//input[@name='metatags[und][robots][value][index]' and @type='checkbox']";
+  }
+
+  /**
+   * Implements {meta_tag_name}_test_value() for 'revisit-after'.
+   */
+  public function revisit_after_test_value() {
+    return 2;
+  }
+
+}

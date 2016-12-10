@@ -23,6 +23,9 @@ function metatag_mobile_theme() {
   $info['metatag_mobile_ios_app'] = array(
     'render element' => 'element',
   );
+  $info['metatag_mobile_alt_handheld'] = array(
+    'render element' => 'element',
+  );
 
   return $info;
 }
@@ -53,6 +56,25 @@ function theme_metatag_mobile_ios_app($variables) {
   $variables['element']['#value'] = 'ios-app://' . $variables['element']['#value'];
 
   return theme('metatag_link_rel', $variables);
+}
+
+
+/**
+ * Theme callback for a handheld-formatted alternative URL.
+ *
+ * The format is:
+ * <link rel="alternate" media="handheld" href="https://phone.example.com/the/page" />
+ */
+function theme_metatag_mobile_alt_handheld($variables) {
+  $element = &$variables['element'];
+  $args = array(
+    '#name' => 'rel',
+    '#media' => 'media',
+    '#value' => 'href',
+  );
+  element_set_attributes($element, $args);
+  unset($element['#value']);
+  return theme('html_tag', $variables);
 }
 
 /*

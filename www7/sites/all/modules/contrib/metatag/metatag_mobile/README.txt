@@ -9,6 +9,7 @@ Mobile:
   <meta name="HandheldFriendly" value="[VALUE]" />
   <meta name="viewport" value="[VALUE]" />
   <meta http-equiv="cleartype" content="[VALUE]" />
+  <link href="amphtml" value="[VALUE]" />
 
 iOS:
   <meta name="apple-itunes-app" content="[VALUE]" />

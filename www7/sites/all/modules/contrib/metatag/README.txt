@@ -293,7 +293,10 @@ Troubleshooting / known issues
 * Versions of Drupal older than v7.17 were missing necessary functionality for
   taxonomy term pages to work correctly.
 * Using Metatag with values assigned for the page title and the Page Title
-  module simultaneously can cause conflicts and unexpected results.
+  module simultaneously can cause conflicts and unexpected results. It is
+  strongly recommended to convert the Page Title settings to Metatag and just
+  uninstall Page Title entirely. See https://www.drupal.org/node/2774833 for
+  further details.
 * When customizing the meta tags for user pages, it is strongly recommended to
   not use the [current-user] tokens, these pertain to the person *viewing* the
   page and not e.g., the person who authored a page.
@@ -311,6 +314,10 @@ Troubleshooting / known issues
   recommended to disable the "Force language neutral aliases" setting on the
   Admin Language settings page, i.e. set the "admin_language_force_neutral"
   variable to FALSE. Failing to do so can lead to data loss in Metatag.
+* If Entity Token is installed (a dependency for Rules, Commerce and others) it
+  is possible that the token browser may not work correctly and may either
+  timeout or give an error instead of a browsable list of tokens. This is a
+  limitation of the token browser.
 
 
 Related modules
