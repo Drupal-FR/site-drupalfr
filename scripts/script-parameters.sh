@@ -26,6 +26,8 @@ DEVELOPMENT_MODULES=(
   features_ui
   field_ui
   kint
+  renderviz
+  search_kint
   views_ui
   webprofiler
 )
