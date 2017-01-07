@@ -85,111 +85,87 @@ field_settings:
       module:
         - taxonomy
 processor_settings:
-  content_access:
-    plugin_id: content_access
-    settings:
-      weights:
-        preprocess_query: -10
-  rendered_item:
-    plugin_id: rendered_item
-    settings: {  }
-  add_url:
-    plugin_id: add_url
-    settings: {  }
-  aggregated_field:
-    plugin_id: aggregated_field
-    settings: {  }
   ignorecase:
-    plugin_id: ignorecase
-    settings:
-      fields:
-        - title
-        - body
-      weights:
-        preprocess_index: -10
-        preprocess_query: -10
+    fields:
+      - title
+      - body
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
+  content_access:
+    weights:
+      preprocess_query: -10
   highlight:
-    plugin_id: highlight
-    settings:
-      highlight: always
-      excerpt: true
-      excerpt_length: 256
-      exclude_fields: {  }
-      prefix: '<strong>'
-      suffix: '</strong>'
-      weights:
-        postprocess_query: 0
+    highlight: always
+    excerpt: true
+    excerpt_length: 256
+    exclude_fields: {  }
+    prefix: '<strong>'
+    suffix: '</strong>'
+    weights:
+      postprocess_query: 0
+  rendered_item: {  }
   ignore_character:
-    plugin_id: ignore_character
-    settings:
-      fields:
-        - title
-        - body
-      ignorable: '[''¿¡!?,.:;]'
-      strip:
-        character_sets:
-          Pc: Pc
-          Pd: Pd
-          Pe: Pe
-          Pf: Pf
-          Pi: Pi
-          Po: Po
-          Ps: Ps
-          Cc: 0
-          Cf: 0
-          Co: 0
-          Mc: 0
-          Me: 0
-          Mn: 0
-          Sc: 0
-          Sk: 0
-          Sm: 0
-          So: 0
-          Zl: 0
-          Zp: 0
-          Zs: 0
-      weights:
-        preprocess_index: -10
-        preprocess_query: -10
+    fields:
+      - title
+      - body
+    ignorable: '[''¿¡!?,.:;]'
+    strip:
+      character_sets:
+        Pc: Pc
+        Pd: Pd
+        Pe: Pe
+        Pf: Pf
+        Pi: Pi
+        Po: Po
+        Ps: Ps
+        Cc: 0
+        Cf: 0
+        Co: 0
+        Mc: 0
+        Me: 0
+        Mn: 0
+        Sc: 0
+        Sk: 0
+        Sm: 0
+        So: 0
+        Zl: 0
+        Zp: 0
+        Zs: 0
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
+  add_url: {  }
   tokenizer:
-    plugin_id: tokenizer
-    settings:
-      fields:
-        - title
-        - body
-      spaces: ''
-      overlap_cjk: 1
-      minimum_word_size: '3'
-      weights:
-        preprocess_index: -6
-        preprocess_query: -6
-  node_status:
-    plugin_id: node_status
-    settings: {  }
+    fields:
+      - title
+      - body
+    spaces: ''
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -6
+      preprocess_query: -6
+  aggregated_field: {  }
+  node_status: {  }
   transliteration:
-    plugin_id: transliteration
-    settings:
-      fields:
-        - title
-        - body
-      weights:
-        preprocess_index: -10
-        preprocess_query: -10
+    fields:
+      - title
+      - body
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
 options:
   index_directly: false
   cron_limit: 500
 datasource_settings:
   'entity:node':
-    plugin_id: 'entity:node'
-    settings:
-      bundles:
-        default: true
-        selected: {  }
-      languages:
-        default: true
-        selected: {  }
+    bundles:
+      default: true
+      selected: {  }
+    languages:
+      default: true
+      selected: {  }
 tracker_settings:
-  default:
-    plugin_id: default
-    settings: {  }
+  default: {  }
 server: solr
