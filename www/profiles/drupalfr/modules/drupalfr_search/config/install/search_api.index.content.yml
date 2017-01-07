@@ -84,6 +84,14 @@ field_settings:
         - field.storage.node.field_drupal_version
       module:
         - taxonomy
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: true
+      selected: {  }
+    languages:
+      default: true
+      selected: {  }
 processor_settings:
   ignorecase:
     fields:
@@ -104,6 +112,7 @@ processor_settings:
     suffix: '</strong>'
     weights:
       postprocess_query: 0
+    highlight_partial: false
   rendered_item: {  }
   ignore_character:
     fields:
@@ -155,17 +164,9 @@ processor_settings:
     weights:
       preprocess_index: -10
       preprocess_query: -10
+tracker_settings:
+  default: {  }
 options:
   index_directly: false
   cron_limit: 500
-datasource_settings:
-  'entity:node':
-    bundles:
-      default: true
-      selected: {  }
-    languages:
-      default: true
-      selected: {  }
-tracker_settings:
-  default: {  }
 server: solr
