@@ -1,10 +1,10 @@
 <?php
+
 /**
- * @file
  * A base class for the Metatag tests, provides shared methods.
  */
-
 abstract class MetatagTestHelper extends DrupalWebTestCase {
+
   /**
    * Admin user.
    *
@@ -745,6 +745,20 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     $xpath = $this->xpath("//meta[@name='abstract']");
     $this->assertEqual(count($xpath), 1, 'Exactly one abstract meta tag found.');
     $this->assertEqual($xpath[0]['content'], $user->name . " ponies");
+  }
+
+  /**
+   * Generate a string that is allowable as a machine name.
+   *
+   * @param int $length
+   *   How long the machine name will be, defaults to eight characters.
+   *
+   * @return string
+   *   A string that contains lowercase letters and numbers, with a letter as
+   *   the first character.
+   */
+  function randomMachineName($length = 8) {
+    return strtolower($this->randomName($length));
   }
 
 }

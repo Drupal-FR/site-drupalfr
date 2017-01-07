@@ -10,7 +10,7 @@
 function metatag_mobile_metatag_info() {
   $info['groups']['mobile'] = array(
     'label' => t('Mobile & UI Adjustments'),
-    'description' => t("Meta tags used to control the mobile browser experience. Some of these meta tags have been replaced by newer mobile browsers. These meta tags usually only need to be set globally, rather than per-page."),
+    'description' => t('Meta tags used to control the mobile browser experience. Some of these meta tags have been replaced by newer mobile browsers. These meta tags usually only need to be set globally, rather than per-page.'),
     'form' => array(
       '#weight' => 80,
     ),
@@ -24,14 +24,14 @@ function metatag_mobile_metatag_info() {
   );
   $info['groups']['android_mobile'] = array(
     'label' => t('Android'),
-    'description' => t("Custom meta tags used by the Android OS, browser, etc."),
+    'description' => t('Custom meta tags used by the Android OS, browser, etc.'),
     'form' => array(
       '#weight' => 82,
     ),
   );
   $info['groups']['windows_mobile'] = array(
     'label' => t('Windows & Windows Mobile'),
-    'description' => t("Custom meta tags used by the Windows and Windows Mobile OSes, IE browser, etc."),
+    'description' => t('Custom meta tags used by the Windows and Windows Mobile OSes, IE browser, etc.'),
     'form' => array(
       '#weight' => 83,
     ),

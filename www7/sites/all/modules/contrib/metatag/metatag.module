@@ -526,9 +526,7 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
   // Get all translations of tag data for this entity.
   $query = db_select('metatag', 'm')
     ->fields('m', array('entity_id', 'revision_id', 'language', 'data'))
-    ->condition('m.entity_type', $entity_type)
-    ->orderBy('entity_id')
-    ->orderBy('revision_id');
+    ->condition('m.entity_type', $entity_type);
   // Filter by revision_ids if they are available. If not, filter by entity_ids.
   if (!empty($revision_ids)) {
     $query->condition('m.revision_id', $revision_ids, 'IN');
@@ -587,7 +585,6 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
  * @param string|null $bundle
  *   The bundle of the entity that is being saved. Optional.
  */
-
 function metatag_metatags_save($entity_type, $entity_id, $revision_id, $metatags, $bundle = NULL) {
   // Check that $entity_id is numeric because of Entity API and string IDs.
   if (!is_numeric($entity_id)) {
@@ -896,11 +893,6 @@ function metatag_entity_insert($entity, $entity_type) {
       unset($entity->metatags[LANGUAGE_NONE]);
     }
 
-    // Support for Workbench Moderation v1.
-    if ($entity_type == 'node' && _metatag_isdefaultrevision($entity)) {
-      return;
-    }
-
     metatag_metatags_save($entity_type, $entity_id, $revision_id, $entity->metatags, $bundle);
   }
 }
@@ -954,11 +946,6 @@ function metatag_entity_update($entity, $entity_type) {
           }
         }
       }
-    }
-
-    // Support for Workbench Moderation v1.
-    if ($entity_type == 'node' && _metatag_isdefaultrevision($entity)) {
-      return;
     }
 
     // Save the record.
@@ -2567,42 +2554,6 @@ function metatag_ctools_render_alter(&$info, $page, $context) {
 }
 
 /**
- * Checks if this entity is the default revision (published).
- *
- * @param object $entity
- *   The entity object, e.g., $node.
- *
- * @return bool
- *   TRUE if the entity is the default revision, FALSE otherwise.
- */
-function _metatag_isdefaultrevision($entity) {
-  // D7 "Forward revisioning" is complex and causes a node_save() with the
-  // future node in node table. This fires hook_node_update() twice and cause
-  // abnormal behaviour in metatag.
-  //
-  // The steps taken by Workbench Moderation is to save the forward revision
-  // first and overwrite this with the live version in a shutdown function in
-  // a second step. This will confuse metatag. D7 has no generic property
-  // in the node object, if the node that is updated is the 'published' version
-  // or only a draft of a future version.
-  //
-  // This behaviour will change in D8 where $node->isDefaultRevision has been
-  // introduced. See below links for more details.
-  // - https://www.drupal.org/node/1879482
-  // - https://www.drupal.org/node/218755
-  // - https://www.drupal.org/node/1522154
-  //
-  // Every moderation module saving a forward revision needs to return FALSE.
-  // @todo: Refactor this workaround under D8.
-  // Support for Workbench Moderation v1 - if this is a node, check if the
-  // content type supports moderation.
-  if (function_exists('workbench_moderation_node_type_moderated') && workbench_moderation_node_type_moderated($entity->type) === TRUE) {
-    return !empty($entity->workbench_moderation['updating_live_revision']);
-  }
-  return FALSE;
-}
-
-/**
  * Generate the cache ID to use with metatag_cache_get/metatag_cache_set calls.
  *
  * @param array $cid_parts
@@ -2657,8 +2608,12 @@ function metatag_cache_default_cid_parts(array $cid_parts = array()) {
  * @see cache_set()
  */
 function metatag_cache_set($cid, $data) {
-  // Cache the data for later.
-  return cache_set($cid, $data, 'cache_metatag');
+  // By default the cached data will not expire.
+  $expire = CACHE_PERMANENT;
+
+  // Triggers hook_metatag_cache_set_expire_alter().
+  drupal_alter("metatag_cache_set_expire", $expire, $cid, $data);
+  return cache_set($cid, $data, 'cache_metatag', $expire);
 }
 
 /**

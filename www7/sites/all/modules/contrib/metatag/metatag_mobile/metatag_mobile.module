@@ -38,7 +38,7 @@ function metatag_mobile_theme() {
  */
 function theme_metatag_mobile_android_app($variables) {
   // Pass everything through to the normal 'link' tag theme.
-  $variables['element']['#name'] = 'alternative';
+  $variables['element']['#name'] = 'alternate';
   $variables['element']['#value'] = 'android-app://' . $variables['element']['#value'];
 
   return theme('metatag_link_rel', $variables);
@@ -52,7 +52,7 @@ function theme_metatag_mobile_android_app($variables) {
  */
 function theme_metatag_mobile_ios_app($variables) {
   // Pass everything through to the normal 'link' tag theme.
-  $variables['element']['#name'] = 'alternative';
+  $variables['element']['#name'] = 'alternate';
   $variables['element']['#value'] = 'ios-app://' . $variables['element']['#value'];
 
   return theme('metatag_link_rel', $variables);

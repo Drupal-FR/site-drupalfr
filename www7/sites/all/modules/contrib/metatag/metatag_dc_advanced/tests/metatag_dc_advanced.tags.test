@@ -1,9 +1,8 @@
 <?php
+
 /**
- * @file
  * Tests that each of the Metatag Advanced Dublin Core tags work correctly.
  */
-
 class MetatagDcAdvancedTagsTest extends MetatagTagsTestBase {
 
   /**
@@ -69,6 +68,13 @@ class MetatagDcAdvancedTagsTest extends MetatagTagsTestBase {
   function setUp(array $modules = array()) {
     $modules[] = 'metatag_dc_advanced';
     parent::setUp($modules);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTestTagName($tag_name) {
+    return str_replace('dcterms_', 'dcterms.', $tag_name);
   }
 
 }

@@ -1,9 +1,8 @@
 <?php
+
 /**
- * @file
  * Tests that each of the Metatag Hreflang tags work correctly.
  */
-
 class MetatagHreflangTagsTest extends MetatagTagsTestBase {
 
   /**
@@ -74,6 +73,36 @@ class MetatagHreflangTagsTest extends MetatagTagsTestBase {
       // English is automatic, so remember to not try enabling it.
       'en',
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public $test_tag = 'link';
+
+  /**
+   * {@inheritdoc}
+   */
+  public $test_name_attribute = 'hreflang';
+
+  /**
+   * {@inheritdoc}
+   */
+  public $test_value_attribute = 'href';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTestTagValue() {
+    return base_path() . $this->randomMachineName() . '/' . $this->randomMachineName();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTestTagName($tag_name) {
+    $tag_name = str_replace('xdefault', 'x-default', $tag_name);
+    return str_replace('hreflang_', '', $tag_name);
   }
 
 }

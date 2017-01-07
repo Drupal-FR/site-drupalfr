@@ -1,9 +1,8 @@
 <?php
+
 /**
- * @file
  * Tests that each of the Metatag Dublin Core tags work correctly.
  */
-
 class MetatagDcTagsTest extends MetatagTagsTestBase {
 
   /**
@@ -47,6 +46,13 @@ class MetatagDcTagsTest extends MetatagTagsTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getTestTagName($tag_name) {
+    return str_replace('dcterms_', 'dcterms.', $tag_name);
+  }
+
+  /**
    * Implements {meta_tag_name}_test_key() for 'dcterms.type'.
    */
   public function dcterms_type_test_key() {
@@ -61,9 +67,9 @@ class MetatagDcTagsTest extends MetatagTagsTestBase {
   }
 
   /**
-   * Implements {meta_tag_name}_test_xpath() for 'dcterms.type'.
+   * Implements {meta_tag_name}_test_field_xpath() for 'dcterms.type'.
    */
-  public function dcterms_type_test_xpath() {
+  public function dcterms_type_test_field_xpath() {
     return "//select[@name='metatags[und][dcterms.type][value]']";
   }
 

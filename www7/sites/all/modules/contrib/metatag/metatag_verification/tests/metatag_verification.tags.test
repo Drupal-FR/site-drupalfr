@@ -1,9 +1,8 @@
 <?php
+
 /**
- * @file
  * Tests that each of the Metatag Verification tags work correctly.
  */
-
 class MetatagVerificationTagsTest extends MetatagTagsTestBase {
 
   /**
@@ -35,6 +34,16 @@ class MetatagVerificationTagsTest extends MetatagTagsTestBase {
   function setUp(array $modules = array()) {
     $modules[] = 'metatag_verification';
     parent::setUp($modules);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTestTagName($tag_name) {
+    $tag_name = str_replace('_', '-', $tag_name);
+    $tag_name = str_replace('msvalidate-01', 'msvalidate.01', $tag_name);
+    $tag_name = str_replace('p-domain-verify', 'p:domain_verify', $tag_name);
+    return $tag_name;
   }
 
 }

@@ -133,6 +133,7 @@ function metatag_google_plus_metatag_info() {
     'description' => t("Used by some search engines to confirm authorship of the content on a page. Should be either the full URL for the author's Google+ profile page or a local page with information about the author."),
     'class' => 'DrupalLinkMetaTag',
     'weight' => ++$weight,
+    'element' => array(),
     'devel_generate' => array(
       'type' => 'url',
     ),
@@ -142,6 +143,7 @@ function metatag_google_plus_metatag_info() {
     'description' => t("Used by some search engines to confirm publication of the content on a page. Should be the full URL for the publication's Google+ profile page."),
     'class' => 'DrupalLinkMetaTag',
     'weight' => ++$weight,
+    'element' => array(),
     'devel_generate' => array(
       'type' => 'url',
     ),

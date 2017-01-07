@@ -181,6 +181,37 @@ function metatag_requirements($phase) {
         );
       }
     }
+
+    // If Workbench Moderation is installed, this only works with v3.
+    if (module_exists('workbench_moderation')) {
+      $wm_module = $module_data['workbench_moderation'];
+      // If the version string is not present then it means the module is
+      // running from git, which means it can't be compared against.
+      // Alternatively, look for the test file, which was the last commit of
+      // the 1.6 release.
+      if (!empty($wm_module->info['version'])) {
+        // Versions are in the format 7.x-1.y, so split the string up to find
+        // the 'y' portion.
+        $version = explode('-', $wm_module->info['version']);
+        if (isset($version[1])) {
+          list($major, $minor) = explode('.', $version[1]);
+        }
+        // If the version string couldn't be extracted correctly, assume that
+        // an incorrect version is installed.
+        else {
+          $major = 0;
+        }
+      }
+      // If v3.x is not installed, give an error message.
+      if ($major < 3) {
+        $requirements['metatag_wm_version'] = array(
+          'severity' => REQUIREMENT_ERROR,
+          'title' => 'Metatag',
+          'value' => $t('Workbench Moderation module is out of date.'),
+          'description' => $t('Metatag only works with <a href="https://www.drupal.org/project/workbench_moderation">Workbench Moderation module</a> v7.x-3.0 or newer, otherwise there will be problems when content is changed.'),
+        );
+      }
+    }
   }
 
   return $requirements;

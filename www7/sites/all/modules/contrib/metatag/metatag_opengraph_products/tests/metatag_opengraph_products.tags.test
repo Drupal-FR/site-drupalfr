@@ -1,9 +1,8 @@
 <?php
+
 /**
- * @file
  * Tests that each of the Metatag OpenGraph Products tags work correctly.
  */
-
 class MetatagOpenGraphProductsTagsTest extends MetatagTagsTestBase {
 
   /**
@@ -55,6 +54,30 @@ class MetatagOpenGraphProductsTagsTest extends MetatagTagsTestBase {
   function setUp(array $modules = array()) {
     $modules[] = 'metatag_opengraph_products';
     parent::setUp($modules);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public $test_name_attribute = 'property';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTestTagName($tag_name) {
+    // All OG tags use colons to separate levels.
+    $tag_name = str_replace('_', ':', $tag_name);
+
+    // Fix a few specific tags.
+    $tag_name = str_replace(':weight', '_weight', $tag_name);
+    $tag_name = str_replace('product_weight', 'product:weight', $tag_name);
+    $tag_name = str_replace(':cost', '_cost', $tag_name);
+    $tag_name = str_replace(':part:no', '_part_no', $tag_name);
+    $tag_name = str_replace(':title', '_title', $tag_name);
+    $tag_name = str_replace(':link', '_link', $tag_name);
+    $tag_name = str_replace(':time', '_time', $tag_name);
+
+    return $tag_name;
   }
 
 }

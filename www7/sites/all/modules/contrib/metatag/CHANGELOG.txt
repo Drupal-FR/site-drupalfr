@@ -1,3 +1,28 @@
+Metatag 7.x-1.19, 2017-01-01
+----------------------------
+#2832427 by dmitry.kazberovich, e2thex, DamienMcKenna: Allow the metatag cache
+  expiration time to be modified.
+#2780025 by DamienMcKenna: Backported output tests from D8. Also fixes the
+  output of the shortcut icon, ios-app, android-app, author, publisher, and made
+  the Google CSE thumbnail tag an 'image'. Left some others to be fixed later.
+#2832476 by czigor; Added the 'product.group' and 'place' og:type options.
+#2835614 by drumm: metatag_metatags_load_multiple() doesn't need to sort the
+  results.
+By DamienMcKenna: Noted in the metatag_google_plus info file and README.txt that
+  it includes the Author and Publisher meta tags.
+By DamienMcKenna: Tweaked the favicons module description.
+By DamienMcKenna: Updated main tests to match the latest coding standards.
+By DamienMcKenna: Minor updates to various Google CSE labels.
+By DamienMcKenna: A string in metatag_opengraph_products wasn't using an
+  argument that was being passed to it.
+By DamienMcKenna: Minor adjustment to metatag_mobile strings.
+By DamienMcKenna: Updated submodule tests to match the latest coding standards.
+#2838198 by DamienMcKenna, Mixologic: Test dependency changes to workaround
+  changes in the DrupalCI platform.
+#2831073 by dxvargas, DamienMcKenna: Remove old workarounds due to Workbench
+  Moderation 3.x API changes, warn if older version installed.
+
+
 Metatag 7.x-1.18, 2016-11-30
 ----------------------------
 #2761817 by DamienMcKenna: Fixed metatag_update_replace_config() so it isn't
