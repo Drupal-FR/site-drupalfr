@@ -258,6 +258,12 @@ class views_pdf_plugin_row_fields extends views_plugin_row {
         '#default_value' => isset($this->options['formats'][$field]['render']['is_html']) ? $this->options['formats'][$field]['render']['is_html'] : 1,
       );
 
+      $form['formats'][$field]['render']['custom_layout'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable custom layout hook.'),
+        '#description' => t("Allow a custom module to alter the layout of this field."),
+        '#default_value' => !empty($this->options['formats'][$field]['render']['custom_layout']) ? $this->options['formats'][$field]['render']['custom_layout'] : FALSE,
+      );
       $form['formats'][$field]['render']['minimal_space'] = array(
         '#type' => 'textfield',
         '#title' => t('Minimal Space'),
@@ -276,6 +282,12 @@ class views_pdf_plugin_row_fields extends views_plugin_row {
           '#description' => t("WARNING: If you don't know the risk of using eval leave as it."),
           '#default_value' => !empty($this->options['formats'][$field]['render']['bypass_eval_before']) ? $this->options['formats'][$field]['render']['bypass_eval_before'] : FALSE,
         );
+        $form['formats'][$field]['render']['custom_post'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable custom post render hook.'),
+        '#description' => t("Allow a custom module hook to be executed after the rendering of this field."),
+        '#default_value' => !empty($this->options['formats'][$field]['render']['custom_post']) ? $this->options['formats'][$field]['render']['custom_post'] : FALSE,
+      );
 
         $form['formats'][$field]['render']['eval_after'] = array(
           '#type' => 'textarea',

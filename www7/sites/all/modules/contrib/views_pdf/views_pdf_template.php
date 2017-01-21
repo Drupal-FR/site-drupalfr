@@ -257,6 +257,8 @@ class PdfTemplate extends FPDI {
       'eval_after' => '',
       'bypass_eval_before' => FALSE,
       'bypass_eval_after' => FALSE,
+      'custom_layout'     => FALSE,
+      'custom_post'       => FALSE,
     );
 
     $x = $y = 0;
@@ -513,6 +515,26 @@ class PdfTemplate extends FPDI {
             $content = php_eval($options['render']['eval_before']);
           }
         }
+        if ($options['render']['custom_layout']) {
+          // Custom layout hook.
+          $layout_data = array (
+            'x'          => &$x,
+            'y'          => &$y,
+            'h'          => &$h,
+            'w'          => &$w,
+            'content'    => &$content,
+            'key'        => &$key,
+            'view'       => &$view,
+            'this'       => &$this,
+            'border'     => &$border,
+            'color'      => &$textColor,
+            'font'       => &$font_family,
+            'font_style' => &$font_style,
+            'font_size'  => &$font_size,
+
+          );
+          drupal_alter('views_pdf_custom_layout', $layout_data);
+        }
 
         // Add css if there is a css file set and stripHTML is not active.
         if (!empty($css_file) && is_string($css_file) && !$stripHTML && $ishtml && !empty($content)) {
@@ -545,6 +567,10 @@ class PdfTemplate extends FPDI {
         // Reset font to default.
         $this->SetFont($this->defaultFontFamily, implode('', $this->defaultFontStyle), $this->defaultFontSize);
 
+        // Post render.
+        if ($options['render']['custom_post']) {
+          drupal_alter('views_pdf_custom_post', $view);
+        }
         // Run eval after.
         if (VIEWS_PDF_PHP) {
           if (!empty($options['render']['bypass_eval_after']) && !empty($options['render']['eval_after'])) {

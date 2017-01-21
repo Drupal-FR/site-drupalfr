@@ -59,3 +59,30 @@ function views_pdf_requirements($phase) {
   return $requirements;
 }
 
+/**
+ * The previous update to version 7.x-1.6 contained a faulty views_pdf_update_7000() function that
+ * created a faulty views display object for some pdf displays (i.e. pdf display with the default "Display a specified number of items | 10"  pager )
+ * This resulted in a display_option['pager'] NULL array element, which broke the pdf display.
+ *
+ * This new update replaces the views_pdf_update_7000() function and fixes the faulty array element
+ * It is recommended that users avoid 7.x-1.6 and update to 7.x-1.7 version
+ */
+function views_pdf_update_7101() {
+  $views = views_get_all_views();
+
+  foreach ($views as $key => $view) {
+    foreach ($view->display as $key => $display) {
+      if($display->display_plugin == 'pdf') {
+        if(isset($display->display_options['pager'])) {
+          if (!isset($display->display_options['defaults']['pager']))  {
+            $display->display_options['defaults']['pager'] = FALSE;
+          }
+          if (!isset($display->display_options['defaults']['pager_options'])) {
+            $display->display_options['defaults']['pager_options'] = FALSE;
+          }
+        }
+      }
+    }
+    views_save_view($view);
+  }
+}
