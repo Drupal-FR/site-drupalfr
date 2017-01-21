@@ -182,13 +182,12 @@ function metatag_requirements($phase) {
       }
     }
 
-    // If Workbench Moderation is installed, this only works with v3.
+    // If Workbench Moderation is installed, show a message if it is out of
+    // date.
     if (module_exists('workbench_moderation')) {
       $wm_module = $module_data['workbench_moderation'];
       // If the version string is not present then it means the module is
       // running from git, which means it can't be compared against.
-      // Alternatively, look for the test file, which was the last commit of
-      // the 1.6 release.
       if (!empty($wm_module->info['version'])) {
         // Versions are in the format 7.x-1.y, so split the string up to find
         // the 'y' portion.
@@ -202,13 +201,13 @@ function metatag_requirements($phase) {
           $major = 0;
         }
       }
-      // If v3.x is not installed, give an error message.
+      // If v3.x is not installed, give a message.
       if ($major < 3) {
         $requirements['metatag_wm_version'] = array(
-          'severity' => REQUIREMENT_ERROR,
+          'severity' => REQUIREMENT_INFO,
           'title' => 'Metatag',
           'value' => $t('Workbench Moderation module is out of date.'),
-          'description' => $t('Metatag only works with <a href="https://www.drupal.org/project/workbench_moderation">Workbench Moderation module</a> v7.x-3.0 or newer, otherwise there will be problems when content is changed.'),
+          'description' => $t('It is recommended to use <a href="https://www.drupal.org/project/workbench_moderation">Workbench Moderation module</a> v7.x-3.0 or newer.'),
         );
       }
     }
@@ -544,10 +543,17 @@ function metatag_update_replace_entity_tag(&$sandbox, $old_tag, $new_tag) {
 
   if (!empty($count)) {
     $sandbox['progress'] += $count;
-    $sandbox['#finished'] = min(0.99, $sandbox['progress'] / $sandbox['max']);
+    // In some cases the query yields results that cannot be fixed and we would
+    // run into an infinite loop. Stop immediately if we processed all records.
+    if ($sandbox['progress'] >= $sandbox['max']) {
+      $sandbox['#finished'] = TRUE;
+    }
+    else {
+      $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+    }
   }
   else {
-    $sandbox['#finished'] = 1;
+    $sandbox['#finished'] = TRUE;
     return t('Converted the "@old_tag" meta tag for @count entity records to "@new_tag" meta tag.', array('@old_tag' => $old_tag, '@new_tag' => $new_tag, '@count' => $sandbox['progress']));
   }
 }
@@ -621,10 +627,17 @@ function metatag_update_replace_entity_value(&$sandbox, $meta_tag, $old_value, $
   }
 
   if (!empty($count)) {
-    $sandbox['#finished'] = min(0.99, $sandbox['progress'] / $sandbox['max']);
+    // In some cases the query yields results that cannot be fixed and we would
+    // run into an infinite loop. Stop immediately if we processed all records.
+    if ($sandbox['progress'] >= $sandbox['max']) {
+      $sandbox['#finished'] = TRUE;
+    }
+    else {
+      $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+    }
   }
   else {
-    $sandbox['#finished'] = 1;
+    $sandbox['#finished'] = TRUE;
     return t('Replaced the value of @count entity records for the "@meta_tag" meta tag.', array('@meta_tag' => $meta_tag, '@count' => $sandbox['count']));
   }
 }
@@ -1142,7 +1155,12 @@ function metatag_update_7011(&$sandbox) {
   // Set the "finished" status, to tell batch engine whether this function
   // needs to run again. If you set a float, this will indicate the progress of
   // the batch so the progress bar will update.
-  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']) ? TRUE : ($sandbox['progress'] / $sandbox['max']);
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    $sandbox['#finished'] = TRUE;
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
 
   if ($sandbox['#finished']) {
     // Clear all caches so the fixed data will be reloaded.
@@ -1300,7 +1318,12 @@ function metatag_update_7013(&$sandbox) {
   // Set the "finished" status, to tell batch engine whether this function
   // needs to run again. If you set a float, this will indicate the progress of
   // the batch so the progress bar will update.
-  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']) ? TRUE : ($sandbox['progress'] / $sandbox['max']);
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    $sandbox['#finished'] = TRUE;
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
 
   if ($sandbox['#finished']) {
     // Clear all caches so the fixed data will be reloaded.
@@ -1785,7 +1808,12 @@ function metatag_update_7018(&$sandbox) {
   // Set the "finished" status, to tell batch engine whether this function
   // needs to run again. If you set a float, this will indicate the progress of
   // the batch so the progress bar will update.
-  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']) ? TRUE : ($sandbox['progress'] / $sandbox['max']);
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    $sandbox['#finished'] = TRUE;
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
 
   if ($sandbox['#finished']) {
     // Clear all caches so the fixed data will be reloaded.
@@ -2153,7 +2181,12 @@ function metatag_update_7040(&$sandbox) {
   // Set the "finished" status, to tell batch engine whether this function
   // needs to run again. If you set a float, this will indicate the progress of
   // the batch so the progress bar will update.
-  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']) ? TRUE : ($sandbox['progress'] / $sandbox['max']);
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    $sandbox['#finished'] = TRUE;
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
 
   // Only display a status message if process finished.
   if ($sandbox['#finished'] === TRUE) {
@@ -2336,7 +2369,12 @@ function metatag_update_7104(&$sandbox) {
   // Set the "finished" status, to tell batch engine whether this function
   // needs to run again. If you set a float, this will indicate the progress of
   // the batch so the progress bar will update.
-  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']) ? TRUE : ($sandbox['progress'] / $sandbox['max']);
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    $sandbox['#finished'] = TRUE;
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
 
   if ($sandbox['#finished']) {
     // Clear all caches so the fixed data will be reloaded.
@@ -2469,7 +2507,12 @@ function metatag_update_7108(&$sandbox) {
   // Set the "finished" status, to tell batch engine whether this function
   // needs to run again. If you set a float, this will indicate the progress of
   // the batch so the progress bar will update.
-  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']) ? TRUE : ($sandbox['progress'] / $sandbox['max']);
+  if ($sandbox['progress'] >= $sandbox['max']) {
+    $sandbox['#finished'] = TRUE;
+  }
+  else {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
 
   if ($sandbox['#finished']) {
     // Clear all caches so the fixed data will be reloaded.

@@ -893,6 +893,11 @@ function metatag_entity_insert($entity, $entity_type) {
       unset($entity->metatags[LANGUAGE_NONE]);
     }
 
+    // Support for Workbench Moderation.
+    if ($entity_type == 'node' && _metatag_isdefaultrevision($entity)) {
+      return;
+    }
+
     metatag_metatags_save($entity_type, $entity_id, $revision_id, $entity->metatags, $bundle);
   }
 }
@@ -946,6 +951,11 @@ function metatag_entity_update($entity, $entity_type) {
           }
         }
       }
+    }
+
+    // Support for Workbench Moderation.
+    if ($entity_type == 'node' && _metatag_isdefaultrevision($entity)) {
+      return;
     }
 
     // Save the record.
@@ -1867,8 +1877,8 @@ function _metatag_entity_is_page($entity_type, $entity) {
   $uri = entity_uri($entity_type, $entity);
   $current_path = current_path();
 
-  // Support for Workbench Moderation v1 - if this is a node, check if the
-  // content type supports moderation.
+  // Support for Workbench Moderation - if this is a node, check if the content
+  // type supports moderation.
   if ($entity_type == 'node' && function_exists('workbench_moderation_node_type_moderated') && workbench_moderation_node_type_moderated($entity->type) === TRUE) {
     return !empty($uri['path']) && ($current_path == $uri['path'] || $current_path == $uri['path'] . '/draft');
   }
@@ -2551,6 +2561,50 @@ function metatag_ctools_render_alter(&$info, $page, $context) {
       }
     }
   }
+}
+
+/**
+ * Checks if this entity is the default revision (published).
+ *
+ * Only needed when running Workbench Moderation v1; v3 is skipped.
+ *
+ * @param object $entity
+ *   The entity object, e.g., $node.
+ *
+ * @return bool
+ *   TRUE if the entity is the default revision, FALSE otherwise.
+ */
+function _metatag_isdefaultrevision($entity) {
+  // D7 "Forward revisioning" is complex and causes a node_save() with the
+  // future node in node table. This fires hook_node_update() twice and cause
+  // abnormal behaviour in metatag.
+  //
+  // The steps taken by Workbench Moderation is to save the forward revision
+  // first and overwrite this with the live version in a shutdown function in
+  // a second step. This will confuse metatag. D7 has no generic property
+  // in the node object, if the node that is updated is the 'published' version
+  // or only a draft of a future version.
+  //
+  // This behaviour will change in D8 where $node->isDefaultRevision has been
+  // introduced. See below links for more details.
+  // - https://www.drupal.org/node/1879482
+  // - https://www.drupal.org/node/218755
+  // - https://www.drupal.org/node/1522154
+  //
+  // Every moderation module saving a forward revision needs to return FALSE.
+  // @todo: Refactor this workaround under D8.
+
+  // Workbench Moderation v1 uses the hook_node_presave() for some custom logic.
+  // This was replaced with hook_entity_presave() in v3, so only proceed if the
+  // old hook implementation is present.
+  if (function_exists('workbench_moderation_node_presave')) {
+    // If this is a node, check if the content type supports moderation.
+    if (function_exists('workbench_moderation_node_type_moderated') && workbench_moderation_node_type_moderated($entity->type) === TRUE) {
+      return !empty($entity->workbench_moderation['updating_live_revision']);
+    }
+  }
+
+  return FALSE;
 }
 
 /**
