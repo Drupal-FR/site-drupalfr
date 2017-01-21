@@ -1,6 +1,8 @@
 langcode: fr
 status: true
 dependencies:
+  config:
+    - views.view.files_entity_browser
   module:
     - dropzonejs_eb_widget
     - views
@@ -33,6 +35,7 @@ widgets:
       view: files_entity_browser
       view_display: entity_browser_1
       submit_text: 'Sélectionner les entités'
+      auto_select: false
     uuid: 61a3cb07-d2c5-419e-91a1-25b0de82362f
     weight: 2
     label: 'Liste de fichiers'

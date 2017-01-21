@@ -72,11 +72,11 @@
     "composer/installers": "^1.0.21",
     "cweagans/composer-patches": "~1.0",
     "drupal/core": "8.2.5",
-    "drush/drush": "8.1.8",
+    "drush/drush": "8.1.9",
     "drupal/drush_language": "dev-8.x-1.x",
     "drupal/admin_toolbar": "1.18.0",
     "drupal/dropzonejs": "1.0.0-alpha3",
-    "drupal/entity_browser": "1.0.0-beta2",
+    "drupal/entity_browser": "1.0.0-beta4",
     "drupal/entity_embed": "1.0.0-beta2",
     "drupal/eu_cookie_compliance": "1.0.0-beta7",
     "drupal/facets": "1.0.0-alpha7",
@@ -94,12 +94,12 @@
     "drupal/migrate_plus": "3.0.0-beta1",
     "drupal/migrate_source_csv": "2.0.0",
     "drupal/migrate_tools": "3.0.0-beta1",
-    "drupal/pathauto": "1.0.0-beta1",
+    "drupal/pathauto": "1.0.0-beta2",
     "drupal/r4032login": "1.*",
     "drupal/redis": "1.0.0-alpha1",
     "drupal/search_api": "1.0.0-beta4",
     "drupal/search_api_solr": "1.0.0-beta1",
-    "drupal/video_embed_field": "1.3.0",
+    "drupal/video_embed_field": "1.4.0",
     "abraham/twitteroauth": "0.7.2"
   },
   "require-dev": {
@@ -131,6 +131,9 @@
       "../drush/contrib/{$name}": ["type:drupal-drush"]
     },
     "patches": {
+      "drupal/entity_browser": {
+        "Fixed the issue of Call to a member function getConfigDependencyKey() on null on [Widget view], and [SelectionDisplay view]": "https://www.drupal.org/files/issues/2845037-4.patch"
+      },
       "drupal/leaflet": {
         "Error in leaflet_process_geofield() when twig debug is active.": "https://www.drupal.org/files/issues/leaflet-error_when_debug_active-2783843-2.patch"
       },
