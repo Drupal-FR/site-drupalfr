@@ -53,7 +53,7 @@ function views_pdf_views_plugins() {
         'handler' => 'views_pdf_plugin_display',
         'uses hook menu' => TRUE,
         'use ajax' => FALSE,
-        'use pager' => FALSE,
+        'use pager' => TRUE,
         'use more' => FALSE,
         'accept attachments' => FALSE,
         'admin' => t('PDF Page'),

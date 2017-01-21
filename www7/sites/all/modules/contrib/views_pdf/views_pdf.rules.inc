@@ -79,7 +79,7 @@ function views_pdf_rules_action_save($views_pdf, $arguments, $path) {
 
     $view->pre_execute();
     foreach ($view->display as $id => $display) {
-      if ($display->display_plugin == 'pdf' && isset($display->handler)) {
+      if ($display->display_plugin == 'pdf' && isset($display->handler) && $id == $display_id) {
         $display->handler->execute($path, 'F');
       }
     }

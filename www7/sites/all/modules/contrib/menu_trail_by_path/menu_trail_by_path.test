@@ -72,44 +72,41 @@ class MenuTrailByPathTestCase extends DrupalWebTestCase {
     $this->moveDrupalBlock('system_main-menu', 'header');
   }
 
-  // TODO: CURRENTLY THE MODULE IS NOT CAPABLE OF PASSING THIS TEST
-  ///**
-  // * Test url: Home
-  // */
-  //public function testUrlHome() {
-  //  $this->drupalGet($this->menuUrls['Home']);
-  //  $this->assertMenuActiveTrail(
-  //    array(
-  //      $this->menuUrlBasePath('Home') => 'Home',
-  //    ), TRUE
-  //  );
-  //}
+  /**
+   * Test url: Home
+   */
+  public function testUrlHome() {
+    $this->drupalGet($this->menuUrls['Home']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('Home') => 'Home',
+      ), TRUE
+    );
+  }
 
-  // TODO: CURRENTLY THE MODULE IS NOT CAPABLE OF PASSING THIS TEST
-  ///**
-  // * Test url: User password
-  // */
-  //public function testUrlUserPassword() {
-  //  $this->drupalGet($this->menuUrls['User password']);
-  //  $this->assertMenuActiveTrail(
-  //    array(
-  //      $this->menuUrlBasePath('User password') => 'User password',
-  //    ), TRUE
-  //  );
-  //}
+  /**
+   * Test url: User password
+   */
+  public function testUrlUserPassword() {
+    $this->drupalGet($this->menuUrls['User password']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('User password') => 'User password',
+      ), TRUE
+    );
+  }
 
-  // TODO: CURRENTLY THE MODULE IS NOT CAPABLE OF PASSING THIS TEST
-  ///**
-  // * Test url: User login
-  // */
-  //public function testUrlUserLogin() {
-  //  $this->drupalGet($this->menuUrls['User login']);
-  //  $this->assertMenuActiveTrail(
-  //    array(
-  //      $this->menuUrlBasePath('User login') => 'User login',
-  //    ), TRUE
-  //  );
-  //}
+  /**
+   * Test url: User login
+   */
+  public function testUrlUserLogin() {
+    $this->drupalGet($this->menuUrls['User login']);
+    $this->assertMenuActiveTrail(
+      array(
+        $this->menuUrlBasePath('User login') => 'User login',
+      ), TRUE
+    );
+  }
 
   /**
    * Test url: User

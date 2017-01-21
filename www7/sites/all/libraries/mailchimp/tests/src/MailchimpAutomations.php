@@ -7,7 +7,7 @@ class MailchimpAutomations extends \Mailchimp\MailchimpAutomations {
   /**
    * @inheritdoc
    */
-  public function __construct($api_key = 'apikey', $api_user = 'apikey', $timeout = 60) {
+  public function __construct($api_key = 'apikey', $api_user = 'apikey', $http_options = []) {
     $this->client = new Client();
   }
 
