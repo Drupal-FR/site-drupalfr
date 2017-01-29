@@ -26,6 +26,7 @@ DEVELOPMENT_MODULES=(
   features_ui
   field_ui
   kint
+  purge_ui
   renderviz
   search_kint
   views_ui

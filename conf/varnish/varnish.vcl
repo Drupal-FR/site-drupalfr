@@ -3,7 +3,8 @@ import std;
 import directors;
 
 # This Varnish VCL has been adapted from the Four Kitchens VCL for Varnish 3.
-# This VCL is for using cache tags with drupal 8. Minor chages of VCL provided by Jeff Geerling.
+# This VCL is for using cache tags with drupal 8. Minor chages of VCL provided
+# by Jeff Geerling.
 
 # Default backend definition. Points to Apache, normally.
 # Apache is in this config on port 80.
@@ -39,7 +40,7 @@ sub vcl_recv {
         if (!client.ip ~ purge) {
             return (synth(405, "Not allowed."));
         }
-        return (hash);
+        return (purge);
     }
 
     # Only allow BAN requests from IP addresses in the 'purge' ACL.
@@ -49,15 +50,15 @@ sub vcl_recv {
             return (synth(403, "Not allowed."));
         }
 
-        # Logic for the ban, using the Purge-Cache-Tags header. For more info
+        # Logic for the ban, using the Cache-Tags header. For more info
         # see https://github.com/geerlingguy/drupal-vm/issues/397.
-        if (req.http.Purge-Cache-Tags) {
-            ban("obj.http.Purge-Cache-Tags ~ " + req.http.Purge-Cache-Tags);
+        if (req.http.Cache-Tags) {
+            ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
         }
         # Comment out this to debug.
-        # else {
-        #     return (synth(403, "Purge-Cache-Tags header missing."));
-        # }
+        #else {
+        #    return (synth(403, "Cache-Tags header missing."));
+        #}
 
         # Throw a synthetic page so the request won't go to the backend.
         return (synth(200, "Ban added."));
@@ -122,15 +123,17 @@ sub vcl_deliver {
     # Remove ban-lurker friendly custom headers when delivering to client.
     unset resp.http.X-Url;
     unset resp.http.X-Host;
+
     # Comment these for easier Drupal cache tag debugging in development.
     unset resp.http.Purge-Cache-Tags;
     unset resp.http.X-Drupal-Cache-Contexts;
 
     if (obj.hits > 0) {
-        set resp.http.Purge-Cache-Tags = "HIT";
+        set resp.http.X-Cache = "HIT";
+        set resp.http.X-Cache-Hits = obj.hits;
     }
     else {
-        set resp.http.Purge-Cache-Tags = "MISS";
+        set resp.http.X-Cache = "MISS";
     }
 }
 
