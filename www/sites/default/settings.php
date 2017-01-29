@@ -16,6 +16,24 @@ $settings['file_public_path'] = 'sites/default/files';
 
 $settings['container_yamls'][] = __DIR__ . '/services.yml';
 
+// Performance.
+$config['system.performance']['cache']['page']['max_age'] = '86400';
+$config['system.performance']['css']['preprocess'] = TRUE;
+$config['system.performance']['js']['preprocess'] = TRUE;
+
+// External cache.
+if (file_exists(__DIR__ . '/.cache_activated')) {
+  $settings['redis.connection']['interface'] = 'PhpRedis';
+  $settings['redis.connection']['host'] = 'redis';
+  $settings['cache']['default'] = 'cache.backend.redis';
+
+  // Always set the fast backend for bootstrap, discover and config, otherwise
+  // this gets lost when redis is enabled.
+  $settings['cache']['bins']['bootstrap'] = 'cache.backend.chainedfast';
+  $settings['cache']['bins']['discovery'] = 'cache.backend.chainedfast';
+  $settings['cache']['bins']['config'] = 'cache.backend.chainedfast';
+}
+
 if (file_exists(__DIR__ . '/settings.local.php')) {
   include __DIR__ . '/settings.local.php';
 }
