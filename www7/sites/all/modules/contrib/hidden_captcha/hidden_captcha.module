@@ -1,17 +1,22 @@
 <?php
 
 /**
- * Implementation of hook_help().
+ * @file
+ * All code for the Foo Bar module, except installation-related code.
+ */
+
+/**
+ * Implements hook_help().
  */
 function hidden_captcha_help($path, $arg) {
   switch ($path) {
     case 'admin/config/people/captcha/hidden_captcha':
-      return '<p>'. t('This CAPTCHA presents a text field that we expect no one to fill. The text field can be given any name and will be hidden from view using CSS.') .'</p>';
+      return '<p>' . t('This CAPTCHA presents a text field that we expect no one to fill. The text field can be given any name and will be hidden from view using CSS.') . '</p>';
   }
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function hidden_captcha_menu() {
   $items = array();
@@ -35,9 +40,9 @@ function hidden_captcha_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Hidden text field label'),
     '#description' => t(
-      "This is the hidden captcha form field's label, describing the expected input.<br />".
-      "<strong>It is highly recommended to change it!</strong><br />".
-      "The label should be as \"machine-readable\" as possible, encouraging spambots to fill in the field. An example might be a simple math challenge.<br />".
+      "This is the hidden captcha form field's label, describing the expected input.<br />" .
+      "<strong>It is highly recommended to change it!</strong><br />" .
+      "The label should be as \"machine-readable\" as possible, encouraging spambots to fill in the field. An example might be a simple math challenge.<br />" .
       "The label will only be visible to people who do not have CSS enabled and to robots."
     ),
     '#default_value' => variable_get('hidden_captcha_label', 'Website URL'),
@@ -46,7 +51,7 @@ function hidden_captcha_settings_form() {
 }
 
 /**
- * Implementation of hook_captcha().
+ * Implements hook_captcha().
  */
 function hidden_captcha_captcha($op, $captcha_type = '') {
   switch ($op) {
@@ -58,7 +63,8 @@ function hidden_captcha_captcha($op, $captcha_type = '') {
         $captcha['form']['captcha_response'] = array(
           '#type' => 'textfield',
           '#title' => variable_get('hidden_captcha_label', 'Website URL'),
-          '#required' => FALSE
+          '#required' => FALSE,
+          '#attributes' => array('tabindex' => '-1'),
         );
         return $captcha;
       }
@@ -67,7 +73,7 @@ function hidden_captcha_captcha($op, $captcha_type = '') {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function hidden_captcha_theme() {
   return array(
@@ -79,7 +85,7 @@ function hidden_captcha_theme() {
 }
 
 /**
- * Implementation of theme_hook().
+ * Implements theme_hook().
  */
 function theme_hidden_captcha_captcha($element) {
   $captcha = theme_captcha($element);
@@ -89,7 +95,7 @@ function theme_hidden_captcha_captcha($element) {
     $class = "";
     for ($i = 0; $i < 64; ++$i) $class .= substr($chars, rand(0, strlen($chars)-1), 1);
     //hide the random class via css
-    drupal_add_css(".$class{width:0;height:0;overflow:hidden;}","inline"); // TODO: move the random class to an external file
+    drupal_add_css(".$class{width:0;height:0;overflow:hidden;}", "inline"); // TODO: move the random class to an external file
     //html for the captcha
     $captcha = "<div class=\"$class\">" . $captcha . "</div>";
   }
