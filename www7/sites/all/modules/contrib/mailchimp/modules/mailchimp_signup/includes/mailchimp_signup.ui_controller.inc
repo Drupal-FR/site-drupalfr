@@ -29,7 +29,7 @@ class MailChimpSignupUIController extends EntityDefaultUIController {
    */
   public function overviewTable($conditions = array()) {
     $render = parent::overviewTable($conditions);
-    $mc_lists = mailchimp_get_lists();
+    $mc_lists = mailchimp_get_lists(array(), FALSE);
     foreach ($render['#rows'] as &$row) {
       $signup = $row[0]['data']['#url']['options']['entity'];
       $modes = NULL;

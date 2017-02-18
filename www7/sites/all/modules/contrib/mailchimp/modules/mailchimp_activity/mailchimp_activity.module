@@ -201,7 +201,9 @@ function mailchimp_activity_page($entity, MailchimpActivityEntity $mailchimp_act
 
   /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
   $mc_campaigns = mailchimp_get_api_object('MailchimpCampaigns');
-  $result = $mc_campaigns->getCampaigns();
+  // TODO: Campaign limit is set high because all campaigns need to be
+  // retrieved here. This function should be refactored to be more efficient.
+  $result = $mc_campaigns->getCampaigns(array('count' => 500));
   $campaigns = ($result->total_items > 0) ? $result->campaigns : array();
 
   $campaign_index = array();

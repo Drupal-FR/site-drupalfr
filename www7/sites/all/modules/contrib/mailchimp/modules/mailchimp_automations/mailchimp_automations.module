@@ -163,7 +163,7 @@ function mailchimp_automations_trigger_workflow($automation_entity, $wrapped_ent
     drupal_alter('mailchimp_automations_mergevars', $merge_vars, $automation_entity, $wrapped_entity);
     // Skip mailchimp_subscribe to avoid cron if set
     $added = mailchimp_subscribe_process($automation_entity->list_id, $email, $merge_vars);
-    if (!$added) {
+    if (empty($added) || (isset($added->success) && ($added->success === FALSE))) {
       watchdog('mailchimp', 'An error occurred subscribing @email to list @list during a workflow @automation. The automation did not comlplete.', array(
         '@automation' => $automation_entity->label,
         '@email' => $email,

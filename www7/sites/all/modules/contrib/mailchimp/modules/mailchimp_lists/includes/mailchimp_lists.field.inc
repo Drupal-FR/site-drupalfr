@@ -461,7 +461,8 @@ function mailchimp_lists_field_formatter_settings_summary($field, $instance, $vi
  */
 function mailchimp_lists_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
-  $mc_list = mailchimp_get_list($field['settings']['mc_list_id']);
+  $use_interest_groups = ($instance['settings']['show_interest_groups'] && $display['settings']['show_interest_groups']);
+  $mc_list = mailchimp_get_list($field['settings']['mc_list_id'], $use_interest_groups);
   $email = mailchimp_lists_load_email($instance, $entity, FALSE);
 
   // Display subscription form if accessible.
@@ -491,31 +492,29 @@ function mailchimp_lists_field_formatter_view($entity_type, $entity, $field, $in
       '#markup' => $status,
       '#description' => t('@mc_list_description', array('@mc_list_description' => $instance['description'])),
     );
-    if ($instance['settings']['show_interest_groups'] && $display['settings']['show_interest_groups']) {
-      if (!empty($mc_list->intgroups)) {
+    if ($use_interest_groups && !empty($mc_list->intgroups)) {
 
-        $element['interest_groups'] = array(
-          '#type' => 'fieldset',
-          '#title' => t('Interest Groups'),
-          '#weight' => 100,
-        );
+      $element['interest_groups'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Interest Groups'),
+        '#weight' => 100,
+      );
 
-        foreach ($mc_list->intgroups as $interest_group) {
-          $items = array();
-          foreach ($interest_group->interests as $interest) {
-            if (isset($member_info->interests->{$interest->id}) && ($member_info->interests->{$interest->id} === TRUE)) {
-              $items[] = $interest->name;
-            }
+      foreach ($mc_list->intgroups as $interest_group) {
+        $items = array();
+        foreach ($interest_group->interests as $interest) {
+          if (isset($member_info->interests->{$interest->id}) && ($member_info->interests->{$interest->id} === TRUE)) {
+            $items[] = $interest->name;
           }
+        }
 
-          if (count($items) > 0) {
-            $element['interest_groups'][$interest_group->id] = array(
-              '#title' => $interest_group->title,
-              '#theme' => 'item_list',
-              '#items' => $items,
-              '#type' => 'ul',
-            );
-          }
+        if (count($items) > 0) {
+          $element['interest_groups'][$interest_group->id] = array(
+            '#title' => $interest_group->title,
+            '#theme' => 'item_list',
+            '#items' => $items,
+            '#type' => 'ul',
+          );
         }
       }
     }
