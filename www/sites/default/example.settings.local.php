@@ -9,10 +9,11 @@ $databases['default']['default'] = array(
   'prefix' => '',
 );
 
-$settings['install_profile'] = 'drupalfr';
 $settings['hash_salt'] = 'drupalfr';
 $settings['trusted_host_patterns'] = array(
   '^127\.0\.0\.1$',
+  'varnish',
+  'web',
 );
 
 // Redis.

@@ -1,14 +1,7 @@
 #!/bin/bash
 
-function abspath() {
-    python -c "import sys, os;sys.stdout.write(os.path.abspath(\"$@\"))"
-}
-
-FILE_PATH=$(abspath "${0}")
-PROJECT_PATH=$(dirname $(dirname $FILE_PATH))
-
-. $PROJECT_PATH/scripts/script-parameters.sh
-. $PROJECT_PATH/scripts/script-parameters.local.sh
+. $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.sh
+. $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.local.sh
 
 # Enable development modules.
 if [ "${ENVIRONMENT_MODE}" = "dev" ]; then

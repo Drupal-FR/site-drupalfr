@@ -26,6 +26,7 @@ content:
     weight: 0
     settings: {  }
     third_party_settings: {  }
+    region: content
   field_user_biography:
     weight: 9
     settings:
@@ -33,6 +34,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textarea
+    region: content
   field_user_company:
     weight: 8
     settings:
@@ -41,6 +43,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
   field_user_event:
     weight: 10
     settings:
@@ -49,6 +52,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
   field_user_membership_number:
     weight: 7
     settings:
@@ -56,16 +60,19 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textfield
+    region: content
   field_user_newsletter_adff:
     weight: 12
     settings: {  }
     third_party_settings: {  }
     type: mailchimp_lists_select
+    region: content
   field_user_newsletter_drupalcamp:
     weight: 13
     settings: {  }
     third_party_settings: {  }
     type: mailchimp_lists_select
+    region: content
   field_user_realname:
     weight: 6
     settings:
@@ -73,6 +80,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textfield
+    region: content
   field_user_social_link:
     weight: 11
     settings:
@@ -80,10 +88,12 @@ content:
       placeholder_title: ''
     third_party_settings: {  }
     type: link_default
+    region: content
   timezone:
     weight: 5
     settings: {  }
     third_party_settings: {  }
+    region: content
   user_picture:
     type: image_image
     settings:
@@ -91,6 +101,7 @@ content:
       preview_image_style: thumbnail
     third_party_settings: {  }
     weight: 3
+    region: content
 hidden:
   contact: true
   langcode: true

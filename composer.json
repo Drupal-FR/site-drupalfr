@@ -2,12 +2,12 @@
   "name": "Drupal-FR/site-drupalfr",
   "description": "drupal.fr repository.",
   "type": "project",
-  "homepage": "http://drupal.fr",
+  "homepage": "https://drupal.fr",
   "license": "GPL-2.0+",
   "authors": [
     {
       "name": "Florent Torregrosa",
-      "homepage": "http://drupal.fr/user/40695",
+      "homepage": "https://drupal.fr/user/40695",
       "role": "Developer"
     }
   ],
@@ -20,10 +20,6 @@
     "drupal": {
       "type": "composer",
       "url": "https://packages.drupal.org/8"
-    },
-    "drush_language": {
-      "type": "vcs",
-      "url": "git@github.com:dawehner/drush_language.git"
     },
     "leafletjs": {
       "type": "package",
@@ -40,6 +36,19 @@
     "ows_slideshare": {
       "type": "vcs",
       "url": "git@github.com:OWS/ZendService_SlideShare.git"
+    },
+    "dropzone": {
+      "type": "package",
+      "package": {
+        "name": "dropzone/dropzone",
+        "version": "v4.3.0",
+        "type": "drupal-library",
+        "source": {
+          "url": "https://github.com/enyo/dropzone",
+          "type": "git",
+          "reference": "v4.3.0"
+        }
+      }
     },
     "d3": {
       "type": "package",
@@ -71,12 +80,13 @@
   "require": {
     "composer/installers": "^1.0.21",
     "cweagans/composer-patches": "~1.0",
-    "drupal/core": "8.2.5",
+    "drupal-composer/drupal-scaffold": "^2.2",
+    "drupal/core": "8.3.0-beta1",
     "drush/drush": "8.1.9",
-    "drupal/drush_language": "dev-8.x-1.x",
+    "drupal/drush_language": "1.*",
     "drupal/admin_toolbar": "1.18.0",
-    "drupal/dropzonejs": "1.0.0-alpha3",
-    "drupal/entity_browser": "1.0.0-beta4",
+    "drupal/dropzonejs": "1.0.0-alpha4",
+    "drupal/entity_browser": "1.0.0-rc1",
     "drupal/entity_embed": "1.0.0-beta2",
     "drupal/eu_cookie_compliance": "1.0.0-beta7",
     "drupal/facets": "1.0.0-alpha7",
@@ -94,15 +104,16 @@
     "drupal/migrate_plus": "3.0.0-beta1",
     "drupal/migrate_source_csv": "2.0.0",
     "drupal/migrate_tools": "3.0.0-beta1",
-    "drupal/pathauto": "1.0.0-beta2",
+    "drupal/pathauto": "1.0.0-rc1",
     "drupal/purge": "3.0.0-beta6",
     "drupal/r4032login": "1.*",
-    "drupal/redis": "1.0.0-alpha1",
+    "drupal/redis": "1.0.0-beta1",
     "drupal/search_api": "1.0.0-beta4",
     "drupal/search_api_solr": "1.0.0-beta1",
     "drupal/varnish_purge": "1.4.0",
     "drupal/video_embed_field": "1.4.0",
-    "abraham/twitteroauth": "0.7.2"
+    "abraham/twitteroauth": "0.7.2",
+    "dropzone/dropzone": "4.3.*"
   },
   "require-dev": {
     "drupal/config_inspector": "1.*",
@@ -117,20 +128,42 @@
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
+  "config": {
+    "bin-dir": "bin",
+    "optimize-autoloader": true
+  },
   "scripts": {
+    "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+    "post-create-project-cmd": [
+      "bash ./scripts/init.sh"
+    ],
     "post-install-cmd": [
-      "bash ../scripts/update-scaffold.sh",
-      "bash ../scripts/update-libraries.sh"
+      "@drupal-scaffold",
+      "bash ./scripts/update-libraries.sh"
+    ],
+    "post-update-cmd": [
+      "@drupal-scaffold",
+      "bash ./scripts/update-libraries.sh"
     ]
   },
   "extra": {
     "installer-paths": {
-      "core": ["type:drupal-core"],
-      "modules/contrib/{$name}": ["type:drupal-module"],
-      "themes/contrib/{$name}": ["type:drupal-theme"],
-      "profiles/{$name}": ["type:drupal-profile"],
-      "libraries/{$name}": ["type:drupal-library"],
-      "../drush/contrib/{$name}": ["type:drupal-drush"]
+      "www/core": ["type:drupal-core"],
+      "www/modules/contrib/{$name}": ["type:drupal-module"],
+      "www/modules/custom/{$name}": ["type:drupal-custom-module"],
+      "www/themes/contrib/{$name}": ["type:drupal-theme"],
+      "www/themes/custom/{$name}": ["type:drupal-custom-theme"],
+      "www/profiles/contrib/{$name}": ["type:drupal-profile"],
+      "www/libraries/{$name}": ["type:drupal-library"],
+      "drush/contrib/{$name}": ["type:drupal-drush"]
+    },
+    "drupal-scaffold": {
+      "excludes": [
+        "update.php",
+        "web.config",
+        "sites/development.services.yml",
+        "sites/example.settings.local.php"
+      ]
     },
     "patches": {
       "drupal/entity_browser": {
