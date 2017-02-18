@@ -750,8 +750,8 @@ function metatag_admin_settings_form() {
   $form['advanced']['metatag_cache_output'] = array(
     '#type' => 'checkbox',
     '#title' => t('Cache meta tag output'),
-    '#description' => t('Disabling this will cause all meta tag output to be generated uniquely for each page load. Currently only affects entities. Note: the entity configuration and output for other types of pages will still be cached, but this can stop the {cache_metatag} table from growing out of control in some scenarios.'),
-    '#default_value' => variable_get('metatag_cache_output', TRUE),
+    '#description' => t('Enabling this will cause all meta tag output to be cached for each page, which may aid with site performance in some circumstances. Should not be used if there are paths which include user-specific meta tags for the <em>current user</em>, they may lead to information about the user being accidentally leaked; this problem does not affect the "user/[uid]" pages. It may also cause the {cache_metatag} cache table to grow to be extremely large in certain circumstances.'),
+    '#default_value' => variable_get('metatag_cache_output', FALSE),
   );
 
   $form['advanced']['metatag_leave_core_tags'] = array(
