@@ -11,7 +11,7 @@ CURRENT_PATH=$(pwd)
 SCRIPTS_PATH=$PROJECT_PATH/scripts
 WWW_PATH=$PROJECT_PATH/www
 
-DRUSH=$PROJECT_PATH/bin/drush
+DRUSH=$PROJECT_PATH/vendor/bin/drush
 
 CURRENT_DATE=$(date "+%Y-%m-%d-%Hh%Mm%Ss")
 
