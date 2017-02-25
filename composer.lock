@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b25454ee585563fbdecd1b2166033d2b",
+    "content-hash": "2020d6d74fc2de4c687a5a1ca99a87ef",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -274,16 +274,16 @@
         },
         {
             "name": "consolidation/annotated-command",
-            "version": "2.4.0",
+            "version": "2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/consolidation/annotated-command.git",
-                "reference": "80afffd362bd1cf83bef60db690a8c50d8390803"
+                "reference": "23d58c04175e4aed4d4be986dcac851da81660ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/consolidation/annotated-command/zipball/80afffd362bd1cf83bef60db690a8c50d8390803",
-                "reference": "80afffd362bd1cf83bef60db690a8c50d8390803",
+                "url": "https://api.github.com/repos/consolidation/annotated-command/zipball/23d58c04175e4aed4d4be986dcac851da81660ab",
+                "reference": "23d58c04175e4aed4d4be986dcac851da81660ab",
                 "shasum": ""
             },
             "require": {
@@ -296,7 +296,7 @@
                 "symfony/finder": "^2.5|~3"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*",
+                "phpunit/phpunit": "^4.8",
                 "satooshi/php-coveralls": "^1.0",
                 "squizlabs/php_codesniffer": "^2.7"
             },
@@ -322,7 +322,7 @@
                 }
             ],
             "description": "Initialize Symfony Console commands from annotated command class methods.",
-            "time": "2017-02-04T06:13:54+00:00"
+            "time": "2017-02-25T06:37:06+00:00"
         },
         {
             "name": "consolidation/output-formatters",
@@ -1301,17 +1301,17 @@
         },
         {
             "name": "drupal/dropzonejs",
-            "version": "1.0.0-alpha4",
+            "version": "1.0.0-alpha5",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/dropzonejs",
-                "reference": "8.x-1.0-alpha4"
+                "reference": "8.x-1.0-alpha5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/dropzonejs-8.x-1.0-alpha4.zip",
+                "url": "https://ftp.drupal.org/files/projects/dropzonejs-8.x-1.0-alpha5.zip",
                 "reference": null,
-                "shasum": "f8ab49fdd1226670473423de1ed47a0c89772dc0"
+                "shasum": "c4687dd281c7726ed07379604e4c2d31259c7854"
             },
             "require": {
                 "drupal/core": "*"
@@ -1319,14 +1319,17 @@
             "require-dev": {
                 "drupal/entity_browser": "*"
             },
+            "suggest": {
+                "enyo/dropzone": "Required to user drupal/dropzonejs. Dropzone is an easy to use drag'n'drop library."
+            },
             "type": "drupal-module",
             "extra": {
                 "branch-alias": {
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-alpha4",
-                    "datestamp": "1487251383"
+                    "version": "8.x-1.0-alpha5",
+                    "datestamp": "1487593983"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -1335,20 +1338,24 @@
             ],
             "authors": [
                 {
-                    "name": "Drupal Media Team",
-                    "homepage": "https://www.drupal.org/user/3260690"
+                    "name": "Janez Urevc",
+                    "homepage": "https://drupal.org/u/slashrsm",
+                    "role": "Maintainer"
                 },
                 {
-                    "name": "Drupal media CI",
-                    "homepage": "https://www.drupal.org/user/3057985"
+                    "name": "Christian Fritsch",
+                    "homepage": "https://drupal.org/u/chrfritsch",
+                    "role": "Maintainer"
                 },
                 {
-                    "name": "Primsi",
-                    "homepage": "https://www.drupal.org/user/282629"
+                    "name": "Primoz Hmeljak",
+                    "homepage": "https://drupal.org/u/Primsi",
+                    "role": "Maintainer"
                 },
                 {
-                    "name": "chr.fritsch",
-                    "homepage": "https://www.drupal.org/user/2103716"
+                    "name": "See other contributors",
+                    "homepage": "https://www.drupal.org/node/1998478/committers",
+                    "role": "contributor"
                 },
                 {
                     "name": "slashrsm",
@@ -1363,10 +1370,16 @@
                     "homepage": "https://www.drupal.org/user/888644"
                 }
             ],
-            "description": "DropzoneJS",
+            "description": "Drupal integration for DropzoneJS - An open source library that provides drag’n’drop file uploads with image previews.",
             "homepage": "https://www.drupal.org/project/dropzonejs",
+            "keywords": [
+                "DropzoneJS",
+                "Drupal"
+            ],
             "support": {
-                "source": "http://cgit.drupalcode.org/dropzonejs"
+                "source": "https://www.drupal.org/project/dropzonejs",
+                "issues": "https://www.drupal.org/project/issues/dropzonejs",
+                "irc": "irc://irc.freenode.org/drupal-contribute"
             }
         },
         {
@@ -1545,17 +1558,17 @@
         },
         {
             "name": "drupal/entity_browser",
-            "version": "1.0.0-rc1",
+            "version": "1.0.0-rc2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/entity_browser",
-                "reference": "8.x-1.0-rc1"
+                "reference": "8.x-1.0-rc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/entity_browser-8.x-1.0-rc1.zip",
+                "url": "https://ftp.drupal.org/files/projects/entity_browser-8.x-1.0-rc2.zip",
                 "reference": null,
-                "shasum": "290b9db0f2b0f30bc59a4c18d869e58ce85de63d"
+                "shasum": "7954668b9134a8ec2dac2604c482d6521e43ee91"
             },
             "require": {
                 "drupal/core": "~8.0"
@@ -1574,11 +1587,8 @@
                     "dev-8.x-1.x": "8.1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-rc1",
-                    "datestamp": "1486242784"
-                },
-                "patches_applied": {
-                    "Fixed the issue of Call to a member function getConfigDependencyKey() on null on [Widget view], and [SelectionDisplay view]": "https://www.drupal.org/files/issues/2845037-4.patch"
+                    "version": "8.x-1.0-rc2",
+                    "datestamp": "1487581984"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -1848,17 +1858,17 @@
         },
         {
             "name": "drupal/features",
-            "version": "3.2.0",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/features",
-                "reference": "8.x-3.2"
+                "reference": "8.x-3.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/features-8.x-3.2.zip",
+                "url": "https://ftp.drupal.org/files/projects/features-8.x-3.3.zip",
                 "reference": null,
-                "shasum": "1fce32d01b812d2a613ffadb1b9395293364980e"
+                "shasum": "ae0248b3ad233edfc50970b9dfdd95fed71fecb9"
             },
             "require": {
                 "drupal/config_update": "*",
@@ -1870,8 +1880,8 @@
                     "dev-3.x": "3.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-3.2",
-                    "datestamp": "1481513884"
+                    "version": "8.x-3.3",
+                    "datestamp": "1487861884"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -3294,16 +3304,16 @@
         },
         {
             "name": "drush/drush",
-            "version": "8.1.9",
+            "version": "8.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drush-ops/drush.git",
-                "reference": "7c1887fbbe746ffbfba7575440a7b21cbfe21833"
+                "reference": "2192496b80aa9cdb0581a2d308623f950f747e94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drush-ops/drush/zipball/7c1887fbbe746ffbfba7575440a7b21cbfe21833",
-                "reference": "7c1887fbbe746ffbfba7575440a7b21cbfe21833",
+                "url": "https://api.github.com/repos/drush-ops/drush/zipball/2192496b80aa9cdb0581a2d308623f950f747e94",
+                "reference": "2192496b80aa9cdb0581a2d308623f950f747e94",
                 "shasum": ""
             },
             "require": {
@@ -3395,7 +3405,7 @@
             ],
             "description": "Drush is a command line shell and scripting interface for Drupal, a veritable Swiss Army knife designed to make life easier for those of us who spend some of our working hours hacking away at the command prompt.",
             "homepage": "http://www.drush.org",
-            "time": "2017-01-14T17:17:30+00:00"
+            "time": "2017-02-23T20:46:12+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -3626,16 +3636,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.3.1",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "5c6447c9df362e8f8093bda8f5d8873fe5c7f65b"
+                "reference": "04a6d1a00ea5da0727ee94309a9f0d3dbaecb569"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/5c6447c9df362e8f8093bda8f5d8873fe5c7f65b",
-                "reference": "5c6447c9df362e8f8093bda8f5d8873fe5c7f65b",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/04a6d1a00ea5da0727ee94309a9f0d3dbaecb569",
+                "reference": "04a6d1a00ea5da0727ee94309a9f0d3dbaecb569",
                 "shasum": ""
             },
             "require": {
@@ -3671,16 +3681,23 @@
                     "name": "Michael Dowling",
                     "email": "mtdowling@gmail.com",
                     "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Tobias Schultze",
+                    "homepage": "https://github.com/Tobion"
                 }
             ],
-            "description": "PSR-7 message implementation",
+            "description": "PSR-7 message implementation that also provides common utility methods",
             "keywords": [
                 "http",
                 "message",
+                "request",
+                "response",
                 "stream",
-                "uri"
+                "uri",
+                "url"
             ],
-            "time": "2016-06-24T23:00:38+00:00"
+            "time": "2017-02-21T01:20:32+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
