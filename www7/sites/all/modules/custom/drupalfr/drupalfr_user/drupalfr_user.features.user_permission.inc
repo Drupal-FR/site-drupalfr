@@ -276,6 +276,7 @@ function drupalfr_user_user_default_permissions() {
     'name' => 'view own field_membership_number',
     'roles' => array(
       'admin' => 'admin',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'field_permissions',
   );

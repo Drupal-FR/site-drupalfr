@@ -214,7 +214,7 @@ function mailchimp_campaign_access(MailChimpCampaign $campaign, $sent = TRUE) {
  */
 function mailchimp_campaign_overview_page() {
   $campaigns = mailchimp_campaign_load_multiple();
-  $templates = mailchimp_campaign_list_templates();
+  $templates = mailchimp_campaign_list_templates(FALSE, 0, 500);
 
   $rows = array();
   foreach ($campaigns as $campaign) {
@@ -517,12 +517,21 @@ function mailchimp_campaign_delete_campaign($cid) {
  *
  * @param bool $reset
  *   True if templates should not be loaded from cache.
+ * @param int $offset
+ *   The number of templates to skip.
+ * @param int $count
+ *   The number of templates to return.
+ * @param string $type
+ *   The template type to limit results to.
+ * @param int $folder_id
+ *   The template folder ID to limit results to.
  *
  * @return mixed
  *   Array listing existing Mailchimp templates by type.
  */
-function mailchimp_campaign_list_templates($reset = FALSE) {
-  $cache = $reset ? NULL : cache_get('templates', 'cache_mailchimp');
+function mailchimp_campaign_list_templates($reset = FALSE, $offset = 0, $count = 10, $type = NULL, $folder_id = NULL) {
+  $cache_key = 'templates-' . $offset . '-' . $count . '-' . $type . '-' . $folder_id;
+  $cache = ($reset) ? NULL : cache_get($cache_key, 'cache_mailchimp');
   $all_templates = array();
   // Return cached templates:
   if ($cache) {
@@ -532,26 +541,29 @@ function mailchimp_campaign_list_templates($reset = FALSE) {
   else {
     /* @var \Mailchimp\MailchimpTemplates $mc_templates */
     if ($mc_templates = mailchimp_get_api_object('MailchimpTemplates')) {
-      $template_types = array(
-        'user',
-        'base',
-        'gallery',
+      $template_params = array(
+        'offset' => $offset,
+        'count' => $count,
       );
 
-      foreach ($template_types as $type) {
-        $all_templates[$type] = array();
+      if ($type != NULL) {
+        $template_params['type'] = $type;
+      }
 
-        $response = $mc_templates->getTemplates(array('type' => $type));
+      if ($folder_id != NULL) {
+        $template_params['folder_id'] = $folder_id;
+      }
 
-        if ($response->total_items > 0) {
-          foreach ($response->templates as $template) {
-            $all_templates[$type][$template->id] = $template;
-          }
+      $response = $mc_templates->getTemplates($template_params);
+
+      if ($response->total_items > 0) {
+        foreach ($response->templates as $template) {
+          $all_templates[$template->type][$template->id] = $template;
         }
       }
     }
 
-    cache_set('templates', $all_templates, 'cache_mailchimp', CACHE_TEMPORARY);
+    cache_set($cache_key, $all_templates, 'cache_mailchimp', CACHE_TEMPORARY);
   }
   return $all_templates;
 }
@@ -560,7 +572,7 @@ function mailchimp_campaign_list_templates($reset = FALSE) {
  * Return full details for a Mailchimp Template.
  *
  * @param string $template_id
- *   Optional template ID. Set to return a single MailChimp template.
+ *   The ID of the template.
  * @param bool $reset
  *   True if templates should not be loaded from cache.
  *
@@ -568,26 +580,24 @@ function mailchimp_campaign_list_templates($reset = FALSE) {
  *   An array with all configuration and content for a Mailchimp Template.
  */
 function mailchimp_campaign_get_template($template_id, $reset = FALSE) {
-  $all_templates = mailchimp_campaign_list_templates($reset);
-  foreach ($all_templates as $type) {
-    if (isset($type[$template_id])) {
-      $template = $type[$template_id];
-      // Get template details from cache or the MailChimp API.
-      $cache = $reset ? NULL : cache_get('template_' . $template_id, 'cache_mailchimp');
-      if ($cache) {
-        $template->info = $cache->data;
-      }
-      else {
-        /* @var \Mailchimp\MailchimpTemplates $mc_templates */
-        if ($mc_templates = mailchimp_get_api_object('MailchimpTemplates')) {
+  $template = NULL;
+  if (!empty($template_id)) {
+    $cache = $reset ? NULL : cache_get('mc_template_' . $template_id, 'cache_mailchimp');
+    if ($cache) {
+      $template = $cache->data;
+    }
+    else {
+      if ($mc_templates = mailchimp_get_api_object('MailchimpTemplates')) {
+        $template = $mc_templates->getTemplate($template_id);
+        if (!empty($template)) {
           $template->info = $mc_templates->getTemplateContent($template_id);
-          cache_set('template_' . $template_id, $template->info, 'cache_mailchimp', CACHE_TEMPORARY);
+          cache_set('mc_template_' . $template_id, $template, 'cache_mailchimp', CACHE_TEMPORARY);
         }
       }
-      return $template;
     }
   }
-  return NULL;
+
+  return $template;
 }
 
 /**
@@ -886,7 +896,20 @@ function mailchimp_campaign_get_campaigns($campaign_ids, $reset = FALSE) {
       }
 
       foreach ($to_refresh as $campaign_id) {
-        $response = $mc_campaigns->getCampaign($campaign_id);
+        try {
+          $response = $mc_campaigns->getCampaign($campaign_id);
+        }
+        catch (Exception $e) {
+          $message = t('An error occurred while getting campaign %campaign_id. Would you like to <a href="@administer-page">delete it</a>?', array(
+            '%campaign_id' => $campaign_id,
+            '@administer-page' => url('admin/config/services/mailchimp/campaigns/' . $campaign_id . '/delete'),
+          ));
+          drupal_set_message($message, 'error');
+          watchdog('mailchimp_campaign', 'An error occurred while getting campaign %campaign_id:  %message', array(
+            '%campaign_id' => $campaign_id,
+            '%message' => $e->getMessage(),
+          ), WATCHDOG_ERROR);
+        }
 
         if (!empty($response->id)) {
           $campaigns[$response->id] = $response;

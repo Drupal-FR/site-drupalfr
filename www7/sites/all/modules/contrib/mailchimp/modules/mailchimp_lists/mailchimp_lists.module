@@ -142,7 +142,8 @@ function mailchimp_lists_forms($form_id, $args) {
  * Return a form element for a single newsletter.
  */
 function mailchimp_lists_subscribe_form($form, &$form_state, $instance, $settings, $entity, $field) {
-  $mc_list = mailchimp_get_list($field['settings']['mc_list_id']);
+  $use_interest_groups = ($instance['settings']['show_interest_groups'] && $settings['show_interest_groups']);
+  $mc_list = mailchimp_get_list($field['settings']['mc_list_id'], $use_interest_groups);
   $email = mailchimp_lists_load_email($instance, $entity);
   if (!$email) {
     return array();
@@ -176,7 +177,7 @@ function mailchimp_lists_subscribe_form($form, &$form_state, $instance, $setting
     '#default_value' => $instance['required'] || $is_subscribed,
   );
   // Present interest groups:
-  if ($instance['settings']['show_interest_groups'] && $settings['show_interest_groups']) {
+  if ($use_interest_groups) {
     // Perform test in case error comes back from MCAPI when getting groups:
     if (is_array($mc_list->intgroups)) {
       $form[$wrapper_key]['interest_groups'] = array(
@@ -253,7 +254,7 @@ function mailchimp_lists_process_subscribe_form_choices($choices, $instance, $fi
       $mergevars = array();
     }
     else {
-      $mergevars = _mailchimp_lists_mergevars_populate($instance['settings']['mergefields'], $entity, $instance['entity_type']);
+      $mergevars = _mailchimp_lists_mergevars_populate($instance['settings']['mergefields'], $entity, $instance['entity_type'], $list_id);
     }
 
     $interest_groups = (isset($choices['interest_groups'])) ? $choices['interest_groups'] : array();
@@ -289,7 +290,7 @@ function mailchimp_lists_process_subscribe_form_choices($choices, $instance, $fi
         break;
 
     }
-    if (empty($ret)) {
+    if (empty($ret) || (isset($ret->success) && ($ret->success === FALSE))) {
       drupal_set_message(t('There was a problem with your newsletter signup.'), 'warning');
     }
   }
@@ -342,7 +343,9 @@ function _mailchimp_lists_subscription_has_changed($instance, $field, $entity, $
   else {
     $member_info = mailchimp_get_memberinfo($field['settings']['mc_list_id'], $email);
 
-    foreach ($choices['interest_groups'] as $interest_group) {
+    $interest_groups = (isset($choices['interest_groups'])) ? $choices['interest_groups'] : array();
+
+    foreach ($interest_groups as $interest_group) {
       foreach ($interest_group as $interest_id => $interest_status) {
         // Check for new interest selected.
         if (($interest_status !== 0) && empty($member_info->interests->{$interest_id})) {
@@ -362,9 +365,9 @@ function _mailchimp_lists_subscription_has_changed($instance, $field, $entity, $
 /**
  * Helper function to complete a MailChimp-API-ready mergevars array.
  */
-function _mailchimp_lists_mergevars_populate($mergefields, $entity, $entity_type) {
-  $mergevars = mailchimp_mergevars_populate($mergefields, $entity, $entity_type);
-  drupal_alter('mailchimp_lists_mergevars', $mergevars, $entity, $entity_type);
+function _mailchimp_lists_mergevars_populate($mergefields, $entity, $entity_type, $list_id) {
+  $mergevars = mailchimp_mergevars_populate($mergefields, $entity, $entity_type, $list_id);
+  drupal_alter('mailchimp_lists_mergevars', $mergevars, $entity, $entity_type, $list_id);
   return $mergevars;
 }
 

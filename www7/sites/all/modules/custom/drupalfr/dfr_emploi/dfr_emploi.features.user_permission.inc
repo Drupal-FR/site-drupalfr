@@ -19,6 +19,16 @@ function dfr_emploi_user_default_permissions() {
     'module' => 'field_permissions',
   );
 
+  // Exported permission: 'create field_message_moderation'.
+  $permissions['create field_message_moderation'] = array(
+    'name' => 'create field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'create offre content'.
   $permissions['create offre content'] = array(
     'name' => 'create offre content',
@@ -37,11 +47,31 @@ function dfr_emploi_user_default_permissions() {
     'module' => 'field_permissions',
   );
 
+  // Exported permission: 'edit field_message_moderation'.
+  $permissions['edit field_message_moderation'] = array(
+    'name' => 'edit field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'edit own field_flag_moderation'.
   $permissions['edit own field_flag_moderation'] = array(
     'name' => 'edit own field_flag_moderation',
     'roles' => array(
       'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'edit own field_message_moderation'.
+  $permissions['edit own field_message_moderation'] = array(
+    'name' => 'edit own field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
     ),
     'module' => 'field_permissions',
   );
@@ -73,11 +103,31 @@ function dfr_emploi_user_default_permissions() {
     'module' => 'field_permissions',
   );
 
+  // Exported permission: 'view field_message_moderation'.
+  $permissions['view field_message_moderation'] = array(
+    'name' => 'view field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'view own field_flag_moderation'.
   $permissions['view own field_flag_moderation'] = array(
     'name' => 'view own field_flag_moderation',
     'roles' => array(
       'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
+  // Exported permission: 'view own field_message_moderation'.
+  $permissions['view own field_message_moderation'] = array(
+    'name' => 'view own field_message_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+      'modérateur emploi' => 'modérateur emploi',
     ),
     'module' => 'field_permissions',
   );

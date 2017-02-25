@@ -13,6 +13,9 @@ LinkedIn, etc (see below).
 
 This version of the module only works with Drupal 7.28 and newer.
 
+For additional information, see the online documentation:
+  https://www.drupal.org/docs/7/modules/metatag
+
 
 Features
 --------------------------------------------------------------------------------
@@ -86,6 +89,9 @@ The primary features include:
   tag.
 
 * The hreflang meta tags are available via the Metatag:hreflang submodule.
+
+* Support for meta tags specific to Google Custom Search Appliance are available
+  in the "Metatag: Google Custom Search Engine (CSE)" submodule.
 
 * A variety of favicon sizes and styles can be added to the global configuration
   using the Metatag: Favicons submodule.
@@ -367,9 +373,10 @@ functionality:
   with meta tags that only allow for one item but which are assigned from fields
   which accept multiple items, e.g. og:audio and og:video.
 
-* Yoast SEO
+* Real-time SEO for Drupal
   https://www.drupal.org/project/yoast_seo
-  Adds integration with the Yoast service (https://yoast.com/).
+  Uses the YoastSEO.js library and service (https://yoast.com/) to provide
+  realtime feedback on the meta tags.
 
 * Parse.ly Publishing Analytics
   https://www.drupal.org/project/parsely
@@ -393,7 +400,7 @@ References
 --------------------------------------------------------------------------------
 1: https://www.drupal.org/u/damienmckenna
 2: https://www.drupal.org/u/dave-reid
-3: http://www.mediacurrent.com/
-4: http://www.lullabot.com/
-5: http://www.acquia.com/
-6: http://www.palantir.net/
+3: https://www.mediacurrent.com/
+4: https://www.lullabot.com/
+5: https://www.acquia.com/
+6: https://www.palantir.net/

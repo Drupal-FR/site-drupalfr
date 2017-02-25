@@ -1122,7 +1122,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   $metatag_variants = array();
 
   // Caching is enabled.
-  if ($cached && variable_get('metatag_cache_output', TRUE)) {
+  if ($cached && variable_get('metatag_cache_output', FALSE)) {
     // All possible variants of the metatags for this entity are stored in a
     // single cache entry.
     $cid = "output:$entity_type:$entity_id";
@@ -1821,7 +1821,10 @@ function metatag_page_build(&$page) {
     }
     else {
       $metatags = metatag_metatags_view($instance, array());
-      metatag_cache_set($cid, $metatags);
+      // If output caching is enabled, save this for later.
+      if (variable_get('metatag_cache_output', FALSE)) {
+        metatag_cache_set($cid, $metatags);
+      }
     }
 
     $page[$region]['metatags'][$instance] = $metatags;
@@ -1850,7 +1853,10 @@ function metatag_page_build(&$page) {
     }
     else {
       $metatags = metatag_metatags_view($instance, array());
-      metatag_cache_set($cid, $metatags);
+      // If output caching is enabled, save this for later.
+      if (variable_get('metatag_cache_output', FALSE)) {
+        metatag_cache_set($cid, $metatags);
+      }
     }
     $page[$region]['metatags'][$instance] = $metatags;
   }

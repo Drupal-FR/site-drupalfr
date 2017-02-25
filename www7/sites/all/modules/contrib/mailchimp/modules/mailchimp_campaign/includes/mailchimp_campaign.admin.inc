@@ -97,7 +97,7 @@ function mailchimp_campaign_campaign_form($form, &$form_state, MailChimpCampaign
     '#type' => 'select',
     '#title' => t('Template'),
     '#description' => t('Select a MailChimp user template to use. Due to a limitation in the API, only templates that do not contain repeating sections are available. If empty, the default template will be applied.'),
-    '#options' => _mailchimp_campaign_build_option_list(mailchimp_campaign_list_templates(), '-- Select --', $template_type_labels),
+    '#options' => _mailchimp_campaign_build_option_list(mailchimp_campaign_list_templates(FALSE, 0, 500), '-- Select --', $template_type_labels),
     '#default_value' => ($campaign) ? $campaign->mc_data->settings->template_id : -1,
     '#ajax' => array(
       'callback' => 'mailchimp_campaign_template_callback',

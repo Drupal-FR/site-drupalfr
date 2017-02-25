@@ -25,7 +25,7 @@ class MailchimpSignup extends Entity {
     if (!empty($values['settings']['mergefields'])) {
       foreach ($values['settings']['mergefields'] as $tag => $mergefield) {
         if (is_array($mergefield)) {
-          if (is_array($mergefield['options'])) {
+          if (isset($mergefield['options']) && is_array($mergefield['options'])) {
             $mergefield['options'] = (object) $mergefield['options'];
           }
           $values['settings']['mergefields'][$tag] = (object) $mergefield;

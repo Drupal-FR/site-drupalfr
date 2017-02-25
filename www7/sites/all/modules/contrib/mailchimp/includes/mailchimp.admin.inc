@@ -65,6 +65,6 @@ function mailchimp_clear_list_cache_form($form, &$form_state) {
  * Handler for lists cache clear form.
  */
 function mailchimp_clear_list_cache_form_submit($form, &$form_state) {
-  mailchimp_get_lists(array(), TRUE);
+  mailchimp_get_lists(array(), TRUE, TRUE);
   drupal_set_message(t('MailChimp List cache cleared.'));
 }

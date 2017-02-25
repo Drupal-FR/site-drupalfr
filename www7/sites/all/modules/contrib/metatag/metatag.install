@@ -2560,3 +2560,26 @@ function metatag_update_7112() {
   cache_clear_all('*', 'cache_metatag', TRUE);
   drupal_set_message(t('The Publisher meta tag is now part of the Google Plus submodule.'));
 }
+
+/**
+ * Clear all metatag output caches if output caching is disabled.
+ */
+function metatag_update_7113() {
+  if (variable_get('metatag_cache_output', TRUE) == FALSE) {
+    cache_clear_all('output:', 'cache_metatag', TRUE);
+  }
+}
+
+/**
+ * Disable output caching.
+ */
+function metatag_update_7114() {
+  variable_del('metatag_cache_output');
+}
+
+/**
+ * Clear all metatag output caches, it will be rebuild if needed.
+ */
+function metatag_update_7115() {
+  cache_clear_all('output:', 'cache_metatag', TRUE);
+}
