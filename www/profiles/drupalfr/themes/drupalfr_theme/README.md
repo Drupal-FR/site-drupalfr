@@ -6,6 +6,7 @@
 * gulp
 
 ## Installation
+
 In the theme folder (`PROJECT/www/profiles/drupalfr/themes/drupalfr_theme`) 
 
 Execute:
@@ -21,4 +22,3 @@ If you experience a issue involving the *gaze* module, using GNU/Linux check thi
  Or simply increase your inotify max memory :
 
  `echo fs.inotify.max_user_watches=582222 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
-

@@ -4,7 +4,7 @@ var gulp = require('gulp'),
 
 gulp.task('nunjucks', function() {
   return gulp.src('app/pages/**/*.+(html|nunjucks)')
-  // Adding data to Nunjucks
+  // Adding data to Nunjucks.
     .pipe(data(function() {
       return require('./app/data.json')
     }))
