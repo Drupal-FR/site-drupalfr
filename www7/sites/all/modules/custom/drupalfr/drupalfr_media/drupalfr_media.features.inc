@@ -36,6 +36,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['deleted-file'] = array(
     'player' => array(
@@ -47,6 +50,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   $contexts['file_representation-audio'] = array(
@@ -60,6 +66,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['file_representation-file'] = array(
     'player' => array(
@@ -71,6 +80,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   $contexts['full-audio'] = array(
@@ -84,6 +96,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['full-file'] = array(
     'player' => array(
@@ -95,6 +110,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   $contexts['invalid-id-audio'] = array(
@@ -108,6 +126,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['invalid-id-file'] = array(
     'player' => array(
@@ -119,6 +140,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   $contexts['media-audio'] = array(
@@ -132,6 +156,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['media-file'] = array(
     'player' => array(
@@ -143,6 +170,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   $contexts['no-access-audio'] = array(
@@ -156,6 +186,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['no-access-file'] = array(
     'player' => array(
@@ -167,6 +200,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   $contexts['title-audio'] = array(
@@ -180,6 +216,9 @@ function drupalfr_media_scald_default_context_types() {
         '*' => 'passthrough',
       ),
     ),
+    'data' => array(
+      'audio' => array(),
+    ),
   );
   $contexts['title-file'] = array(
     'player' => array(
@@ -191,6 +230,9 @@ function drupalfr_media_scald_default_context_types() {
       'file' => array(
         '*' => 'passthrough',
       ),
+    ),
+    'data' => array(
+      'file' => array(),
     ),
   );
   return $contexts;

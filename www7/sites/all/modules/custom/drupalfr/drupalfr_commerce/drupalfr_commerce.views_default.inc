@@ -118,6 +118,7 @@ function drupalfr_commerce_views_default_views() {
 
   /* Display: PDF Page */
   $handler = $view->new_display('pdf', 'PDF Page', 'pdf_carte');
+  $handler->display->display_options['defaults']['pager'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'some';
   $handler->display->display_options['pager']['options']['items_per_page'] = '1';
   $handler->display->display_options['pager']['options']['offset'] = '0';
@@ -705,7 +706,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['header']['area']['content'] = '<p>Adhérer en tant que personne physique. L\'adhésion est annuelle.</p>
 <p>L\'adhésion pour les personnes morales n\'est pas disponible en ligne pour l\'instant, veuillez nous <a href="/contact">contacter</a> pour toute demande.</p>';
   $handler->display->display_options['header']['area']['format'] = '3';
-  /* Field: Commerce Product: Prix */
+  /* Field: Commerce Product: Price */
   $handler->display->display_options['fields']['commerce_price']['id'] = 'commerce_price';
   $handler->display->display_options['fields']['commerce_price']['table'] = 'field_data_commerce_price';
   $handler->display->display_options['fields']['commerce_price']['field'] = 'commerce_price';
