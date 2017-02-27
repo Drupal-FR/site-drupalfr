@@ -1,0 +1,27 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - facets.facet.author
+  module:
+    - facets
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_facet_author
+theme: drupalfr_theme
+region: sidebar_first
+weight: -8
+provider: null
+plugin: 'facet_block:author'
+settings:
+  id: 'facet_block:author'
+  label: Auteur
+  provider: facets
+  label_display: visible
+visibility:
+  other_facet:
+    id: other_facet
+    facets: ''
+    facet_value: ''
+    negate: false
+    context_mapping: {  }

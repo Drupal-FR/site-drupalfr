@@ -1,0 +1,23 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.job_offer
+  module:
+    - views
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_job_offer
+theme: drupalfr_theme
+region: sidebar_first
+weight: -6
+provider: null
+plugin: 'views_block:job_offer-block_1'
+settings:
+  id: 'views_block:job_offer-block_1'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility: {  }

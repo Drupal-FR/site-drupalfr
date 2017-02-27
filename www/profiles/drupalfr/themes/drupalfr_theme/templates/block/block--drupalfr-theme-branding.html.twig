@@ -1,4 +1,3 @@
-{% extends "block--bare.html.twig" %}
 {#
 /**
  * @file
@@ -15,6 +14,7 @@
  * @ingroup templates
  */
 #}
+{% extends "block--bare.html.twig" %}
 {% block content %}
   {% if site_logo %}
     <a class="logo navbar-btn pull-left" href="{{ path('<front>') }}" title="{{ 'Home'|t }}" rel="home">

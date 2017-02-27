@@ -1,10 +1,13 @@
-core: 8.x
+name: 'Drupalfr theme'
 type: theme
+description: 'Theme for drupal.fr'
+package: 'Drupalfr'
+core: 8.x
 base theme: bootstrap
 
-name: 'drupalfr_theme'
-description: 'Theme for drupal.fr'
-package: 'Bootstrap'
+libraries:
+  - 'drupalfr_theme/global-styling'
+  - 'drupalfr_theme/bootstrap-scripts'
 
 regions:
   navigation: 'Navigation'
@@ -18,8 +21,3 @@ regions:
   footer: 'Footer'
   page_top: 'Page top'
   page_bottom: 'Page bottom'
-
-libraries:
-  - 'drupalfr_theme/global-styling'
-  - 'drupalfr_theme/bootstrap-scripts'
-

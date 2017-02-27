@@ -1,0 +1,27 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - facets.facet.tag
+  module:
+    - facets
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_facet_tag
+theme: drupalfr_theme
+region: sidebar_first
+weight: -7
+provider: null
+plugin: 'facet_block:tag'
+settings:
+  id: 'facet_block:tag'
+  label: Tags
+  provider: facets
+  label_display: visible
+visibility:
+  other_facet:
+    id: other_facet
+    facets: ''
+    facet_value: ''
+    negate: false
+    context_mapping: {  }

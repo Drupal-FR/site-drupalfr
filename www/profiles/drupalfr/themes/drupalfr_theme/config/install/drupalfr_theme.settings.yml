@@ -1,15 +1,39 @@
-# Default settings should not be located here. This file is only used to
-# override existing settings. If your theme is the one that introduces a new
-# theme setting, it should use the Drupal Bootstrap base theme's
-# @BootstrapSetting annotation discovery process. This ensures that sub-theme
-# settings are inherited from base themes themes properly and to determine when
-# a setting should be saved to config as "overridden".
-#
-# @see \Drupal\bootstrap\Plugin\SettingBase
-# @see \Drupal\bootstrap\Plugin\SettingInterface
-# @see \Drupal\bootstrap\Plugin\SettingManager
-# @see \Drupal\bootstrap\Plugin\Form\SystemThemeSettings
-# @see \Drupal\bootstrap\ThemeSettings
-
-# Disable the CDN provider so compiled source files can be used.
+favicon:
+  mimetype: image/vnd.microsoft.icon
+  path: ''
+  url: 'http://socle-drupalcampfr.local/profiles/drupalcampfr/themes/drupalcampfr_theme/favicon.ico'
+  use_default: 1
+schema: '8000'
+features:
+  comment_user_picture: true
+  comment_user_verification: true
+  favicon: 1
+  node_user_picture: 1
+logo:
+  path: ''
+  url: ''
+  use_default: 1
+region_wells:
+  navigation: ''
+  navigation_collapsible: ''
+  header: ''
+  highlighted: ''
+  help: ''
+  content: ''
+  sidebar_first: ''
+  sidebar_second: ''
+  content_bottom: ''
+  footer: ''
+navbar_position: fixed-top
+breadcrumb_home: 1
+forms_smart_descriptions: 0
+tooltip_enabled: 0
+popover_enabled: 0
+modal_enabled: 0
+schemas:
+  bootstrap: 8000
+  drupalcampfr_theme: 8000
+table_responsive: '-1'
+table: ''
 cdn_provider: ''
+langcode: fr

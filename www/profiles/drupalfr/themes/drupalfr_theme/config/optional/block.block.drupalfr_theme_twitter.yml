@@ -1,0 +1,19 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - drupalfr_social
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_homepage_twitter
+theme: drupalfr_theme
+region: sidebar_first
+weight: -2
+provider: null
+plugin: twitter_block
+settings:
+  id: twitter_block
+  label: 'Twitter @drupalfr'
+  provider: drupalfr_social
+  label_display: visible
+visibility: {}

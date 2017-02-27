@@ -1,0 +1,23 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.planet
+  module:
+    - views
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_planet
+theme: drupalfr_theme
+region: sidebar_first
+weight: -5
+provider: null
+plugin: 'views_block:planet-block_1'
+settings:
+  id: 'views_block:planet-block_1'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility: {  }
