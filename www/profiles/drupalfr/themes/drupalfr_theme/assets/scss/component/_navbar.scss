@@ -1,56 +1,182 @@
 /**
  * Navbar styling.
  */
-$mobile:  "screen and (max-width: #{$screen-xs-max})";
-$tablet:  "screen and (min-width: #{$screen-sm-min})";
-$normal:  "screen and (min-width: #{$screen-md-min})";
-$wide:    "screen and (min-width: #{$screen-lg-min})";
+$mobile : "screen and (max-width: #{$screen-xs-max})";
+$tablet : "screen and (min-width: #{$screen-sm-min})";
+$normal : "screen and (min-width: #{$screen-md-min})";
+$wide : "screen and (min-width: #{$screen-lg-min})";
 
 body {
   // Fix horizontal scrolling on iOS devices.
   // http://drupal.org/node/1870076
-  position: relative;
+  position : relative;
 
   &.navbar-is-static-top {
-    margin-top: 0;
+    margin-top : 0;
   }
   &.navbar-is-fixed-top {
-    margin-top: ($navbar-height + ($grid-gutter-width / 2));
+    margin-top : ($navbar-height + ($grid-gutter-width / 2));
   }
   &.navbar-is-fixed-bottom {
-    padding-bottom: ($navbar-height + ($grid-gutter-width / 2));
+    padding-bottom : ($navbar-height + ($grid-gutter-width / 2));
   }
 
   @media #{$tablet} {
-    margin-top: ($grid-gutter-width / 2);
+    margin-top : ($grid-gutter-width / 2);
   }
   @media #{$mobile} {
     &.toolbar-vertical {
       &.navbar-is-fixed-top,
       &.navbar-is-fixed-bottom {
         .toolbar-bar {
-          position: fixed;
+          position : fixed;
         }
         header {
-          z-index: 500;
+          z-index : 500;
         }
       }
       // Default toolbar fixed height value.
       // @see core/modules/toolbar/css/toolbar.icons.theme.css@261
       &.navbar-is-fixed-top header {
-        top: 39px;
+        top : 39px;
       }
     }
   }
 }
+
 .navbar.container {
   @media #{$tablet} {
-    max-width: (($container-sm - $grid-gutter-width));
+    max-width : (($container-sm - $grid-gutter-width));
   }
   @media #{$normal} {
-    max-width: (($container-md - $grid-gutter-width));
+    max-width : (($container-md - $grid-gutter-width));
   }
   @media #{$wide} {
-    max-width: (($container-lg - $grid-gutter-width));
+    max-width : (($container-lg - $grid-gutter-width));
   }
+}
+
+// Drupal FR Style
+
+body {
+  .navbar.navbar-inverse.navbar-fixed-top {
+    .navbar-header {
+      width : 100%;
+      // Logo display
+      a.logo {
+        z-index       : 1031;
+        margin-top    : 0;
+        margin-bottom : 0;
+        img {
+          height : $navbar-height;
+        }
+      }
+
+      // Main Menu
+      nav.main-menu {
+        font-family : 'Ubuntu', sans-serif;
+        z-index     : 1030;
+        ul.menu.nav.navbar-nav {
+          li {
+            a {
+              &:hover,
+              &:focus,
+              &:active {
+                font-weight : 700;
+              }
+            }
+          }
+          li.active a {
+            font-weight : 700;
+          }
+        }
+        @media #{$wide} {
+          text-align : center;
+          margin     : auto;
+          width      : 80%;
+          ul.menu.nav.navbar-nav {
+            float : none;
+            li {
+              float   : none;
+              display : inline-block;
+            }
+          }
+        }
+      }
+      // Search
+
+      // User Menu
+      .menu.nav.navbar-user {
+        z-index : 1031;
+        .btn-user {
+          border-color : $drupal_dark_blue;
+          padding      : 7px;
+          color        : #ffffff;
+          width        : 40px;
+          height       : 40px;
+          display      : block;
+          line-height  : 24px;
+          font-size    : 20px;
+          margin-right : 10px;
+
+          &:hover,
+          &:focus,
+          &:active {
+            background-color : #ffffff;
+            color            : $drupal_dark_blue;
+
+            .visible-onhover {
+              opacity    : 1;
+              transition : opacity 1s ease-in-out;
+            }
+          }
+        }
+
+        // Download
+        li.nav-downloads {
+          width : 40px;
+          .btn-downloads {
+            padding     : 7px 10px;
+            color       : #ffffff;
+            display     : block;
+            width       : 40px;
+            height      : 40px;
+            overflow    : hidden;
+            text-shadow : -1px -1px 0 rgba(0, 0, 0, .15);
+            font-size   : 20px;
+            transition  : width 0.25s ease-in-out;
+
+            .glyphicon {
+              float : left;
+            }
+            .visible-onhover {
+              color       : #ffffff;
+              padding     : 0 10px;
+              line-height : 24px;
+              font-size   : 14px;
+              font-family : 'Ubuntu', sans-serif;
+              float       : left;
+              opacity     : 0;
+              height      : 26px;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+              width            : 175px;
+              background-color : $drupal_light_blue;
+
+              .visible-onhover {
+                opacity    : 1;
+                transition : opacity 1s ease-in-out;
+              }
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+
 }
