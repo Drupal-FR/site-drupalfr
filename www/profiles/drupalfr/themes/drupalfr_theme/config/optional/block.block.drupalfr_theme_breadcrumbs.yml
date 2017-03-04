@@ -1,17 +1,19 @@
 langcode: fr
 status: true
 dependencies:
+  module:
+    - system
   theme:
     - drupalfr_theme
-id: drupalfr_theme_page_title
+id: drupalfr_theme_breadcrumb
 theme: drupalfr_theme
 region: header
-weight: -7
+weight: -9
 provider: null
-plugin: page_title_block
+plugin: system_breadcrumb_block
 settings:
-  id: page_title_block
-  label: 'Page title'
-  provider: core
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  provider: system
   label_display: '0'
 visibility: {  }
