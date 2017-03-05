@@ -173,7 +173,8 @@ function commerce_billy_invoice_nr_infinite() {
  */
 function commerce_billy_apply_invoice_nr_pattern($nr_array) {
   $pattern = variable_get('commerce_billy_invoice_nr_pattern', '[date:custom:Y]-{id}');
-  $new_nr = str_replace('{id}', $nr_array['id'], $pattern);
+  $invoice_id = str_pad($nr_array['id'], variable_get('commerce_billy_invoice_nr_padding', 0), '0', STR_PAD_LEFT);
+  $new_nr = str_replace('{id}', $invoice_id, $pattern);
   $new_nr = token_replace($new_nr, array(), array('clear' => TRUE));
 
   return $new_nr;
@@ -245,6 +246,9 @@ function commerce_billy_flush_caches() {
   $instance_definition = array(
     'entity_type' => 'commerce_order',
     'required' => FALSE,
+    'settings' => array(
+      'default_value' => 'blank',
+    ),
     'widget' => array(
       'type' => 'date_text',
       'settings' => array(
