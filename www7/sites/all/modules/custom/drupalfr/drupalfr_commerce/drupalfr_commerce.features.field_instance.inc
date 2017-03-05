@@ -890,7 +890,7 @@ function drupalfr_commerce_field_default_field_instances() {
     'label' => 'Cancel date',
     'required' => FALSE,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -939,7 +939,7 @@ function drupalfr_commerce_field_default_field_instances() {
     'label' => 'Invoice date',
     'required' => FALSE,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',

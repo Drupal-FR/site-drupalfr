@@ -13,6 +13,7 @@ function commerce_billy_uninstall() {
   variable_del('commerce_billy_auto_invoice');
   variable_del('commerce_billy_invoice_nr_pattern');
   variable_del('commerce_billy_invoice_nr_last');
+  variable_del('commerce_billy_invoice_nr_padding');
 }
 
 /**
@@ -83,4 +84,26 @@ function commerce_billy_update_7100() {
   variable_del('commerce_billy_invoice_nr_last_infinite');
   variable_del('commerce_billy_invoice_nr_last_yearly');
   variable_del('commerce_billy_invoice_nr_last_monthly');
+}
+
+/**
+ * Invoice and cancel dates: Set field default value to "blank".
+ */
+function commerce_billy_update_7101() {
+  $entity_info = entity_get_info('commerce_order');
+  $order_types = array_keys($entity_info['bundles']);
+
+  drupal_alter('commerce_billy_order_types', $order_types);
+
+  $fields = array('field_commerce_billy_cancel_date', 'field_commerce_billy_i_date');
+
+  foreach ($fields as $field_name) {
+    foreach ($order_types as $order_type) {
+      $instance = field_info_instance('commerce_order', $field_name, $order_type);
+      if ($instance) {
+        $instance['settings']['default_value'] = 'blank';
+        field_update_instance($instance);
+      }
+    }
+  }
 }

@@ -54,6 +54,14 @@ function commerce_billy_admin_form($form, &$form_state) {
     '#description' => $pattern_help_text,
   );
 
+  $form['commerce_billy_invoice_nr_padding'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Invoice id padding'),
+    '#description' => t('Pad the invoice id with leading zeroes. Example: a value of 6 will output invoice id 52 as 000052.'),
+    '#size' => 10,
+    '#default_value' => variable_get('commerce_billy_invoice_nr_padding', 0),
+  );
+
   $form['commerce_billy_invoice_nr_override'] = array(
     '#type' => 'textfield',
     '#title' => t('Current invoice id'),
@@ -91,6 +99,11 @@ function commerce_billy_admin_form_validate($form, &$form_state) {
   }
   elseif ($pattern === '{id}') {
     form_set_error('commerce_billy_invoice_nr_pattern', t('You must include additional characters to {id}, as otherwise the invoice number might overlap with the order ID, leading the database exceptions.'));
+  }
+
+  // Check invoice id padding input.
+  if (preg_match('#\D#', $form_state['values']['commerce_billy_invoice_nr_padding']) || $form_state['values']['commerce_billy_invoice_nr_padding'] < 0 || $form_state['values']['commerce_billy_invoice_nr_padding'] > 20) {
+    form_set_error('commerce_billy_invoice_nr_padding', t('Please enter a number from 0 to 20 for invoice id padding.'));
   }
 
   // Check for valid characters.

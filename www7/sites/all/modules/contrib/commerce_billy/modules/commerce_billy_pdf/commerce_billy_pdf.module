@@ -65,7 +65,7 @@ function commerce_billy_pdf_admin_paths_alter(&$paths) {
  * Furthermore admins can access 'canceled' orders (credit memo).
  */
 function commerce_billy_pdf_view_access($order) {
-  if ($order->status == 'canceled' && user_access('administer commerce_order entities')) {
+  if ($order->status == 'canceled' && $order->order_id != $order->order_number && user_access('administer commerce_order entities')) {
     return TRUE;
   }
   elseif ($order->status != 'invoiced') {
@@ -141,7 +141,7 @@ function commerce_billy_pdf_preprocess_entity(&$variables) {
  */
 function commerce_billy_pdf($order) {
   $html = commerce_billy_pdf_html($order);
-  $filename = preg_replace('/[^a-z0-9]/', '_', drupal_strtolower('invoice_' . $order->order_number)) . '.pdf';
+  $filename = preg_replace('/[^a-z0-9]/', '_', drupal_strtolower('invoice_' . $order->order_number));
 
   try {
     commerce_billy_pdf_output($html, $filename);
@@ -285,4 +285,38 @@ function commerce_billy_pdf_prepare_dompdf($html, $filename) {
     return $dompdf;
   }
   return FALSE;
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function commerce_billy_pdf_action_info() {
+  return array(
+    'commerce_billy_pdf_print_invoices' => array(
+      'label' => t('Print invoice'),
+      'type' => 'commerce_order',
+      'aggregate' => TRUE,
+      'configurable' => FALSE,
+      'triggers' => array('any'),
+    )
+  );
+}
+
+/**
+ * Callback to generate a PDF.
+ */
+function commerce_billy_pdf_print_invoices($orders) {
+  $html = commerce_billy_pdf_html($orders);
+  // The .pdf file extension is added by DOMPDF.
+  $filename = 'invoices';
+
+  try {
+    commerce_billy_pdf_output($html, $filename);
+    drupal_exit();
+  }
+  catch (DOMPDF_Exception $e) {
+    drupal_set_message(t('Error generating PDF invoice. Please contact the website administrator.'), 'error');
+    watchdog('commerce_billy_pdf', 'DOMPDF exception while generating pdf invoice: %message', array('%message' => $e->getMessage()), WATCHDOG_ERROR);
+    return '';
+  }
 }
