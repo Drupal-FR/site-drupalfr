@@ -105,8 +105,7 @@ function drupalfr_events_display_events($events, $display_mode = 'teaser') {
  *   Number of items to extract from the feed. If not provided, all the meetups
  *   will be fetched.
  *
- * @return mixed
- *   Returns FALSE if the feed is down or doesn't have any upcoming event.
+ * @return array
  *   Returns the raw array of the upcoming events extracted from
  *   meetup.com API response.
  */
@@ -127,12 +126,21 @@ function drupalfr_events_fetch_events($items = FALSE) {
       return $data['results'];
     }
     else {
-      return FALSE;
+      return array();
     }
   }
   else {
-    watchdog('events_meetup', 'Error parsing the meetup feed. @response', array('@response' => $response));
-    return FALSE;
+    $response_data = drupal_json_decode($response->data);
+    if (
+      isset($response_data['errors']) &&
+      isset($response_data['errors'][0]) &&
+      isset($response_data['errors'][0]['message'])) {
+      watchdog('events_meetup', 'Error parsing the meetup feed. @response', array('@response' => $response_data['errors'][0]['message']));
+    }
+    else {
+      watchdog('events_meetup', 'Error parsing the meetup feed. @response', array('@response' => $response->status_message));
+    }
+    return array();
   }
 }
 
