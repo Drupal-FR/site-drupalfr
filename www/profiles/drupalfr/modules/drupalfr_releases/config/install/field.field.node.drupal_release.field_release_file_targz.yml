@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_release_file_targz
+    - node.type.drupal_release
+  module:
+    - link
+id: node.drupal_release.field_release_file_targz
+field_name: field_release_file_targz
+entity_type: node
+bundle: drupal_release
+label: 'Fichier (.tar.gz)'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 0
+field_type: link

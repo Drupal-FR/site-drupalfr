@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_release_version_major
+    - node.type.drupal_release
+id: node.drupal_release.field_release_version_major
+field_name: field_release_version_major
+entity_type: node
+bundle: drupal_release
+label: 'Version majeure'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
