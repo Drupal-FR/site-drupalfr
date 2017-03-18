@@ -63,7 +63,7 @@ class MenutrailbypathBreadcrumb {
         $breadcrumb[] = l($parent['title'], $parent['href'], $parent['localized_options']);
       }
 
-      if ($current_page_link) {
+      if (!empty($current_page_link)) {
         $drupal_page_title = drupal_get_title();
         if (!empty($drupal_page_title) && $current_page_link['href'] == current_path()) {
           $current_page_link['title'] = $drupal_page_title;
@@ -109,9 +109,9 @@ class MenutrailbypathBreadcrumb {
         $menu_link['type']     = $router_item['type'];
         _menu_link_translate($menu_link);
       }
-      elseif (!empty($router_item['title'])) {
+      else {
         $menu_link = array(
-          'title'             => $router_item['title'],
+          'title'             => (isset($router_item['title'])) ? $router_item['title'] : '',
           'href'              => $trail_path,
           'localized_options' => array(),
           'type'              => MENU_NORMAL_ITEM,

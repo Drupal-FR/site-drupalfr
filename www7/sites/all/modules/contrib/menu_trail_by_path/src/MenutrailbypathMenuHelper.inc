@@ -3,13 +3,17 @@
 class MenutrailbypathMenuHelper {
   protected $language;
 
+  /** @var \MenutrailbypathUrlHelper */
+  protected $urlHelper;
+
   /**
    * MenutrailbypathMenuHelper constructor.
    *
    * @param $language
    */
-  public function __construct($language) {
-    $this->language = $language;
+  public function __construct($language, MenutrailbypathUrlHelper $urlHelper) {
+    $this->language  = $language;
+    $this->urlHelper = $urlHelper;
   }
 
   /**
@@ -45,19 +49,34 @@ class MenutrailbypathMenuHelper {
    * @return array
    */
   public function getMenuLinks($menu_name) {
-    $query = db_select('menu_links', 'ml')
-      ->fields('ml')
-      ->condition('menu_name', $menu_name, '=') // Do not touch admin menu.
-      ->condition('hidden', 0) // Only consider normal, visible menu links.
-      ->orderBy('depth')
-      ->orderBy('weight')
-      ->orderBy('mlid');
-
-    if (module_exists('i18n_menu')) {
-      $query->condition('language', array(LANGUAGE_NONE, $this->language->language), 'IN');
+    $cid = 'menu_trail_by_path:menu_links:' . $menu_name . ':' . $this->language->language;
+    $cache = cache_get($cid, 'cache_menu');
+    if (!empty($cache->data)) {
+      $menu_links = $cache->data;
     }
-    $results = $query->execute();
-    return ($results instanceof DatabaseStatementInterface) ? $this->translateMenuLinkTitles($results->fetchAll()) : array();
+
+    if (!isset($menu_links)) {
+      $query = db_select('menu_links', 'ml')
+        ->fields('ml')
+        ->condition('menu_name', $menu_name, '=') // Do not touch admin menu.
+        ->condition('hidden', 0) // Only consider normal, visible menu links.
+        ->orderBy('depth')
+        ->orderBy('weight')
+        ->orderBy('mlid');
+
+      if (module_exists('i18n_menu')) {
+        $query->condition('language', array(LANGUAGE_NONE, $this->language->language), 'IN');
+      }
+      $results = $query->execute();
+      $menu_links = ($results instanceof DatabaseStatementInterface) ? $this->translateMenuLinkTitles($results->fetchAll()) : array();
+      foreach ($menu_links as &$menu_link) {
+        $menu_link->menu_path_by_trail_url = $this->urlHelper->getUrl($menu_link->link_path);
+      }
+
+      cache_set($cid, $menu_links, 'cache_menu');
+    }
+
+    return $menu_links;
   }
 
   /**

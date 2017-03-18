@@ -25,12 +25,13 @@ function menu_trail_by_path_page_delivery_callback_alter() {
 
   menu_trail_by_path_fix_cache_after_upgrade();
 
+  $urlHelper  = new MenutrailbypathUrlHelper();
   $pathHelper = new MenutrailbypathPathHelper();
-  $menuHelper = new MenutrailbypathMenuHelper($language);
+  $menuHelper = new MenutrailbypathMenuHelper($language, $urlHelper);
 
   // Set the active-trail for each menu containing one of the candidates.
   if (menu_trail_by_path_is_active('menu_trail')) {
-    $activetrail = new MenutrailbypathActivetrail($pathHelper, $menuHelper);
+    $activetrail = new MenutrailbypathActivetrail($pathHelper, $menuHelper, $urlHelper);
     $activetrail->setActivetrails();
   }
 
@@ -48,7 +49,7 @@ function menu_trail_by_path_page_delivery_callback_alter() {
  * @deprecated (to be removed in 7.x-4.x)
  */
 function menu_trail_by_path_fix_cache_after_upgrade() {
-  if (!class_exists('MenutrailbypathPathHelper') || !class_exists('MenutrailbypathActivetrail') || !class_exists('MenutrailbypathUsortMenulinks')) {
+  if (!class_exists('MenutrailbypathUrlHelper') || !class_exists('MenutrailbypathPathHelper') || !class_exists('MenutrailbypathActivetrail') || !class_exists('MenutrailbypathUsortMenulinks')) {
     watchdog('menu_trail_by_path', 'Fixing invalid cache, you probably forgot to clear the cache after menu_trail_by_path upgrade..', array(), WATCHDOG_ERROR);
     drupal_flush_all_caches();
   }

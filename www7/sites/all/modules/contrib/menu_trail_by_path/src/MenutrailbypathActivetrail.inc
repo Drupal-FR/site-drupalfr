@@ -3,6 +3,7 @@
 class MenutrailbypathActivetrail {
   protected $pathHelper;
   protected $menuHelper;
+  protected $urlHelper;
 
   /**
    * MenutrailbypathActivetrail constructor.
@@ -10,9 +11,10 @@ class MenutrailbypathActivetrail {
    * @param \MenutrailbypathPathHelper $pathHelper
    * @param \MenutrailbypathMenuHelper $menuHelper
    */
-  public function __construct(MenutrailbypathPathHelper $pathHelper, MenutrailbypathMenuHelper $menuHelper) {
+  public function __construct(MenutrailbypathPathHelper $pathHelper, MenutrailbypathMenuHelper $menuHelper, MenutrailbypathUrlHelper $urlHelper) {
     $this->pathHelper = $pathHelper;
     $this->menuHelper = $menuHelper;
+    $this->urlHelper  = $urlHelper;
   }
 
   /**
@@ -74,12 +76,13 @@ class MenutrailbypathActivetrail {
    *   The menu link for the given menu, or NULL if there is no matching menu link.
    */
   protected function getActiveTrailLink($menu_name) {
-    $menu_links  = $this->menuHelper->getMenuLinks($menu_name);
-    $trail_paths = $this->pathHelper->getPaths();
+    $menu_links  = array_reverse($this->menuHelper->getMenuLinks($menu_name));
+    $trail_paths = array_reverse($this->pathHelper->getPaths());
 
-    foreach (array_reverse($trail_paths) as $trail_path) {
-      foreach (array_reverse($menu_links) as $menu_link) {
-        if (url($menu_link->link_path) == url($trail_path)) {
+    foreach ($trail_paths as $trail_path) {
+      $trail_path_url = $this->urlHelper->getUrl($trail_path);
+      foreach ($menu_links as $menu_link) {
+        if ($menu_link->menu_path_by_trail_url == $trail_path_url) {
           return $menu_link;
         }
       }
