@@ -5,8 +5,10 @@
 
 # Enable development modules.
 if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
-  for MODULE in "${DEVELOPMENT_MODULES[@]}"
+  MODULES=''
+  for DEVELOPMENT_MODULE in "${DEVELOPMENT_MODULES[@]}"
   do
-    $DRUSH en $MODULE -y
+    MODULES="$MODULES $DEVELOPMENT_MODULE"
   done
+  $DRUSH en $MODULES -y
 fi
