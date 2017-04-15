@@ -43,6 +43,9 @@ $settings['redis.connection']['interface'] = 'PhpRedis';
 
 // External cache.
 if (file_exists(__DIR__ . '/.cache_activated')) {
+  // Additional redis services.
+  $settings['container_yamls'][] = 'modules/contrib/redis/example.services.yml';
+
   $settings['cache']['default'] = 'cache.backend.redis';
 
   // Always set the fast backend for bootstrap, discover and config, otherwise

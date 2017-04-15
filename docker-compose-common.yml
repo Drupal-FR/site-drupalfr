@@ -64,6 +64,14 @@ services:
     volumes:
       - ./conf/mysql:/etc/mysql/conf.d
 
+  redis:
+    image: redis:3.2-alpine
+    volumes:
+      - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    entrypoint:
+      - docker-entrypoint.sh
+      - /usr/local/etc/redis/redis.conf
+
 
   solr:
     image: solr:6.4-alpine
