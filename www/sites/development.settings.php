@@ -67,6 +67,14 @@ $config['system.performance']['js']['preprocess'] = FALSE;
 $settings['cache']['bins']['render'] = 'cache.backend.null';
 
 /**
+ * Disable caching for migrations.
+ *
+ * Uncomment the code below to only store migrations in memory and not in the
+ * database. This makes it easier to develop custom migrations.
+ */
+# $settings['cache']['bins']['discovery_migration'] = 'cache.backend.memory';
+
+/**
  * Disable Dynamic Page Cache.
  *
  * Note: you should test with Dynamic Page Cache enabled, to ensure the correct
@@ -93,3 +101,27 @@ $settings['extension_discovery_scan_tests'] = TRUE;
  * using these parameters in a request to rebuild.php.
  */
 $settings['rebuild_access'] = TRUE;
+
+/**
+ * Skip file system permissions hardening.
+ *
+ * The system module will periodically check the permissions of your site's
+ * site directory to ensure that it is not writable by the website user. For
+ * sites that are managed with a version control system, this can cause problems
+ * when files in that directory such as settings.php are updated, because the
+ * user pulling in the changes won't have permissions to modify files in the
+ * directory.
+ */
+$settings['skip_permissions_hardening'] = TRUE;
+
+// Devel.
+$config['devel.settings']['devel_dumper'] = 'var_dumper';
+
+// Webprofiler.
+// Enable all toolbar items.
+$config['webprofiler.config']['active_toolbar_items']['config'] = 'config';
+$config['webprofiler.config']['active_toolbar_items']['events'] = 'events';
+$config['webprofiler.config']['active_toolbar_items']['http'] = 'http';
+$config['webprofiler.config']['active_toolbar_items']['routing'] = 'routing';
+$config['webprofiler.config']['active_toolbar_items']['services'] = 'services';
+$config['webprofiler.config']['active_toolbar_items']['state'] = 'state';
