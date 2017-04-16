@@ -21,13 +21,13 @@ DEVELOPMENT_MODULES=(
   config_inspector
   dblog
   devel
-  devel_a11y
+#  devel_a11y
   features_ui
   field_ui
-  kint
+#  kint
   purge_ui
-  renderviz
-  search_kint
+#  renderviz
+#  search_kint
   views_ui
   webprofiler
 )
