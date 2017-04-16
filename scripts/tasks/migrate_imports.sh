@@ -16,6 +16,7 @@ $DRUSH migrate-import drupalfr_showcase --update
 $DRUSH migrate-import drupalfr_local_group --update
 $DRUSH migrate-import drupalfr_event --update
 $DRUSH migrate-import drupalfr_feed --update
+$DRUSH migrate-import drupalfr_basic_block --update
 # Re-import users to update references as we do not create stub.
 $DRUSH migrate-import drupalfr_user --update
 

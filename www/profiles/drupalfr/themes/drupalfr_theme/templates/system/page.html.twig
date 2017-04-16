@@ -179,10 +179,13 @@
   </div>
 {% endblock %}
 
-{% if page.footer %}
+{% if (page.footer or page.footer_col_1 or page.footer_col_2 or page.footer_col_3) %}
   {% block footer %}
     <footer class="footer {{ container }}" role="contentinfo">
       {{ page.footer }}
+      {{ page.footer_col_1 }}
+      {{ page.footer_col_2 }}
+      {{ page.footer_col_3 }}
     </footer>
   {% endblock %}
 {% endif %}

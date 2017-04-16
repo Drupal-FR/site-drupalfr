@@ -1,0 +1,24 @@
+langcode: fr
+status: true
+dependencies:
+  content:
+    - 'block_content:basic:block_footer_contact'
+  module:
+    - block_content
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_footer_contact
+theme: drupalfr_theme
+region: footer_col_3
+weight: -5
+provider: null
+plugin: 'block_content:block_footer_contact'
+settings:
+  id: 'block_content:block_footer_contact'
+  label: 'Footer : Contact'
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }
