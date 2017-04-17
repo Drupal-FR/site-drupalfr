@@ -2,7 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.field.paragraph.titre_texte_media.field_calls_to_action
+    - field.field.paragraph.titre_texte_media.field_call_to_action
     - field.field.paragraph.titre_texte_media.field_media
     - field.field.paragraph.titre_texte_media.field_media_position
     - field.field.paragraph.titre_texte_media.field_media_width_class
@@ -61,7 +61,7 @@ third_party_settings:
       label: Texte
     group_cta:
       children:
-        - field_calls_to_action
+        - field_call_to_action
       parent_name: group_tabs
       weight: 22
       format_type: tab
@@ -92,7 +92,7 @@ targetEntityType: paragraph
 bundle: titre_texte_media
 mode: default
 content:
-  field_calls_to_action:
+  field_call_to_action:
     weight: 4
     settings:
       placeholder_url: ''

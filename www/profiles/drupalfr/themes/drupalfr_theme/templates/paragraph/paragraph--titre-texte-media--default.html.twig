@@ -55,12 +55,12 @@ view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
       {% endif %}
 
 
-      {% if (content.field_title or content.field_sub_title or content.field_text or content.field_calls_to_action) %}
+      {% if (content.field_title or content.field_sub_title or content.field_text or content.field_call_to_action) %}
         <div class="{{ text_width_class }}">
           {{ content.field_title }}
           {{ content.field_sub_title }}
           {{ content.field_text }}
-          {{ content.field_calls_to_action }}
+          {{ content.field_call_to_action }}
         </div>
       {% endif %}
 

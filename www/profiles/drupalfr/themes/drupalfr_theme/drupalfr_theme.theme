@@ -30,7 +30,7 @@ function drupalfr_theme_preprocess_paragraph(&$variables) {
         unset($variables['content']['field_title']);
         unset($variables['content']['field_sub_title']);
         unset($variables['content']['field_text']);
-        unset($variables['content']['field_calls_to_action']);
+        unset($variables['content']['field_call_to_action']);
       }
       $text_width_class = 12 - (int) $media_width_class[0]['value'];
       $variables['media_width_class'] = 'col-md-' . $media_width_class[0]['value'];
