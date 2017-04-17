@@ -20,6 +20,7 @@ DEFAULT_LANGUAGE=fr
 DEVELOPMENT_MODULES=(
   blazy_ui
   config_inspector
+  context_ui
   dblog
   devel
 #  devel_a11y
