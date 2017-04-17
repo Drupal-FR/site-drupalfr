@@ -1,0 +1,27 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_user
+    - paragraphs.paragraphs_type.trombinoscope
+id: paragraph.trombinoscope.field_user
+field_name: field_user
+entity_type: paragraph
+bundle: trombinoscope
+label: Utilisateurs
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: entity_reference

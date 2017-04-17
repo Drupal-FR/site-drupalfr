@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_media_position
+    - paragraphs.paragraphs_type.titre_texte_image
+id: paragraph.titre_texte_image.field_media_position
+field_name: field_media_position
+entity_type: paragraph
+bundle: titre_texte_image
+label: 'Position du média'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Gauche
+  off_label: Droite
+field_type: boolean

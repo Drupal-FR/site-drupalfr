@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_media_width_class
+    - paragraphs.paragraphs_type.titre_texte_image
+  module:
+    - options
+id: paragraph.titre_texte_image.field_media_width_class
+field_name: field_media_width_class
+entity_type: paragraph
+bundle: titre_texte_image
+label: 'Largeur du média'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: '6'
+default_value_callback: ''
+settings: {  }
+field_type: list_string
