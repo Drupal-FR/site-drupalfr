@@ -6,9 +6,11 @@ dependencies:
     - field.field.node.page.body
     - field.field.node.page.field_attachment
     - field.field.node.page.field_drupal_version
+    - field.field.node.page.field_paragraph
     - node.type.page
   module:
     - entity_browser
+    - paragraphs
     - path
     - text
 id: node.page.default
@@ -35,9 +37,9 @@ content:
     weight: 33
     settings:
       entity_browser: attachment_files
-      field_widget_edit: '1'
-      field_widget_remove: '1'
-      open: '1'
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
       selection_mode: append
       view_mode: default
       preview_image_style: thumbnail
@@ -52,6 +54,18 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
+  field_paragraph:
+    type: entity_reference_paragraphs
+    weight: 34
+    settings:
+      title: Paragraphe
+      title_plural: Paragraphes
+      edit_mode: closed
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+    third_party_settings: {  }
     region: content
   langcode:
     type: language_select

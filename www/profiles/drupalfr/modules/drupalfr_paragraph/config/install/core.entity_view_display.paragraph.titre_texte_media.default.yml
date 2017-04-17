@@ -13,7 +13,6 @@ dependencies:
     - paragraphs.paragraphs_type.titre_texte_media
   module:
     - link
-    - options
     - text
 id: paragraph.titre_texte_media.default
 targetEntityType: paragraph
@@ -21,7 +20,7 @@ bundle: titre_texte_media
 mode: default
 content:
   field_calls_to_action:
-    weight: 3
+    weight: 2
     label: hidden
     settings:
       trim_length: 80
@@ -33,7 +32,7 @@ content:
     type: link
     region: content
   field_media:
-    weight: 8
+    weight: 4
     label: hidden
     settings:
       view_mode: default
@@ -41,25 +40,8 @@ content:
     third_party_settings: {  }
     type: entity_reference_entity_view
     region: content
-  field_media_position:
-    weight: 10
-    label: hidden
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_media_width_class:
-    weight: 9
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: list_default
-    region: content
   field_sub_title:
-    weight: 2
+    weight: 1
     label: hidden
     settings:
       link_to_entity: false
@@ -67,7 +49,7 @@ content:
     type: string
     region: content
   field_text:
-    weight: 7
+    weight: 3
     label: hidden
     settings: {  }
     third_party_settings: {  }
@@ -81,11 +63,7 @@ content:
     third_party_settings: {  }
     type: string
     region: content
-  field_title_level:
-    weight: 1
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: list_default
-    region: content
-hidden: {  }
+hidden:
+  field_media_position: true
+  field_media_width_class: true
+  field_title_level: true
