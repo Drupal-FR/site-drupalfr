@@ -3,127 +3,208 @@ status: true
 dependencies: {  }
 name: global
 label: Global
-group: null
-description: 'Fournit les blocs présents sur toutes les pages front et admin.'
+group: Global
+description: 'Fournit les blocs présents sur toutes les pages.'
 requireAllConditions: false
 disabled: false
 conditions: {  }
 reactions:
   blocks:
     blocks:
-      5d5718d6-861f-4f56-9340-88f5bf34c3c9:
+      8a8a5173-d3d5-491b-bb2a-110629ca5deb:
+        id: system_branding_block
+        label: 'Site branding'
+        provider: system
+        label_display: 0
+        use_site_logo: 1
+        use_site_name: 1
+        use_site_slogan: 0
+        region: navigation
+        weight: '-10'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 8a8a5173-d3d5-491b-bb2a-110629ca5deb
+      0e2ddad5-baff-4c6f-9706-d7907e269aff:
+        id: 'system_menu_block:main'
+        label: 'Main navigation'
+        provider: system
+        label_display: 0
+        level: '1'
+        depth: '2'
+        region: navigation_collapsible
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 0e2ddad5-baff-4c6f-9706-d7907e269aff
+      5850955d-bef3-4cce-a87b-4a9668b5fce2:
+        id: 'system_menu_block:account'
+        label: 'User account menu'
+        provider: system
+        label_display: 0
+        level: '1'
+        depth: '2'
+        region: navigation_collapsible
+        weight: '-5'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 5850955d-bef3-4cce-a87b-4a9668b5fce2
+      d73d8247-2a1c-44ae-9fb0-577839ce7f9c:
         id: page_title_block
         label: 'Page title'
         provider: core
         label_display: 0
         region: header
-        weight: '-10'
+        weight: '-5'
         context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: 5d5718d6-861f-4f56-9340-88f5bf34c3c9
+        theme: drupalfr_theme
         css_class: ''
-      4a5b080b-f31b-4963-b3e9-842366ce9fb0:
+        unique: 1
+        uuid: d73d8247-2a1c-44ae-9fb0-577839ce7f9c
+      a06736f9-6bce-4b1a-a531-698ba0e05f08:
+        id: system_messages_block
+        label: Messages
+        provider: system
+        label_display: 0
+        region: header
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: a06736f9-6bce-4b1a-a531-698ba0e05f08
+      10015eb2-8bf5-48d0-802c-1f28d1b47c21:
+        id: local_actions_block
+        label: 'Primary admin actions'
+        provider: core
+        label_display: 0
+        region: header
+        weight: '-3'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 10015eb2-8bf5-48d0-802c-1f28d1b47c21
+      83d8be44-f305-42de-bffa-aefa0598b7e2:
         id: local_tasks_block
-        label: 'Primary tabs'
+        label: Tabs
         provider: core
         label_display: 0
         primary: 1
-        secondary: 0
-        region: header
-        weight: '-9'
-        context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: 4a5b080b-f31b-4963-b3e9-842366ce9fb0
-        css_class: ''
-      7cecae40-e211-4f9a-b65c-b5f43c9c3b06:
-        id: local_tasks_block
-        label: 'Secondary tabs'
-        provider: core
-        label_display: 0
-        primary: 0
         secondary: 1
-        region: pre_content
-        weight: '-3'
+        region: header
+        weight: '-4'
         context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: 7cecae40-e211-4f9a-b65c-b5f43c9c3b06
+        theme: drupalfr_theme
         css_class: ''
-      527ac4ec-17e7-4338-976d-2e50320d3521:
-        id: system_breadcrumb_block
-        label: Breadcrumbs
-        provider: system
+        unique: 1
+        uuid: 83d8be44-f305-42de-bffa-aefa0598b7e2
+      a14c28f8-cd35-4e9d-836f-1fded2b337eb:
+        id: newsletter_subscription_block
+        label: 'Garder le contact'
+        provider: drupalfr_newsletter
+        label_display: visible
+        account_hash: eb7ebedd32b3b2fc0ac192ee9
+        mailing_list_hash: 27e99cb1af
+        anti_spam_token: b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af
+        region: footer_col_3
+        weight: '-5'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: a14c28f8-cd35-4e9d-836f-1fded2b337eb
+      2635f041-0fe0-472f-88a4-d64461d63610:
+        id: 'block_content:block_footer_contact'
+        label: 'Footer : Contact'
+        provider: block_content
         label_display: 0
-        region: breadcrumb
-        weight: '-10'
+        status: true
+        info: ''
+        view_mode: full
+        region: footer_col_3
+        weight: '-4'
         context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: 527ac4ec-17e7-4338-976d-2e50320d3521
+        theme: drupalfr_theme
         css_class: ''
-      bbabcb10-5fa9-4ed5-ac5f-7e2e7b5c922f:
+        unique: 1
+        uuid: 2635f041-0fe0-472f-88a4-d64461d63610
+      82edfa45-5858-4346-a0a7-d55d336ebe39:
         id: help_block
         label: Help
         provider: help
         label_display: 0
         region: help
-        weight: '-3'
+        weight: '-6'
         context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: bbabcb10-5fa9-4ed5-ac5f-7e2e7b5c922f
+        theme: drupalfr_theme
         css_class: ''
-      3854ec2d-ecfa-4972-a3ea-e5dab6f5758a:
-        id: local_actions_block
-        label: 'Primary admin actions'
-        provider: core
-        label_display: 0
-        region: content
-        weight: '-3'
-        context_mapping: {  }
-        theme: seven
         unique: 1
-        uuid: 3854ec2d-ecfa-4972-a3ea-e5dab6f5758a
-        css_class: ''
-      6f40b2cb-7d58-4d58-9d24-5043fd7ac83d:
+        uuid: 82edfa45-5858-4346-a0a7-d55d336ebe39
+      2af9f8a0-6077-4da9-bf4d-b68b335e0351:
         id: system_main_block
         label: 'Main page content'
         provider: system
         label_display: 0
         region: content
-        weight: '-2'
-        context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: 6f40b2cb-7d58-4d58-9d24-5043fd7ac83d
-        css_class: ''
-      eb1f1197-2d25-4be2-98d0-d77af0da0e23:
-        id: system_messages_block
-        label: Messages
-        provider: system
-        label_display: 0
-        region: highlighted
-        weight: '-3'
-        context_mapping: {  }
-        theme: seven
-        unique: 1
-        uuid: eb1f1197-2d25-4be2-98d0-d77af0da0e23
-        css_class: ''
-      fa154095-d158-4008-9754-40c7d0814585:
-        id: page_title_block
-        label: 'Page title'
-        provider: core
-        label_display: 0
-        region: header
-        weight: '0'
+        weight: '-6'
         context_mapping: {  }
         theme: drupalfr_theme
-        unique: 1
-        uuid: fa154095-d158-4008-9754-40c7d0814585
         css_class: ''
+        unique: 1
+        uuid: 2af9f8a0-6077-4da9-bf4d-b68b335e0351
+      f4bc815b-810b-45b3-9f88-c883c0198916:
+        id: 'block_content:block_footer_who_are_we'
+        label: 'Qui sommes nous ?'
+        provider: block_content
+        label_display: visible
+        status: true
+        info: ''
+        view_mode: full
+        region: footer_col_1
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: f4bc815b-810b-45b3-9f88-c883c0198916
+      78bd5292-0973-4e56-a168-04c8f7161e4e:
+        id: follow_us_block
+        label: 'Suivez nous sur :'
+        provider: drupalfr_social
+        label_display: visible
+        url_facebook: 'http://facebook.com'
+        url_twitter: 'https://twitter.com/drupalfr'
+        url_linkedin: 'http://linkedin.com'
+        url_viadeo: 'http://viadeo.com'
+        url_youtube: 'https://www.youtube.com/channel/UCIa6rzX4xvIu6eas8MZMCAw'
+        region: footer_col_3
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 78bd5292-0973-4e56-a168-04c8f7161e4e
+      e6f5ba1a-d383-49eb-86ec-5135620448c4:
+        id: 'system_menu_block:main'
+        label: 'Plan du site'
+        provider: system
+        label_display: visible
+        level: '1'
+        depth: '1'
+        region: footer_col_2
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: e6f5ba1a-d383-49eb-86ec-5135620448c4
     id: blocks
     saved: false
-    uuid: d6ae72b8-89d3-4eb1-a751-c9cefce433ce
+    uuid: 63e5ce9d-1565-46ac-a1cf-036db79cb9f4
 weight: 0
