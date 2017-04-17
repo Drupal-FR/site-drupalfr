@@ -12,8 +12,81 @@ dependencies:
     - field.field.paragraph.titre_texte_media.field_title_level
     - paragraphs.paragraphs_type.titre_texte_media
   module:
+    - field_group
     - link_attributes
     - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_heading
+        - group_text
+        - group_cta
+        - group_media
+      parent_name: ''
+      weight: 20
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: Tabs
+    group_heading:
+      children:
+        - field_title
+        - field_title_level
+        - field_sub_title
+      parent_name: group_tabs
+      weight: 20
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: En-tête
+    group_text:
+      children:
+        - field_text
+      parent_name: group_tabs
+      weight: 21
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Texte
+    group_cta:
+      children:
+        - field_calls_to_action
+      parent_name: group_tabs
+      weight: 22
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: CTA
+    group_media:
+      children:
+        - field_media
+        - field_media_width_class
+        - field_media_position
+      parent_name: group_tabs
+      weight: 23
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Média
 id: paragraph.titre_texte_media.default
 targetEntityType: paragraph
 bundle: titre_texte_media
@@ -45,10 +118,9 @@ content:
     region: content
   field_media_position:
     weight: 10
-    settings:
-      display_label: false
+    settings: {  }
     third_party_settings: {  }
-    type: boolean_checkbox
+    type: options_buttons
     region: content
   field_media_width_class:
     weight: 9
@@ -65,7 +137,7 @@ content:
     type: string_textfield
     region: content
   field_text:
-    weight: 3
+    weight: 21
     settings:
       rows: 5
       placeholder: ''
