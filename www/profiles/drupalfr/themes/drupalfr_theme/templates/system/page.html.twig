@@ -69,7 +69,7 @@
       ]
     %}
     <header{{ navbar_attributes.addClass(navbar_classes) }} id="navbar" role="banner">
-      {% if not navbar_attributes.hasClass('container') %}
+      {% if not navbar_attributes.hasClass(container) %}
         <div class="{{ container }}">
       {% endif %}
       <div class="navbar-header">
@@ -91,7 +91,7 @@
           {{ page.navigation_collapsible }}
         </div>
       {% endif %}
-      {% if not navbar_attributes.hasClass('container') %}
+      {% if not navbar_attributes.hasClass(container) %}
         </div>
       {% endif %}
     </header>
