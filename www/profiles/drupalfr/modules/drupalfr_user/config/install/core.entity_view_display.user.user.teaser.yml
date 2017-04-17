@@ -12,7 +12,7 @@ dependencies:
     - field.field.user.user.field_user_realname
     - field.field.user.user.field_user_social_link
     - field.field.user.user.user_picture
-    - image.style.thumbnail
+    - image.style.square_230
   module:
     - image
     - user
@@ -25,8 +25,8 @@ content:
     type: image
     weight: 0
     settings:
-      image_style: thumbnail
-      image_link: ''
+      image_style: square_230
+      image_link: content
     third_party_settings: {  }
     label: hidden
     region: content
