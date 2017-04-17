@@ -13,7 +13,7 @@
 function drupalfr_theme_preprocess_paragraph(&$variables) {
   /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
   $paragraph = $variables['paragraph'];
-  if ($paragraph->bundle() == 'titre_texte_media') {
+  if ($paragraph->bundle() == 'title_text_media') {
     // Media position.
     $media_position = $paragraph->get('field_media_position')->getValue();
     if (!empty($media_position)) {
