@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0755ab7a256ab149441d76ddedf9ca2d",
+    "content-hash": "57e2147b96d99a7483825b0ad53c8f63",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -458,6 +458,16 @@
             "time": "2017-03-19T18:18:52+00:00"
         },
         {
+            "name": "dinbror/blazy",
+            "version": "1.8.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dinbror/blazy",
+                "reference": "1.8.2"
+            },
+            "type": "drupal-library"
+        },
+        {
             "name": "dnoegel/php-xdg-base-dir",
             "version": "0.1",
             "source": {
@@ -889,16 +899,6 @@
             "time": "2014-09-09T13:34:57+00:00"
         },
         {
-            "name": "dropzone/dropzone",
-            "version": "v4.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/enyo/dropzone",
-                "reference": "v4.3.0"
-            },
-            "type": "drupal-library"
-        },
-        {
             "name": "drupal-composer/drupal-scaffold",
             "version": "2.2.0",
             "source": {
@@ -1000,6 +1000,61 @@
             }
         },
         {
+            "name": "drupal/blazy",
+            "version": "1.0.0-rc1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/blazy",
+                "reference": "8.x-1.0-rc1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/blazy-8.x-1.0-rc1.zip",
+                "reference": "8.x-1.0-rc1",
+                "shasum": "0502916f2cb5b6237f13e5216e12063b8d56ce42"
+            },
+            "require": {
+                "drupal/core": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-1.0-rc1",
+                    "datestamp": "1485193983"
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Gaus Surahman",
+                    "homepage": "https://www.drupal.org/u/gausarts",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://www.drupal.org/node/2663268/committers",
+                    "role": "Contributor"
+                }
+            ],
+            "description": "Provides basic bLazy integration for lazy loading and multi-serving images.",
+            "homepage": "https://drupal.org/project/blazy",
+            "keywords": [
+                "Drupal",
+                "bLazy",
+                "lazyload"
+            ],
+            "support": {
+                "source": "http://cgit.drupalcode.org/blazy",
+                "issues": "https://drupal.org/project/issues/blazy"
+            }
+        },
+        {
             "name": "drupal/bootstrap",
             "version": "3.3.0",
             "source": {
@@ -1098,6 +1153,105 @@
             "homepage": "https://www.drupal.org/project/config_update",
             "support": {
                 "source": "http://cgit.drupalcode.org/config_update"
+            }
+        },
+        {
+            "name": "drupal/context",
+            "version": "1.0.0-alpha1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/context",
+                "reference": "8.x-1.0-alpha1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/context-8.x-1.0-alpha1.zip",
+                "reference": null,
+                "shasum": "42472037794f8ae9a6c128837dceb2cea8353a58"
+            },
+            "require": {
+                "drupal/core": "~8.0"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-1.0-alpha1",
+                    "datestamp": "1460041522"
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christoffer Palm",
+                    "homepage": "http://www.oddhill.se/",
+                    "email": "christoffer.palm@oddhill.se",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Steven Jones",
+                    "homepage": "https://www.drupal.org/user/99644"
+                },
+                {
+                    "name": "alex_b",
+                    "homepage": "https://www.drupal.org/user/53995"
+                },
+                {
+                    "name": "boshtian",
+                    "homepage": "https://www.drupal.org/user/1773456"
+                },
+                {
+                    "name": "colan",
+                    "homepage": "https://www.drupal.org/user/58704"
+                },
+                {
+                    "name": "emanaton",
+                    "homepage": "https://www.drupal.org/user/120853"
+                },
+                {
+                    "name": "febbraro",
+                    "homepage": "https://www.drupal.org/user/43670"
+                },
+                {
+                    "name": "fizk",
+                    "homepage": "https://www.drupal.org/user/473174"
+                },
+                {
+                    "name": "hass",
+                    "homepage": "https://www.drupal.org/user/85918"
+                },
+                {
+                    "name": "hefox",
+                    "homepage": "https://www.drupal.org/user/426416"
+                },
+                {
+                    "name": "hyrcan",
+                    "homepage": "https://www.drupal.org/user/26618"
+                },
+                {
+                    "name": "jmiccolis",
+                    "homepage": "https://www.drupal.org/user/31731"
+                },
+                {
+                    "name": "tekante",
+                    "homepage": "https://www.drupal.org/user/640024"
+                },
+                {
+                    "name": "yhahn",
+                    "homepage": "https://www.drupal.org/user/264833"
+                }
+            ],
+            "description": "Set conditions and configure reactions that should be implemented when conditions pass.",
+            "homepage": "https://github.com/oddhill/context",
+            "support": {
+                "source": "https://github.com/oddhill/context",
+                "issues": "https://github.com/oddhill/context/issues",
+                "docs": "https://github.com/oddhill/context"
             }
         },
         {
@@ -1639,7 +1793,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/entity_browser-8.x-1.0-rc2.zip",
-                "reference": null,
+                "reference": "8.x-1.0-rc2",
                 "shasum": "7954668b9134a8ec2dac2604c482d6521e43ee91"
             },
             "require": {
@@ -3867,6 +4021,16 @@
                 "validator"
             ],
             "time": "2017-02-03T22:48:59+00:00"
+        },
+        {
+            "name": "enyo/dropzone",
+            "version": "v4.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/enyo/dropzone",
+                "reference": "v4.3.0"
+            },
+            "type": "drupal-library"
         },
         {
             "name": "guzzlehttp/guzzle",
