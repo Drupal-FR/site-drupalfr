@@ -1,0 +1,17 @@
+# Account menu.
+drupalfr_user.account.compte:
+  weight: -10
+  menu_name: account
+  expanded: true
+  class: Drupal\drupalfr_user\Plugin\Menu\AccountMenuLink
+
+drupalfr_user.account.create:
+  parent: drupalfr_user.account.compte
+  weight: -10
+  menu_name: account
+  class: Drupal\drupalfr_user\Plugin\Menu\MyAccountCreateAccountMenuLink
+drupalfr_user.account.login:
+  parent: drupalfr_user.account.compte
+  weight: -5
+  menu_name: account
+  class: Drupal\user\Plugin\Menu\LoginLogoutMenuLink

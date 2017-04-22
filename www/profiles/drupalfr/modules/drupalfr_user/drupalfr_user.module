@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_user module.
+ */
+
+/**
+ * Implements hook_menu_links_discovered_alter().
+ *
+ * Disable default links provided by the user module.
+ */
+function drupalfr_user_menu_links_discovered_alter(&$links) {
+  $user_links = [
+    'user.logout',
+    'user.page',
+  ];
+
+  foreach ($user_links as $user_link) {
+    if (isset($links[$user_link])) {
+      $links[$user_link]['enabled'] = FALSE;
+    }
+  }
+}
