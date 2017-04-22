@@ -30,19 +30,34 @@ function drupalfr_theme_preprocess_paragraph(&$variables) {
     if ($paragraph->hasField('field_media_width_class')) {
       $media_width_class = $paragraph->get('field_media_width_class')->getValue();
       if (!empty($media_width_class)) {
+        $media_width_class = $media_width_class[0]['value'];
         // Edge cases.
-        if ($media_width_class[0]['value'] == 0) {
+        if ($media_width_class == 0) {
           unset($variables['content']['field_media']);
         }
-        elseif ($media_width_class[0]['value'] == 12) {
+        elseif ($media_width_class == 12) {
           unset($variables['content']['field_title']);
           unset($variables['content']['field_sub_title']);
           unset($variables['content']['field_text']);
           unset($variables['content']['field_call_to_action']);
         }
-        $text_width_class = 12 - (int) $media_width_class[0]['value'];
-        $variables['media_width_class'] = 'col-md-' . $media_width_class[0]['value'];
+        $text_width_class = 12 - (int) $media_width_class;
+        $variables['media_width_class'] = 'col-md-' . $media_width_class;
         $variables['text_width_class'] = 'col-md-' . $text_width_class;
+      }
+    }
+
+    // Title level.
+    if (
+      $paragraph->hasField('field_title_level') &&
+      $paragraph->hasField('field_title') &&
+      isset($variables['content']['field_title'])
+    ) {
+      $title_level = $paragraph->get('field_title_level')->getValue();
+      if (!empty($title_level)) {
+        $title_level = $title_level[0]['value'];
+        $variables['content']['field_title']['#prefix'] = "<$title_level>";
+        $variables['content']['field_title']['#suffix'] = "</$title_level>";
       }
     }
   }
