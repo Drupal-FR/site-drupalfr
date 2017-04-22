@@ -14,27 +14,36 @@ function drupalfr_theme_preprocess_paragraph(&$variables) {
   /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
   $paragraph = $variables['paragraph'];
   if ($paragraph->bundle() == 'title_text_media') {
+    $variables['media_position'] = 'right';
+    $variables['media_width_class'] = 'col-md-6';
+    $variables['text_width_class'] = 'col-md-6';
+
     // Media position.
-    $media_position = $paragraph->get('field_media_position')->getValue();
-    if (!empty($media_position)) {
-      $variables['media_position'] = $media_position[0]['value'] ? 'left' : 'right';
+    if ($paragraph->hasField('field_media_position')) {
+      $media_position = $paragraph->get('field_media_position')->getValue();
+      if (!empty($media_position)) {
+        $variables['media_position'] = $media_position[0]['value'] ? 'left' : 'right';
+      }
     }
 
     // Media width.
-    $media_width_class = $paragraph->get('field_media_width_class')->getValue();
-    if (!empty($media_width_class)) {
-      if ($media_width_class[0]['value'] == 0) {
-        unset($variables['content']['field_media']);
+    if ($paragraph->hasField('field_media_width_class')) {
+      $media_width_class = $paragraph->get('field_media_width_class')->getValue();
+      if (!empty($media_width_class)) {
+        // Edge cases.
+        if ($media_width_class[0]['value'] == 0) {
+          unset($variables['content']['field_media']);
+        }
+        elseif ($media_width_class[0]['value'] == 12) {
+          unset($variables['content']['field_title']);
+          unset($variables['content']['field_sub_title']);
+          unset($variables['content']['field_text']);
+          unset($variables['content']['field_call_to_action']);
+        }
+        $text_width_class = 12 - (int) $media_width_class[0]['value'];
+        $variables['media_width_class'] = 'col-md-' . $media_width_class[0]['value'];
+        $variables['text_width_class'] = 'col-md-' . $text_width_class;
       }
-      elseif ($media_width_class[0]['value'] == 12) {
-        unset($variables['content']['field_title']);
-        unset($variables['content']['field_sub_title']);
-        unset($variables['content']['field_text']);
-        unset($variables['content']['field_call_to_action']);
-      }
-      $text_width_class = 12 - (int) $media_width_class[0]['value'];
-      $variables['media_width_class'] = 'col-md-' . $media_width_class[0]['value'];
-      $variables['text_width_class'] = 'col-md-' . $text_width_class;
     }
   }
 }

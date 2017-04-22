@@ -45,6 +45,9 @@ set classes = [
 view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
 ]
 %}
+{% set media_position = media_position ?: 'right' %}
+{% set media_width_class = media_width_class ?: 'col-md-6' %}
+{% set text_width_class = text_width_class ?: 'col-md-6' %}
 {% block paragraph %}
   <section{{ attributes.addClass(classes) }}>
     {% block content %}
