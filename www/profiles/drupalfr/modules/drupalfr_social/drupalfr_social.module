@@ -9,22 +9,22 @@
  * Implements hook_theme().
  */
 function drupalfr_social_theme($existing, $type, $theme, $path) {
-  return array(
-    'drupalfr_social_twitter_statuses' => array(
-      'variables' => array(
-        'statuses' => array(),
-      ),
-    ),
-    'drupalfr_social_follow_us_block' => array(
-      'variables' => array(
+  return [
+    'drupalfr_social_twitter_statuses' => [
+      'variables' => [
+        'statuses' => [],
+      ],
+    ],
+    'drupalfr_social_follow_us_block' => [
+      'variables' => [
         'url_facebook' => NULL,
         'url_twitter' => NULL,
         'url_linkedin' => NULL,
         'url_viadeo' => NULL,
         'url_youtube' => NULL,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**

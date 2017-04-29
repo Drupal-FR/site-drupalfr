@@ -40,17 +40,17 @@ class Release {
   public function importWithBatch() {
     $this->getFeed();
 
-    $batch = array(
+    $batch = [
       'title' => t('Importing'),
-      'operations' => array(
-        array(
+      'operations' => [
+        [
           '\Drupal\drupalfr_release\Release::importFeed',
-          array($this, 5)
-        ),
-      ),
+          [$this, 5]
+        ],
+      ],
       'file' => drupal_get_path('module', 'drupalfr_release')
         . '/src/Release.php'
-    );
+    ];
 
     batch_set($batch);
   }

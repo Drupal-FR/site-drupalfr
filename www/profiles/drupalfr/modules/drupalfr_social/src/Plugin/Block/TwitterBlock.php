@@ -69,14 +69,14 @@ class TwitterBlock extends BlockBase implements ContainerFactoryPluginInterface 
 
     $build = [];
     if (!empty($statuses)) {
-      $build['twitter_block'] = array(
+      $build['twitter_block'] = [
         '#theme' => 'drupalfr_social_twitter_statuses',
         '#statuses' => $statuses,
-        '#cache' => array(
+        '#cache' => [
           // 15 minutes.
           'max-age' => '900',
-        ),
-      );
+        ],
+      ];
     }
 
     return $build;

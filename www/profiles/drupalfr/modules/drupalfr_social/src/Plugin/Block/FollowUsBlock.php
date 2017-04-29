@@ -19,31 +19,31 @@ class FollowUsBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    $form['url_facebook'] = array(
+    $form['url_facebook'] = [
       '#type' => 'url',
       '#title' => $this->t('Facebook URL'),
       '#default_value' => $this->configuration['url_facebook'],
-    );
-    $form['url_twitter'] = array(
+    ];
+    $form['url_twitter'] = [
       '#type' => 'url',
       '#title' => $this->t('Twitter URL'),
       '#default_value' => $this->configuration['url_facebook'],
-    );
-    $form['url_linkedin'] = array(
+    ];
+    $form['url_linkedin'] = [
       '#type' => 'url',
       '#title' => $this->t('LinkedIn URL'),
       '#default_value' => $this->configuration['url_facebook'],
-    );
-    $form['url_viadeo'] = array(
+    ];
+    $form['url_viadeo'] = [
       '#type' => 'url',
       '#title' => $this->t('Viadeo URL'),
       '#default_value' => $this->configuration['url_facebook'],
-    );
-    $form['url_youtube'] = array(
+    ];
+    $form['url_youtube'] = [
       '#type' => 'url',
       '#title' => $this->t('Youtube URL'),
       '#default_value' => $this->configuration['url_facebook'],
-    );
+    ];
 
     return $form;
   }
@@ -64,14 +64,14 @@ class FollowUsBlock extends BlockBase {
    */
   public function build() {
 
-    $build = array(
+    $build = [
       '#theme' => 'drupalfr_social_follow_us_block',
       '#url_facebook' => $this->configuration['url_facebook'],
       '#url_twitter' => $this->configuration['url_twitter'],
       '#url_linkedin' => $this->configuration['url_linkedin'],
       '#url_viadeo' => $this->configuration['url_viadeo'],
       '#url_youtube' => $this->configuration['url_youtube'],
-    );
+    ];
 
     return $build;
   }
@@ -80,13 +80,13 @@ class FollowUsBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
+    return [
       'url_facebook' => '',
       'url_twitter' => '',
       'url_linkedin' => '',
       'url_viadeo' => '',
       'url_youtube' => '',
-    );
+    ];
   }
 
 }

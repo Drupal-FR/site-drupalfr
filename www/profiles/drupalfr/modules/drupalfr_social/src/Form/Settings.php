@@ -34,11 +34,11 @@ class Settings extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $twitter = $this->config('drupalfr_social.twitter');
 
-    $form['twitter'] = array(
+    $form['twitter'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Twitter'),
       '#description' => $this->t('These values are defined in the settings.php file.'),
-    );
+    ];
 
     $form['twitter']['consumer_key'] = [
       '#type' => 'textfield',

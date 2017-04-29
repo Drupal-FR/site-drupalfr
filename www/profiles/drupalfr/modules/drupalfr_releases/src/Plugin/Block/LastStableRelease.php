@@ -19,9 +19,9 @@ class LastStableRelease extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-    return array(
+    return [
       '#theme' => 'drupalfr_release_last_stable',
-    );
+    ];
   }
 
 }

@@ -1,20 +1,20 @@
 <?php
 
-$databases['default']['default'] = array(
+$databases['default']['default'] = [
   'driver' => 'mysql',
   'database' => 'drupal',
   'username' => 'drupal',
   'password' => 'drupal',
   'host' => 'mysql',
   'prefix' => '',
-);
+];
 
 $settings['hash_salt'] = 'drupalfr';
-$settings['trusted_host_patterns'] = array(
+$settings['trusted_host_patterns'] = [
   '^127\.0\.0\.1$',
   'varnish',
   'web',
-);
+];
 
 // Redis.
 $settings['redis.connection']['host'] = 'redis';

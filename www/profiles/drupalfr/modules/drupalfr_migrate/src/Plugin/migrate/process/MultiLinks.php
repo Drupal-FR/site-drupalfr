@@ -31,17 +31,17 @@ class MultiLinks extends ProcessPluginBase {
     }
 
     $uris = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['uri_property']));
-    $titles = array();
+    $titles = [];
     if (!empty($this->configuration['title_property'])) {
       $titles = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['title_property']));
     }
 
-    $value = array();
+    $value = [];
     foreach ($uris as $key => $uri) {
-      $value[] = array(
+      $value[] = [
         'uri' => $uri,
         'title' => isset($titles[$key]) ? $titles[$key] : '',
-      );
+      ];
     }
 
     return $value;

@@ -30,11 +30,11 @@ class MultiGeoFields extends ProcessPluginBase {
 
     $geophp_objects = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['source']));
 
-    $value = array();
+    $value = [];
     foreach ($geophp_objects as $geophp_object) {
-      $value[] = array(
+      $value[] = [
         'value' => $geophp_object,
-      );
+      ];
     }
 
     return $value;
