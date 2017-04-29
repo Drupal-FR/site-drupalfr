@@ -36,11 +36,36 @@ class MultiLinks extends ProcessPluginBase {
       $titles = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['title_property']));
     }
 
+    $targets = [];
+    if (!empty($this->configuration['target_property'])) {
+      $targets = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['target_property']));
+    }
+
+    $rels = [];
+    if (!empty($this->configuration['rel_property'])) {
+      $rels = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['rel_property']));
+    }
+
+    $classes = [];
+    if (!empty($this->configuration['class_property'])) {
+      $classes = explode($this->configuration['delimiter'], $row->getSourceProperty($this->configuration['class_property']));
+    }
+
     $value = [];
     foreach ($uris as $key => $uri) {
+      // Prepare options.
+      $options = [
+        'attributes' => [
+          'target' => isset($targets[$key]) ? $targets[$key] : '',
+          'rel' => isset($rels[$key]) ? $rels[$key] : '',
+          'class' => isset($classes[$key]) ? $classes[$key] : '',
+        ],
+      ];
+
       $value[] = [
         'uri' => $uri,
         'title' => isset($titles[$key]) ? $titles[$key] : '',
+        'options' => $options,
       ];
     }
 

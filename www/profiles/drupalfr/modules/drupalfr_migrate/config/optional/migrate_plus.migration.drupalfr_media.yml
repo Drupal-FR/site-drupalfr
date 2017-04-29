@@ -8,13 +8,13 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - drupalfr_media
-id: drupalfr_media_soundcloud
+id: drupalfr_media
 migration_tags:
   - drupalfr
-label: 'Media Soundcloud import'
+label: 'Media import'
 source:
   plugin: csv
-  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/media_soundcloud.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/media.csv
   header_row_count: 1
   keys:
     - uuid
@@ -22,17 +22,24 @@ source:
     -
       uuid: UUID
     -
-      name: Name
+      type: Type
     -
       published: Published
     -
+      name: Name
+    -
+      image: 'Image ID'
+    -
       soundcloud_url: 'Soundcloud URL'
 process:
-  bundle:
-    plugin: default_value
-    default_value: soundcloud
   uuid: uuid
+  bundle: type
   name: name
+  field_image:
+    -
+      plugin: migration
+      migration: drupalfr_file
+      source: image
   field_soundcloud_url/uri: soundcloud_url
   status: published
   uid:
@@ -40,8 +47,6 @@ process:
     default_value: 1
 destination:
   plugin: 'entity:media'
-  type: soundcloud
-  bundle: soundcloud
 template: null
 migration_dependencies: {  }
 migration_group: drupalfr

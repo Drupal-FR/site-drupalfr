@@ -35,6 +35,8 @@ source:
       body_value: Body
     -
       body_format: 'Body format'
+    -
+      paragraphs: Paragraphs
 process:
   type:
     plugin: default_value
@@ -59,6 +61,20 @@ process:
       migration: drupalfr_file
   body/value: body_value
   body/format: body_format
+  field_paragraph:
+    -
+      plugin: explode
+      delimiter: ;
+      source: paragraphs
+    -
+      plugin: migration
+      migration: drupalfr_paragraph
+      no_stub: true
+    -
+      plugin: iterator
+      process:
+        target_id: '0'
+        target_revision_id: '1'
   path:
     -
       plugin: skip_on_empty
