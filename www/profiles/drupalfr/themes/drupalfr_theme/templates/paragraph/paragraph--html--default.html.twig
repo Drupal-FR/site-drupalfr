@@ -46,33 +46,10 @@
     'row',
   ]
 %}
-{% set media_position = media_position ?: 'right' %}
-{% set media_width_class = media_width_class ?: 'col-md-6' %}
-{% set text_width_class = text_width_class ?: 'col-md-6' %}
 {% block paragraph %}
-  <section{{ attributes.addClass(classes) }}>
+  <div{{ attributes.addClass(classes) }}>
     {% block content %}
-      {% if (content.field_media and media_position == 'left') %}
-        <div class="{{ media_width_class }}">
-          {{ content.field_media }}
-        </div>
-      {% endif %}
-
-
-      {% if (content.field_title or content.field_sub_title or content.field_text or content.field_call_to_action) %}
-        <div class="{{ text_width_class }}">
-          {{ content.field_title }}
-          {{ content.field_sub_title }}
-          {{ content.field_text }}
-          {{ content.field_call_to_action }}
-        </div>
-      {% endif %}
-
-      {% if (content.field_media and media_position == 'right') %}
-        <div class="{{ media_width_class }}">
-          {{ content.field_media }}
-        </div>
-      {% endif %}
+      {{ content }}
     {% endblock %}
-  </section>
+  </div>
 {% endblock paragraph %}
