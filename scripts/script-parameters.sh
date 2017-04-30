@@ -31,5 +31,6 @@ DEVELOPMENT_MODULES=(
 #  renderviz
 #  search_kint
   views_ui
+  webform_ui
   webprofiler
 )

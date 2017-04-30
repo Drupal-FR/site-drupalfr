@@ -35,6 +35,10 @@ $config['drupalfr_social.twitter']['access_token_secret'] = '';
 // Mailchimp.
 $config['mailchimp.settings']['api_key'] = '';
 
+// Contact form.
+$config['webform.webform.contact']['handlers']['email_notification']['settings']['to_options']['webmaster'] = 'example@example.org';
+$config['webform.webform.contact']['handlers']['email_notification']['settings']['to_options']['bureau'] = 'example@example.org';
+
 if (file_exists(__DIR__ . '/../development.settings.php')) {
   include __DIR__ . '/../development.settings.php';
 }
