@@ -47,9 +47,23 @@
   ]
 %}
 {% block paragraph %}
-  <secion{{ attributes.addClass(classes) }}>
+  <section{{ attributes.addClass(classes) }}>
     {% block content %}
-      {{ content }}
+      {% if (content.field_title or content.field_sub_title) %}
+        <div class="row text-center">
+          {% if content.field_title %}
+            <h2>
+              {{ content.field_title }}
+            </h2>
+          {% endif %}
+          {{ content.field_sub_title }}
+        </div>
+      {% endif %}
+
+      {{ content
+      |without('field_title')
+      |without('field_sub_title')
+      }}
     {% endblock %}
-  </secion>
+  </section>
 {% endblock paragraph %}
