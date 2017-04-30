@@ -4,7 +4,6 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - node.type.job_offer
-    - system.menu.main
   module:
     - node
     - options
@@ -126,7 +125,7 @@ display:
           field_api_classes: false
       filters:
         status:
-          value: true
+          value: '1'
           table: node_field_data
           field: status
           plugin_id: boolean
@@ -279,12 +278,17 @@ display:
       display_extenders: {  }
       path: emploi
       menu:
-        type: normal
+        type: none
         title: 'Offres d''emploi'
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
         menu_name: main
       filters:
         status:
-          value: true
+          value: '1'
           table: node_field_data
           field: status
           plugin_id: boolean

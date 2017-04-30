@@ -4,7 +4,6 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - node.type.showcase
-    - system.menu.main
   module:
     - node
     - user
@@ -125,7 +124,7 @@ display:
           field_api_classes: false
       filters:
         status:
-          value: true
+          value: '1'
           table: node_field_data
           field: status
           plugin_id: boolean
@@ -185,8 +184,13 @@ display:
       display_extenders: {  }
       path: showcases
       menu:
-        type: normal
+        type: none
         title: Showcases
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
         menu_name: main
     cache_metadata:
       max-age: -1

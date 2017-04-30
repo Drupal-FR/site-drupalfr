@@ -3,7 +3,6 @@ status: true
 dependencies:
   config:
     - search_api.index.content
-    - system.menu.main
   module:
     - search_api
     - user
@@ -221,8 +220,13 @@ display:
       display_extenders: {  }
       path: recherche
       menu:
-        type: normal
+        type: none
         title: Search
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
         menu_name: main
       cache:
         type: none
