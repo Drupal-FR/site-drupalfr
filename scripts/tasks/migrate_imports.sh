@@ -18,6 +18,8 @@ $DRUSH migrate-import drupalfr_showcase --update
 $DRUSH migrate-import drupalfr_local_group --update
 $DRUSH migrate-import drupalfr_event --update
 $DRUSH migrate-import drupalfr_feed --update
+$DRUSH migrate-import drupalfr_news_type --update
+$DRUSH migrate-import drupalfr_news --update
 $DRUSH migrate-import drupalfr_basic_block --update
 $DRUSH migrate-import drupalfr_menu_link --update
 # Re-import users to update references as we do not create stub.

@@ -8,13 +8,13 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_page
+id: drupalfr_news
 migration_tags:
   - drupalfr
-label: 'Page import'
+label: 'News import'
 source:
   plugin: csv
-  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/page.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/news.csv
   header_row_count: 1
   keys:
     - uuid
@@ -24,41 +24,37 @@ source:
     -
       title: Title
     -
-      path: Path
-    -
       published: Published
     -
-      drupal_version: 'Drupal version'
+      author: Author
     -
-      attachments: Attachments
+      banner: Banner
+    -
+      news_type: 'News type'
     -
       body_value: Body
     -
       body_format: 'Body format'
     -
       paragraphs: Paragraphs
+    -
+      creation_date: 'Creation date'
 process:
   type:
     plugin: default_value
-    default_value: page
+    default_value: news
   uuid: uuid
   title: title
-  field_drupal_version:
-    -
-      plugin: explode
-      source: drupal_version
-      delimiter: ;
+  field_news_type:
     -
       plugin: migration
-      migration: drupalfr_drupal_version
-  field_attachment:
-    -
-      plugin: explode
-      source: attachments
-      delimiter: ;
-    -
-      plugin: migration
-      migration: drupalfr_file
+      migration: drupalfr_news_type
+      source: news_type
+  field_media_banner:
+      -
+        plugin: migration
+        migration: drupalfr_media
+        source: banner
   body/value: body_value
   body/format: body_format
   field_paragraph:
@@ -75,15 +71,16 @@ process:
       process:
         target_id: '0'
         target_revision_id: '1'
-  path:
-    -
-      plugin: skip_on_empty
-      method: process
-      source: path
+  created:
+    plugin: callback
+    callable: strtotime
+    source: creation_date
   status: published
   uid:
-    plugin: default_value
-    default_value: 1
+    -
+      plugin: migration
+      migration: drupalfr_user
+      source: author
 destination:
   plugin: 'entity:node'
 template: null

@@ -6,12 +6,13 @@
  *
  * Place your custom PHP code in this file.
  */
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Implements hook_preprocess_paragraph().
  */
 function drupalfr_theme_preprocess_paragraph(&$variables) {
-  /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+  /** @var \Drupal\paragraphs\ParagraphInterface $paragraph */
   $paragraph = $variables['paragraph'];
   if ($paragraph->bundle() == 'title_text_media') {
     $variables['media_position'] = 'right';
@@ -61,4 +62,26 @@ function drupalfr_theme_preprocess_paragraph(&$variables) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function drupalfr_theme_preprocess_node(&$variables) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+
+  // Add the formatted date to all nodes.
+  /** @var Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+  $date_formatter = \Drupal::service('date.formatter');
+  $creation_time = $node->getCreatedTime();
+  $formatted_date = $date_formatter->format($creation_time, 'custom', '<\s\p\a\n \c\l\a\s\s="\d\a\t\e">d<\b\r>M</\s\p\a\n><\s\p\a\n \c\l\a\s\s="\t\i\m\e">H\hi</\s\p\a\n>');
+  $variables['square_publication_date'] = new FormattableMarkup($formatted_date, []);
+}
+
+/**
+ * Implements hook_theme_suggestions_user_alter().
+ */
+function drupalfr_theme_theme_suggestions_user_alter(&$suggestions, $variables) {
+  $suggestions[] = 'user__' . $variables['elements']['#view_mode'];
 }

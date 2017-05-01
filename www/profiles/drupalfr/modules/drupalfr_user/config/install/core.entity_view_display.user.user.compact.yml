@@ -12,13 +12,32 @@ dependencies:
     - field.field.user.user.field_user_realname
     - field.field.user.user.field_user_social_link
     - field.field.user.user.user_picture
+    - image.style.square_40
   module:
+    - image
     - user
 id: user.user.compact
 targetEntityType: user
 bundle: user
 mode: compact
-content: {  }
+content:
+  field_user_realname:
+    type: string
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  user_picture:
+    type: image
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: square_40
+      image_link: content
+    third_party_settings: {  }
 hidden:
   field_user_biography: true
   field_user_company: true
@@ -26,8 +45,6 @@ hidden:
   field_user_membership_number: true
   field_user_newsletter_adff: true
   field_user_newsletter_drupalcamp: true
-  field_user_realname: true
   field_user_social_link: true
   langcode: true
   member_for: true
-  user_picture: true
