@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9437f97140b257f0b10d0ca4a5dfb07e",
+    "content-hash": "fa34e61b95d3395da1850888d3e8b507",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -2204,7 +2204,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/feeds",
-                "reference": "6142dccd0ed9b52eeaacaa0e6f82287dc2291bac"
+                "reference": "907a986bb3d48126c7fb52b2facc5e2a70acc886"
             },
             "require": {
                 "drupal/core": "~8.0"
@@ -2216,7 +2216,7 @@
                 },
                 "drupal": {
                     "version": "8.x-3.x-dev",
-                    "datestamp": "1493237943"
+                    "datestamp": "1493544543"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -2290,7 +2290,7 @@
                 "source": "http://cgit.drupalcode.org/feeds",
                 "issues": "https://www.drupal.org/project/issues/feeds"
             },
-            "time": "2017-04-26 20:22:12"
+            "time": "2017-04-30 10:51:18"
         },
         {
             "name": "drupal/field_group",
@@ -3396,17 +3396,17 @@
         },
         {
             "name": "drupal/pathauto",
-            "version": "1.0.0-rc1",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/pathauto",
-                "reference": "8.x-1.0-rc1"
+                "reference": "8.x-1.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/pathauto-8.x-1.0-rc1.zip",
-                "reference": "8.x-1.0-rc1",
-                "shasum": "2460339ac8739317b3c4e66e9ce7142cc02adac3"
+                "url": "https://ftp.drupal.org/files/projects/pathauto-8.x-1.0.zip",
+                "reference": "8.x-1.0",
+                "shasum": "4c82a5689a18421c8c73fcc8be7b333bb21ae02a"
             },
             "require": {
                 "drupal/core": "*",
@@ -3419,8 +3419,8 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-rc1",
-                    "datestamp": "1485702484"
+                    "version": "8.x-1.0",
+                    "datestamp": "1493468044"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -3798,18 +3798,116 @@
             }
         },
         {
-            "name": "drupal/token",
-            "version": "1.0.0-rc1",
+            "name": "drupal/slick",
+            "version": "1.0.0-rc3",
             "source": {
                 "type": "git",
-                "url": "https://git.drupal.org/project/token",
-                "reference": "8.x-1.0-rc1"
+                "url": "https://git.drupal.org/project/slick",
+                "reference": "8.x-1.0-rc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/token-8.x-1.0-rc1.zip",
-                "reference": "8.x-1.0-rc1",
-                "shasum": "204b2f18a3d770589d66656aa83121d2156d0a31"
+                "url": "https://ftp.drupal.org/files/projects/slick-8.x-1.0-rc3.zip",
+                "reference": "8.x-1.0-rc3",
+                "shasum": "e47be5189e3d03e2824a6ecfd41f14c45eea9a55"
+            },
+            "require": {
+                "drupal/blazy": "~1.0",
+                "drupal/core": "~8.0"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-1.0-rc3",
+                    "datestamp": "1490295783"
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "arshadcn",
+                    "homepage": "https://www.drupal.org/user/571032"
+                },
+                {
+                    "name": "gausarts",
+                    "homepage": "https://www.drupal.org/user/159062"
+                }
+            ],
+            "description": "Slick carousel, the last carousel you'll ever need.",
+            "homepage": "https://drupal.org/project/slick",
+            "keywords": [
+                "Drupal",
+                "carousel",
+                "slideshow"
+            ],
+            "support": {
+                "source": "http://cgit.drupalcode.org/slick",
+                "issues": "https://drupal.org/project/issues/slick"
+            }
+        },
+        {
+            "name": "drupal/slick_views",
+            "version": "1.0.0-rc2",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/slick_views",
+                "reference": "8.x-1.0-rc2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/slick_views-8.x-1.0-rc2.zip",
+                "reference": null,
+                "shasum": "13a1394dece68c76bf53502bd1e892e491885264"
+            },
+            "require": {
+                "drupal/core": "*",
+                "drupal/slick": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-1.0-rc2",
+                    "datestamp": "1486728183"
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "gausarts",
+                    "homepage": "https://www.drupal.org/user/159062"
+                }
+            ],
+            "description": "Provides Slick carousel integration with Views.",
+            "homepage": "https://www.drupal.org/project/slick_views",
+            "support": {
+                "source": "http://cgit.drupalcode.org/slick_views"
+            }
+        },
+        {
+            "name": "drupal/token",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/token",
+                "reference": "8.x-1.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/token-8.x-1.0.zip",
+                "reference": "8.x-1.0",
+                "shasum": "d24c7f1ffddbd0fc56bc92bacae1c4ff769a4442"
             },
             "require": {
                 "drupal/core": "~8.0"
@@ -3820,8 +3918,8 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-rc1",
-                    "datestamp": "1483290542"
+                    "version": "8.x-1.0",
+                    "datestamp": "1493466843"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -3857,8 +3955,7 @@
             "description": "Provides a user interface for the Token API and some missing core tokens.",
             "homepage": "https://www.drupal.org/project/token",
             "support": {
-                "source": "http://cgit.drupalcode.org/token",
-                "issues": "https://www.drupal.org/project/issues/token"
+                "source": "http://cgit.drupalcode.org/token"
             }
         },
         {
@@ -4027,7 +4124,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/webform-8.x-5.0-beta12.zip",
-                "reference": null,
+                "reference": "8.x-5.0-beta12",
                 "shasum": "5fdaf9cba10c146937f86f85f868008ef1799a94"
             },
             "require": {
@@ -4318,6 +4415,17 @@
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/enyo/dropzone/archive/v4.3.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "drupal-library"
+        },
+        {
+            "name": "gdsmith/easing",
+            "version": "1.4.1",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/gdsmith/jquery.easing/archive/1.4.1.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -4629,6 +4737,28 @@
                 }
             ],
             "time": "2015-04-20T18:58:01+00:00"
+        },
+        {
+            "name": "jquery/mousewheel",
+            "version": "3.1.13",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/jquery/jquery-mousewheel/archive/3.1.13.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "drupal-library"
+        },
+        {
+            "name": "kenwheeler/slick",
+            "version": "1.6.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/kenwheeler/slick/archive/1.6.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "drupal-library"
         },
         {
             "name": "leaflet/leaflet",
@@ -9304,16 +9434,16 @@
         },
         {
             "name": "gabordemooij/redbean",
-            "version": "v4.3.3",
+            "version": "v4.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gabordemooij/redbean.git",
-                "reference": "1c7ec69850e9f7966ff7feb87b01d8f43a9753d3"
+                "reference": "d0944d7f966d7f45a0d973981fe3f64aff0050f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gabordemooij/redbean/zipball/1c7ec69850e9f7966ff7feb87b01d8f43a9753d3",
-                "reference": "1c7ec69850e9f7966ff7feb87b01d8f43a9753d3",
+                "url": "https://api.github.com/repos/gabordemooij/redbean/zipball/d0944d7f966d7f45a0d973981fe3f64aff0050f0",
+                "reference": "d0944d7f966d7f45a0d973981fe3f64aff0050f0",
                 "shasum": ""
             },
             "require": {
@@ -9341,7 +9471,7 @@
             "keywords": [
                 "orm"
             ],
-            "time": "2016-10-03T21:25:17+00:00"
+            "time": "2017-03-07T22:26:54+00:00"
         },
         {
             "name": "instaclick/php-webdriver",
