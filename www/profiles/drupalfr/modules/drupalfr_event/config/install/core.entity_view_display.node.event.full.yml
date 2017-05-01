@@ -2,6 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.full
     - field.field.node.event.body
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
@@ -18,21 +19,21 @@ dependencies:
     - link
     - text
     - user
-id: node.event.default
+id: node.event.full
 targetEntityType: node
 bundle: event
-mode: default
+mode: full
 content:
   body:
     label: hidden
     type: text_default
-    weight: 101
+    weight: 5
     settings: {  }
     third_party_settings: {  }
     region: content
   field_event_date_end:
-    weight: 106
-    label: above
+    weight: 2
+    label: hidden
     settings:
       format_type: medium
       timezone_override: ''
@@ -40,25 +41,26 @@ content:
     type: datetime_default
     region: content
   field_event_date_start:
-    weight: 105
-    label: above
+    weight: 1
+    label: hidden
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
     type: datetime_default
     region: content
   field_event_organizer:
-    weight: 103
+    weight: 7
     label: above
     settings:
-      link: true
+      view_mode: teaser
+      link: false
     third_party_settings: {  }
-    type: entity_reference_label
+    type: entity_reference_entity_view
     region: content
   field_event_place:
-    weight: 108
-    label: above
+    weight: 4
+    label: hidden
     settings:
       leaflet_map: 'OSM Mapnik'
       zoom: '10'
@@ -87,16 +89,17 @@ content:
     type: leaflet_formatter_default
     region: content
   field_event_sponsor:
-    weight: 102
+    weight: 6
     label: above
     settings:
-      link: true
+      view_mode: teaser
+      link: false
     third_party_settings: {  }
-    type: entity_reference_label
+    type: entity_reference_entity_view
     region: content
   field_event_website:
-    weight: 107
-    label: above
+    weight: 3
+    label: hidden
     settings:
       trim_length: 80
       url_only: false
@@ -107,25 +110,15 @@ content:
     type: link
     region: content
   field_media_banner:
-    weight: 110
-    label: above
+    weight: 0
+    label: hidden
     settings:
       link: true
+      view_mode: default
     third_party_settings: {  }
-    type: entity_reference_label
+    type: entity_reference_entity_view
     region: content
-  field_media_teaser:
-    weight: 111
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  links:
-    weight: 100
-    region: content
-    settings: {  }
-    third_party_settings: {  }
 hidden:
+  field_media_teaser: true
   langcode: true
+  links: true

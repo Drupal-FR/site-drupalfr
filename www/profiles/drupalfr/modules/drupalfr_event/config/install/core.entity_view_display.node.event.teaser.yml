@@ -6,39 +6,54 @@ dependencies:
     - field.field.node.event.body
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
-    - field.field.node.event.field_event_image
     - field.field.node.event.field_event_organizer
     - field.field.node.event.field_event_place
     - field.field.node.event.field_event_sponsor
     - field.field.node.event.field_event_website
+    - field.field.node.event.field_media_banner
+    - field.field.node.event.field_media_teaser
     - node.type.event
   module:
-    - text
+    - datetime
     - user
 id: node.event.teaser
 targetEntityType: node
 bundle: event
 mode: teaser
 content:
-  body:
-    label: hidden
-    type: text_summary_or_trimmed
-    weight: 101
+  field_event_date_end:
+    type: datetime_default
+    weight: 2
+    region: content
+    label: inline
     settings:
-      trim_length: 600
+      timezone_override: ''
+      format_type: jour_mois_annee
     third_party_settings: {  }
+  field_event_date_start:
+    type: datetime_default
+    weight: 1
     region: content
-  links:
-    weight: 100
-    settings: {  }
+    label: inline
+    settings:
+      timezone_override: ''
+      format_type: jour_mois_annee
     third_party_settings: {  }
+  field_media_teaser:
+    type: entity_reference_entity_view
+    weight: 0
     region: content
+    label: hidden
+    settings:
+      link: true
+      view_mode: default
+    third_party_settings: {  }
 hidden:
-  field_event_date_end: true
-  field_event_date_start: true
-  field_event_image: true
+  body: true
   field_event_organizer: true
   field_event_place: true
   field_event_sponsor: true
   field_event_website: true
+  field_media_banner: true
   langcode: true
+  links: true

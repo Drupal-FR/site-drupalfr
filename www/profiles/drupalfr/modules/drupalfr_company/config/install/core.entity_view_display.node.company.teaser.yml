@@ -11,32 +11,32 @@ dependencies:
     - field.field.node.company.field_company_size
     - field.field.node.company.field_company_website
     - field.field.node.company.field_region
+    - image.style.square_230
     - node.type.company
   module:
-    - text
+    - image
     - user
 id: node.company.teaser
 targetEntityType: node
 bundle: company
 mode: teaser
 content:
-  body:
+  field_company_logo:
+    type: image
+    weight: 0
+    region: content
     label: hidden
-    type: text_summary_or_trimmed
-    weight: 101
     settings:
-      trim_length: 600
+      image_style: square_230
+      image_link: content
     third_party_settings: {  }
-    region: content
-  links:
-    weight: 100
-    region: content
 hidden:
+  body: true
   field_company_contact_info: true
   field_company_legal_form: true
-  field_company_logo: true
   field_company_service_type: true
   field_company_size: true
   field_company_website: true
   field_region: true
   langcode: true
+  links: true

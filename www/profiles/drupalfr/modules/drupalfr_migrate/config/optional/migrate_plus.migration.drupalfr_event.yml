@@ -40,7 +40,9 @@ source:
     -
       place: Place
     -
-      images: Images
+      media_banner: 'Media banner'
+    -
+      media_teaser: 'Media teaser'
     -
       body_value: Body
     -
@@ -69,14 +71,16 @@ process:
     -
       plugin: migration
       migration: drupalfr_user
-  field_event_image:
-    -
-      plugin: explode
-      source: images
-      delimiter: ;
+  field_media_banner:
     -
       plugin: migration
-      migration: drupalfr_file
+      migration: drupalfr_media
+      source: media_banner
+  field_media_teaser:
+    -
+      plugin: migration
+      migration: drupalfr_media
+      source: media_teaser
   field_event_date_start: start_date
   field_event_date_end: end_date
   field_event_website/uri: website_uri
