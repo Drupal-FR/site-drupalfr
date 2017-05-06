@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_meetup module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_meetup_theme($existing, $type, $theme, $path) {
+  return [
+    'drupalfr_meetup_events' => [
+      'variables' => [
+        'events' => [],
+      ],
+    ],
+  ];
+}

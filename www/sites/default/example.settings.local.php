@@ -34,7 +34,7 @@ $config['drupalfr_social.twitter']['access_token_secret'] = '';
 
 // Meetup.
 $config['drupalfr_meetup.settings']['api_key'] = '';
-$config['drupalfr_meetup.settings']['group_url_name'] = '';
+$config['drupalfr_meetup.settings']['group_urlname'] = '';
 
 // Mailchimp.
 $config['mailchimp.settings']['api_key'] = '';

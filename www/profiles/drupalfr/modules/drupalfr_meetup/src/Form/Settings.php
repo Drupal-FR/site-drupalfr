@@ -46,11 +46,11 @@ class Settings extends ConfigFormBase {
       '#size' => 64,
       '#default_value' => $settings->get('api_key'),
     ];
-    $form['meetup']['group_url_name'] = [
+    $form['meetup']['group_urlname'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Group URL name'),
       '#size' => 64,
-      '#default_value' => $settings->get('group_url_name'),
+      '#default_value' => $settings->get('group_urlname'),
     ];
 
     return parent::buildForm($form, $form_state);
@@ -71,7 +71,7 @@ class Settings extends ConfigFormBase {
 
     $this->config('drupalfr_meetup.settings')
       ->set('api_key', $form_state->getValue('api_key'))
-      ->set('group_url_name', $form_state->getValue('group_url_name'))
+      ->set('group_urlname', $form_state->getValue('group_urlname'))
       ->save();
   }
 
