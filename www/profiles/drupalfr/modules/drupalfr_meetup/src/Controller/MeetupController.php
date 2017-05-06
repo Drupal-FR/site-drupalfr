@@ -3,15 +3,44 @@
 namespace Drupal\drupalfr_meetup\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use MeetupEvents;
-use MeetupKeyAuthConnection;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\drupalfr_meetup\Service\MeetupHelperInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class MeetupController.
  *
  * @package Drupal\drupalfr_meetup\Controller
  */
-class MeetupController extends ControllerBase {
+class MeetupController extends ControllerBase implements ContainerInjectionInterface {
+
+  /**
+   * A meetup helper service.
+   *
+   * @var \Drupal\drupalfr_meetup\Service\MeetupHelperInterface
+   */
+  protected $meetupHelper;
+
+  /**
+   * Construct.
+   *
+   * @param \Drupal\drupalfr_meetup\Service\MeetupHelperInterface $meetup_helper
+   *   A twitter service.
+   */
+  public function __construct(
+    MeetupHelperInterface $meetup_helper
+  ) {
+    $this->meetupHelper = $meetup_helper;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('drupalfr_meetup.meetup_helper')
+    );
+  }
 
   /**
    * Index.
@@ -20,25 +49,24 @@ class MeetupController extends ControllerBase {
    *   Return renderable array.
    */
   public function index() {
-    $settings = $this->config('drupalfr_meetup.settings');
+    $page = [
+      '#theme' => 'drupalfr_meetup_page',
+      '#title' => $this->t('Drupal Meetups'),
+      '#cache' => [
+        // 15 minutes.
+        'max-age' => '900',
+      ],
+    ];
 
-    $connection = new MeetupKeyAuthConnection($settings->get('api_key'));
-    $meetup_events = new MeetupEvents($connection);
-    $events = $meetup_events->getEvents([
-      'group_urlname' => $settings->get('group_urlname'),
-      'status' => 'upcoming',
-    ]);
-
-    $page = [];
+    $events = $this->meetupHelper->getEvents();
     if (!empty($events)) {
-      $page['events'] = [
+      $page['#events_list'] = [
         '#theme' => 'drupalfr_meetup_events',
         '#events' => $events,
-        '#cache' => [
-          // 15 minutes.
-          'max-age' => '900',
-        ],
       ];
+
+      $map = leaflet_map_get_info('OSM Mapnik');
+      $page['#map'] = leaflet_render_map($map, $this->meetupHelper->prepareLeafletFeatures($events), '600px');
     }
 
     return $page;
