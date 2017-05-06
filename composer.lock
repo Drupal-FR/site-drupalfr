@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f334b6f5f6da2dfeb5b4b7080bf2f20",
+    "content-hash": "b33cf466d56eda1e6f60fb16df2348da",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -111,6 +111,43 @@
                 "stack"
             ],
             "time": "2017-04-11T20:03:41+00:00"
+        },
+        {
+            "name": "blobaugh/meetup-api-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/blobaugh/Meetup-API-client-for-PHP.git",
+                "reference": "760113eb6548d160a5148f5ca4210e2c30bdd00c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/blobaugh/Meetup-API-client-for-PHP/zipball/760113eb6548d160a5148f5ca4210e2c30bdd00c",
+                "reference": "760113eb6548d160a5148f5ca4210e2c30bdd00c",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "."
+                ],
+                "files": [
+                    "Meetup.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Ben Lobaugh",
+                    "email": "ben@lobaugh.net"
+                }
+            ],
+            "description": "A PHP API wrapper for the Meetup.com API",
+            "keywords": [
+                "api",
+                "meetup"
+            ],
+            "time": "2012-12-10 15:43:05"
         },
         {
             "name": "composer/installers",
@@ -2085,7 +2122,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/eva-8.x-1.2-rc1.zip",
-                "reference": null,
+                "reference": "8.x-1.2-rc1",
                 "shasum": "dadd7399262133fc4edc3903e5904d74de0aaecc"
             },
             "require": {
@@ -11046,6 +11083,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "blobaugh/meetup-api-client": 20,
         "drupal/context": 20,
         "behat/mink": 20
     },
