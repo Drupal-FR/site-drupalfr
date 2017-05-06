@@ -120,11 +120,182 @@
           "type": "zip"
         }
       }
+    },
+    "ckeditor": {
+      "type": "package",
+      "package": {
+        "name": "ckeditor/ckeditor",
+        "version": "4.6.2",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.6.2/ckeditor_4.6.2_standard.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "ckeditor_autogrow": {
+      "type": "package",
+      "package": {
+        "name": "ckeditor/ckeditor_autogrow",
+        "version": "4.6.2",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://cdn.rawgit.com/ckeditor/ckeditor-dev/4.6.2/plugins/autogrow/plugin.js",
+          "type": "file"
+        }
+      }
+    },
+    "code_mirror": {
+      "type": "package",
+      "package": {
+        "name": "components/codemirror",
+        "version": "5.24.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/components/codemirror/archive/5.21.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_geocomplete": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.geocomplete",
+        "version": "1.7.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/ubilabs/geocomplete/archive/1.7.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_icheck": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.icheck",
+        "version": "1.0.2",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/fronteed/icheck/archive/1.0.2.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_image_picker": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.image-picker",
+        "version": "0.3.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/rvera/image-picker/archive/0.3.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_input_mask": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.inputmask",
+        "version": "3.3.3",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/RobinHerbots/jquery.inputmask/archive/3.3.3.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_intl_tel_input": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.intl-tel-input",
+        "version": "v11.0.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/jackocnr/intl-tel-input/archive/v11.0.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_rateit": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.rateit",
+        "version": "1.1.1",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/gjunge/rateit.js/archive/1.1.1.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_select2": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.select2",
+        "version": "4.0.3",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/select2/select2/archive/4.0.3.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_timepicker": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.timepicker",
+        "version": "1.11.10",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/jonthornton/jquery-timepicker/archive/1.11.10.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_toggles": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.toggles",
+        "version": "v4.0.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/simontabor/jquery-toggles/archive/v4.0.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery_wacc": {
+      "type": "package",
+      "package": {
+        "name": "jquery/jquery.word-and-character-counter",
+        "version": "2.3.5",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/qwertypants/jQuery-Word-and-Character-Counter-Plugin/archive/2.3.5.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "signature_pad": {
+      "type": "package",
+      "package": {
+        "name": "szimek/signature_pad",
+        "version": "1.5.3",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/szimek/signature_pad/archive/v1.5.3.zip",
+          "type": "zip"
+        }
+      }
     }
   },
   "require": {
     "abraham/twitteroauth": "0.7.2",
     "blobaugh/meetup-api-client": "dev-master#760113eb6548d160a5148f5ca4210e2c30bdd00c",
+    "ckeditor/ckeditor": "4.6.2",
+    "ckeditor/ckeditor_autogrow": "4.6.2",
+    "components/codemirror": "5.24.0",
     "composer/installers": "^1.0.21",
     "cweagans/composer-patches": "~1.0",
     "dinbror/blazy": "1.8.*",
@@ -177,8 +348,19 @@
     "drush/drush": "8.1.11",
     "enyo/dropzone": "4.3.*",
     "gdsmith/easing": "1.4.*",
+    "jquery/jquery.geocomplete": "1.7.0",
+    "jquery/jquery.icheck": "1.0.2",
+    "jquery/jquery.image-picker": "0.3.0",
+    "jquery/jquery.inputmask": "3.3.3",
+    "jquery/jquery.intl-tel-input": "11.0.0",
+    "jquery/jquery.rateit": "1.1.1",
+    "jquery/jquery.select2": "4.0.3",
+    "jquery/jquery.timepicker": "1.11.10",
+    "jquery/jquery.toggles": "4.0.0",
+    "jquery/jquery.word-and-character-counter": "2.3.5",
     "jquery/mousewheel": "3.1.*",
-    "kenwheeler/slick": "1.6.0"
+    "kenwheeler/slick": "1.6.0",
+    "szimek/signature_pad": "1.5.3"
   },
   "require-dev": {
     "behat/mink": "1.7.x-dev",
