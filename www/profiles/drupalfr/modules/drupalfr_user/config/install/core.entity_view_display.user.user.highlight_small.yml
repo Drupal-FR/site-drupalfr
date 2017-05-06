@@ -1,0 +1,52 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.user.highlight_small
+    - field.field.user.user.field_user_biography
+    - field.field.user.user.field_user_company
+    - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_local_group
+    - field.field.user.user.field_user_membership_number
+    - field.field.user.user.field_user_newsletter_adff
+    - field.field.user.user.field_user_newsletter_drupalcamp
+    - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_social_link
+    - field.field.user.user.user_picture
+    - image.style.square_65
+  module:
+    - image
+    - user
+id: user.user.highlight_small
+targetEntityType: user
+bundle: user
+mode: highlight_small
+content:
+  field_user_realname:
+    weight: 1
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  user_picture:
+    type: image
+    weight: 0
+    settings:
+      image_style: square_65
+      image_link: content
+    third_party_settings: {  }
+    label: hidden
+    region: content
+hidden:
+  field_user_biography: true
+  field_user_company: true
+  field_user_event: true
+  field_user_local_group: true
+  field_user_membership_number: true
+  field_user_newsletter_adff: true
+  field_user_newsletter_drupalcamp: true
+  field_user_social_link: true
+  langcode: true
+  member_for: true

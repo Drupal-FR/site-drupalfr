@@ -4,15 +4,17 @@ dependencies:
   config:
     - field.storage.node.field_media_teaser
     - media_entity.bundle.image
-    - node.type.event
-id: node.event.field_media_teaser
+    - node.type.local_group
+  content:
+    - 'media:image:media_image_1'
+id: node.local_group.field_media_teaser
 field_name: field_media_teaser
 entity_type: node
-bundle: event
+bundle: local_group
 label: 'Image d''accroche'
 description: ''
 required: false
-translatable: false
+translatable: true
 default_value:
   -
     target_uuid: media_image_1

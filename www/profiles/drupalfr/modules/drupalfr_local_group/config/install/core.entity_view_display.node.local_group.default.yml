@@ -5,6 +5,8 @@ dependencies:
     - field.field.node.local_group.body
     - field.field.node.local_group.field_local_group_organizer
     - field.field.node.local_group.field_local_group_place
+    - field.field.node.local_group.field_media_banner
+    - field.field.node.local_group.field_media_teaser
     - node.type.local_group
   module:
     - leaflet
@@ -18,20 +20,20 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 101
+    weight: 1
     settings: {  }
     third_party_settings: {  }
     region: content
   field_local_group_organizer:
-    weight: 102
-    label: above
+    weight: 2
+    label: hidden
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
     region: content
   field_local_group_place:
-    weight: 103
+    weight: 3
     label: above
     settings:
       leaflet_map: 'OSM Mapnik'
@@ -60,10 +62,28 @@ content:
     third_party_settings: {  }
     type: leaflet_formatter_default
     region: content
+  field_media_banner:
+    weight: 4
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_media_teaser:
+    weight: 5
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   links:
-    weight: 100
+    weight: 0
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
 hidden:
   langcode: true
+  local_group_entity_view_1: true
+  local_group_member_entity_view_1: true

@@ -2,7 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.full
     - field.field.node.local_group.body
     - field.field.node.local_group.field_local_group_organizer
     - field.field.node.local_group.field_local_group_place
@@ -12,33 +12,48 @@ dependencies:
   module:
     - text
     - user
-id: node.local_group.teaser
+id: node.local_group.full
 targetEntityType: node
 bundle: local_group
-mode: teaser
+mode: full
 content:
   body:
     label: hidden
-    type: text_summary_or_trimmed
+    type: text_default
     weight: 1
-    settings:
-      trim_length: 600
+    settings: {  }
     third_party_settings: {  }
     region: content
-  field_media_teaser:
-    type: entity_reference_entity_view
-    weight: 0
-    region: content
-    label: hidden
+  field_local_group_organizer:
+    weight: 3
+    label: above
     settings:
-      view_mode: default
+      view_mode: highlight
       link: false
     third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  field_media_banner:
+    weight: 0
+    label: hidden
+    settings:
+      link: true
+      view_mode: default
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  local_group_entity_view_1:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  local_group_member_entity_view_1:
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden:
-  field_local_group_organizer: true
   field_local_group_place: true
-  field_media_banner: true
+  field_media_teaser: true
   langcode: true
   links: true
-  local_group_entity_view_1: true
-  local_group_member_entity_view_1: true
