@@ -30,6 +30,10 @@ source:
     -
       places: Places
     -
+      media_banner: 'Media banner'
+    -
+      media_teaser: 'Media teaser'
+    -
       body_value: Body
     -
       body_format: 'Body format'
@@ -54,6 +58,16 @@ process:
       plugin: drupalfr_multigeofields
       source: places
       delimiter: ;
+  field_media_banner:
+    -
+      plugin: migration
+      migration: drupalfr_media
+      source: media_banner
+  field_media_teaser:
+    -
+      plugin: migration
+      migration: drupalfr_media
+      source: media_teaser
   status: published
   uid:
     plugin: default_value

@@ -42,6 +42,8 @@ source:
     -
       events: Events
     -
+      groups: Groups
+    -
       biography: Biography
 process:
   uuid: uuid
@@ -83,6 +85,15 @@ process:
     -
       plugin: migration
       migration: drupalfr_event
+      no_stub: true
+  field_user_local_group:
+    -
+      plugin: explode
+      source: groups
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_local_group
       no_stub: true
 destination:
   plugin: 'entity:user'
