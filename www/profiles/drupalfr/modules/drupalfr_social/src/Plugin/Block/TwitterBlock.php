@@ -20,7 +20,7 @@ class TwitterBlock extends BlockBase implements ContainerFactoryPluginInterface 
   /**
    * A twitter service.
    *
-   * @var TwitterServiceInterface
+   * @var \Drupal\drupalfr_social\Service\TwitterServiceInterface
    */
   protected $twitterService;
 

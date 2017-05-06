@@ -54,14 +54,10 @@ class TwitterService implements TwitterServiceInterface {
       $access_token = $twitter->get('access_token');
       $access_token_secret = $twitter->get('access_token_secret');
 
-      $connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
-      $this->connection = $connection;
-    }
-    else {
-      $connection = $this->connection;
+      $this->connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
     }
 
-    return $connection;
+    return $this->connection;
   }
 
   /**
