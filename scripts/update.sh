@@ -7,7 +7,7 @@
 cd $WWW_PATH
 
 # Database backup.
-$DRUSH sql-dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip
+$DRUSH sql-dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip --structure-tables-key=common
 
 # Put the site in maintenance mode.
 $DRUSH state-set system.maintenance_mode 1
