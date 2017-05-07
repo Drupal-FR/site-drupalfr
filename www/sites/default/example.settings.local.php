@@ -16,6 +16,8 @@ $settings['trusted_host_patterns'] = [
   'web',
 ];
 
+$settings['file_private_path'] = '/project/private_files/default';
+
 // Redis.
 $settings['redis.connection']['host'] = 'redis';
 
