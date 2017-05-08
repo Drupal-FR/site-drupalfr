@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\drupalfr_release;
+namespace Drupal\drupalfr_releases;
 
 use SimpleXMLElement;
 use Drupal\node\Entity\Node;
@@ -8,13 +8,13 @@ use Drupal\node\Entity\Node;
 /**
  * Functions for parse the xml, return the last stable release ...
  */
-class Release {
+class Release  {
 
   private $xml_url = '';
   private $xml = NULL;
 
   public function __construct() {
-    $release_config = \Drupal::config('drupalfr_release.flux');
+    $release_config = \Drupal::config('drupalfr_releases.settings');
     $this->xml_url = $release_config->get('xml_address');
   }
 
@@ -26,8 +26,8 @@ class Release {
 
     $query->condition('status', 1)
       ->condition('type', 'drupal_release')
-      ->condition('field_release_version_extra', '','=')
-      ->range(0,1)
+      ->condition('field_release_version_extra', '', '=')
+      ->range(0, 1)
       ->sort('created', 'DESC');
 
     return $query->execute();
@@ -44,11 +44,11 @@ class Release {
       'title' => t('Importing'),
       'operations' => [
         [
-          '\Drupal\drupalfr_release\Release::importFeed',
+          '\Drupal\drupalfr_releases\Release::importFeed',
           [$this, 5]
         ],
       ],
-      'file' => drupal_get_path('module', 'drupalfr_release')
+      'file' => drupal_get_path('module', 'drupalfr_releases')
         . '/src/Release.php'
     ];
 
@@ -78,7 +78,7 @@ class Release {
 
   /**
    * Function for import drupal release
-   * @param \Drupal\drupalfr_release\Release $Release
+   * @param \Drupal\drupalfr_releases\Release $Release
    * @param $context
    */
   public static function importFeed(Release $Release, $nb, &$context) {
@@ -110,7 +110,7 @@ class Release {
       // Set values of fields
       $node->set('title', $release->name);
       $node->set('status', TRUE);
-      $node->set('created',$release->date);
+      $node->set('created', $release->date);
       $node->set('field_release_version_major', $release->version_major);
       $node->set('field_release_version_minor', $release->version_minor);
       $node->set('field_release_version_patch', $release->version_patch);
@@ -120,7 +120,7 @@ class Release {
       $node->set('field_release_file_zip', $release->files->file[1]->url);
       $node->save();
 
-      \Drupal::logger('drupalfr_release_import')
+      \Drupal::logger('drupalfr_releases_import')
         ->notice('Release (' . $release->name . ') was imported/updated');
     }
 

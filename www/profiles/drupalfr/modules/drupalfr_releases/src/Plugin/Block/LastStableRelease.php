@@ -1,9 +1,8 @@
 <?php
 
-namespace Drupal\drupalfr_release\Plugin\Block;
+namespace Drupal\drupalfr_releases\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\drupalfr_release\Release;
 
 /**
  * Provides a 'LastStableRelease' Block.
@@ -20,7 +19,7 @@ class LastStableRelease extends BlockBase {
    */
   public function build() {
     return [
-      '#theme' => 'drupalfr_release_last_stable',
+      '#theme' => 'drupalfr_releases_last_stable',
     ];
   }
 

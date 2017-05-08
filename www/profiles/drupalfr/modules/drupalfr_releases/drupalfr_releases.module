@@ -1,0 +1,57 @@
+<?php
+
+use  Drupal\drupalfr_releases\Release;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_cron()
+ */
+function drupalfr_releases_cron() {
+  $release = new \Drupal\drupalfr_releases\Release();
+  $release->importWithCron();
+}
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_releases_theme($existing, $type, $theme, $path) {
+  return [
+    'drupalfr_releases_last_stable' => [
+      'variables' => [],
+      'template' => 'last-stable-release'
+    ]
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function drupalfr_releases_preprocess_drupalfr_releases_last_stable(&$variables) {
+  // Preprocess of drupalfr_releases_last_stable theme
+
+  // Load the last stable release and extract informations and set it in twig
+  $release = new Release();
+  $last_release = $release->getLastPublished();
+
+  if (empty($last_release)) {
+    return;
+  }
+
+  $release_node = Node::load(reset($last_release));
+
+  $variables['link_release'] = $release_node->get('field_release_link')
+    ->first()
+    ->uri;
+
+  $variables['version_release'] = implode('.', [
+    $release_node->get('field_release_version_major')
+      ->first()
+      ->value,
+    $release_node->get('field_release_version_minor')
+      ->first()
+      ->value,
+    $release_node->get('field_release_version_patch')
+      ->first()
+      ->value
+  ]);
+}

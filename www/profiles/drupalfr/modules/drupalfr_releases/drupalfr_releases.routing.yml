@@ -1,15 +1,15 @@
-drupalfr_release.last_release:
+drupalfr_releases.last_release:
   path: '/drupal-last-release'
   defaults:
-    _controller: '\Drupal\drupalfr_release\Controller\ReleaseController::getLast'
+    _controller: '\Drupal\drupalfr_releases\Controller\ReleaseController::getLast'
     _title: 'Drupal last release'
   requirements:
     _permission: 'access content'
 
-drupalfr_release.settings:
+drupalfr_releases.settings:
   path: '/admin/config/drupalfr/release-settings'
   defaults:
-    _form: '\Drupal\drupalfr_release\Form\Settings'
+    _form: '\Drupal\drupalfr_releases\Form\Settings'
     _title: 'Release'
   requirements:
     _permission: 'access administration pages'
