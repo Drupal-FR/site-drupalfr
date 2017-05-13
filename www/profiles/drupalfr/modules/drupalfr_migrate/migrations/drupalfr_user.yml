@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_user
+label: 'User import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,7 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - user
-id: drupalfr_user
-migration_tags:
-  - drupalfr
-label: 'User import'
+migration_dependencies: {  }
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/user.csv
@@ -45,6 +45,8 @@ source:
       groups: Groups
     -
       biography: Biography
+destination:
+  plugin: 'entity:user'
 process:
   uuid: uuid
   mail: mail
@@ -95,8 +97,3 @@ process:
       plugin: migration
       migration: drupalfr_local_group
       no_stub: true
-destination:
-  plugin: 'entity:user'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

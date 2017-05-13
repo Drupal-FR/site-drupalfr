@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_event
+label: 'Event import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,11 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_event
-migration_tags:
-  - drupalfr
-label: 'Event import'
+migration_dependencies:
+  required:
+    - drupalfr_media
+    - drupalfr_user
+    - drupalfr_company
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/event.csv
@@ -47,6 +51,8 @@ source:
       body_value: Body
     -
       body_format: 'Body format'
+destination:
+  plugin: 'entity:node'
 process:
   type:
     plugin: default_value
@@ -90,8 +96,3 @@ process:
   uid:
     plugin: default_value
     default_value: 1
-destination:
-  plugin: 'entity:node'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

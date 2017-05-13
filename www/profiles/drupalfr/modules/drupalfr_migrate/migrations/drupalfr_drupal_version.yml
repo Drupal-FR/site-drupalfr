@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_drupal_version
+label: 'Drupal version import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,13 +11,10 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - taxonomy
-id: drupalfr_news_type
-migration_tags:
-  - drupalfr
-label: 'News type import'
+migration_dependencies: {  }
 source:
   plugin: csv
-  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/news_type.csv
+  path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/drupal_version.csv
   header_row_count: 1
   keys:
     - uuid
@@ -25,15 +25,12 @@ source:
       name: Name
     -
       weight: Weight
+destination:
+  plugin: 'entity:taxonomy_term'
 process:
   vid:
     plugin: default_value
-    default_value: news_types
+    default_value: drupal_versions
   uuid: uuid
   name: name
   weight: weight
-destination:
-  plugin: 'entity:taxonomy_term'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

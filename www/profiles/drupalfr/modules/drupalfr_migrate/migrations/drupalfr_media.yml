@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_media
+label: 'Media import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,9 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - drupalfr_media
-id: drupalfr_media
-migration_tags:
-  - drupalfr
-label: 'Media import'
+migration_dependencies:
+  required:
+    - drupalfr_file
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/media.csv
@@ -31,6 +33,8 @@ source:
       image: 'Image ID'
     -
       soundcloud_url: 'Soundcloud URL'
+destination:
+  plugin: 'entity:media'
 process:
   uuid: uuid
   bundle: type
@@ -45,8 +49,3 @@ process:
   uid:
     plugin: default_value
     default_value: 1
-destination:
-  plugin: 'entity:media'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

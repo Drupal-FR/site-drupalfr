@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_news
+label: 'News import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,12 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_news
-migration_tags:
-  - drupalfr
-label: 'News import'
+migration_dependencies:
+  required:
+    - drupalfr_media
+    - drupalfr_news_type
+    - drupalfr_paragraph
+    - drupalfr_user
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/news.csv
@@ -39,6 +44,8 @@ source:
       paragraphs: Paragraphs
     -
       creation_date: 'Creation date'
+destination:
+  plugin: 'entity:node'
 process:
   type:
     plugin: default_value
@@ -81,8 +88,3 @@ process:
       plugin: migration
       migration: drupalfr_user
       source: author
-destination:
-  plugin: 'entity:node'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

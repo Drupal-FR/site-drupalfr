@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_feed
+label: 'Feed import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,9 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - feeds
-id: drupalfr_feed
-migration_tags:
-  - drupalfr
-label: 'Feed import'
+migration_dependencies:
+  required:
+    - drupalfr_user
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/feed.csv
@@ -31,6 +33,8 @@ source:
       website_uri: 'Website URL'
     -
       website_title: 'Website title'
+destination:
+  plugin: 'entity:feeds_feed'
 process:
   type:
     plugin: default_value
@@ -48,8 +52,3 @@ process:
       migration: drupalfr_user
   field_feed_website/uri: website_uri
   field_feed_website/title: website_title
-destination:
-  plugin: 'entity:feeds_feed'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

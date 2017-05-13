@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_page
+label: 'Page import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,11 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_page
-migration_tags:
-  - drupalfr
-label: 'Page import'
+migration_dependencies:
+  required:
+    - drupalfr_drupal_version
+    - drupalfr_file
+    - drupalfr_paragraph
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/page.csv
@@ -37,6 +41,8 @@ source:
       body_format: 'Body format'
     -
       paragraphs: Paragraphs
+destination:
+  plugin: 'entity:node'
 process:
   type:
     plugin: default_value
@@ -84,8 +90,3 @@ process:
   uid:
     plugin: default_value
     default_value: 1
-destination:
-  plugin: 'entity:node'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

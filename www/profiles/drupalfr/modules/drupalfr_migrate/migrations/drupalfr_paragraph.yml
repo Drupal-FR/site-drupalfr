@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_paragraph
+label: 'Paragraph import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,10 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - paragraphs
-id: drupalfr_paragraph
-migration_tags:
-  - drupalfr
-label: 'Paragraph import'
+migration_dependencies:
+  required:
+    - drupalfr_user
+    - drupalfr_media
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/paragraph.csv
@@ -55,6 +58,8 @@ source:
       field_sub_title: 'Sub title'
     -
       field_users: 'Users'
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
 process:
   type: type
   field_media:
@@ -88,8 +93,3 @@ process:
     -
       plugin: migration
       migration: drupalfr_user
-destination:
-  plugin: 'entity_reference_revisions:paragraph'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

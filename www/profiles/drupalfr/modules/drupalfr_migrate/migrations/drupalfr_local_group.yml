@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_local_group
+label: 'Local group import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,10 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_local_group
-migration_tags:
-  - drupalfr
-label: 'Local group import'
+migration_dependencies:
+  required:
+    - drupalfr_user
+    - drupalfr_media
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/local_group.csv
@@ -37,6 +40,8 @@ source:
       body_value: Body
     -
       body_format: 'Body format'
+destination:
+  plugin: 'entity:node'
 process:
   type:
     plugin: default_value
@@ -72,8 +77,3 @@ process:
   uid:
     plugin: default_value
     default_value: 1
-destination:
-  plugin: 'entity:node'
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

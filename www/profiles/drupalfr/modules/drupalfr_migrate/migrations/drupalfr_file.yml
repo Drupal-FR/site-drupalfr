@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_file
+label: 'File import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,7 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - node
-id: drupalfr_file
-migration_tags:
-  - drupalfr
-label: 'File import'
+migration_dependencies: {  }
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/file.csv
@@ -31,6 +31,8 @@ source:
       status: Status
     -
       uri: URI
+destination:
+  plugin: entity:file
 process:
   uuid: uuid
   filename: filename
@@ -44,8 +46,3 @@ process:
   uid:
     plugin: default_value
     default_value: 1
-destination:
-  plugin: entity:file
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr

@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_menu_link
+label: 'Menu link import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,9 @@ dependencies:
     - menu_link_content
     - migrate_plus
     - migrate_source_csv
-id: drupalfr_menu_link
-migration_tags:
-  - drupalfr
-label: 'Menu link import'
+migration_dependencies:
+  required:
+    - drupalfr_page
 source:
   plugin: drupalfr_migrate_menu_link_csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/menu_link.csv
@@ -57,6 +59,8 @@ source:
       item_attributes_class: Menu link attribute - class
     -
       item_attributes_style: Menu link attribute - style
+destination:
+  plugin: entity:menu_link_content
 process:
   id: id
   uuid: uuid
@@ -75,10 +79,3 @@ process:
   expanded: expanded
   enabled: enabled
   'link/options': options
-destination:
-  plugin: entity:menu_link_content
-template: null
-migration_dependencies:
-  required:
-    - drupalfr_page
-migration_group: drupalfr

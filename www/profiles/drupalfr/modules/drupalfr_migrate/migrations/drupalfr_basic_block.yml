@@ -1,5 +1,8 @@
-langcode: fr
-status: true
+id: drupalfr_basic_block
+label: 'Default blocks import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
 dependencies:
   enforced:
     module:
@@ -8,10 +11,7 @@ dependencies:
     - block_content
     - migrate_plus
     - migrate_source_csv
-id: drupalfr_basic_block
-migration_tags:
-  - drupalfr
-label: 'Default blocks import'
+migration_dependencies: {  }
 source:
   plugin: csv
   path: profiles/drupalfr/modules/drupalfr_migrate/migrations/data/basic_block.csv
@@ -27,6 +27,9 @@ source:
       body_value: Body
     -
       body_format: 'Body format'
+destination:
+  plugin: 'entity:block_content'
+  no_stub: true
 process:
   id: id
   uuid: uuid
@@ -36,10 +39,3 @@ process:
   info: info
   body/value: body_value
   body/format: body_format
-destination:
-  plugin: 'entity:block_content'
-  type: basic
-  no_stub: true
-template: null
-migration_dependencies: {  }
-migration_group: drupalfr
