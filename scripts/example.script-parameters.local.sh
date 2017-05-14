@@ -6,8 +6,8 @@ ENVIRONMENT_MODE="dev"
 ENVIRONMENT_MODE="prod"
 
 # For Drush site-install.
-ACCOUNT_MAIL=admin@example.com
-ACCOUNT_NAME=admin
-ACCOUNT_PASS=admin
-SITE_MAIL=admin@example.com
+ACCOUNT_MAIL="admin@example.com"
+ACCOUNT_NAME="admin"
+ACCOUNT_PASS="admin"
+SITE_MAIL="admin@example.com"
 SITE_NAME="Drupalfr"
