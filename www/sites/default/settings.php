@@ -20,6 +20,10 @@ $settings['file_scan_ignore_directories'] = [
 
 $settings['container_yamls'][] = __DIR__ . '/services.yml';
 
+// Translations.
+$config['locale.settings']['translation']['path'] = 'translations/contrib';
+$config['locale.settings']['translation']['use_source'] = 'local';
+
 // TODO: Remove this line when it will no more be added when installing with
 // Drush.
 $settings['install_profile'] = 'drupalfr';

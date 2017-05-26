@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2794f783372f1435e15a885f6a9e61ce",
+    "content-hash": "a3aa5926599df2b95ca97ad389f6776b",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -978,6 +978,50 @@
             "time": "2014-09-09T13:34:57+00:00"
         },
         {
+            "name": "drupal-composer/drupal-l10n",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FlorentTorregrosa/drupal-l10n.git",
+                "reference": "1cb1be9ed287e49f7f9a56354c66545b12aca968"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FlorentTorregrosa/drupal-l10n/zipball/1cb1be9ed287e49f7f9a56354c66545b12aca968",
+                "reference": "1cb1be9ed287e49f7f9a56354c66545b12aca968",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0.0",
+                "php": ">=5.4.5"
+            },
+            "require-dev": {
+                "composer/composer": "dev-master",
+                "phpunit/phpunit": "^4.4.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "DrupalComposer\\DrupalL10n\\Plugin",
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DrupalComposer\\DrupalL10n\\": "src/"
+                }
+            },
+            "license": [
+                "GPL-2.0+"
+            ],
+            "description": "Composer Plugin for downloading Drupal translation files",
+            "support": {
+                "source": "https://github.com/FlorentTorregrosa/drupal-l10n/tree/master",
+                "issues": "https://github.com/FlorentTorregrosa/drupal-l10n/issues"
+            },
+            "time": "2017-05-25 16:59:39"
+        },
+        {
             "name": "drupal-composer/drupal-scaffold",
             "version": "2.3.0",
             "source": {
@@ -1089,7 +1133,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/blazy-8.x-1.0-rc2.zip",
-                "reference": null,
+                "reference": "8.x-1.0-rc2",
                 "shasum": "242f3022b039c6fd3b98f6ce1955d295119b4b5a"
             },
             "require": {
@@ -1144,7 +1188,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/bootstrap-8.x-3.5.zip",
-                "reference": null,
+                "reference": "8.x-3.5",
                 "shasum": "569f8a243ad6a2e04a86123a0b2a594783a09860"
             },
             "require": {
@@ -1616,7 +1660,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/dropzonejs-8.x-1.0-alpha7.zip",
-                "reference": null,
+                "reference": "8.x-1.0-alpha7",
                 "shasum": "62fc6d46cee1d5fa9885bab3e65b3638172311f6"
             },
             "require": {
@@ -2158,7 +2202,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/eva-8.x-1.2-rc2.zip",
-                "reference": null,
+                "reference": "8.x-1.2-rc2",
                 "shasum": "7fbfd04feff389226f9a317948af16a4b039ee7c"
             },
             "require": {
@@ -2494,7 +2538,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/flag-8.x-4.0-alpha2.zip",
-                "reference": null,
+                "reference": "8.x-4.0-alpha2",
                 "shasum": "e9ead06aadc9d26364b9ad1225354b0c47d5ce02"
             },
             "require": {
@@ -2649,7 +2693,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/honeypot-8.x-1.25.zip",
-                "reference": null,
+                "reference": "8.x-1.25",
                 "shasum": "9dfe6677c5b4a19e87fae143755949b79168b9d1"
             },
             "require": {
@@ -3318,7 +3362,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/migrate_plus-8.x-4.0-beta1.zip",
-                "reference": null,
+                "reference": "8.x-4.0-beta1",
                 "shasum": "e64bac006e3ef9ae697b0f2c4b3744af0524e208"
             },
             "require": {
@@ -3429,7 +3473,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/migrate_tools-8.x-4.0-beta1.zip",
-                "reference": null,
+                "reference": "8.x-4.0-beta1",
                 "shasum": "81ef335ea37053c26d4bcb4f5339fd77051e59e0"
             },
             "require": {
@@ -3821,7 +3865,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/search_api-8.x-1.1.zip",
-                "reference": null,
+                "reference": "8.x-1.1",
                 "shasum": "896d21a8b0dee0bea6e49fb0b2ac38315f4b52fe"
             },
             "require": {
@@ -3877,7 +3921,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/search_api_solr-8.x-1.0-rc3.zip",
-                "reference": null,
+                "reference": "8.x-1.0-rc3",
                 "shasum": "0b4f7cbe4e5f43cea6399a180e7366b109f68e6b"
             },
             "require": {
@@ -3948,7 +3992,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/slick-8.x-1.0.zip",
-                "reference": null,
+                "reference": "8.x-1.0",
                 "shasum": "14ae69943a07749163ed13900dcd0a6809c54ebd"
             },
             "require": {
@@ -4109,7 +4153,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/varnish_purge-8.x-1.5.zip",
-                "reference": null,
+                "reference": "8.x-1.5",
                 "shasum": "a5fba946f355e648883dc2729fd895017f638ed7"
             },
             "require": {
@@ -11250,6 +11294,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "blobaugh/meetup-api-client": 20,
+        "drupal-composer/drupal-l10n": 20,
         "drupal/context": 20,
         "behat/mink": 20
     },
