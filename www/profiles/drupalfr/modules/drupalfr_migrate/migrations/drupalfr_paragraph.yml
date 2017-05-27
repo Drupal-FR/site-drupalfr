@@ -58,6 +58,8 @@ source:
       field_sub_title: 'Sub title'
     -
       field_users: 'Users'
+    -
+      field_css_class: 'Paragraph CSS Class'
 destination:
   plugin: 'entity_reference_revisions:paragraph'
 process:
@@ -93,3 +95,4 @@ process:
     -
       plugin: migration
       migration: drupalfr_user
+  field_css_class: field_css_class

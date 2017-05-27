@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.title_text_media.field_call_to_action
+    - field.field.paragraph.title_text_media.field_css_class
     - field.field.paragraph.title_text_media.field_media
     - field.field.paragraph.title_text_media.field_media_position
     - field.field.paragraph.title_text_media.field_media_width_class
@@ -64,6 +65,7 @@ content:
     type: string
     region: content
 hidden:
+  field_css_class: true
   field_media_position: true
   field_media_width_class: true
   field_title_level: true

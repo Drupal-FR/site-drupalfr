@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.title_text_media.field_call_to_action
+    - field.field.paragraph.title_text_media.field_css_class
     - field.field.paragraph.title_text_media.field_media
     - field.field.paragraph.title_text_media.field_media_position
     - field.field.paragraph.title_text_media.field_media_width_class
@@ -19,6 +20,7 @@ third_party_settings:
   field_group:
     group_tabs:
       children:
+        - group_configuration
         - group_heading
         - group_text
         - group_cta
@@ -37,7 +39,7 @@ third_party_settings:
         - field_title_level
         - field_sub_title
       parent_name: group_tabs
-      weight: 20
+      weight: 24
       format_type: tab
       format_settings:
         id: ''
@@ -50,7 +52,7 @@ third_party_settings:
       children:
         - field_text
       parent_name: group_tabs
-      weight: 21
+      weight: 25
       format_type: tab
       format_settings:
         id: ''
@@ -63,7 +65,7 @@ third_party_settings:
       children:
         - field_call_to_action
       parent_name: group_tabs
-      weight: 22
+      weight: 26
       format_type: tab
       format_settings:
         id: ''
@@ -78,7 +80,7 @@ third_party_settings:
         - field_media_width_class
         - field_media_position
       parent_name: group_tabs
-      weight: 23
+      weight: 27
       format_type: tab
       format_settings:
         id: ''
@@ -87,6 +89,19 @@ third_party_settings:
         description: ''
         required_fields: true
       label: Média
+    group_configuration:
+      children:
+        - field_css_class
+      parent_name: group_tabs
+      weight: 22
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: open
+        description: ''
+        required_fields: true
+      label: Configuration
 id: paragraph.title_text_media.default
 targetEntityType: paragraph
 bundle: title_text_media
@@ -106,6 +121,14 @@ content:
         accesskey: false
     third_party_settings: {  }
     type: link_attributes
+    region: content
+  field_css_class:
+    weight: 23
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
     region: content
   field_media:
     weight: 8
