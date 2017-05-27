@@ -1,6 +1,8 @@
 langcode: fr
 status: true
 dependencies:
+  module:
+    - system
   theme:
     - drupalfr_theme
 id: drupalfr_theme_page_title
@@ -14,4 +16,9 @@ settings:
   label: 'Page title'
   provider: core
   label_display: '0'
-visibility: {  }
+visibility:
+  request_path:
+    id: request_path
+    pages: "<front>\r\n/decouvrir\r\n/decouvrir/*"
+    negate: true
+    context_mapping: {  }
