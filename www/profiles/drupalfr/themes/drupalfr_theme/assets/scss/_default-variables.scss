@@ -13,9 +13,13 @@ $bootstrap-sass-asset-helper: false !default;
 //
 //## Gray and brand colors for use across Bootstrap.
 
-$drupal_dark_blue:      #064771 !default;
-$drupal_light_blue:     #0678be !default;
-$drupal_lighter_blue:   #4d9dcc !default;
+$drupal_dark_blue:              #064771 !default;
+$drupal_light_blue:             #0678be !default;
+$drupal_lighter_blue:           #4d9dcc !default;
+$drupal_desaturate_blue:        #245d82 !default;
+$drupal_desaturate_blue_light:  #82a3b8 !default;
+
+
 
 $gray-base:              #000 !default;
 $gray-darker:            lighten($gray-base, 13.5%) !default; // #222
@@ -52,7 +56,7 @@ $link-hover-decoration: none !default;
 //
 //## Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif:  "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-sans-serif:  "Ubuntu", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
 $font-family-serif:       Georgia, "Times New Roman", Times, serif !default;
 //** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
 $font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
@@ -76,7 +80,7 @@ $line-height-computed:    floor(($font-size-base * $line-height-base)) !default;
 
 //** By default, this inherits from the `<body>`.
 $headings-font-family:    "Ubuntu", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
-$headings-font-weight:    500 !default;
+$headings-font-weight:    300 !default;
 $headings-line-height:    1.1 !default;
 $headings-color:          inherit !default;
 
@@ -116,9 +120,9 @@ $padding-xs-horizontal:     5px !default;
 $line-height-large:         1.3333333 !default; // extra decimals for Win 8.1 Chrome
 $line-height-small:         1.5 !default;
 
-$border-radius-base:        4px !default;
-$border-radius-large:       6px !default;
-$border-radius-small:       3px !default;
+$border-radius-base:        2px !default;
+$border-radius-large:       3px !default;
+$border-radius-small:       1px !default;
 
 //** Global color for active items (e.g., navs or dropdowns).
 $component-active-color:    #fff !default;
