@@ -1,0 +1,102 @@
+
+.btn-outlined-white {
+  color            : white;
+  background-color : transparent;
+  border-color     : white;
+
+  &:focus,
+  &.focus,
+  &:active,
+  &.active,
+  &:hover {
+    color            : $drupal_dark_blue;
+    background-color : white;
+    border-color     : white;
+  }
+}
+
+.btn-outlined-blue-dark {
+  color            : $drupal_dark_blue;
+  background-color : transparent;
+  border-color     : $drupal_dark_blue;
+
+  &:focus,
+  &.focus,
+  &:active,
+  &.active,
+  &:hover {
+    color            : $drupal_dark_blue;
+    background-color : white;
+    border-color     : white;
+  }
+}
+
+.btn-outlined-blue-light {
+  color            : $drupal_light_blue;
+  background-color : transparent;
+  border-color     : $drupal_light_blue;
+
+  &:focus,
+  &.focus,
+  &:active,
+  &.active,
+  &:hover {
+    color            : white;
+    background-color : $drupal_light_blue;
+    border-color     : $drupal_light_blue;
+  }
+}
+
+.btn.btn-header {
+  color            : white;
+  background-color : transparent;
+  border-color     : transparent;
+
+  &:focus,
+  &.focus {
+    color            : $drupal_light_blue;
+    background-color : white;
+    border-color     : white;
+  }
+  &:hover {
+    color            : $drupal_light_blue;
+    background-color : white;
+    border-color     : white;
+  }
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    color            : $drupal_light_blue;
+    background-color : white;
+    border-color     : white;
+
+    &:hover,
+    &:focus,
+    &.focus {
+      color            : $drupal_light_blue;
+      background-color : white;
+      border-color     : white;
+    }
+  }
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    background-image : none;
+  }
+}
+
+.btn-footer {
+  color            : $drupal_desaturate_blue_light;
+  background-color : $drupal_desaturate_blue;
+  border-color     : $drupal_desaturate_blue;
+
+  &:focus,
+  &.focus,
+  &:active,
+  &.active,
+  &:hover {
+    color            : white;
+    background-color : $drupal_light_blue;
+    border-color     : $drupal_light_blue;
+  }
+}

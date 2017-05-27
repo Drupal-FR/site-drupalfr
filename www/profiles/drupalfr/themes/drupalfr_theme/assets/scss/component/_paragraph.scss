@@ -1,0 +1,51 @@
+/**
+ * Paragraph styling.
+ */
+
+$mobile : "screen and (max-width: #{$screen-xs-max})";
+$tablet : "screen and (min-width: #{$screen-sm-min})";
+$normal : "screen and (min-width: #{$screen-md-min})";
+$wide : "screen and (min-width: #{$screen-lg-min})";
+
+.paragraph {
+  &--type--title-text-media {
+
+    @media #{$tablet} {
+      padding : 50px 50px 20px;
+    }
+    @media #{$normal} {
+      padding : 70px 70px 40px;
+    }
+    @media #{$wide} {
+      padding : 100px 100px 50px;
+    }
+
+    .field--name-field-title {
+      font-weight : 300;
+    }
+
+    .field--name-field-sub-title {
+    }
+
+    .field--name-field-text {
+      margin : 20px 0 40px;
+    }
+
+    .field--name-field-call-to-action {
+      .field--item {
+        display      : inline-block;
+        float        : left;
+        margin-right : 10px;
+        a {
+          padding        : 10px 30px;
+          font-weight    : 700;
+          text-transform : uppercase;
+          font-size      : 14px;
+        }
+      }
+    }
+  }
+
+  &--type--html {
+  }
+}

@@ -15,7 +15,7 @@ body {
     margin-top : 0;
   }
   &.navbar-is-fixed-top {
-    margin-top : ($navbar-height + ($grid-gutter-width / 2));
+    margin-top : ($navbar-height);
   }
   &.navbar-is-fixed-bottom {
     padding-bottom : ($navbar-height + ($grid-gutter-width / 2));
@@ -46,13 +46,13 @@ body {
 
 .navbar.container {
   @media #{$tablet} {
-    max-width : (($container-sm - $grid-gutter-width));
+    max-width : (($container-sm));
   }
   @media #{$normal} {
-    max-width : (($container-md - $grid-gutter-width));
+    max-width : (($container-md));
   }
   @media #{$wide} {
-    max-width : (($container-lg - $grid-gutter-width));
+    max-width : (($container-lg));
   }
 }
 
@@ -175,9 +175,6 @@ body {
           }
         }
       }
-
     }
-
   }
-
 }
