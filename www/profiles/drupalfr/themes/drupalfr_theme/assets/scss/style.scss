@@ -1,10 +1,245 @@
 // Default variables.
 @import "default-variables";
-
 // Bootstrap Framework.
 @import '../bootstrap/assets/stylesheets/bootstrap';
-
+// Font-Awesome Iconset.
+@import 'font-awesome/font-awesome';
 // Base-theme overrides.
 @import 'overrides';
 
-// Drupal FR styling
+/**
+ * DRUPAL FRANCE THEME
+ *
+ * 1 - General
+ * 2 - Header
+ * 3 - Homepage
+ * 3 -
+ * X - Footer
+ */
+
+/* ==========================================================================
+   1 - GENERAL
+   ========================================================================== */
+body * {
+  font-family : 'Ubuntu', sans-serif;
+  font-weight : 300;
+}
+
+/* ==========================================================================
+   2 - HEADER
+   ========================================================================== */
+.btn.btn-header {
+  font-size     : 25px;
+  border        : 0;
+  padding       : 15px;
+  border-radius : 0;
+}
+
+/* ==========================================================================
+   3 - HOMEPAGE
+   ========================================================================== */
+.paragraph.head_homepage {
+  background-color : $drupal_dark_blue;
+  color            : white;
+}
+
+.paragraph .homepage_discover {
+  padding-top : 50px;
+  text-align  : center;
+
+  .title {
+    color       : $drupal_dark_blue;
+    font-weight : 300;
+    small {
+      color       : $drupal_dark_blue;
+      font-weight : 300;
+    }
+  }
+
+  .subtitle {
+    color : $gray;
+  }
+
+  .row-items {
+    margin-bottom : 30px;
+    .item {
+      padding : 50px 50px 25px;
+      &-icon {
+        font-size : 80px;
+        color     : $drupal_light_blue;
+      }
+      &-title {
+        color      : $drupal_dark_blue;
+        margin-top : 5px;
+      }
+      &-text {
+        font-size : small;
+        color     : $gray;
+      }
+    }
+  }
+
+  .row-cta {
+    a {
+      padding        : 15px 30px;
+      font-weight    : 700;
+      text-transform : uppercase;
+      font-size      : 14px;
+    }
+  }
+
+}
+
+/* ==========================================================================
+   X - FOOTER
+   ========================================================================== */
+
+/* Container
+   ========================================================================== */
+
+.footer {
+  margin-top       : 45px;
+  padding-top      : 35px;
+  padding-bottom   : 36px;
+  background-color : $drupal_dark_blue;
+}
+
+/* Blocks
+   ========================================================================== */
+
+.footer {
+  nav,
+  .block {
+    padding : 10px 25px;
+    h2,
+    .block-title {
+      margin-top    : 0;
+      margin-bottom : 15px;
+      color         : $drupal_desaturate_blue_light;
+      font-size     : 18px;
+      font-weight   : 500;
+    }
+    p {
+      color       : $drupal_desaturate_blue_light;
+      font-size   : 16px;
+      line-height : 20px;
+      font-weight : 400;
+      padding     : 15px 0;
+    }
+  }
+
+  .block + .block {
+    //    padding-top : 50px;
+  }
+}
+
+/* Buttons and Links
+   ========================================================================== */
+.footer {
+  /* Connection & Contact */
+  .btn-footer {
+    margin-top  : 50px;
+    padding     : 15px 40px;
+    font-size   : 18px;
+    font-weight : 500;
+    text-indent : 15px;
+
+    i {
+      display     : inline-block;
+      position    : relative;
+      text-indent : -40px;
+    }
+
+    &.footer-contact-link {
+      margin-top : 0;
+      padding    : 10px 30px;
+      float      : right;
+    }
+  }
+  /* Mini Sitemap */
+  nav[role="navigation"] {
+    ul.menu.nav.navbar-nav {
+      > li {
+        float   : none;
+        display : list-item;
+        a {
+          display : inline-block;
+          color   : $drupal_desaturate_blue_light;
+          padding : 5px;
+
+          &:hover {
+            background-color : transparent;
+            color            : white;
+          }
+        }
+      }
+    }
+  }
+
+  /* Follow Us */
+  .follow-us {
+    list-style : none;
+    li {
+      display : inline-block;
+
+      a {
+        font-size  : 30px;
+        color      : $drupal_desaturate_blue_light;
+        display    : inline-block;
+        max-height : 30px;
+        width      : 30px;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color : white;
+        }
+      }
+
+    }
+  }
+
+}
+
+/* Newsletter Form
+   ========================================================================== */
+.footer {
+  .newsletter-subscription {
+    input[type="email"] {
+      padding          : 5px 10px;
+      height           : 40px;
+      background-color : $drupal_desaturate_blue;
+      color            : $drupal_dark_blue;
+      border           : 0;
+      border-radius    : 2px 0 0 2px;
+      font-size        : 18px;
+      font-weight      : 400;
+
+      &:focus {
+        box-shadow       : none;
+        background-color : $drupal_desaturate_blue_light;
+        color            : $drupal_dark_blue;
+      }
+
+      &::placeholder {
+        font-size   : 16px;
+        font-weight : 400;
+        color       : $drupal_dark_blue;
+      }
+    }
+
+    .btn-footer-light {
+      padding          : 10px;
+      background-color : $drupal_desaturate_blue_light;
+      color            : $drupal_dark_blue;
+      border-radius    : 0 2px 2px 0;
+      height           : 40px;
+      &:hover,
+      &:focus,
+      &:active {
+        background-color : $drupal_desaturate_blue;
+        color            : $drupal_desaturate_blue_light;
+      }
+    }
+  }
+}
