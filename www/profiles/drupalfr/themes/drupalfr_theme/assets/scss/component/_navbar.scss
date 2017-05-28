@@ -16,6 +16,9 @@ body {
   }
   &.navbar-is-fixed-top {
     margin-top : ($navbar-height);
+    @media #{$mobile} {
+      margin-top : ($navbar-height) + 7;
+    }
   }
   &.navbar-is-fixed-bottom {
     padding-bottom : ($navbar-height + ($grid-gutter-width / 2));
@@ -99,78 +102,6 @@ body {
             li {
               float   : none;
               display : inline-block;
-            }
-          }
-        }
-      }
-      // Search
-
-      // User Menu
-      // TODO: Rework user menu CSS when ready.
-      .menu.nav.navbar-user {
-        z-index : 1031;
-        .btn-user {
-          border-color : $drupal_dark_blue;
-          padding      : 7px;
-          color        : #ffffff;
-          width        : 40px;
-          height       : 40px;
-          display      : block;
-          line-height  : 24px;
-          font-size    : 20px;
-          margin-right : 10px;
-
-          &:hover,
-          &:focus,
-          &:active {
-            background-color : #ffffff;
-            color            : $drupal_dark_blue;
-
-            .visible-onhover {
-              opacity    : 1;
-              transition : opacity 1s ease-in-out;
-            }
-          }
-        }
-
-        // Download
-        li.nav-downloads {
-          width : 40px;
-          .btn-downloads {
-            padding     : 7px 10px;
-            color       : #ffffff;
-            display     : block;
-            width       : 40px;
-            height      : 40px;
-            overflow    : hidden;
-            text-shadow : -1px -1px 0 rgba(0, 0, 0, .15);
-            font-size   : 20px;
-            transition  : width 0.25s ease-in-out;
-
-            .glyphicon {
-              float : left;
-            }
-            .visible-onhover {
-              color       : #ffffff;
-              padding     : 0 10px;
-              line-height : 24px;
-              font-size   : 14px;
-              font-family : 'Ubuntu', sans-serif;
-              float       : left;
-              opacity     : 0;
-              height      : 26px;
-            }
-
-            &:hover,
-            &:focus,
-            &:active {
-              width            : 175px;
-              background-color : $drupal_light_blue;
-
-              .visible-onhover {
-                opacity    : 1;
-                transition : opacity 1s ease-in-out;
-              }
             }
           }
         }
