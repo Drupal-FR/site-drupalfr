@@ -22,7 +22,7 @@ class MenuAccount extends PreprocessBase {
     // Add icon on user link.
     if (isset($variables['items']['drupalfr_user.account.compte'])) {
       $variables['items']['drupalfr_user.account.compte']['title'] = new FormattableMarkup(
-        '<span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="sr-only">@original_title</span>',
+        '<i class="fa fa-user-circle-o" aria-hidden="true"></i><span class="sr-only">@original_title</span>',
         [
           '@original_title' => $variables['items']['drupalfr_user.account.compte']['title'],
         ]

@@ -64,14 +64,12 @@
     {%
       set navbar_classes = [
         'navbar',
+        'container',
         theme.settings.navbar_inverse ? 'navbar-inverse' : 'navbar-default',
         theme.settings.navbar_position ? 'navbar-' ~ theme.settings.navbar_position|clean_class : container,
       ]
     %}
     <header{{ navbar_attributes.addClass(navbar_classes) }} id="navbar" role="banner">
-      {% if not navbar_attributes.hasClass(container) %}
-        <div class="{{ container }}">
-      {% endif %}
       <div class="navbar-header">
         {{ page.navigation }}
         {# .btn-navbar is used as the toggle for collapsed navbar content #}
@@ -102,9 +100,6 @@
           <div id="navbar-collapse-mobile-user" class="navbar-collapse collapse">
             {{ page.navigation_collapsible_mobile_user }}
           </div>
-        </div>
-      {% endif %}
-      {% if not navbar_attributes.hasClass(container) %}
         </div>
       {% endif %}
     </header>
