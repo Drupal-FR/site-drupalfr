@@ -18,6 +18,10 @@ $settings['trusted_host_patterns'] = [
 
 $settings['file_private_path'] = '/project/private_files/default';
 
+// Translations.
+$config['locale.settings']['translation']['path'] = 'translations/contrib';
+$config['locale.settings']['translation']['use_source'] = 'local';
+
 // Redis.
 $settings['redis.connection']['host'] = 'redis';
 
