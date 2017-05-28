@@ -9,7 +9,9 @@ $wide : "screen and (min-width: #{$screen-lg-min})";
 
 .paragraph {
   &--type--title-text-media {
-
+    @media #{$mobile} {
+      padding : 50px 50px 20px;
+    }
     @media #{$tablet} {
       padding : 50px 50px 20px;
     }
