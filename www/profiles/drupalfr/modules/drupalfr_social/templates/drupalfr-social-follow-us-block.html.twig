@@ -13,40 +13,30 @@
  * @ingroup themeable
  */
 #}
-<ul class="follow-us">
+<ul>
   {% if url_facebook %}
     <li>
-      <a href="{{ url_facebook }}" title="{{ 'Facebook'|t }}">
-        <i class="fa fa-facebook" aria-hidden="true"></i>
-      </a>
+      <a href="{{ url_facebook }}" title="{{ 'Facebook'|t }}">{{ 'Facebook'|t }}</a>
     </li>
   {% endif %}
   {% if url_twitter %}
     <li>
-      <a href="{{ url_twitter }}" title="{{ 'Twitter'|t }}">
-        <i class="fa fa-twitter" aria-hidden="true"></i>
-      </a>
+      <a href="{{ url_twitter }}" title="{{ 'Twitter'|t }}">{{ 'Twitter'|t }}</a>
     </li>
   {% endif %}
   {% if url_linkedin %}
     <li>
-      <a href="{{ url_linkedin }}" title="{{ 'LinkedIn'|t }}">
-        <i class="fa fa-linkedin" aria-hidden="true"></i>
-      </a>
+      <a href="{{ url_linkedin }}" title="{{ 'LinkedIn'|t }}">{{ 'LinkedIn'|t }}</a>
     </li>
   {% endif %}
   {% if url_viadeo %}
     <li>
-      <a href="{{ url_viadeo }}" title="{{ 'Viadeo'|t }}">
-        <i class="fa fa-viadeo" aria-hidden="true"></i>
-      </a>
+      <a href="{{ url_viadeo }}" title="{{ 'Viadeo'|t }}">{{ 'Viadeo'|t }}</a>
     </li>
   {% endif %}
   {% if url_youtube %}
     <li>
-      <a href="{{ url_youtube }}" title="{{ 'Youtube'|t }}">
-        <i class="fa fa-youtube" aria-hidden="true"></i>
-      </a>
+      <a href="{{ url_youtube }}" title="{{ 'Youtube'|t }}">{{ 'Youtube'|t }}</a>
     </li>
   {% endif %}
 </ul>
