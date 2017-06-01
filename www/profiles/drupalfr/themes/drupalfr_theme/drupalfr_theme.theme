@@ -6,6 +6,7 @@
  *
  * Place your custom PHP code in this file.
  */
+
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
@@ -18,13 +19,15 @@ function drupalfr_theme_preprocess_paragraph(&$variables) {
     $variables['media_position'] = 'right';
     $variables['media_width_class'] = 'col-md-6';
     $variables['text_width_class'] = 'col-md-6';
-  
-    // Paragraph CSS Class
-    $css_class = $paragraph->get('field_css_class')->getValue();
-    if (!empty($css_class)) {
-      $variables['attributes']['class'][] = $css_class[0]['value'];
+
+    // Paragraph CSS Class.
+    if ($paragraph->hasField('field_css_class')) {
+      $css_class = $paragraph->get('field_css_class')->getValue();
+      if (!empty($css_class)) {
+        $variables['attributes']['class'][] = $css_class[0]['value'];
+      }
     }
-    
+
     // Media position.
     if ($paragraph->hasField('field_media_position')) {
       $media_position = $paragraph->get('field_media_position')->getValue();
