@@ -34,7 +34,7 @@ $settings['install_profile'] = 'drupalfr';
 $config['system.file']['temporary_maximum_age'] = 0;
 
 // Performance.
-$config['system.performance']['cache']['page']['max_age'] = '86400';
+$config['system.performance']['cache']['page']['max_age'] = 86400;
 $config['system.performance']['css']['preprocess'] = TRUE;
 $config['system.performance']['js']['preprocess'] = TRUE;
 
