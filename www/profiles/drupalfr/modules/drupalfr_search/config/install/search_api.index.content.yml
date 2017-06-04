@@ -93,15 +93,29 @@ datasource_settings:
       default: true
       selected: {  }
 processor_settings:
-  ignorecase:
+  tokenizer:
+    fields:
+      - title
+      - body
+    spaces: ''
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -6
+      preprocess_query: -6
+  transliteration:
     fields:
       - title
       - body
     weights:
       preprocess_index: -10
       preprocess_query: -10
-  content_access:
+  ignorecase:
+    fields:
+      - title
+      - body
     weights:
+      preprocess_index: -10
       preprocess_query: -10
   highlight:
     highlight: always
@@ -113,6 +127,11 @@ processor_settings:
     weights:
       postprocess_query: 0
     highlight_partial: false
+  content_access:
+    weights:
+      preprocess_query: -10
+  add_url: {  }
+  aggregated_field: {  }
   rendered_item: {  }
   ignore_character:
     fields:
@@ -141,26 +160,6 @@ processor_settings:
         Zl: 0
         Zp: 0
         Zs: 0
-    weights:
-      preprocess_index: -10
-      preprocess_query: -10
-  add_url: {  }
-  tokenizer:
-    fields:
-      - title
-      - body
-    spaces: ''
-    overlap_cjk: 1
-    minimum_word_size: '3'
-    weights:
-      preprocess_index: -6
-      preprocess_query: -6
-  aggregated_field: {  }
-  node_status: {  }
-  transliteration:
-    fields:
-      - title
-      - body
     weights:
       preprocess_index: -10
       preprocess_query: -10
