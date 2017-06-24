@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0733173c626506f882b01ac4ef9a1506",
+    "content-hash": "9df98d685b4757320f2bcb71baa8da2b",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -1973,7 +1973,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/entity_browser-8.x-1.0.zip",
-                "reference": "8.x-1.0",
+                "reference": null,
                 "shasum": "6bd7bbcda1eebacc3685e9edaad2ad29b525b2ad"
             },
             "require": {
@@ -2850,21 +2850,14 @@
         },
         {
             "name": "drupal/leaflet",
-            "version": "1.0.0-beta1",
+            "version": "dev-1.x",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/leaflet",
-                "reference": "8.x-1.0-beta1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/leaflet-8.x-1.0-beta1.zip",
-                "reference": "8.x-1.0-beta1",
-                "shasum": "5c23ec9be44721fd9ed806600ea27e241bf96a39"
+                "reference": "da0386d50987b63199937163bfe438807e7affcd"
             },
             "require": {
-                "drupal/core": "~8.0",
-                "leaflet/leaflet": "^0.7.7"
+                "drupal/core": "~8.0"
             },
             "type": "drupal-module",
             "extra": {
@@ -2872,11 +2865,12 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-beta1",
-                    "datestamp": "1475508239"
+                    "version": "8.x-1.0-beta1+3-dev",
+                    "datestamp": "1485300782"
                 },
                 "patches_applied": {
-                    "Error in leaflet_process_geofield() when twig debug is active.": "https://www.drupal.org/files/issues/leaflet-error_when_debug_active-2783843-2.patch"
+                    "Error in leaflet_process_geofield() when twig debug is active.": "https://www.drupal.org/files/issues/leaflet-error_when_debug_active-2783843-2.patch",
+                    "No field recognized in 'Leaflet map' views style settings in 8.3.0-alpha1": "https://www.drupal.org/files/issues/leaflet_map-no_field_recognized-2852506-5.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -2915,7 +2909,8 @@
             "support": {
                 "source": "http://cgit.drupalcode.org/leaflet",
                 "issues": "https://www.drupal.org/project/issues/leaflet"
-            }
+            },
+            "time": "2017-01-25 20:55:54"
         },
         {
             "name": "drupal/link_attributes",
@@ -3925,7 +3920,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/redis-8.x-1.0-beta1.zip",
-                "reference": "8.x-1.0-beta1",
+                "reference": null,
                 "shasum": "c52dfdc675e95f04266e4ddd7c603c23f217e1f8"
             },
             "require": {
@@ -5245,10 +5240,10 @@
         },
         {
             "name": "leaflet/leaflet",
-            "version": "v0.7.7",
+            "version": "v1.0.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Leaflet/Leaflet/archive/v0.7.7.zip",
+                "url": "https://github.com/Leaflet/Leaflet/archive/v1.0.3.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -11508,6 +11503,7 @@
         "blobaugh/meetup-api-client": 20,
         "drupal-composer/drupal-l10n": 20,
         "drupal/context": 20,
+        "drupal/leaflet": 20,
         "behat/mink": 20
     },
     "prefer-stable": true,
