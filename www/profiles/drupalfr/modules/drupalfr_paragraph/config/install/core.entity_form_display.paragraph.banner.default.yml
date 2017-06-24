@@ -2,11 +2,13 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - entity_browser.browser.media_image
     - field.field.paragraph.banner.field_banner_link
     - field.field.paragraph.banner.field_media
     - field.field.paragraph.banner.field_text
     - paragraphs.paragraphs_type.banner
   module:
+    - entity_browser
     - link
     - text
 id: paragraph.banner.default
@@ -25,11 +27,16 @@ content:
   field_media:
     weight: 2
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+      entity_browser: media_image
+      field_widget_display: rendered_entity
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: editor
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: entity_browser_entity_reference
     region: content
   field_text:
     weight: 0

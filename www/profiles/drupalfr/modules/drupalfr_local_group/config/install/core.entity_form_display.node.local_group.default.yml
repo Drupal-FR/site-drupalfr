@@ -2,6 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - entity_browser.browser.media_image
     - field.field.node.local_group.body
     - field.field.node.local_group.field_local_group_organizer
     - field.field.node.local_group.field_local_group_place
@@ -9,6 +10,7 @@ dependencies:
     - field.field.node.local_group.field_media_teaser
     - node.type.local_group
   module:
+    - entity_browser
     - field_group
     - geofield
     - path
@@ -108,20 +110,30 @@ content:
   field_media_banner:
     weight: 11
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+      entity_browser: media_image
+      field_widget_display: rendered_entity
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: editor
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: entity_browser_entity_reference
     region: content
   field_media_teaser:
     weight: 12
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+      entity_browser: media_image
+      field_widget_display: rendered_entity
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: editor
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: entity_browser_entity_reference
     region: content
   langcode:
     type: language_select

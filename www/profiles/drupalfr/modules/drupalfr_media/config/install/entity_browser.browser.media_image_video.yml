@@ -1,0 +1,51 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.media_browser
+  module:
+    - entity_browser_entity_form
+    - views
+name: media_image_video
+label: 'Media image video'
+display: modal
+display_configuration:
+  width: ''
+  height: ''
+  link_text: 'Sélectionner les entités'
+  auto_open: false
+selection_display: no_display
+selection_display_configuration: {  }
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  fa44c144-f77a-4745-8c55-1fc0f9faf51a:
+    settings:
+      view: media_browser
+      view_display: entity_browser_image_video
+      submit_text: 'Sélectionner les entités'
+      auto_select: false
+    uuid: fa44c144-f77a-4745-8c55-1fc0f9faf51a
+    weight: 1
+    label: Bibliothèque
+    id: view
+  0fa5abad-a56a-49bc-bd4d-b6c02ff53d70:
+    settings:
+      entity_type: media
+      bundle: ''
+      form_mode: default
+      submit_text: 'Enregistrer l''entité'
+    uuid: 0fa5abad-a56a-49bc-bd4d-b6c02ff53d70
+    weight: 2
+    label: 'Créer une image'
+    id: entity_form
+  84b3b2d4-2e30-4086-81be-d2cb6bc4061a:
+    settings:
+      entity_type: media
+      bundle: video
+      form_mode: default
+      submit_text: 'Enregistrer l''entité'
+    uuid: 84b3b2d4-2e30-4086-81be-d2cb6bc4061a
+    weight: 3
+    label: 'Créer une vidéo'
+    id: entity_form

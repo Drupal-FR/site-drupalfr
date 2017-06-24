@@ -2,6 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - entity_browser.browser.media_image_video
     - field.field.paragraph.title_text_media.field_call_to_action
     - field.field.paragraph.title_text_media.field_css_class
     - field.field.paragraph.title_text_media.field_media
@@ -13,6 +14,7 @@ dependencies:
     - field.field.paragraph.title_text_media.field_title_level
     - paragraphs.paragraphs_type.title_text_media
   module:
+    - entity_browser
     - field_group
     - link_attributes
     - text
@@ -133,11 +135,16 @@ content:
   field_media:
     weight: 8
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+      entity_browser: media_image_video
+      field_widget_display: rendered_entity
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: editor
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: entity_browser_entity_reference
     region: content
   field_media_position:
     weight: 10
