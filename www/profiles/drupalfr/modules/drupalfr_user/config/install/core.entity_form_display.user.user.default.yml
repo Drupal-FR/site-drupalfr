@@ -5,7 +5,6 @@ dependencies:
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_company
     - field.field.user.user.field_user_event
-    - field.field.user.user.field_user_local_group
     - field.field.user.user.field_user_membership_number
     - field.field.user.user.field_user_newsletter_adff
     - field.field.user.user.field_user_newsletter_drupalcamp
@@ -47,15 +46,6 @@ content:
     region: content
   field_user_event:
     weight: 10
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
-    region: content
-  field_user_local_group:
-    weight: 14
     settings:
       match_operator: CONTAINS
       size: 60
