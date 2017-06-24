@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.local_group.field_local_group_place
     - field.field.node.local_group.field_media_banner
     - field.field.node.local_group.field_media_teaser
+    - field.field.node.local_group.field_twitter_account
     - node.type.local_group
   module:
     - entity_browser
@@ -62,6 +63,7 @@ third_party_settings:
       children:
         - field_local_group_organizer
         - field_local_group_place
+        - field_twitter_account
       parent_name: group_tabs
       weight: 22
       format_type: tab
@@ -134,6 +136,14 @@ content:
         view_mode: editor
     third_party_settings: {  }
     type: entity_browser_entity_reference
+    region: content
+  field_twitter_account:
+    weight: 11
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
     region: content
   langcode:
     type: language_select
