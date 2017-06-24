@@ -77,10 +77,10 @@
       "type": "package",
       "package": {
         "name": "components/highlightjs",
-        "version": "9.11.0",
+        "version": "9.12.0",
         "type": "drupal-library",
         "dist": {
-          "url": "https://github.com/components/highlightjs/archive/9.11.0.zip",
+          "url": "https://github.com/components/highlightjs/archive/9.12.0.zip",
           "type": "zip"
         }
       }
@@ -121,185 +121,307 @@
         }
       }
     },
-    "ckeditor": {
+    "drupal-l10n": {
+      "type": "vcs",
+      "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
+    },
+    "ckeditor.autogrow": {
       "type": "package",
       "package": {
-        "name": "ckeditor/ckeditor",
+        "name": "ckeditor/autogrow",
         "version": "4.6.2",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "ckeditor.autogrow"
+        },
         "dist": {
-          "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.6.2/ckeditor_4.6.2_standard.zip",
+          "url": "http://download.ckeditor.com/autogrow/releases/autogrow_4.6.2.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "ckeditor_autogrow": {
+    "ckeditor.fakeobjects": {
       "type": "package",
       "package": {
-        "name": "ckeditor/ckeditor_autogrow",
+        "name": "ckeditor/fakeobjects",
         "version": "4.6.2",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "ckeditor.fakeobjects"
+        },
         "dist": {
-          "url": "https://cdn.rawgit.com/ckeditor/ckeditor-dev/4.6.2/plugins/autogrow/plugin.js",
-          "type": "file"
-        }
-      }
-    },
-    "code_mirror": {
-      "type": "package",
-      "package": {
-        "name": "components/codemirror",
-        "version": "5.24.0",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/components/codemirror/archive/5.21.0.zip",
+          "url": "http://download.ckeditor.com/fakeobjects/releases/fakeobjects_4.6.2.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_geocomplete": {
+    "ckeditor.image": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.geocomplete",
+        "name": "ckeditor/image",
+        "version": "4.6.2",
+        "type": "drupal-library",
+        "extra": {
+          "installer-name": "ckeditor.image"
+        },
+        "dist": {
+          "url": "http://download.ckeditor.com/image/releases/image_4.6.2.zip",
+          "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
+        }
+      }
+    },
+    "ckeditor.link": {
+      "type": "package",
+      "package": {
+        "name": "ckeditor/link",
+        "version": "4.6.2",
+        "type": "drupal-library",
+        "extra": {
+          "installer-name": "ckeditor.link"
+        },
+        "dist": {
+          "url": "http://download.ckeditor.com/link/releases/link_4.6.2.zip",
+          "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
+        }
+      }
+    },
+    "codemirror": {
+      "type": "package",
+      "package": {
+        "name": "codemirror/codemirror",
+        "version": "5.25.2",
+        "type": "drupal-library",
+        "extra": {
+          "installer-name": "codemirror"
+        },
+        "dist": {
+          "url": "https://github.com/components/codemirror/archive/5.25.2.zip",
+          "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
+        }
+      }
+    },
+    "jquery.geocomplete": {
+      "type": "package",
+      "package": {
+        "name": "jquery/geocomplete",
         "version": "1.7.0",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.geocomplete"
+        },
         "dist": {
           "url": "https://github.com/ubilabs/geocomplete/archive/1.7.0.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_icheck": {
+    "jquery.icheck": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.icheck",
-        "version": "1.0.2",
+        "name": "jquery/icheck",
+        "version": "1.0.2 ",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.icheck"
+        },
         "dist": {
           "url": "https://github.com/fronteed/icheck/archive/1.0.2.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_image_picker": {
+    "jquery.image-picker": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.image-picker",
+        "name": "jquery/image-picker",
         "version": "0.3.0",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.image-picker"
+        },
         "dist": {
           "url": "https://github.com/rvera/image-picker/archive/0.3.0.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_input_mask": {
+    "jquery.inputmask": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.inputmask",
-        "version": "3.3.3",
+        "name": "jquery/inputmask",
+        "version": "3.3.4",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.inputmask"
+        },
         "dist": {
-          "url": "https://github.com/RobinHerbots/jquery.inputmask/archive/3.3.3.zip",
+          "url": "https://github.com/RobinHerbots/jquery.inputmask/archive/3.3.4.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_intl_tel_input": {
+    "jquery.intl-tel-input": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.intl-tel-input",
-        "version": "v11.0.0",
+        "name": "jquery/intl-tel-input",
+        "version": "11.0.12",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.intl-tel-input"
+        },
         "dist": {
-          "url": "https://github.com/jackocnr/intl-tel-input/archive/v11.0.0.zip",
+          "url": "https://github.com/jackocnr/intl-tel-input/archive/v11.0.12.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_rateit": {
+    "jquery.rateit": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.rateit",
+        "name": "jquery/rateit",
         "version": "1.1.1",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.rateit"
+        },
         "dist": {
           "url": "https://github.com/gjunge/rateit.js/archive/1.1.1.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_select2": {
+    "jquery.select2": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.select2",
+        "name": "jquery/select2",
         "version": "4.0.3",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.select2"
+        },
         "dist": {
           "url": "https://github.com/select2/select2/archive/4.0.3.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_timepicker": {
+    "jquery.timepicker": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.timepicker",
+        "name": "jquery/timepicker",
         "version": "1.11.10",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.timepicker"
+        },
         "dist": {
           "url": "https://github.com/jonthornton/jquery-timepicker/archive/1.11.10.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_toggles": {
+    "jquery.toggles": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.toggles",
-        "version": "v4.0.0",
+        "name": "jquery/toggles",
+        "version": "4.0.0",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.toggles"
+        },
         "dist": {
           "url": "https://github.com/simontabor/jquery-toggles/archive/v4.0.0.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
-    "jquery_wacc": {
+    "jquery.word-and-character-counter": {
       "type": "package",
       "package": {
-        "name": "jquery/jquery.word-and-character-counter",
+        "name": "jquery/word-and-character-counter",
         "version": "2.3.5",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "jquery.word-and-character-counter"
+        },
         "dist": {
           "url": "https://github.com/qwertypants/jQuery-Word-and-Character-Counter-Plugin/archive/2.3.5.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
     },
     "signature_pad": {
       "type": "package",
       "package": {
-        "name": "szimek/signature_pad",
+        "name": "signature_pad/signature_pad",
         "version": "1.5.3",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "signature_pad"
+        },
         "dist": {
           "url": "https://github.com/szimek/signature_pad/archive/v1.5.3.zip",
           "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
         }
       }
-    },
-    "drupal-l10n": {
-      "type": "vcs",
-      "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
     }
   },
   "require": {
     "abraham/twitteroauth": "0.7.2",
     "blobaugh/meetup-api-client": "dev-master#760113eb6548d160a5148f5ca4210e2c30bdd00c",
-    "ckeditor/ckeditor": "4.6.2",
-    "ckeditor/ckeditor_autogrow": "4.6.2",
-    "components/codemirror": "5.24.0",
+    "ckeditor/autogrow": "4.6.2",
+    "ckeditor/fakeobjects": "4.6.2",
+    "ckeditor/image": "4.6.2",
+    "ckeditor/link": "4.6.2",
+    "codemirror/codemirror": "5.25.2",
     "composer/installers": "^1.0.21",
     "cweagans/composer-patches": "~1.0",
     "dinbror/blazy": "1.8.*",
@@ -309,7 +431,7 @@
     "drupal/blazy": "1.0.0-rc2",
     "drupal/bootstrap": "3.5.0",
     "drupal/context": "1.x-dev#457c7e166d1a6356d031b43e4e2becb3af1b72ab",
-    "drupal/core": "8.3.2",
+    "drupal/core": "8.3.4",
     "drupal/dropzonejs": "1.0.0-alpha7",
     "drupal/drush_language": "1.*",
     "drupal/entity_browser": "1.0.0",
@@ -321,8 +443,8 @@
     "drupal/feeds": "3.*",
     "drupal/field_group": "1.0.0-rc6",
     "drupal/flag": "4.0.0-alpha2",
-    "drupal/geofield": "1.0.0-alpha2",
-    "drupal/honeypot": "1.25.0",
+    "drupal/geofield": "1.0.0-alpha4",
+    "drupal/honeypot": "1.26.0",
     "drupal/inline_entity_form": "1.0.0-beta1",
     "drupal/leaflet": "1.0.0-beta1",
     "drupal/link_attributes": "1.0.0",
@@ -331,7 +453,7 @@
     "drupal/media_entity_document": "1.1.0",
     "drupal/media_entity_image": "1.2.0",
     "drupal/media_entity_slideshare": "1.3.0",
-    "drupal/media_entity_soundcloud": "1.0.0-alpha2",
+    "drupal/media_entity_soundcloud": "1.0.0-rc1",
     "drupal/menu_attributes": "1.*",
     "drupal/migrate_plus": "4.0.0-beta1",
     "drupal/migrate_source_csv": "2.0.0",
@@ -343,34 +465,34 @@
     "drupal/redirect": "1.0.0-alpha5",
     "drupal/redis": "1.0.0-beta1",
     "drupal/search_api": "1.1.0",
-    "drupal/search_api_solr": "1.0.0-rc3",
+    "drupal/search_api_solr": "1.0.0-rc4",
     "drupal/slick": "1.0.0",
     "drupal/slick_views": "1.0.0-rc2",
     "drupal/varnish_purge": "1.5.0",
     "drupal/video_embed_field": "1.5.0",
     "drupal/views_infinite_scroll": "1.3.0",
-    "drupal/webform": "5.0.0-beta12",
-    "drush/drush": "8.1.11",
+    "drupal/webform": "5.0.0-beta13",
+    "drush/drush": "8.1.12",
     "enyo/dropzone": "4.3.*",
     "gdsmith/easing": "1.4.*",
-    "jquery/jquery.geocomplete": "1.7.0",
-    "jquery/jquery.icheck": "1.0.2",
-    "jquery/jquery.image-picker": "0.3.0",
-    "jquery/jquery.inputmask": "3.3.3",
-    "jquery/jquery.intl-tel-input": "11.0.0",
-    "jquery/jquery.rateit": "1.1.1",
-    "jquery/jquery.select2": "4.0.3",
-    "jquery/jquery.timepicker": "1.11.10",
-    "jquery/jquery.toggles": "4.0.0",
-    "jquery/jquery.word-and-character-counter": "2.3.5",
+    "jquery/geocomplete": "1.7.0",
+    "jquery/icheck": "1.0.2 ",
+    "jquery/image-picker": "0.3.0",
+    "jquery/inputmask": "3.3.4",
+    "jquery/intl-tel-input": "11.0.12",
+    "jquery/rateit": "1.1.1",
+    "jquery/select2": "4.0.3",
+    "jquery/timepicker": "1.11.10",
+    "jquery/toggles": "4.0.0",
+    "jquery/word-and-character-counter": "2.3.5",
     "jquery/mousewheel": "3.1.*",
     "kenwheeler/slick": "1.6.0",
-    "szimek/signature_pad": "1.5.3"
+    "signature_pad/signature_pad": "1.5.3"
   },
   "require-dev": {
     "behat/mink": "1.7.x-dev",
     "behat/mink-goutte-driver": "~1.2",
-    "components/highlightjs": "9.11.*",
+    "components/highlightjs": "9.12.*",
     "d3/d3": "3.5.*",
     "drupal/coder": "8.2.*",
     "drupal/config_inspector": "1.*",
@@ -393,7 +515,8 @@
   "prefer-stable": true,
   "config": {
     "optimize-autoloader": true,
-    "sort-packages": true
+    "sort-packages": true,
+    "secure-http": false
   },
   "scripts": {
     "drupal-l10n": "DrupalComposer\\DrupalL10n\\Plugin::download",
@@ -441,9 +564,6 @@
       },
       "drupal/leaflet": {
         "Error in leaflet_process_geofield() when twig debug is active.": "https://www.drupal.org/files/issues/leaflet-error_when_debug_active-2783843-2.patch"
-      },
-      "drupal/media_entity_soundcloud": {
-        "Formatter options are not properly added to url": "https://www.drupal.org/files/issues/2852502-fix-options.patch"
       },
       "drupal/redis": {
         "Add status page and some statistics": "https://www.drupal.org/files/issues/redis-statistics-7.patch"
