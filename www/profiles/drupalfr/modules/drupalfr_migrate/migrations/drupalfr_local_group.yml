@@ -29,6 +29,8 @@ source:
     -
       published: Published
     -
+      creation_date: 'Creation date'
+    -
       organizers: Organizers
     -
       places: Places
@@ -77,3 +79,7 @@ process:
   uid:
     plugin: default_value
     default_value: 1
+  created:
+    plugin: callback
+    callable: strtotime
+    source: creation_date

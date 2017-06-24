@@ -11,7 +11,6 @@ dependencies:
     - leaflet_views
     - node
     - user
-    - views_infinite_scroll
 id: local_group
 label: 'Drupalfr local group'
 module: views
@@ -154,10 +153,10 @@ display:
           entity_field: type
           plugin_id: bundle
       sorts:
-        title:
-          id: title
+        created:
+          id: created
           table: node_field_data
-          field: title
+          field: created
           relationship: none
           group_type: group
           admin_label: ''
@@ -165,9 +164,10 @@ display:
           exposed: false
           expose:
             label: ''
+          granularity: day
           entity_type: node
-          entity_field: title
-          plugin_id: standard
+          entity_field: created
+          plugin_id: date
       title: 'Groupes locaux'
       header: {  }
       footer: {  }
@@ -587,39 +587,21 @@ display:
           empty: true
           tokenize: false
           content:
-            value: "<h1 class=\"text-center\">Les groupes locaux</h1>\n<p class=\"text-center\">Texte description des groupes locaux.</p>"
+            value: "<h1 class=\"text-center\">Les groupes locaux</h1>\n<p class=\"text-center\">Partout en France, nous vous proposons des rencontres au plus proche de chez vous. N'hésitez plus et venez rencontrer la communauté.\nSi toutefois, vous vous trouvez encore un peu loin de tout, n'hésitez pas à nous contacter et à proposer vous aussi un groupe local.</p>"
             format: full_html
           plugin_id: text
       defaults:
         header: false
         pager: false
       pager:
-        type: infinite_scroll
+        type: none
         options:
-          items_per_page: 6
           offset: 0
-          id: 0
-          total_pages: null
-          tags:
-            previous: '‹ Previous'
-            next: 'Next ›'
-          expose:
-            items_per_page: false
-            items_per_page_label: 'Items per page'
-            items_per_page_options: '5, 10, 25, 50'
-            items_per_page_options_all: false
-            items_per_page_options_all_label: '- All -'
-            offset: false
-            offset_label: Offset
-          views_infinite_scroll:
-            button_text: 'Afficher plus'
-            automatically_load_content: false
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
