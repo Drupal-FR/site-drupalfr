@@ -21,6 +21,10 @@
       "type": "composer",
       "url": "https://packages.drupal.org/8"
     },
+    "drupal-l10n": {
+      "type": "vcs",
+      "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
+    },
     "leafletjs": {
       "type": "package",
       "package": {
@@ -121,9 +125,17 @@
         }
       }
     },
-    "drupal-l10n": {
-      "type": "vcs",
-      "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
+    "bootstrap-sass": {
+      "type": "package",
+      "package": {
+        "name": "twbs/bootstrap-sass",
+        "version": "v3.3.7",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/twbs/bootstrap-sass/archive/v3.3.7.zip",
+          "type": "zip"
+        }
+      }
     },
     "ckeditor.autogrow": {
       "type": "package",
@@ -487,7 +499,8 @@
     "jquery/word-and-character-counter": "2.3.5",
     "jquery/mousewheel": "3.1.*",
     "kenwheeler/slick": "1.6.0",
-    "signature_pad/signature_pad": "1.5.3"
+    "signature_pad/signature_pad": "1.5.3",
+    "twbs/bootstrap-sass": "3.3.7"
   },
   "require-dev": {
     "behat/mink": "1.7.x-dev",
