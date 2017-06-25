@@ -9,7 +9,6 @@ dependencies:
     - field.field.node.planet.field_planet_url
     - node.type.planet
   module:
-    - link
     - text
     - user
 id: node.planet.teaser
@@ -22,34 +21,12 @@ content:
     type: text_summary_or_trimmed
     weight: 0
     settings:
-      trim_length: 600
-    third_party_settings: {  }
-    region: content
-  field_planet_tag:
-    type: entity_reference_label
-    weight: 1
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    region: content
-  field_planet_url:
-    type: link
-    weight: 2
-    label: inline
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    region: content
-  links:
-    weight: 3
-    settings: {  }
+      trim_length: 200
     third_party_settings: {  }
     region: content
 hidden:
   feeds_item: true
+  field_planet_tag: true
+  field_planet_url: true
   langcode: true
+  links: true

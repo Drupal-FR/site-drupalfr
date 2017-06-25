@@ -1,0 +1,40 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+name: homepage
+label: 'Page d''accueil'
+group: 'Page particulière'
+description: ''
+requireAllConditions: true
+disabled: false
+conditions:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: 0
+    uuid: 7ac275ac-f023-4b07-873d-2adbb9528410
+    context_mapping: {  }
+reactions:
+  blocks:
+    blocks:
+      bfc76cd8-5ed8-4e7a-b61c-2a64912e477c:
+        id: 'views_block:planet-block_1'
+        label: ''
+        provider: views
+        label_display: 0
+        views_label: ''
+        items_per_page: none
+        region: content
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: bfc76cd8-5ed8-4e7a-b61c-2a64912e477c
+    id: blocks
+    saved: false
+    uuid: 4f656551-ac16-4329-b580-fc2e8d6f6f25
+    include_default_blocks: 0
+weight: 0

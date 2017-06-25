@@ -7,6 +7,7 @@ dependencies:
   module:
     - node
     - user
+    - views_infinite_scroll
 id: planet
 label: 'Drupalfr planet'
 module: views
@@ -48,17 +49,15 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: full
+        type: infinite_scroll
         options:
-          items_per_page: 20
+          items_per_page: 9
           offset: 0
           id: 0
           total_pages: null
           tags:
             previous: ‹‹
             next: ››
-            first: '« First'
-            last: 'Last »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -67,7 +66,9 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-          quantity: 9
+          views_infinite_scroll:
+            button_text: 'Afficher plus'
+            automatically_load_content: false
       style:
         type: default
       row:
@@ -166,6 +167,8 @@ display:
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
+      link_url: ''
+      link_display: '0'
     cache_metadata:
       max-age: -1
       contexts:
@@ -189,14 +192,23 @@ display:
         row: false
         pager: false
         fields: false
+        use_more: false
+        use_more_always: false
+        use_more_text: false
+        link_display: false
+        link_url: false
+        header: false
       style:
         type: default
       row:
-        type: fields
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: teaser
       pager:
         type: some
         options:
-          items_per_page: 5
+          items_per_page: 3
           offset: 0
       fields:
         title:
@@ -262,6 +274,25 @@ display:
           separator: ', '
           field_api_classes: false
           plugin_id: field
+      use_more: true
+      use_more_always: true
+      use_more_text: 'Toutes les contributions'
+      link_display: page_1
+      link_url: ''
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: '<h2 class="title">En ce moment dans la communauté<br><small>Actualités, nouvelles publications et autres réjouissances</small></h2>'
+            format: full_html
+          plugin_id: text
     cache_metadata:
       max-age: -1
       contexts:
@@ -277,7 +308,7 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: planete
+      path: communaute/planete
       menu:
         type: none
         title: Planète
@@ -287,6 +318,22 @@ display:
         weight: 0
         context: '0'
         menu_name: main
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: "<h1 class=\"text-center\">Les contributions de la communauté</h1>\n<p class=\"text-center\">Texte de description. Vous pouvez retrouver l'ensemble des flux agrégés est sur la page <a href=\"/communaute/planete/flux\">des flux</a>.</p>"
+            format: full_html
+          plugin_id: text
+      defaults:
+        header: false
     cache_metadata:
       max-age: -1
       contexts:

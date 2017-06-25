@@ -3,9 +3,11 @@ status: true
 dependencies:
   config:
     - feeds.feed_type.planet_feed_rss
+    - field.field.feeds_feed.planet_feed_rss.field_feed_image
     - field.field.feeds_feed.planet_feed_rss.field_feed_website
   module:
     - feeds
+    - image
     - link
     - user
 id: feeds_feed.planet_feed_rss.default
@@ -13,6 +15,15 @@ targetEntityType: feeds_feed
 bundle: planet_feed_rss
 mode: default
 content:
+  field_feed_image:
+    weight: 3
+    label: hidden
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
   field_feed_website:
     weight: 2
     label: above
@@ -27,12 +38,12 @@ content:
     region: content
   imported:
     label: inline
-    type: timestamp_ago
+    type: timestamp
     weight: 1
     settings:
-      future_format: '@interval hence'
-      past_format: '@interval ago'
-      granularity: 2
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
     third_party_settings: {  }
     region: content
   next:

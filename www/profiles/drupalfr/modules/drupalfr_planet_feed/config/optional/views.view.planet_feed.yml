@@ -214,7 +214,20 @@ display:
             label: ''
           plugin_id: standard
       title: 'Les flux du planète'
-      header: {  }
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: "<h1 class=\"text-center\">Les flux du planète</h1>\n<p class=\"text-center\">Voici la liste des flux agrégés sur la page planète</p>"
+            format: full_html
+          plugin_id: text
       footer: {  }
       empty: {  }
       relationships: {  }
@@ -228,13 +241,14 @@ display:
         - user.permissions
       tags:
         - 'config:field.storage.feeds_feed.field_feed_website'
-  block_1:
-    display_plugin: block
-    id: block_1
-    display_title: Block
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_title: Page
     position: 1
     display_options:
       display_extenders: {  }
+      path: communaute/planete/flux
     cache_metadata:
       max-age: -1
       contexts:

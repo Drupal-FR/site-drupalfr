@@ -3,8 +3,11 @@ status: true
 dependencies:
   config:
     - feeds.feed_type.planet_feed_rss
+    - field.field.feeds_feed.planet_feed_rss.field_feed_image
     - field.field.feeds_feed.planet_feed_rss.field_feed_website
+    - image.style.thumbnail
   module:
+    - image
     - link
 id: feeds_feed.planet_feed_rss.default
 targetEntityType: feeds_feed
@@ -16,6 +19,14 @@ content:
     weight: 10
     settings: {  }
     third_party_settings: {  }
+    region: content
+  field_feed_image:
+    weight: 12
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: image_image
     region: content
   field_feed_website:
     weight: 11
