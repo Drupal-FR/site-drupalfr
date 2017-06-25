@@ -12,7 +12,7 @@ gulp.task('styles', function () {
 });
 
 // Watch task.
-gulp.task('default', ['watch']);
+gulp.task('default', ['styles']);
 
 // Default task.
 gulp.task('watch', function () {
