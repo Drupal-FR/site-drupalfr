@@ -17,42 +17,6 @@
     "docs": "https://github.com/Drupal-FR/site-drupalfr/blob/8.x-1.x/README.md"
   },
   "repositories": {
-    "drupal": {
-      "type": "composer",
-      "url": "https://packages.drupal.org/8"
-    },
-    "drupal-l10n": {
-      "type": "vcs",
-      "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
-    },
-    "leafletjs": {
-      "type": "package",
-      "package": {
-        "name": "leaflet/leaflet",
-        "version": "v1.0.3",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/Leaflet/Leaflet/archive/v1.0.3.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "ows_slideshare": {
-      "type": "vcs",
-      "url": "git@github.com:OWS/ZendService_SlideShare.git"
-    },
-    "dropzone": {
-      "type": "package",
-      "package": {
-        "name": "enyo/dropzone",
-        "version": "v4.3.0",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/enyo/dropzone/archive/v4.3.0.zip",
-          "type": "zip"
-        }
-      }
-    },
     "blazy": {
       "type": "package",
       "package": {
@@ -61,78 +25,6 @@
         "type": "drupal-library",
         "dist": {
           "url": "https://github.com/dinbror/blazy/archive/1.8.2.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "d3": {
-      "type": "package",
-      "package": {
-        "name": "d3/d3",
-        "version": "v3.5.17",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/d3/d3/archive/v3.5.17.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "highlightjs": {
-      "type": "package",
-      "package": {
-        "name": "components/highlightjs",
-        "version": "9.12.0",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/components/highlightjs/archive/9.12.0.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "jquery_mousewheel": {
-      "type": "package",
-      "package": {
-        "name": "jquery/mousewheel",
-        "version": "3.1.13",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/jquery/jquery-mousewheel/archive/3.1.13.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "jquery.easing": {
-      "type": "package",
-      "package": {
-        "name": "gdsmith/easing",
-        "version": "1.4.1",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/gdsmith/jquery.easing/archive/1.4.1.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "slick": {
-      "type": "package",
-      "package": {
-        "name": "kenwheeler/slick",
-        "version": "1.6.0",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/kenwheeler/slick/archive/1.6.0.zip",
-          "type": "zip"
-        }
-      }
-    },
-    "fontawesome": {
-      "type": "package",
-      "package": {
-        "name": "fortawesome/fontawesome",
-        "version": "v4.7.0",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
           "type": "zip"
         }
       }
@@ -149,25 +41,8 @@
         }
       }
     },
-    "ckeditor.autogrow": {
-      "type": "package",
-      "package": {
-        "name": "ckeditor/autogrow",
-        "version": "4.6.2",
-        "type": "drupal-library",
-        "extra": {
-          "installer-name": "ckeditor.autogrow"
-        },
-        "dist": {
-          "url": "http://download.ckeditor.com/autogrow/releases/autogrow_4.6.2.zip",
-          "type": "zip"
-        },
-        "require": {
-          "composer/installers": "~1.0"
-        }
-      }
-    },
     "ckeditor.fakeobjects": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "ckeditor/fakeobjects",
@@ -186,6 +61,7 @@
       }
     },
     "ckeditor.image": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "ckeditor/image",
@@ -204,6 +80,7 @@
       }
     },
     "ckeditor.link": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "ckeditor/link",
@@ -222,6 +99,7 @@
       }
     },
     "codemirror": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "codemirror/codemirror",
@@ -239,7 +117,76 @@
         }
       }
     },
+    "d3": {
+      "type": "package",
+      "package": {
+        "name": "d3/d3",
+        "version": "v3.5.17",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/d3/d3/archive/v3.5.17.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "dropzone": {
+      "type": "package",
+      "package": {
+        "name": "enyo/dropzone",
+        "version": "v4.3.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/enyo/dropzone/archive/v4.3.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "drupal": {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    },
+    "drupal-l10n": {
+      "type": "vcs",
+      "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
+    },
+    "fontawesome": {
+      "type": "package",
+      "package": {
+        "name": "fortawesome/fontawesome",
+        "version": "v4.7.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "highlightjs": {
+      "type": "package",
+      "package": {
+        "name": "components/highlightjs",
+        "version": "9.12.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/components/highlightjs/archive/9.12.0.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "jquery.easing": {
+      "type": "package",
+      "package": {
+        "name": "gdsmith/easing",
+        "version": "1.4.1",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/gdsmith/jquery.easing/archive/1.4.1.zip",
+          "type": "zip"
+        }
+      }
+    },
     "jquery.geocomplete": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/geocomplete",
@@ -258,6 +205,7 @@
       }
     },
     "jquery.icheck": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/icheck",
@@ -276,6 +224,7 @@
       }
     },
     "jquery.image-picker": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/image-picker",
@@ -294,6 +243,7 @@
       }
     },
     "jquery.inputmask": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/inputmask",
@@ -312,6 +262,7 @@
       }
     },
     "jquery.intl-tel-input": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/intl-tel-input",
@@ -330,6 +281,7 @@
       }
     },
     "jquery.rateit": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/rateit",
@@ -348,6 +300,7 @@
       }
     },
     "jquery.select2": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/select2",
@@ -366,6 +319,7 @@
       }
     },
     "jquery.timepicker": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/timepicker",
@@ -384,6 +338,7 @@
       }
     },
     "jquery.toggles": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/toggles",
@@ -402,6 +357,7 @@
       }
     },
     "jquery.word-and-character-counter": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "jquery/word-and-character-counter",
@@ -419,7 +375,55 @@
         }
       }
     },
+    "jquery_mousewheel": {
+      "type": "package",
+      "package": {
+        "name": "jquery/mousewheel",
+        "version": "3.1.13",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/jquery/jquery-mousewheel/archive/3.1.13.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "leafletjs": {
+      "type": "package",
+      "package": {
+        "name": "leaflet/leaflet",
+        "version": "v1.0.3",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/Leaflet/Leaflet/archive/v1.0.3.zip",
+          "type": "zip"
+        }
+      }
+    },
+    "ows_slideshare": {
+      "type": "vcs",
+      "url": "git@github.com:OWS/ZendService_SlideShare.git"
+    },
+    "progress-tracker": {
+      "_webform": true,
+      "type": "package",
+      "package": {
+        "name": "progress-tracker/progress-tracker",
+        "version": "1.4.0",
+        "type": "drupal-library",
+        "extra": {
+          "installer-name": "progress-tracker"
+        },
+        "dist": {
+          "url": "https://github.com/NigelOToole/progress-tracker/archive/v1.4.0.zip",
+          "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
+        }
+      }
+    },
     "signature_pad": {
+      "_webform": true,
       "type": "package",
       "package": {
         "name": "signature_pad/signature_pad",
@@ -436,12 +440,23 @@
           "composer/installers": "~1.0"
         }
       }
+    },
+    "slick": {
+      "type": "package",
+      "package": {
+        "name": "kenwheeler/slick",
+        "version": "1.6.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/kenwheeler/slick/archive/1.6.0.zip",
+          "type": "zip"
+        }
+      }
     }
   },
   "require": {
-    "abraham/twitteroauth": "0.7.3",
+    "abraham/twitteroauth": "0.7.4",
     "blobaugh/meetup-api-client": "dev-master#760113eb6548d160a5148f5ca4210e2c30bdd00c",
-    "ckeditor/autogrow": "4.6.2",
     "ckeditor/fakeobjects": "4.6.2",
     "ckeditor/image": "4.6.2",
     "ckeditor/link": "4.6.2",
@@ -455,20 +470,20 @@
     "drupal/blazy": "1.0.0-rc2",
     "drupal/bootstrap": "3.5.0",
     "drupal/context": "1.x-dev#457c7e166d1a6356d031b43e4e2becb3af1b72ab",
-    "drupal/core": "8.3.4",
+    "drupal/core": "8.3.5",
     "drupal/dropzonejs": "1.0.0-alpha7",
     "drupal/drush_language": "1.*",
     "drupal/entity_browser": "1.0.0",
     "drupal/entity_embed": "1.0.0-beta2",
     "drupal/eu_cookie_compliance": "1.0.0-beta7",
     "drupal/eva": "1.2.0-rc2",
-    "drupal/facets": "1.0.0-alpha9",
+    "drupal/facets": "1.0.0-alpha10",
     "drupal/features": "3.5.0",
     "drupal/feeds": "3.*",
     "drupal/field_group": "1.0.0-rc6",
     "drupal/flag": "4.0.0-alpha2",
     "drupal/geofield": "1.0.0-alpha4",
-    "drupal/honeypot": "1.26.0",
+    "drupal/honeypot": "1.27.0",
     "drupal/inline_entity_form": "1.0.0-beta1",
     "drupal/leaflet": "1.x-dev#da0386d50987b63199937163bfe438807e7affcd",
     "drupal/link_attributes": "1.0.0",
@@ -489,14 +504,14 @@
     "drupal/r4032login": "1.*",
     "drupal/redirect": "1.0.0-alpha5",
     "drupal/redis": "1.0.0-beta1",
-    "drupal/search_api": "1.1.0",
-    "drupal/search_api_solr": "1.0.0-rc4",
+    "drupal/search_api": "1.2.0",
+    "drupal/search_api_solr": "1.0.0",
     "drupal/slick": "1.0.0",
     "drupal/slick_views": "1.0.0-rc2",
     "drupal/varnish_purge": "1.5.0",
     "drupal/video_embed_field": "1.5.0",
     "drupal/views_infinite_scroll": "1.3.0",
-    "drupal/webform": "5.0.0-beta13",
+    "drupal/webform": "5.0.0-beta15",
     "drush/drush": "8.1.12",
     "enyo/dropzone": "4.3.*",
     "fortawesome/fontawesome": "4.7.0",
@@ -514,6 +529,7 @@
     "jquery/word-and-character-counter": "2.3.5",
     "kenwheeler/slick": "1.6.0",
     "leaflet/leaflet": "1.0.3",
+    "progress-tracker/progress-tracker": "1.4.0",
     "signature_pad/signature_pad": "1.5.3",
     "twbs/bootstrap-sass": "3.3.7"
   },
@@ -589,9 +605,6 @@
     "patches": {
       "drupal/entity_browser": {
         "Notice: Undefined index: max_resolution": "https://www.drupal.org/files/issues/entity-browser-widget-context-small-fix-2871372-2.patch"
-      },
-      "drupal/feeds": {
-        "Use the feed owner as the owner of the imported entities": "https://www.drupal.org/files/issues/feeds-feed_owner-2889442-2.patch"
       },
       "drupal/leaflet": {
         "Error in leaflet_process_geofield() when twig debug is active.": "https://www.drupal.org/files/issues/leaflet-error_when_debug_active-2783843-2.patch",
