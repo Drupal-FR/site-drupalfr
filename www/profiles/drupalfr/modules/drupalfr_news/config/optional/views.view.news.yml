@@ -2,6 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.listing
     - core.entity_view_mode.node.teaser
     - node.type.news
     - taxonomy.vocabulary.news_types
@@ -168,6 +169,9 @@ display:
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
+      use_more: true
+      use_more_always: true
+      use_more_text: 'Toutes les actualités'
     cache_metadata:
       max-age: -1
       contexts:
@@ -278,10 +282,20 @@ display:
       defaults:
         filters: false
         filter_groups: false
+        style: false
+        row: false
       filter_groups:
         operator: AND
         groups:
           1: AND
+      style:
+        type: default
+        options: {  }
+      row:
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: listing
     cache_metadata:
       max-age: -1
       contexts:

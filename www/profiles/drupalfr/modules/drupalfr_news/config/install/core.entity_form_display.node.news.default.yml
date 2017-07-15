@@ -2,15 +2,76 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - entity_browser.browser.media_image
     - field.field.node.news.body
     - field.field.node.news.field_media_banner
+    - field.field.node.news.field_media_teaser
     - field.field.node.news.field_news_type
     - field.field.node.news.field_paragraph
     - node.type.news
   module:
+    - entity_browser
+    - field_group
     - paragraphs
     - path
     - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_texts
+        - group_media
+        - group_informations
+      parent_name: ''
+      weight: 2
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: Onglets
+    group_texts:
+      children:
+        - title
+        - body
+        - field_paragraph
+      parent_name: group_tabs
+      weight: 1
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Textes
+    group_media:
+      children:
+        - field_media_banner
+        - field_media_teaser
+      parent_name: group_tabs
+      weight: 2
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Média
+    group_informations:
+      children:
+        - field_news_type
+      parent_name: group_tabs
+      weight: 3
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Informations
 id: node.news.default
 targetEntityType: node
 bundle: news
@@ -18,7 +79,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 9
+    weight: 1
     settings:
       rows: 9
       summary_rows: 3
@@ -27,18 +88,37 @@ content:
     region: content
   created:
     type: datetime_timestamp
-    weight: 3
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
   field_media_banner:
     weight: 10
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+      entity_browser: media_image
+      field_widget_display: rendered_entity
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: editor
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: entity_browser_entity_reference
+    region: content
+  field_media_teaser:
+    weight: 11
+    settings:
+      entity_browser: media_image
+      field_widget_display: rendered_entity
+      field_widget_edit: true
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: editor
+    third_party_settings: {  }
+    type: entity_browser_entity_reference
     region: content
   field_news_type:
     weight: 7
@@ -50,7 +130,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_paragraph:
-    weight: 11
+    weight: 2
     settings:
       title: Paragraphe
       title_plural: Paragraphes
@@ -69,7 +149,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 6
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -77,14 +157,14 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 4
+    weight: 5
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 5
+    weight: 6
     region: content
     third_party_settings: {  }
   title:
@@ -97,7 +177,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 2
+    weight: 3
     settings:
       match_operator: CONTAINS
       size: 60

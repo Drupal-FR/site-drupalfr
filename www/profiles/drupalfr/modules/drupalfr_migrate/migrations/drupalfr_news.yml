@@ -35,6 +35,8 @@ source:
     -
       banner: Banner
     -
+      media_teaser: 'Media teaser'
+    -
       news_type: 'News type'
     -
       body_value: Body
@@ -62,6 +64,11 @@ process:
         plugin: migration
         migration: drupalfr_media
         source: banner
+  field_media_teaser:
+    -
+      plugin: migration
+      migration: drupalfr_media
+      source: media_teaser
   body/value: body_value
   body/format: body_format
   field_paragraph:

@@ -66,27 +66,36 @@
  */
 #}
 {%
-  set classes = [
-    node.bundle|clean_class,
-    node.isPromoted() ? 'is-promoted',
-    node.isSticky() ? 'is-sticky',
-    not node.isPublished() ? 'is-unpublished',
-    view_mode ? view_mode|clean_class,
-    'clearfix',
-  ]
+set classes = [
+node.bundle|clean_class,
+node.isPromoted() ? 'is-promoted',
+node.isSticky() ? 'is-sticky',
+not node.isPublished() ? 'is-unpublished',
+view_mode ? view_mode|clean_class,
+'clearfix',
+]
 %}
 <article{{ attributes.addClass(classes) }}>
 
-  {{ content.field_media_teaser }}
+  <div class="col-md-1">
+    {{ square_publication_date }}
+  </div>
 
-  {{ title_prefix }}
-  <h2{{ title_attributes }}>
-    <a href="{{ url }}" rel="bookmark">{{ label }}</a>
-  </h2>
-  {{ title_suffix }}
+  <div class="col-md-11">
+    <div class="clearfix">
+      {{ content.field_news_type }}
+      {{ author_picture }}
+    </div>
 
-  <div{{ content_attributes.addClass('content') }}>
-    {{ content.body }}
+    {{ title_prefix }}
+    <h2{{ title_attributes }}>
+      <a href="{{ url }}" rel="bookmark">{{ label }}</a>
+    </h2>
+    {{ title_suffix }}
+
+    <div{{ content_attributes.addClass('content') }}>
+      {{ content.body }}
+    </div>
   </div>
 
 </article>
