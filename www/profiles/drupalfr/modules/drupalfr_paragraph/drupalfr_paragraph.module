@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_paragraph module.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_preprocess_paragraph().
+ */
+function drupalfr_paragraph_preprocess_paragraph(&$variables) {
+  /** @var \Drupal\paragraphs\ParagraphInterface $paragraph */
+  $paragraph = $variables['paragraph'];
+  if ($paragraph->bundle() == 'banner') {
+    // Allow to wrap the paragraph into a link.
+    if ($paragraph->hasField('field_banner_link')) {
+      $banner_link = $paragraph->get('field_banner_link')->getValue();
+      if (!empty($banner_link)) {
+        $variables['banner_link_url'] = Url::fromUri($banner_link[0]['uri'])->toString();
+        $variables['banner_link_title'] = $banner_link[0]['title'];
+      }
+    }
+  }
+}
