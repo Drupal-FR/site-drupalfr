@@ -1,16 +1,18 @@
-drupalfr_releases.last_release:
-  path: '/drupal-last-release'
-  defaults:
-    _controller: '\Drupal\drupalfr_releases\Controller\ReleaseController::getLast'
-    _title: 'Drupal last release'
-  requirements:
-    _permission: 'access content'
-
 drupalfr_releases.settings:
-  path: '/admin/config/drupalfr/release-settings'
+  path: '/admin/config/drupalfr/releases'
   defaults:
     _form: '\Drupal\drupalfr_releases\Form\Settings'
-    _title: 'Release'
+    _title: 'Releases'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+
+drupalfr_releases.import:
+  path: '/admin/config/drupalfr/releases/import'
+  defaults:
+    _form: '\Drupal\drupalfr_releases\Form\Import'
+    _title: 'Releases import'
   requirements:
     _permission: 'access administration pages'
   options:

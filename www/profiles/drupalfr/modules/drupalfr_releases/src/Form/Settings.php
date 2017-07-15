@@ -4,7 +4,6 @@ namespace Drupal\drupalfr_releases\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\drupalfr_releases\Release;
 
 /**
  * Class Settings for release xml.
@@ -38,14 +37,10 @@ class Settings extends ConfigFormBase {
     $form['xml_address'] = [
       '#type' => 'textfield',
       '#title' => $this->t('XML address'),
-      '#size' => 64,
       '#default_value' => $twitter->get('xml_address'),
+      '#required' => TRUE,
     ];
 
-    $form['action']['import'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Import releases'),
-    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -58,14 +53,6 @@ class Settings extends ConfigFormBase {
     $this->config('drupalfr_releases.settings')
       ->set('xml_address', $form_state->getValue('xml_address'))
       ->save();
-
-    $clicked_button = &$form_state->getTriggeringElement()['#parents'][0];
-
-    // Import button.
-    if ($clicked_button == 'import') {
-      $release = new Release();
-      $release->importWithBatch();
-    }
   }
 
 }

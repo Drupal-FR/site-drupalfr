@@ -1,0 +1,7 @@
+services:
+  drupalfr_releases.release_helper:
+    class: Drupal\drupalfr_releases\Service\ReleaseHelper
+    arguments:
+      - '@config.factory'
+      - '@entity_type.manager'
+      - '@logger.factory'
