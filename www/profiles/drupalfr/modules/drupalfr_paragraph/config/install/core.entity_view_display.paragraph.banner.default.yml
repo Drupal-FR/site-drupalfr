@@ -7,27 +7,14 @@ dependencies:
     - field.field.paragraph.banner.field_text
     - paragraphs.paragraphs_type.banner
   module:
-    - link
     - text
 id: paragraph.banner.default
 targetEntityType: paragraph
 bundle: banner
 mode: default
 content:
-  field_banner_link:
-    weight: 1
-    label: hidden
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    type: link
-    region: content
   field_media:
-    weight: 2
+    weight: 0
     label: hidden
     settings:
       link: true
@@ -36,10 +23,11 @@ content:
     type: entity_reference_entity_view
     region: content
   field_text:
-    weight: 0
+    weight: 1
     label: hidden
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-hidden: {  }
+hidden:
+  field_banner_link: true
