@@ -110,12 +110,12 @@ class Release {
     // Check if we restrict elements.
     $results = $nb > 0 ? array_slice($elements, $context['sandbox']['progress'], 5) : $elements;
 
-    foreach ($results as $release) {
-      $context['message'] = t('Import drupal version : @version', ['@version' => (string) $release->version]);
+    foreach ($results as $result) {
+      $context['message'] = t('Import drupal version : @version', ['@version' => (string) $result->version]);
       $context['sandbox']['progress']++;
 
       // If node exist, we update it.
-      $nid = $release->checkNodeExist('drupal_release', $release->name);
+      $nid = $release->checkNodeExist('drupal_release', $result->name);
 
       if (empty($nid)) {
         $node = Node::create(['type' => 'drupal_release']);
@@ -125,20 +125,20 @@ class Release {
       }
 
       // Set values of fields.
-      $node->set('title', $release->name);
+      $node->set('title', $result->name);
       $node->set('status', TRUE);
-      $node->set('created', $release->date);
-      $node->set('field_release_version_major', $release->version_major);
-      $node->set('field_release_version_minor', $release->version_minor);
-      $node->set('field_release_version_patch', $release->version_patch);
-      $node->set('field_release_version_extra', $release->version_extra);
-      $node->set('field_release_link', $release->release_link);
-      $node->set('field_release_file_targz', $release->files->file[0]->url);
-      $node->set('field_release_file_zip', $release->files->file[1]->url);
+      $node->set('created', $result->date);
+      $node->set('field_release_version_major', $result->version_major);
+      $node->set('field_release_version_minor', $result->version_minor);
+      $node->set('field_release_version_patch', $result->version_patch);
+      $node->set('field_release_version_extra', $result->version_extra);
+      $node->set('field_release_link', $result->release_link);
+      $node->set('field_release_file_targz', $result->files->file[0]->url);
+      $node->set('field_release_file_zip', $result->files->file[1]->url);
       $node->save();
 
       \Drupal::logger('drupalfr_releases_import')
-        ->notice('Release (' . $release->name . ') was imported/updated');
+        ->notice('Release (' . $result->name . ') was imported/updated');
     }
 
     if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
