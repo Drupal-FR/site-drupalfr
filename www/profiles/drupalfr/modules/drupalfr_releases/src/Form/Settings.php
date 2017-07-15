@@ -44,16 +44,9 @@ class Settings extends ConfigFormBase {
 
     $form['action']['import'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Import releases')
+      '#value' => $this->t('Import releases'),
     ];
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
   }
 
   /**
@@ -68,13 +61,11 @@ class Settings extends ConfigFormBase {
 
     $clicked_button = &$form_state->getTriggeringElement()['#parents'][0];
 
-
-    if ($clicked_button == 'import') {// Import button
+    // Import button.
+    if ($clicked_button == 'import') {
       $release = new Release();
       $release->importWithBatch();
     }
-
-
   }
 
 }

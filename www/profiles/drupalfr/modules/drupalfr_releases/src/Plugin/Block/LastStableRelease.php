@@ -9,7 +9,7 @@ use Drupal\Core\Block\BlockBase;
  *
  * @Block(
  *   id = "last_stable_release",
- *   admin_label = @Translation("Last stable release  block"),
+ *   admin_label = @Translation("Last stable release block"),
  * )
  */
 class LastStableRelease extends BlockBase {

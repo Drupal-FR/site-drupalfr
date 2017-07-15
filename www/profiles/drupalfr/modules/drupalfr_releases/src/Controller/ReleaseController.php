@@ -1,13 +1,11 @@
 <?php
 
-
 namespace Drupal\drupalfr_releases\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\drupalfr_releases\Release;
 use Drupal\node\Entity\Node;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Class ReleaseController.
@@ -17,7 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class ReleaseController extends ControllerBase {
 
   /**
-   * Redirect to drupal.org on the last stable release of Drupal
+   * Redirect to drupal.org on the last stable release of Drupal.
    *
    * @return string
    *   Return empty string.

@@ -8,18 +8,32 @@ use Drupal\node\Entity\Node;
 /**
  * Functions for parse the xml, return the last stable release ...
  */
-class Release  {
+class Release {
 
-  private $xml_url = '';
-  private $xml = NULL;
+  /**
+   * The XML URL.
+   *
+   * @var string
+   */
+  private $xmlUrl = '';
 
+  /**
+   * The XML response.
+   *
+   * @var string
+   */
+  private $xml = '';
+
+  /**
+   * Release constructor.
+   */
   public function __construct() {
     $release_config = \Drupal::config('drupalfr_releases.settings');
-    $this->xml_url = $release_config->get('xml_address');
+    $this->xmlUrl = $release_config->get('xml_address');
   }
 
   /**
-   * Return full url to the last published release
+   * Return full url to the last published release.
    */
   public function getLastPublished() {
     $query = \Drupal::entityQuery('node');
@@ -33,9 +47,8 @@ class Release  {
     return $query->execute();
   }
 
-
   /**
-   * Import drupal release versions
+   * Import drupal release versions.
    */
   public function importWithBatch() {
     $this->getFeed();
@@ -45,44 +58,48 @@ class Release  {
       'operations' => [
         [
           '\Drupal\drupalfr_releases\Release::importFeed',
-          [$this, 5]
+          [$this, 5],
         ],
       ],
-      'file' => drupal_get_path('module', 'drupalfr_releases')
-        . '/src/Release.php'
+      'file' => drupal_get_path('module', 'drupalfr_releases') . '/src/Release.php',
     ];
 
     batch_set($batch);
   }
 
   /**
-   * Get xml feed
+   * Get xml feed.
    */
   protected function getFeed() {
     $client = \Drupal::httpClient();
-    $response = $client->get($this->xml_url);
+    $response = $client->get($this->xmlUrl);
     $this->xml = $response->getBody()->getContents();
   }
 
   /**
-   * Import Drupal releases
+   * Import Drupal releases.
    */
   public function importWithCron() {
     $this->getFeed();
 
-    // I set fake context for use same method when I load by Cron or Batch
+    // I set fake context for use same method when I load by Cron or Batch.
     $fake_context = [];
 
     static::importFeed($this, 0, $fake_context);
   }
 
   /**
-   * Function for import drupal release
-   * @param \Drupal\drupalfr_releases\Release $Release
-   * @param $context
+   * Function for import drupal release.
+   *
+   * @param \Drupal\drupalfr_releases\Release $release
+   *   A release object.
+   * @param int $nb
+   *   Number of release to get.
+   * @param array $context
+   *   Batch context.
    */
-  public static function importFeed(Release $Release, $nb, &$context) {
-    $xmlElement = new SimpleXMLElement($Release->xml);
+  public static function importFeed(Release $release, $nb, array &$context) {
+    $xmlElement = new SimpleXMLElement($release->xml);
     $elements = $xmlElement->xpath("//releases/release");
 
     if (empty($context['sandbox'])) {
@@ -90,15 +107,15 @@ class Release  {
       $context['sandbox']['max'] = count($elements);
     }
 
-    // Check if we restrict elements
+    // Check if we restrict elements.
     $results = $nb > 0 ? array_slice($elements, $context['sandbox']['progress'], 5) : $elements;
 
     foreach ($results as $release) {
-      $context['message'] = t('Import drupal version : ' . (string) $release->version);
+      $context['message'] = t('Import drupal version : @version', ['@version' => (string) $release->version]);
       $context['sandbox']['progress']++;
 
-      // If node exist, we update it
-      $nid = $Release->checkNodeExist('drupal_release', $release->name);
+      // If node exist, we update it.
+      $nid = $release->checkNodeExist('drupal_release', $release->name);
 
       if (empty($nid)) {
         $node = Node::create(['type' => 'drupal_release']);
@@ -107,7 +124,7 @@ class Release  {
         $node = Node::load($nid);
       }
 
-      // Set values of fields
+      // Set values of fields.
       $node->set('title', $release->name);
       $node->set('status', TRUE);
       $node->set('created', $release->date);
@@ -130,10 +147,15 @@ class Release  {
   }
 
   /**
-   * Check if node exist
-   * @param $type
-   * @param $id
+   * Check if node exist.
+   *
+   * @param string $type
+   *   The type of node to check.
+   * @param string $title
+   *   The title of the node.
+   *
    * @return mixed
+   *   The node id if it exists.
    */
   protected function checkNodeExist($type, $title) {
     $query = \Drupal::entityQuery('node')
@@ -144,4 +166,5 @@ class Release  {
     $result = $query->execute();
     return reset($result);
   }
+
 }
