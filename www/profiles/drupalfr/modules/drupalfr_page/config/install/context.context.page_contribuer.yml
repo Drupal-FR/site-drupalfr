@@ -1,0 +1,56 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+name: page_contribuer
+label: 'Page contribuer'
+group: 'Page particulière'
+description: ''
+requireAllConditions: true
+disabled: false
+conditions:
+  request_path:
+    id: request_path
+    pages: /association/contribuer
+    negate: 0
+    uuid: 99fd4de9-e32d-47b1-b6fe-57bf01fdc91f
+    context_mapping: {  }
+reactions:
+  blocks:
+    blocks:
+      1fbb9c9b-30d0-46a8-a696-aef649e622a8:
+        id: 'block_content:block_header_contribute'
+        label: "Header\_: page contribuer"
+        provider: block_content
+        label_display: 0
+        status: true
+        info: ''
+        view_mode: full
+        region: header
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 1fbb9c9b-30d0-46a8-a696-aef649e622a8
+      bf15a66d-3f6e-4935-a375-1497d51bf8cd:
+        id: 'block_content:block_sidebar_question'
+        label: "Sidebar\_: poser une question"
+        provider: block_content
+        label_display: 0
+        status: true
+        info: ''
+        view_mode: full
+        region: sidebar_second
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: bf15a66d-3f6e-4935-a375-1497d51bf8cd
+    id: blocks
+    saved: false
+    uuid: 89b02ff1-5cc8-4b2b-846c-6011f9364565
+    include_default_blocks: 0
+weight: 0
