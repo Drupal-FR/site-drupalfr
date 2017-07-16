@@ -49,3 +49,22 @@ function drupalfr_release_cron() {
     }
   }
 }
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function drupalfr_release_preprocess_node(&$variables) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+
+  // Add variable for the creation date.
+  if ($node->bundle() == 'release') {
+    /** @var Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+    $date_formatter = \Drupal::service('date.formatter');
+
+    $variables['release_creation_date'] = t('Created the @date', [
+      '@date' => $date_formatter->format($node->getCreatedTime(), 'jour_mois_annee_heure'),
+    ]);
+  }
+
+}
