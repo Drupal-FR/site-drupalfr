@@ -66,18 +66,5 @@ function drupalfr_release_preprocess_node(&$variables) {
       '@date' => $date_formatter->format($node->getCreatedTime(), 'jour_mois_annee_heure'),
     ]);
   }
-}
 
-/**
- * Implements hook_preprocess_page().
- *
- * Add variables to know if the view route exists.
- */
-function drupalfr_release_preprocess_page(&$variables) {
-  $variables['releases_page_exists'] = FALSE;
-  /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */
-  $route_provider = \Drupal::service('router.route_provider');
-  if (!empty($route_provider->getRoutesByNames(['view.release.page_1']))) {
-    $variables['releases_page_exists'] = TRUE;
-  }
 }
