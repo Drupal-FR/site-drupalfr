@@ -1,0 +1,22 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_release_version_minor
+    - node.type.release
+id: node.release.field_release_version_minor
+field_name: field_release_version_minor
+entity_type: node
+bundle: release
+label: 'Version mineure'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
