@@ -113,7 +113,7 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
         'max-age' => '900',
       ];
 
-      // Limit to three meetup.
+      // Limit to three meetups.
       $events = array_slice($events, 0, 3);
       $build['events_list'] = [
         '#theme' => 'drupalfr_meetup_events',
