@@ -1,8 +1,8 @@
 langcode: fr
-status: false
+status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.listing
     - field.field.node.drupal_release.body
     - field.field.node.drupal_release.field_release_file_targz
     - field.field.node.drupal_release.field_release_file_zip
@@ -19,61 +19,61 @@ dependencies:
     - options
     - text
     - user
-id: node.drupal_release.teaser
+id: node.drupal_release.listing
 targetEntityType: node
 bundle: drupal_release
-mode: teaser
+mode: listing
 content:
   body:
     label: hidden
     type: text_default
-    weight: 1
+    weight: 2
     settings: {  }
     third_party_settings: {  }
     region: content
   field_release_file_targz:
-    type: link
     weight: 4
-    region: content
     label: hidden
     settings:
-      trim_length: 80
+      trim_length: null
       url_only: false
       url_plain: false
-      rel: ''
-      target: ''
+      rel: '0'
+      target: '0'
     third_party_settings: {  }
+    type: link
+    region: content
   field_release_file_zip:
-    type: link
     weight: 3
-    region: content
     label: hidden
     settings:
-      trim_length: 80
+      trim_length: null
       url_only: false
       url_plain: false
-      rel: ''
-      target: ''
+      rel: '0'
+      target: '0'
     third_party_settings: {  }
-  field_release_link:
     type: link
-    weight: 0
     region: content
+  field_release_link:
+    weight: 0
     label: hidden
     settings:
-      trim_length: 80
+      trim_length: null
       url_only: false
       url_plain: false
-      rel: ''
-      target: ''
+      rel: '0'
+      target: '0'
     third_party_settings: {  }
-  field_release_type:
-    type: list_default
-    weight: 2
+    type: link
     region: content
+  field_release_type:
+    weight: 1
     label: above
     settings: {  }
     third_party_settings: {  }
+    type: list_default
+    region: content
 hidden:
   field_release_security: true
   field_release_version_extra: true

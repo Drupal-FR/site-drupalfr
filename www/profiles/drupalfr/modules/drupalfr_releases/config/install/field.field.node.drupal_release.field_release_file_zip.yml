@@ -14,9 +14,17 @@ label: 'Fichier (.zip)'
 description: ''
 required: true
 translatable: false
-default_value: {  }
+default_value:
+  -
+    attributes:
+      class: 'btn btn-info btn-lg'
+    uri: 'https://www.drupal.org/project/drupal'
+    options:
+      attributes:
+        class: 'btn btn-info'
+    title: 'Télécharger (zip)'
 default_value_callback: ''
 settings:
   link_type: 16
-  title: 0
+  title: 1
 field_type: link

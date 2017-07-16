@@ -7,6 +7,7 @@ dependencies:
     - field.field.node.drupal_release.field_release_file_zip
     - field.field.node.drupal_release.field_release_link
     - field.field.node.drupal_release.field_release_security
+    - field.field.node.drupal_release.field_release_type
     - field.field.node.drupal_release.field_release_version_extra
     - field.field.node.drupal_release.field_release_version_major
     - field.field.node.drupal_release.field_release_version_minor
@@ -14,6 +15,7 @@ dependencies:
     - node.type.drupal_release
   module:
     - link
+    - options
     - text
     - user
 id: node.drupal_release.default
@@ -24,13 +26,13 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 101
+    weight: 8
     settings: {  }
     third_party_settings: {  }
     region: content
   field_release_file_targz:
-    weight: 108
-    label: above
+    weight: 5
+    label: inline
     settings:
       trim_length: 80
       url_only: false
@@ -41,8 +43,8 @@ content:
     type: link
     region: content
   field_release_file_zip:
-    weight: 109
-    label: above
+    weight: 6
+    label: inline
     settings:
       trim_length: 80
       url_only: false
@@ -53,8 +55,8 @@ content:
     type: link
     region: content
   field_release_link:
-    weight: 110
-    label: above
+    weight: 4
+    label: inline
     settings:
       trim_length: 80
       url_only: false
@@ -64,27 +66,24 @@ content:
     third_party_settings: {  }
     type: link
     region: content
-  field_release_security:
-    weight: 107
+  field_release_type:
+    weight: 7
     label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
+    settings: {  }
     third_party_settings: {  }
-    type: boolean
+    type: list_default
     region: content
   field_release_version_extra:
-    weight: 105
-    label: above
+    weight: 3
+    label: inline
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
   field_release_version_major:
-    weight: 102
-    label: above
+    weight: 0
+    label: inline
     settings:
       thousand_separator: ''
       prefix_suffix: true
@@ -92,8 +91,8 @@ content:
     type: number_integer
     region: content
   field_release_version_minor:
-    weight: 103
-    label: above
+    weight: 1
+    label: inline
     settings:
       thousand_separator: ''
       prefix_suffix: true
@@ -101,16 +100,15 @@ content:
     type: number_integer
     region: content
   field_release_version_patch:
-    weight: 104
-    label: above
+    weight: 2
+    label: inline
     settings:
       thousand_separator: ''
       prefix_suffix: true
     third_party_settings: {  }
     type: number_integer
     region: content
-  links:
-    weight: 100
-    region: content
 hidden:
+  field_release_security: true
   langcode: true
+  links: true

@@ -7,15 +7,80 @@ dependencies:
     - field.field.node.drupal_release.field_release_file_zip
     - field.field.node.drupal_release.field_release_link
     - field.field.node.drupal_release.field_release_security
+    - field.field.node.drupal_release.field_release_type
     - field.field.node.drupal_release.field_release_version_extra
     - field.field.node.drupal_release.field_release_version_major
     - field.field.node.drupal_release.field_release_version_minor
     - field.field.node.drupal_release.field_release_version_patch
     - node.type.drupal_release
   module:
+    - field_group
     - link
+    - link_attributes
     - path
     - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_texts
+        - group_informations
+        - group_download
+      parent_name: ''
+      weight: 0
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: Onglets
+    group_texts:
+      children:
+        - title
+        - body
+      parent_name: group_tabs
+      weight: 20
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Textes
+    group_informations:
+      children:
+        - field_release_type
+        - field_release_version_major
+        - field_release_version_minor
+        - field_release_version_patch
+        - field_release_version_extra
+        - field_release_security
+        - field_release_link
+      parent_name: group_tabs
+      weight: 21
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Informations
+    group_download:
+      children:
+        - field_release_file_targz
+        - field_release_file_zip
+      parent_name: group_tabs
+      weight: 22
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Téléchargement
 id: node.drupal_release.default
 targetEntityType: node
 bundle: drupal_release
@@ -23,7 +88,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 6
+    weight: 2
     settings:
       rows: 9
       summary_rows: 3
@@ -32,28 +97,42 @@ content:
     region: content
   created:
     type: datetime_timestamp
-    weight: 12
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
   field_release_file_targz:
-    weight: 8
-    settings:
-      placeholder_url: ''
-      placeholder_title: ''
-    third_party_settings: {  }
-    type: link_default
-    region: content
-  field_release_file_zip:
     weight: 9
     settings:
       placeholder_url: ''
       placeholder_title: ''
+      enabled_attributes:
+        class: true
+        id: false
+        name: false
+        target: false
+        rel: false
+        accesskey: false
     third_party_settings: {  }
-    type: link_default
+    type: link_attributes
+    region: content
+  field_release_file_zip:
+    weight: 10
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      enabled_attributes:
+        class: true
+        id: false
+        name: false
+        target: false
+        rel: false
+        accesskey: false
+    third_party_settings: {  }
+    type: link_attributes
     region: content
   field_release_link:
-    weight: 7
+    weight: 23
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -61,14 +140,20 @@ content:
     type: link_default
     region: content
   field_release_security:
-    weight: 5
+    weight: 22
     settings:
       display_label: true
     third_party_settings: {  }
     type: boolean_checkbox
     region: content
+  field_release_type:
+    weight: 17
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
   field_release_version_extra:
-    weight: 4
+    weight: 21
     settings:
       size: 60
       placeholder: ''
@@ -76,21 +161,21 @@ content:
     type: string_textfield
     region: content
   field_release_version_major:
-    weight: 1
+    weight: 18
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
     region: content
   field_release_version_minor:
-    weight: 2
+    weight: 19
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
     region: content
   field_release_version_patch:
-    weight: 3
+    weight: 20
     settings:
       placeholder: ''
     third_party_settings: {  }
@@ -98,13 +183,13 @@ content:
     region: content
   langcode:
     type: language_select
-    weight: 10
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
   path:
     type: path
-    weight: 15
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -112,19 +197,19 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 13
+    weight: 14
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 14
+    weight: 15
     region: content
     third_party_settings: {  }
   title:
     type: string_textfield
-    weight: 0
+    weight: 1
     region: content
     settings:
       size: 60
@@ -132,7 +217,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 11
+    weight: 12
     settings:
       match_operator: CONTAINS
       size: 60

@@ -5,6 +5,7 @@ namespace Drupal\drupalfr_releases\Service;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use GuzzleHttp\Client;
 use Drupal\node\Entity\Node;
 
@@ -12,6 +13,7 @@ use Drupal\node\Entity\Node;
  * Functions for parse the xml, return the last stable release ...
  */
 class ReleaseHelper implements ReleaseHelperInterface {
+  use StringTranslationTrait;
 
   /**
    * The factory for configuration objects.
@@ -94,9 +96,32 @@ class ReleaseHelper implements ReleaseHelperInterface {
       if (isset($result['version_extra'])) {
         $node->set('field_release_version_extra', $result['version_extra']);
       }
-      $node->set('field_release_link', $result['release_link']);
-      $node->set('field_release_file_targz', $result['files']['file'][0]['url']);
-      $node->set('field_release_file_zip', $result['files']['file'][1]['url']);
+      $node->set('field_release_link', [
+        'uri' => $result['release_link'],
+        'title' => $result['name'],
+      ]);
+      $node->set('field_release_file_targz', [
+        'uri' => $result['files']['file'][0]['url'],
+        'title' => $this->t('Download (tar.gz)'),
+        'options' => [
+          'attributes' => [
+            'class' => 'btn btn-info',
+          ],
+        ],
+      ]);
+      $node->set('field_release_file_zip', [
+        'uri' => $result['files']['file'][1]['url'],
+        'title' => $this->t('Download (zip)'),
+        'options' => [
+          'attributes' => [
+            'class' => 'btn btn-info',
+          ],
+        ],
+      ]);
+      if (isset($result['terms'])) {
+        $node->set('field_release_type', $this->extractReleaseTypes($result['terms']['term']));
+      }
+
       $node->save();
 
       $imported_release_ids[] = $node->id();
@@ -126,6 +151,78 @@ class ReleaseHelper implements ReleaseHelperInterface {
 
     $result = $query->execute();
     return reset($result);
+  }
+
+  /**
+   * Convert release types from XML into Drupal value.
+   *
+   * @param array $terms
+   *   The release types from the XML.
+   *
+   * @return array
+   *   The array of release types.
+   */
+  protected function extractReleaseTypes(array $terms) {
+    $release_types = [];
+
+    if (!$this->isNumericArray($terms)) {
+      return $this->extractReleaseTypes([$terms]);
+    }
+
+    foreach ($terms as $term) {
+      $release_type = $this->extractReleaseType($term);
+      if ($release_type) {
+        $release_types[] = $release_type;
+      }
+    }
+
+    return $release_types;
+  }
+
+  /**
+   * Return the corresponding Drupal value of a release type.
+   *
+   * @param array $term
+   *   The release types from the XML.
+   *
+   * @return string|bool
+   *   The Drupal value. FALSE if no match is found.
+   */
+  protected function extractReleaseType(array $term) {
+    $release_type = FALSE;
+    switch ($term['value']) {
+      case 'Security update':
+        $release_type = 'security_update';
+        break;
+
+      case 'Bug fixes':
+        $release_type = 'bug_fixes';
+        break;
+
+      case 'New features':
+        $release_type = 'new_features';
+        break;
+    }
+
+    return $release_type;
+  }
+
+  /**
+   * Check if a array is numeric.
+   *
+   * @param array $array
+   *   The array to check.
+   *
+   * @return bool
+   *   TRUE if the array is numeric. FALSE in case of associative array.
+   */
+  protected function isNumericArray(array $array) {
+    foreach ($array as $a => $b) {
+      if (!is_int($a)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
 }
