@@ -5,7 +5,7 @@ namespace Drupal\drupalfr_release;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 
 /**
- * Class ReleasesBatchHelper.
+ * Class ReleaseBatchHelper.
  *
  * Contains static method to use for batch operations.
  *
