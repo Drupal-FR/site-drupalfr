@@ -57,7 +57,6 @@ class NewsletterSubscriptionBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-
     $build = [
       '#theme' => 'drupalfr_newsletter_subscription_block',
       '#account_hash' => $this->configuration['account_hash'],

@@ -86,6 +86,10 @@
             <span class="icon-bar"></span>
           </button>
         {% endif %}
+        <button type="button" class="toggle-search navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-mobile-search">
+          <span class="sr-only">{{ 'Toggle search'|t }}</span>
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
       </div>
 
       {# Navigation (collapsible) #}
@@ -99,6 +103,14 @@
         <div class="visible-xs">
           <div id="navbar-collapse-mobile-user" class="navbar-collapse collapse">
             {{ page.navigation_collapsible_mobile_user }}
+          </div>
+        </div>
+      {% endif %}
+      {# Search mobile (collapsible) #}
+      {% if page.search_collapsible_mobile %}
+        <div class="visible-xs">
+          <div id="navbar-collapse-mobile-search" class="navbar-collapse collapse">
+            {{ page.search_collapsible_mobile }}
           </div>
         </div>
       {% endif %}
