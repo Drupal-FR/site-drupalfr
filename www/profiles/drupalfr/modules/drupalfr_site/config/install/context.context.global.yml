@@ -101,7 +101,7 @@ reactions:
         mailing_list_hash: 27e99cb1af
         anti_spam_token: b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af
         region: footer_col_3
-        weight: '-6'
+        weight: '-8'
         context_mapping: {  }
         theme: drupalfr_theme
         css_class: ''
@@ -116,7 +116,7 @@ reactions:
         info: ''
         view_mode: full
         region: footer_col_3
-        weight: '-4'
+        weight: '-5'
         context_mapping: {  }
         theme: drupalfr_theme
         css_class: ''
@@ -161,23 +161,6 @@ reactions:
         css_class: ''
         unique: 1
         uuid: f4bc815b-810b-45b3-9f88-c883c0198916
-      78bd5292-0973-4e56-a168-04c8f7161e4e:
-        id: follow_us_block
-        label: 'Suivez nous sur :'
-        provider: drupalfr_social
-        label_display: visible
-        url_facebook: 'http://facebook.com'
-        url_twitter: 'https://twitter.com/drupalfr'
-        url_linkedin: 'http://linkedin.com'
-        url_viadeo: 'http://viadeo.com'
-        url_youtube: 'https://www.youtube.com/channel/UCIa6rzX4xvIu6eas8MZMCAw'
-        region: footer_col_3
-        weight: '-5'
-        context_mapping: {  }
-        theme: drupalfr_theme
-        css_class: ''
-        unique: 1
-        uuid: 78bd5292-0973-4e56-a168-04c8f7161e4e
       e6f5ba1a-d383-49eb-86ec-5135620448c4:
         id: 'system_menu_block:main'
         label: 'Plan du site'
@@ -231,6 +214,20 @@ reactions:
         css_class: ''
         unique: 1
         uuid: 722e0141-3a8c-46e4-a597-87f1094aa9b2
+      9a861378-f8c2-4c03-aad0-d7490dcdfb41:
+        id: 'system_menu_block:follow-us'
+        label: 'Suivez nous sur :'
+        provider: system
+        label_display: visible
+        level: '1'
+        depth: '1'
+        region: footer_col_3
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 9a861378-f8c2-4c03-aad0-d7490dcdfb41
     id: blocks
     saved: false
     uuid: 63e5ce9d-1565-46ac-a1cf-036db79cb9f4
