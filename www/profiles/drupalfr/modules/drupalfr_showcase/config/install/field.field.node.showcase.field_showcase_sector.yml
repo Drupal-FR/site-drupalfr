@@ -2,26 +2,26 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.node.field_showcase_contributor
+    - field.storage.node.field_showcase_sector
     - node.type.showcase
-id: node.showcase.field_showcase_contributor
-field_name: field_showcase_contributor
+    - taxonomy.vocabulary.website_sectors
+id: node.showcase.field_showcase_sector
+field_name: field_showcase_sector
 entity_type: node
 bundle: showcase
-label: Intervenants
+label: Secteur
 description: ''
 required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  handler: 'default:user'
+  handler: 'default:taxonomy_term'
   handler_settings:
-    include_anonymous: false
-    filter:
-      type: _none
-    target_bundles: null
+    target_bundles:
+      website_sectors: website_sectors
     sort:
       field: _none
     auto_create: false
+    auto_create_bundle: ''
 field_type: entity_reference

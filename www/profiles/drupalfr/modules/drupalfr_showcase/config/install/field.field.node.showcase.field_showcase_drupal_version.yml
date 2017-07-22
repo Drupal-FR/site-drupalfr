@@ -2,24 +2,24 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.node.field_showcase_company
-    - node.type.company
+    - field.storage.node.field_showcase_drupal_version
     - node.type.showcase
-id: node.showcase.field_showcase_company
-field_name: field_showcase_company
+    - taxonomy.vocabulary.references_drupal_versions
+id: node.showcase.field_showcase_drupal_version
+field_name: field_showcase_drupal_version
 entity_type: node
 bundle: showcase
-label: Société
+label: 'Version de Drupal'
 description: ''
 required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  handler: 'default:node'
+  handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      company: company
+      references_drupal_versions: references_drupal_versions
     sort:
       field: _none
     auto_create: false

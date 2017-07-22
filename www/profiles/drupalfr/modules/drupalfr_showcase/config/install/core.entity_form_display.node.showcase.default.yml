@@ -2,90 +2,62 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - entity_browser.browser.showcase_images
-    - field.field.node.showcase.body
+    - entity_browser.browser.media_image
     - field.field.node.showcase.field_showcase_category
-    - field.field.node.showcase.field_showcase_company
-    - field.field.node.showcase.field_showcase_contributor
-    - field.field.node.showcase.field_showcase_image
-    - field.field.node.showcase.field_showcase_technology
+    - field.field.node.showcase.field_showcase_drupal_version
+    - field.field.node.showcase.field_showcase_media
+    - field.field.node.showcase.field_showcase_sector
     - field.field.node.showcase.field_showcase_website
     - node.type.showcase
   module:
     - entity_browser
     - link
     - path
-    - text
 id: node.showcase.default
 targetEntityType: node
 bundle: showcase
 mode: default
 content:
-  body:
-    type: text_textarea_with_summary
-    weight: 31
-    settings:
-      rows: 9
-      summary_rows: 3
-      placeholder: ''
-    third_party_settings: {  }
-    region: content
   created:
     type: datetime_timestamp
-    weight: 10
+    weight: 8
     settings: {  }
     third_party_settings: {  }
     region: content
   field_showcase_category:
-    weight: 33
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+    weight: 3
+    settings: {  }
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: options_buttons
     region: content
-  field_showcase_company:
-    weight: 35
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
+  field_showcase_drupal_version:
+    weight: 4
+    settings: {  }
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: options_buttons
     region: content
-  field_showcase_contributor:
-    weight: 36
+  field_showcase_media:
+    weight: 1
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
-    region: content
-  field_showcase_image:
-    weight: 37
-    settings:
-      entity_browser: showcase_images
+      entity_browser: media_image
+      field_widget_display: rendered_entity
+      field_widget_edit: true
       field_widget_remove: true
       open: true
       selection_mode: selection_append
-      preview_image_style: thumbnail
-      field_widget_edit: true
-      view_mode: default
+      field_widget_display_settings:
+        view_mode: editor
     third_party_settings: {  }
-    type: entity_browser_file
+    type: entity_browser_entity_reference
     region: content
-  field_showcase_technology:
-    weight: 34
-    settings:
-      placeholder_url: ''
-      placeholder_title: ''
+  field_showcase_sector:
+    weight: 2
+    settings: {  }
     third_party_settings: {  }
-    type: link_default
+    type: options_buttons
     region: content
   field_showcase_website:
-    weight: 32
+    weight: 5
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -94,13 +66,13 @@ content:
     region: content
   langcode:
     type: language_select
-    weight: 2
+    weight: 6
     settings: {  }
     third_party_settings: {  }
     region: content
   path:
     type: path
-    weight: 30
+    weight: 11
     settings: {  }
     third_party_settings: {  }
     region: content
@@ -108,19 +80,19 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 15
+    weight: 9
     third_party_settings: {  }
     region: content
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 16
+    weight: 10
     third_party_settings: {  }
     region: content
   title:
     type: string_textfield
-    weight: -5
+    weight: 0
     settings:
       size: 60
       placeholder: ''
@@ -128,7 +100,7 @@ content:
     region: content
   uid:
     type: entity_reference_autocomplete
-    weight: 5
+    weight: 7
     settings:
       match_operator: CONTAINS
       size: 60

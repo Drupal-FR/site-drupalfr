@@ -30,6 +30,7 @@ $config['varnish_purger.settings.varnish']['hostname'] = 'varnish';
 
 // Solr.
 $config['search_api.server.solr']['backend_config']['connector_config']['host'] = 'solr';
+$config['search_api.server.showcase']['backend_config']['connector_config']['host'] = 'solr-showcase';
 
 // Twitter.
 // Go to https://apps.twitter.com to get these tokens.

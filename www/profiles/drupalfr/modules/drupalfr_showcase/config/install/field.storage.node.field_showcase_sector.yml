@@ -3,12 +3,13 @@ status: true
 dependencies:
   module:
     - node
-id: node.field_showcase_company
-field_name: field_showcase_company
+    - taxonomy
+id: node.field_showcase_sector
+field_name: field_showcase_sector
 entity_type: node
 type: entity_reference
 settings:
-  target_type: node
+  target_type: taxonomy_term
 module: core
 locked: false
 cardinality: 1

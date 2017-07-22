@@ -1,35 +1,20 @@
 langcode: fr
 status: true
 dependencies:
+  config:
+    - field.storage.node.field_showcase_category
+    - field.storage.node.field_showcase_drupal_version
+    - field.storage.node.field_showcase_sector
+    - search_api.server.showcase
   module:
-    - user
     - taxonomy
     - search_api
     - node
-  config:
-    - field.storage.node.body
-    - field.storage.node.field_planet_tag
-    - field.storage.node.field_drupal_version
-    - search_api.server.solr
-id: content
-name: Content
+id: showcase
+name: Références
 description: ''
 read_only: false
 field_settings:
-  status:
-    label: null
-    datasource_id: 'entity:node'
-    property_path: status
-    type: boolean
-    indexed_locked: true
-    type_locked: true
-  uid:
-    label: null
-    datasource_id: 'entity:node'
-    property_path: uid
-    type: integer
-    indexed_locked: true
-    type_locked: true
   node_grants:
     label: 'Node access information'
     property_path: search_api_node_grants
@@ -37,57 +22,59 @@ field_settings:
     indexed_locked: true
     type_locked: true
     hidden: true
-  type:
-    label: 'Content type'
+  status:
+    label: status
     datasource_id: 'entity:node'
-    property_path: type
-    type: string
-  title:
-    label: Title
+    property_path: status
+    type: boolean
+    indexed_locked: true
+    type_locked: true
+  uid:
+    label: uid
     datasource_id: 'entity:node'
-    property_path: title
-    type: text
+    property_path: uid
+    type: integer
+    indexed_locked: true
+    type_locked: true
+  created:
+    label: 'Écrit le'
+    datasource_id: 'entity:node'
+    property_path: created
+    type: date
   name:
-    label: 'Écrit par » Utilisateur » Name'
+    label: Typologie
     datasource_id: 'entity:node'
-    property_path: 'uid:entity:name'
+    property_path: 'field_showcase_category:entity:name'
     type: string
     dependencies:
+      config:
+        - field.storage.node.field_showcase_category
       module:
-        - user
-  body:
-    label: Body
-    datasource_id: 'entity:node'
-    property_path: body
-    type: text
-    boost: !!float 2
-    dependencies:
-      config:
-        - field.storage.node.body
+        - taxonomy
   name_1:
-    label: 'Tags » Taxonomy term » Name'
+    label: 'Version de Drupal'
     datasource_id: 'entity:node'
-    property_path: 'field_planet_tag:entity:name'
+    property_path: 'field_showcase_drupal_version:entity:name'
     type: string
     dependencies:
       config:
-        - field.storage.node.field_planet_tag
+        - field.storage.node.field_showcase_drupal_version
       module:
         - taxonomy
   name_2:
-    label: 'Version de Drupal » Taxonomy term » Name'
+    label: Secteur
     datasource_id: 'entity:node'
-    property_path: 'field_drupal_version:entity:name'
+    property_path: 'field_showcase_sector:entity:name'
     type: string
     dependencies:
       config:
-        - field.storage.node.field_drupal_version
+        - field.storage.node.field_showcase_sector
       module:
         - taxonomy
 datasource_settings:
   'entity:node':
     bundles:
-      default: true
+      default: false
       selected:
         - showcase
     languages:
@@ -95,52 +82,45 @@ datasource_settings:
       selected: {  }
 processor_settings:
   tokenizer:
-    fields:
-      - title
-      - body
+    all_fields: false
+    fields: {  }
     spaces: ''
     overlap_cjk: 1
     minimum_word_size: '3'
     weights:
       preprocess_index: -6
       preprocess_query: -6
-    all_fields: false
   transliteration:
+    all_fields: true
     fields:
-      - title
-      - body
+      - node_grants
+      - name
+      - name_1
+      - name_2
     weights:
-      preprocess_index: -10
-      preprocess_query: -10
-    all_fields: false
+      preprocess_index: -20
+      preprocess_query: -20
   ignorecase:
+    all_fields: true
     fields:
-      - title
-      - body
+      - node_grants
+      - name
+      - name_1
+      - name_2
     weights:
-      preprocess_index: -10
-      preprocess_query: -10
-    all_fields: false
-  highlight:
-    highlight: always
-    excerpt: true
-    excerpt_length: 256
-    exclude_fields: {  }
-    prefix: '<strong>'
-    suffix: '</strong>'
-    weights:
-      postprocess_query: 0
-    highlight_partial: false
+      preprocess_index: -20
+      preprocess_query: -20
   content_access:
     weights:
-      preprocess_query: -10
+      preprocess_query: -30
   add_url: {  }
   aggregated_field: {  }
   rendered_item: {  }
   ignore_character:
+    all_fields: false
     fields:
-      - title
-      - body
+      - node_grants
+      - name
     ignorable: '[''¿¡!?,.:;]'
     strip:
       character_sets:
@@ -167,10 +147,9 @@ processor_settings:
     weights:
       preprocess_index: -10
       preprocess_query: -10
-    all_fields: false
 tracker_settings:
   default: {  }
 options:
   index_directly: false
-  cron_limit: 500
-server: solr
+  cron_limit: 50
+server: showcase

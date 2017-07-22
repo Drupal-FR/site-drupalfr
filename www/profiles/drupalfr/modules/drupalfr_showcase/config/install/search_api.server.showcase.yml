@@ -3,18 +3,18 @@ status: true
 dependencies:
   module:
     - search_api_solr
-id: solr
-name: Solr
+id: showcase
+name: Référence
 description: ''
 backend: search_api_solr
 backend_config:
   connector: standard
   connector_config:
     scheme: http
-    host: solr
+    host: solr-showcase
     port: '8983'
     path: /solr
-    core: drupal
+    core: drupal-showcase
     timeout: 5
     index_timeout: 5
     optimize_timeout: 10

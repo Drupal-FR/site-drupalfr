@@ -82,3 +82,14 @@ services:
       - solr-precreate
       - drupal
       - /solr-drupal
+
+
+  solr-showcase:
+    image: solr:6.6-alpine
+    volumes:
+      - ./conf/solr:/solr-drupal/conf
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - drupal-showcase
+      - /solr-drupal

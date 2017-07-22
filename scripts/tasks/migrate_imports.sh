@@ -10,6 +10,8 @@ $DRUSH migrate-import drupalfr_user --update
 $DRUSH migrate-import drupalfr_media --update
 $DRUSH migrate-import drupalfr_paragraph --update
 $DRUSH migrate-import drupalfr_website_type --update
+$DRUSH migrate-import drupalfr_website_sector --update
+$DRUSH migrate-import drupalfr_website_drupal_version --update
 $DRUSH migrate-import drupalfr_drupal_version --update
 $DRUSH migrate-import drupalfr_page --update
 $DRUSH migrate-import drupalfr_company --update

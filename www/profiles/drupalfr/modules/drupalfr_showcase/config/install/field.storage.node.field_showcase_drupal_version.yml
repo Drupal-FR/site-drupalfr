@@ -3,16 +3,16 @@ status: true
 dependencies:
   module:
     - node
-    - user
-id: node.field_showcase_contributor
-field_name: field_showcase_contributor
+    - taxonomy
+id: node.field_showcase_drupal_version
+field_name: field_showcase_drupal_version
 entity_type: node
 type: entity_reference
 settings:
-  target_type: user
+  target_type: taxonomy_term
 module: core
 locked: false
-cardinality: -1
+cardinality: 1
 translatable: true
 indexes: {  }
 persist_with_no_fields: false

@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_showcase module.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_preprocess_field__node__field_showcase_media().
+ */
+function drupalfr_showcase_preprocess_field__node__field_showcase_media(&$variables) {
+  // Allows to wrap the showcase image into link.
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['element']['#object'];
+  if ($node->bundle() == 'showcase') {
+    $link = $node->get('field_showcase_website')->getValue();
+    if (!empty($link)) {
+      $variables['website_link'] = Url::fromUri($link[0]['uri'])->toString();
+    }
+  }
+}
