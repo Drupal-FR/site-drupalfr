@@ -4,7 +4,7 @@ dependencies:
   config:
     - field.storage.node.field_showcase_category
     - node.type.showcase
-    - taxonomy.vocabulary.website_types
+    - taxonomy.vocabulary.showcase_types
 id: node.showcase.field_showcase_category
 field_name: field_showcase_category
 entity_type: node
@@ -19,9 +19,9 @@ settings:
   handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      website_types: website_types
+      showcase_types: showcase_types
     sort:
       field: _none
     auto_create: false
-    auto_create_bundle: website_types
+    auto_create_bundle: showcase_types
 field_type: entity_reference

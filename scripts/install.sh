@@ -28,6 +28,9 @@ $DRUSH site-install $PROFILE \
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updb --entity-updates -y
 
+# Import some specific features overridden even after install.
+$DRUSH features-import drupalfr_showcase --bundle=$Profile -y
+
 . $SCRIPTS_PATH/tasks/development_modules.sh
 . $SCRIPTS_PATH/tasks/migrate_imports.sh
 . $SCRIPTS_PATH/tasks/update_translations.sh

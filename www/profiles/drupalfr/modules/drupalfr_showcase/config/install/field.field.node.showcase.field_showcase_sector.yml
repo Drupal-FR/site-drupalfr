@@ -4,7 +4,7 @@ dependencies:
   config:
     - field.storage.node.field_showcase_sector
     - node.type.showcase
-    - taxonomy.vocabulary.website_sectors
+    - taxonomy.vocabulary.showcase_sectors
 id: node.showcase.field_showcase_sector
 field_name: field_showcase_sector
 entity_type: node
@@ -19,7 +19,7 @@ settings:
   handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      website_sectors: website_sectors
+      showcase_sectors: showcase_sectors
     sort:
       field: _none
     auto_create: false

@@ -3,8 +3,8 @@ status: true
 dependencies:
   config:
     - field.storage.node.field_showcase_category
-    - field.storage.node.field_showcase_drupal_version
     - field.storage.node.field_showcase_sector
+    - field.storage.node.field_showcase_drupal_version
     - search_api.server.showcase
   module:
     - taxonomy
@@ -52,16 +52,6 @@ field_settings:
       module:
         - taxonomy
   name_1:
-    label: 'Version de Drupal'
-    datasource_id: 'entity:node'
-    property_path: 'field_showcase_drupal_version:entity:name'
-    type: string
-    dependencies:
-      config:
-        - field.storage.node.field_showcase_drupal_version
-      module:
-        - taxonomy
-  name_2:
     label: Secteur
     datasource_id: 'entity:node'
     property_path: 'field_showcase_sector:entity:name'
@@ -69,6 +59,16 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_showcase_sector
+      module:
+        - taxonomy
+  name_2:
+    label: 'Version de Drupal'
+    datasource_id: 'entity:node'
+    property_path: 'field_showcase_drupal_version:entity:name'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_showcase_drupal_version
       module:
         - taxonomy
 datasource_settings:
@@ -120,7 +120,6 @@ processor_settings:
     all_fields: false
     fields:
       - node_grants
-      - name
     ignorable: '[''¿¡!?,.:;]'
     strip:
       character_sets:

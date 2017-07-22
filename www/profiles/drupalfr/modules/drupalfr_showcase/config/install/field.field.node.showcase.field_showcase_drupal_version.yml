@@ -4,7 +4,7 @@ dependencies:
   config:
     - field.storage.node.field_showcase_drupal_version
     - node.type.showcase
-    - taxonomy.vocabulary.references_drupal_versions
+    - taxonomy.vocabulary.showcase_drupal_versions
 id: node.showcase.field_showcase_drupal_version
 field_name: field_showcase_drupal_version
 entity_type: node
@@ -19,7 +19,7 @@ settings:
   handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      references_drupal_versions: references_drupal_versions
+      showcase_drupal_versions: showcase_drupal_versions
     sort:
       field: _none
     auto_create: false
