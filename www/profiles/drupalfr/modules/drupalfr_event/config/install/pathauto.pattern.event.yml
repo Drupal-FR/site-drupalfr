@@ -1,0 +1,21 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: event
+label: Événements
+type: 'canonical_entities:node'
+pattern: 'association/evenements/[node:title]'
+selection_criteria:
+  1bae0281-1c82-4250-9488-9b7d0e262bbe:
+    id: node_type
+    bundles:
+      event: event
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 1bae0281-1c82-4250-9488-9b7d0e262bbe
+selection_logic: and
+weight: -5
+relationships: {  }

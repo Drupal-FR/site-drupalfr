@@ -1,0 +1,21 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: planet
+label: 'Articles planète'
+type: 'canonical_entities:node'
+pattern: 'communaute/planete/[node:title]'
+selection_criteria:
+  71a96fd6-636f-4b6c-addf-e40be95237d4:
+    id: node_type
+    bundles:
+      planet: planet
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 71a96fd6-636f-4b6c-addf-e40be95237d4
+selection_logic: and
+weight: -5
+relationships: {  }
