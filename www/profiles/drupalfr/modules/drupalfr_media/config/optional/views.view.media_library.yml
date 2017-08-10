@@ -2,7 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - media_entity.bundle.soundcloud
+    - media_entity.bundle.video
   module:
     - media_entity
     - user
@@ -211,7 +211,7 @@ display:
           admin_label: ''
           operator: in
           value:
-            soundcloud: soundcloud
+            video: video
           group: 1
           exposed: false
           expose:
@@ -267,7 +267,7 @@ display:
           empty: true
           tokenize: false
           content:
-            value: '<a href="/communaute/mediatheque?bundle=soundcloud" class="btn btn-primary">Tous nos podcasts</a>'
+            value: '<a href="/communaute/mediatheque?bundle=video" class="btn btn-primary">Tous nos podcasts</a>'
             format: full_full_html
           plugin_id: text
     cache_metadata:
