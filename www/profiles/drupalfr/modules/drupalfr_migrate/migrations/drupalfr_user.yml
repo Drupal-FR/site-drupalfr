@@ -42,6 +42,8 @@ source:
     -
       events: Events
     -
+      in_directory: 'In directory'
+    -
       biography: Biography
 destination:
   plugin: 'entity:user'
@@ -86,3 +88,4 @@ process:
       plugin: migration
       migration: drupalfr_event
       no_stub: true
+  field_user_in_directory: in_directory

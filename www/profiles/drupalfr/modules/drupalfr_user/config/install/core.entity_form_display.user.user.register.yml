@@ -6,15 +6,14 @@ dependencies:
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_company
     - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_in_directory
     - field.field.user.user.field_user_membership_number
     - field.field.user.user.field_user_newsletter_adff
     - field.field.user.user.field_user_newsletter_drupalcamp
     - field.field.user.user.field_user_realname
     - field.field.user.user.field_user_social_link
     - field.field.user.user.user_picture
-    - image.style.thumbnail
   module:
-    - image
     - user
 id: user.user.register
 targetEntityType: user
@@ -23,22 +22,15 @@ mode: register
 content:
   account:
     weight: 0
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
-  user_picture:
-    type: image_image
-    weight: 6
-    settings:
-      progress_indicator: throbber
-      preview_image_style: thumbnail
-    third_party_settings: {  }
-    region: content
 hidden:
   contact: true
   field_user_biography: true
   field_user_company: true
   field_user_event: true
+  field_user_in_directory: true
   field_user_membership_number: true
   field_user_newsletter_adff: true
   field_user_newsletter_drupalcamp: true
@@ -48,3 +40,4 @@ hidden:
   language: true
   path: true
   timezone: true
+  user_picture: true

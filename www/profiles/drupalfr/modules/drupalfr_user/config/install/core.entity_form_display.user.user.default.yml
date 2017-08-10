@@ -5,6 +5,7 @@ dependencies:
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_company
     - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_in_directory
     - field.field.user.user.field_user_membership_number
     - field.field.user.user.field_user_newsletter_adff
     - field.field.user.user.field_user_newsletter_drupalcamp
@@ -24,9 +25,9 @@ mode: default
 content:
   account:
     weight: 0
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
   field_user_biography:
     weight: 9
     settings:
@@ -52,6 +53,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
+  field_user_in_directory:
+    weight: 14
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
     region: content
   field_user_membership_number:
     weight: 7
@@ -91,9 +99,9 @@ content:
     region: content
   timezone:
     weight: 5
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
   user_picture:
     type: image_image
     settings:
