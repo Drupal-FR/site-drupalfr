@@ -481,6 +481,9 @@
     "drupal/admin_toolbar": "1.19.0",
     "drupal/blazy": "1.0.0-rc2",
     "drupal/bootstrap": "3.5.0",
+    "drupal/commerce": "2.0.0-rc1",
+    "drupal/commerce_license": "2.*",
+    "drupal/commerce_paypal": "1.x-dev#1517211b5660a9710b875c7357be42ad479ff054",
     "drupal/context": "1.x-dev#457c7e166d1a6356d031b43e4e2becb3af1b72ab",
     "drupal/core": "8.3.5",
     "drupal/dropzonejs": "1.0.0-alpha7",
@@ -617,6 +620,9 @@
       ]
     },
     "patches": {
+      "drupal/commerce_paypal": {
+        "No payment_gateway when returning to the website": "https://www.drupal.org/files/issues/commerce_paypal-no_payment_gateway-2900865-3.patch"
+      },
       "drupal/entity_browser": {
         "Notice: Undefined index: max_resolution": "https://www.drupal.org/files/issues/entity-browser-widget-context-small-fix-2871372-2.patch"
       },

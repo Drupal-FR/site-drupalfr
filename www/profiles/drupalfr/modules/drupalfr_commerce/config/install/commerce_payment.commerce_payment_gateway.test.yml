@@ -1,0 +1,21 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_payment_example
+id: test
+label: test
+weight: null
+plugin: example_onsite
+configuration:
+  api_key: test
+  display_label: Example
+  mode: test
+  payment_method_types:
+    - credit_card
+conditions:
+  -
+    plugin: order_customer_role
+    configuration:
+      roles:
+        administrator: administrator

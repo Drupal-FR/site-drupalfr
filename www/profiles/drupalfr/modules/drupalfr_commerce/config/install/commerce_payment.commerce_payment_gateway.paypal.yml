@@ -1,0 +1,20 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_paypal
+id: paypal
+label: Paypal
+weight: null
+plugin: paypal_express_checkout
+configuration:
+  api_username: ''
+  api_password: ''
+  shipping_prompt: shipping_skip
+  signature: ''
+  solution_type: SoleBilling
+  display_label: PayPal
+  mode: live
+  payment_method_types:
+    - credit_card
+conditions: {  }

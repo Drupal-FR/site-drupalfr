@@ -50,6 +50,14 @@ $config['mailchimp.settings']['api_key'] = '';
 $config['webform.webform.contact']['handlers']['email_notification']['settings']['to_options']['webmaster'] = 'example@example.org';
 $config['webform.webform.contact']['handlers']['email_notification']['settings']['to_options']['bureau'] = 'example@example.org';
 
+// Paypal.
+$config['commerce_payment.commerce_payment_gateway.paypal_test']['configuration']['api_username'] = '';
+$config['commerce_payment.commerce_payment_gateway.paypal_test']['configuration']['api_password'] = '';
+$config['commerce_payment.commerce_payment_gateway.paypal_test']['configuration']['signature'] = '';
+$config['commerce_payment.commerce_payment_gateway.paypal']['configuration']['api_username'] = '';
+$config['commerce_payment.commerce_payment_gateway.paypal']['configuration']['api_password'] = '';
+$config['commerce_payment.commerce_payment_gateway.paypal']['configuration']['signature'] = '';
+
 if (file_exists(__DIR__ . '/../development.settings.php')) {
   include __DIR__ . '/../development.settings.php';
 }
