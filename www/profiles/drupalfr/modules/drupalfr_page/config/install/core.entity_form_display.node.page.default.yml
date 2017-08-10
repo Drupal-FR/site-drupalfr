@@ -6,10 +6,12 @@ dependencies:
     - field.field.node.page.body
     - field.field.node.page.field_attachment
     - field.field.node.page.field_drupal_version
+    - field.field.node.page.field_metatags
     - field.field.node.page.field_paragraph
     - node.type.page
   module:
     - entity_browser
+    - metatag
     - paragraphs
     - path
     - text
@@ -54,6 +56,12 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
+  field_metatags:
+    weight: 35
+    settings: {  }
+    third_party_settings: {  }
+    type: metatag_firehose
     region: content
   field_paragraph:
     type: entity_reference_paragraphs
