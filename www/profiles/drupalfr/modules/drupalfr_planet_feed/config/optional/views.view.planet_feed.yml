@@ -5,6 +5,7 @@ dependencies:
     - feeds.feed_type.planet_feed_rss
     - field.storage.feeds_feed.field_feed_website
   module:
+    - eva
     - feeds
     - link
     - user
@@ -238,6 +239,82 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - user.permissions
+      tags:
+        - 'config:field.storage.feeds_feed.field_feed_website'
+  entity_view_1:
+    display_plugin: entity_view
+    id: entity_view_1
+    display_title: 'EVA user account'
+    position: 2
+    display_options:
+      display_extenders:
+        metatag_display_extender: {  }
+      entity_type: user
+      bundles:
+        - user
+      arguments:
+        uid:
+          id: uid
+          table: feeds_feed
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: user
+          default_argument_options:
+            user: false
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: false
+          validate:
+            type: none
+            fail: 'not found'
+          validate_options: {  }
+          break_phrase: false
+          not: false
+          entity_type: feeds_feed
+          entity_field: uid
+          plugin_id: numeric
+      defaults:
+        arguments: false
+        header: false
+        style: false
+        row: false
+      display_description: ''
+      title: 'Flux du planète'
+      header: {  }
+      style:
+        type: default
+        options:
+          grouping: {  }
+          row_class: ''
+          default_row_class: true
+      row:
+        type: fields
+        options: {  }
+      show_title: true
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
         - user.permissions
       tags:
         - 'config:field.storage.feeds_feed.field_feed_website'
