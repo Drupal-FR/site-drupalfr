@@ -9,7 +9,7 @@ dependencies:
     - field.field.node.planet.field_planet_url
     - node.type.planet
   module:
-    - text
+    - smart_trim
     - user
 id: node.planet.teaser
 targetEntityType: node
@@ -18,10 +18,18 @@ mode: teaser
 content:
   body:
     label: hidden
-    type: text_summary_or_trimmed
+    type: smart_trim
     weight: 0
     settings:
-      trim_length: 200
+      trim_length: '200'
+      trim_type: chars
+      trim_suffix: ...
+      more_link: '0'
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: text
+      more_class: more-link
     third_party_settings: {  }
     region: content
 hidden:
