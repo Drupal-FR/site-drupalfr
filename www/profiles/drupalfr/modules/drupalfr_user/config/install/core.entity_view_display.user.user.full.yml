@@ -3,85 +3,52 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.user.full
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_user_banner
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_company
+    - field.field.user.user.field_user_drupal_org
     - field.field.user.user.field_user_event
     - field.field.user.user.field_user_in_directory
     - field.field.user.user.field_user_membership_number
     - field.field.user.user.field_user_newsletter_adff
     - field.field.user.user.field_user_newsletter_drupalcamp
     - field.field.user.user.field_user_realname
-    - field.field.user.user.field_user_social_link
+    - field.field.user.user.field_user_twitter
+    - field.field.user.user.field_user_website
     - field.field.user.user.user_picture
-    - image.style.thumbnail
+    - image.style.square_165
   module:
     - image
     - link
-    - mailchimp_lists
+    - text
     - user
 id: user.user.full
 targetEntityType: user
 bundle: user
 mode: full
 content:
+  field_user_banner:
+    type: image
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
   field_user_biography:
-    weight: 4
-    label: above
+    type: text_default
+    weight: 6
+    region: content
+    label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+  field_user_drupal_org:
+    type: link
+    weight: 4
     region: content
-  field_user_company:
-    weight: 3
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_user_event:
-    weight: 5
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_user_membership_number:
-    weight: 2
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
-  field_user_newsletter_adff:
-    weight: 7
-    label: above
-    settings:
-      show_interest_groups: false
-    third_party_settings: {  }
-    type: mailchimp_lists_subscribe_default
-    region: content
-  field_user_newsletter_drupalcamp:
-    weight: 8
-    label: above
-    settings:
-      show_interest_groups: false
-    third_party_settings: {  }
-    type: mailchimp_lists_subscribe_default
-    region: content
-  field_user_realname:
-    weight: 1
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
-  field_user_social_link:
-    weight: 6
-    label: above
+    label: hidden
     settings:
       trim_length: 80
       url_only: false
@@ -89,18 +56,63 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    type: link
+  field_user_event:
+    weight: 7
+    label: above
+    settings:
+      view_mode: teaser
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
     region: content
+  field_user_realname:
+    weight: 2
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_user_twitter:
+    type: link
+    weight: 3
+    region: content
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+  field_user_website:
+    type: link
+    weight: 5
+    region: content
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
   user_picture:
     type: image
-    weight: 0
+    weight: 1
     settings:
-      image_style: thumbnail
-      image_link: content
+      image_style: square_165
+      image_link: ''
     third_party_settings: {  }
     label: hidden
     region: content
 hidden:
+  commerce_remote_id: true
+  field_user_company: true
   field_user_in_directory: true
+  field_user_membership_number: true
+  field_user_newsletter_adff: true
+  field_user_newsletter_drupalcamp: true
   langcode: true
   member_for: true
+  profile_customer: true

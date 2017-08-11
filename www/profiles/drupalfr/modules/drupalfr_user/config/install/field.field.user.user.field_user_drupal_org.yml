@@ -2,20 +2,21 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.user.field_user_biography
+    - field.storage.user.field_user_drupal_org
   module:
-    - text
+    - link
     - user
-id: user.user.field_user_biography
-field_name: field_user_biography
+id: user.user.field_user_drupal_org
+field_name: field_user_drupal_org
 entity_type: user
 bundle: user
-label: Biographie
+label: Drupal.org
 description: ''
 required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  display_summary: false
-field_type: text_with_summary
+  link_type: 17
+  title: 1
+field_type: link

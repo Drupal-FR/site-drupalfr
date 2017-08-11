@@ -3,15 +3,19 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.user.teaser
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_user_banner
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_company
+    - field.field.user.user.field_user_drupal_org
     - field.field.user.user.field_user_event
     - field.field.user.user.field_user_in_directory
     - field.field.user.user.field_user_membership_number
     - field.field.user.user.field_user_newsletter_adff
     - field.field.user.user.field_user_newsletter_drupalcamp
     - field.field.user.user.field_user_realname
-    - field.field.user.user.field_user_social_link
+    - field.field.user.user.field_user_twitter
+    - field.field.user.user.field_user_website
     - field.field.user.user.user_picture
     - image.style.square_230
   module:
@@ -32,14 +36,19 @@ content:
     label: hidden
     region: content
 hidden:
+  commerce_remote_id: true
+  field_user_banner: true
   field_user_biography: true
   field_user_company: true
+  field_user_drupal_org: true
   field_user_event: true
   field_user_in_directory: true
   field_user_membership_number: true
   field_user_newsletter_adff: true
   field_user_newsletter_drupalcamp: true
   field_user_realname: true
-  field_user_social_link: true
+  field_user_twitter: true
+  field_user_website: true
   langcode: true
   member_for: true
+  profile_customer: true
