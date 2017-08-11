@@ -114,6 +114,9 @@ $settings['rebuild_access'] = TRUE;
  */
 $settings['skip_permissions_hardening'] = TRUE;
 
+// Views.
+$config['views.settings']['ui']['show']['advanced_column'] = TRUE;
+
 // Devel.
 $config['devel.settings']['devel_dumper'] = 'var_dumper';
 
