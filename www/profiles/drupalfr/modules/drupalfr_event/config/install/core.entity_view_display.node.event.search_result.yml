@@ -1,0 +1,58 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_result
+    - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
+    - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
+    - field.field.node.event.field_media_banner
+    - field.field.node.event.field_media_teaser
+    - node.type.event
+  module:
+    - smart_trim
+    - user
+id: node.event.search_result
+targetEntityType: node
+bundle: event
+mode: search_result
+content:
+  body:
+    label: hidden
+    type: smart_trim
+    weight: 1
+    settings:
+      trim_length: '200'
+      trim_type: chars
+      trim_suffix: ...
+      more_link: '0'
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: text
+      more_class: more-link
+    third_party_settings: {  }
+    region: content
+  field_media_teaser:
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+hidden:
+  field_event_date_end: true
+  field_event_date_start: true
+  field_event_organizer: true
+  field_event_place: true
+  field_event_sponsor: true
+  field_event_website: true
+  field_media_banner: true
+  langcode: true
+  links: true

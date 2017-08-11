@@ -2,7 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.search_result
     - field.field.node.news.body
     - field.field.node.news.field_media_banner
     - field.field.node.news.field_media_teaser
@@ -12,10 +12,10 @@ dependencies:
   module:
     - smart_trim
     - user
-id: node.news.teaser
+id: node.news.search_result
 targetEntityType: node
 bundle: news
-mode: teaser
+mode: search_result
 content:
   body:
     label: hidden
@@ -34,22 +34,22 @@ content:
     third_party_settings: {  }
     region: content
   field_media_teaser:
-    type: entity_reference_entity_view
     weight: 0
-    region: content
     label: hidden
     settings:
       view_mode: default
       link: false
     third_party_settings: {  }
-  field_news_type:
-    type: entity_reference_label
-    weight: 1
+    type: entity_reference_entity_view
     region: content
+  field_news_type:
+    weight: 1
     label: hidden
     settings:
       link: false
     third_party_settings: {  }
+    type: entity_reference_label
+    region: content
 hidden:
   field_media_banner: true
   field_paragraph: true

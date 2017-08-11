@@ -2,6 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.search_index
     - field.field.node.planet.body
     - field.field.node.planet.feeds_item
     - field.field.node.planet.field_planet_tag
@@ -11,29 +12,29 @@ dependencies:
     - link
     - text
     - user
-id: node.planet.default
+id: node.planet.search_index
 targetEntityType: node
 bundle: planet
-mode: default
+mode: search_index
 content:
   body:
     label: hidden
     type: text_default
-    weight: 1
+    weight: 0
     settings: {  }
     third_party_settings: {  }
     region: content
   field_planet_tag:
-    weight: 2
-    label: above
+    weight: 1
+    label: hidden
     settings:
-      link: true
+      link: false
     third_party_settings: {  }
     type: entity_reference_label
     region: content
   field_planet_url:
-    weight: 3
-    label: above
+    weight: 2
+    label: hidden
     settings:
       trim_length: 80
       url_only: false
@@ -43,11 +44,7 @@ content:
     third_party_settings: {  }
     type: link
     region: content
-  links:
-    weight: 0
-    region: content
-    settings: {  }
-    third_party_settings: {  }
 hidden:
   feeds_item: true
   langcode: true
+  links: true

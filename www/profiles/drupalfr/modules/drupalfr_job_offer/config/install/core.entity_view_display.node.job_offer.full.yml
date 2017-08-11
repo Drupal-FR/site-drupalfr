@@ -2,6 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.full
     - field.field.node.job_offer.body
     - field.field.node.job_offer.field_job_company
     - field.field.node.job_offer.field_job_contract_type
@@ -14,10 +15,10 @@ dependencies:
     - options
     - text
     - user
-id: node.job_offer.default
+id: node.job_offer.full
 targetEntityType: node
 bundle: job_offer
-mode: default
+mode: full
 content:
   body:
     label: hidden
