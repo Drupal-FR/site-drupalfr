@@ -1,0 +1,5 @@
+services:
+  drupalfr_user.member_badge_builder:
+    class: Drupal\drupalfr_user\Service\MemberBadgeBuilder
+    arguments:
+      - '@current_user'

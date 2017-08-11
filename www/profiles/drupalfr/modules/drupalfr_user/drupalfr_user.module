@@ -6,6 +6,20 @@
  */
 
 /**
+ * Implements hook_theme().
+ */
+function drupalfr_user_theme($existing, $type, $theme, $path) {
+  return [
+    'drupalfr_user_member_badge' => [
+      'variables' => [
+        'is_member' => TRUE,
+        'is_profile_owner' => TRUE,
+      ],
+    ],
+  ];
+}
+
+/**
  * Implements hook_menu_links_discovered_alter().
  *
  * Disable default links provided by the user module.
@@ -20,5 +34,25 @@ function drupalfr_user_menu_links_discovered_alter(&$links) {
     if (isset($links[$user_link])) {
       $links[$user_link]['enabled'] = FALSE;
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_user().
+ */
+function drupalfr_user_preprocess_user(&$variables) {
+  // Add member badge to display on user profile.
+  if ($variables['elements']['#view_mode'] == 'full') {
+    /** @var \Drupal\user\UserInterface $user */
+    $user = $variables['user'];
+
+    $variables['member_badge'] = [
+      '#lazy_builder' => ['drupalfr_user.member_badge_builder:build',
+        [
+          $user->id(),
+        ],
+      ],
+      '#create_placeholder' => TRUE,
+    ];
   }
 }
