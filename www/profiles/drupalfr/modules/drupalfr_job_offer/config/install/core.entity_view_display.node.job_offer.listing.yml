@@ -2,7 +2,7 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.full
+    - core.entity_view_mode.node.listing
     - field.field.node.job_offer.body
     - field.field.node.job_offer.field_job_company
     - field.field.node.job_offer.field_job_contract_type
@@ -13,28 +13,19 @@ dependencies:
     - node.type.job_offer
   module:
     - options
-    - text
     - user
-id: node.job_offer.full
+id: node.job_offer.listing
 targetEntityType: node
 bundle: job_offer
-mode: full
+mode: listing
 content:
-  body:
-    label: hidden
-    type: text_default
-    weight: 5
-    settings: {  }
-    third_party_settings: {  }
-    region: content
   field_job_company:
-    weight: 6
-    label: above
+    weight: 5
+    label: inline
     settings:
-      view_mode: job_offer
-      link: false
+      link: true
     third_party_settings: {  }
-    type: entity_reference_entity_view
+    type: entity_reference_label
     region: content
   field_job_contract_type:
     weight: 1
@@ -75,9 +66,10 @@ content:
     type: list_default
     region: content
   links:
-    weight: 7
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  body: true
   langcode: true

@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.company.field_company_size
     - field.field.node.company.field_company_website
     - field.field.node.company.field_region
+    - image.style.square_230
     - node.type.company
   module:
     - image
@@ -24,7 +25,7 @@ bundle: company
 mode: full
 content:
   body:
-    label: hidden
+    label: above
     type: text_default
     weight: 7
     settings: {  }
@@ -39,16 +40,16 @@ content:
     region: content
   field_company_legal_form:
     weight: 4
-    label: above
+    label: inline
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_company_logo:
     weight: 0
-    label: above
+    label: hidden
     settings:
-      image_style: ''
+      image_style: square_230
       image_link: ''
     third_party_settings: {  }
     type: image
@@ -62,7 +63,7 @@ content:
     region: content
   field_company_size:
     weight: 3
-    label: above
+    label: inline
     settings: {  }
     third_party_settings: {  }
     type: list_default

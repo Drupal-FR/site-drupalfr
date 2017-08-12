@@ -1,0 +1,21 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: job_offer
+label: 'Offres d''emploi'
+type: 'canonical_entities:node'
+pattern: 'emploi/[node:title]'
+selection_criteria:
+  df009e2b-14c4-4958-90a2-56a5dad577c0:
+    id: node_type
+    bundles:
+      job_offer: job_offer
+    negate: false
+    context_mapping:
+      node: node
+    uuid: df009e2b-14c4-4958-90a2-56a5dad577c0
+selection_logic: and
+weight: -5
+relationships: {  }

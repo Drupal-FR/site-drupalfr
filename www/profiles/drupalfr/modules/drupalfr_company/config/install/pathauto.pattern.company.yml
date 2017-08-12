@@ -1,0 +1,21 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: company
+label: Sociétés
+type: 'canonical_entities:node'
+pattern: 'emploi/societes/[node:title]'
+selection_criteria:
+  38ce8845-74d6-4e04-b2dc-db73cd287ed9:
+    id: node_type
+    bundles:
+      company: company
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 38ce8845-74d6-4e04-b2dc-db73cd287ed9
+selection_logic: and
+weight: -5
+relationships: {  }
