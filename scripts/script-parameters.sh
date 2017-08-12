@@ -24,6 +24,7 @@ DEVELOPMENT_MODULES=(
   dblog
   devel
 #  devel_a11y
+  devel_generate
   features_ui
   field_ui
 #  kint
