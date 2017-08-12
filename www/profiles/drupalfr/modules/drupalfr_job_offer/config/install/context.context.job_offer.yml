@@ -1,0 +1,40 @@
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+name: job_offer
+label: 'Offres d''emploi'
+group: Contenu
+description: ''
+requireAllConditions: true
+disabled: false
+conditions:
+  node_type:
+    id: node_type
+    bundles:
+      job_offer: job_offer
+    negate: 0
+    uuid: e17eb268-6633-44b7-aa36-456718ea9de0
+    context_mapping:
+      node: '@node.node_route_context:node'
+reactions:
+  blocks:
+    blocks:
+      a1742596-b66f-4601-b799-28146d167f0f:
+        id: page_title_block
+        label: 'Titre de page'
+        provider: core
+        label_display: 0
+        region: header
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: a1742596-b66f-4601-b799-28146d167f0f
+    id: blocks
+    saved: false
+    uuid: 60a9f093-455f-4025-9ba3-816cacae0566
+    include_default_blocks: 0
+weight: 0
