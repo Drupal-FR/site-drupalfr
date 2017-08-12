@@ -216,6 +216,7 @@ display:
         style: false
         row: false
         fields: false
+        empty: false
       arguments:
         field_job_company_target_id:
           id: field_job_company_target_id
@@ -261,7 +262,7 @@ display:
           group_type: group
           admin_label: ''
           empty: false
-          content: 'Actuellement @total offre(s) d''emploi disponible(s).'
+          content: '<p>Actuellement @total offre(s) d''emploi disponible(s).</p>'
           plugin_id: result
       style:
         type: html_list
@@ -391,6 +392,20 @@ display:
           separator: ', '
           field_api_classes: false
           plugin_id: field
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: '<p>Aucune offre d''emploi pour l''instant.</p>'
+            format: full_html
+          plugin_id: text
     cache_metadata:
       max-age: -1
       contexts:
