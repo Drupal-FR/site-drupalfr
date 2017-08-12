@@ -89,7 +89,7 @@ function drupalfr_theme_preprocess_node(&$variables) {
   $variables['square_publication_date'] = new FormattableMarkup($formatted_date, []);
 
   // Add the feed image to the planet article.
-  if ($variables['view_mode'] == 'teaser' && $node->bundle() == 'planet') {
+  if ($node->bundle() == 'planet' && in_array($variables['view_mode'], ['teaser', 'search_result'])) {
     if ($node->hasField('feeds_item')) {
       $feed = $node->get('feeds_item')->getValue();
       if (!empty($feed)) {
