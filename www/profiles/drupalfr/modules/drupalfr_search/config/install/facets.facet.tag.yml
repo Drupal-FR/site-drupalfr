@@ -23,7 +23,7 @@ query_operator: and
 use_hierarchy: false
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
-hard_limit: null
+hard_limit: 0
 exclude: false
 only_visible_when_facet_source_is_visible: true
 processor_configs:
@@ -52,4 +52,6 @@ processor_configs:
       build: -10
     settings: {  }
 empty_behavior:
-  behavior: none
+  behavior: text
+  text_format: full_html
+  text: '<p>Aucun résultat pour ce filtre.</p>'

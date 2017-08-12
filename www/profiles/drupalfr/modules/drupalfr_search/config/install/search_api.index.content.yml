@@ -113,6 +113,23 @@ processor_settings:
     weights:
       preprocess_index: -6
       preprocess_query: -6
+  html_filter:
+    all_fields: false
+    fields:
+      - rendered_item
+    title: true
+    alt: true
+    tags:
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+      b: 2
+      em: 1
+      u: 1
+    weights:
+      preprocess_index: -15
+      preprocess_query: -15
   transliteration:
     all_fields: false
     fields:
@@ -173,23 +190,6 @@ processor_settings:
     weights:
       preprocess_index: -10
       preprocess_query: -10
-  html_filter:
-    all_fields: false
-    fields:
-      - rendered_item
-    title: true
-    alt: true
-    tags:
-      h1: 5
-      h2: 3
-      h3: 2
-      strong: 2
-      b: 2
-      em: 1
-      u: 1
-    weights:
-      preprocess_index: -15
-      preprocess_query: -15
 tracker_settings:
   default: {  }
 options:
