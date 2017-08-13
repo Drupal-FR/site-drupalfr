@@ -6,10 +6,6 @@ dependencies:
       - webform
   module:
     - honeypot
-third_party_settings:
-  honeypot:
-    honeypot: true
-    time_restriction: false
 open: null
 close: null
 uid: null
@@ -22,12 +18,11 @@ elements: "description:\n  '#type': processed_text\n  '#text': \"<h1>Entrer en c
 css: ''
 javascript: ''
 settings:
+  ajax: false
   page: true
   page_submit_path: /contact
   page_confirm_path: ''
-  form_submit_label: 'Envoyer le message'
   form_submit_once: true
-  form_submit_attributes: {  }
   form_exception_message: ''
   form_open_message: ''
   form_close_message: ''
@@ -37,33 +32,34 @@ settings:
   form_convert_anonymous: false
   form_prepopulate: false
   form_prepopulate_source_entity: false
+  form_prepopulate_source_entity_required: false
+  form_prepopulate_source_entity_type: ''
+  form_reset: false
   form_disable_autocomplete: false
   form_novalidate: false
   form_unsaved: false
   form_disable_back: false
   form_autofocus: false
   form_details_toggle: false
+  submission_label: ''
   submission_log: false
+  submission_user_columns: {  }
   wizard_progress_bar: true
   wizard_progress_pages: false
   wizard_progress_percentage: false
-  wizard_next_button_label: ''
-  wizard_next_button_attributes: {  }
-  wizard_prev_button_label: ''
-  wizard_prev_button_attributes: {  }
   wizard_start_label: ''
   wizard_complete: true
   wizard_complete_label: ''
   preview: 0
-  preview_next_button_label: ''
-  preview_next_button_attributes: {  }
-  preview_prev_button_label: ''
-  preview_prev_button_attributes: {  }
+  preview_label: ''
+  preview_title: ''
   preview_message: ''
+  preview_attributes: {  }
+  preview_excluded_elements: {  }
+  preview_exclude_empty: true
   draft: none
+  draft_multiple: false
   draft_auto_save: false
-  draft_button_label: ''
-  draft_button_attributes: {  }
   draft_saved_message: ''
   draft_loaded_message: ''
   confirmation_type: url_message
@@ -85,33 +81,53 @@ settings:
   results_disabled: false
   results_disabled_ignore: false
   token_update: false
+  form_submit_label: 'Envoyer le message'
+  form_submit_attributes: {  }
+  wizard_next_button_label: ''
+  wizard_next_button_attributes: {  }
+  wizard_prev_button_label: ''
+  wizard_prev_button_attributes: {  }
+  preview_next_button_label: ''
+  preview_next_button_attributes: {  }
+  preview_prev_button_label: ''
+  preview_prev_button_attributes: {  }
+  draft_button_label: ''
+  draft_button_attributes: {  }
 access:
   create:
     roles:
       - anonymous
       - authenticated
     users: {  }
+    permissions: {  }
   view_any:
     roles: {  }
     users: {  }
+    permissions: {  }
   update_any:
     roles: {  }
     users: {  }
+    permissions: {  }
   delete_any:
     roles: {  }
     users: {  }
+    permissions: {  }
   purge_any:
     roles: {  }
     users: {  }
+    permissions: {  }
   view_own:
     roles: {  }
     users: {  }
+    permissions: {  }
   update_own:
     roles: {  }
     users: {  }
+    permissions: {  }
   delete_own:
     roles: {  }
     users: {  }
+    permissions: {  }
 handlers:
   email_confirmation:
     id: email
@@ -131,7 +147,7 @@ handlers:
       from_mail: default
       from_options: {  }
       from_name: default
-      subject: '[webform_submission:values:subject:value]'
+      subject: '[webform_submission:values:subject:raw]'
       body: '[webform_submission:values:message:value]'
       excluded_elements: {  }
       html: true
@@ -140,6 +156,7 @@ handlers:
       reply_to: ''
       return_path: ''
       ignore_access: false
+      exclude_empty: true
   email_notification:
     id: email
     label: 'Notification par courriel'
@@ -159,8 +176,8 @@ handlers:
       bcc_options: {  }
       from_mail: '[webform_submission:values:email:raw]'
       from_options: {  }
-      from_name: '[webform_submission:values:name:value]'
-      subject: '[webform_submission:values:subject:value]'
+      from_name: '[webform_submission:values:name:raw]'
+      subject: '[webform_submission:values:subject:raw]'
       body: '[webform_submission:values:message:value]'
       excluded_elements: {  }
       html: true
@@ -169,3 +186,8 @@ handlers:
       reply_to: ''
       return_path: ''
       ignore_access: false
+      exclude_empty: true
+third_party_settings:
+  honeypot:
+    honeypot: true
+    time_restriction: false
