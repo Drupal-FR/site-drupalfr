@@ -1,0 +1,36 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - comment.type.forum
+    - field.field.comment.forum.comment_body
+  module:
+    - text
+id: comment.forum.default
+targetEntityType: comment
+bundle: forum
+mode: default
+content:
+  author:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  comment_body:
+    type: text_textarea
+    weight: 2
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    region: content
+  subject:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  langcode: true

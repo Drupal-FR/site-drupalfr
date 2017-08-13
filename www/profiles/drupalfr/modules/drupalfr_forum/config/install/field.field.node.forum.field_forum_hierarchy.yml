@@ -1,0 +1,27 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_forum_hierarchy
+    - node.type.forum
+    - taxonomy.vocabulary.forum_hierarchy
+id: node.forum.field_forum_hierarchy
+field_name: field_forum_hierarchy
+entity_type: node
+bundle: forum
+label: Arborescence
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      forum_hierarchy: forum_hierarchy
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

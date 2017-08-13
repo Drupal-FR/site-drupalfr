@@ -9,6 +9,7 @@ dependencies:
   config:
     - field.storage.node.field_planet_tag
     - field.storage.node.field_drupal_version
+    - field.storage.node.field_forum_tag
     - search_api.server.solr
     - core.entity_view_mode.node.search_index
 id: content
@@ -90,6 +91,16 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_drupal_version
+      module:
+        - taxonomy
+  name_3:
+    label: 'Tags » Taxonomy term » Name'
+    datasource_id: 'entity:node'
+    property_path: 'field_forum_tag:entity:name'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_forum_tag
       module:
         - taxonomy
 datasource_settings:
