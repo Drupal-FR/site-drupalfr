@@ -27,6 +27,8 @@ $DRUSH migrate-import drupalfr_basic_block --update
 $DRUSH migrate-import drupalfr_menu_link --update
 # Re-import users to update references as we do not create stub.
 $DRUSH migrate-import drupalfr_user --update
+# Re-import paragraphs to update links to pages.
+$DRUSH migrate-import drupalfr_paragraph --update
 
 # Clear search_api indexes.
 $DRUSH search-api-clear
