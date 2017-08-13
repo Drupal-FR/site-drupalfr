@@ -23,6 +23,8 @@ $DRUSH migrate-import drupalfr_feed --update
 $DRUSH migrate-import drupalfr_news_type --update
 $DRUSH migrate-import drupalfr_news --update
 $DRUSH migrate-import drupalfr_store --update
+$DRUSH migrate-import drupalfr_forum_tag --update
+$DRUSH migrate-import drupalfr_forum_hierarchy --update
 $DRUSH migrate-import drupalfr_basic_block --update
 $DRUSH migrate-import drupalfr_menu_link --update
 # Re-import users to update references as we do not create stub.
