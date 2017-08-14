@@ -17,7 +17,6 @@ dependencies:
     - taxonomy
     - text
     - user
-    - views_infinite_scroll
 id: forum
 label: 'Drupalfr forum'
 module: views
@@ -505,7 +504,7 @@ display:
     display_options:
       display_extenders: {  }
       display_description: ''
-      title: 'Mes 6 dernières questions/réponse du forum'
+      title: 'Dernières questions/réponse du forum'
       style:
         type: default
         options:
@@ -532,26 +531,10 @@ display:
         - user
       show_title: true
       pager:
-        type: infinite_scroll
+        type: some
         options:
           items_per_page: 6
           offset: 0
-          id: 0
-          total_pages: null
-          tags:
-            previous: ‹‹
-            next: ››
-          expose:
-            items_per_page: false
-            items_per_page_label: 'Items per page'
-            items_per_page_options: '5, 10, 25, 50'
-            items_per_page_options_all: false
-            items_per_page_options_all_label: '- All -'
-            offset: false
-            offset_label: Offset
-          views_infinite_scroll:
-            button_text: 'Afficher plus'
-            automatically_load_content: false
       relationships: {  }
       filters:
         status:
@@ -650,7 +633,6 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
-        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags:
