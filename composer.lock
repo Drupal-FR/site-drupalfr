@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "158f3895c6025ce1798f8eb1329edc97",
+    "content-hash": "36470f3a881202c8a026a8af61c24cef",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -3394,7 +3394,14 @@
                 },
                 "drupal": {
                     "version": "8.x-4.0-alpha2",
-                    "datestamp": "1494517385"
+                    "datestamp": "1494517385",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Alpha releases are not covered by Drupal security advisories."
+                    }
+                },
+                "patches_applied": {
+                    "[regression] restore 'All' option in flag Views filter handler": "https://www.drupal.org/files/issues/flag-all_option-2813503-3.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -11261,7 +11268,8 @@
                 "source": "http://cgit.drupalcode.org/examples",
                 "issues": "https://www.drupal.org/project/issues/examples",
                 "documentation": "https://api.drupal.org/api/examples"
-            }
+            },
+            "time": "2017-08-11 18:10:27"
         },
         {
             "name": "drupal/pistachio",
