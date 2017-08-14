@@ -1,0 +1,42 @@
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.forum.body
+    - field.field.node.forum.field_forum_comment
+    - field.field.node.forum.field_forum_hierarchy
+    - field.field.node.forum.field_forum_tag
+    - node.type.forum
+  module:
+    - smart_trim
+    - user
+id: node.forum.teaser
+targetEntityType: node
+bundle: forum
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: smart_trim
+    weight: 0
+    settings:
+      trim_length: '200'
+      trim_type: chars
+      trim_suffix: ...
+      more_link: '0'
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: text
+      more_class: more-link
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_forum_comment: true
+  field_forum_hierarchy: true
+  field_forum_tag: true
+  flag_forum_topic_solved: true
+  flag_spam_node: true
+  langcode: true
+  links: true
