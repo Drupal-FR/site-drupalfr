@@ -15,18 +15,3 @@ drupalfr_spam.admin.content.spam_comment:
   route_name: view.spam_comment.page_1
   parent_id: drupalfr_spam.admin.content.spam
   weight: 1
-
-
-#entity.block_content.collection: # (1) Non-default tab by side of "Block layout" (which is on block.admin_display)
-#  title: 'Custom block library'
-#  route_name: entity.block_content.collection
-#  base_route: block.admin_display
-#block_content.list_sub: # (2) Default subtab, same route as the parent tab, so different tab ID.
-#  title: Blocks
-#  route_name: entity.block_content.collection
-#  parent_id: entity.block_content.collection
-#entity.block_content_type.collection: # (3) Non-default subtab alongside the "Blocks" default tab
-#  title: Block types
-#  route_name: entity.block_content_type.collection
-#  parent_id: entity.block_content.collection
-#  weight: 1
