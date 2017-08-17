@@ -33,6 +33,5 @@ DEVELOPMENT_MODULES=(
 #  search_kint
   serialization
   views_ui
-  webform_ui
   webprofiler
 )
