@@ -4,7 +4,7 @@
 . $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.local.sh
 
 # Import content.
-$DRUSH en drupalfr_migrate -y
+$DRUSH pm:enable drupalfr_migrate -y
 $DRUSH migrate-import drupalfr_file --update
 $DRUSH migrate-import drupalfr_user --update
 $DRUSH migrate-import drupalfr_media --update
@@ -33,4 +33,5 @@ $DRUSH migrate-import drupalfr_user --update
 $DRUSH migrate-import drupalfr_paragraph --update
 
 # Clear search_api indexes.
-$DRUSH search-api-clear
+# TODO: Update Search api to support Drush 9.
+#$DRUSH search-api-clear

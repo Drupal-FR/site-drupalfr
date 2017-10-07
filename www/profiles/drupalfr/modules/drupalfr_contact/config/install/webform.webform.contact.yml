@@ -6,6 +6,10 @@ dependencies:
       - webform
   module:
     - honeypot
+third_party_settings:
+  honeypot:
+    honeypot: true
+    time_restriction: false
 open: null
 close: null
 uid: null
@@ -134,6 +138,7 @@ handlers:
     label: 'Courriel de confirmation'
     handler_id: email_confirmation
     status: true
+    conditions: {  }
     weight: 1
     settings:
       states:
@@ -146,22 +151,25 @@ handlers:
       bcc_options: {  }
       from_mail: default
       from_options: {  }
-      from_name: default
+      from_name: défaut
       subject: '[webform_submission:values:subject:raw]'
       body: '[webform_submission:values:message:value]'
       excluded_elements: {  }
+      ignore_access: false
+      exclude_empty: true
       html: true
       attachments: false
       debug: false
       reply_to: ''
       return_path: ''
-      ignore_access: false
-      exclude_empty: true
+      sender_mail: ''
+      sender_name: ''
   email_notification:
     id: email
     label: 'Notification par courriel'
     handler_id: email_notification
     status: true
+    conditions: {  }
     weight: 1
     settings:
       states:
@@ -180,14 +188,12 @@ handlers:
       subject: '[webform_submission:values:subject:raw]'
       body: '[webform_submission:values:message:value]'
       excluded_elements: {  }
+      ignore_access: false
+      exclude_empty: true
       html: true
       attachments: false
       debug: false
       reply_to: ''
       return_path: ''
-      ignore_access: false
-      exclude_empty: true
-third_party_settings:
-  honeypot:
-    honeypot: true
-    time_restriction: false
+      sender_mail: ''
+      sender_name: ''

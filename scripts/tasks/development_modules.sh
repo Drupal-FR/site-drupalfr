@@ -10,5 +10,5 @@ if [ "${ENVIRONMENT_MODE}" = "dev" ]; then
   do
     MODULES="$MODULES $DEVELOPMENT_MODULE"
   done
-  $DRUSH en $MODULES -y
+  $DRUSH pm:enable $MODULES -y
 fi

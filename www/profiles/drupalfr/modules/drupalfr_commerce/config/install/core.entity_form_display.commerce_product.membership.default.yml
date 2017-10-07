@@ -35,7 +35,8 @@ content:
     type: language_select
     weight: 2
     region: content
-    settings: {  }
+    settings:
+      include_locked: true
     third_party_settings: {  }
   path:
     type: path
@@ -43,6 +44,13 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 31
+    third_party_settings: {  }
+    region: content
   stores:
     type: commerce_entity_select
     weight: -10
@@ -82,5 +90,4 @@ content:
       match_operator: CONTAINS
     third_party_settings: {  }
     region: content
-hidden:
-  status: true
+hidden: {  }
