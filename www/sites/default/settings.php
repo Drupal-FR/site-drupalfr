@@ -3,7 +3,7 @@
 $databases = [];
 
 $config_directories = [
-  CONFIG_SYNC_DIRECTORY => __DIR__ . '/../../../conf/drupal/default',
+  CONFIG_SYNC_DIRECTORY => $app_root . '/' . $site_path . '/../../../conf/drupal/default',
 ];
 
 $settings['omit_vary_cookie'] = TRUE;
@@ -18,7 +18,7 @@ $settings['file_scan_ignore_directories'] = [
   'bower_components',
 ];
 
-$settings['container_yamls'][] = __DIR__ . '/services.yml';
+$settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 
 // TODO: Remove this line when it will no more be added when installing with
 // Drush.
@@ -42,13 +42,12 @@ $config['system.performance']['js']['preprocess'] = TRUE;
 $settings['redis.connection']['interface'] = 'PhpRedis';
 
 // External cache.
-if (file_exists(__DIR__ . '/.cache_activated')) {
+if (file_exists($app_root . '/' . $site_path . '/.cache_activated')) {
+  $settings['cache']['default'] = 'cache.backend.redis';
   // Additional redis services.
   $settings['container_yamls'][] = 'modules/contrib/redis/example.services.yml';
-
-  $settings['cache']['default'] = 'cache.backend.redis';
 }
 
-if (file_exists(__DIR__ . '/settings.local.php')) {
+if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include __DIR__ . '/settings.local.php';
 }

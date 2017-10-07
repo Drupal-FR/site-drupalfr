@@ -58,6 +58,6 @@ $config['commerce_payment.commerce_payment_gateway.paypal']['configuration']['ap
 $config['commerce_payment.commerce_payment_gateway.paypal']['configuration']['api_password'] = '';
 $config['commerce_payment.commerce_payment_gateway.paypal']['configuration']['signature'] = '';
 
-if (file_exists(__DIR__ . '/../development.settings.php')) {
-  include __DIR__ . '/../development.settings.php';
+if (file_exists($app_root . '/' . $site_path . '/../development.settings.php')) {
+  include $app_root . '/' . $site_path . '/../development.settings.php';
 }
