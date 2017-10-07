@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f1ac7262ec732ba212fb091d2595fcb9",
+    "content-hash": "5ee0f7b823bfe23f0fbb4495bf4e709f",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -4978,21 +4978,18 @@
         },
         {
             "name": "drupal/migrate_tools",
-            "version": "4.0.0-beta1",
+            "version": "dev-4.x",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/migrate_tools",
-                "reference": "8.x-4.0-beta1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/migrate_tools-8.x-4.0-beta1.zip",
-                "reference": "8.x-4.0-beta1",
-                "shasum": "81ef335ea37053c26d4bcb4f5339fd77051e59e0"
+                "reference": "44af9bc40425c9a62a81024442d335aca09f5f5a"
             },
             "require": {
                 "drupal/core": "^8.3",
                 "drupal/migrate_plus": "*"
+            },
+            "require-dev": {
+                "drupal/coder": "*"
             },
             "type": "drupal-module",
             "extra": {
@@ -5000,8 +4997,15 @@
                     "dev-4.x": "4.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-4.0-beta1",
-                    "datestamp": "1494450185"
+                    "version": "8.x-4.0-beta1+2-dev",
+                    "datestamp": "1499874842",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
+                    }
+                },
+                "patches_applied": {
+                    "Drush 9 port of commands": "https://www.drupal.org/files/issues/migrate_tools-2914005-25.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -5010,15 +5014,24 @@
             ],
             "authors": [
                 {
+                    "name": "heddn",
+                    "homepage": "https://www.drupal.org/user/1463982"
+                },
+                {
                     "name": "mikeryan",
                     "homepage": "https://www.drupal.org/user/4420"
+                },
+                {
+                    "name": "moshe weitzman",
+                    "homepage": "https://www.drupal.org/user/23"
                 }
             ],
             "description": "Tools to assist in developing and running migrations.",
             "homepage": "https://www.drupal.org/project/migrate_tools",
             "support": {
                 "source": "http://cgit.drupalcode.org/migrate_tools"
-            }
+            },
+            "time": "2017-08-28T18:14:44+00:00"
         },
         {
             "name": "drupal/paragraphs",
@@ -13685,6 +13698,7 @@
         "drupal/commerce_paypal": 20,
         "drupal/context": 20,
         "drupal/leaflet": 20,
+        "drupal/migrate_tools": 20,
         "behat/mink": 20
     },
     "prefer-stable": true,
