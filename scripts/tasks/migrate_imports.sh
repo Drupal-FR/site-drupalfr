@@ -33,5 +33,4 @@ $DRUSH migrate:import drupalfr_user --update
 $DRUSH migrate:import drupalfr_paragraph --update
 
 # Clear search_api indexes.
-# TODO: Update Search api to support Drush 9.
-#$DRUSH search-api-clear
+$DRUSH search-api:clear
