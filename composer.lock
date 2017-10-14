@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ee0f7b823bfe23f0fbb4495bf4e709f",
+    "content-hash": "ee600f6d6f707c02596331a62777ee0c",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -2421,12 +2421,8 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-alpha1+25-dev",
-                    "datestamp": "1495802883",
-                    "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
-                    }
+                    "version": "8.x-1.0-alpha1+20-dev",
+                    "datestamp": "1494266286"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -2882,7 +2878,14 @@
                 },
                 "drupal": {
                     "version": "8.x-1.x-dev",
-                    "datestamp": "1491263583"
+                    "datestamp": "1492040643",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
+                    }
+                },
+                "patches_applied": {
+                    "Convert for Drush 9": "https://www.drupal.org/files/issues/drush_language-drush_9-2914081-8.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -4529,7 +4532,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://ftp.drupal.org/files/projects/media_entity_browser-8.x-1.0-beta3.zip",
-                "reference": "8.x-1.0-beta3",
+                "reference": null,
                 "shasum": "f6f9f13bb0aa6bfd0a61667a47ca60c5282341d5"
             },
             "require": {
@@ -13697,6 +13700,7 @@
         "drupal/commerce_license": 20,
         "drupal/commerce_paypal": 20,
         "drupal/context": 20,
+        "drupal/drush_language": 20,
         "drupal/leaflet": 20,
         "drupal/migrate_tools": 20,
         "behat/mink": 20
