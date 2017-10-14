@@ -476,11 +476,6 @@
         "composer/installers": "^1.0.21",
         "cweagans/composer-patches": "~1.0",
         "dinbror/blazy": "1.8.*",
-        "doctrine/annotations": "1.2.7",
-        "doctrine/cache": "1.6.1",
-        "doctrine/collections": "1.3.0",
-        "doctrine/common": "2.7.2",
-        "doctrine/inflector": "1.1.0",
         "drupal-composer/drupal-l10n": "dev-master",
         "drupal-composer/drupal-scaffold": "^2.2",
         "drupal/admin_toolbar": "1.20.0",
@@ -535,7 +530,7 @@
         "drupal/video_embed_field": "1.5.0",
         "drupal/views_infinite_scroll": "1.5.0",
         "drupal/webform": "5.0.0-beta19",
-        "drush/drush": "9.0.0-beta6",
+        "drush/drush": "9.0.0-beta7",
         "enyo/dropzone": "4.3.*",
         "farbelous/fontawesome-iconpicker": "1.3.0",
         "fortawesome/fontawesome": "4.7.0",
@@ -584,7 +579,10 @@
     "prefer-stable": true,
     "config": {
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "5.6"
+        }
     },
     "scripts": {
         "drupal-l10n": "DrupalComposer\\DrupalL10n\\Plugin::download",
