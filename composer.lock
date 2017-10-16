@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "afd4143f78b199fee8cc006695c0f9f0",
+    "content-hash": "bc7158806944610634ebfe0f03486577",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -6335,6 +6335,9 @@
             "extra": {
                 "branch-alias": {
                     "dev-master": "9.0.x-dev"
+                },
+                "patches_applied": {
+                    "If problem in args preprocessor where any option begining with '--local' would be confused for the '--local' option.": "https://github.com/drush-ops/drush/commit/85db92feb60af29aa2dc936883aefb80f1d6a4ad.patch"
                 }
             },
             "autoload": {
