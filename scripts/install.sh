@@ -29,8 +29,7 @@ $DRUSH site:install $PROFILE \
 $DRUSH updatedb --entity-updates -y
 
 # Import some specific features overridden even after install.
-# TODO: Update Features to support Drush 9.
-#$DRUSH features-import drupalfr_showcase --bundle=$Profile -y
+$DRUSH features:import drupalfr_showcase --bundle=$PROFILE -y
 
 . $SCRIPTS_PATH/tasks/development_modules.sh
 . $SCRIPTS_PATH/tasks/migrate_imports.sh

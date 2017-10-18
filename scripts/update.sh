@@ -22,8 +22,7 @@ $DRUSH updatedb --entity-updates -y
 . $SCRIPTS_PATH/tasks/development_modules.sh
 
 # Revert features.
-# TODO: Update Features to support Drush 9.
-#$DRUSH features-import -y $PROFILE
+$DRUSH features:import:all --bundle=$PROFILE -y
 
 # Import content.
 # For update.sh import only content if the environment is dev to not risk
