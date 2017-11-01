@@ -204,8 +204,8 @@
   <dynamicField name="tws_*" type="text_ws" indexed="true" stored="true" multiValued="false"/>
   <dynamicField name="twm_*" type="text_ws" indexed="true" stored="true" multiValued="true"/>
 
-  <dynamicField name="terms_ts_*" type="textSpell" indexed="true" stored="true" multiValued="false"/>
-  <dynamicField name="terms_tm_*" type="textSpell" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="terms_ts_*" type="textSpell" indexed="true" stored="true" multiValued="false" termVectors="true"/>
+  <dynamicField name="terms_tm_*" type="textSpell" indexed="true" stored="true" multiValued="true" termVectors="true"/>
 
   <!-- trie dates are preferred, so give them the 2 letter prefix -->
   <dynamicField name="ds_*"  type="tdate"   indexed="true"  stored="true" multiValued="false"/>
