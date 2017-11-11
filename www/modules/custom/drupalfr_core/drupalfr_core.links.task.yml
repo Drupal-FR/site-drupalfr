@@ -1,17 +1,17 @@
-drupalfr_spam.admin.content.spam:
+drupalfr_core.admin.content.spam:
   title: 'Spam'
   route_name: view.spam_content.page_1
   base_route: system.admin_content
   weight: 10
 
-drupalfr_spam.admin.content.spam_content:
+drupalfr_core.admin.content.spam_content:
   title: 'Content'
   route_name: view.spam_content.page_1
-  parent_id: drupalfr_spam.admin.content.spam
+  parent_id: drupalfr_core.admin.content.spam
   weight: 0
 
-drupalfr_spam.admin.content.spam_comment:
+drupalfr_core.admin.content.spam_comment:
   title: 'Comment'
   route_name: view.spam_comment.page_1
-  parent_id: drupalfr_spam.admin.content.spam
+  parent_id: drupalfr_core.admin.content.spam
   weight: 1
