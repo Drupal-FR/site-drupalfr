@@ -1,0 +1,35 @@
+default:
+  suites:
+    default:
+      contexts:
+        - FeatureContext
+        - Drupal\DrupalExtension\Context\MinkContext
+        - Drupal\DrupalExtension\Context\DrupalContext
+        - Drupal\DrupalExtension\Context\MarkupContext
+        - Drupal\DrupalExtension\Context\MessageContext
+  extensions:
+    Behat\MinkExtension:
+      goutte: ~
+      base_url: http://varnish
+    Drupal\DrupalExtension:
+      blackbox: ~
+      region_map:
+        header: '.region-header'
+        primary_menu: '.region-primary-menu'
+        secondary_menu: '.region-secondary-menu'
+        page_top: '.region-page-top'
+        page_bottom: '.region-page-bottom'
+        highlighted: '.region-highlighted'
+        featured_top: '.region-featured-top'
+        breadcrumb: '.region-breadcrumb'
+        content: '.region-content'
+        sidebar_first: '.region-sidebar-first'
+        sidebar_second: '.region-sidebar-first'
+        featured_bottom_first: '.region-featured-bottom-first'
+        featured_bottom_second: '.region-featured-bottom-second'
+        featured_bottom_third: '.region-featured-bottom-third'
+        footer_first: '.region-footer-first'
+        footer_second: '.region-footer-second'
+        footer_third: '.region-footer-third'
+        footer_fourth: '.region-footer-fourth'
+        footer_fifth: '.region-footer-fifth'

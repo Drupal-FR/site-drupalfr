@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO set checkForUnintentionallyCoveredCode="true" once https://www.drupal.org/node/2626832 is resolved. -->
+<!-- PHPUnit expects functional tests to be run with either a privileged user
+ or your current system user. See core/tests/README.md and
+ https://www.drupal.org/node/2116263 for details.
+-->
+<phpunit bootstrap="/project/www/core/tests/bootstrap.php" colors="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutChangesToGlobalState="true"
+         checkForUnintentionallyCoveredCode="false"
+         printerClass="\Drupal\Tests\Listeners\HtmlOutputPrinter">
+
+  <php>
+    <!-- Set error reporting to E_ALL. -->
+    <ini name="error_reporting" value="32767"/>
+    <!-- Do not limit the amount of memory tests take to run. -->
+    <ini name="memory_limit" value="-1"/>
+    <!-- Example SIMPLETEST_BASE_URL value: http://localhost -->
+    <env name="SIMPLETEST_BASE_URL" value="http://web"/>
+    <!-- Example SIMPLETEST_DB value: mysql://username:password@localhost/databasename#table_prefix -->
+    <env name="SIMPLETEST_DB" value="mysql://drupal:drupal@mysql/drupal"/>
+    <!-- Example BROWSERTEST_OUTPUT_DIRECTORY value: /path/to/webroot/sites/simpletest/browser_output -->
+    <env name="BROWSERTEST_OUTPUT_DIRECTORY" value="/project/www/sites/default/files/simpletest"/>
+  </php>
+  <testsuites>
+    <testsuite name="unit">
+      <file>/project/www/core/tests/TestSuites/UnitTestSuite.php</file>
+    </testsuite>
+    <testsuite name="kernel">
+      <file>/project/www/core/tests/TestSuites/KernelTestSuite.php</file>
+    </testsuite>
+    <testsuite name="functional">
+      <file>/project/www/core/tests/TestSuites/FunctionalTestSuite.php</file>
+    </testsuite>
+    <testsuite name="functional-javascript">
+      <file>/project/www/core/tests/TestSuites/FunctionalJavascriptTestSuite.php</file>
+    </testsuite>
+  </testsuites>
+  <listeners>
+    <listener class="\Drupal\Tests\Listeners\DrupalStandardsListener">
+    </listener>
+  </listeners>
+  <!-- Filter for coverage reports. -->
+  <filter>
+    <whitelist>
+      <directory>/project/www/core/includes</directory>
+      <directory>/project/www/core/lib</directory>
+      <directory>/project/www/core/modules</directory>
+      <directory>/project/www/modules</directory>
+      <directory>/project/www/sites</directory>
+      <!-- By definition test classes have no tests. -->
+      <exclude>
+        <directory suffix="Test.php">./</directory>
+        <directory suffix="TestBase.php">./</directory>
+      </exclude>
+     </whitelist>
+  </filter>
+</phpunit>

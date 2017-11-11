@@ -7,13 +7,17 @@
 cd $WWW_PATH
 
 # Database backup.
-$DRUSH sql:dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip --structure-tables-key=common
+$DRUSH sql:dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip --structure-tables-key="common"
 
 # Put the site in maintenance mode.
 $DRUSH state:set system.maintenance_mode 1
 
 # Install sources.
 . $SCRIPTS_PATH/tasks/composer_install.sh
+
+# Clear cache to be sure cache are cleared even if there is no update or Drush
+# has been updated.
+$DRUSH cache:rebuild
 
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updatedb --entity-updates -y

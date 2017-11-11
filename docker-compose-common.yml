@@ -65,7 +65,7 @@ services:
       - ./conf/mysql:/etc/mysql/conf.d
 
   redis:
-    image: redis:3.2-alpine
+    image: redis:4.0-alpine
     volumes:
       - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
     entrypoint:
