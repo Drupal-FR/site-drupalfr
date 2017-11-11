@@ -113,18 +113,3 @@ $settings['rebuild_access'] = TRUE;
  * directory.
  */
 $settings['skip_permissions_hardening'] = TRUE;
-
-// Views.
-$config['views.settings']['ui']['show']['advanced_column'] = TRUE;
-
-// Devel.
-$config['devel.settings']['devel_dumper'] = 'var_dumper';
-
-// Webprofiler.
-// Enable all toolbar items.
-$config['webprofiler.config']['active_toolbar_items']['config'] = 'config';
-$config['webprofiler.config']['active_toolbar_items']['events'] = 'events';
-$config['webprofiler.config']['active_toolbar_items']['http'] = 'http';
-$config['webprofiler.config']['active_toolbar_items']['routing'] = 'routing';
-$config['webprofiler.config']['active_toolbar_items']['services'] = 'services';
-$config['webprofiler.config']['active_toolbar_items']['state'] = 'state';
