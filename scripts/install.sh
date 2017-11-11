@@ -30,6 +30,10 @@ $DRUSH site:install config_installer \
 
 # TODO: workaround since https://www.drupal.org/node/2916090 is not fixed.
 $DRUSH user:password $ACCOUNT_NAME $ACCOUNT_PASS
+$DRUSH config:set system.site mail $SITE_MAIL -y
+
+# Import configuration so splits and some side effects are taken into account.
+$DRUSH config:import -y
 
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updatedb --entity-updates -y
