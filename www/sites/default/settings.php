@@ -3,7 +3,7 @@
 $databases = [];
 
 $config_directories = [
-  CONFIG_SYNC_DIRECTORY => $app_root . '/' . $site_path . '/../../../conf/drupal/default',
+  CONFIG_SYNC_DIRECTORY => $app_root . '/' . $site_path . '/../../../conf/drupal/default/sync',
 ];
 
 $settings['omit_vary_cookie'] = TRUE;

@@ -23,10 +23,13 @@ $DRUSH cache:rebuild
 $DRUSH updatedb --entity-updates -y
 
 # Enable development modules.
-. $SCRIPTS_PATH/tasks/development_modules.sh
+#. $SCRIPTS_PATH/tasks/development_modules.sh
 
-# Revert features.
-$DRUSH features:import:all --bundle=$PROFILE -y
+# Export prod config split in case of overrides.
+$DRUSH config-split:export prod -y
+
+# Import configuration.
+$DRUSH config:import -y
 
 # Import content.
 # For update.sh import only content if the environment is dev to not risk

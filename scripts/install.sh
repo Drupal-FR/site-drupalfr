@@ -19,7 +19,7 @@ $DRUSH sql:dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gz
 rm -f $WWW_PATH/sites/default/.cache_activated
 
 # Install Drupal.
-$DRUSH site:install $PROFILE \
+$DRUSH site:install config_installer \
   --account-mail=$ACCOUNT_MAIL \
   --account-name=$ACCOUNT_NAME \
   --account-pass=$ACCOUNT_PASS \
@@ -31,10 +31,7 @@ $DRUSH site:install $PROFILE \
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updatedb --entity-updates -y
 
-# Import some specific features overridden even after install.
-$DRUSH features:import drupalfr_showcase --bundle=$PROFILE -y
-
-. $SCRIPTS_PATH/tasks/development_modules.sh
+#. $SCRIPTS_PATH/tasks/development_modules.sh
 . $SCRIPTS_PATH/tasks/migrate_imports.sh
 . $SCRIPTS_PATH/tasks/update_translations.sh
 

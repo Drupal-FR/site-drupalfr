@@ -18,6 +18,10 @@ $settings['trusted_host_patterns'] = [
 
 $settings['file_private_path'] = '/project/private_files/default';
 
+// Config split.
+$config['config_split.config_split.dev']['status'] = FALSE;
+$config['config_split.config_split.prod']['status'] = FALSE;
+
 // Translations.
 $config['locale.settings']['translation']['path'] = 'translations/contrib';
 $config['locale.settings']['translation']['use_source'] = 'local';
