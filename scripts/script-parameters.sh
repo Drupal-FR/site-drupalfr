@@ -15,7 +15,6 @@ DRUSH=$PROJECT_PATH/vendor/bin/drush
 
 CURRENT_DATE=$(date "+%Y-%m-%d-%Hh%Mm%Ss")
 
-PROFILE="drupalfr"
 DEFAULT_LANGUAGE="fr"
 
 WEBSERVER_USER='www-data'

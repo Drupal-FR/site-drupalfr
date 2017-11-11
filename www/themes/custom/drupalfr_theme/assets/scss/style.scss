@@ -1,0 +1,420 @@
+// Default variables.
+@import "default-variables";
+// Bootstrap Framework.
+@import '../../../../../libraries/bootstrap-sass/assets/stylesheets/bootstrap';
+// Font-Awesome Iconset.
+@import '../../../../../libraries/fontawesome/scss/font-awesome';
+// Base-theme overrides.
+@import 'overrides';
+
+/**
+ * DRUPAL FRANCE THEME
+ *
+ * 1 - General
+ * 2 - Header
+ * 3 - Homepage
+ * 4 - Discover
+ * X - Footer
+ */
+
+$mobile : "screen and (max-width: #{$screen-xs-max})";
+$tablet : "screen and (min-width: #{$screen-sm-min})";
+$normal : "screen and (min-width: #{$screen-md-min})";
+$wide : "screen and (min-width: #{$screen-lg-min})";
+
+/* ==========================================================================
+   1 - GENERAL
+   ========================================================================== */
+body * {
+  font-family : 'Ubuntu', sans-serif;
+  font-weight : 300;
+}
+
+/* ==========================================================================
+   2 - HEADER
+   ========================================================================== */
+
+/* Navbar Menu & Submenu
+   ========================================================================== */
+header.navbar {
+  @media #{$mobile} {
+    .navbar-toggle {
+      border-color : white;
+      color        : white;
+      &:hover,
+      &:focus {
+        background-color : $drupal-light-blue;
+      }
+
+      &.toggle-user-menu {
+        font-size : 24px;
+        padding   : 2px 7px;
+      }
+    }
+
+    #navbar-collapse-mobile-user {
+      padding : 0
+    }
+
+  }
+  @media #{$tablet} {
+    border-bottom : 0;
+    // Level 1 hover & focus
+    .nav > li.dropdown:not(.open) > a {
+      &:hover,
+      &:focus {
+        &::after {
+          content          : " ";
+          height           : 4px;
+          width            : 100%;
+          position         : absolute;
+          bottom           : 0;
+          left             : 0;
+          background-color : white;
+        }
+      }
+    }
+    // Level 1 Active (current path / page)
+    .nav > li.dropdown.active {
+      > a {
+        font-weight : 700;
+      }
+    }
+
+    // Level 2 Opened
+    .nav > li.dropdown.open {
+      position : static;
+      > a {
+        &::after {
+          content       : " ";
+          display       : block;
+          width         : 0;
+          height        : 0;
+          border-top    : 10px solid transparent;
+          border-bottom : 10px solid $drupal-light-blue;
+          border-left   : 10px solid transparent;
+          border-right  : 10px solid transparent;
+          position      : absolute;
+          bottom        : 0px;
+          left          : 40%;
+          z-index       : 2;
+        }
+      }
+
+      .dropdown-menu {
+        display          : table;
+        width            : 100%;
+        text-align       : center;
+        left             : 0;
+        right            : 0;
+        height           : 60px;
+        padding          : 0;
+        margin           : 0;
+        //box-shadow       : none;
+        border           : none;
+        border-radius    : 0;
+        background-color : $drupal-light-blue;
+
+        > li {
+          display : table-cell;
+          height  : 60px;
+          > a {
+            height           : 60px;
+            line-height      : 60px;
+            padding          : 0;
+            color            : white;
+            display          : block;
+            background-color : $drupal-light-blue;
+
+            &.is-active {
+              font-weight : 700;
+            }
+
+            // Level 2 hover/focus/active states (pseudo-elements)
+            &:hover,
+            &:focus,
+            &:active {
+              background-color : $drupal-light-blue;
+              border-bottom    : 4px solid white;
+            }
+          }
+        }
+      }
+    }
+
+    .nav:not(.navbar-right) {
+      display         : flex;
+      flex-direction  : row;
+      flex-wrap       : nowrap;
+      justify-content : space-around;
+      width           : (($container-sm - 200));
+
+      @media #{$normal} {
+        width : (($container-md - 200));
+      }
+      @media #{$wide} {
+        width : (($container-lg - 200));
+      }
+
+      > li.dropdown.open .dropdown-menu {
+        @media #{$normal} {
+          padding : 0 70px 0 100px;
+        }
+        @media #{$wide} {
+          padding : 0 100px 0 150px;
+        }
+      }
+    }
+  }
+}
+
+/* User Account Menu Button
+   ========================================================================== */
+header.navbar {
+  .nav.navbar-right > li.dropdown {
+    > a.btn-header {
+      font-size     : 25px;
+      border        : 0;
+      padding       : 15px;
+      border-radius : 0;
+      height        : 60px;
+      @media #{$mobile} {
+        display : none;
+      }
+    }
+
+    &.open {
+      position : static;
+      > a.btn-header {
+        background-color : $drupal-dark-blue;
+        color            : white;
+        &::after {
+          left : 18px;
+        }
+      }
+    }
+
+  }
+}
+
+/* ==========================================================================
+   3 - HOMEPAGE
+   ========================================================================== */
+.paragraph.head_homepage {
+  background-color : $drupal_dark_blue;
+  color            : white;
+}
+
+.paragraph .homepage_discover {
+  padding-top : 50px;
+  text-align  : center;
+
+  .title {
+    color       : $drupal_dark_blue;
+    font-weight : 300;
+    small {
+      color       : $drupal_dark_blue;
+      font-weight : 300;
+    }
+  }
+
+  .subtitle {
+    color : $gray;
+  }
+
+  .row-items {
+    margin-bottom : 30px;
+    .item {
+      padding : 50px 50px 25px;
+      &-icon {
+        font-size : 80px;
+        color     : $drupal_light_blue;
+      }
+      &-title {
+        color      : $drupal_dark_blue;
+        margin-top : 5px;
+      }
+      &-text {
+        font-size : small;
+        color     : $gray;
+      }
+    }
+  }
+
+  .row-cta {
+    a {
+      padding        : 15px 30px;
+      font-weight    : 700;
+      text-transform : uppercase;
+      font-size      : 14px;
+    }
+  }
+
+}
+
+/* ==========================================================================
+   3 - DISCOVER
+   ========================================================================== */
+.paragraph.head_discover {
+  background-color : $drupal_light_blue;
+  color            : white;
+}
+
+/* ==========================================================================
+   X - FOOTER
+   ========================================================================== */
+
+/* Container
+   ========================================================================== */
+
+.footer {
+  margin-top       : 45px;
+  padding-top      : 35px;
+  padding-bottom   : 36px;
+  background-color : $drupal_dark_blue;
+}
+
+/* Blocks
+   ========================================================================== */
+
+.footer {
+  nav,
+  .block {
+    padding : 10px 25px;
+    h2,
+    .block-title {
+      margin-top    : 0;
+      margin-bottom : 15px;
+      color         : $drupal_desaturate_blue_light;
+      font-size     : 18px;
+      font-weight   : 500;
+    }
+    p {
+      color       : $drupal_desaturate_blue_light;
+      font-size   : 16px;
+      line-height : 20px;
+      font-weight : 400;
+      padding     : 15px 0;
+    }
+  }
+
+  .block + .block {
+    //    padding-top : 50px;
+  }
+}
+
+/* Buttons and Links
+   ========================================================================== */
+.footer {
+  /* Connection & Contact */
+  .btn-footer {
+    margin-top  : 50px;
+    padding     : 15px 40px;
+    font-size   : 18px;
+    font-weight : 500;
+    text-indent : 15px;
+
+    i {
+      display     : inline-block;
+      position    : relative;
+      text-indent : -40px;
+    }
+
+    &.footer-contact-link {
+      margin-top : 0;
+      padding    : 10px 30px;
+      float      : right;
+    }
+  }
+  /* Mini Sitemap */
+  nav[role="navigation"] {
+    ul.menu.nav.navbar-nav {
+      > li {
+        float   : none;
+        display : list-item;
+        a {
+          display : inline-block;
+          color   : $drupal_desaturate_blue_light;
+          padding : 5px;
+
+          &:hover {
+            background-color : transparent;
+            color            : white;
+          }
+        }
+      }
+    }
+  }
+
+  /* Follow Us */
+  .follow-us {
+    list-style : none;
+    li {
+      display : inline-block;
+
+      a {
+        font-size  : 30px;
+        color      : $drupal_desaturate_blue_light;
+        display    : inline-block;
+        max-height : 30px;
+        width      : 30px;
+        visibility : hidden;
+
+        i {
+          visibility: initial;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+          color : white;
+        }
+      }
+
+    }
+  }
+
+}
+
+/* Newsletter Form
+   ========================================================================== */
+.footer {
+  .newsletter-subscription {
+    input[type="email"] {
+      padding          : 5px 10px;
+      height           : 40px;
+      background-color : $drupal_desaturate_blue;
+      color            : $drupal_dark_blue;
+      border           : 0;
+      border-radius    : 2px 0 0 2px;
+      font-size        : 18px;
+      font-weight      : 400;
+
+      &:focus {
+        box-shadow       : none;
+        background-color : $drupal_desaturate_blue_light;
+        color            : $drupal_dark_blue;
+      }
+
+      &::placeholder {
+        font-size   : 16px;
+        font-weight : 400;
+        color       : $drupal_dark_blue;
+      }
+    }
+
+    .btn-footer-light {
+      padding          : 10px;
+      background-color : $drupal_desaturate_blue_light;
+      color            : $drupal_dark_blue;
+      border-radius    : 0 2px 2px 0;
+      height           : 40px;
+      &:hover,
+      &:focus,
+      &:active {
+        background-color : $drupal_desaturate_blue;
+        color            : $drupal_desaturate_blue_light;
+      }
+    }
+  }
+}

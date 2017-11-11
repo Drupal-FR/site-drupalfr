@@ -1,0 +1,92 @@
+id: drupalfr_page
+label: 'Page import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+migration_dependencies:
+  required:
+    - drupalfr_drupal_version
+    - drupalfr_file
+    - drupalfr_paragraph
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/page.csv
+  header_row_count: 1
+  keys:
+    - uuid
+  column_names:
+    -
+      uuid: UUID
+    -
+      title: Title
+    -
+      path: Path
+    -
+      published: Published
+    -
+      drupal_version: 'Drupal version'
+    -
+      attachments: Attachments
+    -
+      body_value: Body
+    -
+      body_format: 'Body format'
+    -
+      paragraphs: Paragraphs
+destination:
+  plugin: 'entity:node'
+process:
+  type:
+    plugin: default_value
+    default_value: page
+  uuid: uuid
+  title: title
+  field_drupal_version:
+    -
+      plugin: explode
+      source: drupal_version
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_drupal_version
+  field_attachment:
+    -
+      plugin: explode
+      source: attachments
+      delimiter: ;
+    -
+      plugin: migration
+      migration: drupalfr_file
+  body/value: body_value
+  body/format: body_format
+  field_paragraph:
+    -
+      plugin: explode
+      delimiter: ;
+      source: paragraphs
+    -
+      plugin: migration
+      migration: drupalfr_paragraph
+      no_stub: true
+    -
+      plugin: iterator
+      process:
+        target_id: '0'
+        target_revision_id: '1'
+  path:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: path
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1

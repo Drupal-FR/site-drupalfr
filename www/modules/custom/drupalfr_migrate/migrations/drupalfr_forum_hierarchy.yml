@@ -1,0 +1,43 @@
+id: drupalfr_forum_hierarchy
+label: 'Forum hierarchy import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - taxonomy
+migration_dependencies: {  }
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/forum_hierarchy.csv
+  header_row_count: 1
+  keys:
+    - uuid
+  column_names:
+    -
+      uuid: UUID
+    -
+      name: Name
+    -
+      weight: Weight
+    -
+      parent: Parent
+destination:
+  plugin: 'entity:taxonomy_term'
+process:
+  vid:
+    plugin: default_value
+    default_value: forum_hierarchy
+  uuid: uuid
+  name: name
+  weight: weight
+  parent:
+    -
+      plugin: migration
+      migration: drupalfr_forum_hierarchy
+      source: parent

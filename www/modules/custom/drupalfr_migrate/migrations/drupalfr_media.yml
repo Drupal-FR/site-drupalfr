@@ -1,0 +1,51 @@
+id: drupalfr_media
+label: 'Media import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - drupalfr_media
+migration_dependencies:
+  required:
+    - drupalfr_file
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/media.csv
+  header_row_count: 1
+  keys:
+    - uuid
+  column_names:
+    -
+      uuid: UUID
+    -
+      type: Type
+    -
+      published: Published
+    -
+      name: Name
+    -
+      image: 'Image ID'
+    -
+      video_url: 'Video URL'
+destination:
+  plugin: 'entity:media'
+process:
+  uuid: uuid
+  bundle: type
+  name: name
+  field_image:
+    -
+      plugin: migration
+      migration: drupalfr_file
+      source: image
+  field_media_video_embed_field: video_url
+  status: published
+  uid:
+    plugin: default_value
+    default_value: 1

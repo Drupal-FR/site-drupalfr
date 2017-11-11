@@ -7,5 +7,5 @@ $DRUSH locale:check
 $DRUSH locale:update
 
 $DRUSH pm:enable drush_language
-$DRUSH language:import:translations $DEFAULT_LANGUAGE $WWW_PATH/profiles/$PROFILE/translations/$PROFILE.po --replace
+$DRUSH language:import:translations $DEFAULT_LANGUAGE $WWW_PATH/translations/custom/drupalfr.po --replace
 $DRUSH pm:uninstall drush_language
