@@ -31,7 +31,6 @@ $DRUSH site:install config_installer \
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updatedb --entity-updates -y
 
-#. $SCRIPTS_PATH/tasks/development_modules.sh
 . $SCRIPTS_PATH/tasks/migrate_imports.sh
 . $SCRIPTS_PATH/tasks/update_translations.sh
 

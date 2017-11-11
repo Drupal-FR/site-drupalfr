@@ -17,23 +17,6 @@ CURRENT_DATE=$(date "+%Y-%m-%d-%Hh%Mm%Ss")
 
 PROFILE="drupalfr"
 DEFAULT_LANGUAGE="fr"
-DEVELOPMENT_MODULES=(
-  blazy_ui
-  config_inspector
-  context_ui
-  dblog
-  devel
-#  devel_a11y
-  devel_generate
-  field_ui
-#  kint
-  purge_ui
-#  renderviz
-#  search_kint
-  serialization
-  views_ui
-  webprofiler
-)
 
 WEBSERVER_USER='www-data'
 

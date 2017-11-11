@@ -1,0 +1,29 @@
+uuid: dcf480ba-1c7f-4480-9595-580e2f070b61
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+    - facets.facet.drupal_version
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_search_drupal_version
+theme: drupalfr_theme
+region: sidebar_second
+weight: -8
+provider: null
+plugin: 'facet_block:drupal_version'
+settings:
+  id: 'facet_block:drupal_version'
+  label: 'Version de Drupal'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

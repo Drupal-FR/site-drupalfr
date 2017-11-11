@@ -1,0 +1,17 @@
+uuid: a5690f41-ceaa-4384-addc-facf1cdde96d
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+id: release_listing
+label: 'Page téléchargements'
+logic: and
+conditions:
+  40a5d3e8-94b6-431b-a660-7ab6b4a4d506:
+    id: request_path
+    pages: /decouvrir/telechargements
+    negate: false
+    context_mapping: {  }
+    uuid: 40a5d3e8-94b6-431b-a660-7ab6b4a4d506
+allow_other_conditions: true

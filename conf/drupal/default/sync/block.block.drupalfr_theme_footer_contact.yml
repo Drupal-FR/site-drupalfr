@@ -2,6 +2,10 @@ uuid: 3258f0df-0715-4327-b8c3-323822e2a76b
 langcode: fr
 status: true
 dependencies:
+  content:
+    - 'block_content:basic:block_footer_contact'
+  module:
+    - block_content
   theme:
     - drupalfr_theme
 _core:
@@ -9,7 +13,7 @@ _core:
 id: drupalfr_theme_footer_contact
 theme: drupalfr_theme
 region: footer_col_3
-weight: -5
+weight: -6
 provider: null
 plugin: 'block_content:block_footer_contact'
 settings:

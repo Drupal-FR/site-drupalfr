@@ -1,0 +1,17 @@
+uuid: ecbe246d-fe6c-4b19-99c5-643cafb66e55
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+id: homepage
+label: 'Page d''accueil'
+logic: and
+conditions:
+  8d7acbdf-9efd-4c8a-978d-ddf4eee29020:
+    id: request_path
+    pages: '<front>'
+    negate: false
+    context_mapping: {  }
+    uuid: 8d7acbdf-9efd-4c8a-978d-ddf4eee29020
+allow_other_conditions: true

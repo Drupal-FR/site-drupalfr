@@ -1,0 +1,29 @@
+uuid: bb28f711-1a37-41df-95ce-230f3583efc3
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+    - facets.facet.forum_tag
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_search_forum_tag
+theme: drupalfr_theme
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'facet_block:forum_tag'
+settings:
+  id: 'facet_block:forum_tag'
+  label: 'Tags du forum'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

@@ -1,0 +1,17 @@
+uuid: a9de5937-4bab-4072-93f1-e5bbbfa2fef2
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+id: news_listing
+label: 'Page liste actualités'
+logic: and
+conditions:
+  ad64c62a-0c9d-4178-a3d7-fd2687a6105e:
+    id: request_path
+    pages: /association/actualites
+    negate: false
+    context_mapping: {  }
+    uuid: ad64c62a-0c9d-4178-a3d7-fd2687a6105e
+allow_other_conditions: true

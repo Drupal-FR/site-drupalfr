@@ -1,28 +1,27 @@
-uuid: 21f82b0d-74dc-4364-a19c-66f2c863e172
+uuid: dae2dc46-870d-4524-b5f2-126c46618a48
 langcode: fr
 status: true
 dependencies:
+  config:
+    - system.menu.account
   module:
     - block_visibility_groups
     - system
   theme:
     - drupalfr_theme
-_core:
-  default_config_hash: y95_LY5l_Sc4XIrIM_qzPZ4p6g6HGR3_H990qf6PJ94
-id: drupalfr_theme_branding
+id: drupalfr_theme_mobile_user_menu
 theme: drupalfr_theme
-region: navigation
+region: navigation_collapsible_mobile_user
 weight: 0
 provider: null
-plugin: system_branding_block
+plugin: 'system_menu_block:account'
 settings:
-  id: system_branding_block
-  label: 'Site branding'
+  id: 'system_menu_block:account'
+  label: 'Menu du compte de l''utilisateur (mobile)'
   provider: system
   label_display: '0'
-  use_site_logo: true
-  use_site_name: false
-  use_site_slogan: false
+  level: 2
+  depth: 1
 visibility:
   condition_group:
     id: condition_group

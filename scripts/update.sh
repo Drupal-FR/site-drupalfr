@@ -22,9 +22,6 @@ $DRUSH cache:rebuild
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updatedb --entity-updates -y
 
-# Enable development modules.
-#. $SCRIPTS_PATH/tasks/development_modules.sh
-
 # Export prod config split in case of overrides.
 $DRUSH config-split:export prod -y
 

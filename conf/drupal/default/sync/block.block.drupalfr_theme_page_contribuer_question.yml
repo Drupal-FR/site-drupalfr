@@ -1,0 +1,33 @@
+uuid: 6c72cfbe-3421-43ec-b0c9-57be0ec3457b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.page_contribuer
+  content:
+    - 'block_content:basic:block_sidebar_question'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_page_contribuer_question
+theme: drupalfr_theme
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'block_content:block_sidebar_question'
+settings:
+  id: 'block_content:block_sidebar_question'
+  label: "Sidebar\_: poser une question"
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: page_contribuer
+    context_mapping: {  }

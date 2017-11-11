@@ -1,0 +1,17 @@
+uuid: 61bca701-acc4-4918-aecb-36e7cff242eb
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+id: page_contribuer
+label: 'Page contribuer'
+logic: and
+conditions:
+  b7c1e608-3473-4a32-b3de-a071141991d6:
+    id: request_path
+    pages: /association/contribuer
+    negate: false
+    context_mapping: {  }
+    uuid: b7c1e608-3473-4a32-b3de-a071141991d6
+allow_other_conditions: true
