@@ -1,0 +1,56 @@
+uuid: cf6f683b-242d-4c3e-aab1-3d3d68fe8d17
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_result
+    - field.field.node.job_offer.body
+    - field.field.node.job_offer.field_job_company
+    - field.field.node.job_offer.field_job_contract_type
+    - field.field.node.job_offer.field_job_nature
+    - field.field.node.job_offer.field_job_teleworking
+    - field.field.node.job_offer.field_job_validity
+    - field.field.node.job_offer.field_region
+    - node.type.job_offer
+  module:
+    - smart_trim
+    - user
+_core:
+  default_config_hash: O7oXceLpeziygE7-BemfSqkqWMfr_DJZACxZA_mY6Zs
+id: node.job_offer.search_result
+targetEntityType: node
+bundle: job_offer
+mode: search_result
+content:
+  body:
+    label: hidden
+    type: smart_trim
+    weight: 1
+    settings:
+      trim_length: '200'
+      trim_type: chars
+      trim_suffix: ...
+      more_link: '0'
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: text
+      more_class: more-link
+    third_party_settings: {  }
+    region: content
+  field_job_company:
+    weight: 0
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+hidden:
+  field_job_contract_type: true
+  field_job_nature: true
+  field_job_teleworking: true
+  field_job_validity: true
+  field_region: true
+  langcode: true
+  links: true

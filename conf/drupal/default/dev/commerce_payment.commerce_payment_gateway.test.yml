@@ -1,0 +1,25 @@
+uuid: f18eac85-2d23-46b4-8802-0cd7a13f4581
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_payment_example
+_core:
+  default_config_hash: EEX3LpxOOduWwYz10WQ6TNsfpB_GmN87U_0ghm_Oqg4
+id: test
+label: test
+weight: null
+plugin: example_onsite
+configuration:
+  api_key: test
+  display_label: Example
+  mode: test
+  payment_method_types:
+    - credit_card
+conditions:
+  -
+    plugin: order_customer_role
+    configuration:
+      roles:
+        administrator: administrator
+conditionOperator: AND

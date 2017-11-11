@@ -1,0 +1,238 @@
+uuid: 3a2e6223-f50b-472c-b4e2-2a4a9594d8aa
+langcode: fr
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: HVv3iCoqY-Z4W-uxWJFfWMp8QUKL9gI0rh-2VnuIlY8
+name: global
+label: Global
+group: Global
+description: 'Fournit les blocs présents sur toutes les pages.'
+requireAllConditions: false
+disabled: false
+conditions: {  }
+reactions:
+  blocks:
+    blocks:
+      8a8a5173-d3d5-491b-bb2a-110629ca5deb:
+        id: system_branding_block
+        label: 'Site branding'
+        provider: system
+        label_display: 0
+        use_site_logo: 1
+        use_site_name: 0
+        use_site_slogan: 0
+        region: navigation
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 8a8a5173-d3d5-491b-bb2a-110629ca5deb
+      0e2ddad5-baff-4c6f-9706-d7907e269aff:
+        id: 'system_menu_block:main'
+        label: 'Main navigation'
+        provider: system
+        label_display: 0
+        level: '1'
+        depth: '2'
+        region: navigation_collapsible
+        weight: '-7'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 0e2ddad5-baff-4c6f-9706-d7907e269aff
+      5850955d-bef3-4cce-a87b-4a9668b5fce2:
+        id: 'system_menu_block:account'
+        label: 'User account menu'
+        provider: system
+        label_display: 0
+        level: '1'
+        depth: '2'
+        region: navigation_collapsible
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 5850955d-bef3-4cce-a87b-4a9668b5fce2
+      a06736f9-6bce-4b1a-a531-698ba0e05f08:
+        id: system_messages_block
+        label: Messages
+        provider: system
+        label_display: 0
+        region: header
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: a06736f9-6bce-4b1a-a531-698ba0e05f08
+      10015eb2-8bf5-48d0-802c-1f28d1b47c21:
+        id: local_actions_block
+        label: 'Primary admin actions'
+        provider: core
+        label_display: 0
+        region: header
+        weight: '-3'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 10015eb2-8bf5-48d0-802c-1f28d1b47c21
+      83d8be44-f305-42de-bffa-aefa0598b7e2:
+        id: local_tasks_block
+        label: Tabs
+        provider: core
+        label_display: 0
+        primary: 1
+        secondary: 1
+        region: header
+        weight: '-4'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 83d8be44-f305-42de-bffa-aefa0598b7e2
+      a14c28f8-cd35-4e9d-836f-1fded2b337eb:
+        id: newsletter_subscription_block
+        label: 'Garder le contact'
+        provider: drupalfr_newsletter
+        label_display: visible
+        account_hash: eb7ebedd32b3b2fc0ac192ee9
+        mailing_list_hash: 27e99cb1af
+        anti_spam_token: b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af
+        region: footer_col_3
+        weight: '-8'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: a14c28f8-cd35-4e9d-836f-1fded2b337eb
+      2635f041-0fe0-472f-88a4-d64461d63610:
+        id: 'block_content:block_footer_contact'
+        label: 'Footer : Contact'
+        provider: block_content
+        label_display: 0
+        status: true
+        info: ''
+        view_mode: full
+        region: footer_col_3
+        weight: '-5'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 2635f041-0fe0-472f-88a4-d64461d63610
+      82edfa45-5858-4346-a0a7-d55d336ebe39:
+        id: help_block
+        label: Help
+        provider: help
+        label_display: 0
+        region: help
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 82edfa45-5858-4346-a0a7-d55d336ebe39
+      2af9f8a0-6077-4da9-bf4d-b68b335e0351:
+        id: system_main_block
+        label: 'Main page content'
+        provider: system
+        label_display: 0
+        region: content
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 2af9f8a0-6077-4da9-bf4d-b68b335e0351
+      f4bc815b-810b-45b3-9f88-c883c0198916:
+        id: 'block_content:block_footer_who_are_we'
+        label: 'Qui sommes nous ?'
+        provider: block_content
+        label_display: visible
+        status: true
+        info: ''
+        view_mode: full
+        region: footer_col_1
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: f4bc815b-810b-45b3-9f88-c883c0198916
+      e6f5ba1a-d383-49eb-86ec-5135620448c4:
+        id: 'system_menu_block:main'
+        label: 'Plan du site'
+        provider: system
+        label_display: visible
+        level: '1'
+        depth: '1'
+        region: footer_col_2
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: e6f5ba1a-d383-49eb-86ec-5135620448c4
+      30970886-85b4-43a1-823c-e31112678f43:
+        id: 'system_menu_block:account'
+        label: 'Menu du compte de l''utilisateur (mobile)'
+        provider: system
+        label_display: 0
+        level: '2'
+        depth: '1'
+        region: navigation_collapsible_mobile_user
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 30970886-85b4-43a1-823c-e31112678f43
+      efd945b5-3dd2-485c-b68d-3435f4210dcc:
+        id: 'views_exposed_filter_block:search-page_1'
+        label: ''
+        provider: views
+        label_display: 0
+        views_label: ''
+        region: search_collapsible_mobile
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: efd945b5-3dd2-485c-b68d-3435f4210dcc
+      722e0141-3a8c-46e4-a597-87f1094aa9b2:
+        id: search_header_block
+        label: 'Search header block'
+        provider: drupalfr_search
+        label_display: 0
+        region: navigation_collapsible
+        weight: '-5'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 722e0141-3a8c-46e4-a597-87f1094aa9b2
+      9a861378-f8c2-4c03-aad0-d7490dcdfb41:
+        id: 'system_menu_block:follow-us'
+        label: 'Suivez nous sur :'
+        provider: system
+        label_display: visible
+        level: '1'
+        depth: '1'
+        region: footer_col_3
+        weight: '-6'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 9a861378-f8c2-4c03-aad0-d7490dcdfb41
+    id: blocks
+    saved: false
+    uuid: 63e5ce9d-1565-46ac-a1cf-036db79cb9f4
+    include_default_blocks: 0
+weight: 0

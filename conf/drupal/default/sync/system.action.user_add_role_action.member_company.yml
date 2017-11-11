@@ -1,0 +1,14 @@
+uuid: 5bab21e7-6245-4d05-a2ae-46b36b61d498
+langcode: fr
+status: true
+dependencies:
+  config:
+    - user.role.member_company
+  module:
+    - user
+id: user_add_role_action.member_company
+label: 'Add the Société adhérente role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: member_company

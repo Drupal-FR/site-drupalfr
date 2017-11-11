@@ -1,0 +1,62 @@
+uuid: f9d979fd-8ccc-44f5-8e03-f62367891adb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
+    - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
+    - field.field.node.event.field_media_banner
+    - field.field.node.event.field_media_teaser
+    - node.type.event
+  module:
+    - datetime
+    - user
+_core:
+  default_config_hash: iCXYhC7tbfOY7BF7d5NNI-BfWL4lRnV2re-5sIP6tlM
+id: node.event.teaser
+targetEntityType: node
+bundle: event
+mode: teaser
+content:
+  field_event_date_end:
+    type: datetime_default
+    weight: 2
+    region: content
+    label: inline
+    settings:
+      timezone_override: ''
+      format_type: jour_mois_annee
+    third_party_settings: {  }
+  field_event_date_start:
+    type: datetime_default
+    weight: 1
+    region: content
+    label: inline
+    settings:
+      timezone_override: ''
+      format_type: jour_mois_annee
+    third_party_settings: {  }
+  field_media_teaser:
+    type: entity_reference_entity_view
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      link: true
+      view_mode: default
+    third_party_settings: {  }
+hidden:
+  body: true
+  field_event_organizer: true
+  field_event_place: true
+  field_event_sponsor: true
+  field_event_website: true
+  field_media_banner: true
+  langcode: true
+  links: true

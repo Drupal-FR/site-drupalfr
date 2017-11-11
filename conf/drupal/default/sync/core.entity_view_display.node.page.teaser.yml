@@ -1,0 +1,41 @@
+uuid: bbba3c01-db1b-4a04-83e3-d9aa4f3a20f9
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.page.body
+    - field.field.node.page.field_attachment
+    - field.field.node.page.field_drupal_version
+    - field.field.node.page.field_metatags
+    - field.field.node.page.field_paragraph
+    - node.type.page
+  module:
+    - text
+    - user
+_core:
+  default_config_hash: 0pshtguGTvgUE5VtE-M7oy9EB9KYKy5TsuPA0IQ2dz8
+id: node.page.teaser
+targetEntityType: node
+bundle: page
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 0
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_attachment: true
+  field_drupal_version: true
+  field_metatags: true
+  field_paragraph: true
+  langcode: true

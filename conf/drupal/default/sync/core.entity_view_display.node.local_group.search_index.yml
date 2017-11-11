@@ -1,0 +1,53 @@
+uuid: 03016397-8b56-46e5-879f-38d18cec21fd
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.local_group.body
+    - field.field.node.local_group.field_local_group_organizer
+    - field.field.node.local_group.field_local_group_place
+    - field.field.node.local_group.field_media_banner
+    - field.field.node.local_group.field_media_teaser
+    - field.field.node.local_group.field_twitter_account
+    - node.type.local_group
+  module:
+    - text
+    - user
+_core:
+  default_config_hash: _Ei9HtTOn3cbOwmIN9KXgR7jNsx6Nyy1IpEmVHZ3ra8
+id: node.local_group.search_index
+targetEntityType: node
+bundle: local_group
+mode: search_index
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_local_group_organizer:
+    weight: 1
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_twitter_account:
+    weight: 2
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+hidden:
+  field_local_group_place: true
+  field_media_banner: true
+  field_media_teaser: true
+  langcode: true
+  links: true
+  local_group_entity_view_1: true

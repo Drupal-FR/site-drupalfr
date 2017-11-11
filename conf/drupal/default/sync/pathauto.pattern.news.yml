@@ -1,0 +1,24 @@
+uuid: 8046d54d-b93f-458d-a0d6-2bcfd8766cd4
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: IfFWI48gp-qhAjAhN34D-MFuB0dxmtPapuIwSe936aQ
+id: news
+label: Actualités
+type: 'canonical_entities:node'
+pattern: 'association/actualites/[node:title]'
+selection_criteria:
+  db99e8dc-fca4-4792-92b8-6ccdb3072820:
+    id: node_type
+    bundles:
+      news: news
+    negate: false
+    context_mapping:
+      node: node
+    uuid: db99e8dc-fca4-4792-92b8-6ccdb3072820
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,23 @@
+uuid: 86e25fec-9bd7-4aaa-9179-7fbcd58e4d3f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_job_validity
+    - node.type.job_offer
+  module:
+    - options
+_core:
+  default_config_hash: h3sS6HHcP9YV-HIzHnKq3TmDZAxHmNgZwkFT3fIoJ7U
+id: node.job_offer.field_job_validity
+field_name: field_job_validity
+entity_type: node
+bundle: job_offer
+label: 'Temps de publication'
+description: 'Cette annonce restera publiée pendant ce laps de temps.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_integer

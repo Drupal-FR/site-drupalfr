@@ -1,0 +1,24 @@
+uuid: a09f2570-3d35-45a6-beed-af7eb7265d22
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.company
+  module:
+    - text
+_core:
+  default_config_hash: SQg7GcfvCfIhYxXLV3Czy10CZhPmyeLloZyuHAoez8E
+id: node.company.body
+field_name: body
+entity_type: node
+bundle: company
+label: Description
+description: 'Présenter votre structure en quelques lignes.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+field_type: text_with_summary

@@ -1,0 +1,24 @@
+uuid: fb16f439-810b-4530-8d1d-bd5fc46d1da6
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: rNJIOJ929-fcH8BZYaGUcKUz2ixgzsaSQAN6UxfCrVU
+id: forum
+label: 'Sujets de forum'
+type: 'canonical_entities:node'
+pattern: 'assistance/forum/[node:title]'
+selection_criteria:
+  7cca5faf-a82f-40f4-86ff-cc0b0d1d6859:
+    id: node_type
+    bundles:
+      forum: forum
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 7cca5faf-a82f-40f4-86ff-cc0b0d1d6859
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,27 @@
+uuid: e3a0765b-4c8f-4f5e-8589-c8eb47d03320
+langcode: fr
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: sCoQ1VVma0-3Ou_bnsm0GR6oF2g0qVn86ei82rXnLm4
+id: varnish
+name: Varnish
+invalidationtype: tag
+hostname: varnish
+port: 80
+path: /
+request_method: BAN
+scheme: http
+verify: '1'
+headers:
+  -
+    field: Cache-Tags
+    value: '[invalidation:expression]'
+body: null
+body_content_type: null
+runtime_measurement: true
+timeout: !!float 1
+connect_timeout: !!float 1
+cooldown_time: !!float 0
+max_requests: 100
+http_errors: true

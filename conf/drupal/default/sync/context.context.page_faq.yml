@@ -1,0 +1,58 @@
+uuid: eaf0026b-5e46-419e-98df-23e238cba5f3
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+_core:
+  default_config_hash: ETAxFH-9Drb04LMgbmMvimDjR9UTluZaq_ReCQldHc8
+name: page_faq
+label: 'Page FAQ'
+group: 'Page particulière'
+description: ''
+requireAllConditions: true
+disabled: false
+conditions:
+  request_path:
+    id: request_path
+    pages: /assistance
+    negate: 0
+    uuid: 3d6b3762-3bad-4717-8197-e959633daf2c
+    context_mapping: {  }
+reactions:
+  blocks:
+    blocks:
+      c4e58f9e-2338-4ea7-8f80-5c4d97ec914a:
+        id: 'block_content:block_sidebar_question_forum'
+        label: "Sidebar\_: poser une question forum"
+        provider: block_content
+        label_display: 0
+        status: true
+        info: ''
+        view_mode: full
+        region: sidebar_second
+        weight: '0'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: c4e58f9e-2338-4ea7-8f80-5c4d97ec914a
+      1e197356-30e4-45ca-a6e8-7cb7091c1d93:
+        id: 'views_block:forum-block_1'
+        label: ''
+        provider: views
+        label_display: visible
+        views_label: ''
+        items_per_page: none
+        region: sidebar_second
+        weight: '1'
+        context_mapping: {  }
+        theme: drupalfr_theme
+        css_class: ''
+        unique: 1
+        uuid: 1e197356-30e4-45ca-a6e8-7cb7091c1d93
+    id: blocks
+    saved: false
+    uuid: 8e0f34ab-39a0-4dad-8b9f-8fe1d43c7926
+    include_default_blocks: 0
+weight: 0

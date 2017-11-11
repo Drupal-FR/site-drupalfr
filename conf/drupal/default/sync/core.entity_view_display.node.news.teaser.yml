@@ -1,0 +1,60 @@
+uuid: 5c8a80d9-33d3-4d66-a22a-8cf36f9fac42
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.news.body
+    - field.field.node.news.field_media_banner
+    - field.field.node.news.field_media_teaser
+    - field.field.node.news.field_news_type
+    - field.field.node.news.field_paragraph
+    - node.type.news
+  module:
+    - smart_trim
+    - user
+_core:
+  default_config_hash: 7cKW-zhQBOaoDsP8VbPUDPSUgThXwsVHYIJQgdKAc6A
+id: node.news.teaser
+targetEntityType: node
+bundle: news
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: smart_trim
+    weight: 2
+    settings:
+      trim_length: '200'
+      trim_type: chars
+      trim_suffix: ...
+      more_link: '0'
+      more_text: More
+      summary_handler: full
+      trim_options:
+        text: text
+      more_class: more-link
+    third_party_settings: {  }
+    region: content
+  field_media_teaser:
+    type: entity_reference_entity_view
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+  field_news_type:
+    type: entity_reference_label
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+hidden:
+  field_media_banner: true
+  field_paragraph: true
+  langcode: true
+  links: true

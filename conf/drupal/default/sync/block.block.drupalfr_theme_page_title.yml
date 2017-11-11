@@ -1,0 +1,27 @@
+uuid: 08462bc6-adec-4545-8e6f-b18133dd3641
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - drupalfr_theme
+_core:
+  default_config_hash: EHbzuNR_hEbmZGBCjbXJtcUbuQk887jXtqEhju0Losw
+id: drupalfr_theme_page_title
+theme: drupalfr_theme
+region: header
+weight: -7
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Page title'
+  provider: core
+  label_display: '0'
+visibility:
+  request_path:
+    id: request_path
+    pages: "<front>\r\n/decouvrir\r\n/decouvrir/*"
+    negate: true
+    context_mapping: {  }

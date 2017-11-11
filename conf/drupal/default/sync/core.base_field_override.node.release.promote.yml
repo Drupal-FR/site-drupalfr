@@ -1,0 +1,24 @@
+uuid: 3f7da3a3-0b4f-4d9e-8916-12a271305ced
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.release
+_core:
+  default_config_hash: glrg0FWEsAoh7FdSDpBvvfblC-QQN4p66No8PjzQkNg
+id: node.release.promote
+field_name: promote
+entity_type: node
+bundle: release
+label: 'Promu en page d''accueil'
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Activé
+  off_label: Désactivé
+field_type: boolean

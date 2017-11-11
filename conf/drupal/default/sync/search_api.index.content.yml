@@ -1,0 +1,212 @@
+uuid: ad36bb78-d896-41fa-adf6-255d86a1676a
+langcode: fr
+status: true
+dependencies:
+  module:
+    - user
+    - taxonomy
+    - search_api
+    - node
+  config:
+    - field.storage.node.field_planet_tag
+    - field.storage.node.field_drupal_version
+    - field.storage.node.field_forum_tag
+    - search_api.server.solr
+    - core.entity_view_mode.node.search_index
+_core:
+  default_config_hash: 8AO8d6XrfTnbpVDvBPiGmsnXtoxnCgpSEmEOUqkD03I
+id: content
+name: Content
+description: ''
+read_only: false
+field_settings:
+  node_grants:
+    label: 'Node access information'
+    property_path: search_api_node_grants
+    type: string
+    indexed_locked: true
+    type_locked: true
+    hidden: true
+  rendered_item:
+    label: 'Rendered HTML output'
+    property_path: rendered_item
+    type: text
+    configuration:
+      roles:
+        anonymous: anonymous
+      view_mode:
+        'entity:node':
+          company: search_index
+          event: search_index
+          job_offer: search_index
+          local_group: search_index
+          news: search_index
+          page: search_index
+          planet: search_index
+  status:
+    label: status
+    datasource_id: 'entity:node'
+    property_path: status
+    type: boolean
+    indexed_locked: true
+    type_locked: true
+  uid:
+    label: uid
+    datasource_id: 'entity:node'
+    property_path: uid
+    type: integer
+    indexed_locked: true
+    type_locked: true
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: text
+    boost: !!float 2
+  name:
+    label: 'Écrit par » Utilisateur » Name'
+    datasource_id: 'entity:node'
+    property_path: 'uid:entity:name'
+    type: string
+    dependencies:
+      module:
+        - user
+  name_1:
+    label: 'Tags » Taxonomy term » Name'
+    datasource_id: 'entity:node'
+    property_path: 'field_planet_tag:entity:name'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_planet_tag
+      module:
+        - taxonomy
+  name_2:
+    label: 'Version de Drupal » Taxonomy term » Name'
+    datasource_id: 'entity:node'
+    property_path: 'field_drupal_version:entity:name'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_drupal_version
+      module:
+        - taxonomy
+  name_3:
+    label: 'Tags » Taxonomy term » Name'
+    datasource_id: 'entity:node'
+    property_path: 'field_forum_tag:entity:name'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_forum_tag
+      module:
+        - taxonomy
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: true
+      selected:
+        - release
+        - showcase
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  tokenizer:
+    all_fields: false
+    fields:
+      - title
+    spaces: ''
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -6
+      preprocess_query: -6
+  html_filter:
+    all_fields: false
+    fields:
+      - rendered_item
+    title: true
+    alt: true
+    tags:
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+      b: 2
+      em: 1
+      u: 1
+    weights:
+      preprocess_index: -15
+      preprocess_query: -15
+  transliteration:
+    all_fields: false
+    fields:
+      - title
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
+  ignorecase:
+    all_fields: false
+    fields:
+      - title
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
+  highlight:
+    highlight: always
+    highlight_partial: false
+    excerpt: true
+    excerpt_length: 256
+    exclude_fields: {  }
+    prefix: '<strong>'
+    suffix: '</strong>'
+    weights:
+      postprocess_query: 0
+  content_access:
+    weights:
+      preprocess_query: -10
+  add_url: {  }
+  aggregated_field: {  }
+  rendered_item: {  }
+  ignore_character:
+    all_fields: false
+    fields:
+      - title
+    ignorable: '[''¿¡!?,.:;]'
+    strip:
+      character_sets:
+        Pc: Pc
+        Pd: Pd
+        Pe: Pe
+        Pf: Pf
+        Pi: Pi
+        Po: Po
+        Ps: Ps
+        Cc: 0
+        Cf: 0
+        Co: 0
+        Mc: 0
+        Me: 0
+        Mn: 0
+        Sc: 0
+        Sk: 0
+        Sm: 0
+        So: 0
+        Zl: 0
+        Zp: 0
+        Zs: 0
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
+tracker_settings:
+  default: {  }
+options:
+  index_directly: false
+  cron_limit: 500
+server: solr

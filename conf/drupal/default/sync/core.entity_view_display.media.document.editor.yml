@@ -1,0 +1,37 @@
+uuid: 3ee28013-7838-4a75-8e7f-9e63b309cfd0
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.editor
+    - field.field.media.document.field_document
+    - media_entity.bundle.document
+  module:
+    - file
+_core:
+  default_config_hash: 1vTmd2SuvmlGqhTVq0h26qajM8ErxpEZGPiSMcXx1BE
+id: media.document.editor
+targetEntityType: media
+bundle: document
+mode: editor
+content:
+  field_document:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: file_table
+    region: content
+  name:
+    type: string
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  created: true
+  langcode: true
+  thumbnail: true
+  uid: true

@@ -1,0 +1,13 @@
+uuid: 40481105-342b-4a92-a3a7-94231b740d55
+langcode: fr
+status: true
+dependencies:
+  module:
+    - flag
+id: flag_action.spam_comment.flag
+label: 'Signaler comme spam'
+type: comment
+plugin: 'flag_action:spam_comment.flag'
+configuration:
+  flag_id: spam_comment
+  flag_action: flag

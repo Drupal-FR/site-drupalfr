@@ -1,0 +1,87 @@
+uuid: faaccfd1-8179-4b06-8f1c-2e70b34a36d0
+langcode: fr
+status: false
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.release.body
+    - field.field.node.release.field_release_file_targz
+    - field.field.node.release.field_release_file_zip
+    - field.field.node.release.field_release_link
+    - field.field.node.release.field_release_security
+    - field.field.node.release.field_release_type
+    - field.field.node.release.field_release_version_extra
+    - field.field.node.release.field_release_version_major
+    - field.field.node.release.field_release_version_minor
+    - field.field.node.release.field_release_version_patch
+    - node.type.release
+  module:
+    - link
+    - options
+    - text
+    - user
+_core:
+  default_config_hash: _dNiQKBVFBzYtKQBh2dNfX4ksYDqpPy1wAyXdBjcCDo
+id: node.release.teaser
+targetEntityType: node
+bundle: release
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_release_file_targz:
+    type: link
+    weight: 4
+    region: content
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+  field_release_file_zip:
+    type: link
+    weight: 3
+    region: content
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+  field_release_link:
+    type: link
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+  field_release_type:
+    type: list_default
+    weight: 2
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_release_security: true
+  field_release_version_extra: true
+  field_release_version_major: true
+  field_release_version_minor: true
+  field_release_version_patch: true
+  langcode: true
+  links: true

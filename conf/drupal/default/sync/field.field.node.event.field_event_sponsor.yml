@@ -1,0 +1,30 @@
+uuid: 8121ac25-3087-46c7-8a7b-41ab891533bd
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_event_sponsor
+    - node.type.company
+    - node.type.event
+_core:
+  default_config_hash: '-csLOq3--QMJ-i-gVyGxlxq4Vg0rcl6D2sXxS2LFNKs'
+id: node.event.field_event_sponsor
+field_name: field_event_sponsor
+entity_type: node
+bundle: event
+label: Sponsors
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      company: company
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

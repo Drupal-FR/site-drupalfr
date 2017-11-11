@@ -1,0 +1,13 @@
+uuid: 17b3c243-8c23-4d07-8ab5-68d88a2bd3c1
+langcode: fr
+status: true
+dependencies:
+  module:
+    - flag
+id: flag_action.forum_topic_solved.unflag
+label: 'Retirer l''indication "résolu"'
+type: node
+plugin: 'flag_action:forum_topic_solved.unflag'
+configuration:
+  flag_id: forum_topic_solved
+  flag_action: unflag

@@ -1,0 +1,34 @@
+uuid: 42943c38-361b-4037-ab26-2f3cd8ec0098
+langcode: fr
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: wwkDVBiXUqSzRifJbb71ajFBklJdNJ_DgS67IF-_qgY
+id: default
+label: 'Par défaut'
+plugin: multistep_default
+configuration:
+  display_checkout_progress: true
+  panes:
+    login:
+      allow_guest_checkout: true
+      allow_registration: false
+      step: login
+      weight: 0
+    contact_information:
+      double_entry: true
+      step: order_information
+      weight: 1
+    billing_information:
+      step: order_information
+      weight: 2
+    review:
+      step: review
+      weight: 3
+    completion_message:
+      step: complete
+      weight: 4
+    order_summary:
+      view: commerce_checkout_order_summary
+      step: _sidebar
+      weight: 5

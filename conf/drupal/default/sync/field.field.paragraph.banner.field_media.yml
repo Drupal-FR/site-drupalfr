@@ -1,0 +1,30 @@
+uuid: 9871e3fa-42be-44bc-b8dd-fa90fae9a0e2
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_media
+    - media_entity.bundle.image
+    - paragraphs.paragraphs_type.banner
+_core:
+  default_config_hash: PXQKJeyoAi1nWuC8lmgAqwbT-iKYgW9D_KCf41ZClFg
+id: paragraph.banner.field_media
+field_name: field_media
+entity_type: paragraph
+bundle: banner
+label: 'Image de fond'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+    auto_create: true
+    auto_create_bundle: ''
+field_type: entity_reference

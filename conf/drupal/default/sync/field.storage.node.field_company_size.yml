@@ -1,0 +1,41 @@
+uuid: 69ebae51-08a7-4a1a-8a4c-7c0a52f9d25a
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - options
+_core:
+  default_config_hash: i7Q81j1Vw23Ty3nPXnMaqMcWfMOlsP-Jci7HlcI1Mqo
+id: node.field_company_size
+field_name: field_company_size
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: 'Une personne'
+      label: 'Une personne'
+    -
+      value: 'Entre 2 et 4'
+      label: 'Entre 2 et 4'
+    -
+      value: 'Entre 5 et 10'
+      label: 'Entre 5 et 10'
+    -
+      value: 'Entre 11 et 50'
+      label: 'Entre 11 et 50'
+    -
+      value: 'Entre 51 et 499'
+      label: 'Entre 51 et 499'
+    -
+      value: 'Plus de 500'
+      label: 'Plus de 500'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

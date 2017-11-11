@@ -1,0 +1,54 @@
+uuid: 7afe6b1a-518c-418a-972a-b2e8a8fe9f14
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.forum.body
+    - field.field.node.forum.field_forum_comment
+    - field.field.node.forum.field_forum_hierarchy
+    - field.field.node.forum.field_forum_tag
+    - node.type.forum
+  module:
+    - text
+    - user
+_core:
+  default_config_hash: MU_kiBs4zI-6j3LAlhshEIZ76mWS4aHZD8zSiP0Xxsg
+id: node.forum.default
+targetEntityType: node
+bundle: forum
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_forum_tag:
+    weight: 1
+    label: above
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  flag_forum_topic_solved:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  flag_spam_node:
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  links:
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_forum_comment: true
+  field_forum_hierarchy: true
+  langcode: true

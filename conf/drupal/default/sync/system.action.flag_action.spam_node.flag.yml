@@ -1,0 +1,13 @@
+uuid: 8ee213c0-1826-4ae4-8627-440e22acb938
+langcode: fr
+status: true
+dependencies:
+  module:
+    - flag
+id: flag_action.spam_node.flag
+label: 'Signaler comme spam'
+type: node
+plugin: 'flag_action:spam_node.flag'
+configuration:
+  flag_id: spam_node
+  flag_action: flag

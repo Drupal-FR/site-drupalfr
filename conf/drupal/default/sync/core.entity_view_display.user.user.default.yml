@@ -1,0 +1,123 @@
+uuid: 28faed93-54cf-4a94-aab2-7f632e0697a9
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_user_banner
+    - field.field.user.user.field_user_biography
+    - field.field.user.user.field_user_company
+    - field.field.user.user.field_user_drupal_org
+    - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_in_directory
+    - field.field.user.user.field_user_membership_number
+    - field.field.user.user.field_user_newsletter_adff
+    - field.field.user.user.field_user_newsletter_drupalcamp
+    - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_twitter
+    - field.field.user.user.field_user_website
+    - field.field.user.user.user_picture
+    - image.style.square_165
+  module:
+    - image
+    - link
+    - text
+    - user
+_core:
+  default_config_hash: PCFOnrudl4GmmxqeuA4UI8MNaSGsEY5EIftuiiQDNPM
+id: user.user.default
+targetEntityType: user
+bundle: user
+mode: default
+content:
+  field_user_banner:
+    weight: 0
+    label: hidden
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
+  field_user_biography:
+    weight: 6
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_user_drupal_org:
+    weight: 4
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+  field_user_event:
+    weight: 7
+    label: above
+    settings:
+      view_mode: teaser
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  field_user_realname:
+    weight: 2
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_user_twitter:
+    weight: 3
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+  field_user_website:
+    weight: 5
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+  user_picture:
+    type: image
+    weight: 1
+    settings:
+      image_style: square_165
+      image_link: ''
+    third_party_settings: {  }
+    label: hidden
+    region: content
+hidden:
+  commerce_remote_id: true
+  field_user_company: true
+  field_user_in_directory: true
+  field_user_membership_number: true
+  field_user_newsletter_adff: true
+  field_user_newsletter_drupalcamp: true
+  forum_entity_view_1: true
+  langcode: true
+  member_for: true
+  planet_entity_view_1: true
+  planet_feed_entity_view_1: true
+  profile_customer: true

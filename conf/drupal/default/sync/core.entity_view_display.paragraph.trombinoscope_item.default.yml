@@ -1,0 +1,33 @@
+uuid: 466ff483-f234-4fc0-8506-f33fb1e3e3e8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.trombinoscope_item.field_title
+    - field.field.paragraph.trombinoscope_item.field_user
+    - paragraphs.paragraphs_type.trombinoscope_item
+_core:
+  default_config_hash: 49LaDAUzsRQkofaMQ7Nn1F58zKgFeE0G0t8FxoU0sS0
+id: paragraph.trombinoscope_item.default
+targetEntityType: paragraph
+bundle: trombinoscope_item
+mode: default
+content:
+  field_title:
+    weight: 1
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_user:
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: teaser
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+hidden: {  }

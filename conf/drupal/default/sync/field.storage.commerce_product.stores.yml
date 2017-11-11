@@ -1,0 +1,22 @@
+uuid: 45782419-35e7-4b78-bc92-84c1b7034ed9
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_product
+    - commerce_store
+_core:
+  default_config_hash: qzJaXjkjRd_-1CF6EnCb5fpCcA6mnBB34P4qOOQ6n9g
+id: commerce_product.stores
+field_name: stores
+entity_type: commerce_product
+type: entity_reference
+settings:
+  target_type: commerce_store
+module: core
+locked: true
+cardinality: -1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,31 @@
+uuid: 7a075f55-741b-4b2f-a218-ca75d9d9c706
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.media.image.field_image
+    - media_entity.bundle.image
+  module:
+    - image
+_core:
+  default_config_hash: BpiFN4kZ6Qk0PVBMAhcq3DHv0r95W4j4PIU8UKQZu28
+id: media.image.default
+targetEntityType: media
+bundle: image
+mode: default
+content:
+  field_image:
+    weight: 0
+    label: hidden
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
+hidden:
+  created: true
+  langcode: true
+  name: true
+  thumbnail: true
+  uid: true

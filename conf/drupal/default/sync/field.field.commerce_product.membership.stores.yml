@@ -1,0 +1,23 @@
+uuid: 610208c1-366a-4155-812c-38b594c71b6f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_type.membership
+    - field.storage.commerce_product.stores
+_core:
+  default_config_hash: L1NxO350RfcYiezV25MBtukjeC1ALm7o1d6xNOdZfxY
+id: commerce_product.membership.stores
+field_name: stores
+entity_type: commerce_product
+bundle: membership
+label: Stores
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: null
+settings:
+  handler: 'default:commerce_store'
+  handler_settings: {  }
+field_type: entity_reference

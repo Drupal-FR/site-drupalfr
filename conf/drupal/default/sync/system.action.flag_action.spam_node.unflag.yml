@@ -1,0 +1,13 @@
+uuid: 47faea8f-c394-49c3-bc0c-1897586f197b
+langcode: fr
+status: true
+dependencies:
+  module:
+    - flag
+id: flag_action.spam_node.unflag
+label: 'Retirer le signalement comme spam'
+type: node
+plugin: 'flag_action:spam_node.unflag'
+configuration:
+  flag_id: spam_node
+  flag_action: unflag

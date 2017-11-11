@@ -1,0 +1,23 @@
+uuid: 24a3fa38-8e78-4cc8-81ea-a4e4bfacd4fb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.membership
+    - field.storage.commerce_order_item.license
+_core:
+  default_config_hash: I49Zb7cbK7FMsjOKHH41yDAFZg54P8CqN_92a4OkLxo
+id: commerce_order_item.membership.license
+field_name: license
+entity_type: commerce_order_item
+bundle: membership
+label: License
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: null
+settings:
+  handler: 'default:commerce_license'
+  handler_settings: {  }
+field_type: entity_reference

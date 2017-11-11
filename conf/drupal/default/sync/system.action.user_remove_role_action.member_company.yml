@@ -1,0 +1,14 @@
+uuid: e3663460-2c5b-47e7-910f-2914c3166bbe
+langcode: fr
+status: true
+dependencies:
+  config:
+    - user.role.member_company
+  module:
+    - user
+id: user_remove_role_action.member_company
+label: 'Remove the Société adhérente role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: member_company
