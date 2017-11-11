@@ -28,6 +28,9 @@ $DRUSH site:install config_installer \
   --locale=$DEFAULT_LANGUAGE \
   -y
 
+# TODO: workaround since https://www.drupal.org/node/2916090 is not fixed.
+$DRUSH user:password $ACCOUNT_NAME $ACCOUNT_PASS
+
 # Launch updates. Ensure that the database schema is up-to-date.
 $DRUSH updatedb --entity-updates -y
 

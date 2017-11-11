@@ -34,6 +34,14 @@ Merci pour votre aide !
 
 The website should be located at this address : http://127.0.0.1:8101/*
 
+### Notes about configuration
+
+We have switched from Features to Config split, Config ignore, Config installer.
+
+Warning: when using drush config:export to export changes, the config ignore
+settings is ignored. So please be cautious and review the changes before
+committing.
+
 ### Q&A
 #### How to find out the container names ?
 You can use the command `docker ps` which list all the running docker containers.

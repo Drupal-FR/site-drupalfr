@@ -22,7 +22,7 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 
 // TODO: Remove this line when it will no more be added when installing with
 // Drush.
-$settings['install_profile'] = 'config_installer';
+$settings['install_profile'] = 'drupalfr';
 
 // Prevent deletion of orphan files.
 // TODO: Remove this line when the following issues will be fixed:
