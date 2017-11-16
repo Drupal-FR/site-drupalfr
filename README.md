@@ -28,21 +28,22 @@ Merci pour votre aide !
   * docker-compose.yml
 * Execute: `docker-compose up`
 * In another tab, get a command-line in the container:
-`docker exec -it container_name_web_1 /bin/bash`
- (*container_name* should be remplaced by the name of the **web** container)
-* Execute `scripts/install.sh`
+`docker exec -it container_name_web_1 /bin/bash` (*container_name* should be remplaced by the name of the **web** container)
+* Execute :
+  * `cd ..`
+  * `./scripts/install.sh`
 
-The website should be located at this address : http://127.0.0.1:8101/*
+The website **should** be located at this address : `http://127.0.0.1:8101/*`
 
 ### Notes about configuration
 
 We have switched from Features to Config split, Config ignore, Config installer.
 
-Warning: when using drush config:export to export changes, the config ignore
+**Warning:** when using `drush config:export` to export changes, the config ignore
 settings is ignored. So please be cautious and review the changes before
 committing.
 
-### Q&A
+### Q/A
 #### How to find out the container names ?
 You can use the command `docker ps` which list all the running docker containers.
 
