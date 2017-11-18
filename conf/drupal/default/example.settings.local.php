@@ -35,6 +35,8 @@ $settings['redis.connection']['base'] = 0;
 $settings['container_yamls'][] = 'modules/contrib/redis/redis.services.yml';
 $settings['container_yamls'][] = 'modules/contrib/redis/example.services.yml';
 
+$settings['cache']['default'] = 'cache.backend.redis';
+
 // Varnish.
 $config['varnish_purger.settings.varnish']['hostname'] = 'varnish';
 
