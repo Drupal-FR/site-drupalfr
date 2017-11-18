@@ -56,7 +56,7 @@ You can use docker within the web container by using the alias `@docker.default.
 drush @docker.default.local status
 ```
 
-Note : you have to "be" in the docroot folder (eg: `/project/www`)
+Note: you have to "be" in the docroot folder (eg: `/project/www`)
 
 #### How to import a custom dump?
 
