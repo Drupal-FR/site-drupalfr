@@ -29,7 +29,7 @@ Merci pour votre aide !
 * Execute: `docker-compose up`
 * In another tab, get a command-line in the container:
 `docker exec -it container_name_web_1 /bin/bash` (*container_name* should be remplaced by the name of the **web** container)
-* Execute :
+* Execute:
   * `cd ..`
   * `./scripts/install.sh`
 
@@ -56,7 +56,7 @@ You can use docker within the web container by using the alias `@docker.default.
 drush @docker.default.local status
 ```
 
-Note : you have to "be" in the docroot folder (eg : `/project/www`)
+Note : you have to "be" in the docroot folder (eg: `/project/www`)
 
 #### How to import a custom dump?
 
