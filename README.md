@@ -44,12 +44,12 @@ settings is ignored. So please be cautious and review the changes before
 committing.
 
 ### Q/A
-#### How to find out the container names ?
+#### How to find out the container names?
 You can use the command `docker ps` which list all the running docker containers.
 
 ![docker PS](http://i.imgur.com/SDgHsqs.png)
 
-#### How to use drush within docker ?
+#### How to use drush within docker?
 You can use docker within the web container by using the alias `@docker.default.local`:
 
 ```
@@ -58,7 +58,7 @@ drush @docker.default.local status
 
 Note : you have to "be" in the docroot folder (eg : `/project/www`)
 
-#### How to import a custom dump
+#### How to import a custom dump?
 
 Put the dump in the `backups` folder and then in the **web** container you can use the following command:
 ```
