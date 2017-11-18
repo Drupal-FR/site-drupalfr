@@ -15,8 +15,9 @@ $DRUSH cache:clear drush
 # Database backup.
 $DRUSH sql:dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip --structure-tables-key="common"
 
-# Disable external cache.
-rm -f $WWW_PATH/sites/default/.cache_activated
+# Clear Redis cache because otherwise it is no emptied on site-install and it
+# provokes errors.
+$REDIS_FLUSH_COMMAND
 
 # Install Drupal.
 $DRUSH site:install config_installer \
@@ -44,8 +45,7 @@ $DRUSH updatedb --entity-updates -y
 # Run CRON.
 $DRUSH core:cron
 
-# Enable external cache.
-touch $WWW_PATH/sites/default/.cache_activated
+# Flush caches to be clean.
 $DRUSH cache:rebuild
 
 # Back to the current directory.

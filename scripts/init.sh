@@ -5,7 +5,7 @@
 # Copy example files.
 rsync -avz --ignore-existing $PROJECT_PATH/example.docker-compose.yml           $PROJECT_PATH/docker-compose.yml
 rsync -avz --ignore-existing $SCRIPTS_PATH/example.script-parameters.local.sh   $SCRIPTS_PATH/script-parameters.local.sh
-rsync -avz --ignore-existing $WWW_PATH/sites/default/example.settings.local.php $WWW_PATH/sites/default/settings.local.php
+rsync -avz --ignore-existing $PROJECT_PATH/conf/drupal/default/example.settings.local.php $PROJECT_PATH/conf/drupal/default/settings.local.php
 
 # Create public files directory.
 mkdir -p $WWW_PATH/sites/default/files

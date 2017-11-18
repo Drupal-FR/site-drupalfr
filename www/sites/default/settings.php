@@ -38,16 +38,6 @@ $config['system.performance']['cache']['page']['max_age'] = 86400;
 $config['system.performance']['css']['preprocess'] = TRUE;
 $config['system.performance']['js']['preprocess'] = TRUE;
 
-// Redis.
-$settings['redis.connection']['interface'] = 'PhpRedis';
-
-// External cache.
-if (file_exists($app_root . '/' . $site_path . '/.cache_activated')) {
-  $settings['cache']['default'] = 'cache.backend.redis';
-  // Additional redis services.
-  $settings['container_yamls'][] = 'modules/contrib/redis/example.services.yml';
-}
-
-if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
-  include __DIR__ . '/settings.local.php';
+if (file_exists($app_root . '/' . $site_path . '/../../../conf/drupal/default/settings.local.php')) {
+  include $app_root . '/' . $site_path . '/../../../conf/drupal/default/settings.local.php';
 }
