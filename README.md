@@ -33,7 +33,7 @@ Merci pour votre aide !
   * `cd ..`
   * `./scripts/install.sh`
 
-The website **should** be located at this address : `http://127.0.0.1:8101/*`
+The website **should** be located at this address: `http://127.0.0.1:8101/*`
 
 ### Notes about configuration
 
