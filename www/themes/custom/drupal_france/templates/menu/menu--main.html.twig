@@ -1,0 +1,85 @@
+{#
+/**
+ * @file
+ * Theme override to display a menu.
+ *
+ * Available variables:
+ * - menu_name: The machine name of the menu.
+ * - items: A nested list of menu items. Each menu item contains:
+ *   - attributes: HTML attributes for the menu item.
+ *   - below: The menu item child items.
+ *   - title: The menu link title.
+ *   - url: The menu link url, instance of \Drupal\Core\Url
+ *   - localized_options: Menu link localized options.
+ */
+#}
+{% import _self as menus %}
+
+{#
+  We call a macro which calls itself to render the full tree.
+  @see http://twig.sensiolabs.org/doc/tags/macro.html
+#}
+
+{% if top_bar %}
+  {% if top_bar_sticky %}
+  <div id="top-bar-sticky-container" data-sticky-container>
+  {% endif %}
+    <div {{ top_bar_attributes }}>
+      <div class="title-bar" data-responsive-toggle="main-menu" data-hide-for="medium">
+        <button class="menu-icon" type="button" data-toggle></button>
+        <div class="title-bar-title">{{ top_bar_menu_text }}</div>
+      </div>
+      <nav class="top-bar" id="main-menu" role="navigation">
+        <div class="top-bar-left">
+          <ul class="dropdown menu" data-dropdown-menu>
+            <li class="menu-text">{{ site_name }}</li>
+          </ul>
+        </div>
+        <div class="top-bar-right">
+          {{ menus.menu_links(items, attributes, 0, 1) }}
+          {% if top_bar_search %}
+            {{ top_bar_search }}
+          {% endif %}
+          {% if top_bar_languageswitcher %}
+            {{ top_bar_languageswitcher }}
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+  {% if top_bar_sticky %}
+  </div>
+  {% endif %}
+{% else %}
+  {{ menus.menu_links(items, attributes, 0, 0) }}
+{% endif %}
+
+{% macro menu_links(items, attributes, menu_level, top_bar) %}
+  {% import _self as menus %}
+  {% if items %}
+    {% if top_bar %}
+      {% if menu_level == 0 %}
+        <ul{{ attributes.addClass('menu', 'vertical', 'medium-horizontal').setAttribute('data-responsive-menu', 'drilldown medium-dropdown') }}>
+      {% else %}
+        <ul class="submenu menu vertical" data-submenu>
+      {% endif %}
+    {% else %}
+      {% if menu_level == 0 %}
+        <ul{{ attributes.addClass('dropdown', 'menu') }} data-dropdown-menu>
+      {% else %}
+        <ul class="menu">
+      {% endif %}
+    {% endif %}
+    {% for item in items %}
+      {% if top_bar %}
+        {% set item_classes = [ item.below is not empty ? 'has-submenu' ] %}
+      {% endif %}
+      <li{{ item.attributes.addClass(item_classes) }}>
+        {{ link(item.title, item.url) }}
+        {% if item.below %}
+            {{ menus.menu_links(item.below, attributes, menu_level + 1, top_bar) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
