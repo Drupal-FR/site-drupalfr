@@ -1,0 +1,117 @@
+// NAVBAR MAIN MENU
+// ================
+.main-menu {
+  // Level 0 hover & focus
+  align-content:   stretch;
+  align-items:     stretch;
+  display:         flex;
+  flex-direction:  row;
+  flex-wrap:       nowrap;
+  justify-content: space-around;
+
+  > .has-submenu {
+    display:    inline-block;
+    text-align: center;
+    float:      left;
+
+    > a {
+
+      color: $white;
+
+      &:hover,
+      &:focus {
+        &::after {
+          content:          " ";
+          height:           4px;
+          width:            100%;
+          position:         absolute;
+          bottom:           0;
+          left:             0;
+          background-color: $white;
+        }
+      }
+
+      &.is-active {
+        font-weight: 700;
+      }
+    }
+
+    > ul {
+      position: absolute;
+
+      // TODO : METTRE CA ISO MAQUETTES
+      > li {
+        a {
+          color: $warning-color;
+        }
+      }
+    }
+
+  }
+
+  /*
+  // RELIQUAT DU THEME BOOTSTRAP
+  // THIS NEEDS TO BE ADPATED !
+
+    // Level 1 Opened
+    .nav > li.dropdown.open {
+      position: static;
+      > a {
+        &::after {
+          content:       " ";
+          display:       block;
+          width:         0;
+          height:        0;
+          border-top:    10px solid transparent;
+          border-bottom: 10px solid $drupal-blue-light;
+          border-left:   10px solid transparent;
+          border-right:  10px solid transparent;
+          position:      absolute;
+          bottom:        0px;
+          left:          40%;
+          z-index:       2;
+        }
+      }
+
+      .dropdown-menu {
+        display:          table;
+        width:            100%;
+        text-align:       center;
+        left:             0;
+        right:            0;
+        height:           60px;
+        padding:          0;
+        margin:           0;
+        //box-shadow       : none;
+        border:           none;
+        border-radius:    0;
+        background-color: $drupal-blue-light;
+
+        > li {
+          display: table-cell;
+          height:  60px;
+          > a {
+            height:           60px;
+            line-height:      60px;
+            padding:          0;
+            color:            white;
+            display:          block;
+            background-color: $drupal-blue-light;
+
+            &.is-active {
+              font-weight: 700;
+            }
+
+            // Level 2 hover/focus/active states (pseudo-elements)
+            &:hover,
+            &:focus,
+            &:active {
+              background-color: $drupal-blue-light;
+              border-bottom:    4px solid white;
+            }
+          }
+        }
+      }
+    }
+    */
+}
