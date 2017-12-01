@@ -46,32 +46,42 @@
 // 1. Global
 // ---------
 
-$global-font-size: 100%;
-$global-width: rem-calc(1200);
-$global-lineheight: 1.5;
+$drupal-blue-dark:              #064771;
+$drupal-blue-light:             #0678be;
+$drupal-blue-lighter:           #4d9dcc;
+$drupal-blue-desaturate:        #245d82;
+$drupal-blue-desaturate-light:  #82a3b8;
+
+$global-font-size:      100%;
+$global-width:          rem-calc(1200);
+$global-lineheight:     1.5;
+
 $foundation-palette: (
-  primary: #1779ba,
-  secondary: #767676,
-  success: #3adb76,
-  warning: #ffae00,
-  alert: #cc4b37,
+  primary:      #064771,
+  secondary:    #0678be,
+  success:      #3adb76,
+  warning:      #ffae00,
+  alert:        #cc4b37,
 );
-$light-gray: #e6e6e6;
-$medium-gray: #cacaca;
-$dark-gray: #8a8a8a;
-$black: #0a0a0a;
-$white: #fefefe;
-$body-background: $white;
-$body-font-color: $black;
-$body-font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
-$body-antialiased: true;
-$global-margin: 1rem;
-$global-padding: 1rem;
-$global-weight-normal: normal;
-$global-weight-bold: bold;
-$global-radius: 0;
+$light-gray:    #e6e6e6;
+$medium-gray:   #cacaca;
+$dark-gray:     #8a8a8a;
+$black:         #0a0a0a;
+$white:         #fefefe;
+
+$body-background:   $white;
+$body-font-color:   $black;
+$body-font-family:  'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
+$body-antialiased:  true;
+
+$global-margin:         1rem;
+$global-padding:        1rem;
+$global-weight-normal:  normal;
+$global-weight-bold:    bold;
+$global-radius:         0;
 $global-text-direction: ltr;
-$global-flexbox: false;
+$global-flexbox:        false;
+
 $print-transparent-backgrounds: true;
 
 @include add-foundation-colors;
@@ -80,14 +90,15 @@ $print-transparent-backgrounds: true;
 // --------------
 
 $breakpoints: (
-  small: 0,
-  medium: 640px,
-  large: 1024px,
-  xlarge: 1200px,
-  xxlarge: 1440px,
+  small:    0,
+  medium:   640px,
+  large:    1024px,
+  xlarge:   1200px,
+  xxlarge:  1440px,
 );
-$print-breakpoint: large;
-$breakpoint-classes: (small medium large);
+
+$print-breakpoint:      large;
+$breakpoint-classes:    (small medium large);
 
 // 3. The Grid
 // -----------
@@ -107,7 +118,9 @@ $block-grid-max: 8;
 $header-font-family: $body-font-family;
 $header-font-weight: $global-weight-normal;
 $header-font-style: normal;
+
 $font-family-monospace: Consolas, 'Liberation Mono', Courier, monospace;
+
 $header-color: inherit;
 $header-lineheight: 1.4;
 $header-margin-bottom: 0.5rem;
