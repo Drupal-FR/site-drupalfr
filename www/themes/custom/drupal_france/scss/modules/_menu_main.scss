@@ -1,18 +1,22 @@
-// NAVBAR MAIN MENU
+/**
+ *  TODO : Issue https://github.com/Drupal-FR/site-drupalfr/issues/16
+ */
+
+// TOPBAR MAIN MENU
 // ================
 .main-menu {
   // Level 0 hover & focus
-  align-content:   stretch;
-  align-items:     stretch;
   display:         flex;
   flex-direction:  row;
   flex-wrap:       nowrap;
   justify-content: space-around;
+  align-content:   stretch;
+  align-items:     stretch;
 
   > .has-submenu {
     display:    inline-block;
-    text-align: center;
     float:      left;
+    text-align: center;
 
     > a {
 
@@ -21,13 +25,13 @@
       &:hover,
       &:focus {
         &::after {
-          content:          " ";
-          height:           4px;
-          width:            100%;
           position:         absolute;
           bottom:           0;
           left:             0;
+          width:            100%;
+          height:           4px;
           background-color: $white;
+          content:          ' ';
         }
       }
 
@@ -39,10 +43,9 @@
     > ul {
       position: absolute;
 
-      // TODO : METTRE CA ISO MAQUETTES
       > li {
         a {
-          color: $warning-color;
+          display: none;
         }
       }
     }
@@ -51,7 +54,7 @@
 
   /*
   // RELIQUAT DU THEME BOOTSTRAP
-  // THIS NEEDS TO BE ADPATED !
+  // THIS NEEDS TO BE ADAPTED !
 
     // Level 1 Opened
     .nav > li.dropdown.open {
@@ -102,7 +105,7 @@
               font-weight: 700;
             }
 
-            // Level 2 hover/focus/active states (pseudo-elements)
+            // Level 2 hover/focus/active states (pseudo-classes)
             &:hover,
             &:focus,
             &:active {
