@@ -1,0 +1,29 @@
+// TOPBAR EXTRA ELEMENTS
+// =====================
+
+/* Search button
+   ============= */
+
+/* Download Button
+   =============== */
+
+/* User Account Menu Button
+   ======================== */
+
+
+
+
+.button--user-account {
+  display: none;
+
+  @include breakpoint(medium) {
+    display: block;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: $white;
+  }
+}
+
