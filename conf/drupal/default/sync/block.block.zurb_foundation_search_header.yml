@@ -1,0 +1,33 @@
+uuid: abff3f87-3baa-40ed-9c19-5fe964bf3e2e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+  content:
+    - 'block_content:basic:block_header_search'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - zurb_foundation
+id: zurb_foundation_search_header
+theme: zurb_foundation
+region: header
+weight: 0
+provider: null
+plugin: 'block_content:block_header_search'
+settings:
+  id: 'block_content:block_header_search'
+  label: "Header\_: page recherche"
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

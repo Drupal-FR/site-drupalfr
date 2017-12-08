@@ -1,0 +1,29 @@
+uuid: 3884c940-c266-4169-b2c0-69e506fe0923
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+    - facets.facet.planet_tag
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - zurb_foundation
+id: zurb_foundation_search_planet_tag
+theme: zurb_foundation
+region: sidebar_second
+weight: -10
+provider: null
+plugin: 'facet_block:planet_tag'
+settings:
+  id: 'facet_block:planet_tag'
+  label: 'Tags du planète'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

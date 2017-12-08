@@ -1,0 +1,33 @@
+uuid: dd350ee4-2ce7-406e-b5c3-1c4ccac9a019
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+  content:
+    - 'block_content:basic:block_header_search'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - drupal_france
+id: drupal_france_search_header
+theme: drupal_france
+region: header
+weight: -17
+provider: null
+plugin: 'block_content:block_header_search'
+settings:
+  id: 'block_content:block_header_search'
+  label: "Header\_: page recherche"
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

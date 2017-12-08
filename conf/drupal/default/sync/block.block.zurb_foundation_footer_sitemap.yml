@@ -1,0 +1,26 @@
+uuid: c18a6c15-75a6-4e93-aeef-faf0c81a943b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - system.menu.main
+  module:
+    - system
+  theme:
+    - zurb_foundation
+_core:
+  default_config_hash: yEz7c6hnvGa73hYNdBz_8n_kQUhfwVeXk_szvx7DN2s
+id: zurb_foundation_footer_sitemap
+theme: zurb_foundation
+region: header
+weight: -6
+provider: null
+plugin: 'system_menu_block:main'
+settings:
+  id: 'system_menu_block:main'
+  label: 'Plan du site'
+  provider: system
+  label_display: visible
+  level: 1
+  depth: 1
+visibility: {  }

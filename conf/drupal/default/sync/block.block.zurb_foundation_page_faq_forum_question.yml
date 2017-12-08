@@ -1,0 +1,33 @@
+uuid: a6be2436-0ef2-4a40-ae11-9f28657155e5
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.page_faq
+  content:
+    - 'block_content:basic:block_sidebar_question_forum'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - zurb_foundation
+id: zurb_foundation_page_faq_forum_question
+theme: zurb_foundation
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'block_content:block_sidebar_question_forum'
+settings:
+  id: 'block_content:block_sidebar_question_forum'
+  label: "Sidebar\_: poser une question forum"
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: page_faq
+    context_mapping: {  }

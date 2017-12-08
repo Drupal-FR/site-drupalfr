@@ -1,0 +1,33 @@
+uuid: fa7d0c40-08ca-4c17-9707-b3335ba05a5b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.news_listing
+  content:
+    - 'block_content:basic:block_header_news_listing'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - zurb_foundation
+id: zurb_foundation_news_listing_header
+theme: zurb_foundation
+region: header
+weight: 0
+provider: null
+plugin: 'block_content:block_header_news_listing'
+settings:
+  id: 'block_content:block_header_news_listing'
+  label: 'Header : page actualités'
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: news_listing
+    context_mapping: {  }

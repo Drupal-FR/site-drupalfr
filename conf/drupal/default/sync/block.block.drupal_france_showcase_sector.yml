@@ -1,0 +1,29 @@
+uuid: a227e6e2-c641-4eb9-a8b6-c393ad32fbd7
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.showcase
+    - facets.facet.showcase_sector
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - drupal_france
+id: drupal_france_showcase_sector
+theme: drupal_france
+region: content
+weight: -22
+provider: null
+plugin: 'facet_block:showcase_sector'
+settings:
+  id: 'facet_block:showcase_sector'
+  label: 'Filtrer par'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: showcase
+    context_mapping: {  }

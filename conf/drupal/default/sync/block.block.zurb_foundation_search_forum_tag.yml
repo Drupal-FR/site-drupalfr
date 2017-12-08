@@ -1,0 +1,29 @@
+uuid: 92253f22-c47a-49b8-9b1c-a16d12755698
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+    - facets.facet.forum_tag
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - zurb_foundation
+id: zurb_foundation_search_forum_tag
+theme: zurb_foundation
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'facet_block:forum_tag'
+settings:
+  id: 'facet_block:forum_tag'
+  label: 'Tags du forum'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

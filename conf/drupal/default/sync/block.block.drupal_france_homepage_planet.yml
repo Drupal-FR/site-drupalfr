@@ -1,0 +1,31 @@
+uuid: 683f39a8-c94b-4ebd-9985-7196d08f6baa
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.homepage
+    - views.view.planet
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - drupal_france
+id: drupal_france_homepage_planet
+theme: drupal_france
+region: content
+weight: -17
+provider: null
+plugin: 'views_block:planet-block_1'
+settings:
+  id: 'views_block:planet-block_1'
+  label: ''
+  provider: views
+  label_display: '0'
+  views_label: ''
+  items_per_page: none
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: homepage
+    context_mapping: {  }
