@@ -1,0 +1,29 @@
+uuid: 82d749a7-939d-4741-82cd-2f074e3603ad
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.showcase
+    - facets.facet.showcase_drupal_version
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - zurb_foundation
+id: zurb_foundation_showcase_drupal_version
+theme: zurb_foundation
+region: content
+weight: -21
+provider: null
+plugin: 'facet_block:showcase_drupal_version'
+settings:
+  id: 'facet_block:showcase_drupal_version'
+  label: 'Filtrer par'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: showcase
+    context_mapping: {  }

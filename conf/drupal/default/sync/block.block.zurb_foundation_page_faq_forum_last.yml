@@ -1,0 +1,31 @@
+uuid: b9d83f62-8cb3-4585-a612-3a69aa35320b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.page_faq
+    - views.view.forum
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - zurb_foundation
+id: zurb_foundation_page_faq_forum_last
+theme: zurb_foundation
+region: sidebar_second
+weight: -8
+provider: null
+plugin: 'views_block:forum-block_1'
+settings:
+  id: 'views_block:forum-block_1'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: page_faq
+    context_mapping: {  }

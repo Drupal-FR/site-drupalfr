@@ -1,0 +1,32 @@
+uuid: d01f7942-b3f7-4555-b2e9-e3799d339134
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.company
+    - views.view.job_offer
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - zurb_foundation
+id: zurb_foundation_company_job
+theme: zurb_foundation
+region: sidebar_second
+weight: 0
+provider: null
+plugin: 'views_block:job_offer-block_1'
+settings:
+  id: 'views_block:job_offer-block_1'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+  context_mapping: {  }
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: company
+    context_mapping: {  }

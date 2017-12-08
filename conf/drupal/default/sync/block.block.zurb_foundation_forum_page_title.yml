@@ -1,0 +1,27 @@
+uuid: 4addbead-8590-4cff-b806-c5af0baf48d8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.forum
+  module:
+    - block_visibility_groups
+  theme:
+    - zurb_foundation
+id: zurb_foundation_forum_page_title
+theme: zurb_foundation
+region: header
+weight: 0
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Titre de page (forum)'
+  provider: core
+  label_display: '0'
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: forum
+    context_mapping: {  }

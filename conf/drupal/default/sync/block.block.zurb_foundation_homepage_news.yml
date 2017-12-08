@@ -1,0 +1,31 @@
+uuid: bba57068-9e44-43d7-866d-547eb6cbf8f4
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.homepage
+    - views.view.news
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - zurb_foundation
+id: zurb_foundation_homepage_news
+theme: zurb_foundation
+region: content
+weight: -19
+provider: null
+plugin: 'views_block:news-block_1'
+settings:
+  id: 'views_block:news-block_1'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: homepage
+    context_mapping: {  }
