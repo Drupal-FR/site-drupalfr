@@ -1,0 +1,25 @@
+uuid: e876f671-9cb6-495c-afb3-6628d1c7ab9d
+langcode: fr
+status: true
+dependencies:
+  module:
+    - drupalfr_newsletter
+  theme:
+    - zurb_foundation
+_core:
+  default_config_hash: aUMDu9AxrJJcGGja4b_9wfkItqq3cPw-Ct5B_zRyAtc
+id: zurb_foundation_footer_newsletter
+theme: zurb_foundation
+region: header
+weight: -8
+provider: null
+plugin: newsletter_subscription_block
+settings:
+  id: newsletter_subscription_block
+  label: 'Garder le contact'
+  provider: drupalfr_newsletter
+  label_display: visible
+  account_hash: eb7ebedd32b3b2fc0ac192ee9
+  mailing_list_hash: 27e99cb1af
+  anti_spam_token: b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af
+visibility: {  }

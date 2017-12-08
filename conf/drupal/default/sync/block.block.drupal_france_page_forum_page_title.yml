@@ -1,0 +1,27 @@
+uuid: 7ebba63f-c75e-404a-944a-2ae8e23a931f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.forum_listing
+  module:
+    - block_visibility_groups
+  theme:
+    - drupal_france
+id: drupal_france_page_forum_page_title
+theme: drupal_france
+region: header
+weight: -14
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Titre de page (page forum)'
+  provider: core
+  label_display: '0'
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: forum_listing
+    context_mapping: {  }

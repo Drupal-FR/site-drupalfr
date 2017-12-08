@@ -1,0 +1,33 @@
+uuid: 70106838-083f-4577-be87-f8f8c9672679
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.release_listing
+  content:
+    - 'block_content:basic:block_sidebar_release_docker'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - drupal_france
+id: drupal_france_release_listing_docker
+theme: drupal_france
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'block_content:block_sidebar_release_docker'
+settings:
+  id: 'block_content:block_sidebar_release_docker'
+  label: "Sidebar\_: Docker"
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: release_listing
+    context_mapping: {  }
