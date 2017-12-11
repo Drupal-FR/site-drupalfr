@@ -29,8 +29,7 @@ $DRUSH site:install config_installer \
   --locale=$DEFAULT_LANGUAGE \
   -y
 
-# TODO: workaround since https://www.drupal.org/node/2916090 is not fixed.
-$DRUSH user:password $ACCOUNT_NAME $ACCOUNT_PASS
+# Set the site mail on install because it is ignored by config ignore.
 $DRUSH config:set system.site mail $SITE_MAIL -y
 
 # Import configuration so splits and some side effects are taken into account.
