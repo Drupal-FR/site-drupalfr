@@ -1,0 +1,32 @@
+uuid: 4c14922e-5812-401a-aa0a-b04e7d8bfea7
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.homepage
+  module:
+    - block_visibility_groups
+    - drupalfr_meetup
+  theme:
+    - zurb_foundation
+id: zurb_foundation_homepage_meetup
+theme: zurb_foundation
+region: content
+weight: -18
+provider: null
+plugin: drupalfr_meetup_home_block
+settings:
+  id: drupalfr_meetup_home_block
+  label: 'Rencontrer et échanger'
+  provider: drupalfr_meetup
+  label_display: visible
+  sub_title: 'Au delà du CMS, la communauté francophone'
+  description:
+    value: ''
+    format: full_html
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: homepage
+    context_mapping: {  }

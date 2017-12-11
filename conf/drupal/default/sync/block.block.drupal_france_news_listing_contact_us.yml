@@ -1,0 +1,33 @@
+uuid: 1586cb6e-d562-49ec-92f6-f86c5cf4fa69
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.news_listing
+  content:
+    - 'block_content:basic:block_sidebar_contact'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - drupal_france
+id: drupal_france_news_listing_contact_us
+theme: drupal_france
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'block_content:block_sidebar_contact'
+settings:
+  id: 'block_content:block_sidebar_contact'
+  label: 'Sidebar : nous contacter'
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: news_listing
+    context_mapping: {  }

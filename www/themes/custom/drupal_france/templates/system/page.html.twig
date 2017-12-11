@@ -1,0 +1,218 @@
+{#
+/**
+ * @file
+ * Zurb Foundations's theme implementation to display a single page.
+ *
+ * Available variables:
+ *
+ * General utility variables:
+ * - base_path: The base URL path of the Drupal installation. Will usually be
+ *   "/" unless you have installed Drupal in a sub-directory.
+ * - is_front: A flag indicating if the current page is the front page.
+ * - logged_in: A flag indicating if the user is registered and signed in.
+ * - is_admin: A flag indicating if the user has permission to access
+ *   administration pages.
+ *
+ * Site identity:
+ * - front_page: The URL of the front page. Use this instead of base_path when
+ *   linking to the front page. This includes the language domain or prefix.
+ * - logo: The url of the logo image, as defined in theme settings.
+ * - linked_logo: The logo image, linked to <front>.
+ * - site_name: The name of the site. This is empty when displaying the site
+ *   name has been disabled in the theme settings.
+ * - linked_site_name: The name of the site that also links to <front>.
+ * - site_slogan: The slogan of the site. This is empty when displaying the site
+ *   slogan has been disabled in theme settings.
+ * - hide_site_name: A flag indicating if the site name has been toggled off on
+ *   the theme settings page. If hidden, the "visually-hidden" class is added
+ *   to make the site name visually hidden, but still accessible.
+ * - hide_site_slogan: A flag indicating if the site slogan has been toggled off
+ *   on the theme settings page. If hidden, the "visually-hidden" class is
+ *   added to make the site slogan visually hidden, but still accessible.
+ *
+ * Page content (in order of occurrence in the default page.html.twig):
+ * - messages: Status and error messages. Should be displayed prominently.
+ * - node: Fully loaded node, if there is an automatically-loaded node
+ *   associated with the page and the node ID is the second argument in the
+ *   page's path (e.g. node/12345 and node/12345/revisions, but not
+ *   comment/reply/12345).
+ *
+ * Regions:
+ * - page.meta_header
+ * - page.main_menu
+ * - page.header
+ * - page.help
+ * - page.highlighted
+ * - page.content
+ * - page.sidebar_first
+ * - page.sidebar_second
+ * - page.footer_first
+ * - page.footer_middle
+ * - page.footer_last
+ *
+ * @see template_preprocess_page()
+ * @see bartik_preprocess_page()
+ * @see html.html.twig
+ *
+ *
+ * NOTE : Variables :
+ *          linked_logo  AND linked_site_name
+ *  are instanced by the Theme Config (URL : YOUR_HOST/admin/appearance/settings/drupal_france) section : Page Elements
+ */
+#}
+
+<div class="off-canvas-wrapper">
+  <div class="inner-wrap off-canvas-wrapper-inner"
+       id="inner-wrap"
+       data-off-canvas-wrapper>
+    {% if page.left_off_canvas %}
+      <aside id="left-off-canvas-menu"
+             class="off-canvas left-off-canvas-menu position-left"
+             role="complementary"
+             data-off-canvas>
+        {{ page.left_off_canvas }}
+      </aside>
+    {% endif %}
+
+    {% if page.right_off_canvas %}
+      <aside id="right-off-canvas-menu"
+             class="off-canvas right-off-canvas-menu position-right"
+             role="complementary"
+             data-off-canvas>
+        {{ page.right_off_canvas }}
+      </aside>
+    {% endif %}
+
+    <div class="off-canvas-content meta_header"
+         data-off-canvas-content>
+
+      {% if page.meta_header %}
+        {% if meta_header_grid %}
+          <div class="row expanded"><div class="row">
+        {% endif %}
+
+        {{ page.meta_header }}
+
+        {% if meta_header_grid %}
+          </div></div>
+        {% endif %}
+      {% endif %}
+
+      <header class="row expanded l-header" role="banner" aria-label="{{ 'Site header'|t }}">
+        <div class="row">
+
+          {# LOGO / SITE TITLE #}
+          {% if linked_logo or linked_site_name %}
+            <div class="large-2 column">
+              {% if linked_logo %}
+                {% if is_front %}
+                  <h1 id="site-name">{{ linked_logo }}</h1>
+                {% else %}
+                  <div id="site-name">{{ linked_logo }}</div>
+                {% endif %}
+              {% elseif linked_site_name %}
+
+                {% if is_front %}
+                  <h1 id="site-name">{{ linked_site_name }}</h1>
+                {% else %}
+                  <div id="site-name">{{ linked_site_name }}</div>
+                {% endif %}
+
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {# MAIN MENU #}
+          {% if page.main_menu %}
+            <div class="l-main-menu large-8 column">
+              {{ page.main_menu }}
+            </div>
+          {% endif %}
+
+          {# MAIN MENU EXTRA ELEMENTS#}
+          {% if page.main_menu_extra %}
+            <div class="l-main-menu-extra large-2 column">
+              {{ page.main_menu_extra }}
+            </div>
+          {% endif %}
+        </div>
+      </header>
+
+      {% if page.header %}
+        <div class="large-12 column">
+          {{ page.header }}
+        </div>
+      {% endif %}
+
+
+      {% if messages and not zurb_foundation_messages_modal %}
+        <div class="l-messages row">
+          <div class="large-12 column">
+            {{ messages }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if page.help %}
+        <div class="l-help row">
+          <div class="large-12 column">
+            {{ page.help }}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="row">
+        <main id="main" class="{{ main_grid }} column" role="main">
+          {% if page.highlighted %}
+            {% spaceless %}
+              {{ page.highlighted }}
+            {% endspaceless %}
+          {% endif %}
+          <a id="main-content"></a>
+          {% if breadcrumb %} {{ breadcrumb }} {% endif %}
+          <section>
+            {{ page.content }}
+          </section>
+        </main>
+        {% if page.sidebar_first %}
+          <div id="sidebar-first" class="{{ sidebar_first_grid }} column sidebar">
+            {{ page.sidebar_first }}
+          </div>
+        {% endif %}
+        {% if page.sidebar_second %}
+          <div id="sidebar-second" class="{{ sidebar_sec_grid }} column sidebar">
+            {{ page.sidebar_second }}
+          </div>
+        {% endif %}
+      </div>
+      {% if page.footer_first or page.footer_middle or page.footer_last %}
+        <div class="l-footer row expanded">
+          <footer class="row">
+            {% if page.footer_first %}
+              <div id="footer-first" class="large-4 column">
+                {{ page.footer_first }}
+              </div>
+            {% endif %}
+            {% if page.footer_middle %}
+              <div id="footer-middle" class="large-4 column">
+                {{ page.footer_middle }}
+              </div>
+            {% endif %}
+            {% if page.footer_last %}
+              <div id="footer-last" class="large-4 column">
+                {{ page.footer_last }}
+              </div>
+            {% endif %}
+          </footer>
+        </div>
+      {% endif %}
+      <div class="bottom-bar panel">
+        <div class="row">
+          <div class="large-12 columns">
+            &copy; {{ "now"|date('Y') }} {{ site_name }} {{ 'All rights reserved.'|t }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

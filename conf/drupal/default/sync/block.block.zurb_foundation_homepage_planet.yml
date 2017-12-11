@@ -1,0 +1,31 @@
+uuid: dc60dbf1-2eab-455b-b407-b0c49b6000b4
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.homepage
+    - views.view.planet
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - zurb_foundation
+id: zurb_foundation_homepage_planet
+theme: zurb_foundation
+region: content
+weight: -17
+provider: null
+plugin: 'views_block:planet-block_1'
+settings:
+  id: 'views_block:planet-block_1'
+  label: ''
+  provider: views
+  label_display: '0'
+  views_label: ''
+  items_per_page: none
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: homepage
+    context_mapping: {  }

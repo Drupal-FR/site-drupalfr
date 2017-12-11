@@ -1,0 +1,27 @@
+uuid: ccbbe32d-dfd5-4315-a523-5e116b0d2f4c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.job_offer
+  module:
+    - block_visibility_groups
+  theme:
+    - zurb_foundation
+id: zurb_foundation_job_offer_page_title
+theme: zurb_foundation
+region: header
+weight: 0
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Titre de page (offre d''emploi)'
+  provider: core
+  label_display: '0'
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: job_offer
+    context_mapping: {  }

@@ -1,0 +1,29 @@
+uuid: 2e0ea5e9-a789-4e84-87a7-100b3fbfd896
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.showcase
+    - facets.facet.showcase_typology
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - zurb_foundation
+id: zurb_foundation_showcase_typology
+theme: zurb_foundation
+region: content
+weight: -23
+provider: null
+plugin: 'facet_block:showcase_typology'
+settings:
+  id: 'facet_block:showcase_typology'
+  label: 'Filtrer par'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: showcase
+    context_mapping: {  }
