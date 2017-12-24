@@ -25,31 +25,22 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      published: Published
-    -
-      promote: Promote
-    -
-      typology: Typology
-    -
-      sector: Sector
-    -
-      drupal_version: 'Drupal version'
-    -
-      website_uri: 'Website URI'
-    -
-      image: Image
+    - uuid: UUID
+    - title: Title
+    - published: Published
+    - promote: Promote
+    - typology: Typology
+    - sector: Sector
+    - drupal_version: 'Drupal version'
+    - website_uri: 'Website URI'
+    - image: Image
 destination:
   plugin: 'entity:node'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: showcase
-  uuid: uuid
   status: published
   uid:
     plugin: default_value

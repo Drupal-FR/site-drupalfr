@@ -21,50 +21,29 @@ source:
     - uuid
   header_row_count: 1
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      uri: URI
-    -
-      parent: Parent
-    -
-      weight: Weight
-    -
-      menu_name: 'Menu name'
-    -
-      expanded: Expanded
-    -
-      enabled: Enabled
-    -
-      attributes_title: Link attribute - title
-    -
-      attributes_id: Link attribute - id
-    -
-      attributes_name: Link attribute - name
-    -
-      attributes_rel: Link attribute - relation
-    -
-      attributes_class: Link attribute - class
-    -
-      attributes_style: Link attribute - style
-    -
-      attributes_target: Link attribute - target
-    -
-      attributes_accesskey: Link attribute - accesskey
-    -
-      item_attributes_id: Menu link attribute - id
-    -
-      item_attributes_class: Menu link attribute - class
-    -
-      item_attributes_style: Menu link attribute - style
-    -
-      fa_icon: Fontawesome icon
+    - uuid: UUID
+    - title: Title
+    - uri: URI
+    - parent: Parent
+    - weight: Weight
+    - menu_name: 'Menu name'
+    - expanded: Expanded
+    - enabled: Enabled
+    - attributes_title: Link attribute - title
+    - attributes_id: Link attribute - id
+    - attributes_name: Link attribute - name
+    - attributes_rel: Link attribute - relation
+    - attributes_class: Link attribute - class
+    - attributes_style: Link attribute - style
+    - attributes_target: Link attribute - target
+    - attributes_accesskey: Link attribute - accesskey
+    - item_attributes_id: Menu link attribute - id
+    - item_attributes_class: Menu link attribute - class
+    - item_attributes_style: Menu link attribute - style
+    - fa_icon: Fontawesome icon
 destination:
   plugin: entity:menu_link_content
 process:
-  id: id
   uuid: uuid
   title: title
   'link/uri':

@@ -22,35 +22,24 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      published: Published
-    -
-      creation_date: 'Creation date'
-    -
-      organizers: Organizers
-    -
-      places: Places
-    -
-      media_banner: 'Media banner'
-    -
-      media_teaser: 'Media teaser'
-    -
-      twitter_account: 'Twitter account'
-    -
-      body_value: Body
-    -
-      body_format: 'Body format'
+    - uuid: UUID
+    - title: Title
+    - published: Published
+    - creation_date: 'Creation date'
+    - organizers: Organizers
+    - places: Places
+    - media_banner: 'Media banner'
+    - media_teaser: 'Media teaser'
+    - twitter_account: 'Twitter account'
+    - body_value: Body
+    - body_format: 'Body format'
 destination:
   plugin: 'entity:node'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: local_group
-  uuid: uuid
   title: title
   body/value: body_value
   body/format: body_format

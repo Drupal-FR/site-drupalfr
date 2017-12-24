@@ -19,51 +19,32 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      name: Name
-    -
-      mail: Mail
-    -
-      default_currency: 'Default currency'
-    -
-      default_langcode: 'Default langcode'
-    -
-      address__langcode: 'Address langcode'
-    -
-      address__country_code: 'Address country code'
-    -
-      address__administrative_area: 'Address administrative area'
-    -
-      address__locality: 'Address locality'
-    -
-      address__dependent_locality: 'Address dependent locality'
-    -
-      address__postal_code: 'Address postal code'
-    -
-      address__sorting_code: 'Address sorting code'
-    -
-      address__address_line1: 'Address address line 1'
-    -
-      address__address_line2: 'Address address line 2'
-    -
-      address__organization: 'Address organization'
-    -
-      address__given_name: 'Address given name'
-    -
-      address__additional_name: 'Address additional name'
-    -
-      address__family_name: 'Address family name'
-    -
-      billing_countries: 'Billing countries'
+    - uuid: UUID
+    - name: Name
+    - mail: Mail
+    - default_currency: 'Default currency'
+    - default_langcode: 'Default langcode'
+    - address__langcode: 'Address langcode'
+    - address__country_code: 'Address country code'
+    - address__administrative_area: 'Address administrative area'
+    - address__locality: 'Address locality'
+    - address__dependent_locality: 'Address dependent locality'
+    - address__postal_code: 'Address postal code'
+    - address__sorting_code: 'Address sorting code'
+    - address__address_line1: 'Address address line 1'
+    - address__address_line2: 'Address address line 2'
+    - address__organization: 'Address organization'
+    - address__given_name: 'Address given name'
+    - address__additional_name: 'Address additional name'
+    - address__family_name: 'Address family name'
+    - billing_countries: 'Billing countries'
 destination:
   plugin: 'entity:commerce_store'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: online
-  uuid: uuid
   uid:
     plugin: default_value
     default_value: 1
