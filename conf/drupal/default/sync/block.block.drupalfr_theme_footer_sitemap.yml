@@ -1,0 +1,26 @@
+uuid: e65a7ed2-5681-47f2-bf65-d6b4a32eda9b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - system.menu.main
+  module:
+    - system
+  theme:
+    - drupalfr_theme
+_core:
+  default_config_hash: yEz7c6hnvGa73hYNdBz_8n_kQUhfwVeXk_szvx7DN2s
+id: drupalfr_theme_footer_sitemap
+theme: drupalfr_theme
+region: footer_col_2
+weight: -6
+provider: null
+plugin: 'system_menu_block:main'
+settings:
+  id: 'system_menu_block:main'
+  label: 'Plan du site'
+  provider: system
+  label_display: visible
+  level: 1
+  depth: 1
+visibility: {  }

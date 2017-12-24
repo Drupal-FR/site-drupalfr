@@ -1,0 +1,31 @@
+uuid: 5eed0064-b6be-4e06-958b-c6e2c048d521
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.news_listing
+    - views.view.media_library
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_news_listing_podcasts
+theme: drupalfr_theme
+region: sidebar_second
+weight: -8
+provider: null
+plugin: 'views_block:media_library-block_podcast'
+settings:
+  id: 'views_block:media_library-block_podcast'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: news_listing
+    context_mapping: {  }

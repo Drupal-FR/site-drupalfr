@@ -1,0 +1,26 @@
+uuid: 56a099ee-346a-41e5-8cff-64e8be372151
+langcode: fr
+status: true
+dependencies:
+  config:
+    - system.menu.account
+  module:
+    - system
+  theme:
+    - drupalfr_theme
+_core:
+  default_config_hash: XjSGsO_aXcujbg4Bq7_CsiIVw41r4w47t5vq2kOVg-g
+id: drupalfr_theme_account_menu
+theme: drupalfr_theme
+region: navigation_collapsible
+weight: -6
+provider: null
+plugin: 'system_menu_block:account'
+settings:
+  id: 'system_menu_block:account'
+  label: 'User account menu'
+  provider: system
+  label_display: '0'
+  level: 1
+  depth: 2
+visibility: {  }

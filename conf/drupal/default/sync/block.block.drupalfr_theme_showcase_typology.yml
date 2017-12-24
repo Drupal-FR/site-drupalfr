@@ -1,0 +1,29 @@
+uuid: 31388d9c-1f14-4613-8639-778d37a72891
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.showcase
+    - facets.facet.showcase_typology
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_showcase_typology
+theme: drupalfr_theme
+region: content
+weight: -23
+provider: null
+plugin: 'facet_block:showcase_typology'
+settings:
+  id: 'facet_block:showcase_typology'
+  label: 'Filtrer par'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: showcase
+    context_mapping: {  }

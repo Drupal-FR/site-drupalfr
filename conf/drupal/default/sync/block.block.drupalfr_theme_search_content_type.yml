@@ -1,0 +1,29 @@
+uuid: 7a267888-d450-4ba5-86a0-e0fb3da6a19a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+    - facets.facet.content_type
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_search_content_type
+theme: drupalfr_theme
+region: sidebar_second
+weight: -11
+provider: null
+plugin: 'facet_block:content_type'
+settings:
+  id: 'facet_block:content_type'
+  label: 'Type de contenu'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }
