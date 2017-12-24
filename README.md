@@ -34,7 +34,7 @@ docker-compose up
 
 * In another tab, get a command-line in the container:
 ```
-docker exec -it container_name_web_1 /bin/bash
+docker-compose exec web /bin/bash
 ```
 (*container_name* should be remplaced by the name of the **web** container)
 * Execute:
