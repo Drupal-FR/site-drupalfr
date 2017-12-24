@@ -34,14 +34,8 @@
  */
 #}
 
-  {% block content %}
-    <div class="float-right header--search-block">
-      <a href="{{ content['search_link']['#url'] }}"
-         title="{{ content['search_link']['#title'] }}"
-         class="clear button inverted button--search"
-      >
-        <i class="fa fa-search"></i>
-      </a>
-    </div>
-
-  {% endblock %}
+{% block content %}
+  <div class="float-right header--search-block">
+    {{ content }}
+  </div>
+{% endblock %}
