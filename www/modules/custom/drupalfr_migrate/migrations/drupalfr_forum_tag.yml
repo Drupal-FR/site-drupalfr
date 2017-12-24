@@ -19,18 +19,15 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      name: Name
-    -
-      weight: Weight
+    - uuid: UUID
+    - name: Name
+    - weight: Weight
 destination:
   plugin: 'entity:taxonomy_term'
 process:
+  uuid: uuid
   vid:
     plugin: default_value
     default_value: forum_tags
-  uuid: uuid
   name: name
   weight: weight

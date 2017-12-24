@@ -19,21 +19,17 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      name: Name
-    -
-      weight: Weight
-    -
-      parent: Parent
+    - uuid: UUID
+    - name: Name
+    - weight: Weight
+    - parent: Parent
 destination:
   plugin: 'entity:taxonomy_term'
 process:
+  uuid: uuid
   vid:
     plugin: default_value
     default_value: forum_hierarchy
-  uuid: uuid
   name: name
   weight: weight
   parent:

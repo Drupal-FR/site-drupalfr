@@ -21,35 +21,24 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      published: Published
-    -
-      nature: Nature
-    -
-      regions: Regions
-    -
-      company: Company
-    -
-      validity: Validity
-    -
-      contract_type: 'Contract type'
-    -
-      teleworking: Teleworking
-    -
-      body_value: Body
-    -
-      body_format: 'Body format'
+    - uuid: UUID
+    - title: Title
+    - published: Published
+    - nature: Nature
+    - regions: Regions
+    - company: Company
+    - validity: Validity
+    - contract_type: 'Contract type'
+    - teleworking: Teleworking
+    - body_value: Body
+    - body_format: 'Body format'
 destination:
   plugin: 'entity:node'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: job_offer
-  uuid: uuid
   title: title
   body/value: body_value
   body/format: body_format

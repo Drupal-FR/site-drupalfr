@@ -22,27 +22,20 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      source: Source
-    -
-      uid: 'Author'
-    -
-      website_uri: 'Website URL'
-    -
-      website_title: 'Website title'
-    -
-      feed_image: 'Feed image'
+    - uuid: UUID
+    - title: Title
+    - source: Source
+    - uid: 'Author'
+    - website_uri: 'Website URL'
+    - website_title: 'Website title'
+    - feed_image: 'Feed image'
 destination:
   plugin: 'entity:feeds_feed'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: planet_feed_rss
-  uuid: uuid
   title: title
   source: source
   uid:
