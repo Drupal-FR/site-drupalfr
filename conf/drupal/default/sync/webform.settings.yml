@@ -7,7 +7,9 @@ settings:
   default_reset_button_label: Réinitialiser
   default_form_submit_once: false
   default_form_confidential_message: 'This form is confidential. You must <a href="[site:login-url]/logout?destination=[current-page:url:relative]">Log out</a> to submit it.'
+  default_form_login_message: 'Please login to access this webform.'
   default_form_disable_back: false
+  default_form_submit_back: false
   default_form_unsaved: false
   default_form_novalidate: false
   default_form_details_toggle: true
@@ -28,6 +30,8 @@ settings:
   default_confirmation_message: 'New submission added to [webform:title].'
   default_confirmation_back_label: 'Back to form'
   default_submission_label: '[webform_submission:submitted-to]: Submission #[webform_submission:serial]'
+  default_submission_login_message: 'Please login to access this submission.'
+  default_submission_exception_message: 'Unable to process this submission. Please contact the site administrator.'
   default_submission_log: false
   preview_classes: "messages messages--error\nmessages messages--warning\nmessages messages--status\n"
   confirmation_classes: "messages messages--error\nmessages messages--warning\nmessages messages--status\n"
@@ -89,6 +93,7 @@ html_editor:
 file:
   file_public: false
   file_private_redirect: true
+  file_private_redirect_message: 'Please login to access the uploaded file.'
   default_max_filesize: ''
   default_managed_file_extensions: 'gif jpg png bmp eps tif pict psd txt rtf html odf pdf doc docx ppt pptx xls xlsx xml avi mov mp3 ogg wav bz2 dmg gz jar rar sit svg tar zip'
   default_audio_file_extensions: 'mp3 ogg wav'
