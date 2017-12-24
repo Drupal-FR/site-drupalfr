@@ -1,0 +1,31 @@
+uuid: 21f82b0d-74dc-4364-a19c-66f2c863e172
+langcode: fr
+status: true
+dependencies:
+  module:
+    - block_visibility_groups
+    - system
+  theme:
+    - drupalfr_theme
+_core:
+  default_config_hash: y95_LY5l_Sc4XIrIM_qzPZ4p6g6HGR3_H990qf6PJ94
+id: drupalfr_theme_branding
+theme: drupalfr_theme
+region: navigation
+weight: 0
+provider: null
+plugin: system_branding_block
+settings:
+  id: system_branding_block
+  label: 'Site branding'
+  provider: system
+  label_display: '0'
+  use_site_logo: true
+  use_site_name: false
+  use_site_slogan: false
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: ''
+    context_mapping: {  }

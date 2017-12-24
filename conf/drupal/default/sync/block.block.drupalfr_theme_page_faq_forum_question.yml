@@ -1,0 +1,33 @@
+uuid: fe3c19dd-3703-4bc5-834b-38186ba7493a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.page_faq
+  content:
+    - 'block_content:basic:block_sidebar_question_forum'
+  module:
+    - block_content
+    - block_visibility_groups
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_page_faq_forum_question
+theme: drupalfr_theme
+region: sidebar_second
+weight: -9
+provider: null
+plugin: 'block_content:block_sidebar_question_forum'
+settings:
+  id: 'block_content:block_sidebar_question_forum'
+  label: "Sidebar\_: poser une question forum"
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: page_faq
+    context_mapping: {  }

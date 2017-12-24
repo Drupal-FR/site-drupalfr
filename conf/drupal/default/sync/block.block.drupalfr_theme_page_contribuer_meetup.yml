@@ -1,0 +1,28 @@
+uuid: 10d11af1-e3f1-45dc-a946-f8f23306d2c5
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.page_contribuer
+  module:
+    - block_visibility_groups
+    - drupalfr_meetup
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_page_contribuer_meetup
+theme: drupalfr_theme
+region: sidebar_second
+weight: -8
+provider: null
+plugin: drupalfr_meetup_sidebar_block
+settings:
+  id: drupalfr_meetup_sidebar_block
+  label: 'Prochaines rencontres'
+  provider: drupalfr_meetup
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: page_contribuer
+    context_mapping: {  }

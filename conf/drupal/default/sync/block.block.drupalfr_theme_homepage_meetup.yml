@@ -1,0 +1,32 @@
+uuid: aac4f9cf-2e9b-4050-a1ff-6e6bc0de80b2
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.homepage
+  module:
+    - block_visibility_groups
+    - drupalfr_meetup
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_homepage_meetup
+theme: drupalfr_theme
+region: content
+weight: -18
+provider: null
+plugin: drupalfr_meetup_home_block
+settings:
+  id: drupalfr_meetup_home_block
+  label: 'Rencontrer et échanger'
+  provider: drupalfr_meetup
+  label_display: visible
+  sub_title: 'Au delà du CMS, la communauté francophone'
+  description:
+    value: ''
+    format: full_html
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: homepage
+    context_mapping: {  }
