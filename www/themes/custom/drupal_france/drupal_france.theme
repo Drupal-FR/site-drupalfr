@@ -9,6 +9,20 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\feeds\Entity\Feed;
 
 /**
+ * Implements hook_theme_suggestions_user_alter().
+ */
+function drupal_france_theme_suggestions_user_alter(&$suggestions, $variables) {
+  $suggestions[] = 'user__' . $variables['elements']['#view_mode'];
+}
+
+/**
+ * Implements hook_theme_suggestions_field_alter().
+ */
+function drupal_france_theme_suggestions_field_alter(&$suggestions, $variables) {
+  $suggestions[] = 'field__' . $variables['element']['#entity_type'] . '__' . $variables['element']['#field_name'] . '__' . $variables['element']['#bundle'] . '__' . $variables['element']['#view_mode'];
+}
+
+/**
  * Implements hook_preprocess_paragraph().
  */
 function drupal_france_preprocess_paragraph(&$variables) {
@@ -101,13 +115,6 @@ function drupal_france_preprocess_node(&$variables) {
 }
 
 /**
- * Implements hook_theme_suggestions_user_alter().
- */
-function drupal_france_theme_suggestions_user_alter(&$suggestions, $variables) {
-  $suggestions[] = 'user__' . $variables['elements']['#view_mode'];
-}
-
-/**
  * Implements hook_preprocess_block_search_header_block().
  */
 function drupal_france_preprocess_block__drupal_france_search_header_block(&$variables) {
@@ -124,4 +131,24 @@ function drupal_france_preprocess_block__drupal_france_search_header_block(&$var
     ],
   ];
   $variables['content']['search_link']['#title'] = new FormattableMarkup('<i class="fa fa-search" aria-hidden="true"></i>', []);
+}
+
+/**
+ * Implements hook_preprocess_menu__account().
+ */
+function drupal_france_preprocess_menu__account(&$variables) {
+  if (isset($variables['items']['drupalfr_user.account.compte'])) {
+    $variables['items']['drupalfr_user.account.compte']['attributes']->addClass([
+      'button',
+      'primary',
+      'button--user-account',
+    ]);
+
+    $variables['items']['drupalfr_user.account.compte']['title'] = new FormattableMarkup(
+      '<i class="fa fa-user-circle-o" aria-hidden="true"></i><span class="sr-only">@original_title</span>',
+      [
+        '@original_title' => $variables['items']['drupalfr_user.account.compte']['title'],
+      ]
+    );
+  }
 }
