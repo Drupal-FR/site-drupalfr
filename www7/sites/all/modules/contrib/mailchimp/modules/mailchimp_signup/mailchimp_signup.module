@@ -86,7 +86,7 @@ function mailchimp_signup_block_info() {
     if (intval($signup->mode) == MAILCHIMP_SIGNUP_BLOCK || intval($signup->mode) == MAILCHIMP_SIGNUP_BOTH) {
       $blocks[$signup->identifier()] = array(
         'info' => t('Mailchimp Subscription Form: @name', array('@name' => $signup->label())),
-        'cache' => DRUPAL_CACHE_PER_USER,
+        'cache' => DRUPAL_CACHE_PER_PAGE | DRUPAL_CACHE_PER_ROLE,
       );
     }
   }
@@ -300,6 +300,12 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
           ),
         );
         $form['mailchimp_lists'][$wrapper_key]['interest_groups'] += mailchimp_interest_groups_form_elements($list);
+        foreach ($form['mailchimp_lists'][$wrapper_key]['interest_groups'] as $group_id => $group) {
+          $form['mailchimp_lists'][$wrapper_key]['interest_groups'][$group_id]['#title'] = mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:intgroup_$group_id", $group['#title']);
+          foreach ($group['#options'] as $interest_id => $interest_name) {
+            $form['mailchimp_lists'][$wrapper_key]['interest_groups'][$group_id]['#options'][$interest_id] = mailchimp_signup_tt('mailchimp_signup:mailchimp_signup:' . $signup->name . ':intgroup_' . $group_id . '_interest_' . $interest_id, $interest_name);
+          }
+        }
       }
     }
   }
@@ -308,6 +314,12 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
     if ($use_interest_groups && isset($list->intgroups)) {
       $form['mailchimp_lists']['#weight'] = 9;
       $form['mailchimp_lists']['interest_groups'] = mailchimp_interest_groups_form_elements($list);
+      foreach ($form['mailchimp_lists']['interest_groups'] as $group_id => $group) {
+        $form['mailchimp_lists']['interest_groups'][$group_id]['#title'] = mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:intgroup_$group_id", $group['#title']);
+        foreach ($group['#options'] as $interest_id => $interest_name) {
+          $form['mailchimp_lists']['interest_groups'][$group_id]['#options'][$interest_id] = mailchimp_signup_tt('mailchimp_signup:mailchimp_signup:' . $signup->name . ':intgroup_' . $group_id . '_interest_' . $interest_id, $interest_name);
+        }
+      }
     }
   }
   $form['mergevars'] = array(
@@ -318,7 +330,7 @@ function mailchimp_signup_subscribe_form($form, &$form_state, $signup, $type) {
   foreach ($signup->settings['mergefields'] as $tag => $mergevar) {
     if (!empty($mergevar)) {
       $mergevar->name = mailchimp_signup_tt("mailchimp_signup:mailchimp_signup:$signup->name:mergefield:$tag", $mergevar->name);
-      $form['mergevars'][$tag] = mailchimp_insert_drupal_form_tag($mergevar);
+      $form['mergevars'][$tag] = mailchimp_insert_drupal_form_tag($mergevar, $signup->settings['placeholder']);
       if (empty($lists)) {
         $form['mergevars'][$tag]['#disabled'] = TRUE;
       }
@@ -397,7 +409,7 @@ function mailchimp_signup_subscribe_form_submit($form, &$form_state) {
     }
     $result = mailchimp_subscribe($list_id, $email, $mergevars, $interests, $signup->settings['doublein']);
     // Let other modules act on the results in hook_form_alter.
-    $form_state['mailchimp_results'] = $result;
+    $form_state['mailchimp_results'][$list_id] = $result;
     if (empty($result) || (isset($result->success) && $result->success === FALSE)) {
       drupal_set_message(t('There was a problem with your newsletter signup to %list.', array(
         '%list' => $list_details[$list_id]->name,

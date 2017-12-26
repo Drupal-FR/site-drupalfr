@@ -88,60 +88,21 @@ Installation Notes
 MailChimp Library Installation
 --------------------------------------------------------------------------------
 
-    If you are using Libraries module for MailChimp version 7.x-4.x:
+    # For MailChimp version 7.x-4.x
 
-    The library has dependencies managed by Composer. If you would prefer
-    not to use Composer, you can download the pre-built library package:
-    https://github.com/thinkshout/mailchimp-api-php/files/710410/v1.0.6-package.zip
-    For further steps, see below.
+    To use the Libraries module:
 
-    To use Composer:
+      - Install the Libraries module:
+        https://www.drupal.org/project/libraries
 
-      - Download Composer if you don't already have it installed:
-        https://getcomposer.org/download/
+      - Download the current release of the MailChimp library:
+        https://github.com/thinkshout/mailchimp-api-php/files/1361112/v1.0.8-package.zip
 
-      - Download the most recent release of the v3 API library:
-        https://github.com/thinkshout/mailchimp-api-php/releases
+      - Locate your libraries directory. Usually:
+        /sites/all/libraries/
 
-      - Extract the library archive to libraries/mailchimp
-
-      - Ensure the directory structure looks like this:
-
-        - libraries/
-          - mailchimp/
-            - src/
-              - Mailchimp.php
-              - MailchimpAPIException.php
-              - MailchimpCampaigns.php
-              - MailchimpLists.php
-              - MailchimpReports.php
-              - MailchimpTemplates.php
-            - composer.json
-            - README.md
-
-      - In the mailchimp library directory, run:
-        composer install
-
-    If you are using Composer Manager for MailChimp version 7.x-4.x:
-
-      - Download Composer if you don't already have it installed:
-        https://getcomposer.org/download/
-
-      - Download and install the Composer Manager module:
-        https://www.drupal.org/project/composer_manager
-
-      - Install Drush on your system if you haven't already:
-        http://www.drush.org/en/master/
-
-      - Run Composer manager with Drush within your Drupal installation:
-        drush composer-manager update --no-dev
-
-    Without Composer:
-
-      - Download the pre-built library package:
-        https://github.com/thinkshout/mailchimp-api-php/files/710410/v1.0.6-package.zip
-
-      - Extract the library archive to libraries/mailchimp
+      - Extract the archive to:
+        libraries/mailchimp
 
       - Ensure the directory structure looks like this:
 
@@ -162,8 +123,22 @@ MailChimp Library Installation
             - composer.json
             - README.md
 
+    To use Composer Manager:
 
-    For MailChimp version 7.x-2.x and 7.x-3.x:
+      - Download Composer if you don't already have it installed:
+        https://getcomposer.org/download/
+
+      - Download and install the Composer Manager module:
+        https://www.drupal.org/project/composer_manager
+
+      - Install Drush on your system if you haven't already:
+        http://www.drush.org/en/master/
+
+      - Run Composer manager with Drush within your Drupal installation:
+        drush composer-manager update --no-dev
+
+
+    # For MailChimp version 7.x-2.x and 7.x-3.x:
 
       - Download version 2.0.6 of the v2 API library:
         https://bitbucket.org/mailchimp/mailchimp-api-php/downloads

@@ -5,6 +5,8 @@
  * Mailchimp module.
  */
 
+use Mailchimp\MailchimpLists;
+
 define('MAILCHIMP_QUEUE_CRON', 'mailchimp');
 define('MAILCHIMP_BATCH_QUEUE_CRON', 'mailchimp_batch');
 
@@ -21,7 +23,7 @@ function mailchimp_libraries_info() {
   $libraries['mailchimp'] = array(
     'name' => 'MailChimp API',
     'vendor url' => 'https://github.com/thinkshout/mailchimp-api-php',
-    'download url' => 'https://github.com/thinkshout/mailchimp-api-php/archive/v1.0.6.zip',
+    'download url' => 'https://github.com/thinkshout/mailchimp-api-php/files/1361112/v1.0.8-package.zip',
     'version arguments' => array(
       'file' => 'composer.json',
       'pattern' => '/"version": "([0-9a-zA-Z.-]+)"/',
@@ -29,7 +31,7 @@ function mailchimp_libraries_info() {
     'files' => array(
       'php' => array(
         'src/Mailchimp.php',
-        'src/MailchimpAPIException',
+        'src/MailchimpAPIException.php',
         'src/MailchimpCampaigns.php',
         'src/MailchimpLists.php',
         'src/MailchimpReports.php',
@@ -167,9 +169,32 @@ function mailchimp_get_api_object($classname = 'Mailchimp', $api_key = NULL) {
     return NULL;
   }
   // Set the timeout to something that won't take down the Drupal site:
-  $timeout = 60;
+  $http_options = [
+    'timeout' => 60,
+  ];
 
-  $mailchimp = new $classname($api_key, 'apikey', $timeout);
+  $proxy_server = variable_get('proxy_server', '');
+  if ($proxy_server) {
+    $proxy_url = sprintf(
+      'tcp://%s:%d',
+      $proxy_server,
+      variable_get('proxy_port', 8080)
+    );
+
+    $http_options['proxy'] = [
+      'http' => $proxy_url,
+      'https' => $proxy_url,
+    ];
+
+    if ($proxy_username = variable_get('proxy_username', '')) {
+      $proxy_password = variable_get('proxy_password', '');
+      $http_options['headers']['Proxy-Authorization'] = 'Basic ' . base64_encode(
+        $proxy_username . (!empty($proxy_password) ? ":" . $proxy_password : '')
+      );
+    }
+  }
+
+  $mailchimp = new $classname($api_key, 'apikey', $http_options);
 
   return $mailchimp;
 }
@@ -549,8 +574,9 @@ function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $inte
     }
 
     $parameters = array(
-      // If double opt-in is required, set member status to 'pending'.
-      'status' => ($double_optin) ? \Mailchimp\MailchimpLists::MEMBER_STATUS_PENDING : \Mailchimp\MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+      // If double opt-in is required, set member status to 'pending', but only
+      // if the user isn't already subscribed.
+      'status' => ($double_optin && !mailchimp_is_subscribed($list_id, $email)) ? \Mailchimp\MailchimpLists::MEMBER_STATUS_PENDING : \Mailchimp\MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
       'email_type' => $format,
     );
 
@@ -585,6 +611,14 @@ function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $inte
     }
   }
   catch (Exception $e) {
+    if ($e->getCode() == '400' && strpos($e->getMessage(), 'Member In Compliance State') !== false && !$double_optin) {
+      watchdog('mailchimp', 'Detected "Member In Compliance State" subscribing @email to list @list.  Trying again using double-opt in.', array(
+        '@email' => $email,
+        '@list' => $list_id,
+      ), WATCHDOG_INFO);
+      return mailchimp_subscribe_process($list_id, $email, $merge_vars, $interests, TRUE, $format);
+    }
+
     watchdog('mailchimp', 'An error occurred subscribing @email to list @list. Status code @code. "%message"', array(
       '@email' => $email,
       '@list' => $list_id,
@@ -597,6 +631,9 @@ function mailchimp_subscribe_process($list_id, $email, $merge_vars = NULL, $inte
     $result->message = $e->getMessage();
   }
 
+  if ($double_optin) {
+      drupal_set_message(t('Please check your email to confirm your subscription'), 'status', FALSE);
+  }
   return $result;
 }
 
@@ -622,19 +659,24 @@ function mailchimp_addto_queue($function, $args) {
 }
 
 /**
- * Updates the local cache for a user as though a queued request had been processed.
+ * Updates the local cache for a user as though a queued request had been
+ * processed.
  *
- * If we don't do this, then users can make changes, but not have them shown on the site until
- * cron runs, which is intensely confusing. See https://www.drupal.org/node/2503597
+ * If we don't do this, then users can make changes, but not have them shown on
+ * the site until cron runs, which is intensely confusing. See
+ * https://www.drupal.org/node/2503597
  *
- * @string $function
- *   The name of the function that the queue runner will call when the update is processed.
- * @array $args
+ * @param string $function
+ *   The name of the function that the queue runner will call when the update
+ *   is processed.
+ * @param array $args
  *   The list of args that will be passed to the queue runner.
+ *
+ * @return bool
  */
 function mailchimp_update_local_cache($function, $args) {
   $list_id = isset($args['list_id']) ? $args['list_id'] : NULL;
-  $email   = isset($args['email']) ? $args['email'] : NULL;
+  $email = isset($args['email']) ? $args['email'] : NULL;
   if (empty($list_id) || empty($email)) {
     return FALSE;
   }
@@ -659,8 +701,7 @@ function mailchimp_update_local_cache($function, $args) {
     $cache->status = 'subscribed';
   }
   // Handle member updates.
-  if ($function == 'mailchimp_update_member_process' ||
-      $function == 'mailchimp_subscribe_process') {
+  if ($function == 'mailchimp_update_member_process' || $function == 'mailchimp_subscribe_process') {
     // Update cached merge vars.
     if (!isset($cache->merge_fields)) {
       $cache->merge_fields = new stdClass();
@@ -690,7 +731,7 @@ function mailchimp_update_local_cache($function, $args) {
  * @return bool
  *   Success or failure.
  */
-function mailchimp_update_member($list_id, $email, $merge_vars, $interests, $format = 'html') {
+function mailchimp_update_member($list_id, $email, $merge_vars, $interests, $format = 'html', $double_optin = FALSE) {
   if (variable_get('mailchimp_cron', FALSE)) {
     $args = array(
       'list_id' => $list_id,
@@ -698,11 +739,12 @@ function mailchimp_update_member($list_id, $email, $merge_vars, $interests, $for
       'merge_vars' => $merge_vars,
       'interests' => $interests,
       'format' => $format,
+      'double_optin' => $double_optin,
     );
     return mailchimp_addto_queue('mailchimp_update_member_process', $args);
   }
 
-  return mailchimp_update_member_process($list_id, $email, $merge_vars, $interests, $format);
+  return mailchimp_update_member_process($list_id, $email, $merge_vars, $interests, $format, $double_optin);
 }
 
 /**
@@ -713,7 +755,7 @@ function mailchimp_update_member($list_id, $email, $merge_vars, $interests, $for
  * @return bool
  *   Success or failure.
  */
-function mailchimp_update_member_process($list_id, $email, $merge_vars, $interests, $format) {
+function mailchimp_update_member_process($list_id, $email, $merge_vars, $interests, $format, $double_optin = FALSE) {
   $result = FALSE;
   try {
     /* @var \Mailchimp\MailchimpLists $mc_lists */
@@ -723,7 +765,7 @@ function mailchimp_update_member_process($list_id, $email, $merge_vars, $interes
     }
 
     $parameters = array(
-      'status' => 'subscribed',
+      'status' => ($double_optin) ? \Mailchimp\MailchimpLists::MEMBER_STATUS_PENDING : \Mailchimp\MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
       'email_type' => $format,
     );
 
@@ -737,26 +779,8 @@ function mailchimp_update_member_process($list_id, $email, $merge_vars, $interes
       $parameters['merge_fields'] = (object) $merge_vars;
     }
 
-    // If email address has changed, unsubscribe and create new subscription.
-    // @see http://stackoverflow.com/questions/32224697/mailchimp-api-v3-0-change-subscriber-email
-    if (isset($parameters['merge_fields']->EMAIL) && ($email != $parameters['merge_fields']->EMAIL)) {
-      $result = $mc_lists->removeMember($list_id, $email);
-
-      watchdog('mailchimp', '@email was removed from list @list_id.', array(
-        '@email' => $email,
-        '@list' => $list_id,
-      ), WATCHDOG_NOTICE);
-
-      module_invoke_all('mailchimp_unsubscribe_user', $list_id, $email);
-
-      $email = $parameters['merge_fields']->EMAIL;
-
-      $result = $mc_lists->addOrUpdateMember($list_id, $email, $parameters);
-    }
-    else {
-      // Update member.
-      $result = $mc_lists->updateMember($list_id, $email, $parameters);
-    }
+    // Update member.
+    $result = $mc_lists->updateMember($list_id, $email, $parameters);
 
     if (!empty($result) && isset($result->id)) {
       watchdog('mailchimp', '@email was updated in list @list_id.', array(
@@ -774,11 +798,22 @@ function mailchimp_update_member_process($list_id, $email, $merge_vars, $interes
     }
   }
   catch (Exception $e) {
+    if ($e->getCode() == '400' && strpos($e->getMessage(), 'Member In Compliance State') !== false && !$double_optin) {
+      watchdog('mailchimp', 'Detected "Member In Compliance State" updating @email to list @list.  Trying again using double-opt in.', array(
+        '@email' => $email,
+        '@list' => $list_id,
+      ), WATCHDOG_INFO);
+      return mailchimp_update_member_process($list_id, $email, $merge_vars, $interests, $format, TRUE);
+    }
+
     watchdog('mailchimp', 'An error occurred updating @email on list @list. "%message"', array(
       '@email' => $email,
       '@list' => $list_id,
       '%message' => $e->getMessage(),
     ), WATCHDOG_ERROR);
+  }
+  if ($double_optin) {
+      drupal_set_message(t('Please check your email to confirm your subscription'), 'status', FALSE);
   }
   return $result;
 }
@@ -800,7 +835,10 @@ function mailchimp_get_members($list_id, $status = 'subscribed', $options = arra
       }
 
       $options['status'] = $status;
-      $options['count'] = 500;
+
+      if (!isset($options['count']) || empty($options['count'])) {
+        $options['count'] = 500;
+      }
 
       $results = $mc_lists->getMembers($list_id, $options);
     }
@@ -898,9 +936,7 @@ function mailchimp_unsubscribe_member($list_id, $email, $delete = FALSE, $goodby
 }
 
 /**
- * Wrapper around Mailchimp_Lists::unsubscribe().
- *
- * @see Mailchimp_Lists::unsubscribe()
+ * Unsubscribe a member from a list.
  *
  * @return bool
  *   Success or failure.
@@ -913,7 +949,25 @@ function mailchimp_unsubscribe_process($list_id, $email, $delete, $goodbye, $not
       throw new MailchimpException('Cannot unsubscribe from list without MailChimp API. Check API key has been entered.');
     }
 
-    $mc_lists->removeMember($list_id, $email);
+    if ($delete) {
+      // Remove member from list.
+      $mc_lists->removeMember($list_id, $email);
+      watchdog('mailchimp', '@email was removed from list @list_id.', array(
+        '@email' => $email,
+        '@list' => $list_id,
+      ), WATCHDOG_INFO);
+    }
+    else {
+      // Unsubscribe member.
+      $parameters = array(
+        'status' => MailchimpLists::MEMBER_STATUS_UNSUBSCRIBED,
+      );
+      $mc_lists->updateMember($list_id, $email, $parameters);
+      watchdog('mailchimp', '@email was unsubscribed from list @list_id.', array(
+        '@email' => $email,
+        '@list' => $list_id,
+      ), WATCHDOG_INFO);
+    }
 
     module_invoke_all('mailchimp_unsubscribe_user', $list_id, $email);
 
@@ -1117,7 +1171,8 @@ function mailchimp_segment_batch_add_subscribers($list_id, $segment_id, $batch) 
 }
 
 /**
- * Wrapper around MailchimpCampaigns->getCampaign() to return data for a given campaign.
+ * Wrapper around MailchimpCampaigns->getCampaign() to return data for a given
+ * campaign.
  *
  * Data is stored in the MailChimp cache.
  *
@@ -1454,10 +1509,6 @@ function mailchimp_interest_groups_form_elements($list, $defaults = array(), $em
 
     // Extract the field options:
     $options = array();
-    if ($field_type == 'select') {
-      $options[''] = '-- select --';
-    }
-
     $default_values = array();
 
     // Set interest options and default values.
@@ -1480,6 +1531,7 @@ function mailchimp_interest_groups_form_elements($list, $defaults = array(), $em
       '#type' => $field_type,
       '#title' => $group->title,
       '#options' => $options,
+      '#empty_option' => t('-- select --'),
       '#default_value' => isset($default_values[$group->id]) ? $default_values[$group->id] : array(),
       '#attributes' => array('class' => array('mailchimp-newsletter-interests-' . $list->id)),
     );
@@ -1496,15 +1548,23 @@ function mailchimp_interest_groups_form_elements($list, $defaults = array(), $em
  * @return array
  *   A properly formatted drupal form element.
  */
-function mailchimp_insert_drupal_form_tag($mergevar) {
+function mailchimp_insert_drupal_form_tag($mergevar, $placeholder) {
   // Insert common FormAPI properties:
   $input = array(
-    '#title' => t('@mergevar', array('@mergevar' => $mergevar->name)),
     '#weight' => $mergevar->display_order,
     '#required' => $mergevar->required,
     '#default_value' => $mergevar->default_value,
-  );
 
+  );
+  $placeholder_req = $mergevar->required ? ' *' : '';
+  $title = t('@mergevar', array('@mergevar' => $mergevar->name));
+  // Check to see if we should set placeholder or #title attribute
+  if ($placeholder) {
+    $input['#attributes']['placeholder'] = $title . $placeholder_req;
+  }
+  else {
+    $input['#title'] = $title;
+  }
   switch ($mergevar->type) {
     case 'address':
       // Sub-array of address elements according to MailChimp specs.
@@ -1512,35 +1572,45 @@ function mailchimp_insert_drupal_form_tag($mergevar) {
       $input['#type'] = 'container';
       $input['#tree'] = TRUE;
       $input['addr1'] = array(
-        '#title' => t('Address 1'),
         '#type' => 'textfield',
       );
       $input['addr2'] = array(
-        '#title' => t('Address 2'),
         '#type' => 'textfield',
       );
       $input['city'] = array(
-        '#title' => t('City'),
         '#type' => 'textfield',
       );
       $input['state'] = array(
-        '#title' => t('State'),
         '#type' => 'textfield',
         '#size' => 2,
         '#maxlength' => 2,
       );
       $input['zip'] = array(
-        '#title' => t('Zip'),
         '#type' => 'textfield',
         '#size' => 6,
         '#maxlength' => 6,
       );
       $input['country'] = array(
-        '#title' => t('Country'),
         '#type' => 'textfield',
         '#size' => 2,
         '#maxlength' => 2,
       );
+      if (!$placeholder) {
+        $input['addr1']['#title'] = t('Address 1');
+        $input['addr2']['#title'] = t('Address 2');
+        $input['city']['#title'] = t('City');
+        $input['state']['#title'] = t('State');
+        $input['zip']['#title'] = t('Zip');
+        $input['country']['#title'] = t('Country');
+      }
+      else {
+        $input['addr1']['#attributes']['placeholder'] = t('Address 1') . $placeholder_req;
+        $input['addr2']['#attributes']['placeholder'] = t('Address 2') . $placeholder_req;
+        $input['city']['#attributes']['placeholder'] = t('City') . $placeholder_req;
+        $input['state']['#attributes']['placeholder'] = t('State') . $placeholder_req;
+        $input['zip']['#attributes']['placeholder'] = t('Zip') . $placeholder_req;
+        $input['country']['#attributes']['placeholder'] = t('Country') . $placeholder_req;
+      }
       break;
 
     case 'dropdown':
