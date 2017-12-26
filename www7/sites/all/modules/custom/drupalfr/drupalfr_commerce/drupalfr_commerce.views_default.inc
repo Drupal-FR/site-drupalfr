@@ -67,7 +67,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['field_membership_number']['field'] = 'field_membership_number';
   $handler->display->display_options['fields']['field_membership_number']['label'] = '';
   $handler->display->display_options['fields']['field_membership_number']['element_label_colon'] = FALSE;
-  /* Field: Commerce License: Expires */
+  /* Field: Commerce License: Expire */
   $handler->display->display_options['fields']['expires']['id'] = 'expires';
   $handler->display->display_options['fields']['expires']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['expires']['field'] = 'expires';
@@ -77,7 +77,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['expires']['date_format'] = 'custom';
   $handler->display->display_options['fields']['expires']['custom_date_format'] = 'd/m/Y';
   $handler->display->display_options['fields']['expires']['second_date_format'] = 'long';
-  /* Sort criterion: Commerce License: Expires */
+  /* Sort criterion: Commerce License: Expire */
   $handler->display->display_options['sorts']['expires']['id'] = 'expires';
   $handler->display->display_options['sorts']['expires']['table'] = 'commerce_license';
   $handler->display->display_options['sorts']['expires']['field'] = 'expires';
@@ -107,7 +107,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Commerce License: Status */
+  /* Filter criterion: Commerce License: Statut */
   $handler->display->display_options['filters']['status_1']['id'] = 'status_1';
   $handler->display->display_options['filters']['status_1']['table'] = 'commerce_license';
   $handler->display->display_options['filters']['status_1']['field'] = 'status';
@@ -418,7 +418,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['relationships']['commerce_license_target_id']['relationship'] = 'commerce_line_items_line_item_id';
   $handler->display->display_options['relationships']['commerce_license_target_id']['label'] = 'Licence';
   $handler->display->display_options['relationships']['commerce_license_target_id']['required'] = TRUE;
-  /* Relationship: Commerce License: Owner uid */
+  /* Relationship: Commerce License: Propriétaire uid */
   $handler->display->display_options['relationships']['owner']['id'] = 'owner';
   $handler->display->display_options['relationships']['owner']['table'] = 'commerce_license';
   $handler->display->display_options['relationships']['owner']['field'] = 'owner';
@@ -466,7 +466,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['field_receive_membership_card']['table'] = 'field_data_field_receive_membership_card';
   $handler->display->display_options['fields']['field_receive_membership_card']['field'] = 'field_receive_membership_card';
   $handler->display->display_options['fields']['field_receive_membership_card']['relationship'] = 'commerce_line_items_line_item_id';
-  /* Field: Commerce License: Granted */
+  /* Field: Commerce License: Accordé(e) */
   $handler->display->display_options['fields']['granted']['id'] = 'granted';
   $handler->display->display_options['fields']['granted']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
@@ -578,7 +578,7 @@ function drupalfr_commerce_views_default_views() {
     15 => 0,
     16 => 0,
   );
-  /* Filter criterion: Commerce License: Status */
+  /* Filter criterion: Commerce License: Statut */
   $handler->display->display_options['filters']['status_2']['id'] = 'status_2';
   $handler->display->display_options['filters']['status_2']['table'] = 'commerce_license';
   $handler->display->display_options['filters']['status_2']['field'] = 'status';
@@ -706,7 +706,7 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['header']['area']['content'] = '<p>Adhérer en tant que personne physique. L\'adhésion est annuelle.</p>
 <p>L\'adhésion pour les personnes morales n\'est pas disponible en ligne pour l\'instant, veuillez nous <a href="/contact">contacter</a> pour toute demande.</p>';
   $handler->display->display_options['header']['area']['format'] = '3';
-  /* Field: Commerce Product: Price */
+  /* Field: Commerce Product: Prix */
   $handler->display->display_options['fields']['commerce_price']['id'] = 'commerce_price';
   $handler->display->display_options['fields']['commerce_price']['table'] = 'field_data_commerce_price';
   $handler->display->display_options['fields']['commerce_price']['field'] = 'commerce_price';
@@ -844,25 +844,25 @@ function drupalfr_commerce_views_default_views() {
   $handler->display->display_options['fields']['license_id']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['license_id']['field'] = 'license_id';
   $handler->display->display_options['fields']['license_id']['label'] = 'Identifiant de demande';
-  /* Field: Commerce License: Status */
+  /* Field: Commerce License: Statut */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['status']['field'] = 'status';
-  /* Field: Commerce License: Granted */
+  /* Field: Commerce License: Accordé(e) */
   $handler->display->display_options['fields']['granted']['id'] = 'granted';
   $handler->display->display_options['fields']['granted']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
   $handler->display->display_options['fields']['granted']['label'] = 'Date d\'activation';
   $handler->display->display_options['fields']['granted']['date_format'] = 'long';
   $handler->display->display_options['fields']['granted']['second_date_format'] = 'long';
-  /* Field: Commerce License: Expires */
+  /* Field: Commerce License: Expire */
   $handler->display->display_options['fields']['expires']['id'] = 'expires';
   $handler->display->display_options['fields']['expires']['table'] = 'commerce_license';
   $handler->display->display_options['fields']['expires']['field'] = 'expires';
   $handler->display->display_options['fields']['expires']['label'] = 'Date d\'expiration';
   $handler->display->display_options['fields']['expires']['date_format'] = 'long';
   $handler->display->display_options['fields']['expires']['second_date_format'] = 'long';
-  /* Contextual filter: Commerce License: Owner uid */
+  /* Contextual filter: Commerce License: Propriétaire uid */
   $handler->display->display_options['arguments']['owner']['id'] = 'owner';
   $handler->display->display_options['arguments']['owner']['table'] = 'commerce_license';
   $handler->display->display_options['arguments']['owner']['field'] = 'owner';
@@ -908,7 +908,7 @@ function drupalfr_commerce_views_default_views() {
     t('Identifiant de demande'),
     t('.'),
     t(','),
-    t('Status'),
+    t('Statut'),
     t('Date d\'activation'),
     t('Date d\'expiration'),
     t('Tout'),
