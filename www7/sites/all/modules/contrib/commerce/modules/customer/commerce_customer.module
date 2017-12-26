@@ -96,7 +96,7 @@ function commerce_customer_profile_label($profile) {
   // Make sure we get a valid label callback.
   $callback = $profile_type['label_callback'];
 
-  if (!function_exists($callback)) {
+  if (!is_callable($callback)) {
     $callback = 'commerce_customer_profile_default_label';
   }
 

@@ -482,6 +482,57 @@ function commerce_cart_views_default_views_alter(&$views) {
     $handler->display->display_options['empty']['text']['field'] = 'area';
     $handler->display->display_options['empty']['text']['content'] = 'There are currently no shopping cart orders.';
     $handler->display->display_options['empty']['text']['format'] = 'plain_text';
+    $handler->display->display_options['defaults']['fields'] = FALSE;
+    /* Field: Commerce Order: Order number */
+    $handler->display->display_options['fields']['order_number']['id'] = 'order_number';
+    $handler->display->display_options['fields']['order_number']['table'] = 'commerce_order';
+    $handler->display->display_options['fields']['order_number']['field'] = 'order_number';
+    $handler->display->display_options['fields']['order_number']['link_to_order'] = 'admin';
+    /* Field: Commerce Order: Updated date */
+    $handler->display->display_options['fields']['changed']['id'] = 'changed';
+    $handler->display->display_options['fields']['changed']['table'] = 'commerce_order';
+    $handler->display->display_options['fields']['changed']['field'] = 'changed';
+    $handler->display->display_options['fields']['changed']['label'] = 'Updated';
+    $handler->display->display_options['fields']['changed']['date_format'] = 'medium';
+    /* Field: Commerce Customer profile: Address */
+    $handler->display->display_options['fields']['commerce_customer_address']['id'] = 'commerce_customer_address';
+    $handler->display->display_options['fields']['commerce_customer_address']['table'] = 'field_data_commerce_customer_address';
+    $handler->display->display_options['fields']['commerce_customer_address']['field'] = 'commerce_customer_address';
+    $handler->display->display_options['fields']['commerce_customer_address']['relationship'] = 'commerce_customer_billing_profile_id';
+    $handler->display->display_options['fields']['commerce_customer_address']['label'] = 'Name';
+    $handler->display->display_options['fields']['commerce_customer_address']['empty'] = '-';
+    $handler->display->display_options['fields']['commerce_customer_address']['hide_alter_empty'] = FALSE;
+    $handler->display->display_options['fields']['commerce_customer_address']['click_sort_column'] = 'country';
+    $handler->display->display_options['fields']['commerce_customer_address']['settings'] = array(
+      'use_widget_handlers' => 0,
+      'format_handlers' => array(
+        'name-oneline' => 'name-oneline',
+      ),
+    );
+    /* Field: User: Name */
+    $handler->display->display_options['fields']['name']['id'] = 'name';
+    $handler->display->display_options['fields']['name']['table'] = 'users';
+    $handler->display->display_options['fields']['name']['field'] = 'name';
+    $handler->display->display_options['fields']['name']['relationship'] = 'uid';
+    $handler->display->display_options['fields']['name']['label'] = 'User';
+    /* Field: Commerce Order: Order total */
+    $handler->display->display_options['fields']['commerce_order_total']['id'] = 'commerce_order_total';
+    $handler->display->display_options['fields']['commerce_order_total']['table'] = 'field_data_commerce_order_total';
+    $handler->display->display_options['fields']['commerce_order_total']['field'] = 'commerce_order_total';
+    $handler->display->display_options['fields']['commerce_order_total']['label'] = 'Total';
+    $handler->display->display_options['fields']['commerce_order_total']['click_sort_column'] = 'amount';
+    $handler->display->display_options['fields']['commerce_order_total']['settings'] = array(
+      'calculation' => FALSE,
+    );
+    /* Field: Commerce Order: Order status */
+    $handler->display->display_options['fields']['status']['id'] = 'status';
+    $handler->display->display_options['fields']['status']['table'] = 'commerce_order';
+    $handler->display->display_options['fields']['status']['field'] = 'status';
+    /* Field: Commerce Order: Operations links */
+    $handler->display->display_options['fields']['operations']['id'] = 'operations';
+    $handler->display->display_options['fields']['operations']['table'] = 'commerce_order';
+    $handler->display->display_options['fields']['operations']['field'] = 'operations';
+    $handler->display->display_options['fields']['operations']['label'] = 'Operations';
     $handler->display->display_options['defaults']['filter_groups'] = FALSE;
     $handler->display->display_options['defaults']['filters'] = FALSE;
     /* Filter criterion: Commerce Order: Order state */

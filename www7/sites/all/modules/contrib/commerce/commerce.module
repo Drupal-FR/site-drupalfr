@@ -529,7 +529,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
         'thousands_separator' => ',',
         'decimal_separator' => '.',
         'symbol_placement' => 'hidden',
-        'symbol_spacer' => ' ',
+        'symbol_spacer' => ' ',
         'code_placement' => 'after',
         'code_spacer' => ' ',
         'format_callback' => '',
@@ -1353,4 +1353,20 @@ function commerce_preprocess_entity(&$variables) {
   if ($id = entity_id($entity_type, $entity)) {
     $variables['theme_hook_suggestions'][] = $entity_type . '__' . $id;
   }
+}
+
+/**
+ * Determines whether or not the given entity object was loaded directly from
+ * the database to represent the unchanged version of the entity.
+ *
+ * @param string $entity_type
+ *   The type of $entity; for example, 'commerce_order'.
+ * @param object $entity
+ *   The entity to check.
+ *
+ * @return bool
+ *   TRUE if the entity is "unchanged", FALSE otherwise.
+ */
+function commerce_entity_is_unchanged($entity_type, $entity) {
+  return entity_get_controller($entity_type)->isUnchanged($entity);
 }

@@ -19,6 +19,9 @@ function commerce_product_pricing_hook_info() {
     'commerce_product_calculate_sell_price_line_item_alter' => array(
       'group' => 'commerce',
     ),
+    'commerce_product_calculate_sell_price_line_item' => array(
+      'group' => 'commerce',
+    ),
   );
 
   return $hooks;
@@ -148,8 +151,8 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
     }
   }
 
-  // Pass the line item to Rules.
-  rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
+  // Invoke the callback specified via the "Product pricing process" option.
+  commerce_product_pricing_invoke($line_item);
 
   return entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_unit_price->value();
 }
@@ -486,4 +489,22 @@ function commerce_product_batch_pre_calculate_sell_prices_finished($success, $re
   }
 
   drupal_set_message($message);
+}
+
+/**
+ * Invokes the sell price calculation callback configured via the
+ * "Price calculation process" option.
+ *
+ * @param $line_item
+ *   The product line item used for sell price calculation.
+ */
+function commerce_product_pricing_invoke($line_item) {
+  $callback = variable_get('commerce_product_pricing_callback', 'rules_invoke_event');
+
+  // Defaults to rules_invoke_event if the specified callback doesn't exist.
+  if (!function_exists($callback)) {
+    $callback = 'rules_invoke_event';
+  }
+
+  $callback('commerce_product_calculate_sell_price', $line_item);
 }

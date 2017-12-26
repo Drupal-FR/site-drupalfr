@@ -140,9 +140,7 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     $pane_form['payment_method']['#default_value'] = $default_value;
 
     // Add the payment method specific form elements.
-    $method_info = $order->payment_methods[$pane_form['payment_method']['#default_value']];
-    $payment_method = commerce_payment_method_load($method_info['method_id']);
-    $payment_method['settings'] = $method_info['settings'];
+    $payment_method = commerce_payment_method_instance_load($pane_form['payment_method']['#default_value']);
 
     if ($callback = commerce_payment_method_callback($payment_method, 'submit_form')) {
       $pane_form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);

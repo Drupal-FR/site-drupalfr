@@ -715,7 +715,7 @@ function commerce_checkout_pane_callback($checkout_pane, $callback) {
 
   // If the specified callback function exists, return it.
   if (!empty($checkout_pane['callbacks'][$callback]) &&
-      function_exists($checkout_pane['callbacks'][$callback])) {
+      is_callable($checkout_pane['callbacks'][$callback])) {
     return $checkout_pane['callbacks'][$callback];
   }
 
@@ -749,12 +749,20 @@ function commerce_checkout_access($order, $account = NULL) {
       return FALSE;
     }
   }
-  elseif (empty($_SESSION['commerce_cart_completed_orders']) ||
-    !in_array($order->order_id, $_SESSION['commerce_cart_completed_orders'])) {
-    // And then return FALSE if the anonymous user's session doesn't specify
-    // this order ID.
-    if (empty($_SESSION['commerce_cart_orders']) || !in_array($order->order_id, $_SESSION['commerce_cart_orders'])) {
-      return FALSE;
+  else {
+    // There's no choice but to check the current user's cart
+    // using the commerce_cart module.
+    if (module_exists('commerce_cart')) {
+      $cart_order_ids = commerce_cart_order_session_order_ids();
+      $completed_order_ids = commerce_cart_order_session_order_ids(TRUE);
+      if (empty($completed_order_ids) ||
+        !in_array($order->order_id, $completed_order_ids)) {
+        // And then return FALSE if the anonymous user's session doesn't specify
+        // this order ID.
+        if (empty($cart_order_ids) || !in_array($order->order_id, $cart_order_ids)) {
+          return FALSE;
+        }
+      }
     }
   }
 
@@ -951,6 +959,14 @@ function commerce_checkout_order_can_checkout($order) {
  * Completes the checkout process for the given order.
  */
 function commerce_checkout_complete($order) {
+  // An order could complete the checkout process more than once for a variety
+  // of reasons, including administrators making changes. We want to keep the
+  // timestamp from when the order was originally placed, so we don't update it
+  // if it is already set.
+  if (empty($order->placed)) {
+    $order->placed = REQUEST_TIME;
+  }
+
   rules_invoke_all('commerce_checkout_complete', $order);
 }
 

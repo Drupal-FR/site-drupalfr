@@ -219,6 +219,8 @@ function hook_commerce_checkout_page_info_alter(&$checkout_pages) {
  *   if not specified, defaults to the title
  * - page: the page_id of the checkout page the pane should appear on by
  *   default; defaults to ‘checkout’
+ * - fieldset:  boolean that defines if the pane should render as a fieldset
+ *   or container element.
  * - locked: boolean indicating that the pane cannot be moved from the
  *   specified checkout page.
  * - collapsible: boolean indicating whether or not the checkout pane’s fieldset

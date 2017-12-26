@@ -103,7 +103,8 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $edit = array(
       'name' => '',
       'log' => $this->randomName(),
-      'date' => format_date($timestamp, 'custom', 'Y-m-d H:i:s O'),
+      'date_created' => format_date($timestamp, 'custom', 'Y-m-d H:i:s O'),
+      'date_placed' => format_date($timestamp, 'custom', 'Y-m-d H:i:s O'),
       'status' => 'completed',
     );
 
@@ -120,13 +121,15 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $this->assertTrue($order_wrapper->uid->value() == 0, t('Order owner correctly updated'));
     $this->assertTrue($order->log == $edit['log'], t('Order log correctly updated'));
     $this->assertTrue($order_wrapper->created->value() == $timestamp, t('Order created date correctly updated'));
+    $this->assertTrue($order_wrapper->placed->value() == $timestamp, t('Order placed date correctly updated'));
     $this->assertTrue($order_wrapper->status->value() == $edit['status'], t('Order status correctly updated'));
 
     // Check if the values have been changed. Log is not checked because it
     // is a message for each revision.
     $this->pass(t('Order in screen assertions:'));
     $this->assertFieldById('edit-name', $edit['name'], t('Name correctly modified'));
-    $this->assertFieldById('edit-date', $edit['date'], t('Date changed correctly'));
+    $this->assertFieldById('edit-date-created', $edit['date_created'], t('Created date changed correctly'));
+    $this->assertFieldById('edit-date-placed', $edit['date_placed'], t('Placed date changed correctly'));
     $this->assertOptionSelected('edit-status', $edit['status'], t('Status changed'));
   }
 

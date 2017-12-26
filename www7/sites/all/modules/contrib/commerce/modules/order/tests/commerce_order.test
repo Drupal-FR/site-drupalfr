@@ -106,6 +106,7 @@ class CommerceOrderCRUDTestCase extends CommerceBaseTestCase {
     $order->mail = $this->generateEmail();
     $order->order_number = $this->randomName(10);
     $order->hostname = $this->randomName(10);
+    $order->placed = REQUEST_TIME;
     commerce_order_save($order);
 
     $this->assertEqual(token_replace('[commerce-order:order-id]', array('commerce-order' => $order)), $order->order_id, '[commerce-order:order-id] was replaced with the order ID.');
@@ -118,6 +119,7 @@ class CommerceOrderCRUDTestCase extends CommerceBaseTestCase {
     $this->assertEqual(token_replace('[commerce-order:owner:uid]', array('commerce-order' => $order)), $order->uid, '[commerce-order:owner:uid] was replaced with the uid of the owner.');
     $this->assertEqual(token_replace('[commerce-order:owner:name]', array('commerce-order' => $order)), check_plain(format_username($creator)), '[commerce-order:owner:name] was replaced with the name of the owner.');
     $this->assertEqual(token_replace('[commerce-order:created]', array('commerce-order' => $order)), format_date($order->created, 'medium'), '[commerce-order:created] was replaced with the created date.');
+    $this->assertEqual(token_replace('[commerce-order:placed]', array('commerce-order' => $order)), format_date($order->placed, 'medium'), '[commerce-order:placed] was replaced with the placed date.');
     $this->assertEqual(token_replace('[commerce-order:changed]', array('commerce-order' => $order)), format_date($order->changed, 'medium'), '[commerce-order:changed] was replaced with the changed date.');
   }
 }

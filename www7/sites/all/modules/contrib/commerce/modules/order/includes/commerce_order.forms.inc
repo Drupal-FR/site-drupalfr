@@ -25,10 +25,6 @@ function commerce_order_order_form($form, &$form_state, $order) {
     }
   }
 
-  if (empty($order->created)) {
-    $order->date = format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i:s O');
-  }
-
   // Add the field related form elements.
   $form_state['commerce_order'] = $order;
   field_attach_form('commerce_order', $order, $form, $form_state);
@@ -122,6 +118,9 @@ function commerce_order_order_form($form, &$form_state, $order) {
   );
 
   // Add a log checkbox and timestamp field to a history tab.
+  $created_timestamp = empty($order->created) ? REQUEST_TIME : $order->created;
+  $placed_timestamp = empty($order->placed) ? REQUEST_TIME : $order->placed;
+
   $form['order_history'] = array(
     '#type' => 'fieldset',
     '#title' => t('Order history', array(), array('context' => 'a drupal commerce order')),
@@ -140,12 +139,19 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#default_value' => variable_get('commerce_order_auto_revision', TRUE),
     '#access' => user_access('administer commerce_order entities'),
   );
-  $form['order_history']['date'] = array(
+  $form['order_history']['date_created'] = array(
     '#type' => 'textfield',
     '#title' => t('Created on'),
-    '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($order->date) ? date_format(date_create($order->date), 'Y-m-d H:i:s O') : format_date($order->created, 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($order->date) ? date_format(date_create($order->date), 'O') : format_date($order->created, 'custom', 'O'))),
+    '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => format_date($created_timestamp, 'custom', 'Y-m-d H:i:s O'), '%timezone' => format_date($created_timestamp, 'custom', 'O'))),
     '#maxlength' => 25,
     '#default_value' => !empty($order->created) ? format_date($order->created, 'custom', 'Y-m-d H:i:s O') : '',
+  );
+  $form['order_history']['date_placed'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Placed on'),
+    '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC.', array('%time' => format_date($placed_timestamp, 'custom', 'Y-m-d H:i:s O'), '%timezone' => format_date($placed_timestamp, 'custom', 'O'))),
+    '#maxlength' => 25,
+    '#default_value' => !empty($order->placed) ? format_date($order->placed, 'custom', 'Y-m-d H:i:s O') : '',
   );
   $form['order_history']['created'] = array(
     '#type' => 'hidden',
@@ -156,6 +162,11 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#type' => 'hidden',
     '#value' => !empty($order->changed) ? format_date($order->changed, 'short') : '',
     '#attributes' => array('id' => 'edit-changed'),
+  );
+  $form['order_history']['placed'] = array(
+    '#type' => 'hidden',
+    '#value' => !empty($order->placed) ? format_date($order->placed, 'short') : '',
+    '#attributes' => array('id' => 'edit-placed'),
   );
 
   // We add the form's #submit array to this button along with the actual submit
@@ -195,8 +206,13 @@ function commerce_order_order_form_validate($form, &$form_state) {
   }
 
   // Validate the "created on" field.
-  if (!empty($form_state['values']['date']) && strtotime($form_state['values']['date']) === FALSE) {
-    form_set_error('date', t('You have to specify a valid date.'));
+  if (!empty($form_state['values']['date_created']) && strtotime($form_state['values']['date_created']) === FALSE) {
+    form_set_error('date', t('You have to specify a valid order creation date.'));
+  }
+
+  // Validate the "placed on" field.
+  if (!empty($form_state['values']['date_placed']) && strtotime($form_state['values']['date_placed']) === FALSE) {
+    form_set_error('date', t('You have to specify a valid order placement date.'));
   }
 
   // Validate the e-mail address entered.
@@ -256,7 +272,10 @@ function commerce_order_order_form_submit($form, &$form_state) {
     $order->mail = $form_state['values']['mail'];
   }
 
-  $order->created = !empty($form_state['values']['date']) ? strtotime($form_state['values']['date']) : REQUEST_TIME;
+  $order->created = !empty($form_state['values']['date_created']) ? strtotime($form_state['values']['date_created']) : REQUEST_TIME;
+  if (!empty($form_state['values']['date_placed'])) {
+    $order->placed = strtotime($form_state['values']['date_placed']);
+  }
 
   // Notify field widgets.
   field_attach_submit('commerce_order', $order, $form, $form_state);

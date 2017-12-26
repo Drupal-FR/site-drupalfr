@@ -26,6 +26,10 @@ Drupal.behaviors.orderFieldsetSummaries = {
         Drupal.t('Created @date', { '@date' : $('#edit-created').val() }) :
         Drupal.t('New order');
 
+      if ($('#edit-placed', context).val()) {
+        summary += '<br />' + Drupal.t('Placed @date', { '@date' : $('#edit-placed').val() });
+      }
+
       // Add the changed date to the summary if it's different from the created.
       if ($('#edit-created', context).val() != $('#edit-changed', context).val()) {
         summary += '<br />' + Drupal.t('Updated @date', { '@date' : $('#edit-changed').val() });

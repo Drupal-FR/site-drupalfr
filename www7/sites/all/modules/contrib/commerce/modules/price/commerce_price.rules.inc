@@ -54,7 +54,7 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
         $default_amount = $value['amount'];
       }
       else {
-        commerce_round(COMMERCE_ROUND_HALF_UP, $value['amount']);
+        $default_amount = commerce_round(COMMERCE_ROUND_HALF_UP, $value['amount']);
       }
 
       // Format the number to the proper decimal places for the textfield.

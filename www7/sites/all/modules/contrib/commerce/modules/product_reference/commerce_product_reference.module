@@ -325,6 +325,41 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
     return;
   }
 
+  // Determine if the referencing bundle specifies custom settings
+  // for the view mode currently displayed.
+  $bundle_settings = field_bundle_settings($entity_type, $bundle);
+
+  if (isset($bundle_settings['view_modes'][$view_mode]) && !empty($bundle_settings['view_modes'][$view_mode]['custom_settings'])) {
+    $reference_view_mode = $view_mode;
+  }
+  else {
+    $reference_view_mode = 'default';
+  }
+  // Don't try to perform the field injection by default.
+  $perform_field_injection = FALSE;
+
+  // Retrieve the real extra fields settings.
+  $display = field_extra_fields_get_display($entity_type, $bundle, $reference_view_mode);
+
+  if (!empty($display)) {
+    // Loop over the extra fields and see if at least one of the injected field
+    // is visible.
+    foreach ($display as $key => $extra_field) {
+      if (strpos($key, 'product:') !== 0) {
+        continue;
+      }
+      if (!empty($extra_field['visible'])) {
+        $perform_field_injection = TRUE;
+        break;
+      }
+    }
+  }
+
+  // Stop here if we don't have any field to inject.
+  if (!$perform_field_injection) {
+    return;
+  }
+
   // Resolve the product module path for use in the loop below.
   $product_module_path = drupal_get_path('module', 'commerce_product');
 
@@ -341,7 +376,8 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
       $instances = field_info_instances($entity_type, $bundle);
     }
 
-    if (isset($instances[$field_name])) {
+    // If the reference field enables field injection.
+    if (isset($instances[$field_name]) && !empty($instances[$field_name]['settings']['field_injection'])) {
       // If the field is missing a value, continue to next reference field.
       if (empty($entity->{$field_name})) {
         continue;
@@ -349,7 +385,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
 
       // Load a wrapper for the entity being viewed.
       if (empty($wrapper)) {
-        $wrapper = entity_metadata_wrapper($entity_type, $entity);
+        $wrapper = entity_metadata_wrapper($entity_type, $entity)->language($langcode);
       }
 
       // Fetch the product reference field value.
@@ -383,8 +419,8 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         }
       }
 
-      // If we found a product and the reference field enables field injection...
-      if (!empty($product) && $instances[$field_name]['settings']['field_injection']) {
+      // If we found a product.
+      if (!empty($product)) {
         // Add the display context for these field to the product.
         $product->display_context = array(
           'entity_type' => $entity_type,
@@ -1045,7 +1081,12 @@ function commerce_product_reference_options_list($field, $instance = NULL) {
     $limit = (int) $field['settings']['options_list_limit'];
   }
   else {
-    $limit = 10;
+    // If there is no such limit, then default it to NULL (i.e. no limit) unless
+    // a variable has been set that provides an alternate default. This is
+    // usually required when product matching has been configured to use an
+    // EntityFieldQuery instead of the standard db_select(). Refer to the inline
+    // comments in commerce_product_match_products() for more information.
+    $limit = variable_get('commerce_product_reference_default_options_list_limit', NULL);
   }
 
   // Loop through all product matches.

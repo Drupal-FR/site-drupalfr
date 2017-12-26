@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * @file
+ * Unit tests for credit card detection.
+ */
+
+/**
+ * Tests credit card detection.
+ */
+class CommercePaymentCreditCardTest extends DrupalUnitTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Credit card detection testing',
+      'description' => 'Tests credit card definitions.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.credit_card');
+  }
+
+  /**
+   * Tests type detection.
+   */
+  public function testValidateNumber() {
+    // Structure: Number, Type, Valid.
+    $data = array(
+      // Non-numeric value.
+      array('invalid', NULL, FALSE),
+      // Invalid length.
+      array(41111111111111111, 'visa', FALSE),
+      // Fails luhn check.
+      array(41111111111111112, 'visa', FALSE),
+      // Valid numbers.
+      array(4111111111111111, 'visa', TRUE),
+      array(6759649826438453, 'maestro', TRUE),
+      array(3528000700000000, 'jcb', TRUE),
+      array(5555555555554444, 'mastercard', TRUE),
+      array(36700102000000, 'dc', TRUE),
+      array(30569309025904, 'dc', TRUE),
+      array(38520000023237, 'dc', TRUE),
+      array(6011000400000000, 'discover', TRUE),
+      array(6208205838887174, 'unionpay', TRUE),
+      array(374251018720018, 'amex', TRUE),
+      // Visa Electron card.
+      array(4917300800000000, 'visa', TRUE),
+    );
+
+    foreach ($data as $datum) {
+      $type = CommercePaymentCreditCard::detectType($datum[0]);
+      if (!$type) {
+        $this->assertEqual(NULL, $datum[1]);
+      }
+      else {
+        $this->assertEqual($type['id'], $datum[1]);
+        $this->assertEqual($datum[2], CommercePaymentCreditCard::validateNumber($datum[0], $type));
+      }
+    }
+  }
+
+  /**
+   * Tests expiration date validation.
+   */
+  public function testValidateExpirationDate() {
+    $data = array(
+      // Invalid month.
+      array(0, 2020, FALSE),
+      array(13, 2020, FALSE),
+      // Invalid year.
+      array(10, 2012, FALSE),
+      // Valid month and year.
+      array(date('n'), date('Y'), TRUE),
+    );
+
+    foreach ($data as $datum) {
+      $result = CommercePaymentCreditCard::validateExpirationDate($datum[0], $datum[1]);
+      $this->assertEqual($datum[2], $result);
+    }
+  }
+
+  /**
+   * @covers ::calculateExpirationTimestamp
+   */
+  public function testCalculateExpirationTimestamp() {
+    $timestamp = CommercePaymentCreditCard::calculateExpirationTimestamp(12, 2012);
+    $date = date('Y-m-d H:i:s', $timestamp);
+    $expected_date = date('2012-12-31 00:00:00');
+    $this->assertEqual($expected_date, $date);
+  }
+
+  /**
+   * @covers ::validateSecurityCode
+   */
+  public function testsValidateSecurityCode() {
+    $data = array(
+      // Invalid lengths.
+      array(1, 'visa', FALSE),
+      array(1111, 'visa', FALSE),
+      // Non-numeric inputs.
+      array('llama', 'visa', FALSE),
+      array('12.4', 'visa', FALSE),
+      // Valid number.
+      array(111, 'visa', TRUE),
+    );
+    $types = CommercePaymentCreditCard::getTypes();
+    foreach ($data as $datum) {
+      $result = CommercePaymentCreditCard::validateSecurityCode($datum[0], $types[$datum[1]]);
+      $this->assertEqual($datum[2], $result);
+    }
+  }
+
+}

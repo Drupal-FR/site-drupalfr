@@ -79,6 +79,8 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
       );
     }
   }
+  // Retrieve the current Product pricing callback currently configured.
+  $product_pricing_callback = variable_get('commerce_product_pricing_callback', 'rules_invoke_event');
 
   $form['commerce_product_sell_price_pre_calculation'] = array(
     '#type' => 'radios',
@@ -93,6 +95,7 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
       // 'automated_batch' => t('Manual batch pre-calculation with automated updates'),
     ),
     '#default_value' => variable_get('commerce_product_sell_price_pre_calculation', 'disabled'),
+    '#disabled' => $product_pricing_callback != 'rules_invoke_event',
   );
 
   // If price pre-calculation is enabled, prevent options to bypass rules.
@@ -137,6 +140,29 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
     }
   }
 
+  $form['commerce_product_pricing_callback'] = array(
+    '#type' => 'radios',
+    '#title' => t('Price calculation process'),
+    '#description' => t('You can only allow modules to directly engage in product pricing when pre-calculation is disabled.'),
+    '#options' => array(
+      'rules_invoke_event' => t('Evaluate pricing rules in order'),
+      'rules_invoke_all' => t('Evaluate module based pricing routines then invoke pricing rules in order'),
+    ),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="commerce_product_sell_price_pre_calculation"]' => array('value' => 'disabled'),
+      ),
+    ),
+    '#default_value' => $product_pricing_callback,
+  );
+  // If the Product pricing callback configured is set to "module_invoke_all"
+  // disable the element and update the description.
+  if ($product_pricing_callback == 'module_invoke_all') {
+    $form['commerce_product_pricing_callback']['#options']['module_invoke_all'] = t('Only invoke module based pricing routines');
+    $form['commerce_product_pricing_callback']['#description'] .= ' ' . t("This value has been set in your site's codebase and cannot be changed via this form.");
+    $form['commerce_product_pricing_callback']['#disabled'] = TRUE;
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save configuration'),
@@ -154,8 +180,18 @@ function commerce_product_pre_calculation_settings_form_submit($form, &$form_sta
   // Save variables on the form regardless of the button pressed.
   variable_set('commerce_product_sell_price_pre_calculation', $values['commerce_product_sell_price_pre_calculation']);
 
-  if (!empty($form_state['values']['commerce_product_sell_price_pre_calculation_rules_bypass'])) {
-    variable_set('commerce_product_sell_price_pre_calculation_rules_bypass', $form_state['values']['commerce_product_sell_price_pre_calculation_rules_bypass']);
+  if (!empty($values['commerce_product_sell_price_pre_calculation_rules_bypass'])) {
+    variable_set('commerce_product_sell_price_pre_calculation_rules_bypass', $values['commerce_product_sell_price_pre_calculation_rules_bypass']);
+  }
+  if (!empty($values['commerce_product_pricing_callback'])) {
+    if ($values['commerce_product_sell_price_pre_calculation'] == 'disabled') {
+      variable_set('commerce_product_pricing_callback', $values['commerce_product_pricing_callback']);
+    }
+    else {
+      // If the pre calculation is enabled, revert the Product pricing process
+      // to default.
+      variable_del('commerce_product_pricing_callback');
+    }
   }
 
   // React to the management buttons if they were used to submit the form.

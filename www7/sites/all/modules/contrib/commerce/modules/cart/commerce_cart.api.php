@@ -217,7 +217,7 @@ function hook_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_st
  *   A clone of the line item being added to the cart. Since this is a clone,
  *   changes made to it will not propagate up to the Add to Cart process.
  */
-function hook_commerce_cart_product_comparison_properties_alter(&$comparison_properties) {
+function hook_commerce_cart_product_comparison_properties_alter(&$comparison_properties, $line_item) {
   // Force separate line items when the same product is added to the cart from
   // different display paths.
   $comparison_properties[] = 'commerce_display_path';

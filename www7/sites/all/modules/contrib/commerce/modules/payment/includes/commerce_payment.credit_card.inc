@@ -238,7 +238,7 @@ function commerce_payment_credit_card_validate($details, $settings) {
   }
 
   // Validate the security code if present.
-  if (isset($details['code']) && !commerce_payment_validate_credit_card_security_code($details['number'], $details['code'])) {
+  if (!empty($details['code']) && !commerce_payment_validate_credit_card_security_code($details['number'], $details['code'])) {
     form_set_error($prefix . 'code', t('You have entered an invalid card security code.'));
     $valid = FALSE;
   }
@@ -261,9 +261,9 @@ function commerce_payment_credit_card_validate($details, $settings) {
 /**
  * Validates a credit card number using an array of approved card types.
  *
- * @param $number
+ * @param int $number
  *   The credit card number to validate.
- * @param $card_types
+ * @param array $card_types
  *   An array of credit card types containing any of the keys from the array
  *   returned by commerce_payment_credit_card_types(). Only numbers determined
  *   to be of the types specified will pass validation. This determination is
@@ -272,149 +272,19 @@ function commerce_payment_credit_card_validate($details, $settings) {
  *
  * @return
  *   FALSE if a number is not valid based on approved credit card types or the
- *   credit card type if it is valid and coud be determined.
+ *   credit card type if it is valid and could be determined.
  *
  * @see http://en.wikipedia.org/wiki/Bank_card_number#Issuer_Identification_Number_.28IIN.29
  * @see commerce_payment_credit_card_types()
  */
-function commerce_payment_validate_credit_card_type($number, $card_types) {
-  $strlen = strlen($number);
+function commerce_payment_validate_credit_card_type($number, array $card_types = array()) {
+  $type = CommercePaymentCreditCard::detectType($number);
 
-  // Provide a check on the first digit (and card length if applicable).
-  switch (substr($number, 0, 1)) {
-    case '3':
-      // American Express begins with 3 and is 15 numbers.
-      if ($strlen == 15 && in_array('amex', $card_types)) {
-        return 'amex';
-      }
-
-      // JCB begins with 3528-3589 and is 16 numbers.
-      if ($strlen == 16 && in_array('jcb', $card_types)) {
-        return 'jcb';
-      }
-
-      // Carte Blanche begins with 300-305 and is 14 numbers.
-      // Diners Club International begins 36 and is 14 numbers.
-      if ($strlen == 14) {
-        $initial = (int) substr($number, 0, 3);
-
-        if ($initial >= 300 && $initial <= 305 && in_array('cb', $card_types)) {
-          return 'cb';
-        }
-
-        if (substr($number, 0, 2) == '36' && in_array('dci', $card_types)) {
-          return 'dci';
-        }
-      }
-
-      return FALSE;
-
-    case '4':
-      $initial = (int) substr($number, 0, 4);
-      $return = FALSE;
-
-      if ($strlen == 16) {
-        // Visa begins with 4 and is 16 numbers.
-        if (in_array('visa', $card_types)) {
-          $return = 'visa';
-        }
-
-        // Visa Electron begins with 4026, 417500, 4256, 4508, 4844, 4913, or
-        // 4917 and is 16 numbers.
-        if (in_array($initial, array(4026, 4256, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500') {
-          $return = in_array('visaelectron', $card_types) ? 'visaelectron' : FALSE;
-        }
-      }
-
-      // Switch begins with 4903, 4905, 4911, or 4936 and is 16, 18, or 19
-      // numbers.
-      if (in_array($strlen, array(16, 18, 19)) &&
-        in_array($initial, array(4903, 4905, 4911, 4936))) {
-        $return = in_array('switch', $card_types) ? 'switch' : FALSE;
-      }
-
-      return $return;
-
-    case '5':
-      // MasterCard begins with 51-55 and is 16 numbers.
-      // Diners Club begins with 54 or 55 and is 16 numbers.
-      if ($strlen == 16) {
-        $initial = (int) substr($number, 0, 2);
-
-        if ($initial >= 51 && $initial <= 55 && in_array('mastercard', $card_types)) {
-          return 'mastercard';
-        }
-
-        if ($initial >= 54 && $initial <= 55 && in_array('dc', $card_types)) {
-          return 'dc';
-        }
-      }
-
-      // Switch begins with 564182 and is 16, 18, or 19 numbers.
-      if (in_array('switch', $card_types) && substr($number, 0, 6) == '564182' &&
-        in_array($strlen, array(16, 18, 19))) {
-        return 'switch';
-      }
-
-      // Maestro begins with 5018, 5020, or 5038 and is 12-19 numbers.
-      if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
-        in_array(substr($number, 0, 4), array(5018, 5020, 5038))) {
-        return 'maestro';
-      }
-
-      return FALSE;
-
-    case '6':
-      // Discover begins with 6011, 622126-622925, 644-649, or 65 and is 16
-      // numbers.
-      if ($strlen == 16 && in_array('discover', $card_types)) {
-        if (substr($number, 0, 4) == '6011' || substr($number, 0, 2) == '65') {
-          return 'discover';
-        }
-
-        $initial = (int) substr($number, 0, 6);
-
-        if ($initial >= 622126 && $initial <= 622925) {
-          return 'discover';
-        }
-
-        $initial = (int) substr($number, 0, 3);
-
-        if ($initial >= 644 && $initial <= 649) {
-          return 'discover';
-        }
-      }
-
-      // Laser begins with 6304, 6706, 6771, or 6709 and is 16-19 numbers.
-      $initial = (int) substr($number, 0, 4);
-
-      if (in_array('laser', $card_types) && $strlen >= 16 && $strlen <= 19 &&
-        in_array($initial, array(6304, 6706, 6771, 6709))) {
-        return 'laser';
-      }
-
-      // Maestro begins with 6304, 6759, 6761, or 6763 and is 12-19 numbers.
-      if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
-        in_array($initial, array(6304, 6759, 6761, 6763))) {
-        return 'maestro';
-      }
-
-      // Solo begins with 6334 or 6767 and is 16, 18, or 19 numbers.
-      if (in_array('solo', $card_types) && in_array($strlen, array(16, 18, 19)) &&
-        in_array($initial, array(6334, 6767))) {
-        return 'solo';
-      }
-
-      // Switch begins with 633110, 6333, or 6759 and is 16, 18, or 19 numbers.
-      if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
-        (in_array($initial, array(6333, 6759)) || substr($number, 0, 6) == 633110)) {
-        return 'switch';
-      }
-
-      return FALSE;
+  if (!$type || !in_array($type['id'], $card_types)) {
+    return FALSE;
   }
 
-  return FALSE;
+  return $type['id'];
 }
 
 /**
@@ -429,38 +299,16 @@ function commerce_payment_validate_credit_card_type($number, $card_types) {
  * @see http://www.merriampark.com/anatomycc.htm
  */
 function commerce_payment_validate_credit_card_number($number) {
-  // Ensure every character in the number is numeric.
-  if (!ctype_digit($number)) {
-    return FALSE;
-  }
-
-  // Validate the number using the Luhn algorithm.
-  $total = 0;
-
-  for ($i = 0; $i < strlen($number); $i++) {
-    $digit = substr($number, $i, 1);
-    if ((strlen($number) - $i - 1) % 2) {
-      $digit *= 2;
-      if ($digit > 9) {
-        $digit -= 9;
-      }
-    }
-    $total += $digit;
-  }
-
-  if ($total % 10 != 0) {
-    return FALSE;
-  }
-
-  return TRUE;
+  $type = CommercePaymentCreditCard::detectType($number);
+  return CommercePaymentCreditCard::validateNumber($number, $type);
 }
 
 /**
  * Validates a credit card start date.
  *
- * @param $month
+ * @param int $month
  *   The 1 or 2-digit numeric representation of the month, i.e. 1, 6, 12.
- * @param $year
+ * @param int $year
  *   The 4-digit numeric representation of the year, i.e. 2010.
  *
  * @return
@@ -496,9 +344,9 @@ function commerce_payment_validate_credit_card_start_date($month, $year) {
 /**
  * Validates a credit card expiration date.
  *
- * @param $month
+ * @param int $month
  *   The 1 or 2-digit numeric representation of the month, i.e. 1, 6, 12.
- * @param $year
+ * @param int $year
  *   The 4-digit numeric representation of the year, i.e. 2010.
  *
  * @return
@@ -506,20 +354,7 @@ function commerce_payment_validate_credit_card_start_date($month, $year) {
  *   which value should receive the error.
  */
 function commerce_payment_validate_credit_card_exp_date($month, $year) {
-  if ($month < 1 || $month > 12) {
-    return 'month';
-  }
-
-  if ($year < date('Y')) {
-    return 'year';
-  }
-  elseif ($year == date('Y')) {
-    if ($month < date('n')) {
-      return 'month';
-    }
-  }
-
-  return TRUE;
+  return CommercePaymentCreditCard::validateExpirationDate($month, $year);
 }
 
 /**
@@ -545,45 +380,271 @@ function commerce_payment_validate_credit_card_issue($issue) {
  *   TRUE or FALSE indicating the security code's validity.
  */
 function commerce_payment_validate_credit_card_security_code($number, $code) {
-  // Ensure the code is numeric.
-  if (!ctype_digit($code)) {
-    return FALSE;
-  }
-
-  // Check the length based on the type of the credit card.
-  switch (substr($number, 0, 1)) {
-    case '3':
-      if (strlen($number) == 15) {
-        return strlen($code) == 4;
-      }
-      else {
-        return strlen($code) == 3;
-      }
-
-    case '4':
-    case '5':
-    case '6':
-      return strlen($code) == 3;
-  }
+  $type = CommercePaymentCreditCard::detectType($number);
+  return CommercePaymentCreditCard::validateSecurityCode($code, $type);
 }
 
 /**
  * Returns an associative array of credit card types.
+ *
+ * Provides BC layer for CommercePaymentCreditCard::getTypeLabels().
+ *
+ * @see CommercePaymentCreditCard::getTypeLabels()
+ *
+ * @return array
+ *   An array keyed by card type with card type label.
  */
 function commerce_payment_credit_card_types() {
-  return array(
-    'visa' => t('Visa'),
-    'mastercard' => t('MasterCard'),
-    'amex' => t('American Express'),
-    'discover' => t('Discover Card'),
-    'dc' => t("Diners Club"),
-    'dci' => t("Diners Club International"),
-    'cb' => t("Carte Blanche"),
-    'jcb' => t('JCB'),
-    'maestro' => t('Maestro'),
-    'visaelectron' => t('Visa Electron'),
-    'laser' => t('Laser'),
-    'solo' => t('Solo'),
-    'switch' => t('Switch'),
-  );
+  return CommercePaymentCreditCard::getTypeLabels();
+}
+
+/**
+ * Provides logic for listing card types and validating card details.
+ */
+final class CommercePaymentCreditCard {
+
+  /**
+   * Gets all available credit card types.
+   *
+   * @return array
+   *   The credit card types.
+   */
+  public static function getTypes() {
+    $definitions = array(
+      'visa' => array(
+        'id' => 'visa',
+        'label' => t('Visa'),
+        'number_prefixes' => array('4'),
+      ),
+      'mastercard' => array(
+        'id' => 'mastercard',
+        'label' => t('MasterCard'),
+        'number_prefixes' => array('51-55', '222100-272099'),
+      ),
+      'maestro' => array(
+        'id' => 'maestro',
+        'label' => t('Maestro'),
+        'number_prefixes' => array(
+          '5018', '5020', '5038', '5612', '5893', '6304',
+          '6759', '6761', '6762', '6763', '0604', '6390',
+        ),
+        'number_lengths' => array(12, 13, 14, 15, 16, 17, 18, 19),
+      ),
+      'amex' => array(
+        'id' => 'amex',
+        'label' => t('American Express'),
+        'number_prefixes' => array('34', '37'),
+        'number_lengths' => array(15),
+        'security_code_length' => 4,
+      ),
+      'dc' => array(
+        'id' => 'dc',
+        'label' => t('Diners Club'),
+        'number_prefixes' => array('300-305', '309', '36', '38', '39'),
+        'number_lengths' => array(14),
+      ),
+      'discover' => array(
+        'id' => 'discover',
+        'label' => t('Discover Card'),
+        'number_prefixes' => array('6011', '622126-622925', '644-649', '65'),
+        'number_lengths' => array(16, 19),
+      ),
+      'jcb' => array(
+        'id' => 'jcb',
+        'label' => t('JCB'),
+        'number_prefixes' => array('3528-3589'),
+      ),
+      'unionpay' => array(
+        'id' => 'unionpay',
+        'label' => t('UnionPay'),
+        'number_prefixes' => array('62', '88'),
+        'number_lengths' => array(16, 17, 18, 19),
+        'uses_luhn' => FALSE,
+      ),
+    );
+
+    foreach ($definitions as &$definition) {
+      $definition += array(
+        'number_lengths' => array(16),
+        'security_code_length' => 3,
+        'uses_luhn' => TRUE,
+      );
+    }
+
+    return $definitions;
+  }
+
+  /**
+   * Gets the labels of all available credit card types.
+   *
+   * @return array
+   *   The labels, keyed by ID.
+   */
+  public static function getTypeLabels() {
+    $type_labels = array();
+
+    foreach (self::getTypes() as $type) {
+      $type_labels[$type['id']] = $type['label'];
+    }
+
+    return $type_labels;
+  }
+
+  /**
+   * Detects the credit card type based on the number.
+   *
+   * @param string $number
+   *   The credit card number.
+   *
+   * @return array|false
+   *   The credit card type, or NULL if unknown.
+   */
+  public static function detectType($number) {
+    if (!is_numeric($number)) {
+      return FALSE;
+    }
+    $types = self::getTypes();
+    foreach ($types as $type) {
+      foreach ($type['number_prefixes'] as $prefix) {
+        if (self::matchPrefix($number, $prefix)) {
+          return $type;
+        }
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Checks whether the given credit card number matches the given prefix.
+   *
+   * @param string $number
+   *   The credit card number.
+   * @param string $prefix
+   *   The prefix to match against. Can be a single number such as '43' or a
+   *   range such as '30-35'.
+   *
+   * @return bool
+   *   TRUE if the credit card number matches the prefix, FALSE otherwise.
+   */
+  public static function matchPrefix($number, $prefix) {
+    if (is_numeric($prefix)) {
+      return substr($number, 0, strlen($prefix)) == $prefix;
+    }
+    else {
+      list($start, $end) = explode('-', $prefix);
+      $number = substr($number, 0, strlen($start));
+      return $number >= $start && $number <= $end;
+    }
+  }
+
+  /**
+   * Validates the given credit card number.
+   *
+   * @param string $number
+   *   The credit card number.
+   * @param array $type
+   *   The credit card type.
+   *
+   * @return bool
+   *   TRUE if the credit card number is valid, FALSE otherwise.
+   */
+  public static function validateNumber($number, array $type) {
+    if (!is_numeric($number)) {
+      return FALSE;
+    }
+    if (!in_array(strlen($number), $type['number_lengths'])) {
+      return FALSE;
+    }
+    if ($type['uses_luhn'] && !self::validateLuhn($number)) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Validates the given credit card number using the Luhn algorithm.
+   *
+   * @param string $number
+   *   The credit card number.
+   *
+   * @return bool
+   *   TRUE if the credit card number is valid, FALSE otherwise.
+   */
+  public static function validateLuhn($number) {
+    $total = 0;
+    foreach (array_reverse(str_split($number)) as $i => $digit) {
+      $digit = $i % 2 ? $digit * 2 : $digit;
+      $digit = $digit > 9 ? $digit - 9 : $digit;
+      $total += $digit;
+    }
+    return ($total % 10 === 0);
+  }
+
+  /**
+   * Validates the given credit card expiration date.
+   *
+   * @param string $month
+   *   The 1 or 2-digit numeric representation of the month, i.e. 1, 6, 12.
+   * @param string $year
+   *   The 4-digit numeric representation of the year, i.e. 2010.
+   *
+   * @return bool
+   *   TRUE if the credit card expiration date is valid, FALSE otherwise.
+   */
+  public static function validateExpirationDate($month, $year) {
+    if ($month < 1 || $month > 12) {
+      return FALSE;
+    }
+    if ($year < date('Y')) {
+      return FALSE;
+    }
+    elseif ($year == date('Y') && $month < date('n')) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Calculates the unix timestamp for a credit card expiration date.
+   *
+   * @param string $month
+   *   The 1 or 2-digit numeric representation of the month, i.e. 1, 6, 12.
+   * @param string $year
+   *   The 4-digit numeric representation of the year, i.e. 2010.
+   *
+   * @return int
+   *   The expiration date as a unix timestamp.
+   */
+  public static function calculateExpirationTimestamp($month, $year) {
+    // Credit cards expire on the last day of the month.
+    $month_start = strtotime($year . '-' . $month . '-01');
+    $last_day = date('t', $month_start);
+    return strtotime($year . '-' . $month . '-' . $last_day);
+  }
+
+  /**
+   * Validates the given credit card security code.
+   *
+   * @param string $security_code
+   *   The credit card security code.
+   * @param array $type
+   *   The credit card type.
+   *
+   * @return bool
+   *   TRUE if the credit card security code is valid, FALSE otherwise.
+   */
+  public static function validateSecurityCode($security_code, array $type) {
+    if (!is_numeric($security_code)) {
+      return FALSE;
+    }
+    if (strlen($security_code) != $type['security_code_length']) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
 }

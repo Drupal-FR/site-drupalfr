@@ -76,6 +76,11 @@ function commerce_order_token_info() {
     'description' => t('The date the order was last updated.'),
     'type' => 'date',
   );
+  $order['placed'] = array(
+    'name' => t('Date placed'),
+    'description' => t('The date the order was placed i.e. checkout was completed.'),
+    'type' => 'date',
+  );
 
   return array(
     'types' => array('commerce-order' => $type),
@@ -169,6 +174,10 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
         case 'changed':
           $replacements[$original] = format_date($order->changed, 'medium', '', NULL, $language_code);
           break;
+
+        case 'placed':
+          $replacements[$original] = format_date($order->changed, 'medium', '', NULL, $language_code);
+          break;
       }
     }
 
@@ -178,7 +187,7 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
       $replacements += token_generate('user', $owner_tokens, array('user' => $owner), $options);
     }
 
-    foreach (array('created', 'changed') as $date) {
+    foreach (array('created', 'changed', 'placed') as $date) {
       if ($created_tokens = token_find_with_prefix($tokens, $date)) {
         $replacements += token_generate('date', $created_tokens, array('date' => $order->{$date}), $options);
       }
