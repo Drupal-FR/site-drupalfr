@@ -29,18 +29,33 @@ third_party_settings:
         - group_cta
         - group_media
       parent_name: ''
-      weight: 20
+      weight: 0
       format_type: tabs
       format_settings:
         id: ''
         classes: ''
         direction: vertical
       label: Tabs
+      region: content
     group_heading:
       children:
         - field_title
         - field_title_level
         - field_sub_title
+      parent_name: group_tabs
+      weight: 23
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: En-tête
+      region: content
+    group_text:
+      children:
+        - field_text
       parent_name: group_tabs
       weight: 24
       format_type: tab
@@ -50,10 +65,11 @@ third_party_settings:
         formatter: closed
         description: ''
         required_fields: true
-      label: En-tête
-    group_text:
+      label: Texte
+      region: content
+    group_cta:
       children:
-        - field_text
+        - field_call_to_action
       parent_name: group_tabs
       weight: 25
       format_type: tab
@@ -63,10 +79,13 @@ third_party_settings:
         formatter: closed
         description: ''
         required_fields: true
-      label: Texte
-    group_cta:
+      label: CTA
+      region: content
+    group_media:
       children:
-        - field_call_to_action
+        - field_media
+        - field_media_width_class
+        - field_media_position
       parent_name: group_tabs
       weight: 26
       format_type: tab
@@ -76,22 +95,8 @@ third_party_settings:
         formatter: closed
         description: ''
         required_fields: true
-      label: CTA
-    group_media:
-      children:
-        - field_media
-        - field_media_width_class
-        - field_media_position
-      parent_name: group_tabs
-      weight: 27
-      format_type: tab
-      format_settings:
-        id: ''
-        classes: ''
-        formatter: closed
-        description: ''
-        required_fields: true
       label: Média
+      region: content
     group_configuration:
       children:
         - field_css_class
@@ -105,6 +110,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: Configuration
+      region: content
 _core:
   default_config_hash: rpwIOa63kqGpiVszyR-oVYOJab9ce3-_VCGwNP6Wrq4
 id: paragraph.title_text_media.default
@@ -113,7 +119,7 @@ bundle: title_text_media
 mode: default
 content:
   field_call_to_action:
-    weight: 4
+    weight: 2
     settings:
       placeholder_url: ''
       placeholder_title: ''
