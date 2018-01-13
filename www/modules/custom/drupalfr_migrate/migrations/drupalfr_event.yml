@@ -15,7 +15,7 @@ migration_dependencies:
   required:
     - drupalfr_media
     - drupalfr_user
-    - drupalfr_company
+    - drupalfr_organization
 source:
   plugin: csv
   path: modules/custom/drupalfr_migrate/migrations/data/event.csv
@@ -54,7 +54,7 @@ process:
       delimiter: ;
     -
       plugin: migration
-      migration: drupalfr_company
+      migration: drupalfr_organization
   field_event_organizer:
     -
       plugin: explode

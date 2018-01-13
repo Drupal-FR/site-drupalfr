@@ -5,7 +5,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.listing
     - field.field.node.job_offer.body
-    - field.field.node.job_offer.field_job_company
+    - field.field.node.job_offer.field_job_organization
     - field.field.node.job_offer.field_job_contract_type
     - field.field.node.job_offer.field_job_nature
     - field.field.node.job_offer.field_job_teleworking
@@ -22,7 +22,7 @@ targetEntityType: node
 bundle: job_offer
 mode: listing
 content:
-  field_job_company:
+  field_job_organization:
     weight: 5
     label: inline
     settings:

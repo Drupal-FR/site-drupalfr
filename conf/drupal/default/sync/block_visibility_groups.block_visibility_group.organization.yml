@@ -1,0 +1,19 @@
+uuid: 824f8e3c-49a3-4bf4-baf0-1ada93294763
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: organization
+label: 'Contenu : organismes'
+logic: and
+conditions:
+  5d0166c3-1cc9-400a-a81b-83496f87317d:
+    id: node_type
+    bundles:
+      organization: organization
+    negate: false
+    context_mapping:
+      node: '@node.node_route_context:node'
+    uuid: 5d0166c3-1cc9-400a-a81b-83496f87317d
+allow_other_conditions: false

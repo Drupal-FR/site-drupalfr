@@ -1,0 +1,32 @@
+uuid: feaee15f-a237-4179-a34e-24aba2809e69
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.organization
+    - views.view.job_offer
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - drupal_france
+id: drupal_france_organization_job
+theme: drupal_france
+region: sidebar_second
+weight: 0
+provider: null
+plugin: 'views_block:job_offer-block_1'
+settings:
+  id: 'views_block:job_offer-block_1'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+  context_mapping: {  }
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: organization
+    context_mapping: {  }

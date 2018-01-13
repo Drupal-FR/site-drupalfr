@@ -14,7 +14,7 @@ $DRUSH migrate:import drupalfr_website_sector --update
 $DRUSH migrate:import drupalfr_website_drupal_version --update
 $DRUSH migrate:import drupalfr_drupal_version --update
 $DRUSH migrate:import drupalfr_page --update
-$DRUSH migrate:import drupalfr_company --update
+$DRUSH migrate:import drupalfr_organization --update
 $DRUSH migrate:import drupalfr_job_offer --update
 $DRUSH migrate:import drupalfr_showcase --update
 $DRUSH migrate:import drupalfr_local_group --update

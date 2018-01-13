@@ -4,7 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.field_event_sponsor
-    - node.type.company
+    - node.type.organization
     - node.type.event
 _core:
   default_config_hash: '-csLOq3--QMJ-i-gVyGxlxq4Vg0rcl6D2sXxS2LFNKs'
@@ -22,7 +22,7 @@ settings:
   handler: 'default:node'
   handler_settings:
     target_bundles:
-      company: company
+      organization: organization
     sort:
       field: _none
     auto_create: false

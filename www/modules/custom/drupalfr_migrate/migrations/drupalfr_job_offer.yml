@@ -13,7 +13,7 @@ dependencies:
     - node
 migration_dependencies:
   required:
-    - drupalfr_company
+    - drupalfr_organization
 source:
   plugin: csv
   path: modules/custom/drupalfr_migrate/migrations/data/job_offer.csv
@@ -26,7 +26,7 @@ source:
     - published: Published
     - nature: Nature
     - regions: Regions
-    - company: Company
+    - organization: Organization
     - validity: Validity
     - contract_type: 'Contract type'
     - teleworking: Teleworking
@@ -48,11 +48,11 @@ process:
       plugin: explode
       source: regions
       delimiter: ;
-  field_job_company:
+  field_job_organization:
     -
       plugin: migration
-      migration: drupalfr_company
-      source: company
+      migration: drupalfr_organization
+      source: organization
   field_job_validity: validity
   field_job_contract_type: contract_type
   field_job_teleworking: teleworking

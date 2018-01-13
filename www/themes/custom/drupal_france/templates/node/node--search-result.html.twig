@@ -79,7 +79,7 @@
 
   <div class="col-md-2">
     {{ content.field_media_teaser }}
-    {{ content.field_company_logo }}
+    {{ content.field_organization_logo }}
     {% if feed_image %}
       {{ feed_image }}
     {% endif %}
@@ -97,7 +97,7 @@
     <div{{ content_attributes.addClass('content') }}>
       {{ content
       |without('field_media_teaser')
-      |without('field_company_logo')
+      |without('field_organization_logo')
       }}
     </div>
   </div>

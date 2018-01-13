@@ -1,0 +1,32 @@
+uuid: 24ddf94a-7e3e-4328-a8f0-bf186c6761aa
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.organization
+    - views.view.organization
+  module:
+    - block_visibility_groups
+    - views
+  theme:
+    - drupalfr_theme
+id: drupalfr_theme_organization_badge
+theme: drupalfr_theme
+region: sidebar_second
+weight: 0
+provider: null
+plugin: 'views_block:organization-block_1'
+settings:
+  id: 'views_block:organization-block_1'
+  label: ''
+  provider: views
+  label_display: '0'
+  views_label: ''
+  items_per_page: none
+  context_mapping: {  }
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: organization
+    context_mapping: {  }

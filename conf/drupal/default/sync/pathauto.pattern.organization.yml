@@ -1,0 +1,24 @@
+uuid: e17fdf61-4cbb-451a-b5f5-708960827899
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: AwW97OnlZF_ok6raF5NbNVd4jrlGpNrQy-pwPyaBm2M
+id: organization
+label: Organismes
+type: 'canonical_entities:node'
+pattern: 'emploi/organismes/[node:title]'
+selection_criteria:
+  38ce8845-74d6-4e04-b2dc-db73cd287ed9:
+    id: node_type
+    bundles:
+      organization: organization
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 38ce8845-74d6-4e04-b2dc-db73cd287ed9
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -32,7 +32,7 @@ source:
     - website_uri: 'Website URI'
     - website_title: 'Website title'
     - membership_number: 'Membership number'
-    - company: Company
+    - organization: Organization
     - events: Events
     - in_directory: 'In directory'
     - biography: Biography
@@ -54,7 +54,7 @@ process:
       map:
         administrator: administrator
         member: member
-        member_company: member_company
+        member_organization: member_organization
         moderator: moderator
       bypass: true
   field_user_realname: realname
@@ -67,12 +67,12 @@ process:
   field_user_drupal_org/title: drupal_org_title
   field_user_website/uri: website_uri
   field_user_website/title: website_title
-  field_user_company:
+  field_user_organization:
     -
       plugin: migration
-      migration: drupalfr_company
+      migration: drupalfr_organization
       no_stub: true
-      source: company
+      source: organization
   field_user_event:
     -
       plugin: explode

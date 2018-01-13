@@ -1,0 +1,51 @@
+uuid: c4a63ac2-134c-4db4-963d-911fcc68ccbf
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.job_offer
+    - field.field.node.organization.body
+    - field.field.node.organization.field_organization_contact_info
+    - field.field.node.organization.field_organization_legal_form
+    - field.field.node.organization.field_organization_logo
+    - field.field.node.organization.field_organization_service_type
+    - field.field.node.organization.field_organization_size
+    - field.field.node.organization.field_organization_website
+    - field.field.node.organization.field_region
+    - image.style.square_165
+    - node.type.organization
+  module:
+    - image
+    - user
+_core:
+  default_config_hash: sDwpkSfGunOE2N6AMswSAIFuox22cHO6dOBBn_Hdy3c
+id: node.organization.job_offer
+targetEntityType: node
+bundle: organization
+mode: job_offer
+content:
+  field_organization_contact_info:
+    weight: 1
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_organization_logo:
+    weight: 0
+    label: hidden
+    settings:
+      image_style: square_165
+      image_link: content
+    third_party_settings: {  }
+    type: image
+    region: content
+hidden:
+  body: true
+  field_organization_legal_form: true
+  field_organization_service_type: true
+  field_organization_size: true
+  field_organization_website: true
+  field_region: true
+  langcode: true
+  links: true

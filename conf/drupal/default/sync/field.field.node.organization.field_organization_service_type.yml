@@ -1,0 +1,23 @@
+uuid: c2e0a860-1f8f-400b-baf8-8554643956a8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_organization_service_type
+    - node.type.organization
+  module:
+    - options
+_core:
+  default_config_hash: h4Bf_ERus2uY5zKkIH8qajhTKlrDF10tmcrVkON7rvs
+id: node.organization.field_organization_service_type
+field_name: field_organization_service_type
+entity_type: node
+bundle: organization
+label: 'Type de service'
+description: 'Sélectionnez les prestations que votre organisme propose. Merci de garder à l''esprit que les services que présentez ici doivent être en rapport direct avec Drupal.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

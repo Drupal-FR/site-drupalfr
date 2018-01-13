@@ -6,7 +6,7 @@ dependencies:
     - field.field.user.user.commerce_remote_id
     - field.field.user.user.field_user_banner
     - field.field.user.user.field_user_biography
-    - field.field.user.user.field_user_company
+    - field.field.user.user.field_user_organization
     - field.field.user.user.field_user_drupal_org
     - field.field.user.user.field_user_event
     - field.field.user.user.field_user_in_directory
@@ -88,7 +88,7 @@ third_party_settings:
     group_information:
       children:
         - field_user_realname
-        - field_user_company
+        - field_user_organization
         - field_user_website
         - field_user_twitter
         - field_user_drupal_org
@@ -152,7 +152,7 @@ content:
     third_party_settings: {  }
     type: text_textarea_with_summary
     region: content
-  field_user_company:
+  field_user_organization:
     weight: 3
     settings:
       match_operator: CONTAINS

@@ -1,0 +1,41 @@
+uuid: 907089ae-5e15-43e7-96d8-496167252e2f
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - options
+_core:
+  default_config_hash: AAdzQqfni27Yi0JwzWwDVez0QFcXpFGDdCooHrwsXXA
+id: node.field_organization_legal_form
+field_name: field_organization_legal_form
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: Association
+      label: Association
+    -
+      value: Indépendant
+      label: Indépendant
+    -
+      value: Libéral
+      label: Libéral
+    -
+      value: SARL
+      label: SARL
+    -
+      value: SAS/SA
+      label: SAS/SA
+    -
+      value: Autre
+      label: Autre
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

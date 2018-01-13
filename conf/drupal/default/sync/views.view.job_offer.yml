@@ -185,7 +185,7 @@ display:
   block_1:
     display_plugin: block
     id: block_1
-    display_title: 'Bloc société'
+    display_title: 'Bloc organisme'
     position: 2
     display_options:
       display_extenders: {  }
@@ -221,10 +221,10 @@ display:
         fields: false
         empty: false
       arguments:
-        field_job_company_target_id:
-          id: field_job_company_target_id
-          table: node__field_job_company
-          field: field_job_company_target_id
+        field_job_organization_target_id:
+          id: field_job_organization_target_id
+          table: node__field_job_organization
+          field: field_job_organization_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -255,7 +255,7 @@ display:
           break_phrase: false
           not: false
           plugin_id: numeric
-      title: 'Offres d''emploi de la société'
+      title: 'Offres d''emploi de l''organisme'
       header:
         result:
           id: result
