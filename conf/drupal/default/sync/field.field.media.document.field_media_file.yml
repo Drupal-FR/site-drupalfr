@@ -3,12 +3,15 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.media.field_media_file_1
+    - field.storage.media.field_media_file
     - media.type.document
+  enforced:
+    module:
+      - media
   module:
     - file
-id: media.document.field_media_file_1
-field_name: field_media_file_1
+id: media.document.field_media_file
+field_name: field_media_file
 entity_type: media
 bundle: document
 label: Fichier

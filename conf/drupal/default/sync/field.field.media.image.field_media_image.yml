@@ -3,12 +3,15 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.media.field_media_image_1
+    - field.storage.media.field_media_image
     - media.type.image
+  enforced:
+    module:
+      - media
   module:
     - image
-id: media.image.field_media_image_1
-field_name: field_media_image_1
+id: media.image.field_media_image
+field_name: field_media_image
 entity_type: media
 bundle: image
 label: Image
