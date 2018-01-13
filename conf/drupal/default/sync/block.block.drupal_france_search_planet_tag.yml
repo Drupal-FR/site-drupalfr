@@ -1,0 +1,29 @@
+uuid: 4cb37486-d445-4206-8da9-ca5d0465e143
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.search
+    - facets.facet.planet_tag
+  module:
+    - block_visibility_groups
+    - facets
+  theme:
+    - drupal_france
+id: drupal_france_search_planet_tag
+theme: drupal_france
+region: sidebar_second
+weight: -10
+provider: null
+plugin: 'facet_block:planet_tag'
+settings:
+  id: 'facet_block:planet_tag'
+  label: 'Tags du planète'
+  provider: facets
+  label_display: visible
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: search
+    context_mapping: {  }

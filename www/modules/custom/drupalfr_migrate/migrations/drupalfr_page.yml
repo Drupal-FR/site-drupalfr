@@ -23,31 +23,22 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      path: Path
-    -
-      published: Published
-    -
-      drupal_version: 'Drupal version'
-    -
-      attachments: Attachments
-    -
-      body_value: Body
-    -
-      body_format: 'Body format'
-    -
-      paragraphs: Paragraphs
+    - uuid: UUID
+    - title: Title
+    - path: Path
+    - published: Published
+    - drupal_version: 'Drupal version'
+    - attachments: Attachments
+    - body_value: Body
+    - body_format: 'Body format'
+    - paragraphs: Paragraphs
 destination:
   plugin: 'entity:node'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: page
-  uuid: uuid
   title: title
   field_drupal_version:
     -

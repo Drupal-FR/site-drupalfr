@@ -1,0 +1,36 @@
+// TOPBAR EXTRA ELEMENTS
+// =====================
+
+.dropdown { // Weight + 1
+  &.menu--user-account {
+    > li {
+      &.is-dropdown-submenu-parent {
+
+        > a {
+          padding-right: 1rem;
+          color:         $white;
+
+          &::after {
+            display: none !important;
+          }
+
+          > .fa {
+            font-size: 1.5rem;
+          }
+        }
+
+        &.is-active {
+          > a {
+            color: $white;
+
+            &:hover,
+            &:focus,
+            &:active {
+              color: $white;
+            }
+          }
+        }
+      }
+    }
+  }
+}

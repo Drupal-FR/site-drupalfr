@@ -19,19 +19,14 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      info: Title
-    -
-      body_value: Body
-    -
-      body_format: 'Body format'
+    - uuid: UUID
+    - info: Title
+    - body_value: Body
+    - body_format: 'Body format'
 destination:
   plugin: 'entity:block_content'
   no_stub: true
 process:
-  id: id
   uuid: uuid
   type:
     plugin: default_value

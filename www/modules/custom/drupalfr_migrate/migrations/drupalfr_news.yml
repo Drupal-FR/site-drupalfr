@@ -24,35 +24,24 @@ source:
   keys:
     - uuid
   column_names:
-    -
-      uuid: UUID
-    -
-      title: Title
-    -
-      published: Published
-    -
-      author: Author
-    -
-      banner: Banner
-    -
-      media_teaser: 'Media teaser'
-    -
-      news_type: 'News type'
-    -
-      body_value: Body
-    -
-      body_format: 'Body format'
-    -
-      paragraphs: Paragraphs
-    -
-      creation_date: 'Creation date'
+    - uuid: UUID
+    - title: Title
+    - published: Published
+    - author: Author
+    - banner: Banner
+    - media_teaser: 'Media teaser'
+    - news_type: 'News type'
+    - body_value: Body
+    - body_format: 'Body format'
+    - paragraphs: Paragraphs
+    - creation_date: 'Creation date'
 destination:
   plugin: 'entity:node'
 process:
+  uuid: uuid
   type:
     plugin: default_value
     default_value: news
-  uuid: uuid
   title: title
   field_news_type:
     -

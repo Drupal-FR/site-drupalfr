@@ -26,12 +26,22 @@ Merci pour votre aide !
 * **Do not execute scripts/install.sh from your computer.**.
 * Adapt the following files to your configuration:
   * docker-compose.yml
-* Execute: `docker-compose up`
+* Execute: 
+```
+docker-compose pull
+docker-compose up
+```
+
 * In another tab, get a command-line in the container:
-`docker exec -it container_name_web_1 /bin/bash` (*container_name* should be remplaced by the name of the **web** container)
+```
+docker-compose exec web /bin/bash
+```
+(*container_name* should be remplaced by the name of the **web** container)
 * Execute:
-  * `cd ..`
-  * `./scripts/install.sh`
+```
+cd ..
+./scripts/install.sh
+```
 
 The website **should** be located at this address: `http://127.0.0.1:8101/*`
 
