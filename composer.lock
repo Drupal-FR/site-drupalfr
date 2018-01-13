@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "369344112bee47866ae34b1f62f8d9ef",
+    "content-hash": "7f1af41bf614123a3c94c5ccaaa5b405",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -2077,11 +2077,17 @@
         },
         {
             "name": "drupal/commerce_license",
-            "version": "dev-2.x",
+            "version": "2.0.0-alpha2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/commerce_license",
-                "reference": "388d6e65fcd35e6b2d7635828f8e3a24095c70db"
+                "reference": "8.x-2.0-alpha2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/commerce_license-8.x-2.0-alpha2.zip",
+                "reference": "8.x-2.0-alpha2",
+                "shasum": "1e5e78d65b63cd359f6e31057421102fb212b3cb"
             },
             "require": {
                 "drupal/commerce": "*",
@@ -2102,11 +2108,11 @@
                     "dev-2.x": "2.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-2.0-alpha1+16-dev",
-                    "datestamp": "1513596485",
+                    "version": "8.x-2.0-alpha2",
+                    "datestamp": "1513596784",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "message": "Alpha releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -2144,8 +2150,7 @@
             "support": {
                 "source": "http://cgit.drupalcode.org/commerce_license",
                 "issues": "https://www.drupal.org/project/issues/commerce_license"
-            },
-            "time": "2017-08-07T15:27:31+00:00"
+            }
         },
         {
             "name": "drupal/commerce_order",
@@ -13910,7 +13915,6 @@
     "stability-flags": {
         "blobaugh/meetup-api-client": 20,
         "drupal-composer/drupal-l10n": 20,
-        "drupal/commerce_license": 20,
         "drupal/commerce_paypal": 20,
         "drupal/drush_language": 20,
         "drupal/feeds": 20,
