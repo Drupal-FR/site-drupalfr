@@ -1,22 +1,27 @@
-uuid: aa4f0312-83d8-4469-91d9-d04d568d1204
+uuid: 521876cc-c676-4fda-8e5a-968ffe91a134
 langcode: fr
 status: true
 dependencies:
   module:
     - file
-    - media_entity
-_core:
-  default_config_hash: Hrv-vYFn3leSL3CTat3ZqauRrCOqTYLDdCpBXaUPKFs
-id: media.field_document
-field_name: field_document
+    - image
+    - media
+id: media.field_media_image_1
+field_name: field_media_image_1
 entity_type: media
-type: file
+type: image
 settings:
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+  target_type: file
   display_field: false
   display_default: false
   uri_scheme: public
-  target_type: file
-module: file
+module: image
 locked: false
 cardinality: 1
 translatable: true

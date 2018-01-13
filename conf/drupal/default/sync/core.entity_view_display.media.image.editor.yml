@@ -4,9 +4,9 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.media.editor
-    - field.field.media.image.field_image
+    - field.field.media.image.field_media_image_1
     - image.style.thumbnail
-    - media_entity.bundle.image
+    - media.type.image
   module:
     - image
 _core:
@@ -16,15 +16,6 @@ targetEntityType: media
 bundle: image
 mode: editor
 content:
-  field_image:
-    weight: 1
-    label: hidden
-    settings:
-      image_style: thumbnail
-      image_link: ''
-    third_party_settings: {  }
-    type: image
-    region: content
   name:
     type: string
     weight: 0
@@ -33,8 +24,17 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
+  thumbnail:
+    type: image
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      image_style: thumbnail
+      image_link: ''
+    third_party_settings: {  }
 hidden:
   created: true
+  field_media_image_1: true
   langcode: true
-  thumbnail: true
   uid: true

@@ -4,8 +4,8 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.media.editor
-    - field.field.media.document.field_document
-    - media_entity.bundle.document
+    - field.field.media.document.field_media_file_1
+    - media.type.document
   module:
     - file
 _core:
@@ -15,13 +15,13 @@ targetEntityType: media
 bundle: document
 mode: editor
 content:
-  field_document:
+  field_media_file_1:
+    type: file_table
     weight: 1
+    region: content
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: file_table
-    region: content
   name:
     type: string
     weight: 0

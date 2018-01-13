@@ -1,27 +1,25 @@
-uuid: 634cde4a-c5cf-4bd0-8574-182e696ee8a2
+uuid: ececed74-0873-474a-8f5f-4c93cacf6498
 langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.media.field_document
-    - media_entity.bundle.document
+    - field.storage.media.field_media_file_1
+    - media.type.document
   module:
     - file
-_core:
-  default_config_hash: gISR5sdQeSqBIQIH7jzJUWhHok32ks62R62BsjiEFNo
-id: media.document.field_document
-field_name: field_document
+id: media.document.field_media_file_1
+field_name: field_media_file_1
 entity_type: media
 bundle: document
-label: Document
+label: Fichier
 description: ''
 required: true
-translatable: false
+translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:
   file_directory: 'medias/documents/[date:custom:Y]-[date:custom:m]'
-  file_extensions: 'txt pdf odt odp ods doc docx ppt pptx xls xlsx'
+  file_extensions: 'txt pdf odt odp ods doc docx ppt pptx xls xlsx rtf odf odg fodt fods fodp fodg key numbers pages'
   max_filesize: ''
   description_field: false
   handler: 'default:file'
