@@ -14,7 +14,7 @@ dependencies:
 _core:
   default_config_hash: tpDt6NuuckyWNxkctwBhb-wOuIK--Fk8OBMk6OuRCZg
 id: commerce_orders
-label: Orders
+label: Commandes
 module: views
 description: ''
 tag: Commerce
@@ -212,7 +212,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          action_title: 'With selection'
+          action_title: 'Pour cette sélection'
           include_exclude: exclude
           selected_actions: {  }
           entity_type: commerce_order
@@ -422,7 +422,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Store
+          label: Boutique
           exclude: false
           alter:
             alter_text: false
@@ -488,7 +488,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Customer
+          label: Client
           exclude: false
           alter:
             alter_text: false
@@ -805,7 +805,7 @@ display:
           exposed: true
           expose:
             operator_id: order_number_op
-            label: 'Order number'
+            label: 'Numéro de commande'
             description: ''
             use_operator: false
             operator: order_number_op
@@ -916,7 +916,7 @@ display:
           entity_field: state
           plugin_id: state_machine_state
       sorts: {  }
-      title: Orders
+      title: Commandes
       header: {  }
       footer: {  }
       empty:
@@ -929,7 +929,7 @@ display:
           admin_label: ''
           empty: true
           tokenize: false
-          content: 'No orders available.'
+          content: 'Aucune commande n''est disponible.'
           plugin_id: text_custom
       relationships: {  }
       arguments: {  }
@@ -959,7 +959,7 @@ display:
       path: admin/commerce/orders/list
       menu:
         type: 'default tab'
-        title: Orders
+        title: Commandes
         description: ''
         expanded: false
         parent: ''
@@ -968,8 +968,8 @@ display:
         menu_name: main
       tab_options:
         type: normal
-        title: Orders
-        description: 'Manage your orders.'
+        title: Commandes
+        description: 'Gérer vos commandes.'
         weight: 0
     cache_metadata:
       contexts:

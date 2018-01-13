@@ -201,7 +201,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Order number'
+          label: 'Numéro de commande'
           exclude: false
           alter:
             alter_text: false
@@ -498,7 +498,7 @@ display:
           entity_field: state
           plugin_id: state_machine_state
       sorts: {  }
-      title: Orders
+      title: Commandes
       header: {  }
       footer: {  }
       empty:
@@ -512,7 +512,7 @@ display:
           empty: true
           tokenize: false
           content:
-            value: 'You have not placed any orders with us yet.'
+            value: 'Vous ne nous avez encore rien commandé.'
             format: basic_html
           plugin_id: text
       relationships: {  }
@@ -576,7 +576,7 @@ display:
       path: user/%user/orders
       menu:
         type: tab
-        title: Orders
+        title: Commandes
         description: ''
         expanded: false
         parent: ''
