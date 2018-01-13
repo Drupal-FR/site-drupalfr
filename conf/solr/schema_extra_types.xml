@@ -13,7 +13,7 @@
       <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-ISOLatin1Accent.txt"/>
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
       <filter class="solr.StopFilterFactory" words="lang/stopwords_de.txt" format="snowball" ignoreCase="true"/>
-      <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" splitOnCaseChange="1" splitOnNumerics="1" catenateWords="1" catenateNumbers="1" catenateAll="0" protected="protwords.txt" preserveOriginal="1"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" splitOnCaseChange="1" splitOnNumerics="1" catenateWords="1" catenateNumbers="1" catenateAll="0" protected="protwords.txt" preserveOriginal="1"/>
       <filter class="solr.LowerCaseFilterFactory"/>
       <filter class="solr.GermanLightStemFilterFactory"/>
       <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
@@ -23,7 +23,7 @@
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
       <filter class="solr.SynonymFilterFactory" synonyms="lang/synonyms_de.txt" ignoreCase="true" expand="true"/>
       <filter class="solr.StopFilterFactory" words="lang/stopwords_de.txt" format="snowball" ignoreCase="true"/>
-      <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" splitOnCaseChange="1" splitOnNumerics="1" catenateWords="0" catenateNumbers="0" catenateAll="0" protected="protwords.txt" preserveOriginal="1"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" splitOnCaseChange="1" splitOnNumerics="1" catenateWords="0" catenateNumbers="0" catenateAll="0" protected="protwords.txt" preserveOriginal="1"/>
       <filter class="solr.LowerCaseFilterFactory"/>
       <filter class="solr.GermanLightStemFilterFactory"/>
       <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>

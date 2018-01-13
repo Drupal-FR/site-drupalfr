@@ -139,8 +139,6 @@ processor_settings:
       h3: 2
       strong: 2
       b: 2
-      em: 1
-      u: 1
     weights:
       preprocess_index: -15
       preprocess_query: -15
@@ -205,7 +203,8 @@ processor_settings:
       preprocess_index: -10
       preprocess_query: -10
 tracker_settings:
-  default: {  }
+  default:
+    indexing_order: fifo
 options:
   index_directly: false
   cron_limit: 500
