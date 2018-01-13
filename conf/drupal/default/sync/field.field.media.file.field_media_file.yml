@@ -4,16 +4,16 @@ status: true
 dependencies:
   config:
     - field.storage.media.field_media_file
-    - media.type.document
+    - media.type.file
   enforced:
     module:
       - media
   module:
     - file
-id: media.document.field_media_file
+id: media.file.field_media_file
 field_name: field_media_file
 entity_type: media
-bundle: document
+bundle: file
 label: Fichier
 description: ''
 required: true
@@ -21,7 +21,7 @@ translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:
-  file_directory: 'medias/documents/[date:custom:Y]-[date:custom:m]'
+  file_directory: 'medias/files/[date:custom:Y]-[date:custom:m]'
   file_extensions: 'txt pdf odt odp ods doc docx ppt pptx xls xlsx rtf odf odg fodt fods fodp fodg key numbers pages'
   max_filesize: ''
   description_field: false
