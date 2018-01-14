@@ -298,6 +298,10 @@ function commerce_payment_update_7102() {
  * Disable the payment checkout pane on the review form to preserve prior behavior.
  */
 function commerce_payment_update_7103() {
+  if (!db_table_exists('commerce_checkout_pane')) {
+    return t('Checkout module is disabled, skipping update.');
+  }
+
   db_update('commerce_checkout_pane')
     ->fields(array('review' => 0))
     ->condition('pane_id', 'commerce_payment')

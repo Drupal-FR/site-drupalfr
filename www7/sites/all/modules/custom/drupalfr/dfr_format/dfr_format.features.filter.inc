@@ -55,6 +55,7 @@ function dfr_format_filter_default_formats() {
         'status' => 1,
         'settings' => array(
           'nowrap_expand' => FALSE,
+          'codefilter_prism' => FALSE,
         ),
       ),
       'filter_htmlcorrector' => array(
@@ -95,6 +96,7 @@ function dfr_format_filter_default_formats() {
         'status' => 1,
         'settings' => array(
           'nowrap_expand' => FALSE,
+          'codefilter_prism' => FALSE,
         ),
       ),
       'pathologic' => array(
@@ -145,6 +147,7 @@ function dfr_format_filter_default_formats() {
         'status' => 1,
         'settings' => array(
           'nowrap_expand' => FALSE,
+          'codefilter_prism' => FALSE,
         ),
       ),
       'filter_markdown' => array(

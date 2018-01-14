@@ -34,9 +34,6 @@ function commerce_cart_checkout_router() {
 function commerce_cart_view() {
   global $user;
 
-  // Default to displaying an empty message.
-  $content = theme('commerce_cart_empty_page');
-
   // First check to make sure we have a valid order.
   if ($order = commerce_cart_order_load($user->uid)) {
     $wrapper = entity_metadata_wrapper('commerce_order', $order);
@@ -47,6 +44,11 @@ function commerce_cart_view() {
       // Add the form for editing the cart contents.
       $content = commerce_embed_view('commerce_cart_form', 'default', array($order->order_id), 'cart');
     }
+  }
+
+  if (empty($content)) {
+    // Default to displaying an empty message.
+    $content = theme('commerce_cart_empty_page');
   }
 
   return $content;

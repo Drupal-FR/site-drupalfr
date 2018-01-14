@@ -20,7 +20,7 @@ function commerce_customer_features_export($data, &$export, $module_name = '') {
   foreach ($data as $type) {
     // Add module dependencies.
     $export['dependencies'][$info[$type]['module']] = $info[$type]['module'];
-    $export['features']['commerce_customer_type'][$type] = $type;
+    $export['features']['commerce_customer'][$type] = $type;
 
     // Fetch fields of the profile type and add them as dependency.
     $fields = field_info_instances('commerce_customer_profile', $type);
@@ -50,7 +50,22 @@ function commerce_customer_features_export_options() {
  */
 function commerce_customer_features_export_render($module, $data) {
   // Return nothing, since the appropriate code has to exist already.
-  return array();
+  $info = commerce_customer_profile_types();
+  $output = array();
+  $output[] = '  $items = array(';
+  foreach ($data as $type) {
+    if (isset($info[$type]) && $item = $info[$type]) {
+      $output[] = "    '{$type}' => array(";
+      foreach ($item as $key => $value) {
+        $output[] = "      '{$key}' => " . features_var_export($value, '      ') . ",";
+      }
+      $output[] = "    ),";
+    }
+  }
+  $output[] = '  );';
+  $output[] = '  return $items;';
+  $output = implode("\n", $output);
+  return array('commerce_customer_profile_type_info' => $output);
 }
 
 /**

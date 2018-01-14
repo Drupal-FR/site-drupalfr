@@ -43,3 +43,11 @@ function commerce_cart_update_7102() {
   variable_set('commerce_cart_refresh_frequency', 0);
   return t('New order settings have been added to let you reduce the frequency of the shopping cart refresh. This update set it to occur continuously as it has been, but we recommend you implement some delay unless you have a unique product pricing situation that demands pricing updates every time a shopping cart is loaded.');
 }
+
+/**
+ * Rebuild registry to ensure autoloading for cart provider plugins.
+ */
+function commerce_cart_update_7103() {
+  registry_rebuild();
+  return t('Registry has been rebuilt');
+}

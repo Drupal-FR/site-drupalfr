@@ -75,3 +75,22 @@ function hook_commerce_product_calculate_sell_price_line_item_alter($line_item) 
     $line_item->order_id = commerce_cart_order_id($user->uid);
   }
 }
+
+/**
+ * Allow modules to alter the product line item during sell price calculation
+ * when the "Product pricing process" is configured to either "rules_invoke_all"
+ * or "module_invoke_all".
+ *
+ * @param $line_item
+ *   The product line item used for sell price calculation.
+ */
+function hook_commerce_product_calculate_sell_price($line_item) {
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  $product = $line_item_wrapper->commerce_product->value();
+
+  // If the product is not published, nullify the line item's unit price.
+  if (!$product->status) {
+    $line_item_wrapper->commerce_unit_price->amount = NULL;
+    return;
+  }
+}

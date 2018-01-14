@@ -524,4 +524,33 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertCheckoutPageAccessible($this->order, 'complete');
   }
 
+  /**
+   * Test programmatic checkout completion.
+   */
+  function testCommerceCheckoutProgrammaticCheckout() {
+    // Log in as normal user.
+    $this->drupalLogin($this->store_customer);
+
+    // Order creation, in cart status.
+    $this->order = $this->createDummyOrder($this->store_customer->uid);
+
+    commerce_checkout_complete($this->order);
+
+    // Ensure the "placed" property is set when the order completes checkout.
+    $this->assertTrue($this->order->placed > 0, 'commerce_checkout_complete() added the placed date to the order');
+
+    // Ensure the "placed" property is not updated when the order completes
+    // checkout more than once, such as when simulating checkout via the admin
+    // pages.
+    // If commerce_checkout_complete does not work as expected and does update
+    // the value, we wouldn't know because in the context of this test it would
+    // be set to REQUEST_TIME which is the current value as well. REQUEST_TIME
+    // is a constant and we cannot change it either. We therefore manually set
+    // the value to a different non-zero value and check if that value is
+    // changed.
+    $this->order->placed = 1;
+    commerce_checkout_complete($this->order);
+    $this->assertEqual($this->order->placed, 1, 'commerce_checkout_complete() did not update the already placed date of the order');
+  }
+
 }

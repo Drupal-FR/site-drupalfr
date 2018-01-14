@@ -2,12 +2,14 @@
 
 namespace Mailchimp\Tests;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * MailChimp Ecommerce test library.
  *
  * @package Mailchimp\Tests
  */
-class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
+class MailchimpEcommerceTest extends TestCase {
 
   /**
    * Tests library functionality for stores information.
@@ -40,7 +42,7 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
     $id = 'MC001';
     $store = [
       'list_id' => '205d96e6b4',
-      'name' => "Freddie'\''s Merchandise",
+      'name' => "Freddie's Merchandise",
       'currency_code' => 'USD',
     ];
 
@@ -65,7 +67,7 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
    */
   public function testUpdateStore() {
     $store_id = 'MC001';
-    $name = "Freddie'\''s Merchandise";
+    $name = "Freddie's Merchandise";
     $currency_code = 'USD';
 
     $mc = new MailchimpEcommerce();
@@ -139,9 +141,9 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
       'lines' => [
         'id' => 'LINE001',
         'product_id' => 'PROD001',
-        'product_title' => "Freddie'\''s Jokes",
+        'product_title' => "Freddie's Jokes",
         'product_variant_id' => 'PROD001A',
-        'product_variant_title' => "Freddie'\''s Jokes Volume 1",
+        'product_variant_title' => "Freddie's Jokes Volume 1",
         'quantity' => 2,
         'price' => 10,
       ],
@@ -239,7 +241,7 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
     $id = 'L001';
     $product = [
       'product_id' => 'PROD001',
-      'product_variant_id' => "Freddie'\''s Jokes",
+      'product_variant_id' => "Freddie's Jokes",
       'quantity' => 1,
       'price' => 5,
     ];
@@ -428,9 +430,9 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
       'lines' => [
         'id' => 'LINE001',
         'product_id' => 'PROD001',
-        'product_title' => "Freddie'\''s Jokes",
+        'product_title' => "Freddie's Jokes",
         'product_variant_id' => 'PROD001A',
-        'product_variant_title' => "Freddie'\''s Jokes Volume 1",
+        'product_variant_title' => "Freddie's Jokes Volume 1",
         'quantity' => 2,
         'price' => 10,
       ],
@@ -465,7 +467,7 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
   /**
    * Tests library function for updating an order.
    */
-  public function testsUpdateOrder() {
+  public function testUpdateOrder() {
     $store_id = 'MC001';
     $order_id = 'ord0001';
 
@@ -528,7 +530,7 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
     $id = 'L002';
     $product = [
       'product_id' => 'PROD001',
-      'product_variant_id' => "Freddie'\''s Jokes",
+      'product_variant_id' => "Freddie's Jokes",
       'quantity' => 1,
       'price' => 5,
     ];
@@ -584,9 +586,12 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
     $store_id = 'MC001';
     $id = 'sku0001';
     $title = 'Test Product 001';
-    $variants = [
+    $variant_1 = (object) [
       'id' => 'PROD001A',
-      'title' => "Freddie'\''s Jokes Volume 1",
+      'title' => "Freddie's Jokes Volume 1",
+    ];
+    $variants = [
+      $variant_1,
     ];
 
     $mc = new MailchimpEcommerce();
@@ -601,8 +606,43 @@ class MailchimpEcommerceTest extends \PHPUnit_Framework_TestCase {
 
     $this->assertEquals($id, $request_body->id);
     $this->assertEquals($title, $request_body->title);
-    $this->assertEquals($variants['id'], $request_body->variants['id']);
-    $this->assertEquals($variants['title'], $request_body->variants['title']);
+    $this->assertEquals($variant_1->id, $request_body->variants[0]->id);
+    $this->assertEquals($variant_1->title, $request_body->variants[0]->title);
+  }
+
+  /**
+   * Test updating a product.
+   */
+  public function testUpdateProduct() {
+    $store_id = 'MC001';
+    $id = 'sku0001';
+    $variant_1 = (object) [
+      'id' => 'PROD001A',
+      'title' => "Freddie's Jokes Volume 1",
+    ];
+    $variant_2 = (object) [
+      'id' => 'PROD002A',
+      'title' => "Freddie's Jokes Volume 2",
+    ];
+    $variants = [
+      $variant_1,
+      $variant_2,
+    ];
+
+    $mc = new MailchimpEcommerce();
+
+    $mc->updateProduct($store_id, $id, $variants);
+    $this->assertEquals('PATCH', $mc->getClient()->method);
+
+    $this->assertEquals($mc->getEndpoint() . '/ecommerce/stores/' . $store_id . '/products/' . $id, $mc->getClient()->uri);
+    $this->assertNotEmpty($mc->getClient()->options['json']);
+
+    $request_body = $mc->getClient()->options['json'];
+
+    $this->assertEquals($variant_1->id, $request_body->variants[0]->id);
+    $this->assertEquals($variant_1->title, $request_body->variants[0]->title);
+    $this->assertEquals($variant_2->id, $request_body->variants[1]->id);
+    $this->assertEquals($variant_2->title, $request_body->variants[1]->title);
   }
 
   /**

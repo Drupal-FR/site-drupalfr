@@ -101,9 +101,12 @@ class commerce_line_item_handler_field_edit_quantity extends views_handler_field
     }
 
     // Process the deletes first.
-    foreach ($deleted_line_items as $line_item_id) {
+    if (!empty($deleted_line_items)) {
       $order = commerce_order_load($form_state['order']->order_id);
-      commerce_cart_order_product_line_item_delete($order, $line_item_id);
+      foreach ($deleted_line_items as $line_item_id) {
+        $order = commerce_cart_order_product_line_item_delete($order, $line_item_id, TRUE);
+      }
+      commerce_order_save($order);
     }
 
     // Then process the quantity updates.

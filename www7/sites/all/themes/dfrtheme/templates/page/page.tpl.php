@@ -104,18 +104,6 @@
 
     <?php if ($page['header_bottom']): ?>
       <aside id="header-bottom" role="complementary">
-        <?php if ($is_front): ?>
-          <div class="push-drupalcamp">
-            <a href="https://lannion2017.drupalcamp.bzh" title="Site dédié au Drupalcamp Lannion du 27 au 29 octobre 2017">
-              <picture>
-                <source media="(min-width: 601px)" srcset="/sites/all/themes/dfrtheme/images/drupal-fr-cover.jpg">
-                <source media="(min-width: 480px)" srcset="/sites/all/themes/dfrtheme/images/drupal-fr-cover-mobile.jpg">
-                <img src="/sites/all/themes/dfrtheme/images/drupal-fr-cover.jpg" alt="Visiter le site dédié au Drupalcamp Lannion du 27 au 29 octobre 2017.">
-              </picture>
-            </a>
-          </div>
-        <?php endif; ?>
-
         <div class="inner">
           <?php print render($page['header_bottom']); ?>
         </div>

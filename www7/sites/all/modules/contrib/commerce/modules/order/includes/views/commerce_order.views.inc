@@ -171,7 +171,7 @@ function commerce_order_views_data() {
     ),
   );
 
-  // Expose the created and changed timestamps.
+  // Expose the created, changed, and placed timestamps.
   $data['commerce_order']['created'] = array(
     'title' => t('Created date'),
     'help' => t('The date the order was created.'),
@@ -310,6 +310,75 @@ function commerce_order_views_data() {
     ),
   );
 
+  $data['commerce_order']['placed'] = array(
+    'title' => t('Placed date'),
+    'help' => t('The date the order was placed.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
+  $data['commerce_order']['placed_fulldate'] = array(
+    'title' => t('Placed date'),
+    'help' => t('In the form of CCYYMMDD.'),
+    'argument' => array(
+      'field' => 'placed',
+      'handler' => 'views_handler_argument_node_created_fulldate',
+    ),
+  );
+
+  $data['commerce_order']['placed_year_month'] = array(
+    'title' => t('Placed year + month'),
+    'help' => t('In the form of YYYYMM.'),
+    'argument' => array(
+      'field' => 'placed',
+      'handler' => 'views_handler_argument_node_created_year_month',
+    ),
+  );
+
+  $data['commerce_order']['placed_timestamp_year'] = array(
+    'title' => t('Placed year'),
+    'help' => t('In the form of YYYY.'),
+    'argument' => array(
+      'field' => 'placed',
+      'handler' => 'views_handler_argument_node_created_year',
+    ),
+  );
+
+  $data['commerce_order']['placed_month'] = array(
+    'title' => t('Placed month'),
+    'help' => t('In the form of MM (01 - 12).'),
+    'argument' => array(
+      'field' => 'placed',
+      'handler' => 'views_handler_argument_node_created_month',
+    ),
+  );
+
+  $data['commerce_order']['placed_day'] = array(
+    'title' => t('Placed day'),
+    'help' => t('In the form of DD (01 - 31).'),
+    'argument' => array(
+      'field' => 'placed',
+      'handler' => 'views_handler_argument_node_created_day',
+    ),
+  );
+
+  $data['commerce_order']['placed_week'] = array(
+    'title' => t('Placed week'),
+    'help' => t('In the form of WW (01 - 53).'),
+    'argument' => array(
+      'field' => 'placed',
+      'handler' => 'views_handler_argument_node_created_week',
+    ),
+  );
+
   // Expose links to operate on the order.
   $data['commerce_order']['view_order'] = array(
     'field' => array(
@@ -352,7 +421,7 @@ function commerce_order_views_data() {
   // Define a handler for an area used to summarize a set of line items.
   $data['commerce_order']['order_total'] = array(
     'title' => t('Order total'),
-    'help' => t('Displays the order total field formatted with its components list; requires an Order ID argument.'),
+    'help' => t('Displays the order total field; requires an Order ID argument.'),
     'area' => array(
       'handler' => 'commerce_order_handler_area_order_total',
     ),

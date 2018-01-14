@@ -65,6 +65,12 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'placed' => array(
+        'description' => 'The Unix timestamp when the order was placed e.g. when checkout was completed.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'hostname' => array(
         'description' => 'The IP address that created this order.',
         'type' => 'varchar',
@@ -470,4 +476,32 @@ function commerce_order_update_7109() {
   ));
 
   return t('Schema for the commerce_order table has been updated.');
+}
+
+/**
+ * Add the placed timestamp to {commerce_order}.
+ */
+function commerce_order_update_7110() {
+  if (!db_field_exists('commerce_order', 'placed')) {
+    db_add_field('commerce_order', 'placed', array(
+      'description' => 'The Unix timestamp when the order was placed e.g. when checkout was completed.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+    ));
+
+    // Existing sites may have left the value for this variable undefined, and
+    // the current default is TRUE. We are changing its default to FALSE with
+    // this release so that new sites have the correct behavior i.e. the
+    // "created" property holds the creation time and the "placed" property
+    // holds the checkout completion time. To not alter the behavior in existing
+    // sites we set the variable to TRUE, the previous default, and site admins
+    // can change it when they desire.
+    $current_value = variable_get('enable_commerce_checkout_order_created_date_update');
+    if ($current_value === NULL) {
+      variable_set('enable_commerce_checkout_order_created_date_update', TRUE);
+    }
+
+    return t('Schema for the commerce_order table has been updated. A drush command (commerce-order-update-placed-timestamp) is available to update the placed timestamp for existing orders.');
+  }
 }

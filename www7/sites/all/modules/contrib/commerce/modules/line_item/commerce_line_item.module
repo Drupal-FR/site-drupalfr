@@ -562,7 +562,7 @@ function commerce_line_item_type_to_arg($type) {
 function commerce_line_item_type_callback($line_item_type, $callback) {
   // If the specified callback function exists, return it.
   if (!empty($line_item_type['callbacks'][$callback]) &&
-      function_exists($line_item_type['callbacks'][$callback])) {
+      is_callable($line_item_type['callbacks'][$callback])) {
     return $line_item_type['callbacks'][$callback];
   }
 
@@ -634,12 +634,14 @@ function commerce_line_item_load_multiple($line_item_ids = array(), $conditions 
  *
  * @param $line_item_id
  *   The ID of the line item to delete.
+ * @param boolean $skip_order_save
+ *   TRUE to skip saving the order after deleting the line item.
  *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
-function commerce_line_item_delete($line_item_id) {
-  return commerce_line_item_delete_multiple(array($line_item_id));
+function commerce_line_item_delete($line_item_id, $skip_order_save = FALSE) {
+  return commerce_line_item_delete_multiple(array($line_item_id), $skip_order_save);
 }
 
 /**
@@ -647,12 +649,14 @@ function commerce_line_item_delete($line_item_id) {
  *
  * @param $line_item_ids
  *   An array of line item IDs to delete.
+ * @param boolean $skip_order_save
+ *   TRUE to skip saving the order after deleting the line item.
  *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
-function commerce_line_item_delete_multiple($line_item_ids) {
-  return entity_get_controller('commerce_line_item')->delete($line_item_ids);
+function commerce_line_item_delete_multiple($line_item_ids, $skip_order_save = FALSE) {
+  return entity_get_controller('commerce_line_item')->delete($line_item_ids, NULL, $skip_order_save);
 }
 
 /**
@@ -1170,14 +1174,18 @@ function theme_commerce_line_item_manager($variables) {
 
   // Add each line item to the table.
   foreach (element_children($form['line_items']) as $line_item_id) {
-    $row = array(
-      drupal_render($form['line_items'][$line_item_id]['remove']),
-      drupal_render($form['line_items'][$line_item_id]['title']),
-      drupal_render($form['line_items'][$line_item_id]['line_item_label']),
-      drupal_render($form['line_items'][$line_item_id]['commerce_unit_price']),
-      drupal_render($form['line_items'][$line_item_id]['quantity']),
-      drupal_render($form['line_items'][$line_item_id]['commerce_total']),
-    );
+    $row = array();
+
+    // Loop over all child elements in the line item's form array.
+    foreach (element_children($form['line_items'][$line_item_id]) as $item) {
+      // Do not attempt to render value elements into the row.
+      if (!empty($form['line_items'][$line_item_id][$item]['#type']) &&
+        $form['line_items'][$line_item_id][$item]['#type'] == 'value') {
+        continue;
+      }
+
+      $row[] = drupal_render($form['line_items'][$line_item_id][$item]);
+    }
 
     $rows[] = $row;
   }
@@ -1445,16 +1453,40 @@ function commerce_line_items_quantity($line_items, $types = array()) {
   $quantity = 0;
 
   foreach ($line_items as $line_item) {
-    if (!$line_item instanceof EntityMetadataWrapper) {
-      $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
+    if ($line_item instanceof EntityMetadataWrapper) {
+      $line_item = $line_item->value();
     }
 
-    if (empty($types) || in_array($line_item->getBundle(), $types)) {
-      $quantity += $line_item->quantity->value();
+    if (empty($types) || in_array($line_item->type, $types)) {
+      $quantity += $line_item->quantity;
     }
   }
 
   return $quantity;
+}
+
+/**
+ * Returns the total quantity of a group of line items identified by ID.
+ *
+ * @param int[] $line_item_ids
+ *   An array of line item IDs whose quantities should be summed and returned.
+ * @param string[] $types
+ *   An array of line item types to filter by before counting.
+ *
+ * @return int
+ *   The quantity of the line items.
+ */
+function commerce_line_items_quantity_by_id($line_item_ids, $types = array()) {
+  if (empty($line_item_ids)) {
+    return 0;
+  }
+
+  if (empty($types)) {
+    return db_query("SELECT SUM(quantity) FROM {commerce_line_item} WHERE line_item_id IN(:line_item_ids)", array(':line_item_ids' => $line_item_ids))->fetchField();
+  }
+  else {
+    return db_query("SELECT SUM(quantity) FROM {commerce_line_item} WHERE line_item_id IN(:line_item_ids) AND type IN (:types)", array(':line_item_ids' => $line_item_ids, ':types' => $types))->fetchField();
+  }
 }
 
 /**

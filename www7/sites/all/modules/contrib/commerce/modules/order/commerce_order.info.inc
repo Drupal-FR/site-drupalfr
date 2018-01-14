@@ -60,6 +60,14 @@ function commerce_order_entity_property_info() {
     'setter permission' => 'administer commerce_order entities',
     'schema field' => 'changed',
   );
+  $properties['placed'] = array(
+    'type' => 'date',
+    'label' => t('Date placed'),
+    'description' => t('The date the order was placed.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'setter permission' => 'administer commerce_order entities',
+    'schema field' => 'placed',
+  );
   $properties['hostname'] = array(
     'type' => 'text',
     'label' => t('Host name'),
@@ -79,8 +87,8 @@ function commerce_order_entity_property_info() {
   );
   $properties['uid'] = array(
     'type' => 'integer',
-    'label' => t("Owner ID"),
-    'description' => t("The unique ID of the order owner."),
+    'label' => t('Owner ID'),
+    'description' => t('The unique ID of the order owner.'),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_order entities',
     'clear' => array('owner'),
@@ -111,6 +119,12 @@ function commerce_order_entity_property_info() {
     'getter callback' => 'commerce_order_get_properties',
     'computed' => TRUE,
     'clear' => array('mail'),
+  );
+  $properties['revision'] = array(
+    'label' => t('Create revision'),
+    'type' => 'boolean',
+    'description' => t('Whether or not saving this order creates a new revision.'),
+    'setter callback' => 'entity_property_verbatim_set',
   );
 
   return $info;

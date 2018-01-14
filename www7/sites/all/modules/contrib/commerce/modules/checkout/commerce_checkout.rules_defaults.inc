@@ -22,7 +22,7 @@ function commerce_checkout_default_rules_configuration() {
 
   $rule->label = t('Set the order created date to the checkout completion date');
   $rule->tags = array('Commerce Checkout');
-  $rule->active = variable_get('enable_commerce_checkout_order_created_date_update', TRUE);
+  $rule->active = variable_get('enable_commerce_checkout_order_created_date_update', FALSE);
 
   $rule
     ->event('commerce_checkout_complete')

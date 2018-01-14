@@ -124,8 +124,12 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
    * @param $transaction
    *   An optional transaction object to pass thru. If passed the caller is
    *   responsible for rolling back the transaction if something goes wrong.
+   * @param boolean $skip_order_save
+   *   TRUE to skip saving the order after deleting the line item. If saving the
+   *   order is skipped, the caller is responsible for saving the order to
+   *   ensure changes to its line item reference field value are saved.
    */
-  public function delete($line_item_ids, DatabaseTransaction $transaction = NULL) {
+  public function delete($line_item_ids, DatabaseTransaction $transaction = NULL, $skip_order_save = FALSE) {
     $line_items = $line_item_ids ? $this->load($line_item_ids) : FALSE;
 
     if (!$line_items) {
@@ -182,6 +186,9 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
 
       // Save the entities that were modified through deleted references.
       foreach ($modified_entities as $entity_data) {
+        if ($skip_order_save && $entity_data['entity_type'] == 'commerce_order') {
+          continue;
+        }
         entity_save($entity_data['entity_type'], $entity_data['entity']);
       }
 

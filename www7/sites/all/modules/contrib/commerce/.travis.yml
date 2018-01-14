@@ -1,90 +1,67 @@
 language: php
-cache:
-  bundler: true
-  directories:
-    - $HOME/tmp/drush
-    - $HOME/.bundle
-  apt: true
+sudo: false
 
 php:
-  - 5.3
+  # Use >= 5.4 since it has built-in webserver.
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7
+  # @todo Impossible to use HHVM since it will not have "$PHP INI" and tests will be failed every time.
 
-mysql:
-  database: drupal
-  username: root
-  encoding: utf8
+services:
+  - mysql
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: 7
 
 install:
-  - "mysql -e 'create database drupal;'"
-
-  # Install latest Drush 7.
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - composer self-update
-  - composer global require --no-interaction --prefer-source drush/drush:dev-master
-
-  # Make sure we don't fail when checking out projects
-  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-  # LAMP package installation (mysql is already started)
-  - sudo apt-get update
-  - sudo apt-get install apache2 libapache2-mod-fastcgi
-
-  # enable php-fpm, travis does not support any other method with php and apache
-  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
-  - sudo a2enmod rewrite actions fastcgi alias
-  - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
-
-  # Make sure the apache root is in our wanted directory
-  - echo "$(curl -fsSL https://gist.githubusercontent.com/nickveenhof/11386315/raw/b8abaf9304fe12b5cc7752d39c29c1edae8ac2e6/gistfile1.txt)" | sed -e "s,PATH,$TRAVIS_BUILD_DIR/../drupal,g" | sudo tee /etc/apache2/sites-available/default > /dev/null
-
-  # Disable sendmail.
-  - echo sendmail_path=`which true` >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-
-  # Forward the errors to the syslog so we can print them
-  - echo "error_log=syslog" >> `php --ini | grep "Loaded Configuration" | awk '{print $4}'`
-
-
-  # Build Codebase.
-  - TESTDIR=$(pwd)
+  # Now we are in the directory with repository sources. Go back
+  # to "vendor" directory, where "commerce" will be located.
   - cd ..
-  - git clone --branch 7.x --depth 1 http://git.drupal.org/project/drupal.git drupal
-  - cd drupal
-  - wget https://www.drupal.org/files/issues/run-tests.patch
-  - git apply -v -p1 < run-tests.patch
 
-  # Restart apache and test it
-  - sudo service apache2 restart
-  - curl -v "http://localhost"
+  # Set environment variables.
+  - PHPINI="$HOME/.phpenv/versions/$(phpenv version-name)/etc/php.ini"
+  - DRUPALDIR="$(pwd)/drupal"
+  - DRUPALHOST="127.0.0.1:1349"
+
+  # Populate Composer packages.
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+
+  # Install Drush.
+  - composer global require --prefer-source --no-interaction drush/drush:8.*
+
+  # Download Drupal.
+  - drush dl drupal-7 --drupal-project-rename=$(basename $DRUPALDIR)
+
+  # Move "commerce" module to Drupal.
+  - mv commerce/ $DRUPALDIR/sites/all/modules/
+
+   # Disable Sendmail.
+  - echo sendmail_path=$(which true) >> $PHPINI
+  # Increase the MySQL connection timeout on the PHP end.
+  - echo "mysql.connect_timeout=3000" >> $PHPINI
+  - echo "default_socket_timeout=3000" >> $PHPINI
+
+  # Increase the MySQL server timetout and packet size.
+  - mysql -uroot -e "SET GLOBAL wait_timeout = 36000;"
+  - mysql -uroot -e "SET GLOBAL max_allowed_packet = 33554432;"
 
 before_script:
-  - ln -s $TESTDIR modules/commerce
-  # Mysql might time out for long tests, increase the wait timeout.
-  - mysql -e 'SET @@GLOBAL.wait_timeout=1200'
-  # Update drupal core
-  - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
-  - drush dl addressfield rules ctools entity views
-  - drush en -y commerce_cart commerce_customer_ui commerce_product_ui commerce_line_item_ui commerce_order_ui
-  - drush en -y commerce_payment commerce_payment_example commerce_tax_ui simpletest
+  - cd $DRUPALDIR
+  # Install Drupal.
+  - drush si -y minimal --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name=Commerce
+  # Enabled set of modules.
+  - drush en -y commerce_cart commerce_customer_ui commerce_product_ui commerce_line_item_ui commerce_order_ui commerce_payment commerce_payment_example commerce_tax_ui simpletest
+  # Start HTTP server.
+  - drush runserver $DRUPALHOST > /dev/null 2>&1 &
 
 script:
-  # Run the tests
-  - php scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://localhost "Drupal Commerce" | tee /tmp/test.txt; TEST_EXIT=${PIPESTATUS[0]}; echo $TEST_EXIT
-  # Check if we had fails in the run-tests.sh script
-  # Exit with the inverted value, because if there are no fails found, it will exit with 1 and for us that\
-  # is a good thing so invert it to 0. Travis has some issues with the exclamation mark in front so we have to fiddle a
-  # bit.
+  - php scripts/run-tests.sh --verbose --color --concurrency 4 --php $(which php) --url http://$DRUPALHOST "Drupal Commerce" | tee /tmp/test.txt
+  # Exit with the inverted value, because if there are no fails found, it will exit with 1 and for us
+  # that is a good thing so invert it to 0. Travis has some issues with the exclamation mark in front
+  # so we have to fiddle a bit.
   # Also make the grep case insensitive and fail on run-tests.sh regular fails as well on fatal errors.
-  - TEST_OUTPUT=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
-  - echo $TEST_OUTPUT
-  # if the TEST_EXIT status is 0 AND the TEST_OUTPUT status is also 0 it means we succeeded, in all other cases we
-  # failed.
-  # Re-enable when trying to get CodeSniffer doesn't return a 403 anymore.
-  #- /home/travis/.composer/vendor/bin/phpcs --standard=/home/travis/.composer/vendor/drupal/coder/coder_sniffer/Drupal --extensions=php,inc,test,module,install --ignore=css/ $TRAVIS_BUILD_DIR/../drupal/modules/search_api
-  - php -i | grep 'php.ini'
-  - sudo cat /var/log/apache2/error.log
-
-  #  Enable once PHPUnit tests are in Commerce
-  #  - cd $TRAVIS_BUILD_DIR/../drupal/core
-  #  - ./vendor/bin/phpunit --verbose --debug ../modules/commerce/; TEST_PHPUNIT=$?; echo $TEST_PHPUNIT
-  #  - if [ $TEST_EXIT -eq 0 ] && [ $TEST_OUTPUT -eq 0 ] && [ $TEST_PHPUNIT -eq 0 ]; then exit 0; else exit 1; fi
+  - exit $(! egrep -i "([1-9]+ fail)|([1-9]+ exception)|(error)" /tmp/test.txt > /dev/null 2>&1) $?

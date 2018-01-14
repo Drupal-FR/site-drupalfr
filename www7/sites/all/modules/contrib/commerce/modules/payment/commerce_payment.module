@@ -658,7 +658,7 @@ function commerce_payment_method_callback($payment_method, $callback) {
 
   // If the specified callback function exists, return it.
   if (!empty($payment_method['callbacks'][$callback]) &&
-      function_exists($payment_method['callbacks'][$callback])) {
+      is_callable($payment_method['callbacks'][$callback])) {
     return $payment_method['callbacks'][$callback];
   }
 
@@ -1160,5 +1160,77 @@ function commerce_payment_transaction_set_properties($transaction, $name, $value
     case 'order':
       $transaction->order_id = $value;
       break;
+  }
+}
+
+/**
+ * Implements hook_entity_load().
+ *
+ * Override payment method settings on the fly.
+ */
+function commerce_payment_entity_load($entities, $type) {
+  if ($type != 'rules_config') {
+    return;
+  }
+  foreach ($entities as $entity) {
+    if (!$entity instanceof RulesTriggerableInterface) {
+      continue;
+    }
+
+    $events = $entity->events();
+    // Check for the "Select available payment methods for an order" event.
+    if (!in_array('commerce_payment_methods', $events)) {
+      continue;
+    }
+
+    // Iterate over the actions to find one with the matching element ID and
+    // check if we have payment settings override.
+    foreach ($entity->actions() as $name => $action) {
+      if (is_callable(array($action, 'getElementName')) && strpos($action->getElementName(), 'commerce_payment_enable_') === 0) {
+        if (is_array($action->settings['payment_method']) && !empty($action->settings['payment_method']['settings'])) {
+          $instance_id = commerce_payment_method_instance_id($action->settings['payment_method']['method_id'], $entity);
+          $settings = variable_get($instance_id, array());
+
+          if (!empty($settings) && is_array($settings)) {
+            $action->settings['payment_method']['settings'] = array_replace_recursive($action->settings['payment_method']['settings'], $settings);
+            $action->processSettings(TRUE);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Disable payment method settings form elements that are overridden.
+ */
+function commerce_payment_form_rules_ui_edit_element_alter(&$form, &$form_state) {
+  if (!isset($form['parameter']['payment_method'])) {
+    return;
+  }
+  // Retrieve the Rule from the $form_state.
+  $rule = reset($form_state['build_info']['args']);
+  $payment_method = &$form['parameter']['payment_method']['settings']['payment_method'];
+  $instance_id = commerce_payment_method_instance_id($payment_method['method_id']['#value'], $rule);
+  $settings = variable_get($instance_id, array());
+
+  if (!empty($settings) && is_array($settings)) {
+    $display_override_message = FALSE;
+
+    foreach (element_get_visible_children($payment_method['settings']) as $key) {
+      if (isset($settings[$key]) && isset($payment_method['settings'][$key])) {
+        $payment_method['settings'][$key]['#disabled'] = TRUE;
+        $payment_method['settings'][$key]['#required'] = FALSE;
+        $display_override_message = TRUE;
+      }
+    }
+
+    // Display a warning message to warn the user about the settings
+    // that are overridden.
+    if ($display_override_message) {
+      drupal_set_message(t('Disabled fields below have been configured in code and cannot be changed here.'), 'warning');
+    }
   }
 }

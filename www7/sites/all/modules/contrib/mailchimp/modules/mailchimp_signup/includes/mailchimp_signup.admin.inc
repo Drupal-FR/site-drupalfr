@@ -171,6 +171,12 @@ function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
       );
     }
   }
+  $form['mc_lists_config']['placeholder'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use HTML5 Placeholder.'),
+    '#default_value' => isset($signup->settings['placeholder']) ? $signup->settings['placeholder'] : FALSE,
+    '#description' => t('If set, placeholder will be used instead of labels.'),
+  );
 
   $form['subscription_settings'] = array(
     '#type' => 'fieldset',
@@ -251,6 +257,7 @@ function mailchimp_signup_form_submit($form, &$form_state) {
   $signup->settings['description'] = $form_state['values']['description'];
   $signup->settings['doublein'] = $form_state['values']['doublein'];
   $signup->settings['include_interest_groups'] = $form_state['values']['include_interest_groups'];
+  $signup->settings['placeholder'] = $form_state['values']['placeholder'];
   if ($signup->save()) {
     if (isset($form_state['values']['settings']['path'])) {
       if (!isset($prior_settings['path']) || $prior_settings['path'] != $signup->settings['path'] || !($signup->mode & MAILCHIMP_SIGNUP_PAGE)) {

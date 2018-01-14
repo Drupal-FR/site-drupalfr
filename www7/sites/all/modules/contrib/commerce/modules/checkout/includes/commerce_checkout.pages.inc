@@ -10,6 +10,14 @@
  * Redirects invalid checkout attempts or displays the checkout form if valid.
  */
 function commerce_checkout_router($order, $checkout_page = NULL) {
+  // Ensure this function is routing the latest revision of the given order in
+  // case some hook invoked before this page callback is executed updated some
+  // value on the order that would impact routing.
+  if (FALSE && !commerce_order_is_latest_revision($order)) {
+    entity_get_controller('commerce_order')->resetCache(array($order->order_id));
+    $order = commerce_order_load($order->order_id);
+  }
+
   $checkout_pages = commerce_checkout_pages();
 
   // If no checkout page is specified, default to the first one.
@@ -74,6 +82,10 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   $form['#attached']['css'][] = drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.theme.css';
   $form['#attached']['js'][] = drupal_get_path('module', 'commerce_checkout') . '/commerce_checkout.js';
 
+  // Refresh the order object in case it has been altered outside the checkout
+  // process so cache_form has a stale version.
+  $order = commerce_order_load($order->order_id);
+
   $form_state['order'] = $order;
   $form_state['checkout_page'] = $checkout_page;
   $form_state['account'] = clone($user);
@@ -105,6 +117,11 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
     if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
       // Generate the pane form.
       $pane_form = $callback($form, $form_state, $checkout_pane, $order);
+
+      // Refresh the order object in case the checkout pane altered it outside
+      // of the passed reference.
+      $order = commerce_order_load($order->order_id);
+      $form_state['order'] = $order;
 
       // Combine the messages that were created during this pane's validation or
       // submit process with any that were created during the pane generation
@@ -263,10 +280,10 @@ function _commerce_checkout_set_validated(&$element, $imploded_parents) {
 /**
  * Validate handler for the continue button of the checkout form.
  *
- * This function calls the validation function of each pane, followed by
- * the submit function if the validation succeeded. As long as one pane
- * fails validation, we then ask for the form to be rebuilt. Once all the panes
- * are happy, we move on to the next page.
+ * This function calls the validation function of each pane, followed by the
+ * submit function if the validation succeeded. As long as one pane fails
+ * validation, we then ask for the form to be rebuilt. Once all the panes are
+ * happy, we move on to the next page.
  */
 function commerce_checkout_form_validate($form, &$form_state) {
   $checkout_page = $form_state['checkout_page'];
@@ -278,15 +295,24 @@ function commerce_checkout_form_validate($form, &$form_state) {
   $previous_messages = drupal_get_messages();
 
   // Load any pre-existing validation errors for the elements.
+  $form_errors = form_get_errors();
   $errors = array();
 
-  foreach ((array) form_get_errors() as $element_path => $error) {
+  // If we found any errors at all on the page, go ahead and mark the form as
+  // failing validation. This will ensure that even form elements on the page
+  // that aren't part of a checkout pane trigger validation failure.
+  $form_validate = TRUE;
+
+  if (!empty($form_errors)) {
+    $form_validate = FALSE;
+  }
+
+  foreach ((array) $form_errors as $element_path => $error) {
     list($pane_id, ) = explode('][', $element_path, 2);
     $errors[$pane_id][$element_path] = $error;
   }
 
   // Loop through the enabled checkout panes for the current page.
-  $form_validate = TRUE;
   foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page['page_id'])) as $pane_id => $checkout_pane) {
     $validate = TRUE;
 
