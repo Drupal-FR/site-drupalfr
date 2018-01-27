@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - entity_browser.browser.media_image_video
+    - field.field.paragraph.title_text_media.field_background_color
     - field.field.paragraph.title_text_media.field_call_to_action
     - field.field.paragraph.title_text_media.field_css_class
     - field.field.paragraph.title_text_media.field_media
@@ -15,6 +16,7 @@ dependencies:
     - field.field.paragraph.title_text_media.field_title_level
     - paragraphs.paragraphs_type.title_text_media
   module:
+    - color_field
     - entity_browser
     - field_group
     - link_attributes
@@ -100,6 +102,7 @@ third_party_settings:
     group_configuration:
       children:
         - field_css_class
+        - field_background_color
       parent_name: group_tabs
       weight: 22
       format_type: tab
@@ -118,6 +121,18 @@ targetEntityType: paragraph
 bundle: title_text_media
 mode: default
 content:
+  field_background_color:
+    weight: 29
+    settings:
+      show_input: '1'
+      show_palette: '1'
+      palette: ''
+      show_buttons: '1'
+      allow_empty: '1'
+      show_palette_only: '0'
+    third_party_settings: {  }
+    type: color_field_widget_spectrum
+    region: content
   field_call_to_action:
     weight: 2
     settings:
@@ -134,7 +149,7 @@ content:
     type: link_attributes
     region: content
   field_css_class:
-    weight: 23
+    weight: 28
     settings:
       size: 60
       placeholder: ''
