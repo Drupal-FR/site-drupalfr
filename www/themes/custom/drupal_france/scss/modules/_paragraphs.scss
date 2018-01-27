@@ -1,0 +1,31 @@
+.paragraph--type--title-text-media {
+  padding: $global-padding*2 0;
+
+  .field-paragraph--field {
+    &-title {
+      line-height: 2.5rem;
+      text-indent: -.2rem;
+    }
+
+    &-sub-title {
+      font-size: 1.5rem;
+    }
+
+    &-text {
+      margin-top: $global-margin;
+    }
+
+    &-call-to-action {
+      margin-top: $global-margin*2;
+
+      .field-items {
+        display: flex;
+      }
+
+      .field-item {
+        flex-direction: row;
+        margin-right:   $global-margin;
+      }
+    }
+  }
+}
