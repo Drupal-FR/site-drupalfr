@@ -3,6 +3,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - field.field.paragraph.title_text_media.field_background_color
     - field.field.paragraph.title_text_media.field_call_to_action
     - field.field.paragraph.title_text_media.field_css_class
     - field.field.paragraph.title_text_media.field_media
@@ -14,6 +15,7 @@ dependencies:
     - field.field.paragraph.title_text_media.field_title_level
     - paragraphs.paragraphs_type.title_text_media
   module:
+    - color_field
     - link
     - text
 _core:
@@ -23,6 +25,15 @@ targetEntityType: paragraph
 bundle: title_text_media
 mode: default
 content:
+  field_background_color:
+    type: color_field_formatter_text
+    weight: 5
+    region: content
+    label: hidden
+    settings:
+      format: hex
+      opacity: '0'
+    third_party_settings: {  }
   field_call_to_action:
     weight: 2
     label: hidden
