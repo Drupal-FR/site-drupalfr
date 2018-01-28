@@ -2,4 +2,26 @@
   font-family:    'Open Sans', sans-serif;
   font-weight:    700;
   text-transform: uppercase;
+
+  &.tertiary {
+    color: $drupal-blue-desaturate-light;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $drupal-blue-desaturate-light;
+      color:            $drupal-blue-desaturate;
+    }
+  }
+
+  &.quaternary {
+    color: $drupal-blue-dark;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $drupal-blue-desaturate;
+      color:            $drupal-blue-desaturate-light;
+    }
+  }
 }
