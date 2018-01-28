@@ -187,26 +187,26 @@
       </div>
       {% if page.footer_first or page.footer_middle or page.footer_last %}
         <div class="l-footer row expanded">
-          <footer class="row">
+          <footer class="row footer medium-up-2 large-up-3">
             {% if page.footer_first %}
-              <div id="footer-first" class="large-4 column">
+              <div id="footer-first" class="column">
                 {{ page.footer_first }}
               </div>
             {% endif %}
             {% if page.footer_middle %}
-              <div id="footer-middle" class="large-4 column">
+              <div id="footer-middle" class="column">
                 {{ page.footer_middle }}
               </div>
             {% endif %}
             {% if page.footer_last %}
-              <div id="footer-last" class="large-4 column">
+              <div id="footer-last" class="column">
                 {{ page.footer_last }}
               </div>
             {% endif %}
           </footer>
         </div>
       {% endif %}
-      <div class="bottom-bar panel">
+      <div class="bottom-bar panel hidden">
         <div class="row">
           <div class="large-12 columns">
             &copy; {{ "now"|date('Y') }} {{ site_name }} {{ 'All rights reserved.'|t }}
