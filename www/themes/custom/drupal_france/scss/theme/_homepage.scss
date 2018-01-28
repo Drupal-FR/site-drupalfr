@@ -1,4 +1,58 @@
+//  HOMEPAGE Specific styles
+//  ------------------------
+
 .head_homepage {
   padding: $global-padding*5 0 $global-padding*2;
   color:   $white;
+}
+
+.homepage_discover {
+  padding:    $global-padding*3 0;
+  text-align: center;
+
+  .title {
+    line-height: 2.5rem;
+    color:       $primary-color;
+
+    small {
+      font-size: 70%;
+      color:     $primary-color;
+    }
+  }
+
+  .subtitle {
+    margin-top: $global-margin;
+    color:      $dark-gray;
+  }
+
+  .row-items {
+    margin-bottom: $global-margin;
+
+    .item {
+      padding: $global-padding $global-padding*3;
+
+      &-icon {
+        font-size: 80px;
+        color:     $secondary-color;
+      }
+
+      &-title {
+        color:      $primary-color;
+      }
+
+      &-text {
+        font-size: small;
+        color:     $dark-gray;
+      }
+    }
+  }
+
+  .row-cta {
+    a {
+      padding:        15px 30px;
+      font-size:      14px;
+      font-weight:    700;
+      text-transform: uppercase;
+    }
+  }
 }
