@@ -30,15 +30,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
-  field_job_organization:
-    weight: 6
-    label: above
-    settings:
-      view_mode: job_offer
-      link: false
-    third_party_settings: {  }
-    type: entity_reference_entity_view
-    region: content
   field_job_contract_type:
     weight: 1
     label: inline
@@ -52,6 +43,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: list_default
+    region: content
+  field_job_organization:
+    weight: 6
+    label: above
+    settings:
+      view_mode: job_offer
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
     region: content
   field_job_teleworking:
     weight: 4

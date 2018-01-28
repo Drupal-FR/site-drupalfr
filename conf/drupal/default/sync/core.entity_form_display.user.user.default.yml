@@ -152,15 +152,6 @@ content:
     third_party_settings: {  }
     type: text_textarea_with_summary
     region: content
-  field_user_organization:
-    weight: 3
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
-    region: content
   field_user_drupal_org:
     weight: 6
     settings:
@@ -204,6 +195,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: mailchimp_lists_select
+    region: content
+  field_user_organization:
+    weight: 3
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
     region: content
   field_user_realname:
     weight: 2
