@@ -41,6 +41,14 @@ function drupal_france_preprocess_paragraph(&$variables) {
       }
     }
 
+    // Paragraph background color.
+    if ($paragraph->hasField('field_background_color')) {
+      $background_color = $paragraph->get('field_background_color')->getValue();
+      if (!empty($background_color)) {
+        $variables['background_color'] = $background_color[0]['color'];
+      }
+    }
+
     // Media position.
     if ($paragraph->hasField('field_media_position')) {
       $media_position = $paragraph->get('field_media_position')->getValue();

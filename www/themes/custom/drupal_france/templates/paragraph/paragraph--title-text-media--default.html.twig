@@ -51,10 +51,12 @@
 {% set media_position = media_position ?: 'right' %}
 {% set media_width_class = media_width_class ?: 'medium-6' %}
 {% set text_width_class = text_width_class ?: 'medium-6' %}
-{% set background_color = content.field_background_color['0']['#markup'] %}
+{% if background_color is defined %}
+  {% set attributes = attributes.setAttribute('style', "background-color:#{ background_color }")  %}
+{% endif %}
 
 {% block paragraph %}
-  <section{{ attributes.addClass(classes).setAttribute(background_color ? 'style', "background-color:#{background_color}") }}>
+  <section{{ attributes.addClass(classes) }}>
     <div class="row">
     {% block content %}
       {% if (content.field_media and media_position == 'left') %}

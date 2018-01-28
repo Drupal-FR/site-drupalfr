@@ -15,7 +15,6 @@ dependencies:
     - field.field.paragraph.title_text_media.field_title_level
     - paragraphs.paragraphs_type.title_text_media
   module:
-    - color_field
     - link
     - text
 _core:
@@ -25,15 +24,6 @@ targetEntityType: paragraph
 bundle: title_text_media
 mode: default
 content:
-  field_background_color:
-    type: color_field_formatter_text
-    weight: 5
-    region: content
-    label: hidden
-    settings:
-      format: hex
-      opacity: '0'
-    third_party_settings: {  }
   field_call_to_action:
     weight: 2
     label: hidden
@@ -79,6 +69,7 @@ content:
     type: string
     region: content
 hidden:
+  field_background_color: true
   field_css_class: true
   field_media_position: true
   field_media_width_class: true
