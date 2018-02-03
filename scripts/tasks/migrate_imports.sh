@@ -3,7 +3,7 @@
 . $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.sh
 . $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.local.sh
 
-# Import content.
+echo -e "${LIGHT_GREEN}Import content.${NC}"
 $DRUSH pm:enable drupalfr_migrate -y
 $DRUSH migrate:import drupalfr_file --update
 $DRUSH migrate:import drupalfr_user --update
@@ -32,5 +32,5 @@ $DRUSH migrate:import drupalfr_user --update
 # Re-import paragraphs to update links to pages.
 $DRUSH migrate:import drupalfr_paragraph --update
 
-# Clear search_api indexes.
+echo -e "${LIGHT_GREEN}Clear search API indexes.${NC}"
 $DRUSH search-api:clear

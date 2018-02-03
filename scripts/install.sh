@@ -3,23 +3,21 @@
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.sh
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.local.sh
 
-# Install sources.
 . $SCRIPTS_PATH/tasks/composer_install.sh
 
-# Without drush alias, change temporarily directory to www.
+echo -e "${LIGHT_GREEN}Without drush alias, change temporarily directory to www.${NC}"
 cd $WWW_PATH
 
-# Clear Drush cache in case of update.
+echo -e "${LIGHT_GREEN}Clear Drush cache in case of update.${NC}"
 $DRUSH cache:clear drush
 
-# Database backup.
+echo -e "${LIGHT_GREEN}Database backup.${NC}"
 $DRUSH sql:dump --result-file="${PROJECT_PATH}/backups/${CURRENT_DATE}.sql" --gzip --structure-tables-key="common"
 
-# Clear Redis cache because otherwise it is no emptied on site-install and it
-# provokes errors.
+echo -e "${LIGHT_GREEN}Clear Redis cache because otherwise it is no emptied on site install and it provokes errors.${NC}"
 $REDIS_FLUSH_COMMAND
 
-# Install Drupal.
+echo -e "${LIGHT_GREEN}Install Drupal.${NC}"
 $DRUSH site:install config_installer \
   --account-mail=$ACCOUNT_MAIL \
   --account-name=$ACCOUNT_NAME \
@@ -29,23 +27,23 @@ $DRUSH site:install config_installer \
   --locale=$DEFAULT_LANGUAGE \
   -y
 
-# Set the site mail on install because it is ignored by config ignore.
+echo -e "${LIGHT_GREEN}Set the site mail on install because it is ignored by config ignore.${NC}"
 $DRUSH config:set system.site mail $SITE_MAIL -y
 
-# Import configuration so splits and some side effects are taken into account.
+echo -e "${LIGHT_GREEN}Import configuration so splits and some side effects are taken into account.${NC}"
 $DRUSH config:import -y
 
-# Launch updates. Ensure that the database schema is up-to-date.
+echo -e "${LIGHT_GREEN}Launch updates. Ensure that the database schema is up-to-date.${NC}"
 $DRUSH updatedb --entity-updates -y
 
 . $SCRIPTS_PATH/tasks/migrate_imports.sh
 . $SCRIPTS_PATH/tasks/update_translations.sh
 
-# Run CRON.
+echo -e "${LIGHT_GREEN}Run CRON.${NC}"
 $DRUSH core:cron
 
-# Flush caches to be clean.
+echo -e "${LIGHT_GREEN}Flush caches to be clean.${NC}"
 $DRUSH cache:rebuild
 
-# Back to the current directory.
+echo -e "${LIGHT_GREEN}Back to the current directory.${NC}"
 cd $CURRENT_PATH
