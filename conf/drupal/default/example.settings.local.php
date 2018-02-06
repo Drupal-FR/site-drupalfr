@@ -12,6 +12,7 @@ $databases['default']['default'] = [
 $settings['hash_salt'] = 'drupalfr';
 $settings['trusted_host_patterns'] = [
   '^127\.0\.0\.1$',
+  getenv('DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME'),
   'varnish',
   'web',
 ];

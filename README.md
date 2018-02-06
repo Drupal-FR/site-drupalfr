@@ -45,6 +45,15 @@ cd ..
 
 The website **should** be located at this address: `http://127.0.0.1:8101/*`
 
+#### Traefik integration
+
+If there's a local traefik reverse-proxy on your development environment, you
+can access the site through http://drupalfr.docker/
+
+An alternative hostname can be provided by setting the 
+DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME environment variable, for instance
+using a .env file. 
+
 ### Notes about configuration
 
 We have switched from Features to Config split, Config ignore, Config installer.

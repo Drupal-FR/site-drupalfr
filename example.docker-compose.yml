@@ -1,12 +1,16 @@
-version: "2"
+version: "2.3"
 
 services:
   web:
     extends:
       file: ./docker-compose-common.yml
       service: drupal-php-apache-dev
+    environment:
+      - DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME=${DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME:-drupalfr.docker}
     ports:
       - 8101:80
+    labels:
+      - traefik.frontend.rule=Host:${DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME:-drupalfr.docker}
     depends_on:
       - mysql
       - redis
