@@ -160,3 +160,8 @@ function drupal_france_preprocess_menu__account(&$variables) {
     );
   }
 }
+
+function drupal_france_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+    // Remove eu_cookie_compliance.css file.
+    unset($css[drupal_get_path('module', 'eu_cookie_compliance') . '/css/eu_cookie_compliance.css']);
+}
