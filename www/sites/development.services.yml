@@ -1,10 +1,9 @@
 # Local development services.
 
+parameters:
+  http.response.debug_cacheability_headers: true
+  twig.config:
+    debug: true
 services:
   cache.backend.null:
     class: Drupal\Core\Cache\NullBackendFactory
-
-parameters:
-  twig.config:
-    debug: true
-  http.response.debug_cacheability_headers: true

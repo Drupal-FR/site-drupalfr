@@ -156,17 +156,6 @@
   <copyField source="ts_*" dest="spell"/>
   <copyField source="tm_*" dest="spell"/>
 
-  <copyField source="ts_*" dest="twm_suggest"/>
-  <copyField source="tm_*" dest="twm_suggest"/>
-  <copyField source="tos_*" dest="twm_suggest"/>
-  <copyField source="tom_*" dest="twm_suggest"/>
-  <copyField source="tus_*" dest="twm_suggest"/>
-  <copyField source="tum_*" dest="twm_suggest"/>
-  <copyField source="tes_*" dest="twm_suggest"/>
-  <copyField source="tem_*" dest="twm_suggest"/>
-  <copyField source="tws_*" dest="twm_suggest"/>
-  <copyField source="twm_*" dest="twm_suggest"/>
-
   <!-- Dynamic field definitions.  If a field name is not found, dynamicFields
        will be used if the name matches any of the patterns.
        RESTRICTION: the glob-like pattern in the name attribute must have
@@ -474,60 +463,6 @@
       </analyzer>
     </fieldType>
 
-    <!-- An unstemmed text field - good if one does not know the language of the field -->
-    <fieldType name="text_und" class="solr.TextField" positionIncrementGap="100">
-      <analyzer type="index">
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
-        <filter class="solr.WordDelimiterGraphFilterFactory"
-                protected="protwords.txt"
-                generateWordParts="1"
-                generateNumberParts="1"
-                catenateWords="1"
-                catenateNumbers="1"
-                catenateAll="0"
-                splitOnCaseChange="0"/>
-        <filter class="solr.LengthFilterFactory" min="2" max="100" />
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-      <analyzer type="query">
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
-        <filter class="solr.StopFilterFactory"
-                ignoreCase="true"
-                words="stopwords.txt"
-                />
-        <filter class="solr.WordDelimiterGraphFilterFactory"
-                protected="protwords.txt"
-                generateWordParts="1"
-                generateNumberParts="1"
-                catenateWords="0"
-                catenateNumbers="0"
-                catenateAll="0"
-                splitOnCaseChange="0"/>
-        <filter class="solr.LengthFilterFactory" min="2" max="100" />
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-      <analyzer type="multiterm">
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
-        <filter class="solr.StopFilterFactory"
-                ignoreCase="true"
-                words="stopwords.txt"
-                />
-        <filter class="solr.WordDelimiterGraphFilterFactory"
-                protected="protwords.txt"
-                generateWordParts="1"
-                generateNumberParts="1"
-                catenateWords="0"
-                catenateNumbers="0"
-                catenateAll="0"
-                splitOnCaseChange="0"/>
-        <filter class="solr.LengthFilterFactory" min="2" max="100" />
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-    </fieldType>
-
     <fieldType name="edge_n2_kw_text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-ISOLatin1Accent.txt"/>
@@ -561,7 +496,6 @@
         />
         <filter class="solr.LengthFilterFactory" min="2" max="100" />
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
       </analyzer>
       <analyzer type="multiterm">
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-ISOLatin1Accent.txt"/>
@@ -573,7 +507,6 @@
         />
         <filter class="solr.LengthFilterFactory" min="2" max="100" />
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
       </analyzer>
     </fieldType>
 

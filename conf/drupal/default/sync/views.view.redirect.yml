@@ -5,7 +5,6 @@ dependencies:
   module:
     - link
     - redirect
-    - system
     - user
 _core:
   default_config_hash: Tm6QoaGPvoGikEEJs6iuSB0LdSw3uzD9PPJ7DhkQJAg
@@ -360,6 +359,7 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+            placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -400,6 +400,7 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+            placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -443,6 +444,9 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+            placeholder: ''
+            min_placeholder: ''
+            max_placeholder: ''
           is_grouped: true
           group_info:
             label: 'Status code'

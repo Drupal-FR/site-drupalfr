@@ -1,7 +1,7 @@
 domain: ''
 domains_option: 1
 domains_list: ''
-eu_only: false
+eu_only: null
 exclude_paths: "/admin\r\n/admin/*\r\n/batch\r\n/node/add*\r\n/node/*/*\r\n/user/*/*"
 export:
   folder: custom
@@ -13,7 +13,7 @@ popup_agree_button_message: OK
 popup_agreed_enabled: false
 popup_bg_hex: 01273A
 popup_clicking_confirmation: true
-popup_delay: 1
+popup_delay: 1000
 popup_disagree_button_message: 'Non, donnez moi plus d''informations'
 popup_enabled: true
 popup_find_more_button_message: 'Plus d''infos'
@@ -23,10 +23,28 @@ popup_hide_button_message: Masquer
 popup_info:
   value: "<h2>Nous utilisons des cookies sur ce site pour améliorer votre expérience utilisateur</h2>\r\n\r\n<p>En cliquant sur n'importe quel lien de cette page vous nous donnez votre consentement pour envoyer des cookies.</p>\r\n"
   format: full_html
-popup_link: 'internal:/home'
+popup_link: '<front>'
 popup_link_new_window: true
 popup_position: false
 popup_text_hex: ffffff
 popup_width: 100%
 _core:
   default_config_hash: 8DEBPceUEPO-Cf2mpfehjO317-zCaAjJUE9dru6EC-8
+cookie_lifetime: 100
+mobile_popup_info:
+  value: ''
+  format: full_html
+show_disagree_button: true
+popup_scrolling_confirmation: false
+use_mobile_message: false
+mobile_breakpoint: 768
+exclude_admin_theme: true
+eu_only_js: null
+use_bare_css: false
+disagree_do_not_show_popup: false
+reload_page: false
+cookie_name: ''
+exclude_uid_1: false
+better_support_for_screen_readers: false
+fixed_top_position: false
+script_scope: footer
