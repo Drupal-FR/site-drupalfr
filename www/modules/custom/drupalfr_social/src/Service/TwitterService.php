@@ -2,6 +2,7 @@
 
 namespace Drupal\drupalfr_social\Service;
 
+use Abraham\TwitterOAuth\TwitterOAuthException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -76,21 +77,30 @@ class TwitterService implements TwitterServiceInterface {
    * {@inheritdoc}
    */
   public function getStatuses($path, array $options) {
+    $error = FALSE;
     $connection = $this->getConnection();
-    $connection->setTimeouts(10, 15);
 
-    $statuses = $connection->get($path, $options);
+    try {
+      $statuses = $connection->get($path, $options);
 
-    if ($connection->getLastHttpCode() == 200) {
-      return $statuses;
+      if ($connection->getLastHttpCode() != 200) {
+        $statuses = [];
+        $error = TRUE;
+      }
     }
-    else {
+    catch (TwitterOAuthException $exception) {
+      $statuses = [];
+      $error = TRUE;
+    }
+
+    if ($error) {
       $url = Url::fromRoute('drupalfr_social.config');
       if ($url->renderAccess($url->toRenderArray())) {
         $this->messenger->addError($this->t('Unable to request Twitter. Please check your <a href=":url">twitter connection settings</a>.', [':url' => $url->toString()]));
       }
-      return [];
     }
+
+    return $statuses;
   }
 
 }
