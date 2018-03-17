@@ -4,6 +4,7 @@ namespace Drupal\drupalfr_release\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\drupalfr_release\Service\ReleaseHelperInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,13 +24,23 @@ class Import extends FormBase {
   protected $releaseHelper;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs a ContentEntityForm object.
    *
    * @param \Drupal\drupalfr_release\Service\ReleaseHelperInterface $release_helper
    *   The entity type manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(ReleaseHelperInterface $release_helper) {
+  public function __construct(ReleaseHelperInterface $release_helper, MessengerInterface $messenger) {
     $this->releaseHelper = $release_helper;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -37,7 +48,8 @@ class Import extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('drupalfr_release.release_helper')
+      $container->get('drupalfr_release.release_helper'),
+      $container->get('messenger')
     );
   }
 
@@ -63,7 +75,7 @@ class Import extends FormBase {
     else {
       $url = Url::fromRoute('drupalfr_release.settings');
       if ($url->renderAccess($url->toRenderArray())) {
-        drupal_set_message($this->t('Please set the XML URL on <a href=":url">the settings page</a>.', [':url' => $url->toString()]), 'error');
+        $this->messenger->addError($this->t('Please set the XML URL on <a href=":url">the settings page</a>.', [':url' => $url->toString()]));
       }
     }
 
