@@ -52,17 +52,18 @@ class ReleaseBatchHelper {
    *   If $success is FALSE, contains the operations that remained unprocessed.
    */
   public static function importReleaseBatchBatchFinished($success, array $results, array $operations) {
+    $messenger = \Drupal::messenger();
     if ($success) {
       $message = new PluralTranslatableMarkup(
         count($results),
         'One release processed.',
         '@count releases processed.'
       );
+      $messenger->addStatus($message);
     }
     else {
-      $message = t('Finished with an error.');
+      $messenger->addError(t('Finished with an error.'));
     }
-    drupal_set_message($message);
   }
 
 }
