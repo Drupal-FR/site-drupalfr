@@ -1,3 +1,4 @@
+uuid: d10568bf-ca4b-4a0a-85fe-fd7e7e0f3472
 langcode: fr
 status: open
 dependencies:
@@ -6,6 +7,12 @@ dependencies:
       - webform
   module:
     - honeypot
+third_party_settings:
+  honeypot:
+    honeypot: true
+    time_restriction: false
+_core:
+  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
 open: null
 close: null
 uid: null
@@ -221,10 +228,3 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
-uuid: d10568bf-ca4b-4a0a-85fe-fd7e7e0f3472
-third_party_settings:
-  honeypot:
-    honeypot: true
-    time_restriction: false
-_core:
-  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
