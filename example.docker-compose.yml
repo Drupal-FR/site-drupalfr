@@ -1,28 +1,30 @@
-version: "2"
+version: "2.3"
 
 services:
   web:
     extends:
       file: ./docker-compose-common.yml
       service: drupal-php-apache-dev
+    environment:
+      - DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME=${DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME:-web.drupalfr8.docker.localhost}
     ports:
       - 8101:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME:-web.drupalfr8.docker.localhost}"
     depends_on:
       - mysql
       - redis
       - mail
 
 
-#  php:
-#    extends:
-#      file: ./docker-compose-common.yml
-#      service: drupal-php-dev
-
-
   varnish:
     extends:
       file: ./docker-compose-common.yml
       service: varnish
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${VARNISH_TRAEFIK_FRONTEND_RULE_HOSTNAME:-varnish.drupalfr8.docker.localhost}"
     depends_on:
       - web
     ports:
@@ -61,5 +63,9 @@ services:
 
   mail:
     image: djfarrelly/maildev
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${MAIL_TRAEFIK_FRONTEND_RULE_HOSTNAME:-mail.drupalfr8.docker.localhost}"
+      - "traefik.port=80"
     ports:
       - 8105:80

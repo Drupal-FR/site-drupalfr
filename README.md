@@ -11,66 +11,29 @@ Merci pour votre aide !
 
 ## Requirements
 
+To use with Docker:
+* Docker
+* Docker compose
+
+To use outside of Docker:
 * Composer
 
-## Installation
+Scripts inside the scripts folder don't have dependencies on Docker. So its
+could be executed outside of a Docker environment.
 
-* Execute: `scripts/init.sh`
-* Adapt the following files to your configuration:
-  * scripts/script-parameters.local.sh
-  * www/sites/default/settings.local.php
-* Execute `scripts/install.sh` (do not if using docker, see below)
+Some adjustment in configuration files may be required.
 
-### Additional steps to install with Docker compose
+## Services
 
-* **Do not execute scripts/install.sh from your computer.**.
-* Adapt the following files to your configuration:
-  * docker-compose.yml
-* Execute: 
+If using Docker with the default provided configuration, you will have:
+* the website accessible through Apache: http://web.drupalfr8.docker.localhost or http://127.0.0.1:8101
+* the website accessible through Varnish: http://varnish.drupalfr8.docker.localhost or http://127.0.0.1:8100
+* a mail catcher: http://mail.drupalfr8.docker.localhost or http://127.0.0.1:8105
+
+Note: You have to adapt your DNS configuration to inform your computer to search
+for local websites.
+
+For example, you can edit your /etc/hosts file and add an entry like:
 ```
-docker-compose pull
-docker-compose up
-```
-
-* In another tab, get a command-line in the container:
-```
-docker-compose exec web /bin/bash
-```
-(*container_name* should be remplaced by the name of the **web** container)
-* Execute:
-```
-cd ..
-./scripts/install.sh
-```
-
-The website **should** be located at this address: `http://127.0.0.1:8101/*`
-
-### Notes about configuration
-
-We have switched from Features to Config split, Config ignore, Config installer.
-
-**Warning:** when using `drush config:export` to export changes, the config ignore
-settings is ignored. So please be cautious and review the changes before
-committing.
-
-### Q/A
-#### How to find out the container names?
-You can use the command `docker ps` which list all the running docker containers.
-
-![docker PS](http://i.imgur.com/SDgHsqs.png)
-
-#### How to use drush within docker?
-You can use docker within the web container by using the alias `@docker.default.local`:
-
-```
-drush @docker.default.local status
-```
-
-Note: you have to "be" in the docroot folder (eg: `/project/www`)
-
-#### How to import a custom dump?
-
-Put the dump in the `backups` folder and then in the **web** container you can use the following command:
-```
-zcat /project/backups/DUMP_NAME.sql.gz | mysql -u drupal -pdrupal -h mysql drupal
+127.0.0.1  web.drupalfr8.docker.localhost varnish.drupalfr8.docker.localhost mail.drupalfr8.docker.localhost
 ```

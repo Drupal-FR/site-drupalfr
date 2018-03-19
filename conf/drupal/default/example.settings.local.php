@@ -16,6 +16,10 @@ $settings['trusted_host_patterns'] = [
   'web',
 ];
 
+if (getenv('DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME')) {
+  $settings['trusted_host_patterns'][] = getenv('DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME');
+}
+
 $settings['file_private_path'] = '/project/private_files/default';
 
 // Config split.

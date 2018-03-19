@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  traefik:
+    image: traefik:1.5-alpine
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/etc/traefik/traefik.toml

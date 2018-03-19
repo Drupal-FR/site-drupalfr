@@ -52,15 +52,23 @@ $drupal-blue-lighter:           #4d9dcc;
 $drupal-blue-desaturate:        #245d82;
 $drupal-blue-desaturate-light:  #82a3b8;
 
+$drupal-grey:                   #cccccc;
+$drupal-grey-light:             #eeeeee;
+$drupal-blue-green:             #14435d;
+$drupal-blue-green-light:       #007c8f;
+$drupal-blue-green-lighter:     #72b0b4;
+// TODO: rename this variable.
+$drupal-blue-green-lightest:    #e3e3d8;
+
 $global-font-size:      100%;
 $global-width:          rem-calc(1200);
 $global-lineheight:     1.5;
 
 $foundation-palette: (
-  primary:      #064771,
-  secondary:    #0678be,
-  tertiary:     #245d82,
-  quaternary:   #82a3b8,
+  primary:      $drupal-blue-dark,
+  secondary:    $drupal-blue-light,
+  tertiary:     $drupal-blue-desaturate,
+  quaternary:   $drupal-blue-desaturate-light,
   success:      #3adb76,
   warning:      #ffae00,
   alert:        #cc4b37,
