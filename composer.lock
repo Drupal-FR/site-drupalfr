@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba1672cab6b20352ee43d4e98eb86c7a",
+    "content-hash": "4d6f5a8866fd3ea3160c22cf5f3c4989",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -3365,17 +3365,17 @@
         },
         {
             "name": "drupal/eu_cookie_compliance",
-            "version": "1.0.0-beta7",
+            "version": "1.0.0-beta12",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/eu-cookie-compliance",
-                "reference": "8.x-1.0-beta7"
+                "reference": "8.x-1.0-beta12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/eu_cookie_compliance-8.x-1.0-beta7.zip",
-                "reference": "8.x-1.0-beta7",
-                "shasum": "c8859fbeb5f6b1122c0eb6c5df1c4cd4b2961421"
+                "url": "https://ftp.drupal.org/files/projects/eu_cookie_compliance-8.x-1.0-beta12.zip",
+                "reference": "8.x-1.0-beta12",
+                "shasum": "fb4872c46946e85992592610716288241d499c9b"
             },
             "require": {
                 "drupal/core": "*"
@@ -3386,13 +3386,17 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-beta7",
-                    "datestamp": "1471263146"
+                    "version": "8.x-1.0-beta12",
+                    "datestamp": "1520778184",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Beta releases are not covered by Drupal security advisories."
+                    }
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
             "license": [
-                "GPL-2.0+"
+                "GPL-2.0-or-later"
             ],
             "authors": [
                 {
@@ -10084,7 +10088,13 @@
                 "reference": null,
                 "shasum": null
             },
-            "type": "drupal-library"
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "drupal-library",
+            "extra": {
+                "installer-name": "highlightjs"
+            }
         },
         {
             "name": "d3/d3",
@@ -10095,7 +10105,13 @@
                 "reference": null,
                 "shasum": null
             },
-            "type": "drupal-library"
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "drupal-library",
+            "extra": {
+                "installer-name": "d3"
+            }
         },
         {
             "name": "dflydev/dot-access-configuration",
@@ -10271,12 +10287,6 @@
                 "url": "https://git.drupal.org/project/coder.git",
                 "reference": "984c54a7b1e8f27ff1c32348df69712afd86b17f"
             },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/klausi/coder/zipball/984c54a7b1e8f27ff1c32348df69712afd86b17f",
-                "reference": "984c54a7b1e8f27ff1c32348df69712afd86b17f",
-                "shasum": ""
-            },
             "require": {
                 "ext-mbstring": "*",
                 "php": ">=5.4.0",
@@ -10324,12 +10334,16 @@
                 },
                 "drupal": {
                     "version": "8.x-1.0-beta1",
-                    "datestamp": "1448357340"
+                    "datestamp": "1448357340",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Beta releases are not covered by Drupal security advisories."
+                    }
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
             "license": [
-                "GPL-2.0+"
+                "GPL-2.0-or-later"
             ],
             "authors": [
                 {

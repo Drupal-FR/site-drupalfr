@@ -24,7 +24,9 @@
     </div>
     <div id="popup-buttons">
       <button type="button" class="agree-button button inverted secondary">{{ agree_button }}</button>
-      <button type="button" class="find-more-button button inverted secondary">{{ disagree_button }}</button>
+      {% if disagree_button %}
+        <button type="button" class="find-more-button button inverted secondary">{{ disagree_button }}</button>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -24,7 +24,9 @@
     </div>
     <div id="popup-buttons">
       <button type="button" class="hide-popup-button button inverted secondary">{{ hide_button }}</button>
-      <button type="button" class="find-more-button button inverted secondary" >{{ find_more_button }}</button>
+      {% if find_more_button %}
+        <button type="button" class="find-more-button button inverted secondary">{{ find_more_button }}</button>
+      {% endif %}
     </div>
   </div>
 </div>
