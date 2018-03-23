@@ -3,6 +3,7 @@
 namespace Drupal\drupalfr_meetup\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use MeetupEvents;
@@ -25,6 +26,13 @@ class MeetupHelper implements MeetupHelperInterface {
   protected $configFactory;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * The connection object.
    *
    * @var \MeetupKeyAuthConnection
@@ -43,9 +51,12 @@ class MeetupHelper implements MeetupHelperInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  public function __construct(ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {
     $this->configFactory = $config_factory;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -93,7 +104,7 @@ class MeetupHelper implements MeetupHelperInterface {
     catch (MeetupUnauthorizedRequestException $exception) {
       $url = Url::fromRoute('drupalfr_meetup.config');
       if ($url->renderAccess($url->toRenderArray())) {
-        drupal_set_message($this->t('Unable to request Meetup. Please check your <a href=":url">meetup connection settings</a>.', [':url' => $url->toString()]), 'error');
+        $this->messenger->addError($this->t('Unable to request Meetup. Please check your <a href=":url">meetup connection settings</a>.', [':url' => $url->toString()]));
       }
     }
     return $events;

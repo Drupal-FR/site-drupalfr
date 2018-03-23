@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\drupalfr_meetup\Service\MeetupHelperInterface;
+use Drupal\leaflet\LeafletService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,11 +20,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Drupal\drupalfr_meetup\Service\MeetupHelper definition.
+   * The meetup helper service.
    *
    * @var \Drupal\drupalfr_meetup\Service\MeetupHelperInterface
    */
   protected $meetupHelper;
+
+  /**
+   * The leaflet service.
+   *
+   * @var \Drupal\leaflet\LeafletService
+   */
+  protected $leafletService;
 
   /**
    * Constructs a new DrupalfrMeetupHomeBlock object.
@@ -36,15 +44,19 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
    *   The plugin implementation definition.
    * @param \Drupal\drupalfr_meetup\Service\MeetupHelperInterface $drupalfr_meetup_meetup_helper
    *   The meetup helper service.
+   * @param \Drupal\leaflet\LeafletService $leaflet_service
+   *   The leaflet service.
    */
   public function __construct(
         array $configuration,
         $plugin_id,
         $plugin_definition,
-        MeetupHelperInterface $drupalfr_meetup_meetup_helper
+        MeetupHelperInterface $drupalfr_meetup_meetup_helper,
+        LeafletService $leaflet_service
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->meetupHelper = $drupalfr_meetup_meetup_helper;
+    $this->leafletService = $leaflet_service;
   }
 
   /**
@@ -55,7 +67,8 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('drupalfr_meetup.meetup_helper')
+      $container->get('drupalfr_meetup.meetup_helper'),
+      $container->get('leaflet.service')
     );
   }
 
@@ -107,7 +120,7 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
     $events = $this->meetupHelper->getEvents();
     if (!empty($events)) {
       $map = leaflet_map_get_info('OSM Mapnik');
-      $build['map'] = leaflet_render_map($map, $this->meetupHelper->prepareLeafletFeatures($events), '400px');
+      $build['map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '400px');
       $build['map']['#cache'] = [
         // 15 minutes.
         'max-age' => '900',

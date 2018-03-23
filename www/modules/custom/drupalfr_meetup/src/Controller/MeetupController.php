@@ -5,6 +5,7 @@ namespace Drupal\drupalfr_meetup\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\drupalfr_meetup\Service\MeetupHelperInterface;
+use Drupal\leaflet\LeafletService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,15 +23,26 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
   protected $meetupHelper;
 
   /**
+   * The leaflet service.
+   *
+   * @var \Drupal\leaflet\LeafletService
+   */
+  protected $leafletService;
+
+  /**
    * Construct.
    *
    * @param \Drupal\drupalfr_meetup\Service\MeetupHelperInterface $meetup_helper
    *   A twitter service.
+   * @param \Drupal\leaflet\LeafletService $leaflet_service
+   *   The leaflet service.
    */
   public function __construct(
-    MeetupHelperInterface $meetup_helper
+    MeetupHelperInterface $meetup_helper,
+    LeafletService $leaflet_service
   ) {
     $this->meetupHelper = $meetup_helper;
+    $this->leafletService = $leaflet_service;
   }
 
   /**
@@ -38,7 +50,8 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('drupalfr_meetup.meetup_helper')
+      $container->get('drupalfr_meetup.meetup_helper'),
+      $container->get('leaflet.service')
     );
   }
 
@@ -66,7 +79,7 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
       ];
 
       $map = leaflet_map_get_info('OSM Mapnik');
-      $page['#map'] = leaflet_render_map($map, $this->meetupHelper->prepareLeafletFeatures($events), '600px');
+      $page['#map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '600px');
     }
 
     return $page;

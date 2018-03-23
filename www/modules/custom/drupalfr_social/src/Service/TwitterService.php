@@ -2,8 +2,10 @@
 
 namespace Drupal\drupalfr_social\Service;
 
+use Abraham\TwitterOAuth\TwitterOAuthException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Abraham\TwitterOAuth\TwitterOAuth;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
@@ -13,6 +15,7 @@ use Drupal\Core\Url;
  * @package Drupal\drupalfr_social
  */
 class TwitterService implements TwitterServiceInterface {
+
   use StringTranslationTrait;
 
   /**
@@ -21,6 +24,13 @@ class TwitterService implements TwitterServiceInterface {
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
 
   /**
    * The connection object.
@@ -34,9 +44,12 @@ class TwitterService implements TwitterServiceInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  public function __construct(ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {
     $this->configFactory = $config_factory;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -64,21 +77,30 @@ class TwitterService implements TwitterServiceInterface {
    * {@inheritdoc}
    */
   public function getStatuses($path, array $options) {
+    $error = FALSE;
     $connection = $this->getConnection();
-    $connection->setTimeouts(10, 15);
 
-    $statuses = $connection->get($path, $options);
+    try {
+      $statuses = $connection->get($path, $options);
 
-    if ($connection->getLastHttpCode() == 200) {
-      return $statuses;
+      if ($connection->getLastHttpCode() != 200) {
+        $statuses = [];
+        $error = TRUE;
+      }
     }
-    else {
+    catch (TwitterOAuthException $exception) {
+      $statuses = [];
+      $error = TRUE;
+    }
+
+    if ($error) {
       $url = Url::fromRoute('drupalfr_social.config');
       if ($url->renderAccess($url->toRenderArray())) {
-        drupal_set_message($this->t('Unable to request Twitter. Please check your <a href=":url">twitter connection settings</a>.', [':url' => $url->toString()]), 'error');
+        $this->messenger->addError($this->t('Unable to request Twitter. Please check your <a href=":url">twitter connection settings</a>.', [':url' => $url->toString()]));
       }
-      return [];
     }
+
+    return $statuses;
   }
 
 }
