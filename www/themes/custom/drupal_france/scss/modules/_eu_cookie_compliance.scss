@@ -1,92 +1,73 @@
-#sliding-popup {
-  display: block;
-  margin: 0;
-  padding: 0px;
-  right: 0;
-  text-align: center;
-  width: 100%;
-  z-index: 99999;
-  font-family : 'Open Sans';
-  color : $white;
-
-}
-
 .sliding-popup-bottom {
-  background: $drupal-blue-dark;
   position: fixed;
+  z-index: 9999999;
+  background: $drupal-blue-dark;
+  text-align: center;
 }
 
-.sliding-popup-top {
-  background-color: #000;
-  position: relative;
-}
-
-#sliding-popup .popup-content {
-  background-color: transparent;
-  border: 0 none;
-  display: block;
+.popup-content {
   margin: 0 auto;
   padding: 0;
-  max-width: 80%;
-}
 
-#sliding-popup .popup-content #popup-buttons {
-  float: right;
-  margin: 0;
-  max-width: 40%;
-}
-
-#sliding-popup .popup-content #popup-buttons button {
-  cursor: pointer;
-  display: inline;
-  margin-right: 5px;
-  margin-top: 1em;
-  vertical-align: middle;
-  overflow: visible;
-  width: auto;
-  display:inline-block;
-  text-decoration:none;
-}
+  .popup-buttons {
+    float: right;
+    max-width: 40%;
+    margin: 0;
 
 
-#sliding-popup .popup-content #popup-text {
-  color: #fff;
-  float: left;
-  font-weight: bold;
-  margin: 5px 0;
-  text-align: left;
-  max-width: 60%;
-}
+    button {
+      display: inline;
 
-#sliding-popup .popup-content #popup-text h2,
-#sliding-popup .popup-content #popup-text p {
-  color: #fff;
-  display: block;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.4;
-  margin: 0 0 5px 0;
-}
+      vertical-align: middle;
+      width: auto;
+      margin: 1em 5px 0 0;
+      overflow: visible;
+      text-decoration: none;
+      cursor: pointer;
+    }
 
-#sliding-popup .popup-content #popup-text p {
-  font-size: 12px;
-}
+    .popup-text {
+      float: left;
+      max-width: 60%;
+      margin: 5px 0 0 5px;
+      font-weight: bold;
+      color: $white;
+      text-align: left;
 
-@media screen and (max-width: 600px) {
-  #sliding-popup .popup-content {
-    max-width: 95%;
+      h2,
+      p {
+        display: block;
+        margin: 0 0 5px;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1.4;
+        color: $white;
+      }
+
+      p {
+        font-size: 12px;
+      }
+
+    }
   }
+  @media screen and (max-width: 600px) {
+    .popup-content {
+      max-width: 95%;
+    }
 
-  #sliding-popup .popup-content #popup-text {
-    max-width: 100%;
-  }
+    .popup-text {
+      max-width: 100%;
+    }
 
-  #sliding-popup .popup-content #popup-buttons {
-    float: none;
-    margin: 5px 0;
-    max-width: 100%;
-  }
-  #sliding-popup .popup-content #popup-buttons button {
-    margin-bottom: 1em;
+    .popup-buttons {
+      float: none;
+      max-width: 100%;
+      margin: 5px 0;
+
+      button {
+        margin-bottom: 1em;
+      }
+    }
   }
 }
+
