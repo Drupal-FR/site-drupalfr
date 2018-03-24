@@ -3,28 +3,10 @@
   z-index: 9999999;
   background: $drupal-blue-dark;
   text-align: center;
-}
 
-.popup-content {
-  margin: 0 auto;
-  padding: 0;
-
-  .popup-buttons {
-    float: right;
-    max-width: 40%;
-    margin: 0;
-
-
-    button {
-      display: inline;
-
-      vertical-align: middle;
-      width: auto;
-      margin: 1em 5px 0 0;
-      overflow: visible;
-      text-decoration: none;
-      cursor: pointer;
-    }
+  .popup-content {
+    margin: 0 auto;
+    padding: 0;
 
     .popup-text {
       float: left;
@@ -47,13 +29,31 @@
       p {
         font-size: 12px;
       }
+    }
 
+    .popup-buttons {
+      float: right;
+      max-width: 40%;
+      margin: 0;
+
+      button {
+        display: inline;
+
+        vertical-align: middle;
+        width: auto;
+        margin: 1em 5px 0 0;
+        overflow: visible;
+        text-decoration: none;
+        cursor: pointer;
+      }
     }
   }
-  @media screen and (max-width: 600px) {
-    .popup-content {
-      max-width: 95%;
-    }
+
+}
+
+@media screen and (max-width: 600px) {
+  .popup-content {
+    max-width: 95%;
 
     .popup-text {
       max-width: 100%;
@@ -68,6 +68,7 @@
         margin-bottom: 1em;
       }
     }
+
   }
 }
 
