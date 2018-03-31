@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - field.storage.node.field_event_sponsor
-    - node.type.organization
     - node.type.event
 _core:
   default_config_hash: '-csLOq3--QMJ-i-gVyGxlxq4Vg0rcl6D2sXxS2LFNKs'
@@ -19,12 +18,6 @@ translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  handler: 'default:node'
-  handler_settings:
-    target_bundles:
-      organization: organization
-    sort:
-      field: _none
-    auto_create: false
-    auto_create_bundle: ''
+  handler: 'default:user'
+  handler_settings: {  }
 field_type: entity_reference
