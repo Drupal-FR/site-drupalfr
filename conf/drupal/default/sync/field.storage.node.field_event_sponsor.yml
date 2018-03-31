@@ -4,6 +4,7 @@ status: true
 dependencies:
   module:
     - node
+    - user
 _core:
   default_config_hash: ioRHBZ7mV8Q1mM5JKv4xXqbmZI4hn5xcV4FLkMlFNvQ
 id: node.field_event_sponsor
@@ -11,7 +12,7 @@ field_name: field_event_sponsor
 entity_type: node
 type: entity_reference
 settings:
-  target_type: node
+  target_type: user
 module: core
 locked: false
 cardinality: -1
