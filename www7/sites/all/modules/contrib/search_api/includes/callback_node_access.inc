@@ -12,11 +12,17 @@ class SearchApiAlterNodeAccess extends SearchApiAbstractAlterCallback {
   /**
    * Overrides SearchApiAbstractAlterCallback::supportsIndex().
    *
-   * Returns TRUE only for indexes on nodes.
+   * Returns TRUE only for indexes on nodes or multi-entity indexes that include
+   * nodes.
    */
   public function supportsIndex(SearchApiIndex $index) {
     // Currently only node access is supported.
-    return $index->getEntityType() === 'node';
+    if ($this->isMultiEntityIndex($index)) {
+      return in_array('node', $index->options['datasource']['types']);
+    }
+    else {
+      return $index->getEntityType() == 'node';
+    }
   }
 
   /**
@@ -47,6 +53,12 @@ class SearchApiAlterNodeAccess extends SearchApiAbstractAlterCallback {
 
     foreach ($items as $id => $item) {
       $node = $this->getNode($item);
+
+      // Skip non-node items.
+      if (empty($node)) {
+        continue;
+      }
+
       // Check whether all users have access to the node.
       if (!node_access('view', $node, $account)) {
         // Get node access grants.
@@ -71,8 +83,19 @@ class SearchApiAlterNodeAccess extends SearchApiAbstractAlterCallback {
    * In the default implementation for nodes, the item is already the node.
    * Subclasses may override this to easily provide node access checks for
    * items related to nodes.
+   *
+   * @param $item
+   *  The item which is being indexed.
+   *
+   * @return
+   *  Either the node object, or NULL if the current item is not a node.
    */
   protected function getNode($item) {
+    if ($this->isMultiEntityIndex()) {
+      // For multi-entity indexes, check whether the item is a node.
+      return $item->item_type == 'node' ? $item->node : NULL;
+    }
+    // Normal node index: the whole item is the node.
     return $item;
   }
 

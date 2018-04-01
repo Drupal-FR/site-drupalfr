@@ -1026,6 +1026,28 @@ function search_api_search_api_item_type_info() {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensures the item type and service class static caches are invalidated at the
+ * right time.
+ */
+function search_api_module_implements_alter(array &$implementations, $hook) {
+  switch ($hook) {
+    case 'modules_enabled':
+      $group = $implementations['search_api'];
+      unset($implementations['search_api']);
+      $implementations = array('search_api' => $group) + $implementations;
+      break;
+
+    case 'modules_disabled':
+      $group = $implementations['search_api'];
+      unset($implementations['search_api']);
+      $implementations['search_api'] = $group;
+      break;
+  }
+}
+
+/**
  * Implements hook_modules_enabled().
  */
 function search_api_modules_enabled() {
@@ -2051,17 +2073,32 @@ function search_api_get_processors() {
 function search_api_search_api_query_alter(SearchApiQueryInterface $query) {
   global $user;
   $index = $query->getIndex();
+
   // Only add node access if the necessary fields are indexed in the index, and
   // unless disabled explicitly by the query.
-  $type = $index->getEntityType();
-  if (!empty($index->options['data_alter_callbacks']["search_api_alter_{$type}_access"]['status']) && !$query->getOption('search_api_bypass_access')) {
+  $types = array();
+  if ($index->getEntityType()) {
+    $types[] = $index->getEntityType();
+  }
+  if (!empty($index->options['datasource']['types'])) {
+    $types += $index->options['datasource']['types'];
+  }
+  $data_alter_callback_exists = FALSE;
+  foreach ($types as $type) {
+    if (!empty($index->options['data_alter_callbacks']["search_api_alter_{$type}_access"]['status'])) {
+      $data_alter_callback_exists = TRUE;
+      break;
+    }
+  }
+
+  if ($data_alter_callback_exists && !$query->getOption('search_api_bypass_access')) {
     $account = $query->getOption('search_api_access_account', $user);
     if (is_numeric($account)) {
       $account = user_load($account);
     }
     if (is_object($account)) {
       try {
-        _search_api_query_add_node_access($account, $query, $type);
+        _search_api_query_add_node_access($account, $query);
       }
       catch (SearchApiException $e) {
         watchdog_exception('search_api', $e);
@@ -2087,66 +2124,125 @@ function search_api_search_api_query_alter(SearchApiQueryInterface $query) {
  *   The user object, who searches.
  * @param SearchApiQueryInterface $query
  *   The query to which a node access filter should be added, if applicable.
- * @param string $type
- *   (optional) The type of search – either "node" or "comment". Defaults to
- *   "node".
  *
  * @throws SearchApiException
  *   If not all necessary fields are indexed on the index.
  */
-function _search_api_query_add_node_access($account, SearchApiQueryInterface $query, $type = 'node') {
+function _search_api_query_add_node_access($account, SearchApiQueryInterface $query) {
   // Don't do anything if the user can access all content.
   if (user_access('bypass node access', $account)) {
     return;
   }
 
-  $is_comment = ($type == 'comment');
+  $affected_types = array();
+  $unaffected_types = array();
+  $status_field = NULL;
 
-  // Check whether the necessary fields are indexed.
-  $fields = $query->getIndex()->options['fields'];
-  $required = array('search_api_access_node', 'status');
-  if (!$is_comment) {
-    $required[] = 'author';
-  }
-  foreach ($required as $field) {
-    if (empty($fields[$field])) {
-      $vars['@field'] = $field;
-      $vars['@index'] = $query->getIndex()->name;
-      throw new SearchApiException(t('Required field @field not indexed on index @index. Could not perform access checks.', $vars));
+  $index = $query->getIndex();
+  // Gather the affected and unaffected entity types.
+  if ($index->item_type === 'multiple') {
+    $all_types = array();
+    if (isset($index->options['datasource']['types'])) {
+      $all_types = drupal_map_assoc($index->options['datasource']['types']);
+    }
+    foreach ($all_types as $type) {
+      if (in_array($type, array('node', 'comment'))) {
+        $affected_types[$type] = $type;
+        $status_field = "$type:status";
+      }
+      else {
+        $unaffected_types[$type] = $type;
+      }
     }
   }
-
-  // If the user cannot access content/comments at all, return no results.
-  if (!user_access('access content', $account) || ($is_comment && !user_access('access comments', $account))) {
-    // Simple hack for returning no results.
-    $query->condition('status', 0);
-    $query->condition('status', 1);
-    watchdog('search_api', 'User @name tried to execute a search, but cannot access content.', array('@name' => theme('username', array('account' => $account))), WATCHDOG_NOTICE);
+  elseif ($index->item_type === 'node') {
+    $affected_types['node'] = 'node';
+  }
+  elseif ($index->item_type === 'comment') {
+    $affected_types['comment'] = 'comment';
+  }
+  // Unaffected type. Do nothing.
+  else {
     return;
   }
 
-  // Filter by the "published" status.
-  $published = $is_comment ? COMMENT_PUBLISHED : NODE_PUBLISHED;
-  if (!$is_comment && user_access('view own unpublished content')) {
-    $filter = $query->createFilter('OR');
-    $filter->condition('status', $published);
-    $filter->condition('author', $account->uid);
-    $query->filter($filter);
+  // The filter structure we want looks like this:
+  //   [belongs to other datasource]
+  //   OR
+  //   (
+  //     [is enabled (or was created by the user, if applicable)]
+  //     AND
+  //     [grants view access to one of the user's gid/realm combinations]
+  //   )
+  // If there are no "other" datasources, we don't need the nested OR,
+  // however, and can add the inner conditions directly to the query.
+  if ($unaffected_types) {
+    $outer_conditions = $query->createFilter('OR', array('content_access'));
+    $query->filter($outer_conditions);
+    foreach ($unaffected_types as $type) {
+      $outer_conditions->condition('item_type', $type);
+    }
+    $access_conditions = $query->createFilter('AND');
+    $outer_conditions->filter($access_conditions);
   }
   else {
-    $query->condition('status', $published);
+    $access_conditions = $query;
   }
 
-  // Filter by node access grants.
-  $filter = $query->createFilter('OR');
+  if (!user_access('access content', $account)) {
+    unset($affected_types['node']);
+  }
+  if (!user_access('access comments', $account)) {
+    unset($affected_types['comment']);
+  }
+
+  // If the user does not have the permission to see any content at all, deny
+  // access to all items from affected datasources.
+  if (!$affected_types) {
+    // If there were "other" datasources, the existing filter will already
+    // remove all results of node or comment datasources. Otherwise, we should
+    // not return any results at all.
+    if (!$unaffected_types) {
+      // Simple hack for returning no results.
+      $query->condition($status_field, 0);
+      $query->condition($status_field, 1);
+      watchdog('search_api', 'User @name tried to execute a search, but cannot access content.', array('@name' => theme('username', array('account' => $account))), WATCHDOG_NOTICE);
+
+    }
+    return;
+  }
+
+  // Collect all the required fields that need to be part of the index.
+  $unpublished_own = user_access('view own unpublished content', $account);
+
+  $enabled_conditions = $query->createFilter('OR', array('content_access_enabled'));
+  foreach ($affected_types as $entity_type) {
+    // If this is a comment datasource, or users cannot view their own
+    // unpublished nodes, a simple filter on "status" is enough. Otherwise,
+    // it's a bit more complicated.
+    $status_field = $entity_type . ':status';
+    if ($status_field) {
+      $enabled_conditions->condition($status_field, '1');
+    }
+    if ($entity_type == 'node' && $unpublished_own) {
+      $author_field = $entity_type . ':author';
+      if ($author_field) {
+        $enabled_conditions->condition($author_field, $account->uid);
+      }
+    }
+  }
+
+  $access_conditions->filter($enabled_conditions);
+
+  // Filter by the user's node access grants.
+  $grants_conditions = $query->createFilter('OR', array('content_access_grants'));
   $grants = node_access_grants('view', $account);
   foreach ($grants as $realm => $gids) {
     foreach ($gids as $gid) {
-      $filter->condition('search_api_access_node', "node_access_$realm:$gid");
+      $grants_conditions->condition('search_api_access_node', "node_access_$realm:$gid");
     }
   }
-  $filter->condition('search_api_access_node', 'node_access__all');
-  $query->filter($filter);
+  $access_conditions->filter($grants_conditions);
 }
 
 /**
