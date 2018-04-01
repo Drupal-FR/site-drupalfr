@@ -12,10 +12,16 @@ class SearchApiAlterCommentAccess extends SearchApiAlterNodeAccess {
   /**
    * Overrides SearchApiAlterNodeAccess::supportsIndex().
    *
-   * Returns TRUE only for indexes on comments.
+   * Returns TRUE only for indexes on comments or multi-entity indexes that
+   * include comments.
    */
   public function supportsIndex(SearchApiIndex $index) {
-    return $index->getEntityType() === 'comment';
+    if ($this->isMultiEntityIndex($index)) {
+      return in_array('comment', $index->options['datasource']['types']);
+    }
+    else {
+      return $index->getEntityType() == 'comment';
+    }
   }
 
   /**
@@ -24,7 +30,16 @@ class SearchApiAlterCommentAccess extends SearchApiAlterNodeAccess {
    * Returns the comment's node, instead of the item (i.e., the comment) itself.
    */
   protected function getNode($item) {
-    return node_load($item->nid);
+    if ($this->isMultiEntityIndex()) {
+      if ($item->item_type !== 'comment') {
+        return NULL;
+      }
+      $nid = $item->comment->nid;
+    }
+    else {
+      $nid = $item->nid;
+    }
+    return node_load($nid);
   }
 
   /**
