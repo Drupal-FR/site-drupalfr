@@ -23,6 +23,8 @@ $DRUSH migrate:import drupalfr_feed --update
 $DRUSH migrate:import drupalfr_news_type --update
 $DRUSH migrate:import drupalfr_news --update
 $DRUSH migrate:import drupalfr_store --update
+$DRUSH migrate:import drupalfr_product_variation_membership --update
+$DRUSH migrate:import drupalfr_product_membership --update
 $DRUSH migrate:import drupalfr_forum_tag --update
 $DRUSH migrate:import drupalfr_forum_hierarchy --update
 $DRUSH migrate:import drupalfr_basic_block --update

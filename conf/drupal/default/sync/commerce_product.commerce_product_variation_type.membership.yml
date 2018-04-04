@@ -1,0 +1,18 @@
+uuid: 792b359d-bdfa-4306-9022-08953e84f197
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_license
+third_party_settings:
+  commerce_license:
+    license_types:
+      role: role
+    activate_on_place: false
+id: membership
+label: Adhésion
+orderItemType: membership
+generateTitle: false
+traits:
+  - commerce_license
+locked: false
