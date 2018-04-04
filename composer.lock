@@ -10355,7 +10355,13 @@
                 "reference": null,
                 "shasum": null
             },
-            "type": "drupal-library"
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "drupal-library",
+            "extra": {
+                "installer-name": "highlightjs"
+            }
         },
         {
             "name": "d3/d3",
@@ -10366,7 +10372,13 @@
                 "reference": null,
                 "shasum": null
             },
-            "type": "drupal-library"
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "drupal-library",
+            "extra": {
+                "installer-name": "d3"
+            }
         },
         {
             "name": "dflydev/dot-access-configuration",
@@ -10541,12 +10553,6 @@
                 "type": "git",
                 "url": "https://git.drupal.org/project/coder.git",
                 "reference": "984c54a7b1e8f27ff1c32348df69712afd86b17f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/klausi/coder/zipball/984c54a7b1e8f27ff1c32348df69712afd86b17f",
-                "reference": "984c54a7b1e8f27ff1c32348df69712afd86b17f",
-                "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
