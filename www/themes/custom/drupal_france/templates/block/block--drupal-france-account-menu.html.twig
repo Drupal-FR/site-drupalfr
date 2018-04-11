@@ -36,7 +36,7 @@
 {% set heading_id = attributes.id ~ '-menu'|clean_id %}
 
 <nav
-  {{ attributes.addClass('float-right')|without('role', 'aria-labelledby') }}
+  {{ attributes.addClass('header--user-account')|without('role', 'aria-labelledby') }}
   aria-labelledby="{{ heading_id }}"
   role="navigation"
 >

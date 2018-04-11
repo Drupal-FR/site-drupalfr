@@ -4,3 +4,16 @@
 .l-header {
   background-color: $drupal-blue-dark;
 }
+
+.l-main-menu-icon {
+  height:      40px;
+  line-height: 40px;
+}
+
+.l-main-menu-extra {
+  @include breakpoint(small only) {
+    display:        flex;
+    flex-direction: row-reverse;
+    padding-right:  0;
+  }
+}
