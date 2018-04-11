@@ -1,3 +1,11 @@
+// SITE NAME
+// =====================
+.site-name {
+  > a {
+    display: block;
+  }
+}
+
 // TOPBAR EXTRA ELEMENTS
 // =====================
 
@@ -6,12 +14,16 @@
 
 .header--search-block {
   .button--search {
-    padding:   .85rem 1rem;
-    font-size: 1.2rem !important;
+    height:        70px;
+    margin-bottom: 0;
+    padding:       .85rem 1rem;
+    font-size:     1.3rem !important;
+    line-height:   40px;
 
     &:hover,
     &:focus {
-      color: $white !important;
+      background-color: $drupal-blue-light;
+      color:            $white !important;
     }
   }
 }
