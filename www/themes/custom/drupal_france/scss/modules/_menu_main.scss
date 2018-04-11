@@ -3,65 +3,95 @@
 
 .main-menu {
   &[role='menubar'] {
-    display:         flex;
-    flex-direction:  row;
-    flex-wrap:       nowrap;
-    justify-content: space-between;
-    align-content:   center;
-    align-items:     center;
-    height:          70px;
 
-    > li {
-      height: 70px;
+    @include breakpoint(small only) {
+      li {
+        border-top: 1px solid rgba($white, .25);
 
-      > a {
-        display:       block;
-        height:        70px;
-        padding-right: 2.5rem !important;
-        font-weight:   600;
-        line-height:   50px;
-        color:         $white;
+        &:last-child {
+          border-bottom: 1px solid rgba($white, .25);
+        }
 
-        &:hover,
-        &:focus,
-        &:active {
-          background-color: $drupal-blue-light;
+        a {
+          background-color: transparent;
           color:            $white;
 
+          &::before {
+            border-color: transparent $white transparent transparent;
+          }
+
           &::after {
-            border-color: $white transparent transparent !important;
+            border-color: transparent transparent transparent $white;
+          }
+
+        }
+
+        .submenu {
+          background-color: $drupal-blue-dark;
+        }
+      }
+    }
+
+    @include breakpoint(medium) {
+      display:         flex;
+      flex-direction:  row;
+      flex-wrap:       nowrap;
+      justify-content: space-between;
+      align-content:   center;
+      align-items:     center;
+      height:          70px;
+
+      > li {
+        height: 70px;
+
+        > a {
+          display:       block;
+          height:        70px;
+          padding-right: 2.5rem !important;
+          font-weight:   600;
+          line-height:   50px;
+          color:         $white;
+
+          &:hover,
+          &:focus,
+          &:active {
+            background-color: $drupal-blue-light;
+            color:            $white;
+
+            &::after {
+              border-color: $white transparent transparent !important;
+            }
+          }
+
+          &::after {
+            right: 15px !important;
           }
         }
 
-        &::after {
-          right: 15px !important;
+        &.is-active {
+          > a {
+            background-color: $drupal-blue-light;
+            color:            $white;
+          }
         }
-      }
 
-      &.is-active {
-        > a {
+        > .submenu {
+          border-color:     $drupal-blue-light;
           background-color: $drupal-blue-light;
-          color:            $white;
-        }
-      }
 
-    }
-  }
+          > li {
+            > a {
+              padding: 1rem;
+              color:   $white;
 
-  &.submenu {
-    border-color:     $drupal-blue-light;
-    background-color: $drupal-blue-light;
-
-    > li {
-      > a {
-        padding: 1rem;
-        color:   $white;
-
-        &:hover,
-        &:focus,
-        &:active {
-          background-color: $white;
-          color:            $drupal-blue-dark;
+              &:hover,
+              &:focus,
+              &:active {
+                background-color: $white;
+                color:            $drupal-blue-dark;
+              }
+            }
+          }
         }
       }
     }

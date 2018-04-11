@@ -100,10 +100,22 @@
 
       <header class="row expanded l-header" role="banner" aria-label="{{ 'Site header'|t }}">
         <div class="row">
+          {# Menu toggle button #}
+          {% if page.main_menu %}
+          <div class="l-main-menu-icon small-4 column"
+               data-responsive-toggle="responsive-menu"
+               data-hide-for="medium">
+            <button class="menu-icon"
+                    type="button"
+                    data-toggle="responsive-menu">
+            </button>
+          </div>
+          {% endif %}
 
-          {# LOGO / SITE TITLE #}
+          {# Logo / Title#}
           {% if linked_logo or linked_site_name %}
-            <div class="large-2 column">
+
+            <div class="small-4 medium-2 column">
               {% if linked_logo %}
                 {% if is_front %}
                   <h1 id="site-name" class="site-name">{{ linked_logo }}</h1>
@@ -113,29 +125,42 @@
               {% elseif linked_site_name %}
 
                 {% if is_front %}
-                  <h1 id="site-name">{{ linked_site_name }}</h1>
+                  <h1 id="site-name" class="site-name">{{ linked_site_name }}</h1>
                 {% else %}
-                  <div id="site-name">{{ linked_site_name }}</div>
+                  <div id="site-name" class="site-name">{{ linked_site_name }}</div>
                 {% endif %}
 
               {% endif %}
             </div>
           {% endif %}
 
-          {# MAIN MENU #}
+          {# Main Menu #}
           {% if page.main_menu %}
-            <div class="l-main-menu large-8 column">
+            <div class="l-main-menu medium-8 column hide-for-small-only">
               {{ page.main_menu }}
             </div>
           {% endif %}
 
-          {# MAIN MENU EXTRA ELEMENTS#}
+          {# Main Menu Extra Elements #}
           {% if page.main_menu_extra %}
-            <div class="l-main-menu-extra large-2 column">
+            <div class="l-main-menu-extra small-4 medium-2 column">
               {{ page.main_menu_extra }}
             </div>
           {% endif %}
         </div>
+
+        {# Mobile Main Menu #}
+        {% if page.main_menu %}
+          <div class="row hide-for-medium"
+               data-hide-for="medium">
+            <div class="mobile-main-menu"
+                 id="responsive-menu">
+              <div class="small-12 column">
+                {{ page.main_menu }}
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </header>
 
       {% if page.header %}

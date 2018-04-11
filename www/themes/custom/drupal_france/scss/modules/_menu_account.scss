@@ -6,6 +6,10 @@
     &.button--user-account {
       margin-bottom: 0;
 
+      @include breakpoint(small only) {
+        padding: .25rem;
+      }
+
       &:hover,
       &:focus,
       &:active {
@@ -15,6 +19,10 @@
       > a {
         padding-right: 1rem !important;
         color:         $white;
+
+        @include breakpoint(small only) {
+          padding: .25rem !important;
+        }
 
         &::after {
           display: none !important;
@@ -42,6 +50,11 @@
   .submenu {
     border-color:     $drupal-blue-light;
     background-color: $drupal-blue-light;
+
+    @include breakpoint(small only) {
+      right:  -1px;
+      border: 0;
+    }
 
     > li {
       > a {
