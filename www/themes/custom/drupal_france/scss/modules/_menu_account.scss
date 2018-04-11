@@ -1,36 +1,65 @@
 // TOPBAR EXTRA ELEMENTS
 // =====================
 
-.dropdown { // Weight + 1
-  &.menu--user-account {
-    > li {
-      &.is-dropdown-submenu-parent {
+.menu--user-account {
+  > li {
+    &.button--user-account {
+      margin-bottom: 0;
 
-        > a {
-          padding-right: 1rem;
-          color:         $white;
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $drupal-blue-light;
+      }
 
-          &::after {
-            display: none !important;
-          }
+      > a {
+        padding-right: 1rem !important;
+        color:         $white;
 
-          > .fa {
-            font-size: 1.5rem;
-          }
+        &::after {
+          display: none !important;
         }
 
-        &.is-active {
-          > a {
-            color: $white;
+        > .fa {
+          font-size: 1.5rem;
+        }
+      }
 
-            &:hover,
-            &:focus,
-            &:active {
-              color: $white;
-            }
+      &.is-active {
+        > a {
+          color: $white;
+
+          &:hover,
+          &:focus,
+          &:active {
+            color: $white;
           }
         }
       }
     }
   }
+
+  .submenu {
+    border-color:     $drupal-blue-light;
+    background-color: $drupal-blue-light;
+
+    > li {
+      > a {
+        padding:        1rem;
+        font-size:      16px;
+        font-weight:    400;
+        color:          $white;
+        text-align:     left;
+        text-transform: none;
+
+        &:hover,
+        &:focus,
+        &:active {
+          background-color: $white;
+          color:            $drupal-blue-dark;
+        }
+      }
+    }
+  }
 }
+

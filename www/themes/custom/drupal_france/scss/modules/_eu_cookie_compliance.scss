@@ -1,29 +1,29 @@
 .sliding-popup-bottom {
-  position: fixed;
-  z-index: 9999999;
-  background: $drupal-blue-dark;
+  position:   fixed;
+  z-index:    9999999;
+  background: $drupal-blue-dark !important;
   text-align: center;
 
   .popup-content {
-    margin: 0 auto;
+    margin:  0 auto;
     padding: 0;
 
     .popup-text {
-      float: left;
-      max-width: 60%;
-      margin: 5px 0 0 5px;
+      float:       left;
+      max-width:   60%;
+      margin:      $global-margin 0 0 $global-margin;
       font-weight: bold;
-      color: $white;
-      text-align: left;
+      color:       $white;
+      text-align:  left;
 
       h2,
       p {
-        display: block;
-        margin: 0 0 5px;
-        font-size: 16px;
+        display:     block;
+        margin:      0 0 5px;
+        font-size:   16px;
         font-weight: bold;
         line-height: 1.4;
-        color: $white;
+        color:       $white;
       }
 
       p {
@@ -32,19 +32,19 @@
     }
 
     .popup-buttons {
-      float: right;
+      float:     right;
       max-width: 40%;
-      margin: 0;
+      margin:    $global-margin;
 
       button {
-        display: inline;
+        display:         inline;
 
-        vertical-align: middle;
-        width: auto;
-        margin: 1em 5px 0 0;
-        overflow: visible;
+        vertical-align:  middle;
+        width:           auto;
+        margin:          5px;
+        overflow:        visible;
         text-decoration: none;
-        cursor: pointer;
+        cursor:          pointer;
       }
     }
   }
@@ -60,9 +60,9 @@
     }
 
     .popup-buttons {
-      float: none;
+      float:     none;
       max-width: 100%;
-      margin: 5px 0;
+      margin:    5px 0;
 
       button {
         margin-bottom: 1em;
