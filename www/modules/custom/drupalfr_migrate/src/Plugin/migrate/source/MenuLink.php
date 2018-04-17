@@ -49,8 +49,10 @@ class MenuLink extends CSV {
       }
     }
 
-    // Special case for Fontawesome icons.
+    // Special case for Fontawesome menu icons.
     $menu_link_options['fa_icon'] = $row->getSourceProperty('fa_icon');
+    $menu_link_options['fa_icon_appearance'] = $row->getSourceProperty('fa_icon_appearance');
+//    "only"
 
     $row->setSourceProperty('options', $menu_link_options);
 
