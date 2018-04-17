@@ -17,41 +17,9 @@
         "docs": "https://github.com/Drupal-FR/site-drupalfr/blob/8.x-1.x/README.md"
     },
     "repositories": {
-        "blazy": {
-            "type": "package",
-            "package": {
-                "name": "dinbror/blazy",
-                "version": "1.8.2",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "blazy"
-                },
-                "dist": {
-                    "url": "https://github.com/dinbror/blazy/archive/1.8.2.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
-        },
-        "bootstrap-sass": {
-            "type": "package",
-            "package": {
-                "name": "twbs/bootstrap-sass",
-                "version": "v3.3.7",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "bootstrap-sass"
-                },
-                "dist": {
-                    "url": "https://github.com/twbs/bootstrap-sass/archive/v3.3.7.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
+        "asset-packagist": {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
         },
         "ckeditor.autogrow": {
             "_webform": true,
@@ -77,13 +45,13 @@
             "type": "package",
             "package": {
                 "name": "ckeditor/codemirror",
-                "version": "v1.17.3",
+                "version": "v1.17.5",
                 "type": "drupal-library",
                 "extra": {
                     "installer-name": "ckeditor.codemirror"
                 },
                 "dist": {
-                    "url": "https://github.com/w8tcha/CKEditor-CodeMirror-Plugin/releases/download/v1.17.3/CKEditor-CodeMirror-Plugin.zip",
+                    "url": "https://github.com/w8tcha/CKEditor-CodeMirror-Plugin/releases/download/v1.17.5/CKEditor-CodeMirror-Plugin.zip",
                     "type": "zip"
                 },
                 "require": {
@@ -134,13 +102,13 @@
             "type": "package",
             "package": {
                 "name": "ckeditor/link",
-                "version": "4.6.2",
+                "version": "4.8.0",
                 "type": "drupal-library",
                 "extra": {
                     "installer-name": "ckeditor.link"
                 },
                 "dist": {
-                    "url": "https://download.ckeditor.com/link/releases/link_4.6.2.zip",
+                    "url": "https://download.ckeditor.com/link/releases/link_4.8.0.zip",
                     "type": "zip"
                 },
                 "require": {
@@ -153,49 +121,13 @@
             "type": "package",
             "package": {
                 "name": "codemirror/codemirror",
-                "version": "5.31.0",
+                "version": "5.36.0",
                 "type": "drupal-library",
                 "extra": {
                     "installer-name": "codemirror"
                 },
                 "dist": {
-                    "url": "https://github.com/components/codemirror/archive/5.31.0.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
-        },
-        "d3": {
-            "type": "package",
-            "package": {
-                "name": "d3/d3",
-                "version": "v3.5.17",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "d3"
-                },
-                "dist": {
-                    "url": "https://github.com/d3/d3/archive/v3.5.17.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
-        },
-        "dropzone": {
-            "type": "package",
-            "package": {
-                "name": "enyo/dropzone",
-                "version": "v4.3.0",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "dropzone"
-                },
-                "dist": {
-                    "url": "https://github.com/enyo/dropzone/archive/v4.3.0.zip",
+                    "url": "https://github.com/components/codemirror/archive/5.36.0.zip",
                     "type": "zip"
                 },
                 "require": {
@@ -210,60 +142,6 @@
         "drupal-l10n": {
             "type": "vcs",
             "url": "https://github.com/FlorentTorregrosa/drupal-l10n"
-        },
-        "fontawesome": {
-            "type": "package",
-            "package": {
-                "name": "fortawesome/fontawesome",
-                "version": "v4.7.0",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "fontawesome"
-                },
-                "dist": {
-                    "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
-        },
-        "fontawesome-iconpicker": {
-            "type": "package",
-            "package": {
-                "name": "farbelous/fontawesome-iconpicker",
-                "version": "1.3.0",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "fontawesome-iconpicker"
-                },
-                "dist": {
-                    "url": "https://github.com/farbelous/fontawesome-iconpicker/archive/1.3.0.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
-        },
-        "highlightjs": {
-            "type": "package",
-            "package": {
-                "name": "components/highlightjs",
-                "version": "9.12.0",
-                "type": "drupal-library",
-                "extra": {
-                    "installer-name": "highlightjs"
-                },
-                "dist": {
-                    "url": "https://github.com/components/highlightjs/archive/9.12.0.zip",
-                    "type": "zip"
-                },
-                "require": {
-                    "composer/installers": "~1.0"
-                }
-            }
         },
         "jquery.geocomplete": {
             "_webform": true,
@@ -308,13 +186,13 @@
             "type": "package",
             "package": {
                 "name": "jquery/inputmask",
-                "version": "3.3.10",
+                "version": "3.3.11",
                 "type": "drupal-library",
                 "extra": {
                     "installer-name": "jquery.inputmask"
                 },
                 "dist": {
-                    "url": "https://github.com/RobinHerbots/jquery.inputmask/archive/3.3.10.zip",
+                    "url": "https://github.com/RobinHerbots/jquery.inputmask/archive/3.3.11.zip",
                     "type": "zip"
                 },
                 "require": {
@@ -327,13 +205,13 @@
             "type": "package",
             "package": {
                 "name": "jquery/intl-tel-input",
-                "version": "12.1.0",
+                "version": "12.1.12",
                 "type": "drupal-library",
                 "extra": {
                     "installer-name": "jquery.intl-tel-input"
                 },
                 "dist": {
-                    "url": "https://github.com/jackocnr/intl-tel-input/archive/v12.1.0.zip",
+                    "url": "https://github.com/jackocnr/intl-tel-input/archive/v12.1.12.zip",
                     "type": "zip"
                 },
                 "require": {
@@ -384,13 +262,13 @@
             "type": "package",
             "package": {
                 "name": "jquery/timepicker",
-                "version": "1.11.12",
+                "version": "1.11.13",
                 "type": "drupal-library",
                 "extra": {
                     "installer-name": "jquery.timepicker"
                 },
                 "dist": {
-                    "url": "https://github.com/jonthornton/jquery-timepicker/archive/1.11.12.zip",
+                    "url": "https://github.com/jonthornton/jquery-timepicker/archive/1.11.13.zip",
                     "type": "zip"
                 },
                 "require": {
@@ -478,15 +356,19 @@
     "require": {
         "abraham/twitteroauth": "0.7.4",
         "blobaugh/meetup-api-client": "dev-master#760113eb6548d160a5148f5ca4210e2c30bdd00c",
+        "bower-asset/blazy": "1.8.2",
+        "bower-asset/bootstrap-sass": "3.3.7",
+        "bower-asset/dropzone": "4.3.0",
+        "bower-asset/fontawesome": "4.7.0",
+        "bower-asset/fontawesome-iconpicker": "1.3.1",
         "ckeditor/autogrow": "4.8.0",
-        "ckeditor/codemirror": "v1.17.3",
+        "ckeditor/codemirror": "v1.17.5",
         "ckeditor/fakeobjects": "4.8.0",
         "ckeditor/image": "4.8.0",
-        "ckeditor/link": "4.6.2",
-        "codemirror/codemirror": "5.31.0",
+        "ckeditor/link": "4.8.0",
+        "codemirror/codemirror": "5.36.0",
         "composer/installers": "^1.0.21",
         "cweagans/composer-patches": "~1.0",
-        "dinbror/blazy": "1.8.*",
         "drupal-composer/drupal-l10n": "dev-master",
         "drupal-composer/drupal-scaffold": "^2.2",
         "drupal/admin_toolbar": "1.23.0",
@@ -494,28 +376,28 @@
         "drupal/block_visibility_groups": "1.2.0",
         "drupal/bootstrap": "3.7.0",
         "drupal/color_field": "2.0.0-rc2",
-        "drupal/commerce": "2.5.0",
-        "drupal/commerce_license": "2.0.0-alpha8",
+        "drupal/commerce": "2.6.0",
+        "drupal/commerce_license": "2.0.0-alpha10",
         "drupal/commerce_paypal": "1.x-dev#0f326dbf5dde4e19addcead9140ef94d3c924ea7",
         "drupal/config_ignore": "2.1.0",
         "drupal/config_installer": "1.7.0",
         "drupal/config_split": "1.3.0",
         "drupal/core": "8.5.1",
         "drupal/dropzonejs": "2.0.0-alpha3",
-        "drupal/drush_language": "1.0.0-rc1",
+        "drupal/drush_language": "1.0.0-rc2",
         "drupal/entity_browser": "2.0.0-alpha2",
-        "drupal/eu_cookie_compliance": "1.0.0-rc1",
+        "drupal/eu_cookie_compliance": "1.0.0",
         "drupal/eva": "1.3.0",
         "drupal/facets": "1.0.0-beta2",
         "drupal/feeds": "3.x-dev#a1290e7daeb1a1c513da619ce32d01e9a237f3f4",
         "drupal/field_group": "3.0.0-beta1",
         "drupal/flag": "4.0.0-alpha3",
-        "drupal/fontawesome": "1.3.0",
+        "drupal/fontawesome": "1.4.0",
         "drupal/fontawesome_menu_icons": "1.2.0",
         "drupal/geofield": "1.0.0-beta4",
         "drupal/honeypot": "1.27.0",
         "drupal/inline_entity_form": "1.0.0-beta1",
-        "drupal/leaflet": "1.0.0-beta2",
+        "drupal/leaflet": "1.0.0-beta3",
         "drupal/link_attributes": "1.2.0",
         "drupal/mailchimp": "1.6.0",
         "drupal/media_entity_actions": "1.0.0-alpha2",
@@ -531,36 +413,33 @@
         "drupal/r4032login": "1.x-dev#391f10d69b9b8c466a2fddac2a6b99f1289e7781",
         "drupal/redirect": "1.1.0",
         "drupal/redis": "1.0.0-rc2",
-        "drupal/search_api": "1.7.0",
-        "drupal/search_api_solr": "2.0.0-alpha3",
+        "drupal/search_api": "1.8.0",
+        "drupal/search_api_solr": "2.0.0-beta1",
         "drupal/smart_trim": "1.1.0",
         "drupal/swiftmailer": "1.0.0-beta2",
         "drupal/varnish_purge": "1.10.0",
-        "drupal/video_embed_field": "2.0.0-alpha2",
+        "drupal/video_embed_field": "2.0.0",
         "drupal/views_infinite_scroll": "1.5.0",
-        "drupal/webform": "5.0.0-rc7",
+        "drupal/webform": "5.0.0-rc10",
         "drupal/zurb_foundation": "6.0-alpha3",
-        "drush/drush": "9.2.1",
-        "enyo/dropzone": "4.3.*",
-        "farbelous/fontawesome-iconpicker": "1.3.0",
-        "fortawesome/fontawesome": "4.7.0",
+        "drush/drush": "9.2.3",
         "jquery/geocomplete": "1.7.0",
         "jquery/icheck": "1.0.2 ",
-        "jquery/inputmask": "3.3.10",
-        "jquery/intl-tel-input": "12.1.0",
+        "jquery/inputmask": "3.3.11",
+        "jquery/intl-tel-input": "12.1.12",
         "jquery/rateit": "1.1.1",
         "jquery/select2": "4.0.5",
-        "jquery/timepicker": "1.11.12",
+        "jquery/timepicker": "1.11.13",
         "jquery/toggles": "4.0.0",
         "jquery/word-and-character-counter": "2.5.1",
+        "oomphinc/composer-installers-extender": "^1.1",
         "progress-tracker/progress-tracker": "1.4.0",
-        "signature_pad/signature_pad": "2.3.0",
-        "twbs/bootstrap-sass": "3.3.7"
+        "signature_pad/signature_pad": "2.3.0"
     },
     "require-dev": {
         "anam/phantomjs-linux-x86-binary": "~2.1.1",
-        "components/highlightjs": "9.12.*",
-        "d3/d3": "3.5.*",
+        "bower-asset/d3": "3.5.*",
+        "bower-asset/highlightjs": "9.12.*",
         "drupal/coder": "8.2.*",
         "drupal/config_inspector": "1.*",
         "drupal/console": "1.*",
@@ -599,6 +478,10 @@
         ]
     },
     "extra": {
+        "installer-types": [
+            "bower-asset",
+            "npm-asset"
+        ],
         "installer-paths": {
             "www/core": [
                 "type:drupal-core"
@@ -620,7 +503,9 @@
                 "type:drupal-profile"
             ],
             "www/libraries/{$name}": [
-                "type:drupal-library"
+                "type:drupal-library",
+                "type:bower-asset",
+                "type:npm-asset"
             ]
         },
         "drupal-scaffold": {
