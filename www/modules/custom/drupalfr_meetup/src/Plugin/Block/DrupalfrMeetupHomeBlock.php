@@ -115,7 +115,7 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
     $build = [];
     $build['sub_title']['#markup'] = '<h3>' . $this->configuration['sub_title'] . '</h3>';
     $build['description']['#markup'] = check_markup($this->configuration['description']['value'], $this->configuration['description']['format']);
-    $build['discover']['#markup'] = "<a href='/association'><h4>Découvrez l'association</h4><p>Rejoignez la communauté et profitez de l'ensemble des ressources mises à votre disposition.</p></a>";
+    $build['discover']['#markup'] = "<h4>Découvrez l'association</h4><p>Rejoignez la communauté et profitez de l'ensemble des ressources mises à votre disposition.</p>";
 
     $events = $this->meetupHelper->getEvents();
     if (!empty($events)) {
