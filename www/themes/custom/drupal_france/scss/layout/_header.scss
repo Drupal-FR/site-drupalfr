@@ -8,6 +8,12 @@
 .l-main-menu-icon {
   height:      40px;
   line-height: 40px;
+
+  @include breakpoint(medium only) {
+    height:      70px;
+    padding:     .85rem 1rem;
+    line-height: 40px;
+  }
 }
 
 .l-main-menu-extra {

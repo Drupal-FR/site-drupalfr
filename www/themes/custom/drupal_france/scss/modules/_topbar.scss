@@ -4,6 +4,18 @@
   > a {
     display: block;
     color:   $white;
+
+    @include breakpoint(small only) {
+      text-align: center;
+
+      > img {
+        max-height: 42px;
+      }
+    }
+
+    @include breakpoint(medium only) {
+      margin-top: 8px;
+    }
   }
 }
 
