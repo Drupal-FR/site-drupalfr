@@ -1,0 +1,80 @@
+// =========
+// BLOCKS INDEX :
+// -------------
+// 1 - Meetup / Community
+// 2 -
+// =========
+
+// 1 - Meetup / Community
+// ======================
+.block-meetup {
+  padding:          3*$global-padding 0;
+  background-color: lighten($drupal-blue-green-lightest, 10);
+
+  &--title {
+    .block-title {
+      margin-bottom: 0;
+    }
+  }
+
+  &--subtitle {
+    margin-bottom: $global-margin;
+
+    h3 {
+      font-size: 1.25rem;
+    }
+  }
+
+  &--list,
+  &--map,
+  &--discover {
+    @include shadow();
+    padding:          $global-padding;
+    background-color: $white;
+
+    h4 {
+      font-size: 1.5rem;
+    }
+  }
+
+  &--list {
+    padding-right: 0;
+  }
+
+  &--map {
+    min-height:       300px;
+    background-color: $drupal-blue-desaturate-light;
+  }
+
+  &--discover {
+    @include clearfix();
+
+    display:         flex;
+    flex-direction:  row;
+    flex-wrap:       nowrap;
+    justify-content: center;
+    align-content:   stretch;
+    align-items:     stretch;
+    margin-top:      20px;
+    padding:         0;
+
+    &--content {
+      width:   85%;
+      padding: $global-padding;
+
+      > p {
+        margin: 0;
+      }
+    }
+
+    &--link {
+
+      line-height: 100%;
+      width:            15%;
+
+      background-color: $drupal-blue-dark;
+      color:            $white;
+    }
+  }
+
+}

@@ -45,34 +45,56 @@
  * @see template_process()
  */
 #}
-{%
-  set classes = [
-    'block',
-    'block-' ~ configuration.provider|clean_class,
-    'block-' ~ plugin_id|clean_class,
-    'clearfix',
-  ]
-%}
+{% set classes = [
+  'block',
+  'block-' ~ configuration.provider|clean_class,
+  'block-' ~ plugin_id|clean_class,
+  'block-meetup',
+  'clearfix',
+  'row',
+  'expanded',
+  'column',
+] %}
+
 <section{{ attributes.addClass(classes) }}>
-  {{ title_prefix }}
-  {% if label %}
-    <h2{{ title_attributes.addClass('block-title') }}>{{ label }}</h2>
-  {% endif %}
-  {{ title_suffix }}
+  <div class="block-meetup--title row">
+    <div class="small-12 column">
+      {{ title_prefix }}
+      {% if label %}
+        <h2{{ title_attributes.addClass('block-title') }}>{{ label }}</h2>
+      {% endif %}
+      {{ title_suffix }}
+    </div>
+  </div>
 
   {% block content %}
-    {{ content.sub_title }}
-    {{ content.description }}
-
-    <div class="row">
-      <div class="col-md-8">
-        <h4>{{ 'IRL Meetings & Events'|t }}</h4>
-        {{ content.events_list }}
-        <a href="{{ url('drupalfr_meetup.meetups_page') }}">{{ 'All the events'|t }}</a>
+    <div class="block-meetup--subtitle row">
+      <div class="small-12 column">
+        {{ content.sub_title }}
+        {{ content.description }}
       </div>
-      <div class="col-md-4">
-        {{ content.map }}
-        {{ content.discover }}
+    </div>
+    <div class="row gutter-small">
+      <div class="medium-8 column block-meetup--left">
+        <div class="block-meetup--list">
+          <h4>{{ 'IRL Meetings & Events'|t }}</h4>
+          {{ content.events_list }}
+          <a href="{{ url('drupalfr_meetup.meetups_page') }}">{{ 'All the events'|t }}</a>
+        </div>
+      </div>
+      <div class="medium-4 column block-meetup--right">
+        <div class="block-meetup--map">
+          {{ content.map }}
+        </div>
+
+        <div class="block-meetup--discover">
+          <div class="block-meetup--discover--content">
+            {{ content.discover }}
+          </div>
+          <a href="/association" class="block-meetup--discover--link">
+            &gt;
+          </a>
+        </div>
       </div>
     </div>
 
