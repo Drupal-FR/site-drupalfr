@@ -112,15 +112,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'mailchimp_signup',
   );
 
-  // Exported permission: 'access mollom statistics'.
-  $permissions['access mollom statistics'] = array(
-    'name' => 'access mollom statistics',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'access printer-friendly version'.
   $permissions['access printer-friendly version'] = array(
     'name' => 'access printer-friendly version',
@@ -534,15 +525,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'system',
   );
 
-  // Exported permission: 'administer mollom'.
-  $permissions['administer mollom'] = array(
-    'name' => 'administer mollom',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'administer nodes'.
   $permissions['administer nodes'] = array(
     'name' => 'administer nodes',
@@ -777,18 +759,6 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'scald',
-  );
-
-  // Exported permission: 'bypass mollom protection'.
-  $permissions['bypass mollom protection'] = array(
-    'name' => 'bypass mollom protection',
-    'roles' => array(
-      'admin' => 'admin',
-      'modérateur documentation' => 'modérateur documentation',
-      'modérateur forum' => 'modérateur forum',
-      'node administrateurs' => 'node administrateurs',
-    ),
-    'module' => 'mollom',
   );
 
   // Exported permission: 'bypass node access'.
@@ -2057,15 +2027,6 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'features',
-  );
-
-  // Exported permission: 'report to mollom'.
-  $permissions['report to mollom'] = array(
-    'name' => 'report to mollom',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'mollom',
   );
 
   // Exported permission: 'restrict atom access'.

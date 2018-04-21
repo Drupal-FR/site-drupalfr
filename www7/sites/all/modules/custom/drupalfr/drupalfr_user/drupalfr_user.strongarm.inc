@@ -34,9 +34,6 @@ function drupalfr_user_strongarm() {
         'googleanalytics' => array(
           'weight' => '6',
         ),
-        'mollom' => array(
-          'weight' => '5',
-        ),
         'redirect' => array(
           'weight' => '4',
         ),

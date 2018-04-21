@@ -24,7 +24,6 @@ function drupalfr_user_field_group_info() {
     'weight' => '0',
     'children' => array(
       0 => 'googleanalytics',
-      1 => 'mollom',
       2 => 'redirect',
       3 => 'account',
       4 => 'timezone',
