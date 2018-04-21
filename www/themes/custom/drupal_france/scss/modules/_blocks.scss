@@ -68,12 +68,20 @@
     }
 
     &--link {
-
-      line-height: 100%;
+      display:          block;
       width:            15%;
-
       background-color: $drupal-blue-dark;
+      font-size:        2rem;
+      line-height:      9rem;
       color:            $white;
+      text-align:       center;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $drupal-blue-light;
+        color:            $white;
+      }
     }
   }
 
