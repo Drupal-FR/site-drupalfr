@@ -87,18 +87,26 @@
           display:     block;
           float:       left;
           width:       50px;
-          max-width:   5%;
+          max-width:   10%;
           font-size:   16px;
           line-height: 20px;
           color:       $drupal-grey;
           text-align:  center;
+
+          @include breakpoint(medium) {
+            max-width: 5%;
+          }
         }
 
         dd {
           display:    block;
           float:      left;
-          width:      95%;
+          width:      90%;
           min-height: 25px;
+
+          @include breakpoint(medium) {
+            width: 95%;
+          }
         }
       }
     }
