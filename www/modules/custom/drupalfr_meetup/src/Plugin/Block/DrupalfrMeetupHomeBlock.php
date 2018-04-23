@@ -115,12 +115,12 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
     $build = [];
     $build['sub_title']['#markup'] = '<h3>' . $this->configuration['sub_title'] . '</h3>';
     $build['description']['#markup'] = check_markup($this->configuration['description']['value'], $this->configuration['description']['format']);
-    $build['discover']['#markup'] = "<h4>Découvrez l'association</h4><p>Rejoignez la communauté et profitez de l'ensemble des ressources mises à votre disposition.</p>";
+    $build['discover']['#markup'] = "<h4>".$this->t("Découvrez l'association")."</h4><p>".$this->t("Rejoignez la communauté et profitez de l'ensemble des ressources mises à votre disposition.")."</p>";
 
     $events = $this->meetupHelper->getEvents();
     if (!empty($events)) {
       $map = leaflet_map_get_info('OSM Mapnik');
-      $build['map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '400px');
+      $build['map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '425px');
       $build['map']['#cache'] = [
         // 15 minutes.
         'max-age' => '900',

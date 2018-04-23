@@ -8,7 +8,7 @@
 // 1 - Meetup / Community
 // ======================
 .block-meetup {
-  padding:          3*$global-padding 0;
+  padding:          $global-padding*3 0;
   background-color: lighten($drupal-blue-green-lightest, 10);
 
   &--title {
@@ -18,10 +18,15 @@
   }
 
   &--subtitle {
-    margin-bottom: $global-margin;
+    margin-bottom: $global-margin*2;
 
     h3 {
-      font-size: 1.25rem;
+      font-size: 1.75rem;
+    }
+
+    p {
+      margin-bottom: $global-margin/4;
+      color:         $dark-gray;
     }
   }
 
@@ -39,11 +44,77 @@
 
   &--list {
     padding-right: 0;
+
+    &--title {
+      margin-bottom: $global-padding;
+    }
+
+    &--info-box {
+      color:      $white;
+      text-align: center;
+
+      .info-box--day {
+        padding:          $global-padding*2 $global-padding/2 0;
+        background-color: $drupal-blue-dark;
+        font-size:        2rem;
+        line-height:      1.5rem;
+      }
+
+      .info-box--month {
+        padding:          0 $global-padding/2 $global-padding;
+        background-color: $drupal-blue-dark;
+        font-size:        1.25rem;
+      }
+
+      .info-box--registered {
+        padding:          $global-padding/4 $global-padding/2;
+        background-color: $drupal-blue-lighter;
+        font-size:        1rem;
+      }
+    }
+
+    &--text-box {
+      h5 {
+        margin-bottom: 0;
+        font-size:     16px;
+      }
+
+      .text-box--list {
+        @include clearfix;
+        margin-bottom: $global-padding*3;
+
+        dt {
+          display:     block;
+          float:       left;
+          width:       50px;
+          max-width:   5%;
+          font-size:   16px;
+          line-height: 20px;
+          color:       $drupal-grey;
+          text-align:  center;
+        }
+
+        dd {
+          display:    block;
+          float:      left;
+          width:      95%;
+          min-height: 25px;
+        }
+      }
+    }
+
+    &--cta {
+      text-align: center;
+    }
   }
 
   &--map {
-    min-height:       300px;
+    padding:          0;
     background-color: $drupal-blue-desaturate-light;
+
+    @include breakpoint(medium) {
+      min-height: 425px;
+    }
   }
 
   &--discover {
