@@ -10,55 +10,34 @@
  */
 #}
 {% if events is not empty %}
-
-  {% for event in events %}
-    {% set prepared_time = event.time / 1000 %}
-    {% set registered_number = event.yes_rsvp_count + event.waitlist_count %}
-    <div class="block-meetup--list--element row">
-      <div class="block-meetup--list--info-box small-2 column">
-        <div class="info-box--day">{{ prepared_time|date('d') }}</div>
-        <div class="info-box--month">{{ prepared_time|date('M') }}</div>
-        <div class="info-box--registered">
+  <div>
+    {% for event in events %}
+      {% set prepared_time = event.time / 1000 %}
+      {% set registered_number = event.yes_rsvp_count + event.waitlist_count %}
+      <div>
+        <h3>
+          <a href="{{ event.event_url }}">{{ event.name }}</a>
+        </h3>
+        <p>{{ prepared_time|format_date('long') }}</p>
+        <p>{{ event.venue.name }}</p>
+        <p>{{ event.venue.address_1 }}</p>
+        <p>{{ event.venue.city }}</p>
+        <p>
           {% trans %}
             {{ registered_number }} registered
           {% plural registered_number %}
             {{ registered_number }} registered
           {% endtrans %}
-        </div>
-      </div>
-
-      <div class="block-meetup--list--text-box small-10 column">
-        <h5><a href="{{ event.event_url }}">{{ event.name }}</a></h5>
-        <dl class="text-box--list">
-          <dt><i class="fa fa-map-marker"></i> </dt>
-          <dd>
-            {{ event.venue.address_1 }}<br>
-            {{ event.venue.city }}
-          </dd>
-
-          <dt><i class="fa fa-clock-o"></i></dt>
-          <dd>
-            {{ prepared_time|date('l jS F Y - H:i') }}
-          </dd>
-          <dt><i class="fa fa-users"></i></dt>
-          <dd>
+          {% if event.rsvp_limit %}
+            {{ 'for'|t }}
             {% trans %}
-              {{ registered_number }} registered
-            {% plural registered_number %}
-              {{ registered_number }} registered
+              {{ event.rsvp_limit }} spot
+            {% plural event.rsvp_limit %}
+              {{ event.rsvp_limit }} spots
             {% endtrans %}
-            {% if event.rsvp_limit %}
-              {{ 'for'|t }}
-              {% trans %}
-                {{ event.rsvp_limit }} spot
-              {% plural event.rsvp_limit %}
-                {{ event.rsvp_limit }} spots
-              {% endtrans %}
-            {% endif %}
-          </dd>
-        </dl>
+          {% endif %}
+        </p>
       </div>
-    </div>
-  {% endfor %}
-
+    {% endfor %}
+  </div>
 {% endif %}
