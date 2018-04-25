@@ -2,7 +2,7 @@
 // BLOCKS INDEX :
 // -------------
 // 1 - Meetup / Community
-// 2 -
+// 2 - Planet / News feed
 // =========
 
 // 1 - Meetup / Community
@@ -164,4 +164,36 @@
     }
   }
 
+}
+
+.block-planet {
+  padding:          $global-padding*3 0;
+  background-color: lighten($drupal-blue-green-lightest, 10);
+
+  .title {
+    margin:      1rem auto 3rem;
+    line-height: 2.5rem;
+    text-align:  center;
+
+    small {
+      font-size: 1.25rem;
+      color:     $drupal-blue-dark;
+
+      @include breakpoint(medium) {
+        font-size: 1.75rem;
+      }
+    }
+  }
+
+  .more-link {
+    text-align: center;
+
+    > a {
+      @include button(false, $secondary-color, $secondary-color, $secondary-color, 'hollow');
+
+      margin-top:     $global-margin*3;
+      padding:        $global-padding $global-padding*5;
+      text-transform: uppercase;
+    }
+  }
 }
