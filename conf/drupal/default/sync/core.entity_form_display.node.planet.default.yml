@@ -5,10 +5,12 @@ dependencies:
   config:
     - field.field.node.planet.body
     - field.field.node.planet.feeds_item
+    - field.field.node.planet.field_feature_image
     - field.field.node.planet.field_planet_tag
     - field.field.node.planet.field_planet_url
     - node.type.planet
   module:
+    - file
     - link
     - path
     - text
@@ -33,6 +35,13 @@ content:
     weight: 3
     settings: {  }
     third_party_settings: {  }
+    region: content
+  field_feature_image:
+    weight: 122
+    settings:
+      progress_indicator: throbber
+    third_party_settings: {  }
+    type: file_generic
     region: content
   field_planet_tag:
     weight: 8
