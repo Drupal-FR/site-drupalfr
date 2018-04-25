@@ -1,0 +1,27 @@
+uuid: 21de02fe-a598-4a12-b1bf-7d824240e605
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_feature_image
+    - node.type.planet
+  module:
+    - file
+id: node.planet.field_feature_image
+field_name: field_feature_image
+entity_type: node
+bundle: planet
+label: 'Feature Image'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_extensions: txt
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  max_filesize: ''
+  description_field: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: file
