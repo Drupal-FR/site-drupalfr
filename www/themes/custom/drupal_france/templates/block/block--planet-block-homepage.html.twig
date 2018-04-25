@@ -46,7 +46,8 @@
 {% set section_classes = [
   'block',
   'row',
-  'expanded'
+  'expanded',
+  'block-planet'
 ] %}
 
 {% if block.delta != 'main' %}
@@ -60,7 +61,7 @@
   {{ title_suffix }}
 
 
-  <div {{ content_attributes.addClass('row') }}>
+  <div {{ content_attributes.addClass('row').setAttribute('data-equalizer', true).setAttribute('data-equalize-on', 'medium') }}>
     {% block content %}
       {{ content }}
     {% endblock %}
