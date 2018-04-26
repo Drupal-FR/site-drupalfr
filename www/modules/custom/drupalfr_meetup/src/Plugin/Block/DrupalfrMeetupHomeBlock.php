@@ -78,7 +78,10 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
   public function defaultConfiguration() {
     return [
       'sub_title' => '',
-      'description' => '',
+      'description' => [
+        'value' => '',
+        'format' => 'full_html',
+      ],
     ] + parent::defaultConfiguration();
   }
 
@@ -94,7 +97,8 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
     $form['description'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Description'),
-      '#default_value' => $this->configuration['description'],
+      '#default_value' => $this->configuration['description']['value'],
+      '#format' => $this->configuration['description']['format'],
     ];
 
     return $form;
