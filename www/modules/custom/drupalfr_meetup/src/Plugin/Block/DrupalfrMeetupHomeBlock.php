@@ -78,7 +78,10 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
   public function defaultConfiguration() {
     return [
       'sub_title' => '',
-      'description' => '',
+      'description' => [
+        'value' => '',
+        'format' => 'full_html',
+      ],
     ] + parent::defaultConfiguration();
   }
 
@@ -94,7 +97,8 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
     $form['description'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Description'),
-      '#default_value' => $this->configuration['description'],
+      '#default_value' => $this->configuration['description']['value'],
+      '#format' => $this->configuration['description']['format'],
     ];
 
     return $form;
@@ -115,12 +119,12 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
     $build = [];
     $build['sub_title']['#markup'] = '<h3>' . $this->configuration['sub_title'] . '</h3>';
     $build['description']['#markup'] = check_markup($this->configuration['description']['value'], $this->configuration['description']['format']);
-    $build['discover']['#markup'] = "<a href='/association'><h4>Découvrez l'association</h4><p>Rejoignez la communauté et profitez de l'ensemble des ressources mises à votre disposition.</p></a>";
+    $build['discover']['#markup'] = "<h4>" . $this->t('Discover the association') . "</h4><p>" . $this->t('Meet the community and enjoy all the resources it can brings to you.') . "</p>";
 
     $events = $this->meetupHelper->getEvents();
     if (!empty($events)) {
       $map = leaflet_map_get_info('OSM Mapnik');
-      $build['map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '400px');
+      $build['map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '425px');
       $build['map']['#cache'] = [
         // 15 minutes.
         'max-age' => '900',

@@ -1,0 +1,167 @@
+// =========
+// BLOCKS INDEX :
+// -------------
+// 1 - Meetup / Community
+// 2 -
+// =========
+
+// 1 - Meetup / Community
+// ======================
+.block-meetup {
+  padding:          $global-padding*3 0;
+  background-color: lighten($drupal-blue-green-lightest, 10);
+
+  &--title {
+    .block-title {
+      margin-bottom: 0;
+    }
+  }
+
+  &--subtitle {
+    margin-bottom: $global-margin*2;
+
+    h3 {
+      font-size: 1.75rem;
+    }
+
+    p {
+      margin-bottom: $global-margin/4;
+      color:         $dark-gray;
+    }
+  }
+
+  &--list,
+  &--map,
+  &--discover {
+    @include shadow();
+    padding:          $global-padding;
+    background-color: $white;
+
+    h4 {
+      font-size: 1.5rem;
+    }
+  }
+
+  &--list {
+    padding-right: 0;
+
+    &--title {
+      margin-bottom: $global-padding;
+    }
+
+    &--info-box {
+      color:      $white;
+      text-align: center;
+
+      .info-box--day {
+        padding:          $global-padding*2 $global-padding/2 0;
+        background-color: $drupal-blue-dark;
+        font-size:        2rem;
+        line-height:      1.5rem;
+      }
+
+      .info-box--month {
+        padding:          0 $global-padding/2 $global-padding;
+        background-color: $drupal-blue-dark;
+        font-size:        1.25rem;
+      }
+
+      .info-box--registered {
+        padding:          $global-padding/4 $global-padding/2;
+        background-color: $drupal-blue-lighter;
+        font-size:        1rem;
+      }
+    }
+
+    &--text-box {
+      h5 {
+        margin-bottom: 0;
+        font-size:     16px;
+      }
+
+      .text-box--list {
+        @include clearfix;
+        margin-bottom: $global-padding*3;
+
+        dt {
+          display:     block;
+          float:       left;
+          width:       50px;
+          max-width:   10%;
+          font-size:   16px;
+          line-height: 20px;
+          color:       $drupal-grey;
+          text-align:  center;
+
+          @include breakpoint(medium) {
+            max-width: 5%;
+          }
+        }
+
+        dd {
+          display:    block;
+          float:      left;
+          width:      90%;
+          min-height: 25px;
+
+          @include breakpoint(medium) {
+            width: 95%;
+          }
+        }
+      }
+    }
+
+    &--cta {
+      text-align: center;
+    }
+  }
+
+  &--map {
+    padding:          0;
+    background-color: $drupal-blue-desaturate-light;
+
+    @include breakpoint(medium) {
+      min-height: 425px;
+    }
+  }
+
+  &--discover {
+    @include clearfix();
+
+    display:         flex;
+    flex-direction:  row;
+    flex-wrap:       nowrap;
+    justify-content: center;
+    align-content:   stretch;
+    align-items:     stretch;
+    margin-top:      20px;
+    padding:         0;
+
+    &--content {
+      width:   85%;
+      padding: $global-padding;
+
+      > p {
+        margin: 0;
+      }
+    }
+
+    &--link {
+      display:          block;
+      width:            15%;
+      background-color: $drupal-blue-dark;
+      font-size:        2rem;
+      line-height:      9rem;
+      color:            $white;
+      text-align:       center;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $drupal-blue-light;
+        color:            $white;
+      }
+    }
+  }
+
+}

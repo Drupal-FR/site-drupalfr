@@ -164,15 +164,17 @@
       </header>
 
       {% if page.header %}
-        <div class="large-12 column">
-          {{ page.header }}
+        <div class="l-page-header row">
+          <div class="small-12 column">
+            {{ page.header }}
+          </div>
         </div>
       {% endif %}
 
 
       {% if messages and not zurb_foundation_messages_modal %}
         <div class="l-messages row">
-          <div class="large-12 column">
+          <div class="small-12 column">
             {{ messages }}
           </div>
         </div>
@@ -180,13 +182,13 @@
 
       {% if page.help %}
         <div class="l-help row">
-          <div class="large-12 column">
+          <div class="small-12 column">
             {{ page.help }}
           </div>
         </div>
       {% endif %}
 
-      <div class="row expanded">
+      <div class="l-main row expanded">
         <main id="main" class="{{ main_grid }}" role="main">
           {% if page.highlighted %}
             {% spaceless %}

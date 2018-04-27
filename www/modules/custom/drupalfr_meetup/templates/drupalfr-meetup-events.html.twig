@@ -24,18 +24,18 @@
         <p>{{ event.venue.city }}</p>
         <p>
           {% trans %}
-          {{ registered_number }} registered
+            {{ registered_number }} registered
           {% plural registered_number %}
-          {{ registered_number }} registered
+            {{ registered_number }} registered
           {% endtrans %}
-        {% if event.rsvp_limit %}
-          {{ 'for'|t }}
-          {% trans %}
-            {{ event.rsvp_limit }} spot
-          {% plural event.rsvp_limit %}
-            {{ event.rsvp_limit }} spots
-          {% endtrans %}
-        {% endif %}
+          {% if event.rsvp_limit %}
+            {{ 'for'|t }}
+            {% trans %}
+              {{ event.rsvp_limit }} spot
+            {% plural event.rsvp_limit %}
+              {{ event.rsvp_limit }} spots
+            {% endtrans %}
+          {% endif %}
         </p>
       </div>
     {% endfor %}
