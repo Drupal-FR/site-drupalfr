@@ -12,12 +12,19 @@ $databases['default']['default'] = [
 $settings['hash_salt'] = 'drupalfr';
 $settings['trusted_host_patterns'] = [
   '^127\.0\.0\.1$',
-  'varnish',
-  'web',
+  '^varnish$',
+  '^web$',
 ];
 
-if (getenv('DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME')) {
-  $settings['trusted_host_patterns'][] = getenv('DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME');
+$environment_trusted_host_patterns = [
+  'DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME',
+  'VARNISH_TRAEFIK_FRONTEND_RULE_HOSTNAME',
+];
+
+foreach ($environment_trusted_host_patterns as $environment_trusted_host_pattern) {
+  if (getenv($environment_trusted_host_pattern)) {
+    $settings['trusted_host_patterns'][] = getenv($environment_trusted_host_pattern);
+  }
 }
 
 $settings['file_private_path'] = '/project/private_files/default';

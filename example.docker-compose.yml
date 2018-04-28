@@ -7,6 +7,7 @@ services:
       service: drupal-php-apache-dev
     environment:
       - DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME=${DRUPAL_TRAEFIK_FRONTEND_RULE_HOSTNAME:-web.drupalfr8.docker.localhost}
+      - VARNISH_TRAEFIK_FRONTEND_RULE_HOSTNAME=${VARNISH_TRAEFIK_FRONTEND_RULE_HOSTNAME:-varnish.drupalfr8.docker.localhost}
     ports:
       - 8101:80
     labels:
