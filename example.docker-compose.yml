@@ -49,12 +49,6 @@ services:
       service: solr
 
 
-  solr-showcase:
-    extends:
-      file: ./docker-compose-common.yml
-      service: solr-showcase
-
-
   redis:
     extends:
       file: ./docker-compose-common.yml
