@@ -2,6 +2,11 @@ uuid: 64167340-6b36-423a-b329-b367850e4ef8
 langcode: fr
 status: true
 dependencies:
+  config:
+    - search_api_solr.solr_field_type.text_fr_7_0_0
+    - search_api_solr.solr_field_type.text_phonetic_fr_7_0_0
+    - search_api_solr.solr_field_type.text_phonetic_und_7_0_0
+    - search_api_solr.solr_field_type.text_und_7_0_0
   module:
     - search_api_solr
 _core:
@@ -9,7 +14,7 @@ _core:
 id: solr
 name: Solr
 description: ''
-backend: search_api_solr
+backend: search_api_solr_multilingual
 backend_config:
   connector: standard
   connector_config:
@@ -24,8 +29,11 @@ backend_config:
     commit_within: 1000
     solr_version: ''
     http_method: AUTO
+  sasm_limit_search_page_to_content_language: false
+  sasm_search_page_include_language_independent: true
+  sasm_language_unspecific_fallback_on_schema_issues: true
   retrieve_data: false
   highlight_data: false
   skip_schema_check: false
-  site_hash: true
   domain: generic
+  site_hash: false

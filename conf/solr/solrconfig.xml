@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE config [
-        <!ENTITY spellcheck SYSTEM "solrconfig_spellcheck.xml">
-        <!ENTITY extra SYSTEM "solrconfig_extra.xml">
-        ]>
+  <!ENTITY spellcheck SYSTEM "solrconfig_spellcheck.xml">
+  <!ENTITY extra SYSTEM "solrconfig_extra.xml">
+]>
 
 <!--
      For more details about configurations options that may appear in
@@ -251,18 +251,18 @@
     <!--
     <deletionPolicy class="solr.SolrDeletionPolicy">
     -->
-    <!-- The number of commit points to be kept -->
-    <!-- <str name="maxCommitsToKeep">1</str> -->
-    <!-- The number of optimized commit points to be kept -->
-    <!-- <str name="maxOptimizedCommitsToKeep">0</str> -->
-    <!--
-        Delete all commit points once they have reached the given age.
-        Supports DateMathParser syntax e.g.
+      <!-- The number of commit points to be kept -->
+      <!-- <str name="maxCommitsToKeep">1</str> -->
+      <!-- The number of optimized commit points to be kept -->
+      <!-- <str name="maxOptimizedCommitsToKeep">0</str> -->
+      <!--
+          Delete all commit points once they have reached the given age.
+          Supports DateMathParser syntax e.g.
+        -->
+      <!--
+         <str name="maxCommitAge">30MINUTES</str>
+         <str name="maxCommitAge">1DAY</str>
       -->
-    <!--
-       <str name="maxCommitAge">30MINUTES</str>
-       <str name="maxCommitAge">1DAY</str>
-    -->
     <!--
     </deletionPolicy>
     -->
@@ -276,7 +276,7 @@
          IndexWriter to write its info stream to solr's log. By default,
          this is enabled here, and controlled through log4j.properties.
       -->
-    <infoStream>true</infoStream>
+     <infoStream>true</infoStream>
   </indexConfig>
 
 
@@ -472,9 +472,9 @@
          (DocList) based on a query, a sort, and the range of documents requested.
       -->
     <queryResultCache class="solr.LRUCache"
-                      size="512"
-                      initialSize="512"
-                      autowarmCount="32"/>
+                     size="512"
+                     initialSize="512"
+                     autowarmCount="32"/>
 
     <!-- Document Cache
 
@@ -489,11 +489,11 @@
 
     <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"
-           class="solr.search.LRUCache"
-           size="10"
-           initialSize="0"
-           autowarmCount="10"
-           regenerator="solr.NoOpRegenerator" />
+      class="solr.search.LRUCache"
+      size="10"
+      initialSize="0"
+      autowarmCount="10"
+      regenerator="solr.NoOpRegenerator" />
 
     <!-- Field Value Cache
 
@@ -538,55 +538,55 @@
     -->
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
 
-    <!-- Use Filter For Sorted Query
+   <!-- Use Filter For Sorted Query
 
-         A possible optimization that attempts to use a filter to
-         satisfy a search.  If the requested sort does not include
-         score, then the filterCache will be checked for a filter
-         matching the query. If found, the filter will be used as the
-         source of document ids, and then the sort will be applied to
-         that.
+        A possible optimization that attempts to use a filter to
+        satisfy a search.  If the requested sort does not include
+        score, then the filterCache will be checked for a filter
+        matching the query. If found, the filter will be used as the
+        source of document ids, and then the sort will be applied to
+        that.
 
-         For most situations, this will not be useful unless you
-         frequently get the same search repeatedly with different sort
-         options, and none of them ever use "score"
-      -->
-    <!--
-       <useFilterForSortedQuery>true</useFilterForSortedQuery>
-      -->
+        For most situations, this will not be useful unless you
+        frequently get the same search repeatedly with different sort
+        options, and none of them ever use "score"
+     -->
+   <!--
+      <useFilterForSortedQuery>true</useFilterForSortedQuery>
+     -->
 
-    <!-- Result Window Size
+   <!-- Result Window Size
 
-         An optimization for use with the queryResultCache.  When a search
-         is requested, a superset of the requested number of document ids
-         are collected.  For example, if a search for a particular query
-         requests matching documents 10 through 19, and queryWindowSize is 50,
-         then documents 0 through 49 will be collected and cached.  Any further
-         requests in that range can be satisfied via the cache.
-      -->
-    <queryResultWindowSize>20</queryResultWindowSize>
+        An optimization for use with the queryResultCache.  When a search
+        is requested, a superset of the requested number of document ids
+        are collected.  For example, if a search for a particular query
+        requests matching documents 10 through 19, and queryWindowSize is 50,
+        then documents 0 through 49 will be collected and cached.  Any further
+        requests in that range can be satisfied via the cache.
+     -->
+   <queryResultWindowSize>20</queryResultWindowSize>
 
-    <!-- Maximum number of documents to cache for any entry in the
-         queryResultCache.
-      -->
-    <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+   <!-- Maximum number of documents to cache for any entry in the
+        queryResultCache.
+     -->
+   <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
 
-    <!-- Query Related Event Listeners
+   <!-- Query Related Event Listeners
 
-         Various IndexSearcher related events can trigger Listeners to
-         take actions.
+        Various IndexSearcher related events can trigger Listeners to
+        take actions.
 
-         newSearcher - fired whenever a new searcher is being prepared
-         and there is a current searcher handling requests (aka
-         registered).  It can be used to prime certain caches to
-         prevent long request times for certain requests.
+        newSearcher - fired whenever a new searcher is being prepared
+        and there is a current searcher handling requests (aka
+        registered).  It can be used to prime certain caches to
+        prevent long request times for certain requests.
 
-         firstSearcher - fired whenever a new searcher is being
-         prepared but there is no current registered searcher to handle
-         requests or to gain autowarming data from.
+        firstSearcher - fired whenever a new searcher is being
+        prepared but there is no current registered searcher to handle
+        requests or to gain autowarming data from.
 
 
-      -->
+     -->
     <!-- QuerySenderListener takes an array of NamedList and executes a
          local query request for each NamedList in sequence.
       -->
@@ -780,12 +780,12 @@
 
   <!-- A request handler that returns indented JSON by default -->
   <requestHandler name="/query" class="solr.SearchHandler">
-    <lst name="defaults">
-      <str name="echoParams">explicit</str>
-      <str name="wt">json</str>
-      <str name="indent">true</str>
-      <str name="df">text</str>
-    </lst>
+     <lst name="defaults">
+       <str name="echoParams">explicit</str>
+       <str name="wt">json</str>
+       <str name="indent">true</str>
+       <str name="df">text</str>
+     </lst>
   </requestHandler>
 
   <!-- A Robust Example
@@ -838,11 +838,11 @@
 
   <!-- A minimal query type for doing lucene queries -->
   <requestHandler name="standard" class="solr.SearchHandler">
-    <lst name="defaults">
-      <str name="df">content</str>
-      <str name="echoParams">explicit</str>
-      <bool name="omitHeader">true</bool>
-    </lst>
+     <lst name="defaults">
+       <str name="df">content</str>
+       <str name="echoParams">explicit</str>
+       <bool name="omitHeader">true</bool>
+     </lst>
   </requestHandler>
 
   <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell,/browse">
@@ -931,8 +931,8 @@
   <!-- Echo the request contents back to the client -->
   <requestHandler name="/debug/dump" class="solr.DumpRequestHandler" >
     <lst name="defaults">
-      <str name="echoParams">explicit</str>
-      <str name="echoHandler">true</str>
+     <str name="echoParams">explicit</str>
+     <str name="echoHandler">true</str>
     </lst>
   </requestHandler>
 
@@ -1112,7 +1112,7 @@
 
   <!-- A request handler for demonstrating the terms component -->
   <requestHandler name="/terms" class="solr.SearchHandler" startup="lazy">
-    <lst name="defaults">
+     <lst name="defaults">
       <bool name="terms">true</bool>
       <bool name="distrib">false</bool>
     </lst>
@@ -1313,17 +1313,17 @@
        rich documents injected via ExtractingRequestHandler.
        See more about langId at http://wiki.apache.org/solr/LanguageDetection
     -->
-  <!--
-   <updateRequestProcessorChain name="langid">
-     <processor class="org.apache.solr.update.processor.TikaLanguageIdentifierUpdateProcessorFactory">
-       <str name="langid.fl">text,title,subject,description</str>
-       <str name="langid.langField">language_s</str>
-       <str name="langid.fallback">en</str>
-     </processor>
-     <processor class="solr.LogUpdateProcessorFactory" />
-     <processor class="solr.RunUpdateProcessorFactory" />
-   </updateRequestProcessorChain>
-  -->
+    <!--
+     <updateRequestProcessorChain name="langid">
+       <processor class="org.apache.solr.update.processor.TikaLanguageIdentifierUpdateProcessorFactory">
+         <str name="langid.fl">text,title,subject,description</str>
+         <str name="langid.langField">language_s</str>
+         <str name="langid.fallback">en</str>
+       </processor>
+       <processor class="solr.LogUpdateProcessorFactory" />
+       <processor class="solr.RunUpdateProcessorFactory" />
+     </updateRequestProcessorChain>
+    -->
 
   <!-- Script update processor
 
@@ -1371,23 +1371,23 @@
     -->
 
   <queryResponseWriter name="json" class="solr.JSONResponseWriter">
-    <!-- For the purposes of the tutorial, JSON responses are written as
-     plain text so that they are easy to read in *any* browser.
-     If you expect a MIME type of "application/json" just remove this override.
-    -->
+     <!-- For the purposes of the tutorial, JSON responses are written as
+      plain text so that they are easy to read in *any* browser.
+      If you expect a MIME type of "application/json" just remove this override.
+     -->
     <str name="content-type">application/json; charset=UTF-8</str>
   </queryResponseWriter>
 
   <!--
      Custom response writers can be declared as needed...
     -->
-  <!-- The solr.velocity.enabled flag is used by Solr's test cases so that this response writer is not
-       loaded (causing an error if contrib/velocity has not been built fully) -->
-  <!--
-  <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy">
-    <str name="template.base.dir">${velocity.template.base.dir:}</str>
-  </queryResponseWriter>
-  -->
+    <!-- The solr.velocity.enabled flag is used by Solr's test cases so that this response writer is not
+         loaded (causing an error if contrib/velocity has not been built fully) -->
+    <!--
+    <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy">
+      <str name="template.base.dir">${velocity.template.base.dir:}</str>
+    </queryResponseWriter>
+    -->
 
   <!-- XSLT response writer transforms the XML output by any xslt file found
        in Solr's conf/xslt directory.  Changes to xslt files are checked for
