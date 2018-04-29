@@ -2,7 +2,7 @@
 
 /**
  * @file
- * All code for the Foo Bar module, except installation-related code.
+ * All code for the Hidden CAPTCHA module, except installation-related code.
  */
 
 /**
@@ -26,7 +26,7 @@ function hidden_captcha_menu() {
     'page arguments' => array('hidden_captcha_settings_form'),
     'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => -10
+    'weight' => -10,
   );
   return $items;
 }
@@ -39,12 +39,7 @@ function hidden_captcha_settings_form() {
   $form['hidden_captcha_label'] = array(
     '#type' => 'textfield',
     '#title' => t('Hidden text field label'),
-    '#description' => t(
-      "This is the hidden captcha form field's label, describing the expected input.<br />" .
-      "<strong>It is highly recommended to change it!</strong><br />" .
-      "The label should be as \"machine-readable\" as possible, encouraging spambots to fill in the field. An example might be a simple math challenge.<br />" .
-      "The label will only be visible to people who do not have CSS enabled and to robots."
-    ),
+    '#description' => t("This is the hidden captcha form field's label, describing the expected input.<br /><strong>It is highly recommended to change it!</strong><br />The label should be as \"machine-readable\" as possible, encouraging spambots to fill in the field. An example might be a simple math challenge.<br />The label will only be visible to people who do not have CSS enabled and to robots."),
     '#default_value' => variable_get('hidden_captcha_label', 'Website URL'),
   );
   return system_settings_form($form);
@@ -55,11 +50,33 @@ function hidden_captcha_settings_form() {
  */
 function hidden_captcha_captcha($op, $captcha_type = '') {
   switch ($op) {
-    case 'list': return array('Hidden CAPTCHA');
+    case 'list':
+      return array('Hidden CAPTCHA');
+
     case 'generate':
       if ($captcha_type == 'Hidden CAPTCHA') {
         $captcha = array();
         $captcha['solution'] = '';
+
+        // Ensure this captcha is cacheable.
+        // @see https://www.drupal.org/project/captcha/issues/2449209
+        $captcha['cacheable'] = TRUE;
+
+        // The CAPTCHA solution provided by hook_captcha() is updated in the
+        // 'captcha_session' table on pre-render phase of element process.
+        // @see captcha_pre_render_process()
+        // @see _captcha_update_captcha_session()
+        // However, if the cache is enabled, solution would be empty for the
+        // first attempt of the cached form. For the next attempt, there will
+        // not be any 'sid' in form_state
+        // (i.e. $form_state['captcha_info']['captcha_sid'] = null).
+        // So a new solution would get generated at captcha_element_process().
+        // The default 'captcha_validate' function,
+        // captcha_validate_strict_equality(), would fail in this case.
+        // @see captcha_validate()
+        // Adding custom validation function to check solution is always empty.
+        $captcha['captcha_validate'] = 'hidden_captcha_captcha_validate';
+
         $captcha['form']['captcha_response'] = array(
           '#type' => 'textfield',
           '#title' => variable_get('hidden_captcha_label', 'Website URL'),
@@ -73,14 +90,21 @@ function hidden_captcha_captcha($op, $captcha_type = '') {
 }
 
 /**
+ * CAPTCHA validation callback; checks that the response is empty.
+ */
+function hidden_captcha_captcha_validate($solution, $captcha_response, $element, $form_state) {
+  return $captcha_response === '';
+}
+
+/**
  * Implements hook_theme().
  */
 function hidden_captcha_theme() {
   return array(
     'captcha' => array(
       'arguments' => array('element' => NULL),
-      'function' => 'theme_hidden_captcha_captcha'
-    )
+      'function' => 'theme_hidden_captcha_captcha',
+    ),
   );
 }
 
@@ -90,13 +114,16 @@ function hidden_captcha_theme() {
 function theme_hidden_captcha_captcha($element) {
   $captcha = theme_captcha($element);
   if (strncmp($element["element"]["#captcha_type"], "hidden_captcha/", 15) == 0) {
-    //generate a random class name
+    // Generate a random class name.
     $chars = "abcdfghjkmnpqrstvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     $class = "";
-    for ($i = 0; $i < 64; ++$i) $class .= substr($chars, rand(0, strlen($chars)-1), 1);
-    //hide the random class via css
-    drupal_add_css(".$class{width:0;height:0;overflow:hidden;}", "inline"); // TODO: move the random class to an external file
-    //html for the captcha
+    for ($i = 0; $i < 64; ++$i) {
+      $class .= substr($chars, rand(0, strlen($chars) - 1), 1);
+    }
+    // Hide the random class via CSS.
+    // @todo Move the random class to an external file.
+    drupal_add_css(".$class{width:0;height:0;overflow:hidden;}", "inline");
+    // HTML for the captcha.
     $captcha = "<div class=\"$class\">" . $captcha . "</div>";
   }
   return $captcha;

@@ -138,12 +138,37 @@ Avancé<br/>
   $strongarm->api_version = 1;
   $strongarm->name = 'captcha_placement_map_cache';
   $strongarm->value = array(
-    'user_login_block' => array(
+    'user_register_form' => array(
       'path' => array(),
       'key' => 'actions',
       'weight' => 99,
     ),
-    'user_register_form' => array(
+    'contact_site_form' => array(
+      'path' => array(),
+      'key' => 'actions',
+      'weight' => 99,
+    ),
+    'user_pass' => array(
+      'path' => array(),
+      'key' => 'actions',
+      'weight' => 99,
+    ),
+    'contact_personal_form' => array(
+      'path' => array(),
+      'key' => 'actions',
+      'weight' => 99,
+    ),
+    'doc_node_form' => array(
+      'path' => array(),
+      'key' => 'actions',
+      'weight' => 99,
+    ),
+    'forum_node_form' => array(
+      'path' => array(),
+      'key' => 'actions',
+      'weight' => 99,
+    ),
+    'annuaire_node_form' => array(
       'path' => array(),
       'key' => 'actions',
       'weight' => 99,
@@ -528,95 +553,6 @@ Avancé<br/>
   $strongarm->name = 'l10n_update_import_mode';
   $strongarm->value = '1';
   $export['l10n_update_import_mode'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_audio_captcha_enabled';
-  $strongarm->value = 1;
-  $export['mollom_audio_captcha_enabled'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_connection_timeout';
-  $strongarm->value = '3';
-  $export['mollom_connection_timeout'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_fai_dialog';
-  $strongarm->value = 'mollom';
-  $export['mollom_fai_dialog'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_fai_entity_types';
-  $strongarm->value = array(
-    'comment' => 'comment',
-    'node' => 'node',
-  );
-  $export['mollom_fai_entity_types'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_fallback';
-  $strongarm->value = '0';
-  $export['mollom_fallback'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_fba_enabled';
-  $strongarm->value = 0;
-  $export['mollom_fba_enabled'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_languages_expected';
-  $strongarm->value = array(
-    'languageCode' => 'fr',
-  );
-  $export['mollom_languages_expected'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_log_minimum_severity';
-  $strongarm->value = '4';
-  $export['mollom_log_minimum_severity'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_privacy_link';
-  $strongarm->value = 0;
-  $export['mollom_privacy_link'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_private_key';
-  $strongarm->value = 'b3c4fc88039beb4678abe4024f51551d';
-  $export['mollom_private_key'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_public_key';
-  $strongarm->value = 'd2a49d32eb10a577a0296ed1c788d1d5';
-  $export['mollom_public_key'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'mollom_testing_mode';
-  $strongarm->value = 0;
-  $export['mollom_testing_mode'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

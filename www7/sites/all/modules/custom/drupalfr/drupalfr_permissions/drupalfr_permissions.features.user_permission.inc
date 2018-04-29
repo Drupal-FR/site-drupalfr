@@ -112,15 +112,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'mailchimp_signup',
   );
 
-  // Exported permission: 'access mollom statistics'.
-  $permissions['access mollom statistics'] = array(
-    'name' => 'access mollom statistics',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'access printer-friendly version'.
   $permissions['access printer-friendly version'] = array(
     'name' => 'access printer-friendly version',
@@ -534,15 +525,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'system',
   );
 
-  // Exported permission: 'administer mollom'.
-  $permissions['administer mollom'] = array(
-    'name' => 'administer mollom',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'administer nodes'.
   $permissions['administer nodes'] = array(
     'name' => 'administer nodes',
@@ -779,18 +761,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'scald',
   );
 
-  // Exported permission: 'bypass mollom protection'.
-  $permissions['bypass mollom protection'] = array(
-    'name' => 'bypass mollom protection',
-    'roles' => array(
-      'admin' => 'admin',
-      'modérateur documentation' => 'modérateur documentation',
-      'modérateur forum' => 'modérateur forum',
-      'node administrateurs' => 'node administrateurs',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'bypass node access'.
   $permissions['bypass node access'] = array(
     'name' => 'bypass node access',
@@ -1009,6 +979,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'create field_flag_moderation'.
+  $permissions['create field_flag_moderation'] = array(
+    'name' => 'create field_flag_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'create field_message_moderation'.
   $permissions['create field_message_moderation'] = array(
     'name' => 'create field_message_moderation',
@@ -1036,6 +1015,15 @@ function drupalfr_permissions_user_default_permissions() {
       'node administrateurs' => 'node administrateurs',
     ),
     'module' => 'book',
+  );
+
+  // Exported permission: 'create offre content'.
+  $permissions['create offre content'] = array(
+    'name' => 'create offre content',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'node',
   );
 
   // Exported permission: 'create page content'.
@@ -1560,6 +1548,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'edit field_flag_moderation'.
+  $permissions['edit field_flag_moderation'] = array(
+    'name' => 'edit field_flag_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'edit field_message_moderation'.
   $permissions['edit field_message_moderation'] = array(
     'name' => 'edit field_message_moderation',
@@ -1703,6 +1700,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'edit own field_flag_moderation'.
+  $permissions['edit own field_flag_moderation'] = array(
+    'name' => 'edit own field_flag_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'edit own field_message_moderation'.
   $permissions['edit own field_message_moderation'] = array(
     'name' => 'edit own field_message_moderation',
@@ -1716,6 +1722,15 @@ function drupalfr_permissions_user_default_permissions() {
   // Exported permission: 'edit own forum content'.
   $permissions['edit own forum content'] = array(
     'name' => 'edit own forum content',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'edit own offre content'.
+  $permissions['edit own offre content'] = array(
+    'name' => 'edit own offre content',
     'roles' => array(
       'authenticated user' => 'authenticated user',
     ),
@@ -2059,15 +2074,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'features',
   );
 
-  // Exported permission: 'report to mollom'.
-  $permissions['report to mollom'] = array(
-    'name' => 'report to mollom',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'restrict atom access'.
   $permissions['restrict atom access'] = array(
     'name' => 'restrict atom access',
@@ -2195,6 +2201,15 @@ function drupalfr_permissions_user_default_permissions() {
     'name' => 'unpublish editable page content',
     'roles' => array(
       'admin' => 'admin',
+    ),
+    'module' => 'publishcontent',
+  );
+
+  // Exported permission: 'unpublish own offre content'.
+  $permissions['unpublish own offre content'] = array(
+    'name' => 'unpublish own offre content',
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'publishcontent',
   );
@@ -2468,6 +2483,15 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'view_unpublished',
   );
 
+  // Exported permission: 'view field_flag_moderation'.
+  $permissions['view field_flag_moderation'] = array(
+    'name' => 'view field_flag_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
+  );
+
   // Exported permission: 'view field_message_moderation'.
   $permissions['view field_message_moderation'] = array(
     'name' => 'view field_message_moderation',
@@ -2559,6 +2583,15 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'commerce_product',
+  );
+
+  // Exported permission: 'view own field_flag_moderation'.
+  $permissions['view own field_flag_moderation'] = array(
+    'name' => 'view own field_flag_moderation',
+    'roles' => array(
+      'admin' => 'admin',
+    ),
+    'module' => 'field_permissions',
   );
 
   // Exported permission: 'view own field_message_moderation'.

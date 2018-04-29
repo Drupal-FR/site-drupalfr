@@ -127,9 +127,6 @@ function drupalfr_annuaire_strongarm() {
     ),
     'extra_fields' => array(
       'form' => array(
-        'mollom' => array(
-          'weight' => '17',
-        ),
         'title' => array(
           'weight' => '0',
         ),
