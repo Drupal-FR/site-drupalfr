@@ -8,8 +8,17 @@
 /**
  * Implements hook_uninstall().
  *
- * On uninstall: Remove module variables and clear variable cache.
+ * Remove module variables, simulating variable_del().
  */
 function hidden_captcha_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'hidden_captcha_%%'");
+  global $conf;
+  db_delete('variable')
+    ->condition('name', 'hidden\_captcha\_%', 'LIKE')
+    ->execute();
+  cache_clear_all('variables', 'cache_bootstrap');
+  foreach (array_keys($conf) as $name) {
+    if (strpos($name, 'hidden_captcha_') === 0) {
+      unset($conf[$name]);
+    }
+  }
 }
