@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_planet module.
+ */
+
+use Drupal\feeds\Entity\Feed;
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function drupalfr_planet_preprocess_node(&$variables) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+
+  // Add the feed image to the planet article.
+  if ($node->bundle() == 'planet' && in_array($variables['view_mode'], ['teaser', 'search_result'])) {
+    if ($node->hasField('feeds_item')) {
+      $feed = $node->get('feeds_item')->getValue();
+      if (!empty($feed)) {
+        $feed = Feed::load($feed[0]['target_id']);
+        if ($feed->hasField('field_feed_image')) {
+          $variables['feed_image'] = $feed->get('field_feed_image')->view('default');
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function drupalfr_planet_theme_registry_alter(&$theme_registry) {
+  // The preprocess function must run after quickedit_preprocess_field().
+  $theme_registry['field']['preprocess functions'][] = 'drupalfr_planet_remove_quickedit';
+}
+
+/**
+ * Turn off Quick Edit for injected fields, to avoid warnings.
+ *
+ * @see https://www.drupal.org/node/2923337
+ */
+function drupalfr_planet_remove_quickedit(&$variables) {
+  $entity_type_id = $variables['element']['#entity_type'];
+  if ($entity_type_id != 'feeds_feed' || $variables['element']['#view_mode'] != 'default') {
+    return;
+  }
+
+  if (isset($variables['attributes']['data-quickedit-field-id'])) {
+    unset($variables['attributes']['data-quickedit-field-id']);
+    $context_key = array_search('user.permissions', $variables['#cache']['contexts']);
+    unset($variables['#cache']['contexts'][$context_key]);
+  }
+}
