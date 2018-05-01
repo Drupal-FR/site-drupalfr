@@ -18,8 +18,19 @@
  * @ingroup themeable
  */
 #}
-<article{{ attributes }}>
+
+{% set classes = [
+  'user',
+  'user--compact',
+] %}
+
+<div{{ attributes.addClass(classes) }}>
   {% if content %}
-    {{- content -}}
+    <div class="user--picture">
+      {{ content.user_picture }}
+    </div>
+    <div class="user--realname">
+      {{ content.field_user_realname }}
+    </div>
   {% endif %}
-</article>
+</div>

@@ -1,0 +1,51 @@
+// Users Display
+// -------------
+
+.user {
+  &--compact {
+    @include clearfix();
+
+    margin-bottom: $global-margin;
+
+    .user--picture {
+      float:            left;
+      width:            65px;
+      height:           65px;
+      background-color: $white;
+
+      a {
+        display:       block;
+        width:         100%;
+        height:        100%;
+        border:        thin solid $light-gray;
+        border-radius: 5px;
+
+        > img {
+          filter:        grayscale(50%);
+          border:        5px solid $white;
+          border-radius: 5px;
+
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+
+          > img {
+            filter: grayscale(0%);
+            border: 2px solid $white;
+          }
+        }
+      }
+    }
+
+    .user--realname {
+      display:     block;
+      float:       left;
+      margin-top:  $global-margin*3;
+      margin-left: $global-padding;
+      font-style:  italic;
+      color:       $dark-gray;
+    }
+  }
+}
