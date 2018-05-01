@@ -56,11 +56,14 @@
 
     <section{{ attributes.addClass(classes) }}>
       {% block content %}
-      <div class="small-12 medium-12 large-12 column">
-        <div>{{ content.field_media}}</div>
+      <div class="small-12">
+        {{ content.field_media }}
         {{ content.field_text }}
       </div>
       {% endblock %}
     </section>
+  {% if banner_link_url %}
+    </a>
+  {% endif %}
 
 {% endblock paragraph %}
