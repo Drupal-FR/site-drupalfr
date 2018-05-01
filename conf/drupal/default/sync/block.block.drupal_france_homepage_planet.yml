@@ -1,16 +1,16 @@
-uuid: a4c64553-3c6f-4676-b9d5-3dc6f97a1db7
+uuid: 20fc5863-5cfc-453d-8197-2fe48cf365d9
 langcode: fr
 status: true
 dependencies:
   config:
+    - block_visibility_groups.block_visibility_group.homepage
     - views.view.planet
   module:
     - block_visibility_groups
-    - system
     - views
   theme:
     - drupal_france
-id: planet_block_homepage
+id: drupal_france_homepage_planet
 theme: drupal_france
 region: content
 weight: -16
@@ -27,10 +27,5 @@ visibility:
   condition_group:
     id: condition_group
     negate: false
-    block_visibility_group: ''
-    context_mapping: {  }
-  request_path:
-    id: request_path
-    pages: '<front>'
-    negate: false
+    block_visibility_group: homepage
     context_mapping: {  }
