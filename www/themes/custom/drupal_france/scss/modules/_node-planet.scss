@@ -13,25 +13,28 @@
     background-color: $white;
 
     .planet-element--feature-image {
-      margin-bottom: $global-margin*4;
+      border-bottom: thin solid $light-gray;
     }
 
-    .planet-element--author-picture {
-      position:      absolute;
-      top:           160px;
-      left:          $global-padding*2;
-      width:         50px;
-      height:        50px;
-      border:        5px solid $white;
-      border-radius: 5px;
-      background:    $white;
+    .planet-element--author {
+      margin-top: -$global-padding*2;
+      padding:    0 $global-padding*2;
 
     }
 
     .planet-element--title {
       padding:   0 $global-padding*2 $global-padding/2;
       font-size: 1.75rem;
-      color:     $drupal-blue-lighter;
+
+      a {
+        color: $drupal-blue-lighter;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: $drupal-blue-dark;
+        }
+      }
     }
 
     .planet-element--content {
