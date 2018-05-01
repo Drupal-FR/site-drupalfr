@@ -44,6 +44,8 @@
     'paragraph--type--' ~ paragraph.bundle|clean_class,
     view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
     'row',
+    'expanded',
+    'column',
   ]
 %}
 {% set banner_link_title = banner_link_title ?: '' %}
@@ -54,12 +56,11 @@
 
     <section{{ attributes.addClass(classes) }}>
       {% block content %}
-        {{ content }}
+      <div class="small-12 medium-12 large-12 column">
+        <div>{{ content.field_media}}</div>
+        {{ content.field_text }}
+      </div>
       {% endblock %}
     </section>
-
-  {% if banner_link_url %}
-    </a>
-  {% endif %}
 
 {% endblock paragraph %}
