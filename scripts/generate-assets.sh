@@ -29,6 +29,9 @@ fi
 echo -e "${LIGHT_GREEN}Change temporarily directory.${NC}"
 cd $WWW_PATH/themes/custom/drupal_france
 
+echo -e "${LIGHT_GREEN}Install npm packages.${NC}"
+npm install
+
 echo -e "${LIGHT_GREEN}Generate assets with mode: ${ASSETS_MODE}${NC}"
 npm run-script $ASSETS_MODE
 
