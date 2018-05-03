@@ -3,18 +3,18 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.field.paragraph.layout_9_3.field_main_area
-    - field.field.paragraph.layout_9_3.field_sidebar
-    - paragraphs.paragraphs_type.layout_9_3
+    - field.field.paragraph.layout_twocol.field_column_1
+    - field.field.paragraph.layout_twocol.field_column_2
+    - paragraphs.paragraphs_type.layout_twocol
   module:
     - block_field
     - paragraphs
-id: paragraph.layout_9_3.default
+id: paragraph.layout_twocol.default
 targetEntityType: paragraph
-bundle: layout_9_3
+bundle: layout_twocol
 mode: default
 content:
-  field_main_area:
+  field_column_1:
     type: entity_reference_paragraphs
     weight: 0
     settings:
@@ -26,14 +26,17 @@ content:
       default_paragraph_type: ''
     third_party_settings: {  }
     region: content
-  field_sidebar:
+  field_column_2:
+    type: entity_reference_paragraphs
     weight: 1
     settings:
-      plugin_id: ''
-      settings: {  }
-      configuration_form: full
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
     third_party_settings: {  }
-    type: block_field_default
     region: content
 hidden:
   created: true

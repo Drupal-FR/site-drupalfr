@@ -3,17 +3,17 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.paragraph.field_main_area
+    - field.storage.paragraph.field_column_1
     - paragraphs.paragraphs_type.html
-    - paragraphs.paragraphs_type.layout_9_3
+    - paragraphs.paragraphs_type.layout_twocol
     - paragraphs.paragraphs_type.title_text_media
   module:
     - entity_reference_revisions
-id: paragraph.layout_9_3.field_main_area
-field_name: field_main_area
+id: paragraph.layout_twocol.field_column_1
+field_name: field_column_1
 entity_type: paragraph
-bundle: layout_9_3
-label: 'Main Area'
+bundle: layout_twocol
+label: 'Première colonne'
 description: ''
 required: true
 translatable: false
@@ -27,7 +27,7 @@ settings:
       html: html
       title_text_media: title_text_media
     target_bundles_drag_drop:
-      layout_9_3:
+      layout_twocol:
         weight: 7
         enabled: false
       banner:

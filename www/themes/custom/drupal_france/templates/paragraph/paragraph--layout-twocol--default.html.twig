@@ -38,37 +38,25 @@
  * @ingroup themeable
  */
 #}
-<<<<<<< HEAD
-{% set classes = [
-  'paragraph',
-  'paragraph--type--' ~ paragraph.bundle|clean_class,
-  view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
-  'row',
-] %}
-
-{% block paragraph %}
-  <div{{ attributes.addClass(classes) }}>
-    {% block content %}
-      <div class="small-12 medium-9 large-8 column">
-        {{ content['field_main_area'] }}
-      </div>
-
-      <div class="small-12 medium-3 large-4 column">
-        {{ content['field_sidebar'] }}
-      </div>
-=======
 {%
   set classes = [
     'paragraph',
     'paragraph--type--' ~ paragraph.bundle|clean_class,
     view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+    'row',
   ]
 %}
+
 {% block paragraph %}
   <div{{ attributes.addClass(classes) }}>
     {% block content %}
-      {{ content }}
->>>>>>> WIP Paragraph multicolumn
+      <div class="small-12 medium-9 large-8 column">
+        {{ content.field_column_1 }}
+      </div>
+
+      <div class="small-12 medium-3 large-4 column">
+        {{ content.field_column_2 }}
+      </div>
     {% endblock %}
   </div>
 {% endblock paragraph %}
