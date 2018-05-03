@@ -1,0 +1,34 @@
+uuid: 7984b491-98e3-438f-8f01-1554529f3781
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_block_plugin
+    - paragraphs.paragraphs_type.block
+  module:
+    - block_field
+id: paragraph.block.field_block_plugin
+field_name: field_block_plugin
+entity_type: paragraph
+bundle: block
+label: Bloc
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  plugin_ids:
+    'facet_block:showcase_sector': 'facet_block:showcase_sector'
+    'facet_block:showcase_typology': 'facet_block:showcase_typology'
+    'facet_block:showcase_drupal_version': 'facet_block:showcase_drupal_version'
+    'views_block:forum-block_1': 'views_block:forum-block_1'
+    'views_block:media_library-block_podcast': 'views_block:media_library-block_podcast'
+    'block_content:block_sidebar_contact': 'block_content:block_sidebar_contact'
+    'block_content:block_sidebar_release_help': 'block_content:block_sidebar_release_help'
+    'block_content:block_sidebar_release_docker': 'block_content:block_sidebar_release_docker'
+    'block_content:block_sidebar_release_github': 'block_content:block_sidebar_release_github'
+    'block_content:block_sidebar_question': 'block_content:block_sidebar_question'
+    'block_content:block_sidebar_question_forum': 'block_content:block_sidebar_question_forum'
+    webform_block: webform_block
+field_type: block_field

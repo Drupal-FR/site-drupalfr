@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_column_2
+    - paragraphs.paragraphs_type.block
     - paragraphs.paragraphs_type.html
     - paragraphs.paragraphs_type.layout_twocol
     - paragraphs.paragraphs_type.title_text_media
@@ -24,25 +25,29 @@ settings:
   handler_settings:
     negate: 0
     target_bundles:
-      html: html
       title_text_media: title_text_media
+      html: html
+      block: block
     target_bundles_drag_drop:
-      layout_twocol:
-        weight: 7
-        enabled: false
-      banner:
-        weight: 8
-        enabled: false
-      html:
-        enabled: true
-        weight: 9
       title_text_media:
         enabled: true
-        weight: 10
+        weight: -15
+      html:
+        enabled: true
+        weight: -14
+      block:
+        enabled: true
+        weight: -13
+      layout_twocol:
+        weight: -12
+        enabled: false
+      banner:
+        weight: -11
+        enabled: false
       trombinoscope:
-        weight: 11
+        weight: -10
         enabled: false
       trombinoscope_item:
-        weight: 12
+        weight: -9
         enabled: false
 field_type: entity_reference_revisions

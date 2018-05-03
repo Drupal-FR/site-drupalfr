@@ -23,6 +23,7 @@ default_value_callback: ''
 settings:
   handler: 'default:paragraph'
   handler_settings:
+    negate: 0
     target_bundles:
       trombinoscope_item: trombinoscope_item
     target_bundles_drag_drop:
@@ -32,6 +33,9 @@ settings:
       banner:
         weight: 7
         enabled: false
+      block:
+        weight: 8
+        enabled: false
       html:
         weight: 8
         enabled: false
@@ -40,5 +44,8 @@ settings:
         enabled: false
       trombinoscope:
         weight: 10
+        enabled: false
+      layout_twocol:
+        weight: 11
         enabled: false
 field_type: entity_reference_revisions
