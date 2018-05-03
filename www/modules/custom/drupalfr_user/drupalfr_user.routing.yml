@@ -1,0 +1,9 @@
+drupalfr_user.membership_settings:
+  path: '/admin/config/drupalfr/membership'
+  defaults:
+    _form: '\Drupal\drupalfr_user\Form\MembershipSettings'
+    _title: 'Membership'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE

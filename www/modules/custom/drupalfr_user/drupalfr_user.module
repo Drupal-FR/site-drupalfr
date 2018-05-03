@@ -5,6 +5,9 @@
  * Contains hook implementations for drupalfr_user module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Implements hook_theme().
  */
@@ -54,5 +57,39 @@ function drupalfr_user_preprocess_user(&$variables) {
       ],
       '#create_placeholder' => TRUE,
     ];
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * Set membership number if the user has not one yet.
+ *
+ * Use this hook (no event available) to avoid having to reproduce activation
+ * logic of Commerce license.
+ */
+function drupalfr_user_user_presave(EntityInterface $entity) {
+  /** @var \Drupal\user\UserInterface $entity */
+  // User has to have an account before taking a membership.
+  if (!$entity->isNew()) {
+    if ($entity->hasField('field_user_membership_number') && $entity->get('field_user_membership_number')->isEmpty()) {
+      if ($entity->hasRole('member')) {
+        $next_membership_number = \Drupal::state()->get('drupalfr_user.next_membership_number', 1);
+        $entity->set('field_user_membership_number', $next_membership_number);
+
+        \Drupal::state()->set('drupalfr_user.next_membership_number', $next_membership_number + 1);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Prevent unauthorized users to edit their membership number.
+ */
+function drupalfr_user_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form['field_user_membership_number'])) {
+    $form['field_user_membership_number']['widget']['#disabled'] = !\Drupal::currentUser()->hasPermission('drupalfr_user_edit_user_membership_number');
   }
 }
