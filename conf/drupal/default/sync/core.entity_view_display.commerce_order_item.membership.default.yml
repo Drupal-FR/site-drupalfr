@@ -10,6 +10,16 @@ targetEntityType: commerce_order_item
 bundle: membership
 mode: default
 content:
+  created:
+    label: hidden
+    type: timestamp
+    weight: 0
+    region: content
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
   license:
     region: hidden
     weight: 1
