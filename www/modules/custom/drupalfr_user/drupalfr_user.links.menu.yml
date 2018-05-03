@@ -15,3 +15,9 @@ drupalfr_user.account.login:
   weight: -5
   menu_name: account
   class: Drupal\user\Plugin\Menu\LoginLogoutMenuLink
+
+# Administration menu.
+drupalfr_user.admin.membership_settings:
+  title: 'Membership'
+  route_name: drupalfr_user.membership_settings
+  parent: drupalfr_core.config_list
