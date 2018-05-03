@@ -1,0 +1,48 @@
+uuid: 213b184d-af83-4cd4-ba5b-3e69a75109ba
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_main_area
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.layout_9_3
+    - paragraphs.paragraphs_type.title_text_media
+  module:
+    - entity_reference_revisions
+id: paragraph.layout_9_3.field_main_area
+field_name: field_main_area
+entity_type: paragraph
+bundle: layout_9_3
+label: 'Main Area'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      html: html
+      title_text_media: title_text_media
+    target_bundles_drag_drop:
+      layout_9_3:
+        weight: 7
+        enabled: false
+      banner:
+        weight: 8
+        enabled: false
+      html:
+        enabled: true
+        weight: 9
+      title_text_media:
+        enabled: true
+        weight: 10
+      trombinoscope:
+        weight: 11
+        enabled: false
+      trombinoscope_item:
+        weight: 12
+        enabled: false
+field_type: entity_reference_revisions

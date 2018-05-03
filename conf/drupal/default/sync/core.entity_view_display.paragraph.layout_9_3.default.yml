@@ -1,0 +1,33 @@
+uuid: 27f56a3b-be63-41d7-960c-5441eda9fbf7
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.layout_9_3.field_main_area
+    - field.field.paragraph.layout_9_3.field_sidebar
+    - paragraphs.paragraphs_type.layout_9_3
+  module:
+    - block_field
+    - entity_reference_revisions
+id: paragraph.layout_9_3.default
+targetEntityType: paragraph
+bundle: layout_9_3
+mode: default
+content:
+  field_main_area:
+    type: entity_reference_revisions_entity_view
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_sidebar:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: block_field
+    region: content
+hidden: {  }

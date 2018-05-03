@@ -1,0 +1,30 @@
+uuid: 2263d16d-1be6-40ee-86c6-9a9c55e6701e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sidebar
+    - paragraphs.paragraphs_type.layout_9_3
+  module:
+    - block_field
+id: paragraph.layout_9_3.field_sidebar
+field_name: field_sidebar
+entity_type: paragraph
+bundle: layout_9_3
+label: 'Right Sidebar'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  plugin_ids:
+    'block_content:block_sidebar_release_help': 'block_content:block_sidebar_release_help'
+    'block_content:block_sidebar_release_docker': 'block_content:block_sidebar_release_docker'
+    'block_content:block_sidebar_release_github': 'block_content:block_sidebar_release_github'
+    'block_content:block_sidebar_question': 'block_content:block_sidebar_question'
+    'block_content:block_sidebar_question_forum': 'block_content:block_sidebar_question_forum'
+    'views_block:forum-block_1': 'views_block:forum-block_1'
+    'views_block:media_library-block_podcast': 'views_block:media_library-block_podcast'
+    'views_block:comments_recent-block_1': 'views_block:comments_recent-block_1'
+field_type: block_field

@@ -1,0 +1,41 @@
+uuid: 404856b0-bdbc-4154-9eb3-19cf96945f60
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.layout_9_3.field_main_area
+    - field.field.paragraph.layout_9_3.field_sidebar
+    - paragraphs.paragraphs_type.layout_9_3
+  module:
+    - block_field
+    - paragraphs
+id: paragraph.layout_9_3.default
+targetEntityType: paragraph
+bundle: layout_9_3
+mode: default
+content:
+  field_main_area:
+    type: entity_reference_paragraphs
+    weight: 0
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+    third_party_settings: {  }
+    region: content
+  field_sidebar:
+    weight: 1
+    settings:
+      plugin_id: ''
+      settings: {  }
+      configuration_form: full
+    third_party_settings: {  }
+    type: block_field_default
+    region: content
+hidden:
+  created: true
+  status: true
+  uid: true
