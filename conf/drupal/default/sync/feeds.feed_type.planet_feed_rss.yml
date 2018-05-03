@@ -1,7 +1,9 @@
 uuid: e77a0582-d25d-41dc-a64b-607fe82f776b
 langcode: fr
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - node
 _core:
   default_config_hash: ILSX6lybM0C_Tu4tpwAhh-CbaGA2-VBjgTb3B8a8zf0
 label: 'Flux RSS du planète'
@@ -19,6 +21,7 @@ parser_configuration: {  }
 processor: 'entity:node'
 processor_configuration:
   update_existing: 0
+  update_non_existent: _keep
   expire: -1
   owner_feed_author: true
   owner_id: 0
@@ -26,7 +29,6 @@ processor_configuration:
   skip_hash_check: false
   values:
     type: planet
-  update_non_existent: _keep
 custom_sources: {  }
 mappings:
   -
@@ -35,7 +37,7 @@ mappings:
       value: description
       summary: ''
     settings:
-      format: basic_html
+      format: restricted_html
   -
     target: title
     map:
