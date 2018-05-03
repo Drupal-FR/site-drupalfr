@@ -15,10 +15,12 @@ bundle: video
 mode: default
 content:
   field_media_video_embed_field:
-    type: video_embed_field_video
+    type: video_embed_field_lazyload
     weight: 0
     label: hidden
     settings:
+      image_style: ''
+      link_image_to: ''
       responsive: true
       width: 854
       height: 480
