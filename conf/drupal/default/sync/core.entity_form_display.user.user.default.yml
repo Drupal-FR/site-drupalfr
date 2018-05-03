@@ -6,13 +6,13 @@ dependencies:
     - field.field.user.user.commerce_remote_id
     - field.field.user.user.field_user_banner
     - field.field.user.user.field_user_biography
-    - field.field.user.user.field_user_organization
     - field.field.user.user.field_user_drupal_org
     - field.field.user.user.field_user_event
     - field.field.user.user.field_user_in_directory
     - field.field.user.user.field_user_membership_number
     - field.field.user.user.field_user_newsletter_adff
     - field.field.user.user.field_user_newsletter_drupalcamp
+    - field.field.user.user.field_user_organization
     - field.field.user.user.field_user_realname
     - field.field.user.user.field_user_twitter
     - field.field.user.user.field_user_website
@@ -42,6 +42,7 @@ third_party_settings:
         classes: ''
         direction: vertical
       label: Onglets
+      region: content
     group_newsletters:
       children:
         - field_user_newsletter_adff
@@ -56,6 +57,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: Newsletters
+      region: content
     group_drupal_settings:
       children:
         - account
@@ -71,6 +73,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Paramètres Drupal'
+      region: content
     group_member:
       children:
         - field_user_membership_number
@@ -85,6 +88,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: Adhérent
+      region: content
     group_information:
       children:
         - field_user_realname
@@ -105,6 +109,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: Informations
+      region: content
     group_community:
       children:
         - field_user_event
@@ -118,6 +123,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: Communauté
+      region: content
 _core:
   default_config_hash: lAfBDRbBotlPrp8V88to2Z2Bozg059Xtk3PK_xjxk1A
 id: user.user.default
@@ -136,7 +142,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   field_user_banner:
-    weight: 9
+    weight: 32
     settings:
       progress_indicator: throbber
       preview_image_style: thumbnail
@@ -144,7 +150,7 @@ content:
     type: image_image
     region: content
   field_user_biography:
-    weight: 7
+    weight: 30
     settings:
       rows: 9
       summary_rows: 3
@@ -153,7 +159,7 @@ content:
     type: text_textarea_with_summary
     region: content
   field_user_drupal_org:
-    weight: 6
+    weight: 29
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -197,7 +203,7 @@ content:
     type: mailchimp_lists_select
     region: content
   field_user_organization:
-    weight: 3
+    weight: 26
     settings:
       match_operator: CONTAINS
       size: 60
@@ -206,7 +212,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_user_realname:
-    weight: 2
+    weight: 25
     settings:
       size: 60
       placeholder: ''
@@ -214,7 +220,7 @@ content:
     type: string_textfield
     region: content
   field_user_twitter:
-    weight: 5
+    weight: 28
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -222,7 +228,7 @@ content:
     type: link_default
     region: content
   field_user_website:
-    weight: 4
+    weight: 27
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -240,7 +246,7 @@ content:
       progress_indicator: throbber
       preview_image_style: thumbnail
     third_party_settings: {  }
-    weight: 8
+    weight: 31
     region: content
 hidden:
   commerce_remote_id: true
