@@ -22,7 +22,7 @@ class SearchHeaderBlock extends BlockBase {
     $build = [
       'search_link' => [
         '#type' => 'link',
-        '#url' => Url::fromRoute('view.search.page_1'),
+        '#url' => Url::fromUserInput('/recherche'),
         '#title' => $this->t('Search'),
       ],
     ];

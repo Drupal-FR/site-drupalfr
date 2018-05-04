@@ -56,8 +56,8 @@ display:
           tags:
             previous: ‹‹
             next: ››
-            first: '« First'
-            last: 'Last »'
+            first: '« Première page'
+            last: 'Dernière page »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -199,7 +199,19 @@ display:
           min_length: null
           fields: {  }
           plugin_id: search_api_fulltext
-      sorts: {  }
+      sorts:
+        search_api_relevance:
+          id: search_api_relevance
+          table: search_api_index_content
+          field: search_api_relevance
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: DESC
+          exposed: false
+          expose:
+            label: ''
+          plugin_id: search_api
       title: Recherche
       header: {  }
       footer: {  }
@@ -216,29 +228,20 @@ display:
         - url.query_args
         - user.permissions
       tags: {  }
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
+  block_page_recherche:
+    display_plugin: block
+    id: block_page_recherche
+    display_title: 'Bloc page recherche'
     position: 1
     display_options:
       display_extenders:
         metatag_display_extender: {  }
-      path: recherche
-      menu:
-        type: none
-        title: Search
-        description: ''
-        expanded: false
-        parent: ''
-        weight: 0
-        context: '0'
-        menu_name: main
       cache:
         type: none
       defaults:
         cache: false
       exposed_block: true
+      display_description: ''
     cache_metadata:
       max-age: -1
       contexts:

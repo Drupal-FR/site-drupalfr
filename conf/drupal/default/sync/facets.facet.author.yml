@@ -1,4 +1,4 @@
-uuid: ff020cfd-7a04-45a1-b2d7-54607344f0a6
+uuid: 3333c50e-6b4d-460d-8294-d5042b3b97cb
 langcode: fr
 status: true
 dependencies:
@@ -16,19 +16,22 @@ weight: 0
 min_count: 1
 show_only_one_result: false
 field_identifier: name
-facet_source_id: 'search_api:views_page__search__page_1'
+facet_source_id: 'search_api:views_block__search__block_page_recherche'
 widget:
   type: checkbox
   config:
     show_numbers: true
     soft_limit: 0
+    soft_limit_settings:
+      show_less_label: 'Show less'
+      show_more_label: 'Show more'
 query_operator: and
 use_hierarchy: false
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 hard_limit: 0
 exclude: false
-only_visible_when_facet_source_is_visible: true
+only_visible_when_facet_source_is_visible: false
 processor_configs:
   active_widget_order:
     processor_id: active_widget_order
