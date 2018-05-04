@@ -172,9 +172,11 @@ display:
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
-      use_more: true
+      use_more: false
       use_more_always: true
       use_more_text: 'Toutes les actualités'
+      link_url: association/actualites
+      link_display: custom_url
     cache_metadata:
       max-age: -1
       contexts:
@@ -198,7 +200,13 @@ display:
           offset: 0
       defaults:
         pager: false
+        use_more: false
+        use_more_always: false
+        use_more_text: false
       display_description: ''
+      use_more: true
+      use_more_always: true
+      use_more_text: 'Toutes les actualités'
     cache_metadata:
       max-age: -1
       contexts:
@@ -207,14 +215,13 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
+  block_page_news:
+    display_plugin: block
+    id: block_page_news
+    display_title: 'Bloc page actualités'
     position: 1
     display_options:
       display_extenders: {  }
-      path: association/actualites
       filters:
         status:
           value: '1'
@@ -300,6 +307,8 @@ display:
         options:
           relationship: none
           view_mode: listing
+      display_description: ''
+      exposed_block: true
     cache_metadata:
       max-age: -1
       contexts:
