@@ -1,4 +1,4 @@
-uuid: 1cf6cf52-e618-4ca8-9bf3-371a761dd690
+uuid: 94b9983a-cf13-4e7d-8db5-c58b02135b09
 langcode: fr
 status: true
 dependencies:
@@ -7,8 +7,6 @@ dependencies:
     - views.view.showcase_page
   module:
     - search_api
-_core:
-  default_config_hash: awZb2oiy87O_ATbLjk4iXCz-1yoVVNH1Kwtf-F6ZQsc
 id: showcase_drupal_version
 name: 'Version de Drupal'
 url_alias: showcase_drupal_version
@@ -16,19 +14,22 @@ weight: 0
 min_count: 1
 show_only_one_result: false
 field_identifier: name_2
-facet_source_id: 'search_api:views_page__showcase_page__page_1'
+facet_source_id: 'search_api:views_block__showcase_page__block_page_reference'
 widget:
   type: links
   config:
     show_numbers: false
     soft_limit: 0
+    soft_limit_settings:
+      show_less_label: 'Show less'
+      show_more_label: 'Show more'
 query_operator: and
 use_hierarchy: false
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 hard_limit: 0
 exclude: false
-only_visible_when_facet_source_is_visible: true
+only_visible_when_facet_source_is_visible: false
 processor_configs:
   active_widget_order:
     processor_id: active_widget_order

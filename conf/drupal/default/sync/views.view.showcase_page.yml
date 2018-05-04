@@ -152,6 +152,7 @@ display:
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
+      use_ajax: true
     cache_metadata:
       max-age: -1
       contexts:
@@ -159,19 +160,19 @@ display:
         - url.query_args
         - user.permissions
       tags: {  }
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
+  block_page_reference:
+    display_plugin: block
+    id: block_page_reference
+    display_title: 'Bloc page références'
     position: 1
     display_options:
       display_extenders: {  }
-      path: decouvrir/references
       cache:
-        type: search_api_tag
-        options: {  }
+        type: none
       defaults:
         cache: false
+      block_description: ''
+      display_description: ''
     cache_metadata:
       max-age: -1
       contexts:
