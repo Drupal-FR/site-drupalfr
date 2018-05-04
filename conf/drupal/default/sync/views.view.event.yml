@@ -163,25 +163,13 @@ display:
           granularity: day
           plugin_id: datetime
       title: 'Les événements organisés par l''association'
-      header:
-        area:
-          id: area
-          table: views
-          field: area
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          tokenize: false
-          content:
-            value: "<h1 class=\"text-center\">Les événements organisés par l'association</h1>\n<p class=\"text-center\">Retrouvez les rencontres des années passées, organisées par les bénévoles de l'association.</p>"
-            format: full_html
-          plugin_id: text
+      header: {  }
       footer: {  }
       empty: {  }
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
+      use_ajax: true
     cache_metadata:
       max-age: -1
       contexts:
@@ -191,14 +179,14 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
+  block_page_event:
+    display_plugin: block
+    id: block_page_event
+    display_title: 'Bloc page événements'
     position: 1
     display_options:
       display_extenders: {  }
-      path: association/evenements
+      display_description: ''
     cache_metadata:
       max-age: -1
       contexts:
