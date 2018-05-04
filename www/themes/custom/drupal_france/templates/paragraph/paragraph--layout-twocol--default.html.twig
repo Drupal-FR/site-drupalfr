@@ -46,17 +46,25 @@
     'row',
   ]
 %}
+{% set first_column_width_class = first_column_width_class ?: 'medium-9' %}
+{% set second_column_width_class = second_column_width_class ?: 'medium-3' %}
 
 {% block paragraph %}
   <div{{ attributes.addClass(classes) }}>
     {% block content %}
-      <div class="small-12 medium-9 large-8 column">
-        {{ content.field_column_1 }}
-      </div>
 
-      <div class="small-12 medium-3 large-4 column">
-        {{ content.field_column_2 }}
-      </div>
+      {% if content.field_column_1 %}
+        <div class="small-12 {{ first_column_width_class }} column">
+          {{ content.field_column_1 }}
+        </div>
+      {% endif %}
+
+      {% if content.field_column_2 %}
+        <div class="small-12 {{ second_column_width_class }} column">
+          {{ content.field_column_2 }}
+        </div>
+      {% endif %}
+
     {% endblock %}
   </div>
 {% endblock paragraph %}

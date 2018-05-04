@@ -1,29 +1,25 @@
-uuid: d5fb9995-e03a-4040-acab-73889e43feba
+uuid: 9b0b0e92-4a6d-49ac-a4cb-9b567534a7c6
 langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.node.field_paragraph
-    - node.type.page
+    - field.storage.paragraph.field_column_1
     - paragraphs.paragraphs_type.banner
     - paragraphs.paragraphs_type.block
     - paragraphs.paragraphs_type.html
     - paragraphs.paragraphs_type.layout_onecol
-    - paragraphs.paragraphs_type.layout_twocol
     - paragraphs.paragraphs_type.title_text_media
     - paragraphs.paragraphs_type.trombinoscope
   module:
     - entity_reference_revisions
-_core:
-  default_config_hash: ckNt4LkVOHEZJ6UxMDV8nVjKyeOV5_GWVUOy5flTHbg
-id: node.page.field_paragraph
-field_name: field_paragraph
-entity_type: node
-bundle: page
-label: Paragraphes
+id: paragraph.layout_onecol.field_column_1
+field_name: field_column_1
+entity_type: paragraph
+bundle: layout_onecol
+label: 'Contenu de la colonne'
 description: ''
 required: false
-translatable: false
+translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:
@@ -31,36 +27,34 @@ settings:
   handler_settings:
     negate: 0
     target_bundles:
-      title_text_media: title_text_media
       banner: banner
-      layout_onecol: layout_onecol
-      layout_twocol: layout_twocol
-      html: html
       block: block
+      html: html
+      title_text_media: title_text_media
       trombinoscope: trombinoscope
     target_bundles_drag_drop:
-      title_text_media:
-        enabled: true
-        weight: -17
+      layout_onecol:
+        weight: 9
+        enabled: false
       banner:
         enabled: true
-        weight: -16
-      layout_onecol:
-        enabled: true
-        weight: -15
-      layout_twocol:
-        enabled: true
-        weight: -14
-      html:
-        enabled: true
-        weight: -13
+        weight: 10
       block:
         enabled: true
-        weight: -12
+        weight: 11
+      html:
+        enabled: true
+        weight: 12
+      layout_twocol:
+        weight: 13
+        enabled: false
+      title_text_media:
+        enabled: true
+        weight: 14
       trombinoscope:
         enabled: true
-        weight: -11
+        weight: 15
       trombinoscope_item:
-        weight: -10
+        weight: 16
         enabled: false
 field_type: entity_reference_revisions
