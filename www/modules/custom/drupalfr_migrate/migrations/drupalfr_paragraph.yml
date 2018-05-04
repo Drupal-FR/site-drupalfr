@@ -25,6 +25,10 @@ source:
     - pid: Identifier
     - type: Type
     - field_media: Media
+    - field_users: 'Users'
+    - field_column_1: 'First column'
+    - field_column_2: 'Second column'
+    - field_trombinoscope_items: 'Trombinoscope items'
     - field_banner_link_uri: 'Banner link URI'
     - field_banner_link_title: 'Banner link title'
     - field_text_value: 'Field text value'
@@ -39,10 +43,11 @@ source:
     - field_title_level: 'Title level'
     - field_title: 'Title'
     - field_sub_title: 'Sub title'
-    - field_users: 'Users'
     - field_css_class: 'Paragraph CSS Class'
-    - field_trombinoscope_items: 'Trombinoscope items'
     - field_background_color: 'Background color'
+    - field_column_2_width: 'Second column width'
+    - field_block_plugin_plugin_id: 'Block plugin id'
+    - field_block_plugin_settings: 'Block plugin settings (serialized)'
 destination:
   plugin: 'entity_reference_revisions:paragraph'
 process:
@@ -92,5 +97,39 @@ process:
       process:
         target_id: '0'
         target_revision_id: '1'
+  field_column_1:
+    -
+      plugin: explode
+      delimiter: ;
+      source: field_column_1
+    -
+      plugin: migration
+      migration: drupalfr_paragraph
+      no_stub: true
+    -
+      plugin: sub_process
+      process:
+        target_id: '0'
+        target_revision_id: '1'
+  field_column_2:
+    -
+      plugin: explode
+      delimiter: ;
+      source: field_column_2
+    -
+      plugin: migration
+      migration: drupalfr_paragraph
+      no_stub: true
+    -
+      plugin: sub_process
+      process:
+        target_id: '0'
+        target_revision_id: '1'
+  field_block_plugin/plugin_id: field_block_plugin_plugin_id
+  field_block_plugin/settings:
+    plugin: callback
+    callable: unserialize
+    source: field_block_plugin_settings
   field_css_class: field_css_class
   field_background_color/color: field_background_color
+  field_column_2_width: field_column_2_width
