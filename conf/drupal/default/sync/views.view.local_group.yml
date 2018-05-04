@@ -195,8 +195,7 @@ display:
     display_options:
       display_extenders: {  }
       displays:
-        default: default
-        page_1: page_1
+        block_page_local_group: block_page_local_group
       pager:
         type: none
         options:
@@ -354,6 +353,29 @@ display:
         - user.permissions
       tags:
         - 'config:field.storage.node.field_local_group_place'
+  block_page_local_group:
+    display_plugin: block
+    id: block_page_local_group
+    display_title: 'Bloc page groupes locaux'
+    position: 1
+    display_options:
+      display_extenders: {  }
+      defaults:
+        header: true
+        pager: false
+      pager:
+        type: none
+        options:
+          offset: 0
+      display_description: ''
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
   entity_view_1:
     display_plugin: entity_view
     id: entity_view_1
@@ -562,49 +584,3 @@ display:
         - user.permissions
       tags:
         - 'config:field.storage.node.field_local_group_place'
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
-    position: 1
-    display_options:
-      display_extenders: {  }
-      path: communaute/groupes-locaux
-      menu:
-        type: none
-        title: 'Groupes locaux'
-        description: ''
-        expanded: false
-        parent: ''
-        weight: 0
-        context: '0'
-        menu_name: main
-      header:
-        area:
-          id: area
-          table: views
-          field: area
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          tokenize: false
-          content:
-            value: "<h1 class=\"text-center\">Les groupes locaux</h1>\n<p class=\"text-center\">Partout en France, nous vous proposons des rencontres au plus proche de chez vous. N'hésitez plus et venez rencontrer la communauté.\nSi toutefois, vous vous trouvez encore un peu loin de tout, n'hésitez pas à nous contacter et à proposer vous aussi un groupe local.</p>"
-            format: full_html
-          plugin_id: text
-      defaults:
-        header: false
-        pager: false
-      pager:
-        type: none
-        options:
-          offset: 0
-    cache_metadata:
-      max-age: -1
-      contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - 'user.node_grants:view'
-        - user.permissions
-      tags: {  }
