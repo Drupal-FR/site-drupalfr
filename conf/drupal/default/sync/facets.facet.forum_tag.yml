@@ -1,4 +1,4 @@
-uuid: e4ee911f-2510-45c2-8e34-b3d1ad3b32ba
+uuid: 42531688-1434-4fcb-a7a2-10cbc025d1cd
 langcode: fr
 status: true
 dependencies:
@@ -16,19 +16,22 @@ weight: 0
 min_count: 1
 show_only_one_result: false
 field_identifier: name_3
-facet_source_id: 'search_api:views_page__search__page_1'
+facet_source_id: 'search_api:views_block__search__block_page_recherche'
 widget:
   type: checkbox
   config:
     show_numbers: true
     soft_limit: 0
+    soft_limit_settings:
+      show_less_label: 'Show less'
+      show_more_label: 'Show more'
 query_operator: and
 use_hierarchy: false
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 hard_limit: 0
 exclude: false
-only_visible_when_facet_source_is_visible: true
+only_visible_when_facet_source_is_visible: false
 processor_configs:
   active_widget_order:
     processor_id: active_widget_order
@@ -57,4 +60,4 @@ processor_configs:
 empty_behavior:
   behavior: text
   text_format: full_html
-  text: '<p>Aucun résultat pour ce filtre.</p>'
+  text: "<p>Aucun résultat pour ce filtre.</p>\r\n"
