@@ -91,6 +91,27 @@ function drupal_france_preprocess_paragraph(&$variables) {
       }
     }
   }
+
+  if ($paragraph->bundle() == 'layout_twocol') {
+    // Second column width.
+    if ($paragraph->hasField('field_column_2_width')) {
+      $second_column_width_class = $paragraph->get('field_column_2_width')->getValue();
+      if (!empty($second_column_width_class)) {
+        $second_column_width_class = $second_column_width_class[0]['value'];
+        // Edge cases.
+        if ($second_column_width_class == 0) {
+          unset($variables['content']['field_column_2']);
+        }
+        elseif ($second_column_width_class == 12) {
+          unset($variables['content']['field_column_1']);
+        }
+        $first_column_width_class = 12 - (int) $second_column_width_class;
+        $variables['first_column_width_class'] = 'medium-' . $first_column_width_class;
+        $variables['second_column_width_class'] = 'medium-' . $second_column_width_class;
+      }
+    }
+  }
+
 }
 
 /**
