@@ -354,8 +354,6 @@
         }
     },
     "require": {
-        "abraham/twitteroauth": "0.7.4",
-        "blobaugh/meetup-api-client": "dev-master#760113eb6548d160a5148f5ca4210e2c30bdd00c",
         "bower-asset/blazy": "1.8.2",
         "bower-asset/bootstrap-sass": "3.3.7",
         "bower-asset/dropzone": "4.3.0",
@@ -436,7 +434,8 @@
         "jquery/word-and-character-counter": "2.5.1",
         "oomphinc/composer-installers-extender": "^1.1",
         "progress-tracker/progress-tracker": "1.4.0",
-        "signature_pad/signature_pad": "2.3.0"
+        "signature_pad/signature_pad": "2.3.0",
+        "wikimedia/composer-merge-plugin": "^1.4"
     },
     "require-dev": {
         "anam/phantomjs-linux-x86-binary": "~2.1.1",
@@ -480,10 +479,21 @@
         ]
     },
     "extra": {
-        "installer-types": [
-            "bower-asset",
-            "npm-asset"
-        ],
+        "drupal-l10n": {
+            "destination": "translations/contrib",
+            "languages": [
+                "fr"
+            ]
+        },
+        "drupal-scaffold": {
+            "excludes": [
+                ".ht.router.php",
+                "update.php",
+                "web.config",
+                "sites/development.services.yml",
+                "sites/example.settings.local.php"
+            ]
+        },
         "installer-paths": {
             "www/core": [
                 "type:drupal-core"
@@ -510,20 +520,19 @@
                 "type:npm-asset"
             ]
         },
-        "drupal-scaffold": {
-            "excludes": [
-                ".ht.router.php",
-                "update.php",
-                "web.config",
-                "sites/development.services.yml",
-                "sites/example.settings.local.php"
-            ]
-        },
-        "drupal-l10n": {
-            "destination": "translations/contrib",
-            "languages": [
-                "fr"
-            ]
+        "installer-types": [
+            "bower-asset",
+            "npm-asset"
+        ],
+        "merge-plugin": {
+            "include": [
+                "www/modules/custom/*/composer.json",
+                "www/profiles/custom/*/composer.json",
+                "www/themes/custom/*/composer.json"
+            ],
+            "merge-extra": true,
+            "merge-extra-deep": true,
+            "merge-scripts": true
         },
         "patches": {
             "drupal/color_field": {
