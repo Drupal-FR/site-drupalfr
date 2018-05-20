@@ -6,8 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use GuzzleHttp\Client;
 use Drupal\node\Entity\Node;
+use GuzzleHttp\ClientInterface;
 
 /**
  * Functions for parse the xml, return the last stable release ...
@@ -37,6 +37,16 @@ class ReleaseHelper implements ReleaseHelperInterface {
   protected $loggerFactory;
 
   /**
+   * The http client.
+   *
+   * Use \GuzzleHttp\Client for the property PHPDoc instead of
+   * \GuzzleHttp\ClientInterface to get auto-completion on Guzzle's methods.
+   *
+   * @var \GuzzleHttp\Client
+   */
+  protected $httpClient;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -45,11 +55,19 @@ class ReleaseHelper implements ReleaseHelperInterface {
    *   The factory for configuration objects.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger service.
+   * @param \GuzzleHttp\ClientInterface $http_client
+   *   The http client.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    EntityTypeManagerInterface $entity_type_manager,
+    LoggerChannelFactoryInterface $logger_factory,
+    ClientInterface $http_client
+  ) {
     $this->configFactory = $config_factory;
     $this->entityTypeManager = $entity_type_manager;
     $this->loggerFactory = $logger_factory;
+    $this->httpClient = $http_client;
   }
 
   /**
@@ -58,8 +76,7 @@ class ReleaseHelper implements ReleaseHelperInterface {
   public function getFeedReleases() {
     $release_config = $this->configFactory->get('drupalfr_release.settings');
 
-    $client = new Client();
-    $response = $client->get($release_config->get('xml_address'));
+    $response = $this->httpClient->get($release_config->get('xml_address'));
 
     // Parsed XML and convert it back to array recursively.
     $parsed_response = json_decode(json_encode((array) simplexml_load_string($response->getBody()->getContents())), 1);
