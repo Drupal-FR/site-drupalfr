@@ -1,0 +1,30 @@
+<form role="form"
+      action="//drupalfr.us8.list-manage.com/subscribe/post?u={{ account_hash }}&amp;id={{ mailing_list_hash }}"
+      method="post" id="mc-embedded-subscribe-form"
+      name="mc-embedded-subscribe-form"
+      class="newsletter-subscription validate"
+      target="_blank">
+
+    <div class="input-group">
+      <input type="email"
+             placeholder="{{ 'Enter your email'|t }}"
+             name="EMAIL"
+             class="input-group-field"
+             id="mce-EMAIL"
+             required>
+      <span class="input-group-button">
+        <button type="submit"
+                value="subscribe"
+                id="mc-embedded-subscribe"
+                class="button form-submit button quaternary icon-only"
+                name="">
+          <span class="sr-only">{{ 'Subscribe'|t }}</span>
+          <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
+        </button>
+      </span>
+    </div>
+
+  <div class="hide">
+    <input name="{{ anti_spam_token }}" tabindex="-1" value="" type="text">
+  </div>
+</form>

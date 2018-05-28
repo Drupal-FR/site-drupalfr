@@ -5,6 +5,13 @@ dependencies:
   config:
     - field.storage.node.field_paragraph
     - node.type.page
+    - paragraphs.paragraphs_type.banner
+    - paragraphs.paragraphs_type.block
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.layout_onecol
+    - paragraphs.paragraphs_type.layout_twocol
+    - paragraphs.paragraphs_type.title_text_media
+    - paragraphs.paragraphs_type.trombinoscope
   module:
     - entity_reference_revisions
 _core:
@@ -22,18 +29,38 @@ default_value_callback: ''
 settings:
   handler: 'default:paragraph'
   handler_settings:
-    target_bundles: null
+    negate: 0
+    target_bundles:
+      title_text_media: title_text_media
+      banner: banner
+      layout_onecol: layout_onecol
+      layout_twocol: layout_twocol
+      html: html
+      block: block
+      trombinoscope: trombinoscope
     target_bundles_drag_drop:
       title_text_media:
-        weight: -9
-        enabled: false
+        enabled: true
+        weight: -17
       banner:
-        weight: -8
-        enabled: false
+        enabled: true
+        weight: -16
+      layout_onecol:
+        enabled: true
+        weight: -15
+      layout_twocol:
+        enabled: true
+        weight: -14
       html:
-        weight: -7
-        enabled: false
+        enabled: true
+        weight: -13
+      block:
+        enabled: true
+        weight: -12
       trombinoscope:
-        weight: -6
+        enabled: true
+        weight: -11
+      trombinoscope_item:
+        weight: -10
         enabled: false
 field_type: entity_reference_revisions

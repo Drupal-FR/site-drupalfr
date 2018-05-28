@@ -173,6 +173,7 @@ display:
       display_extenders: {  }
       link_url: ''
       link_display: '0'
+      use_ajax: true
     cache_metadata:
       max-age: -1
       contexts:
@@ -185,7 +186,7 @@ display:
   block_homepage:
     display_plugin: block
     id: block_homepage
-    display_title: 'Block homepage'
+    display_title: 'Bloc homepage'
     position: 3
     display_options:
       display_extenders:
@@ -282,8 +283,8 @@ display:
       use_more: true
       use_more_always: true
       use_more_text: 'Toutes les contributions'
-      link_display: page_1
-      link_url: ''
+      link_display: custom_url
+      link_url: communaute/planete
       header:
         area:
           id: area
@@ -304,6 +305,25 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  block_page_planet:
+    display_plugin: block
+    id: block_page_planet
+    display_title: 'Bloc page planète'
+    position: 1
+    display_options:
+      display_extenders: {  }
+      defaults:
+        header: true
+      display_description: ''
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
@@ -390,48 +410,6 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
-        - url.query_args
-        - 'user.node_grants:view'
-        - user.permissions
-      tags: {  }
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
-    position: 1
-    display_options:
-      display_extenders: {  }
-      path: communaute/planete
-      menu:
-        type: none
-        title: Planète
-        description: ''
-        expanded: false
-        parent: ''
-        weight: 0
-        context: '0'
-        menu_name: main
-      header:
-        area:
-          id: area
-          table: views
-          field: area
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          tokenize: false
-          content:
-            value: "<h1 class=\"text-center\">Les contributions de la communauté</h1>\n<p class=\"text-center\">Texte de description. Vous pouvez retrouver l'ensemble des flux agrégés est sur la page <a href=\"/communaute/planete/flux\">des flux</a>.</p>"
-            format: full_html
-          plugin_id: text
-      defaults:
-        header: false
-    cache_metadata:
-      max-age: -1
-      contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions

@@ -1,0 +1,24 @@
+uuid: efa80128-ede5-45c0-8028-fab0f330625a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.layout_onecol.field_column_1
+    - paragraphs.paragraphs_type.layout_onecol
+  module:
+    - entity_reference_revisions
+id: paragraph.layout_onecol.default
+targetEntityType: paragraph
+bundle: layout_onecol
+mode: default
+content:
+  field_column_1:
+    weight: 0
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+hidden: {  }

@@ -1,0 +1,53 @@
+uuid: 213b184d-af83-4cd4-ba5b-3e69a75109bb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_column_2
+    - paragraphs.paragraphs_type.block
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.layout_twocol
+    - paragraphs.paragraphs_type.title_text_media
+  module:
+    - entity_reference_revisions
+id: paragraph.layout_twocol.field_column_2
+field_name: field_column_2
+entity_type: paragraph
+bundle: layout_twocol
+label: 'Seconde colonne'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      title_text_media: title_text_media
+      html: html
+      block: block
+    target_bundles_drag_drop:
+      title_text_media:
+        enabled: true
+        weight: -15
+      html:
+        enabled: true
+        weight: -14
+      block:
+        enabled: true
+        weight: -13
+      layout_twocol:
+        weight: -12
+        enabled: false
+      banner:
+        weight: -11
+        enabled: false
+      trombinoscope:
+        weight: -10
+        enabled: false
+      trombinoscope_item:
+        weight: -9
+        enabled: false
+field_type: entity_reference_revisions
