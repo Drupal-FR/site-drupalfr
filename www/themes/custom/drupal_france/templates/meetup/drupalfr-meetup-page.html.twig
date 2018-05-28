@@ -11,17 +11,18 @@
  * @ingroup themeable
  */
 #}
-<h1>
-  {{ title }}
-</h1>
+<div class="meetup-page">
+    <h1>
+      {{ title }}
+    </h1>
 
-<div class="medium-6 column">
-    {{ events_list }}
+    <div class="medium-6 column list">
+        {{ events_list }}
+    </div>
+
+
+    <div class="medium-6 column">
+        {{ map }}
+    </div>
 </div>
-
-
-<div class="medium-6 column">
-    {{ map }}
-</div>
-
 
