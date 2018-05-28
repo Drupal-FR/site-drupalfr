@@ -1,0 +1,28 @@
+.meetup-page {
+
+  @media screen and (max-width: 1024px) {
+    .list {
+      height: 900px;
+      overflow: hidden;
+    }
+
+    .leaflet-container {
+      height: 900px !important;
+    }
+  }
+
+  @media screen and (max-width: 320px) {
+    .list {
+      height: 980px;
+      overflow: hidden;
+    }
+
+    .leaflet-container {
+      height: 980px !important;
+    }
+  }
+
+  .leaflet-container {
+    margin-bottom: $global-margin;
+  }
+}
