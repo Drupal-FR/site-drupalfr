@@ -1,6 +1,6 @@
 .meetup-page {
 
-  @media screen and (max-width: 1024px) {
+  @include breakpoint(medium) {
     .list {
       height: 900px;
       overflow: hidden;
@@ -11,7 +11,7 @@
     }
   }
 
-  @media screen and (max-width: 320px) {
+  @include breakpoint(small only) {
     .list {
       height: 980px;
       overflow: hidden;
