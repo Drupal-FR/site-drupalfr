@@ -9,24 +9,17 @@ services:
       - .:/project
 
 
-  nginx:
-    image: nginx:1.11-alpine
-    volumes:
-      - ./conf/nginx:/etc/nginx/conf.d/
-      - .:/project
-
-
 
   # PHP + Apache.
   drupal-php-apache-dev:
-    image: florenttorregrosa/docker-drupal-dev:php7
+    image: florenttorregrosa/drupal-php-dev:7.1-apache
     volumes:
       - .:/project
       - ./conf/php/php.ini:/usr/local/etc/php/php.ini
       - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf
 
   drupal-php-apache:
-    image: florenttorregrosa/docker-drupal:php7
+    image: florenttorregrosa/drupal-php:7.1-apache
     volumes:
       - .:/project
       - ./conf/php/php.ini:/usr/local/etc/php/php.ini
@@ -34,23 +27,8 @@ services:
 
 
 
-  # PHP.
-  drupal-php-dev:
-    image: florenttorregrosa/drupal-php-dev:7.0-fpm-alpine
-    volumes:
-      - .:/project
-      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
-
-  drupal-php:
-    image: florenttorregrosa/drupal-php:7.0-fpm-alpine
-    volumes:
-      - .:/project
-      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
-
-
-
   varnish:
-    image: florenttorregrosa/docker-varnish:latest
+    image: florenttorregrosa/varnish:5-alpine
     environment:
       VCL_CONFIG: /varnish-drupal/varnish.vcl
     volumes:
