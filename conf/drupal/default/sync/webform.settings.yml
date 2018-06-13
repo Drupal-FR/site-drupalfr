@@ -1,4 +1,5 @@
 settings:
+  default_status: open
   default_page_base_path: form
   default_form_open_message: 'This form has not yet been opened to submissions.'
   default_form_close_message: 'Sorry...This form is closed to new submissions.'
@@ -37,12 +38,25 @@ settings:
   default_submission_exception_message: 'Unable to process this submission. Please contact the site administrator.'
   default_submission_locked_message: 'This submission has been locked.'
   default_submission_log: false
+  default_previous_submission_message: 'You have already submitted this webform. <a href="#">View your previous submission</a>.'
+  default_previous_submissions_message: 'You have already submitted this webform. <a href="#">View your previous submissions</a>.'
   default_autofill_message: 'This submission has been autofilled with your previous submission.'
   preview_classes: "messages messages--error\nmessages messages--warning\nmessages messages--status\n"
   confirmation_classes: "messages messages--error\nmessages messages--warning\nmessages messages--status\n"
   confirmation_back_classes: "button\n"
   default_limit_total_message: 'No more submissions are permitted.'
   default_limit_user_message: 'No more submissions are permitted.'
+  dialog: false
+  dialog_options:
+    narrow:
+      title: Narrow
+      width: 600
+    normal:
+      title: Normal
+      width: 800
+    wide:
+      title: Wide
+      width: 1000
 assets:
   css: ''
   javascript: ''
