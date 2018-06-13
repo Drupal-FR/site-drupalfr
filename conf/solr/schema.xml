@@ -49,7 +49,7 @@
     that avoids logging every request
 -->
 
-<schema name="drupal-6.3-solr-7.x" version="1.6">
+<schema name="drupal-6.4-solr-7.x" version="1.6">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and
        semantics.  It should not normally be changed by applications.
@@ -196,8 +196,8 @@
   <dynamicField name="tos_*" type="text"    indexed="true"  stored="true" multiValued="false" termVectors="true" omitNorms="true"/>
   <dynamicField name="tom_*" type="text"    indexed="true"  stored="true" multiValued="true" termVectors="true" omitNorms="true"/>
   <!-- Special-purpose text fields -->
-  <dynamicField name="tes_*" type="edge_n2_kw_text" indexed="true" stored="true" multiValued="false" omitTermFreqAndPositions="true" />
-  <dynamicField name="tem_*" type="edge_n2_kw_text" indexed="true" stored="true" multiValued="true" omitTermFreqAndPositions="true" />
+  <dynamicField name="tes_*" type="edge_n2_kw_text" indexed="true" stored="true" multiValued="false"/>
+  <dynamicField name="tem_*" type="edge_n2_kw_text" indexed="true" stored="true" multiValued="true"/>
   <dynamicField name="tws_*" type="text_ws" indexed="true" stored="true" multiValued="false"/>
   <dynamicField name="twm_*" type="text_ws" indexed="true" stored="true" multiValued="true"/>
 
@@ -251,8 +251,8 @@
   <!-- External file fields -->
   <dynamicField name="eff_*" type="file"/>
 
-  <!-- Sortable version of the dynamic string field -->
-  <dynamicField name="sort_*" type="sortString" indexed="true" stored="false"/>
+  <!-- Sortable version of the dynamic string field. We need to store it for streaming expressions. -->
+  <dynamicField name="sort_*" type="sortString" indexed="true" stored="true"/>
 
   <!-- A random sort field -->
   <dynamicField name="random_*" type="random" indexed="true" stored="true"/>
@@ -602,7 +602,7 @@
             string matched by the pattern.
 
             See the Java Regular Expression documentation for more
-            infomation on pattern and replacement string syntax.
+            information on pattern and replacement string syntax.
 
             http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/package-summary.html
 
