@@ -73,19 +73,22 @@
     not node.isPublished() ? 'is-unpublished',
     view_mode ? view_mode|clean_class,
     'clearfix',
-  ]
+    'planet-element',
+]
 %}
-<article{{ attributes.addClass(classes) }}>
+<article{{ attributes.addClass(classes).setAttribute('data-equalizer-watch', true) }}>
 
-  {{ content.field_media_teaser }}
+  <div class="planet-element--feature-image">
+    {{ content.field_media_teaser }}
+  </div>
 
   {{ title_prefix }}
-  <h2{{ title_attributes }}>
+  <h3{{ title_attributes.addClass('planet-element--title') }}>
     <a href="{{ url }}" rel="bookmark">{{ label }}</a>
-  </h2>
+  </h3>
   {{ title_suffix }}
 
-  <div{{ content_attributes.addClass('content') }}>
+  <div{{ content_attributes.addClass('content', 'planet-element--content') }}>
     {{ content.body }}
   </div>
 

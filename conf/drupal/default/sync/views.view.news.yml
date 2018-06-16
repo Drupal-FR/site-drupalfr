@@ -203,10 +203,25 @@ display:
         use_more: false
         use_more_always: false
         use_more_text: false
+        header: false
       display_description: ''
       use_more: true
       use_more_always: true
       use_more_text: 'Toutes les actualités'
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: '<h2 class="title">Les actus de l''asso</h2>'
+            format: full_html
+          plugin_id: text
     cache_metadata:
       max-age: -1
       contexts:
