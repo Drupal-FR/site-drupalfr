@@ -8,6 +8,7 @@ dependencies:
   module:
     - node
     - user
+    - views_custom_cache_tag
 _core:
   default_config_hash: eqvWjaliG-5KpjRTtmZ2B2zSqVg4XePlMrXPB4Dm5aQ
 id: release
@@ -30,8 +31,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node:type:release'
       query:
         type: views_query
         options:
