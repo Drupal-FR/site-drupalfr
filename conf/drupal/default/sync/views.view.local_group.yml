@@ -12,6 +12,7 @@ dependencies:
     - leaflet_views
     - node
     - user
+    - views_custom_cache_tag
 _core:
   default_config_hash: 1SD1sFoU9064zRHK3oVbL5qc3ykmkO9TMSzPLfgXEhw
 id: local_group
@@ -34,8 +35,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node:type:local_group'
       query:
         type: views_query
         options:

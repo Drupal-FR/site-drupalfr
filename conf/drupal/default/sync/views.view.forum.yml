@@ -18,6 +18,7 @@ dependencies:
     - taxonomy
     - text
     - user
+    - views_custom_cache_tag
 _core:
   default_config_hash: 0Pa6N0XRdPfKYXFqBtxs35JxnWcsxtXLoyga94Ie0Ug
 id: forum
@@ -40,8 +41,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node:type:forum'
       query:
         type: views_query
         options:

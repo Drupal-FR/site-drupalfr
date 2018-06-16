@@ -11,6 +11,7 @@ dependencies:
     - node
     - taxonomy
     - user
+    - views_custom_cache_tag
 _core:
   default_config_hash: FoOtTle3NhDVS6P7XX3jJzyTbk5u-hSBEul0yGx9K0o
 id: news
@@ -33,8 +34,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node:type:news'
       query:
         type: views_query
         options:

@@ -10,6 +10,7 @@ dependencies:
     - node
     - options
     - user
+    - views_custom_cache_tag
     - views_infinite_scroll
 _core:
   default_config_hash: 4AcoilaKBhyaAhHOulWqB-KpUYE0I5ZfwzQXWI3E8jA
@@ -33,8 +34,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node:type:job_offer'
       query:
         type: views_query
         options:

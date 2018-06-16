@@ -10,6 +10,7 @@ dependencies:
     - eva
     - node
     - user
+    - views_custom_cache_tag
     - views_infinite_scroll
 _core:
   default_config_hash: DxC48L3aNvYfC0XGYstRT5J_lI4LWSj4g6X7J_8-w9o
@@ -33,8 +34,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node:type:planet'
       query:
         type: views_query
         options:
