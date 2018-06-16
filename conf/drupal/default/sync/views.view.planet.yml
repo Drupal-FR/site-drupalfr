@@ -3,6 +3,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.rss
     - core.entity_view_mode.node.teaser
     - node.type.planet
   module:
@@ -414,17 +415,34 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  feed_1:
+  feed_page_planet:
     display_plugin: feed
-    id: feed_1
-    display_title: Feed
+    id: feed_page_planet
+    display_title: 'Flux page planète'
     position: 4
     display_options:
       display_extenders: {  }
       row:
         type: node_rss
-        options: {  }
-      path: communaute/planete/feed
+        options:
+          relationship: none
+          view_mode: rss
+      path: communaute/planete/rss
+      displays:
+        block_page_planet: block_page_planet
+        default: '0'
+        block_homepage: '0'
+      display_description: ''
+      pager:
+        type: some
+        options:
+          items_per_page: 20
+          offset: 0
+      title: 'Flux RSS du planète'
+      defaults:
+        title: false
+        sitename_title: false
+      sitename_title: false
     cache_metadata:
       max-age: -1
       contexts:
