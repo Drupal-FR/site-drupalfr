@@ -1,0 +1,28 @@
+.meetup-page {
+
+  @include breakpoint(medium) {
+    .list {
+      height: 900px;
+      overflow: hidden;
+    }
+
+    .leaflet-container {
+      height: 900px !important;
+    }
+  }
+
+  @include breakpoint(small only) {
+    .list {
+      height: 980px;
+      overflow: hidden;
+    }
+
+    .leaflet-container {
+      height: 980px !important;
+    }
+  }
+
+  .leaflet-container {
+    margin-bottom: $global-margin;
+  }
+}
