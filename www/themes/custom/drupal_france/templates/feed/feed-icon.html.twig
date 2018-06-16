@@ -10,8 +10,11 @@
  *   - class: HTML classes to be applied to the feed link.
  */
 #}
+
+{% set title_attribute = 'Subscribe to @title'|t({'@title': title}) %}
+
 <div class="feed-icon">
-    <a href="{{ url }}"{{ attributes.addClass('fa', 'fa-rss-square') }}>
-  {#{{ 'Subscribe to @title'|t({'@title': title}) }} #}
-    </a>
+  <a href="{{ url }}" {{ attributes.setAttribute('title', title_attribute).setAttribute('aria-label', title_attribute) }}>
+    <i class="fa fa-rss-square"></i>
+  </a>
 </div>
