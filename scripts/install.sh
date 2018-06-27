@@ -19,12 +19,12 @@ $REDIS_FLUSH_COMMAND
 
 echo -e "${LIGHT_GREEN}Install Drupal.${NC}"
 $DRUSH site:install config_installer \
-  --account-mail=$ACCOUNT_MAIL \
-  --account-name=$ACCOUNT_NAME \
-  --account-pass=$ACCOUNT_PASS \
-  --site-mail=$SITE_MAIL \
-  --site-name=$SITE_NAME \
-  --locale=$DEFAULT_LANGUAGE \
+  --account-mail="${ACCOUNT_MAIL}" \
+  --account-name="${ACCOUNT_NAME}" \
+  --account-pass="${ACCOUNT_PASS}" \
+  --site-mail="${SITE_MAIL}" \
+  --site-name="${SITE_NAME}" \
+  --locale="${DEFAULT_LANGUAGE}" \
   -y
 
 echo -e "${LIGHT_GREEN}Set the site mail on install because it is ignored by config ignore.${NC}"

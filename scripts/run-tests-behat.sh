@@ -4,4 +4,4 @@
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.local.sh
 
 echo -e "${LIGHT_GREEN}Run behat tests.${NC}"
-$PROJECT_PATH/vendor/bin/behat --config=$SCRIPTS_PATH/tests/behat/behat.yml
+$PROJECT_PATH/vendor/bin/behat --config="${SCRIPTS_PATH}/tests/behat/behat.yml"
