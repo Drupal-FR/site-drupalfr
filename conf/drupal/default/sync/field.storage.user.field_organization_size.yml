@@ -1,15 +1,17 @@
-uuid: 69ebae51-08a7-4a1a-8a4c-7c0a52f9d25a
+uuid: 13ce9189-1221-45f3-a048-30d7f180cb1a
 langcode: fr
 status: true
 dependencies:
   module:
-    - node
+    - field_permissions
     - options
-_core:
-  default_config_hash: i7Q81j1Vw23Ty3nPXnMaqMcWfMOlsP-Jci7HlcI1Mqo
-id: node.field_organization_size
+    - user
+third_party_settings:
+  field_permissions:
+    permission_type: custom
+id: user.field_organization_size
 field_name: field_organization_size
-entity_type: node
+entity_type: user
 type: list_string
 settings:
   allowed_values:

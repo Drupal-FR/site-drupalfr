@@ -5,7 +5,6 @@ dependencies:
   config:
     - core.entity_view_mode.node.listing
     - field.field.node.job_offer.body
-    - field.field.node.job_offer.field_job_organization
     - field.field.node.job_offer.field_job_contract_type
     - field.field.node.job_offer.field_job_nature
     - field.field.node.job_offer.field_job_teleworking
@@ -36,14 +35,6 @@ content:
     third_party_settings: {  }
     type: list_default
     region: content
-  field_job_organization:
-    weight: 5
-    label: inline
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_job_teleworking:
     weight: 4
     label: inline
@@ -69,10 +60,11 @@ content:
     type: list_default
     region: content
   links:
-    weight: 6
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
   body: true
   langcode: true
+  user_member_entity_view_job_offer_organization: true

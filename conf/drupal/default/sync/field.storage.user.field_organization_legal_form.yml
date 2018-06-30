@@ -1,15 +1,17 @@
-uuid: 907089ae-5e15-43e7-96d8-496167252e2f
+uuid: 0536ecfa-d4f4-4bbe-b9cc-1d9911432343
 langcode: fr
 status: true
 dependencies:
   module:
-    - node
+    - field_permissions
     - options
-_core:
-  default_config_hash: AAdzQqfni27Yi0JwzWwDVez0QFcXpFGDdCooHrwsXXA
-id: node.field_organization_legal_form
+    - user
+third_party_settings:
+  field_permissions:
+    permission_type: custom
+id: user.field_organization_legal_form
 field_name: field_organization_legal_form
-entity_type: node
+entity_type: user
 type: list_string
 settings:
   allowed_values:

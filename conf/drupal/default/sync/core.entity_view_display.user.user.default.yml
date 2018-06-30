@@ -4,6 +4,11 @@ status: true
 dependencies:
   config:
     - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_organization_contact_info
+    - field.field.user.user.field_organization_legal_form
+    - field.field.user.user.field_organization_region
+    - field.field.user.user.field_organization_service_type
+    - field.field.user.user.field_organization_size
     - field.field.user.user.field_user_banner
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_drupal_org
@@ -14,14 +19,13 @@ dependencies:
     - field.field.user.user.field_user_newsletter_drupalcamp
     - field.field.user.user.field_user_organization
     - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_slogan
     - field.field.user.user.field_user_twitter
     - field.field.user.user.field_user_website
     - field.field.user.user.user_picture
     - image.style.square_165
   module:
     - image
-    - link
-    - text
     - user
 _core:
   default_config_hash: PCFOnrudl4GmmxqeuA4UI8MNaSGsEY5EIftuiiQDNPM
@@ -30,78 +34,17 @@ targetEntityType: user
 bundle: user
 mode: default
 content:
-  field_user_banner:
-    weight: 0
-    label: hidden
-    settings:
-      image_style: ''
-      image_link: ''
-    third_party_settings: {  }
-    type: image
-    region: content
-  field_user_biography:
-    weight: 6
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_user_drupal_org:
-    weight: 4
-    label: hidden
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    type: link
-    region: content
-  field_user_event:
-    weight: 7
-    label: above
-    settings:
-      view_mode: teaser
-      link: false
-    third_party_settings: {  }
-    type: entity_reference_entity_view
-    region: content
   field_user_realname:
-    weight: 2
+    weight: 1
     label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
-  field_user_twitter:
-    weight: 3
-    label: hidden
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    type: link
-    region: content
-  field_user_website:
-    weight: 5
-    label: hidden
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    type: link
-    region: content
   user_picture:
     type: image
-    weight: 1
+    weight: 0
     settings:
       image_style: square_165
       image_link: ''
@@ -110,12 +53,25 @@ content:
     region: content
 hidden:
   commerce_remote_id: true
+  field_organization_contact_info: true
+  field_organization_legal_form: true
+  field_organization_region: true
+  field_organization_service_type: true
+  field_organization_size: true
+  field_user_banner: true
+  field_user_biography: true
+  field_user_drupal_org: true
+  field_user_event: true
   field_user_in_directory: true
   field_user_membership_number: true
   field_user_newsletter_adff: true
   field_user_newsletter_drupalcamp: true
   field_user_organization: true
+  field_user_slogan: true
+  field_user_twitter: true
+  field_user_website: true
   forum_entity_view_1: true
+  job_offer_entity_view_organization_job_offer: true
   langcode: true
   member_for: true
   planet_entity_view_1: true

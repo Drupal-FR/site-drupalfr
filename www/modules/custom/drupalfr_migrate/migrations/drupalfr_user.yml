@@ -24,6 +24,7 @@ source:
     - status: Status
     - login: Login
     - roles: Roles
+    - picture: Picture
     - realname: Realname
     - twitter_uri: 'Twitter URI'
     - twitter_title: 'Twitter title'
@@ -37,6 +38,11 @@ source:
     - in_directory: 'In directory'
     - biography: Biography
     - biography_format: 'Biography format'
+    - regions: 'Regions'
+    - service_types: 'Service types'
+    - size: Size
+    - legal_form: 'Legal form'
+    - contact_info: 'Contact info'
 destination:
   plugin: 'entity:user'
 process:
@@ -57,6 +63,11 @@ process:
         member_organization: member_organization
         moderator: moderator
       bypass: true
+  user_picture:
+    -
+      plugin: migration
+      migration: drupalfr_file
+      source: picture
   field_user_realname: realname
   field_user_biography/value: biography
   field_user_biography/format: biography_format
@@ -69,10 +80,13 @@ process:
   field_user_website/title: website_title
   field_user_organization:
     -
-      plugin: migration
-      migration: drupalfr_organization
-      no_stub: true
+      plugin: skip_on_empty
+      method: process
       source: organization
+    -
+      plugin: migration
+      migration: drupalfr_user
+      no_stub: true
   field_user_event:
     -
       plugin: explode
@@ -83,3 +97,16 @@ process:
       migration: drupalfr_event
       no_stub: true
   field_user_in_directory: in_directory
+  field_organization_region:
+    -
+      plugin: explode
+      source: regions
+      delimiter: ;
+  field_organization_service_type:
+    -
+      plugin: explode
+      source: service_types
+      delimiter: ;
+  field_organization_size: size
+  field_organization_legal_form: legal_form
+  field_organization_contact_info: contact_info

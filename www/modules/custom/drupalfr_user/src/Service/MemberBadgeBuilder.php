@@ -36,7 +36,7 @@ class MemberBadgeBuilder implements MemberBadgeBuilderInterface {
 
     return [
       '#theme' => 'drupalfr_user_member_badge',
-      '#is_member' => $user->hasRole('member'),
+      '#is_member' => ($user->hasRole('member') || $user->hasRole('member_organization')),
       '#is_profile_owner' => ($this->currentUser->id() == $user->id()),
     ];
   }
