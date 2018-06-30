@@ -53,19 +53,16 @@
 {% block paragraph %}
     <section{{ attributes.addClass(classes) }}>
       {% block content %}
-
+      {% if banner_media %}
       <div class="small-12 banner-image" style="background-image:url('{{ banner_media }}');">
+      {% endif %}
       {% if banner_link_url %}
       <a href="{{ banner_link_url }}" title="{{ banner_link_title }}">
         {{ content.field_text }}
       {% endif %}
-      {% if banner_link_url %}
       </a>
-      {% endif %}
       </div>
-
       {% endblock %}
     </section>
-
 
 {% endblock paragraph %}
