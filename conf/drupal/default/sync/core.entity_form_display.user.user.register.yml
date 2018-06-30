@@ -5,6 +5,11 @@ dependencies:
   config:
     - core.entity_form_mode.user.register
     - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_organization_contact_info
+    - field.field.user.user.field_organization_legal_form
+    - field.field.user.user.field_organization_region
+    - field.field.user.user.field_organization_service_type
+    - field.field.user.user.field_organization_size
     - field.field.user.user.field_user_banner
     - field.field.user.user.field_user_biography
     - field.field.user.user.field_user_drupal_org
@@ -15,6 +20,7 @@ dependencies:
     - field.field.user.user.field_user_newsletter_drupalcamp
     - field.field.user.user.field_user_organization
     - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_slogan
     - field.field.user.user.field_user_twitter
     - field.field.user.user.field_user_website
     - field.field.user.user.user_picture
@@ -35,6 +41,11 @@ content:
 hidden:
   commerce_remote_id: true
   contact: true
+  field_organization_contact_info: true
+  field_organization_legal_form: true
+  field_organization_region: true
+  field_organization_service_type: true
+  field_organization_size: true
   field_user_banner: true
   field_user_biography: true
   field_user_drupal_org: true
@@ -45,6 +56,7 @@ hidden:
   field_user_newsletter_drupalcamp: true
   field_user_organization: true
   field_user_realname: true
+  field_user_slogan: true
   field_user_twitter: true
   field_user_website: true
   langcode: true

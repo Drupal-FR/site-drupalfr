@@ -1,25 +1,24 @@
-uuid: 6b889396-eecc-49cc-972f-b915c6da464b
+uuid: 92a87a4d-266c-4685-a362-ff4ed2664032
 langcode: fr
 status: true
 dependencies:
   module:
     - field_permissions
-    - node
     - user
 third_party_settings:
   field_permissions:
     permission_type: public
-_core:
-  default_config_hash: I4LhNfAmnVRdpJ-jEs7Gdvf7jhZAvM15OD0kejAXjqE
-id: user.field_user_event
-field_name: field_user_event
+id: user.field_user_slogan
+field_name: field_user_slogan
 entity_type: user
-type: entity_reference
+type: string
 settings:
-  target_type: node
+  max_length: 255
+  is_ascii: false
+  case_sensitive: false
 module: core
 locked: false
-cardinality: -1
+cardinality: 1
 translatable: true
 indexes: {  }
 persist_with_no_fields: false

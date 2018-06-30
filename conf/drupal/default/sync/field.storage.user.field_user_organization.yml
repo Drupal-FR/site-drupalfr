@@ -1,18 +1,19 @@
-uuid: 4e768faf-ed9e-45bc-b09e-88bacf71c649
+uuid: c9bf2d9c-f5a4-4d52-8a88-5a9934bb1cc1
 langcode: fr
 status: true
 dependencies:
   module:
-    - node
+    - field_permissions
     - user
-_core:
-  default_config_hash: lvXJgkUlFSoe7slCuxmJ6mFDmQk4sOMVZL2hTP5ZGh8
+third_party_settings:
+  field_permissions:
+    permission_type: public
 id: user.field_user_organization
 field_name: field_user_organization
 entity_type: user
 type: entity_reference
 settings:
-  target_type: node
+  target_type: user
 module: core
 locked: false
 cardinality: 1

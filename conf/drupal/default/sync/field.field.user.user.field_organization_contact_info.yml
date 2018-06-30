@@ -1,16 +1,15 @@
-uuid: 21de773a-3b1c-42ee-8a2c-f9af6a1ddc71
+uuid: 4ed8b4e1-96c7-47d2-baa7-cfd0bb66df05
 langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.node.field_organization_contact_info
-    - node.type.organization
-_core:
-  default_config_hash: Kg3d86Q7Yi2vmozC0z-8JexGuwJu3nVDQXQmbnQPIX8
-id: node.organization.field_organization_contact_info
+    - field.storage.user.field_organization_contact_info
+  module:
+    - user
+id: user.user.field_organization_contact_info
 field_name: field_organization_contact_info
-entity_type: node
-bundle: organization
+entity_type: user
+bundle: user
 label: 'Informations de contact'
 description: 'Vos informations de contact comme l''adresse de l''organisme, l''adresse courriel et le numéro de téléphone de la personne en charge des contacts. Ce champ sera affiché sur les offres d''emploi de l''organisme.'
 required: false

@@ -1,14 +1,16 @@
-uuid: f3794fb7-3dab-40ec-95d1-149d982968a2
+uuid: 6a74da33-3a25-4100-9dc2-c65116796c17
 langcode: fr
 status: true
 dependencies:
   module:
-    - node
-_core:
-  default_config_hash: 2e2JHd8a_Iqg3Go6v-t6qJ_bP4esD0q-dvlNEo-_gRY
-id: node.field_organization_contact_info
+    - field_permissions
+    - user
+third_party_settings:
+  field_permissions:
+    permission_type: custom
+id: user.field_organization_contact_info
 field_name: field_organization_contact_info
-entity_type: node
+entity_type: user
 type: string_long
 settings:
   case_sensitive: false

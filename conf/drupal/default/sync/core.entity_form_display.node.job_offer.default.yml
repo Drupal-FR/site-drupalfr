@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - field.field.node.job_offer.body
-    - field.field.node.job_offer.field_job_organization
     - field.field.node.job_offer.field_job_contract_type
     - field.field.node.job_offer.field_job_nature
     - field.field.node.job_offer.field_job_teleworking
@@ -12,7 +11,6 @@ dependencies:
     - field.field.node.job_offer.field_region
     - node.type.job_offer
   module:
-    - inline_entity_form
     - path
     - text
 _core:
@@ -48,19 +46,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: options_select
-    region: content
-  field_job_organization:
-    weight: 32
-    settings:
-      form_mode: default
-      label_singular: ''
-      label_plural: ''
-      allow_new: true
-      allow_existing: true
-      match_operator: CONTAINS
-      override_labels: false
-    third_party_settings: {  }
-    type: inline_entity_form_complex
     region: content
   field_job_teleworking:
     weight: 35
@@ -134,4 +119,6 @@ content:
   url_redirects:
     weight: 50
     region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden: {  }

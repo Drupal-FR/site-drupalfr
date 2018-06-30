@@ -5,7 +5,6 @@ dependencies:
   config:
     - core.entity_view_mode.node.search_result
     - field.field.node.job_offer.body
-    - field.field.node.job_offer.field_job_organization
     - field.field.node.job_offer.field_job_contract_type
     - field.field.node.job_offer.field_job_nature
     - field.field.node.job_offer.field_job_teleworking
@@ -25,7 +24,7 @@ content:
   body:
     label: hidden
     type: smart_trim
-    weight: 1
+    weight: 0
     settings:
       trim_length: 200
       trim_type: chars
@@ -36,15 +35,9 @@ content:
       trim_options:
         text: true
       more_class: more-link
+      wrap_output: false
+      wrap_class: trimmed
     third_party_settings: {  }
-    region: content
-  field_job_organization:
-    weight: 0
-    label: inline
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
     region: content
 hidden:
   field_job_contract_type: true
@@ -54,3 +47,4 @@ hidden:
   field_region: true
   langcode: true
   links: true
+  user_member_entity_view_job_offer_organization: true

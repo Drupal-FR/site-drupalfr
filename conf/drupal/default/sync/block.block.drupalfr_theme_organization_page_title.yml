@@ -2,8 +2,6 @@ uuid: 4ab5f84f-990c-49e4-9a58-3adf0011debf
 langcode: fr
 status: true
 dependencies:
-  config:
-    - block_visibility_groups.block_visibility_group.organization
   module:
     - block_visibility_groups
   theme:
@@ -23,5 +21,5 @@ visibility:
   condition_group:
     id: condition_group
     negate: false
-    block_visibility_group: organization
+    block_visibility_group: ''
     context_mapping: {  }

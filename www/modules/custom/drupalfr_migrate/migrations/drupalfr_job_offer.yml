@@ -13,7 +13,7 @@ dependencies:
     - node
 migration_dependencies:
   required:
-    - drupalfr_organization
+    - drupalfr_user
 source:
   plugin: csv
   path: modules/custom/drupalfr_migrate/migrations/data/job_offer.csv
@@ -24,9 +24,9 @@ source:
     - uuid: UUID
     - title: Title
     - published: Published
+    - author: Author
     - nature: Nature
     - regions: Regions
-    - organization: Organization
     - validity: Validity
     - contract_type: 'Contract type'
     - teleworking: Teleworking
@@ -48,15 +48,16 @@ process:
       plugin: explode
       source: regions
       delimiter: ;
-  field_job_organization:
-    -
-      plugin: migration
-      migration: drupalfr_organization
-      source: organization
   field_job_validity: validity
   field_job_contract_type: contract_type
   field_job_teleworking: teleworking
   status: published
   uid:
-    plugin: default_value
-    default_value: 1
+    -
+      plugin: skip_on_empty
+      method: process
+      source: author
+    -
+      plugin: migration
+      migration: drupalfr_user
+      no_stub: true
