@@ -9,57 +9,36 @@
  * @see template_preprocess_maintenance_page()
  */
 #}
-<div class="container">
-	<div class="row">
-		<div class="column medium-12">
-			<header role="main" class="column medium-8  panel text-center bottom-block">
-				{% if site_name or site_slogan %}
-				{% if site_name %}
-					<h1>
-						<a href="{{ front_page }}" title="{{ 'Home'|t }}" rel="home">{{ site_name }}</a>
-					</h1>
-				{% endif %}
-
-				{% if title %}
-					<h1>{{ title }}</h1>
-				{% endif %}
-
-				{{ page.highlighted }}
-
-				{{ page.content }}
-			</header>
-
-			<main role="banner" class="column medium-4  panel text-center bottom-block">
-				{% if logo %}
-					<a href="{{ front_page }}" title="{{ 'Home'|t }}" rel="home">
-						<img src="{{ logo }}" alt="{{ 'Home'|t }}"/>
-					</a>
-				{% endif %}
+<div class="container maintenance-page--container">
+  <div class="row expanded column maintenance-page--content">
+    <div class="row">
 
 
-				{% if site_slogan %}
-					<div>{{ site_slogan }}</div>
-				{% endif %}
-				{% endif %}
-			</main>
+      <header role="main" class="medium-7 column">
 
-			{% if page.sidebar_first %}
-				<aside role="complementary">
-					{{ page.sidebar_first }}
-				</aside>
-			{% endif %}
+        {% if site_name or site_slogan %}
+          <h1>
+            <a href="{{ front_page }}" title="{{ 'Home'|t }}" rel="home">
+              <small>{{ site_name }}</small>
+              <br>
+              {{ title }}
+            </a>
+          </h1>
+        {% endif %}
+        <hr>
+        <p>
+          {{ page.content }}
+        </p>
+      </header>
 
-			{% if page.sidebar_second %}
-				<aside role="complementary">
-					{{ page.sidebar_second }}
-				</aside>
-			{% endif %}
+      {% if logo %}
+        <main role="banner" class="medium-4 medium-offset-1 column">
+          <a href="{{ front_page }}" title="{{ 'Home'|t }}" rel="home">
+            <img src="{{ logo }}" alt="{{ 'Home'|t }}"/>
+          </a>
+        </main>
+      {% endif %}
 
-			{% if page.footer %}
-				<footer role="contentinfo">
-					{{ page.footer }}
-				</footer>
-			{% endif %}
-		</div>
-	</div>
+    </div>
+  </div>
 </div>

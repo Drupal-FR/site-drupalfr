@@ -1,11 +1,32 @@
 .maintenance-page {
-  background-color: #0c3d5d;
+  background-color: $drupal-blue-dark;
 
-  .row {
-    background: rgba(255, 255, 255, .1);
+  &--container {
+    display:         flex;
+    flex-direction:  column;
+    flex-wrap:       nowrap;
+    justify-content: center;
+    align-content:   stretch;
+    align-items:     stretch;
+    height:          100vh;
+  }
+
+  &--content {
+    padding-top:      $global-padding * 4;
+    padding-bottom:   $global-padding * 4;
+    background-color: rgba($white, .1);
+
+    > .row {
+      display:     flex;
+      align-items: center;
+    }
+  }
+
+  h1 {
+    line-height: 3.5rem;
   }
 
   h1, a, header {
-    color: $body-background;
+    color: $white;
   }
 }
