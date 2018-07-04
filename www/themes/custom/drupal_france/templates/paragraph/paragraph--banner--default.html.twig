@@ -38,31 +38,36 @@
  * @ingroup themeable
  */
 #}
-{%
-  set classes = [
-    'paragraph',
-    'paragraph--type--' ~ paragraph.bundle|clean_class,
-    view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
-    'row',
-    'expanded',
-    'column',
-  ]
-%}
+{% set classes = [
+  'paragraph',
+  'paragraph--type--' ~ paragraph.bundle|clean_class,
+  view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+  'row',
+  'expanded',
+  'column',
+] %}
+
 {% set banner_link_title = banner_link_title ?: '' %}
 {% set banner_media = banner_media ?: '' %}
+
 {% block paragraph %}
-    <section{{ attributes.addClass(classes) }}>
-      {% block content %}
+  <section{{ attributes.addClass(classes) }}>
+
+    {% block content %}
+
       {% if banner_media %}
-      <div class="small-12 banner-image" style="background-image:url('{{ banner_media }}');">
+        <div class="paragraph--banner--image" style="background-image:url('{{ banner_media }}');">
       {% endif %}
+
       {% if banner_link_url %}
-      <a href="{{ banner_link_url }}" title="{{ banner_link_title }}">
-        {{ content.field_text }}
+        <a class="paragraph--banner--link" href="{{ banner_link_url }}" title="{{ banner_link_title }}">
+          {{ content.field_text }}
+        </a>
       {% endif %}
-      </a>
+
       </div>
-      {% endblock %}
-    </section>
+
+    {% endblock %}
+  </section>
 
 {% endblock paragraph %}
