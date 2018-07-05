@@ -1,6 +1,11 @@
-// TOPBAR MAIN MENU
-// ================
+// ==========================
+// MENUS
+// --------------------------
+// 1 - Main Menu
+// 2 - User account Menu
+// ==========================
 
+// 1 - Main Menu
 .main-menu {
   &[role='menubar'] {
 
@@ -89,7 +94,7 @@
               color:   $white;
 
               &.is-active {
-                font-weight: 700;
+                font-weight:     700;
                 text-decoration: underline;
               }
 
@@ -101,6 +106,86 @@
               }
             }
           }
+        }
+      }
+    }
+  }
+}
+
+// 2 - Topbar User account Menu
+.menu--user-account {
+  > li {
+    &.button--user-account {
+      margin-bottom: 0;
+
+      @include breakpoint(small only) {
+        padding: .25rem;
+      }
+
+      @include breakpoint(medium) {
+        padding: 15px 0;
+      }
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $drupal-blue-light;
+      }
+
+      > a {
+        padding-right: 1rem !important;
+        color:         $white;
+
+        @include breakpoint(small only) {
+          padding: .25rem !important;
+        }
+
+        &::after {
+          display: none !important;
+        }
+
+        > .fa {
+          font-size: 1.5rem;
+        }
+      }
+
+      &.is-active {
+        > a {
+          color: $white;
+
+          &:hover,
+          &:focus,
+          &:active {
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+
+  .submenu {
+    right:            -1px !important;
+    border-color:     $drupal-blue-light;
+    background-color: $drupal-blue-light;
+
+    @include breakpoint(small only) {
+      border: 0;
+    }
+
+    > li {
+      > a {
+        padding:        1rem;
+        font-size:      16px;
+        font-weight:    400;
+        color:          $white;
+        text-align:     left;
+        text-transform: none;
+
+        &:hover,
+        &:focus,
+        &:active {
+          background-color: $white;
+          color:            $drupal-blue-dark;
         }
       }
     }
