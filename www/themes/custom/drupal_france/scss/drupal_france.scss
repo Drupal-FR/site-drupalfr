@@ -40,7 +40,6 @@ $flex: false;
 // Components
 
 // Import our mixins early so they can be used by other partials.
-// Optional.
 @import 'base/mixins';
 
 // Common file is where you place common utility classes to extend or
@@ -52,7 +51,6 @@ $flex: false;
 @import 'base/drupal';
 
 // Styling for elements.
-// Optional.
 @import 'base/elements';
 
 // Layout
@@ -68,6 +66,8 @@ $flex: false;
 @import 'modules/button';
 @import 'modules/eu_cookie_compliance';
 @import 'modules/footer';
+@import 'modules/maintenance';
+@import 'modules/meetup';
 @import 'modules/menu_account';
 @import 'modules/menu_main';
 @import 'modules/node-news';
@@ -75,10 +75,7 @@ $flex: false;
 @import 'modules/paragraphs';
 @import 'modules/topbar';
 @import 'modules/user';
-@import 'modules/views-infinite-scroll-pager';
-@import 'modules/feed-icon';
-@import 'modules/maintenance';
-@import 'modules/meetup-page';
+@import 'modules/views';
 
 // States
 // @import 'states/collapse';

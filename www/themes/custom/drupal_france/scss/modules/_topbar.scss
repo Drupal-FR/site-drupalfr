@@ -1,5 +1,12 @@
-// SITE NAME
-// =====================
+// ==========================
+// TOPBAR
+// --------------------------
+// 1 - Site Name
+// 2 - Search Button
+// 3 - User Account Button
+// ==========================
+
+// 1 - Site Name
 .site-name {
   > a {
     display: block;
@@ -19,11 +26,7 @@
   }
 }
 
-// TOPBAR EXTRA ELEMENTS
-// =====================
-
-/* Search button
-   ============= */
+// 2 - Search Button
 .header--search-block {
   @include breakpoint(medium) {
     float: right;
@@ -49,8 +52,7 @@
   }
 }
 
-/* User Account
-   ============*/
+// 3 - User Account Button
 .header--user-account {
   @include breakpoint(medium) {
     float: right;

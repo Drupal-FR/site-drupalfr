@@ -1,12 +1,16 @@
-// =========
+// ==========================
 // BLOCKS INDEX :
 // -------------
-// 1 - Meetup / Community
-// 2 - Planet / News feed
-// =========
+// 1 - (HP) Meetup / Community
+// 2 - (HP) Planet / News feed
+// 3 - (F)  Who we are ?
+// 4 - (F)  Login / Contact
+// 5 - (F)  Sitemap
+// 6 - (F)  Newsletter
+// 7 - (F)  Follow us
+// ==========================
 
-// 1 - Meetup / Community
-// ======================
+// 1 - (HOMEPAGE) Meetup / Community
 .block-meetup {
   padding:          $global-padding*3 0;
   background-color: lighten($drupal-blue-green-lightest, 10);
@@ -168,6 +172,7 @@
 
 }
 
+// 2 - (HOMEPAGE) Planet / News feed
 .block-planet {
   padding:          $global-padding*3 0;
   background-color: lighten($drupal-blue-green-lightest, 10);
@@ -197,6 +202,102 @@
       padding:        $global-padding $global-padding*5;
       font-weight:    700;
       text-transform: uppercase;
+    }
+  }
+}
+
+// 3 - (FOOTER)  Who we are ?
+.block-drupal-france-footer-who-are-we {
+  p {
+    padding-right: $global-padding;
+  }
+}
+
+// 4 - (FOOTER)  Login / Contact
+.block-drupal-france-footer-login,
+.block-drupal-france-footer-contact {
+  .button-footer {
+    padding:     15px 40px;
+    text-indent: 15px;
+
+    i {
+      position:    relative;
+      display:     inline-block;
+      text-indent: -40px;
+    }
+  }
+}
+
+// 5 - (FOOTER)  Sitemap
+.block-drupal-france-footer-sitemap {
+  .menu {
+    flex-direction: column;
+
+    > li {
+      a {
+        display: inline-block;
+        padding: 5px;
+        color:   $drupal-blue-desaturate-light;
+
+        &:hover {
+          background-color: transparent;
+          color:            $white;
+        }
+      }
+    }
+  }
+}
+
+// 6 - (FOOTER)  Newsletter
+.block-drupal-france-footer-newsletter {
+  input {
+    &[type='email'] {
+      height:           40px;
+      padding:          5px 10px;
+      border:           0;
+      background-color: $drupal-blue-desaturate;
+      font-size:        18px;
+      font-weight:      400;
+      color:            $drupal-blue-dark;
+
+      &:focus {
+        background-color: $drupal-blue-desaturate-light;
+        box-shadow:       none;
+        color:            $drupal-blue-dark;
+      }
+    }
+
+    &::placeholder {
+      font-size:   16px;
+      font-weight: 400;
+      color:       $drupal-blue-desaturate-light;
+    }
+  }
+}
+
+// 7 - (FOOTER)  Follow us
+.block-drupal-france-footer-follow-us {
+  .menu {
+    padding-top: 0;
+    list-style:  none;
+  }
+
+  li {
+    display: inline-block;
+    padding: .25rem;
+
+    a {
+      display:    inline-block;
+      width:      2rem;
+      max-height: 2rem;
+      font-size:  2rem;
+      color:      $drupal-blue-desaturate-light;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: $white;
+      }
     }
   }
 }
