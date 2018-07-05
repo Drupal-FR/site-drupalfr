@@ -8,4 +8,9 @@ id: moderator
 label: Modérateur
 weight: 4
 is_admin: null
-permissions: {  }
+permissions:
+  - 'use job_offer transition archive'
+  - 'use job_offer transition archived_draft'
+  - 'use job_offer transition archived_published'
+  - 'use job_offer transition publish'
+  - 'use job_offer transition waiting_approval_draft'
