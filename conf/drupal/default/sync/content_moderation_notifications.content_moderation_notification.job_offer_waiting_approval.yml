@@ -1,0 +1,17 @@
+uuid: 34518a0f-b457-48de-a5eb-7c0bcf358c39
+langcode: fr
+status: true
+dependencies: {  }
+id: job_offer_waiting_approval
+workflow: job_offer
+transitions:
+  draft_waiting_approval: draft_waiting_approval
+roles:
+  moderator: moderator
+author: false
+emails: ''
+subject: '[[site:name]] : Une nouvelle offre d''emploi en attente de modération'
+body:
+  value: "<p>Bonjour,</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Une nouvelle offre d'emploi a été créée et est en attente de modération.</p>\r\n\r\n<p>[node:url]</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Cordialement,</p>\r\n\r\n<p>L'équipe du site&nbsp;[site:name].</p>\r\n"
+  format: full_html
+label: 'Offre d''emploi : attente modération'
