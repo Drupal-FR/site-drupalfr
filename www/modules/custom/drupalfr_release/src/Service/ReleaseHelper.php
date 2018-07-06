@@ -122,7 +122,7 @@ class ReleaseHelper implements ReleaseHelperInterface {
         'title' => $this->t('Download (tar.gz)'),
         'options' => [
           'attributes' => [
-            'class' => 'btn btn-info',
+            'class' => 'button hollow',
           ],
         ],
       ]);
@@ -131,7 +131,7 @@ class ReleaseHelper implements ReleaseHelperInterface {
         'title' => $this->t('Download (zip)'),
         'options' => [
           'attributes' => [
-            'class' => 'btn btn-info',
+            'class' => 'button primary',
           ],
         ],
       ]);

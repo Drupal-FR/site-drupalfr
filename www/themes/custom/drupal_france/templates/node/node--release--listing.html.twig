@@ -65,27 +65,39 @@
  *   in different view modes.
  */
 #}
-{%
-  set classes = [
-    node.bundle|clean_class,
-    node.isPromoted() ? 'is-promoted',
-    node.isSticky() ? 'is-sticky',
-    not node.isPublished() ? 'is-unpublished',
-    view_mode ? view_mode|clean_class,
-    'clearfix',
-  ]
-%}
+{% set classes = [
+  node.bundle|clean_class,
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+  view_mode ? view_mode|clean_class,
+  'row',
+  'release',
+] %}
 <article{{ attributes.addClass(classes) }}>
 
   {{ title_prefix }}
-  <h2{{ title_attributes }}>
+  <h2{{ title_attributes.addClass('title', 'small-12', 'column') }}>
     {{ content.field_release_link }}
   </h2>
   {{ title_suffix }}
 
   <div{{ content_attributes.addClass('content') }}>
-    {{ release_creation_date }}
-    {{ content|without('field_release_link') }}
+    <div class="release--date column">
+      {{ release_creation_date }}
+    </div>
+
+    <div class="release--content column">
+      {{ content|without('field_release_link', 'field_release_type', 'field_release_file_targz', 'field_release_file_zip') }}
+    </div>
+
+    <div class="release--button small-6 medium-3 column">
+      {{ content.field_release_file_zip }}
+    </div>
+
+    <div class="release--button small-6 medium-3 column end">
+      {{ content.field_release_file_targz }}
+    </div>
   </div>
 
 </article>
