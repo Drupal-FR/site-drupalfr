@@ -20,7 +20,7 @@ display:
   default:
     display_plugin: default
     id: default
-    display_title: Master
+    display_title: Maître
     position: 0
     display_options:
       access:
@@ -41,10 +41,10 @@ display:
       exposed_form:
         type: basic
         options:
-          submit_button: Filter
+          submit_button: Appliquer
           reset_button: true
-          reset_button_label: Reset
-          exposed_sorts_label: 'Sort by'
+          reset_button_label: Réinitialiser
+          exposed_sorts_label: 'Trier par'
           expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
@@ -56,18 +56,18 @@ display:
           id: 0
           total_pages: null
           tags:
-            previous: '‹ Previous'
-            next: 'Next ›'
+            previous: '‹ Précédent'
+            next: 'Suivant ›'
             first: '« First'
             last: 'Last »'
           expose:
             items_per_page: false
-            items_per_page_label: 'Items per page'
+            items_per_page_label: 'Éléments par page'
             items_per_page_options: '5, 10, 25, 50'
             items_per_page_options_all: false
-            items_per_page_options_all_label: '- All -'
+            items_per_page_options_all_label: '- Tout -'
             offset: false
-            offset_label: Offset
+            offset_label: Décalage
           quantity: 9
       style:
         type: table
@@ -134,7 +134,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Title
+          label: Titre
           exclude: false
           alter:
             alter_text: false
@@ -199,7 +199,7 @@ display:
           relationship: nid
           group_type: group
           admin_label: ''
-          label: 'Content type'
+          label: 'Type de contenu'
           exclude: false
           alter:
             alter_text: false
@@ -264,7 +264,7 @@ display:
           relationship: uid
           group_type: group
           admin_label: ''
-          label: Author
+          label: Auteur
           exclude: false
           alter:
             alter_text: false
@@ -392,7 +392,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Updated
+          label: 'Mis à jour'
           exclude: false
           alter:
             alter_text: false
@@ -459,7 +459,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Operations
+          label: Actions
           exclude: false
           alter:
             alter_text: false
@@ -554,7 +554,7 @@ display:
           exposed: true
           expose:
             operator_id: title_op
-            label: Title
+            label: Titre
             description: ''
             use_operator: false
             operator: title_op
@@ -594,7 +594,7 @@ display:
           exposed: true
           expose:
             operator_id: type_op
-            label: 'Content type'
+            label: 'Type de contenu'
             description: ''
             use_operator: false
             operator: type_op
@@ -635,7 +635,7 @@ display:
           exposed: true
           expose:
             operator_id: langcode_op
-            label: Language
+            label: Langue
             description: ''
             use_operator: false
             operator: langcode_op
