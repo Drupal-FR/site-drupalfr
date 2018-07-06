@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.showcase.field_showcase_website
     - node.type.showcase
   module:
+    - field_formatter
     - user
 _core:
   default_config_hash: _jY7oyM3LBrLtDkWi6Rqi_GEnebAXMqtEv_Yk9D2j3c
@@ -36,13 +37,47 @@ content:
       link: false
     third_party_settings: {  }
   field_showcase_media:
-    type: entity_reference_entity_view
+    type: field_formatter_with_inline_settings
     weight: 0
     region: content
     label: hidden
     settings:
-      view_mode: default
-      link: false
+      field_name: field_media_image
+      label: visually_hidden
+      type: blazy
+      settings:
+        image_style: rect_400_200
+        thumbnail_style: ''
+        responsive_image_style: ''
+        media_switch: ''
+        ratio: ''
+        sizes: ''
+        breakpoints:
+          xs:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          sm:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          md:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          lg:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          xl:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+        current_view_mode: _custom
+        background: false
+        caption:
+          title: '0'
+          alt: '0'
     third_party_settings: {  }
   field_showcase_sector:
     type: entity_reference_label
@@ -56,3 +91,4 @@ hidden:
   field_showcase_website: true
   langcode: true
   links: true
+  published_at: true

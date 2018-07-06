@@ -6,6 +6,8 @@ dependencies:
     - field.field.paragraph.trombinoscope_item.field_title
     - field.field.paragraph.trombinoscope_item.field_user
     - paragraphs.paragraphs_type.trombinoscope_item
+  module:
+    - field_formatter
 _core:
   default_config_hash: 49LaDAUzsRQkofaMQ7Nn1F58zKgFeE0G0t8FxoU0sS0
 id: paragraph.trombinoscope_item.default
@@ -25,9 +27,43 @@ content:
     weight: 0
     label: hidden
     settings:
-      view_mode: teaser
-      link: false
+      field_name: user_picture
+      label: visually_hidden
+      type: blazy
+      settings:
+        image_style: square_230
+        thumbnail_style: ''
+        responsive_image_style: ''
+        media_switch: ''
+        ratio: ''
+        sizes: ''
+        breakpoints:
+          xs:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          sm:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          md:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          lg:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          xl:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+        current_view_mode: _custom
+        background: false
+        caption:
+          title: '0'
+          alt: '0'
     third_party_settings: {  }
-    type: entity_reference_entity_view
+    type: field_formatter_with_inline_settings
     region: content
 hidden: {  }

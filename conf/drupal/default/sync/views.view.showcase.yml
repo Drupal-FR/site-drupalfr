@@ -3,9 +3,11 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.node.field_showcase_media
+    - field.storage.media.field_media_image
     - node.type.showcase
   module:
+    - blazy
+    - media
     - node
     - user
     - views_custom_cache_tag
@@ -67,11 +69,11 @@ display:
           separator: ''
           hide_empty: false
       fields:
-        field_showcase_media:
-          id: field_showcase_media
-          table: node__field_showcase_media
-          field: field_showcase_media
-          relationship: none
+        field_media_image:
+          id: field_media_image
+          table: media__field_media_image
+          field: field_media_image
+          relationship: field_showcase_media
           group_type: group
           admin_label: ''
           label: ''
@@ -116,10 +118,41 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: target_id
-          type: entity_reference_entity_view
+          type: blazy
           settings:
-            view_mode: default
-          group_column: target_id
+            background: false
+            caption:
+              title: '0'
+              alt: '0'
+            image_style: rect_220x150
+            thumbnail_style: ''
+            responsive_image_style: ''
+            media_switch: ''
+            ratio: ''
+            sizes: ''
+            breakpoints:
+              xs:
+                image_style: ''
+                width: ''
+                breakpoint: ''
+              sm:
+                image_style: ''
+                width: ''
+                breakpoint: ''
+              md:
+                image_style: ''
+                width: ''
+                breakpoint: ''
+              lg:
+                image_style: ''
+                width: ''
+                breakpoint: ''
+              xl:
+                image_style: ''
+                width: ''
+                breakpoint: ''
+            current_view_mode: _custom
+          group_column: ''
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -232,7 +265,16 @@ display:
           content: '<a class="view--references--link" href="/decouvrir/references"><span class="view--references--link--text">Consulter <br /><small>les @total sites</small></span><span class="view--references--link--arrow"><i class="fa fa-chevron-right"></i></span></a>'
           plugin_id: result
       empty: {  }
-      relationships: {  }
+      relationships:
+        field_showcase_media:
+          id: field_showcase_media
+          table: node__field_showcase_media
+          field: field_showcase_media
+          relationship: none
+          group_type: group
+          admin_label: 'field_showcase_media : Média'
+          required: true
+          plugin_id: standard
       arguments: {  }
       display_extenders: {  }
     cache_metadata:
@@ -243,7 +285,7 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_showcase_media'
+        - 'config:field.storage.media.field_media_image'
   block_homepage:
     display_plugin: block
     id: block_homepage
@@ -260,4 +302,4 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_showcase_media'
+        - 'config:field.storage.media.field_media_image'
