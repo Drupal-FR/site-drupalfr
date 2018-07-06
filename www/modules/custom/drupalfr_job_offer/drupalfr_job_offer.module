@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_job_offer module.
+ */
+
+use Drupal\Core\Link;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_cron().
+ *
+ * Archive expired published job offer.
+ */
+function drupalfr_job_offer_cron() {
+  $request_time = \Drupal::time()->getRequestTime();
+
+  /** @var \Drupal\node\NodeInterface[] $published_job_offers */
+  $published_job_offers = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties([
+    'type' => 'job_offer',
+    'status' => NodeInterface::PUBLISHED,
+  ]);
+
+  foreach ($published_job_offers as $published_job_offer) {
+    if (
+      $published_job_offer->hasField('field_job_validity') &&
+      $published_job_offer->hasField('published_at') &&
+      $published_job_offer->hasField('moderation_state')
+    ) {
+
+      $validity = $published_job_offer->get('field_job_validity')->first();
+      if (!is_null($validity)) {
+        $validity = $validity->getValue()['value'];
+
+        $published_at = $published_job_offer->get('published_at')->first();
+        if (!is_null($published_at)) {
+          $published_at = $published_at->getValue()['value'];
+
+          $validity_time = $validity * 30 * 24 * 3600;
+          if ($request_time > $published_at + $validity_time) {
+            $published_job_offer->moderation_state->value = 'archived';
+            $published_job_offer->save();
+
+            \Drupal::logger('drupalfr_job_offer')->notice('The job offer @nid - @title has been archived.', [
+              '@nid' => $published_job_offer->id(),
+              '@title' => $published_job_offer->label(),
+              'link' => Link::fromTextAndUrl(t('View'), $published_job_offer->toUrl())->toString(),
+            ]);
+          }
+        }
+      }
+    }
+  }
+}
