@@ -25,6 +25,7 @@ source:
     - login: Login
     - roles: Roles
     - picture: Picture
+    - banner: Banner
     - realname: Realname
     - twitter_uri: 'Twitter URI'
     - twitter_title: 'Twitter title'
@@ -110,3 +111,12 @@ process:
   field_organization_size: size
   field_organization_legal_form: legal_form
   field_organization_contact_info: contact_info
+  field_user_banner:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: banner
+    -
+      plugin: migration
+      migration: drupalfr_file
+      no_stub: true
