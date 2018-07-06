@@ -119,7 +119,7 @@
         #drupaleurope .content {
           max-width: calc(960px + 4em);
           width: 100%;
-          min-height: 350px;
+          min-height: 250px;
           padding: 2rem 2.5rem 3.5rem;
           margin: auto;
           color: #fff;
@@ -132,17 +132,16 @@
         }
         #drupaleurope div.message {
           flex: 1 1 60%;
-          padding-top: 50px;
         }
         #drupaleurope h2, #drupaleurope p {
           margin: .5rem 0 0;
           font-weight: normal;
+          color: #ffffff;
         }
         #drupaleurope .logo {
           height: auto;
           width: 200px;
           min-width: 200px;
-          padding-right: 4rem;
         }
         #drupaleurope a {
           color: #fff;
