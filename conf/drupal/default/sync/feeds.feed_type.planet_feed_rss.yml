@@ -10,6 +10,7 @@ dependencies:
     - node.type.planet
   module:
     - node
+    - publication_date
 _core:
   default_config_hash: ILSX6lybM0C_Tu4tpwAhh-CbaGA2-VBjgTb3B8a8zf0
 label: 'Flux RSS du planète'
@@ -72,3 +73,7 @@ mappings:
     map:
       uri: url
       title: title
+  -
+    target: published_at
+    map:
+      value: timestamp
