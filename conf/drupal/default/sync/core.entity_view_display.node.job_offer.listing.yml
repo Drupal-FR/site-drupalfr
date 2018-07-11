@@ -21,6 +21,9 @@ targetEntityType: node
 bundle: job_offer
 mode: listing
 content:
+  content_moderation_control:
+    weight: -20
+    region: content
   field_job_contract_type:
     weight: 1
     label: inline
@@ -67,4 +70,5 @@ content:
 hidden:
   body: true
   langcode: true
+  published_at: true
   user_member_entity_view_job_offer_organization: true
