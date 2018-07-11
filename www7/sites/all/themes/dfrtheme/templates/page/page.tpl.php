@@ -168,11 +168,11 @@
             <div>
               <img class="logo"
                    src="/sites/all/themes/dfrtheme/images/drupaleurope-assets/Drupal_Europe_logo_negative_vertical.svg"
-                   alt="Drupal Europe, Darmstadt, Germany, 10-14 September 2018" />
+                   alt="Drupal Europe, Darmstadt, Allemagne, 10-14 Septembre 2018" />
             </div>
             <div class="message">
-              <h2>The biggest European Drupal event<br>reimagined by the community</h2>
-              <p><a href="https://drupaleurope.org/tickets">Get your ticket now!</a></p>
+              <h2>L'événement majeur de Drupal en Europe,<br>réinventé par la communauté</h2>
+              <p><a href="https://drupaleurope.org/tickets">Réservez votre place</a></p>
             </div>
           </div>
         </div>
