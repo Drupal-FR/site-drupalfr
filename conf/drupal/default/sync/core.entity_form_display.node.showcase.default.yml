@@ -11,9 +11,11 @@ dependencies:
     - field.field.node.showcase.field_showcase_website
     - node.type.showcase
   module:
+    - content_moderation
     - entity_browser
     - link
     - path
+    - publication_date
 _core:
   default_config_hash: iulw3_zxZgwzGiBv3zHk1_Slla83Z5l9UXrjifXRPyY
 id: node.showcase.default
@@ -133,4 +135,6 @@ content:
   url_redirects:
     weight: 50
     region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden: {  }

@@ -11,10 +11,12 @@ dependencies:
     - field.field.node.page.field_paragraph
     - node.type.page
   module:
+    - content_moderation
     - entity_browser
     - metatag
     - paragraphs
     - path
+    - publication_date
     - text
 _core:
   default_config_hash: NxalXuRDPRIVE7SNVuOMeFCko0WcOEfZ5ExkwQ6rn3M
@@ -144,4 +146,6 @@ content:
   url_redirects:
     weight: 50
     region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden: {  }
