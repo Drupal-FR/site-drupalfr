@@ -19,27 +19,6 @@ name: Références
 description: ''
 read_only: false
 field_settings:
-  node_grants:
-    label: 'Node access information'
-    property_path: search_api_node_grants
-    type: string
-    indexed_locked: true
-    type_locked: true
-    hidden: true
-  status:
-    label: status
-    datasource_id: 'entity:node'
-    property_path: status
-    type: boolean
-    indexed_locked: true
-    type_locked: true
-  uid:
-    label: uid
-    datasource_id: 'entity:node'
-    property_path: uid
-    type: integer
-    indexed_locked: true
-    type_locked: true
   created:
     label: 'Écrit le'
     datasource_id: 'entity:node'
@@ -75,6 +54,27 @@ field_settings:
         - field.storage.node.field_showcase_drupal_version
       module:
         - taxonomy
+  node_grants:
+    label: 'Node access information'
+    property_path: search_api_node_grants
+    type: string
+    indexed_locked: true
+    type_locked: true
+    hidden: true
+  status:
+    label: status
+    datasource_id: 'entity:node'
+    property_path: status
+    type: boolean
+    indexed_locked: true
+    type_locked: true
+  uid:
+    label: uid
+    datasource_id: 'entity:node'
+    property_path: uid
+    type: integer
+    indexed_locked: true
+    type_locked: true
 datasource_settings:
   'entity:node':
     bundles:
@@ -85,45 +85,26 @@ datasource_settings:
       default: true
       selected: {  }
 processor_settings:
-  tokenizer:
-    all_fields: false
-    fields: {  }
-    spaces: ''
-    overlap_cjk: 1
-    minimum_word_size: '3'
-    weights:
-      preprocess_index: -6
-      preprocess_query: -6
-  transliteration:
-    all_fields: true
-    fields:
-      - name
-      - name_1
-      - name_2
-    weights:
-      preprocess_index: -20
-      preprocess_query: -20
-  ignorecase:
-    all_fields: true
-    fields:
-      - name
-      - name_1
-      - name_2
-    weights:
-      preprocess_index: -20
-      preprocess_query: -20
+  add_url: {  }
+  aggregated_field: {  }
   content_access:
     weights:
       preprocess_query: -30
-  add_url: {  }
-  aggregated_field: {  }
-  rendered_item: {  }
   ignore_character:
-    all_fields: false
-    fields: {  }
+    all_fields: true
+    fields:
+      - name
+      - name_1
+      - name_2
     ignorable: '[''¿¡!?,.:;]'
     strip:
       character_sets:
+        Cc: 0
+        Cf: 0
+        Co: 0
+        Mc: 0
+        Me: 0
+        Mn: 0
         Pc: Pc
         Pd: Pd
         Pe: Pe
@@ -131,12 +112,6 @@ processor_settings:
         Pi: Pi
         Po: Po
         Ps: Ps
-        Cc: 0
-        Cf: 0
-        Co: 0
-        Mc: 0
-        Me: 0
-        Mn: 0
         Sc: 0
         Sk: 0
         Sm: 0
@@ -147,7 +122,10 @@ processor_settings:
     weights:
       preprocess_index: -10
       preprocess_query: -10
-  solr_date_range: {  }
+  rendered_item: {  }
+  solr_date_range:
+    weights:
+      preprocess_index: 0
 tracker_settings:
   default:
     indexing_order: fifo
