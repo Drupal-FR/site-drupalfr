@@ -10,7 +10,9 @@ dependencies:
     - node.type.forum
   module:
     - comment
+    - content_moderation
     - path
+    - publication_date
     - text
 _core:
   default_config_hash: pBPUPYPfZKHQbV5O4RROowOjQPEKWx1Xrr-FU-e6_88
@@ -122,5 +124,7 @@ content:
   url_redirects:
     weight: 50
     region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden:
   langcode: true

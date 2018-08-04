@@ -371,20 +371,20 @@
         "drupal/block_visibility_groups": "1.2.0",
         "drupal/bootstrap": "3.7.0",
         "drupal/color_field": "2.0.0-rc3",
-        "drupal/commerce": "2.7.0",
-        "drupal/commerce_license": "2.0.0-alpha16",
+        "drupal/commerce": "2.8.0",
+        "drupal/commerce_license": "2.0.0-alpha17",
         "drupal/commerce_paypal": "1.0.0-beta2",
         "drupal/config_ignore": "2.1.0",
         "drupal/config_installer": "1.8.0",
         "drupal/config_split": "1.3.0",
         "drupal/content_moderation_notifications": "3.0.0-rc2",
-        "drupal/core": "8.5.5",
+        "drupal/core": "8.6.0-beta2",
         "drupal/dropzonejs": "2.0.0-alpha3",
         "drupal/drush_language": "1.0.0-rc2",
         "drupal/entity_browser": "2.0.0-alpha3",
         "drupal/eu_cookie_compliance": "1.2.0",
         "drupal/eva": "1.3.0",
-        "drupal/facets": "1.0.0",
+        "drupal/facets": "1.1.0",
         "drupal/feeds": "3.0.0-alpha2",
         "drupal/field_formatter": "1.2.0",
         "drupal/field_group": "3.0.0-beta1",
@@ -396,7 +396,7 @@
         "drupal/geofield": "1.0.0-beta4",
         "drupal/honeypot": "1.27.0",
         "drupal/inline_entity_form": "1.0.0-rc1",
-        "drupal/leaflet": "1.0.0-beta10",
+        "drupal/leaflet": "1.0.0-beta12",
         "drupal/link_attributes": "1.3.0",
         "drupal/mailchimp": "1.7.0",
         "drupal/media_entity_actions": "1.0.0-alpha2",
@@ -413,7 +413,7 @@
         "drupal/r4032login": "1.0.0",
         "drupal/redirect": "1.2.0",
         "drupal/redis": "1.0.0",
-        "drupal/search_api": "1.8.0",
+        "drupal/search_api": "1.9.0",
         "drupal/search_api_solr": "2.0.0",
         "drupal/smart_trim": "1.1.0",
         "drupal/swiftmailer": "1.0.0-beta2",
@@ -454,7 +454,7 @@
         "drupal/renderviz": "1.*",
         "drupal/search_kint": "1.*",
         "drupal/speedboxes": "1.*",
-        "webflo/drupal-core-require-dev": "~8.5"
+        "webflo/drupal-core-require-dev": "~8.6"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -538,6 +538,9 @@
             "merge-scripts": true
         },
         "patches": {
+            "drupal/block_visibility_groups": {
+                "BlockVisibilityGroupedListBuilder - 8.6 Compatibility": "https://www.drupal.org/files/issues/2018-07-31/8.6-compat.patch"
+            },
             "drupal/color_field": {
                 "Color Boxes Widget default values dont work": "https://www.drupal.org/files/issues/color_field-2854199-7.patch"
             },
@@ -546,9 +549,6 @@
             },
             "drupal/config_inspector": {
                 "Filter entities with schema errors": "https://www.drupal.org/files/issues/filter_entities_with-2843729-7.patch"
-            },
-            "drupal/core": {
-                "Use Zend-Feed's standalone extension managers to prevent sites breaking": "https://www.drupal.org/files/issues/2018-06-15/2976335-35.patch"
             },
             "drupal/flag": {
                 "[regression] restore All option in flag Views filter handler": "https://www.drupal.org/files/issues/flag-all_option-2813503-3.patch"
