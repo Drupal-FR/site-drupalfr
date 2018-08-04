@@ -3,29 +3,36 @@ description: 'drupal.fr site.'
 type: profile
 core: 8.x
 dependencies:
-  # Core modules.
   - block
   - block_content
-  - breakpoint
   - ckeditor
   - config
-  - contextual
-  - datetime
-  - dynamic_page_cache
   - editor
   - entity_reference
   - field
   - file
   - filter
-  - help
   - image
-  - inline_form_errors
   - language
-  - link
   - locale
   - menu_link_content
   - menu_ui
   - node
+  - system
+  - taxonomy
+  - text
+  - toolbar
+  - user
+  - views
+install:
+  # Core modules.
+  - breakpoint
+  - contextual
+  - datetime
+  - dynamic_page_cache
+  - help
+  - inline_form_errors
+  - link
   - options
   - page_cache
   - path
@@ -33,14 +40,8 @@ dependencies:
   - rdf
   - responsive_image
   - syslog
-  - system
-  - taxonomy
   - telephone
-  - text
-  - toolbar
   - update
-  - user
-  - views
 
   # Contrib modules.
   - admin_toolbar
