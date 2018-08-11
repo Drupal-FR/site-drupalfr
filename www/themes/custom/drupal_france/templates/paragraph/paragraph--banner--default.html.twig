@@ -58,12 +58,12 @@
       {% if banner_media %}
         <div class="paragraph--banner--image" style="background-image:url('{{ banner_media }}');">
       {% endif %}
-
-      {% if banner_link_url %}
+			{{ content.field_text }}
+    {#  {% if banner_link_url %}
         <a class="paragraph--banner--link" href="{{ banner_link_url }}" title="{{ banner_link_title }}">
           {{ content.field_text }}
         </a>
-      {% endif %}
+      {% endif %} #}
 
       </div>
 
