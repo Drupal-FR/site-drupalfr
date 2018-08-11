@@ -10,8 +10,8 @@ use Drupal\feeds\Entity\Feed;
  * Example Extra field Display.
  *
  * @ExtraFieldDisplay(
- *   id = "planet",
- *   label = @Translation("Planet"),
+ *   id = "drupalfr_planet",
+ *   label = @Translation("DrupalFr_Planet"),
  *   bundles = {
  *     "node.planet",
  *   }

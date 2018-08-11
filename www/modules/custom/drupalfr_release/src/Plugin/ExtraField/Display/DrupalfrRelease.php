@@ -9,8 +9,8 @@ use Drupal\extra_field\Plugin\ExtraFieldDisplayBase;
  * Release Extra field Display.
  *
  * @ExtraFieldDisplay(
- *   id = "release",
- *   label = @Translation("Release"),
+ *   id = "drupalfr_release",
+ *   label = @Translation("DrupalFr_Release"),
  *   bundles = {
  *     "node.release",
  *   }
