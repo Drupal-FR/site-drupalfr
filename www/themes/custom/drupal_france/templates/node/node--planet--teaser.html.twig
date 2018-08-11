@@ -76,9 +76,9 @@
 ] %}
 <article{{ attributes.addClass(classes).setAttribute('data-equalizer-watch', true) }}>
 
-  {% if feed_image %}
-    <div class="planet-element--feature-image">
-      {{ feed_image }}
+  {% if content.extra_field_planet.feed_image %}
+    <div class="planet-element--feature-image testaaa">
+      {{ content.extra_field_planet.feed_image }}
     </div>
   {% else %}
     <div class="planet-element--feature-image">

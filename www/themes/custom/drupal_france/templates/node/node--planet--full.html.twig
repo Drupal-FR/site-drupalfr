@@ -76,8 +76,8 @@
 
 <div class="planet-element--wrapper">
   <div class="row expanded">
-    {% if feed_image_url %}
-      <div class="planet-element--feature-image" style="background-image: url('{{ feed_image_url}}')"></div>
+    {% if content.extra_field_planet.feed_image_url %}
+      <div class="planet-element--feature-image" style="background-image: url('{{ content.extra_field_planet.feed_image_url }}')"></div>
     {% else %}
       <div class="planet-element--feature-image">
         <img src="/{{ directory }}/images/drupal_planet.png" alt="{{ 'Drupal Planet'|t }}">
