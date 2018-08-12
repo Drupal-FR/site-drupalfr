@@ -27,7 +27,7 @@ class ReleaseImport extends JobTypeBase implements ContainerFactoryPluginInterfa
   protected $releaseHelper;
 
   /**
-   * Constructs a new LicenseExpire object.
+   * Constructs a new ReleaseImport object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
