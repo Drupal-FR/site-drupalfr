@@ -84,11 +84,11 @@
 
   <div{{ content_attributes.addClass('content') }}>
     <div class="release--date column">
-      {{ release_creation_date }}
+      {{ content.extra_field_drupalfr_release_creation_date }}
     </div>
 
     <div class="release--content column">
-      {{ content|without('field_release_link', 'field_release_type', 'field_release_file_targz', 'field_release_file_zip') }}
+      {{ content|without('field_release_link', 'field_release_type', 'field_release_file_targz', 'field_release_file_zip', 'extra_field_drupalfr_release_creation_date') }}
     </div>
 
     <div class="release--button small-6 medium-3 column">
