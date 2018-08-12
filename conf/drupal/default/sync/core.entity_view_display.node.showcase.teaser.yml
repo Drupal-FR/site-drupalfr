@@ -12,6 +12,7 @@ dependencies:
     - node.type.showcase
   module:
     - field_formatter
+    - linked_field
     - user
 _core:
   default_config_hash: _jY7oyM3LBrLtDkWi6Rqi_GEnebAXMqtEv_Yk9D2j3c
@@ -78,7 +79,12 @@ content:
         caption:
           title: '0'
           alt: '0'
-    third_party_settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: field
+        destination: field_showcase_website
+        advanced: {  }
   field_showcase_sector:
     type: entity_reference_label
     weight: 2
