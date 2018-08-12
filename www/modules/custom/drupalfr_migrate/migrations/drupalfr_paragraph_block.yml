@@ -1,0 +1,35 @@
+id: drupalfr_paragraph_block
+label: 'Paragraph block import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - paragraphs
+migration_dependencies: {}
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/paragraph_block.csv
+  header_row_count: 1
+  keys:
+    - pid
+  column_names:
+    - pid: Identifier
+    - field_block_plugin_plugin_id: 'Block plugin id'
+    - field_block_plugin_settings: 'Block plugin settings (serialized)'
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+process:
+  type:
+    plugin: default_value
+    default_value: block
+  field_block_plugin/plugin_id: field_block_plugin_plugin_id
+  field_block_plugin/settings:
+    plugin: callback
+    callable: unserialize
+    source: field_block_plugin_settings

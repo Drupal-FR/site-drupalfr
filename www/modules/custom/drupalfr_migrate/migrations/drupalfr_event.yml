@@ -52,7 +52,7 @@ process:
       source: sponsors
       delimiter: ;
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_user
   field_event_organizer:
     -
@@ -60,16 +60,16 @@ process:
       source: organizers
       delimiter: ;
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_user
   field_media_banner:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_media
       source: media_banner
   field_media_teaser:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_media
       source: media_teaser
   field_event_date_start: start_date

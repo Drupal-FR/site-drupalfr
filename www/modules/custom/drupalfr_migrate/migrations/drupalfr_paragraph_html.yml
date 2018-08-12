@@ -1,0 +1,32 @@
+id: drupalfr_paragraph_html
+label: 'Paragraph HTML import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - paragraphs
+migration_dependencies: {}
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/paragraph_html.csv
+  header_row_count: 1
+  keys:
+    - pid
+  column_names:
+    - pid: Identifier
+    - field_text_value: 'Field text value'
+    - field_text_format: 'Field text format'
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+process:
+  type:
+    plugin: default_value
+    default_value: html
+  field_text/value: field_text_value
+  field_text/format: field_text_format
