@@ -14,7 +14,7 @@
   <div>
     {% for status in statuses %}
       <div>
-        <p>{{ status.text }}</p>
+        {{ status.text }}
         <img src="{{ status.user.profile_image_url_https }}"
              class="img-circle pull-left" height="50" width="50">
         <h4>{{ status.user.name }}</h4>

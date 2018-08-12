@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.local_group.field_twitter_account
     - node.type.local_group
   module:
+    - drupalfr_social
     - text
     - user
 _core:
@@ -46,6 +47,13 @@ content:
     third_party_settings: {  }
     type: entity_reference_entity_view
     region: content
+  field_twitter_account:
+    type: drupalfr_social_twitter_feed
+    weight: 4
+    region: content
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
   local_group_entity_view_1:
     weight: 2
     region: content
@@ -54,7 +62,6 @@ content:
 hidden:
   field_local_group_place: true
   field_media_teaser: true
-  field_twitter_account: true
   langcode: true
   links: true
   published_at: true
