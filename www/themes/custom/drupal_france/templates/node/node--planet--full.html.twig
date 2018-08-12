@@ -71,13 +71,13 @@
   node.isSticky() ? 'is-sticky',
   not node.isPublished() ? 'is-unpublished',
   view_mode ? view_mode|clean_class,
-  'planet-element'
+  'planet-element',
 ] %}
 
 <div class="planet-element--wrapper">
   <div class="row expanded">
-    {% if feed_image_url %}
-      <div class="planet-element--feature-image" style="background-image: url('{{ feed_image_url}}')"></div>
+    {% if content.extra_field_drupalfr_planet_feed_image_url %}
+      <div class="planet-element--feature-image" style="background-image: url('{{ content.extra_field_drupalfr_planet_feed_image_url }}')"></div>
     {% else %}
       <div class="planet-element--feature-image">
         <img src="/{{ directory }}/images/drupal_planet.png" alt="{{ 'Drupal Planet'|t }}">

@@ -76,15 +76,13 @@
 ] %}
 <article{{ attributes.addClass(classes).setAttribute('data-equalizer-watch', true) }}>
 
-  {% if feed_image %}
-    <div class="planet-element--feature-image">
-      {{ feed_image }}
-    </div>
+  <div class="planet-element--feature-image">
+  {% if content.extra_field_drupalfr_planet_feed_image %}
+    {{ content.extra_field_drupalfr_planet_feed_image }}
   {% else %}
-    <div class="planet-element--feature-image">
-      <img src="/{{ directory }}/images/drupal_planet.png" alt="{{ 'Drupal Planet'|t }}">
-    </div>
+    <img src="/{{ directory }}/images/drupal_planet.png" alt="{{ 'Drupal Planet'|t }}">
   {% endif %}
+  </div>
 
   <div class="planet-element--author">
     {{ author_picture }}
