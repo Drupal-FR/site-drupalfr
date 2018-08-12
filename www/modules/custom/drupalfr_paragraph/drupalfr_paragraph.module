@@ -17,7 +17,7 @@ function drupalfr_paragraph_preprocess_paragraph(&$variables) {
   $paragraph = $variables['paragraph'];
 
   if ($paragraph->bundle() == 'banner') {
-    
+
     // Allow to wrap the paragraph into a link.
     if ($paragraph->hasField('field_banner_link')) {
       $banner_link = $paragraph->get('field_banner_link')->getValue();
@@ -42,7 +42,7 @@ function drupalfr_paragraph_preprocess_paragraph(&$variables) {
             $banner_image_file = File::load($banner_image[0]['target_id']);
 
             if (!is_null($banner_image_file)) {
-              $variables['banner_media'] = file_create_url($banner_image_file->getFileUri());
+              $variables['banner_media'] = file_url_transform_relative(file_create_url($banner_image_file->getFileUri()));
             }
           }
         }
