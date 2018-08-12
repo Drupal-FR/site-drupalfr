@@ -28,7 +28,7 @@ function drupalfr_planet_preprocess_node(&$variables) {
           }
           else {
             $url = $feed->get('field_feed_image')->entity->uri->value;
-            $variables['feed_image_url'] = file_create_url($url);
+            $variables['feed_image_url'] = file_url_transform_relative(file_create_url($url));
           }
         }
       }
