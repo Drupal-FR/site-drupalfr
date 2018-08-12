@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 use GuzzleHttp\ClientInterface;
 
 /**
@@ -101,7 +102,7 @@ class ReleaseHelper implements ReleaseHelperInterface {
 
       // Set values of fields.
       $node->set('title', $result['name']);
-      $node->set('status', TRUE);
+      $node->set('status', NodeInterface::PUBLISHED);
       $node->set('created', $result['date']);
       $node->set('field_release_version_major', $result['version_major']);
       if (isset($result['version_minor'])) {
