@@ -5,48 +5,37 @@
  * Contains hook implementations for drupalfr_release module.
  */
 
+use Drupal\advancedqueue\Job;
+
 /**
  * Implements hook_cron().
  */
 function drupalfr_release_cron() {
-  /** @var \Drupal\drupalfr_release\Service\ReleaseHelperInterface $release_helper */
-  $release_helper = \Drupal::service('drupalfr_release.release_helper');
-  /** @var \Drupal\Core\Queue\QueueFactory $queue_factory */
-  $queue_factory = \Drupal::service('queue');
-  // Retrieve and init the queue in case it is not already created.
-  $queue = $queue_factory->get('drupalfr_release_import');
-  $queue->createQueue();
-  /** @var \Drupal\Core\State\StateInterface $state */
+  $current_time = \Drupal::time()->getRequestTime();
   $state = \Drupal::state();
 
   $last_uuid_check = $state->get('drupalfr_release.last_uuid_check', 0);
-  $current_time = \Drupal::time()->getRequestTime();
 
   // Check the releases every day (3600x24).
   if (($last_uuid_check + 86400) < $current_time) {
+    $advanced_queue_storage = \Drupal::entityTypeManager()->getStorage('advancedqueue_queue');
+    /** @var \Drupal\advancedqueue\Entity\QueueInterface $advanced_queue */
+    $advanced_queue = $advanced_queue_storage->load('drupalfr_release_import');
+
+    /** @var \Drupal\drupalfr_release\Service\ReleaseHelperInterface $release_helper */
+    $release_helper = \Drupal::service('drupalfr_release.release_helper');
     $data = $release_helper->getFeedReleases();
-    // Add items to the queue.
+
+    // Add items to the queue only if it has been created after the last import.
     foreach ($data as $result) {
-      $queue->createItem([
-        'data' => $result,
-      ]);
+      if ($last_uuid_check < $result['date']) {
+        $release_import_job = Job::create('drupalfr_release_import', [
+          'data' => $result,
+        ]);
+        $advanced_queue->enqueueJob($release_import_job);
+      }
     }
     $state->set('drupalfr_release.last_uuid_check', $current_time);
-  }
-
-  // Process the import of releases.
-  for ($iteration = 1; $iteration <= 10; $iteration++) {
-    if ($queue_item = $queue->claimItem()) {
-      $queue_item_data = $queue_item->data;
-      $data = $queue_item_data['data'];
-
-      $release_helper->importReleaseListData([$data]);
-
-      $queue->deleteItem($queue_item);
-    }
-    else {
-      break;
-    }
   }
 }
 
