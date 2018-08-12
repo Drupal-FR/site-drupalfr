@@ -22,7 +22,7 @@ content:
   body:
     label: hidden
     type: smart_trim
-    weight: 0
+    weight: 1
     settings:
       trim_length: 200
       trim_type: chars
@@ -33,9 +33,17 @@ content:
       trim_options:
         text: true
       more_class: more-link
+      wrap_output: false
+      wrap_class: trimmed
     third_party_settings: {  }
     region: content
+  extra_field_drupalfr_planet_feed_image:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden:
+  extra_field_drupalfr_planet_feed_image_url: true
   feeds_item: true
   field_planet_tag: true
   field_planet_url: true

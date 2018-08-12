@@ -23,12 +23,17 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 0
+    weight: 1
     settings: {  }
     third_party_settings: {  }
     region: content
+  extra_field_drupalfr_planet_feed_image_url:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_planet_tag:
-    weight: 1
+    weight: 2
     label: above
     settings:
       link: false
@@ -36,7 +41,7 @@ content:
     type: entity_reference_label
     region: content
   field_planet_url:
-    weight: 2
+    weight: 3
     label: inline
     settings:
       trim_length: 80
@@ -48,11 +53,12 @@ content:
     type: link
     region: content
   links:
-    weight: 3
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  extra_field_drupalfr_planet_feed_image: true
   feeds_item: true
   langcode: true
   published_at: true
