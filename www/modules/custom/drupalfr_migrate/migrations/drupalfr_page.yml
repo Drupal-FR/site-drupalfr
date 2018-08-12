@@ -15,7 +15,12 @@ migration_dependencies:
   required:
     - drupalfr_drupal_version
     - drupalfr_file
-    - drupalfr_paragraph
+    - drupalfr_paragraph_banner
+    - drupalfr_paragraph_block
+    - drupalfr_paragraph_html
+    - drupalfr_paragraph_layout_twocol
+    - drupalfr_paragraph_title_text_media
+    - drupalfr_paragraph_trombinoscope
 source:
   plugin: csv
   path: modules/custom/drupalfr_migrate/migrations/data/page.csv
@@ -46,7 +51,7 @@ process:
       source: drupal_version
       delimiter: ;
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_drupal_version
   field_attachment:
     -
@@ -54,7 +59,7 @@ process:
       source: attachments
       delimiter: ;
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_file
   body/value: body_value
   body/format: body_format
@@ -64,8 +69,14 @@ process:
       delimiter: ;
       source: paragraphs
     -
-      plugin: migration
-      migration: drupalfr_paragraph
+      plugin: migration_lookup
+      migration:
+        - drupalfr_paragraph_banner
+        - drupalfr_paragraph_block
+        - drupalfr_paragraph_html
+        - drupalfr_paragraph_layout_twocol
+        - drupalfr_paragraph_title_text_media
+        - drupalfr_paragraph_trombinoscope
       no_stub: true
     -
       plugin: sub_process

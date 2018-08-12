@@ -44,12 +44,12 @@ process:
       source: uid
       delimiter: ;
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_user
   field_feed_website/uri: website_uri
   field_feed_website/title: website_title
   field_feed_image:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_file
       source: feed_image

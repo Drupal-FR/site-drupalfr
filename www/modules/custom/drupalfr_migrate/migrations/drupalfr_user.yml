@@ -11,7 +11,7 @@ dependencies:
     - migrate_plus
     - migrate_source_csv
     - user
-migration_dependencies: {  }
+migration_dependencies: {}
 source:
   plugin: csv
   path: modules/custom/drupalfr_migrate/migrations/data/user.csv
@@ -66,7 +66,7 @@ process:
       bypass: true
   user_picture:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_file
       source: picture
   field_user_realname: realname
@@ -85,7 +85,7 @@ process:
       method: process
       source: organization
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_user
       no_stub: true
   field_user_event:
@@ -94,7 +94,7 @@ process:
       source: events
       delimiter: ;
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_event
       no_stub: true
   field_user_in_directory: in_directory
@@ -117,6 +117,6 @@ process:
       method: process
       source: banner
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_file
       no_stub: true

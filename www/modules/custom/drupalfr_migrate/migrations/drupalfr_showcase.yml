@@ -49,22 +49,22 @@ process:
   title: title
   field_showcase_category:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_website_type
       source: typology
   field_showcase_sector:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_website_sector
       source: sector
   field_showcase_drupal_version:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_website_drupal_version
       source: drupal_version
   field_showcase_media:
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: drupalfr_media
       source: image
   field_showcase_website/uri: website_uri
