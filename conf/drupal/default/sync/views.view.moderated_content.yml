@@ -1,7 +1,9 @@
 uuid: 91f6a1dd-2c13-48ad-90f3-48ea64d52f0c
 langcode: fr
-status: false
+status: true
 dependencies:
+  config:
+    - workflows.workflow.job_offer
   module:
     - content_moderation
     - node
@@ -56,10 +58,10 @@ display:
           id: 0
           total_pages: null
           tags:
-            previous: '‹ Précédent'
-            next: 'Suivant ›'
-            first: '« First'
-            last: 'Last »'
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -329,7 +331,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Moderation state'
+          label: 'État de modération'
           exclude: false
           alter:
             alter_text: false
@@ -663,8 +665,93 @@ display:
           entity_type: node
           entity_field: langcode
           plugin_id: language
+        moderation_state_1:
+          id: moderation_state_1
+          table: node_field_revision
+          field: moderation_state
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: in
+          value:
+            job_offer-draft: job_offer-draft
+            job_offer-waiting_approval: job_offer-waiting_approval
+          group: 1
+          exposed: true
+          expose:
+            operator_id: moderation_state_1_op
+            label: 'État de modération'
+            description: ''
+            use_operator: false
+            operator: moderation_state_1_op
+            identifier: moderation_state_1
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
+            reduce: true
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          plugin_id: moderation_state_filter
+        moderation_state:
+          id: moderation_state
+          table: node_field_revision
+          field: moderation_state
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: in
+          value:
+            job_offer-draft: job_offer-draft
+            job_offer-waiting_approval: job_offer-waiting_approval
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          plugin_id: moderation_state_filter
       sorts: {  }
-      title: 'Moderated content'
+      title: 'Contenu modéré'
       header: {  }
       footer: {  }
       empty:
@@ -677,7 +764,7 @@ display:
           admin_label: ''
           empty: true
           tokenize: false
-          content: 'No moderated content available. Only pending versions of content, such as drafts, are listed here.'
+          content: 'Aucun contenu modéré disponible. Seul les versions en attente de contenu, comme les brouillons, sont listées ici.'
           plugin_id: text_custom
       relationships:
         nid:
@@ -717,7 +804,8 @@ display:
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:workflow_list'
   moderated_content:
     display_plugin: page
     id: moderated_content
@@ -736,4 +824,5 @@ display:
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:workflow_list'

@@ -61,6 +61,11 @@ display:
           offset: 0
           id: 0
           total_pages: null
+          tags:
+            previous: "‹\_précédent"
+            next: "suivant\_›"
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -69,11 +74,6 @@ display:
             items_per_page_options_all_label: '- Tout -'
             offset: false
             offset_label: Décalage
-          tags:
-            previous: "‹\_précédent"
-            next: "suivant\_›"
-            first: '« first'
-            last: 'last »'
           quantity: 9
       style:
         type: table
@@ -724,7 +724,7 @@ display:
           entity_type: feeds_feed
           entity_field: changed
           plugin_id: date
-      title: Feeds
+      title: Flux
       header: {  }
       footer: {  }
       empty: {  }
@@ -779,7 +779,7 @@ display:
       path: admin/content/feed
       menu:
         type: normal
-        title: Feeds
+        title: Flux
         description: ''
         expanded: false
         parent: system.admin_content

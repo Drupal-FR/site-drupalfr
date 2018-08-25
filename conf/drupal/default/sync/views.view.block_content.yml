@@ -48,15 +48,17 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: mini
+        type: full
         options:
           items_per_page: 50
           offset: 0
           id: 0
           total_pages: null
           tags:
-            previous: '‹ Précédent'
-            next: 'Suivant ›'
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -65,6 +67,7 @@ display:
             items_per_page_options_all_label: '- Tout -'
             offset: false
             offset_label: Décalage
+          quantity: 9
       style:
         type: table
         options:
@@ -122,7 +125,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Block description'
+          label: 'Description du bloc'
           exclude: false
           alter:
             alter_text: false
@@ -187,7 +190,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Block type'
+          label: 'Type de bloc'
           exclude: false
           alter:
             alter_text: false
@@ -366,7 +369,7 @@ display:
           exposed: true
           expose:
             operator_id: info_op
-            label: 'Block description'
+            label: 'Description du bloc'
             description: ''
             use_operator: false
             operator: info_op
@@ -378,6 +381,9 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -407,7 +413,7 @@ display:
           exposed: true
           expose:
             operator_id: type_op
-            label: 'Block type'
+            label: 'Type de bloc'
             description: ''
             use_operator: false
             operator: type_op
@@ -419,6 +425,9 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -485,7 +494,7 @@ display:
           admin_label: ''
           empty: true
           tokenize: false
-          content: 'There are no custom blocks available. '
+          content: 'Il n''y a aucun bloc personnalisé disponible. '
           plugin_id: text_custom
         block_content_listing_empty:
           admin_label: ''

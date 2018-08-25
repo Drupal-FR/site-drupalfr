@@ -48,12 +48,17 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: mini
+        type: full
         options:
           items_per_page: 50
           offset: 0
           id: 0
           total_pages: null
+          tags:
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -62,9 +67,7 @@ display:
             items_per_page_options_all_label: '- Tout -'
             offset: false
             offset_label: Décalage
-          tags:
-            previous: ‹‹
-            next: ››
+          quantity: 9
       style:
         type: table
         options:
@@ -650,12 +653,12 @@ display:
           expose:
             label: ''
           plugin_id: standard
-      title: 'Recent log messages'
+      title: 'Entrées récentes du journal'
       header: {  }
       footer: {  }
       empty:
         area:
-          id: area_text_custom
+          id: area
           table: views
           field: area_text_custom
           relationship: none
@@ -663,7 +666,7 @@ display:
           admin_label: 'No log messages available.'
           empty: true
           tokenize: false
-          content: 'No log messages available.'
+          content: 'Aucune entrée du journal disponible.'
           plugin_id: text_custom
       relationships:
         uid:
