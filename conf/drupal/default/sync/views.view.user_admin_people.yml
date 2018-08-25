@@ -53,10 +53,10 @@ display:
           id: 0
           total_pages: 0
           tags:
-            previous: '‹ Précédent'
-            next: 'Suivant ›'
-            first: '« First'
-            last: 'Last »'
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -358,7 +358,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Member for'
+          label: 'Membre depuis'
           exclude: false
           alter:
             alter_text: false
@@ -399,11 +399,20 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          click_sort_column: value
           type: timestamp_ago
           settings:
-            future_format: '@interval'
-            past_format: '@interval'
             granularity: 2
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
           plugin_id: field
           entity_type: user
           entity_field: created
@@ -414,7 +423,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Last access'
+          label: 'Dernier accès'
           exclude: false
           alter:
             alter_text: false
@@ -455,11 +464,20 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          click_sort_column: value
           type: timestamp_ago
           settings:
-            future_format: '@interval hence'
-            past_format: '@interval ago'
             granularity: 2
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
           plugin_id: field
           entity_type: user
           entity_field: access
@@ -592,7 +610,7 @@ display:
           exposed: true
           expose:
             operator_id: combine_op
-            label: 'Name or email contains'
+            label: 'Nom ou email contient'
             description: ''
             use_operator: false
             operator: combine_op
@@ -604,6 +622,9 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -663,7 +684,7 @@ display:
                 operator: '='
                 value: '1'
               2:
-                title: Blocked
+                title: Bloqué
                 operator: '='
                 value: '0'
           plugin_id: boolean
@@ -846,7 +867,7 @@ display:
           plugin_id: date
           entity_type: user
           entity_field: created
-      title: People
+      title: Utilisateur
       empty:
         area_text_custom:
           id: area_text_custom
@@ -891,7 +912,7 @@ display:
     position: 1
     display_options:
       path: admin/people/list
-      show_admin_links: false
+      show_admin_links: true
       menu:
         type: 'default tab'
         title: Lister
@@ -901,9 +922,8 @@ display:
         context: ''
       tab_options:
         type: normal
-        title: People
-        description: 'Manage user accounts, roles, and permissions.'
-        menu_name: admin
+        title: Utilisateur
+        description: 'Gérer les comptes utilisateur, les rôles et les permissions.'
         weight: 0
       defaults:
         show_admin_links: false

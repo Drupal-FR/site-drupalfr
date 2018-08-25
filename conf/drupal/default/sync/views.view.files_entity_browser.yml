@@ -55,6 +55,11 @@ display:
           offset: 0
           id: 0
           total_pages: null
+          tags:
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -63,11 +68,6 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-          tags:
-            previous: '‹ previous'
-            next: 'next ›'
-            first: '« first'
-            last: 'last »'
           quantity: 9
       style:
         type: table
@@ -221,7 +221,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Created
+          label: 'Créé le'
           exclude: false
           alter:
             alter_text: false
@@ -262,6 +262,22 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          click_sort_column: value
+          type: timestamp
+          settings:
+            date_format: medium
+            custom_date_format: ''
+            timezone: ''
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: 0
           date_format: fallback
           custom_date_format: ''
           timezone: ''
@@ -275,7 +291,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'File size'
+          label: 'Taille du fichier'
           exclude: false
           alter:
             alter_text: false
@@ -316,6 +332,19 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          click_sort_column: value
+          type: file_size
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: 0
           file_size_display: formatted
           entity_type: file
           entity_field: filesize
@@ -327,7 +356,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Status
+          label: Statut
           exclude: false
           alter:
             alter_text: false
@@ -368,6 +397,22 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          click_sort_column: value
+          type: boolean
+          settings:
+            format: custom
+            format_custom_true: Permanent
+            format_custom_false: Temporaire
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: 0
           entity_type: file
           entity_field: status
           plugin_id: file_status

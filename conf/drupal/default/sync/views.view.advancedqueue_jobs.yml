@@ -55,10 +55,10 @@ display:
           id: 0
           total_pages: null
           tags:
-            previous: ‹‹
-            next: ››
-            first: '« Premier'
-            last: 'Dernier »'
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -323,7 +323,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Job type'
+          label: 'Type de processus'
           exclude: false
           alter:
             alter_text: false
@@ -422,7 +422,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Available date'
+          label: 'Date de disponibilité'
           exclude: false
           alter:
             alter_text: false
@@ -474,11 +474,11 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Processed date'
+          label: 'Date de traitement'
           exclude: false
           alter:
             alter_text: true
-            text: "{{ processed }}\n\n{{ message }}"
+            text: "{{ processed }}\r\n\r\n{{ message }}"
             make_link: false
             path: ''
             absolute: false
@@ -631,7 +631,7 @@ display:
           exposed: true
           expose:
             operator_id: type_op
-            label: 'Job type'
+            label: 'Type de processus'
             description: ''
             use_operator: false
             operator: type_op
@@ -643,6 +643,9 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -713,7 +716,7 @@ display:
           exposed: true
           expose:
             operator_id: available_op
-            label: 'Available date'
+            label: 'Date de disponibilité'
             description: ''
             use_operator: false
             operator: available_op
@@ -725,6 +728,12 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
+            placeholder: ''
+            min_placeholder: ''
+            max_placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -752,7 +761,7 @@ display:
           admin_label: ''
           empty: true
           tokenize: false
-          content: 'No jobs found'
+          content: 'Aucune tâche trouvée.'
           plugin_id: text_custom
       relationships: {  }
       arguments:

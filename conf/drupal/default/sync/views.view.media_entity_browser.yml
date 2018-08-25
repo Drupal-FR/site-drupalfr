@@ -44,10 +44,10 @@ display:
       exposed_form:
         type: basic
         options:
-          submit_button: Apply
+          submit_button: Appliquer
           reset_button: false
           reset_button_label: Reset
-          exposed_sorts_label: 'Sort by'
+          exposed_sorts_label: 'Trier par'
           expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
@@ -59,10 +59,10 @@ display:
           id: 0
           total_pages: null
           tags:
-            previous: '‹ Previous'
-            next: 'Next ›'
-            first: '« First'
-            last: 'Last »'
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -411,7 +411,7 @@ display:
               authenticated: authenticated
           is_grouped: true
           group_info:
-            label: 'Publishing status'
+            label: 'Statut de publication'
             description: ''
             identifier: status
             optional: true
@@ -445,7 +445,7 @@ display:
           exposed: true
           expose:
             operator_id: bundle_op
-            label: Provider
+            label: 'Type de média'
             description: ''
             use_operator: false
             operator: bundle_op
@@ -456,6 +456,10 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -485,7 +489,7 @@ display:
           exposed: true
           expose:
             operator_id: name_op
-            label: 'Media name'
+            label: 'Nom du média'
             description: ''
             use_operator: false
             operator: name_op
@@ -496,6 +500,10 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -525,7 +533,7 @@ display:
           exposed: true
           expose:
             operator_id: langcode_op
-            label: Language
+            label: Langue
             description: ''
             use_operator: false
             operator: langcode_op
@@ -536,6 +544,10 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
             reduce: false
           is_grouped: false
           group_info:
