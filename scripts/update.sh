@@ -1,7 +1,8 @@
 #!/bin/bash
 
+set -e
+
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.sh
-. $(dirname ${BASH_SOURCE[0]})/script-parameters.local.sh
 
 echo -e "${LIGHT_GREEN}Without drush alias, change temporarily directory to www.${NC}"
 cd $WWW_PATH

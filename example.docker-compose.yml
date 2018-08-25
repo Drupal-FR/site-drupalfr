@@ -19,6 +19,13 @@ services:
       - mail
 
 
+  traefik:
+    extends:
+      file: ./docker-compose-common.yml
+      service: traefik
+    image: traefik:1.6-alpine
+
+
   varnish:
     extends:
       file: ./docker-compose-common.yml
@@ -36,10 +43,6 @@ services:
     extends:
       file: ./docker-compose-common.yml
       service: mysql
-    environment:
-      MYSQL_USER: drupal
-      MYSQL_PASSWORD: drupal
-      MYSQL_DATABASE: drupal
     volumes:
       - ./data/db:/var/lib/mysql
 

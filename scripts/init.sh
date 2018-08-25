@@ -5,7 +5,6 @@
 echo -e "${LIGHT_GREEN}Copy example files.${NC}"
 rsync -avz --ignore-existing $PROJECT_PATH/example.env                          $PROJECT_PATH/.env
 rsync -avz --ignore-existing $PROJECT_PATH/example.docker-compose.yml           $PROJECT_PATH/docker-compose.yml
-rsync -avz --ignore-existing $SCRIPTS_PATH/example.script-parameters.local.sh   $SCRIPTS_PATH/script-parameters.local.sh
 rsync -avz --ignore-existing $PROJECT_PATH/conf/drupal/default/example.settings.local.php $PROJECT_PATH/conf/drupal/default/settings.local.php
 
 echo -e "${LIGHT_GREEN}Create public files directory.${NC}"

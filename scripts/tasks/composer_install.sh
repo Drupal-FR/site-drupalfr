@@ -1,7 +1,8 @@
 #!/bin/bash
 
+set -e
+
 . $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.sh
-. $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.local.sh
 
 echo -e "${LIGHT_GREEN}Composer install.${NC}"
 if [ "${ENVIRONMENT_MODE}" = "dev" ]; then

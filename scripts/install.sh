@@ -1,7 +1,8 @@
 #!/bin/bash
 
+set -e
+
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.sh
-. $(dirname ${BASH_SOURCE[0]})/script-parameters.local.sh
 
 . $SCRIPTS_PATH/tasks/composer_install.sh
 

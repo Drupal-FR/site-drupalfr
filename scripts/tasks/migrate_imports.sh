@@ -1,7 +1,8 @@
 #!/bin/bash
 
+set -e
+
 . $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.sh
-. $(dirname $(dirname ${BASH_SOURCE[0]}))/script-parameters.local.sh
 
 echo -e "${LIGHT_GREEN}Import content.${NC}"
 $DRUSH pm:enable drupalfr_migrate -y

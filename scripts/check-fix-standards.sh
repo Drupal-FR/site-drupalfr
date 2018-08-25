@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # You should have the following tools installed globally:
 # - PHPCS
 # - PHPCBF
@@ -25,7 +27,6 @@ if [ -z "$1" ] ; then
 fi
 
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.sh
-. $(dirname ${BASH_SOURCE[0]})/script-parameters.local.sh
 
 
 echo -e "${LIGHT_GREEN}PHP Code Sniffer: Drupal${NC}"

@@ -13,6 +13,8 @@ services:
   # PHP + Apache.
   drupal-php-apache-dev:
     image: florenttorregrosa/drupal-php-dev:7.1-apache
+    env_file:
+      - .env
     volumes:
       - .:/project
       - ./conf/php/php.ini:/usr/local/etc/php/php.ini
@@ -20,12 +22,19 @@ services:
 
   drupal-php-apache:
     image: florenttorregrosa/drupal-php:7.1-apache
+    env_file:
+      - .env
     volumes:
       - .:/project
       - ./conf/php/php.ini:/usr/local/etc/php/php.ini
       - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf
 
-
+  traefik:
+    image: traefik:1.6-alpine
+    network_mode: host
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./conf/traefik/traefik.toml:/etc/traefik/traefik.toml
 
   varnish:
     image: florenttorregrosa/varnish:5-alpine
@@ -37,8 +46,8 @@ services:
 
   mysql:
     image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
+    env_file:
+      - .env
     volumes:
       - ./conf/mysql:/etc/mysql/conf.d
 

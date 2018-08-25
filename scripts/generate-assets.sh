@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # You should have the following tools installed globally:
 # - npm
 
@@ -24,7 +26,6 @@ else
 fi
 
 . $(dirname ${BASH_SOURCE[0]})/script-parameters.sh
-. $(dirname ${BASH_SOURCE[0]})/script-parameters.local.sh
 
 echo -e "${LIGHT_GREEN}Change temporarily directory.${NC}"
 cd $WWW_PATH/themes/custom/drupal_france
