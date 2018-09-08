@@ -65,23 +65,25 @@
  *   in different view modes.
  */
 #}
+{# TODO: Rework this template. #}
 {%
-set classes = [
-node.bundle|clean_class,
-node.isPromoted() ? 'is-promoted',
-node.isSticky() ? 'is-sticky',
-not node.isPublished() ? 'is-unpublished',
-view_mode ? view_mode|clean_class,
-'clearfix',
-]
+  set classes = [
+    node.bundle|clean_class,
+    node.isPromoted() ? 'is-promoted',
+    node.isSticky() ? 'is-sticky',
+    not node.isPublished() ? 'is-unpublished',
+    view_mode ? view_mode|clean_class,
+    'clearfix',
+    'row',
+  ]
 %}
 <article{{ attributes.addClass(classes) }}>
 
-  <div class="col-md-1">
+  <div class="medium-1 column">
     {{ square_publication_date }}
   </div>
 
-  <div class="col-md-11">
+  <div class="medium-11 column">
     <div class="clearfix">
       {{ content.field_news_type }}
       {{ author_picture }}

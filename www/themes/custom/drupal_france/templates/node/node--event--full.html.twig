@@ -65,6 +65,7 @@
  *   in different view modes.
  */
 #}
+{# TODO: Rework this template. #}
 {%
   set classes = [
     node.bundle|clean_class,
@@ -73,18 +74,19 @@
     not node.isPublished() ? 'is-unpublished',
     view_mode ? view_mode|clean_class,
     'clearfix',
+    'row',
   ]
 %}
 <article{{ attributes.addClass(classes) }}>
 
   {{ content.field_media_banner }}
 
-  <div class="col-md-1">
+  <div class="medium-1 column">
     {{ content.field_event_date_start }}
     {{ content.field_event_date_end }}
   </div>
 
-  <div class="col-md-11">
+  <div class="medium-11 column">
     {{ title_prefix }}
     <h1{{ title_attributes }}>
       {{ label }}
@@ -94,12 +96,12 @@
     {{ content.field_event_website }}
   </div>
 
-  <div{{ content_attributes.addClass('content', 'col-md-12') }}>
+  <div{{ content_attributes.addClass('content', 'medium-12', 'column') }}>
     <div class="row">
-      <div class="col-md-5">
+      <div class="medium-5 column">
         {{ content.field_event_place }}
       </div>
-      <div class="col-md-7">
+      <div class="medium-7 column">
         {{ content.body }}
       </div>
     </div>

@@ -65,6 +65,7 @@
  *   in different view modes.
  */
 #}
+{# TODO: Rework this template. #}
 {%
   set classes = [
     node.bundle|clean_class,
@@ -73,11 +74,12 @@
     not node.isPublished() ? 'is-unpublished',
     view_mode ? view_mode|clean_class,
     'clearfix',
+    'row',
   ]
 %}
 <article{{ attributes.addClass(classes) }}>
 
-  <div class="col-md-2">
+  <div class="medium-2 column">
     {{ content.field_media_teaser }}
     {{ content.field_organization_logo }}
     {% if feed_image %}
@@ -85,7 +87,7 @@
     {% endif %}
   </div>
 
-  <div class="col-md-10">
+  <div class="medium-10 column">
     {{ title_prefix }}
     {% if not page %}
       <h2{{ title_attributes }}>
