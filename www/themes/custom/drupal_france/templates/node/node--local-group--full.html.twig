@@ -65,6 +65,7 @@
  *   in different view modes.
  */
 #}
+{# TODO: Rework this template. #}
 {%
   set classes = [
     node.bundle|clean_class,
@@ -73,13 +74,14 @@
     not node.isPublished() ? 'is-unpublished',
     view_mode ? view_mode|clean_class,
     'clearfix',
+    'row',
   ]
 %}
 <article{{ attributes.addClass(classes) }}>
 
   {{ content.field_media_banner }}
 
-  <div{{ content_attributes.addClass('content', 'col-md-8') }}>
+  <div{{ content_attributes.addClass('content', 'medium-8', 'column') }}>
     {{ title_prefix }}
     <h1{{ title_attributes }}>
       {{ label }}
@@ -90,7 +92,7 @@
     {{ content.local_group_entity_view_1 }}
   </div>
 
-  <div class="col-md-4">
+  <div class="medium-4 column">
     {{ content.field_local_group_organizer }}
     {{ content.field_twitter_account }}
   </div>

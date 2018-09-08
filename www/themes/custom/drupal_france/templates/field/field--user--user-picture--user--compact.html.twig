@@ -69,7 +69,7 @@
   <div{{ attributes.addClass(classes) }}>
     <div{{ title_attributes.addClass(title_classes) }}>{{ label }}</div>
     {% if multiple %}
-      <div class="field__items">
+      <div class="field--items">
     {% endif %}
     {% for item in items %}
       <div{{ item.attributes.addClass('field--item') }}>{{ item.content }}</div>
