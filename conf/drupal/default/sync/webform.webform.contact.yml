@@ -1,4 +1,3 @@
-uuid: d10568bf-ca4b-4a0a-85fe-fd7e7e0f3472
 langcode: fr
 status: open
 dependencies:
@@ -7,13 +6,9 @@ dependencies:
       - webform
   module:
     - honeypot
-third_party_settings:
-  honeypot:
-    honeypot: true
-_core:
-  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
 open: null
 close: null
+weight: 0
 uid: null
 template: false
 archive: false
@@ -52,14 +47,20 @@ settings:
   form_submit_back: false
   form_autofocus: false
   form_details_toggle: false
-  form_login: false
-  form_login_message: ''
+  form_access_denied: default
+  form_access_denied_title: ''
+  form_access_denied_message: ''
+  form_access_denied_attributes: {  }
   submission_label: ''
   submission_log: false
+  submission_views: {  }
+  submission_views_replace: {  }
   submission_user_columns: {  }
   submission_user_duplicate: false
-  submission_login: false
-  submission_login_message: ''
+  submission_access_denied: default
+  submission_access_denied_title: ''
+  submission_access_denied_message: ''
+  submission_access_denied_attributes: {  }
   submission_exception_message: ''
   submission_locked_message: ''
   previous_submission_message: ''
@@ -70,7 +71,9 @@ settings:
   wizard_progress_bar: true
   wizard_progress_pages: false
   wizard_progress_percentage: false
+  wizard_progress_link: false
   wizard_start_label: ''
+  wizard_preview_link: false
   wizard_confirmation: true
   wizard_confirmation_label: ''
   wizard_track: ''
@@ -201,6 +204,7 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
+      theme: ''
   email_notification:
     id: email
     label: 'Notification par courriel'
@@ -236,3 +240,10 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
+      theme: ''
+uuid: d10568bf-ca4b-4a0a-85fe-fd7e7e0f3472
+third_party_settings:
+  honeypot:
+    honeypot: true
+_core:
+  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0

@@ -17,6 +17,7 @@ dependencies:
     - paragraphs.paragraphs_type.title_text_media
   module:
     - color_field
+    - content_moderation
     - entity_browser
     - field_group
     - link_attributes
@@ -124,7 +125,7 @@ content:
   field_background_color:
     weight: 29
     settings:
-      default_colors: "#064771,\n#0678be,\n#4d9dcc,\n#245d82,\n#82a3b8,\n#cccccc,\n#eeeeee,\n#14435d,\n#007c8f,\n#72b0b4,\n#e3e3d8"
+      default_colors: '#064771,#0678BE,#4D9DCC,#245D82,#82A3B8,#CCCCCC,#EEEEEE,#14435D,#007C8F,#72B0B4,#E3E3D8'
     third_party_settings: {  }
     type: color_field_widget_box
     region: content
@@ -162,6 +163,7 @@ content:
       selection_mode: selection_append
       field_widget_display_settings:
         view_mode: editor
+      field_widget_replace: false
     third_party_settings: {  }
     type: entity_browser_entity_reference
     region: content
