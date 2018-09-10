@@ -85,9 +85,7 @@
     <h2{{ title_attributes }}>
       {{ label }}
     </h2>
-    {{ content.field_showcase_category }}
-    {{ content.field_showcase_sector }}
-    {{ content.field_showcase_drupal_version }}
+    {{ content|without('field_showcase_media') }}
   </div>
 
 </article>

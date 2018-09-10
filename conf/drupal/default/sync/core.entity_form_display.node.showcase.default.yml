@@ -13,7 +13,7 @@ dependencies:
   module:
     - content_moderation
     - entity_browser
-    - link
+    - link_attributes
     - path
     - publication_date
 _core:
@@ -52,6 +52,7 @@ content:
       selection_mode: selection_append
       field_widget_display_settings:
         view_mode: editor
+      field_widget_replace: false
     third_party_settings: {  }
     type: entity_browser_entity_reference
     region: content
@@ -66,8 +67,16 @@ content:
     settings:
       placeholder_url: ''
       placeholder_title: ''
+      enabled_attributes:
+        class: true
+        id: false
+        name: false
+        target: false
+        rel: false
+        accesskey: false
+        aria-label: false
     third_party_settings: {  }
-    type: link_default
+    type: link_attributes
     region: content
   langcode:
     type: language_select
