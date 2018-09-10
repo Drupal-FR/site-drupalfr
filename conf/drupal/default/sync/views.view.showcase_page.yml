@@ -7,7 +7,6 @@ dependencies:
   module:
     - search_api
     - user
-    - views_infinite_scroll
 _core:
   default_config_hash: ebMxmq6tHJQHg6fGpY8Bs6a-2PaI3Ha_s_MFBrWSX_o
 id: showcase_page
@@ -48,7 +47,7 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: infinite_scroll
+        type: full
         options:
           items_per_page: 9
           offset: 0
@@ -57,6 +56,8 @@ display:
           tags:
             previous: ‹‹
             next: ››
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -65,9 +66,7 @@ display:
             items_per_page_options_all_label: '- Tout -'
             offset: false
             offset_label: Décalage
-          views_infinite_scroll:
-            button_text: 'Afficher plus'
-            automatically_load_content: false
+          quantity: 9
       style:
         type: default
       row:
@@ -152,7 +151,7 @@ display:
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
-      use_ajax: true
+      use_ajax: false
     cache_metadata:
       max-age: -1
       contexts:
