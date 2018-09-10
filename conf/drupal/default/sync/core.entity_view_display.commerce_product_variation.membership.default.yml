@@ -13,6 +13,15 @@ targetEntityType: commerce_product_variation
 bundle: membership
 mode: default
 content:
+  list_price:
+    label: above
+    type: commerce_price_default
+    weight: -1
+    region: content
+    settings:
+      strip_trailing_zeroes: false
+      currency_display: symbol
+    third_party_settings: {  }
   price:
     type: commerce_price_default
     weight: 0
