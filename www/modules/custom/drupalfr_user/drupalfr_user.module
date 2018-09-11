@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_theme().
@@ -72,4 +73,27 @@ function drupalfr_user_form_user_form_alter(&$form, FormStateInterface $form_sta
   if (isset($form['field_user_membership_number'])) {
     $form['field_user_membership_number']['widget']['#disabled'] = !\Drupal::currentUser()->hasPermission('drupalfr_user_edit_user_membership_number');
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add links to password reset and create account form.
+ */
+function drupalfr_user_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $url = Url::fromRoute('user.register');
+  $form['create_account_link'] = [
+    '#type' => 'link',
+    '#title' => t('Create new account'),
+    '#url' => $url,
+    '#access' => $url->renderAccess($url->toRenderArray()),
+  ];
+
+  $url = Url::fromRoute('user.pass');
+  $form['password_reset_link'] = [
+    '#type' => 'link',
+    '#title' => t('Reset your password'),
+    '#url' => Url::fromRoute('user.pass'),
+    '#access' => $url->renderAccess($url->toRenderArray()),
+  ];
 }

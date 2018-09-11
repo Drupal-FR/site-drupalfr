@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Implements hook_theme_suggestions_user_alter().
@@ -168,3 +169,27 @@ function drupal_france_preprocess_menu__account(&$variables) {
   }
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add classes on links to password reset and create account form.
+ */
+function drupal_france_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form['create_account_link'])) {
+    $form['create_account_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'secondary',
+      ],
+    ];
+  }
+
+  if (isset($form['password_reset_link'])) {
+    $form['password_reset_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'secondary',
+      ],
+    ];
+  }
+}
