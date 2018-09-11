@@ -37,29 +37,35 @@
  */
 #}
 {% set field_name_class = field_name|clean_class %}
-{%
-  set classes = [
-    'field',
-    'field-' ~ entity_type|clean_class ~ '--' ~ field_name_class,
-    'field-name-' ~ field_name_class,
-    'field-type-' ~ field_type|clean_class,
-    'field-label-' ~ label_display,
-    label_display == 'inline' ? 'clearfix',
-  ]
-%}
-{%
-  set title_classes = [
-    'field-label',
-    label_display == 'visually_hidden' ? 'visually-hidden',
-  ]
-%}
+{% set classes = [
+  'field',
+  'field-' ~ entity_type|clean_class ~ '--' ~ field_name_class,
+  'field-name-' ~ field_name_class,
+  'field-type-' ~ field_type|clean_class,
+  'field-label-' ~ label_display,
+  'release--type',
+  label_display == 'inline' ? 'clearfix',
+] %}
+{% set title_classes = [
+  'field-label',
+  'release--type--label',
+  label_display == 'visually_hidden' ? 'visually-hidden',
+] %}
+{% set item_classes = [
+  'field-item',
+  'release--type--element',
+  'label',
+  'secondary',
+] %}
+
+
 <div{{ attributes.addClass(classes) }}>
   {% if not label_hidden %}
     <div{{ title_attributes.addClass(title_classes) }}>{{ '@label:'|t({ '@label': label }) }}</div>
   {% endif %}
   <ul{{ content_attributes.addClass('field-items') }}>
     {% for item in items %}
-      <li{{ item.attributes.addClass('field-item') }}>{{ item.content }}</li>
+      <li{{ item.attributes.addClass(item_classes) }}>{{ item.content }}</li>
     {% endfor %}
   </ul>
 </div>
