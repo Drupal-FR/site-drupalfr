@@ -1,0 +1,24 @@
+// ==========================
+// Generic Forms
+// ==========================
+
+form {
+  label {
+    font-size: 1.25rem;
+    color:     get-color(primary);
+
+    &.form-required {
+      &:after {
+        content: '*';
+        color:   get-color(alert);
+      }
+    }
+  }
+
+  .description {
+    margin-top:    -$global-margin;
+    margin-bottom: $global-margin;
+    font-style:    italic;
+    color:         $drupal-grey;
+  }
+}
