@@ -87,13 +87,71 @@ function drupalfr_user_form_user_login_form_alter(&$form, FormStateInterface $fo
     '#title' => t('Create new account'),
     '#url' => $url,
     '#access' => $url->renderAccess($url->toRenderArray()),
+    '#weight' => 10,
   ];
 
   $url = Url::fromRoute('user.pass');
   $form['password_reset_link'] = [
     '#type' => 'link',
     '#title' => t('Reset your password'),
-    '#url' => Url::fromRoute('user.pass'),
+    '#url' => $url,
     '#access' => $url->renderAccess($url->toRenderArray()),
+    '#weight' => 11,
   ];
+  $form['actions']['#weight'] = 9;
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add links to password reset and login.
+ */
+function drupalfr_user_form_user_register_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $url = Url::fromRoute('user.login');
+  $form['login_link'] = [
+    '#type' => 'link',
+    '#title' => t('Log In'),
+    '#url' => $url,
+    '#access' => $url->renderAccess($url->toRenderArray()),
+    '#weight' => 10,
+  ];
+
+  $url = Url::fromRoute('user.pass');
+  $form['password_reset_link'] = [
+    '#type' => 'link',
+    '#title' => t('Reset your password'),
+    '#url' => $url,
+    '#access' => $url->renderAccess($url->toRenderArray()),
+    '#weight' => 11,
+  ];
+  $form['actions']['#weight'] = 9;
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add links to password reset and login.
+ */
+function drupalfr_user_form_user_pass_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $url = Url::fromRoute('user.login');
+  $form['login_link'] = [
+    '#type' => 'link',
+    '#title' => t('Log In'),
+    '#url' => $url,
+    '#access' => $url->renderAccess($url->toRenderArray()),
+    '#weight' => 10,
+  ];
+
+  $url = Url::fromRoute('user.register');
+  $form['create_account_link'] = [
+    '#type' => 'link',
+    '#title' => t('Create new account'),
+    '#url' => $url,
+    '#access' => $url->renderAccess($url->toRenderArray()),
+    '#weight' => 10,
+  ];
+  $form['actions']['#weight'] = 9;
+
 }

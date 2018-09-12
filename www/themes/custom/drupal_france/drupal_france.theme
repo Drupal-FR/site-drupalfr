@@ -23,6 +23,13 @@ function drupal_france_theme_suggestions_field_alter(&$suggestions, $variables) 
 }
 
 /**
+ * Implements hook_theme_suggestions_form_alter().
+ */
+function drupal_france_theme_suggestions_form_alter(&$suggestions, $variables) {
+  $suggestions[] = 'form__' . $variables['element']['#form_id'];
+}
+
+/**
  * Implements hook_preprocess_paragraph().
  */
 function drupal_france_preprocess_paragraph(&$variables) {
@@ -59,7 +66,8 @@ function drupal_france_preprocess_paragraph(&$variables) {
 
     // Media width.
     if ($paragraph->hasField('field_media_width_class')) {
-      $media_width_class = $paragraph->get('field_media_width_class')->getValue();
+      $media_width_class = $paragraph->get('field_media_width_class')
+        ->getValue();
       if (!empty($media_width_class)) {
         $media_width_class = $media_width_class[0]['value'];
         // Edge cases.
@@ -96,7 +104,8 @@ function drupal_france_preprocess_paragraph(&$variables) {
   if ($paragraph->bundle() == 'layout_twocol') {
     // Second column width.
     if ($paragraph->hasField('field_column_2_width')) {
-      $second_column_width_class = $paragraph->get('field_column_2_width')->getValue();
+      $second_column_width_class = $paragraph->get('field_column_2_width')
+        ->getValue();
       if (!empty($second_column_width_class)) {
         $second_column_width_class = $second_column_width_class[0]['value'];
         // Edge cases.
@@ -172,14 +181,35 @@ function drupal_france_preprocess_menu__account(&$variables) {
 /**
  * Implements hook_form_FORM_ID_alter().
  *
- * Add classes on links to password reset and create account form.
+ * Add classes on links to password reset and create account forms.
  */
 function drupal_france_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['title'] = [
+    '#type' => 'item',
+    '#markup' => t('Login'),
+    '#weight' => -1,
+    '#prefix' => '<h1>',
+    '#suffix' => '</h1>',
+  ];
+
+  if (isset($form['actions'])) {
+    $form['actions']['submit']['#attributes']['class'] = [
+      'button',
+      'large',
+      'expanded',
+      'primary',
+    ];
+  }
+
   if (isset($form['create_account_link'])) {
     $form['create_account_link']['#attributes'] = [
       'class' => [
         'button',
+        'small',
         'secondary',
+        'clear',
+        'float-left',
       ],
     ];
   }
@@ -188,7 +218,108 @@ function drupal_france_form_user_login_form_alter(&$form, FormStateInterface $fo
     $form['password_reset_link']['#attributes'] = [
       'class' => [
         'button',
+        'small',
         'secondary',
+        'clear',
+        'float-right',
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add classes on links to password reset and Login forms.
+ */
+function drupal_france_form_user_register_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['title'] = [
+    '#type' => 'item',
+    '#markup' => t('Register'),
+    '#weight' => -1,
+    '#prefix' => '<h1>',
+    '#suffix' => '</h1>',
+  ];
+
+  if (isset($form['actions'])) {
+    $form['actions']['submit']['#attributes']['class'] = [
+      'button',
+      'large',
+      'expanded',
+      'primary',
+    ];
+  }
+
+  if (isset($form['login_link'])) {
+    $form['login_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-left',
+      ],
+    ];
+  }
+
+  if (isset($form['password_reset_link'])) {
+    $form['password_reset_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-right',
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add classes on links to Login and create account forms.
+ */
+function drupal_france_form_user_pass_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['title'] = [
+    '#type' => 'item',
+    '#markup' => t('Reset your password'),
+    '#weight' => -1,
+    '#prefix' => '<h1>',
+    '#suffix' => '</h1>',
+  ];
+
+  if (isset($form['actions'])) {
+    $form['actions']['submit']['#attributes']['class'] = [
+      'button',
+      'large',
+      'expanded',
+      'primary',
+    ];
+  }
+
+  if (isset($form['login_link'])) {
+    $form['login_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-left',
+      ],
+    ];
+  }
+
+  if (isset($form['create_account_link'])) {
+    $form['create_account_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-right',
       ],
     ];
   }

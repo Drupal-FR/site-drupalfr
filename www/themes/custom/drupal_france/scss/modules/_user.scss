@@ -1,5 +1,32 @@
 // ==========================
-// Users
+// User Forms
+// ==========================
+
+// Log in
+//--------
+.user--login-form,
+.user--pass,
+.user--register-form {
+  &--wrapper {
+    padding-top:    $global-padding;
+    padding-bottom: $global-padding;
+
+    @include breakpoint(medium) {
+      @include shadow();
+      margin-top:     $global-margin * 2;
+      margin-bottom:  $global-margin * 2;
+    }
+  }
+}
+
+// Create an account
+//-------------------
+
+// Reset your password
+//---------------------
+
+// ==========================
+// User Display
 // ==========================
 
 .user {
