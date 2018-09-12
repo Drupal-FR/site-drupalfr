@@ -2,6 +2,9 @@ uuid: 23f9d44c-a2a3-4263-8508-62ffdc755675
 langcode: fr
 status: true
 dependencies:
+  module:
+    - block_visibility_groups
+    - system
   theme:
     - drupal_france
 _core:
@@ -19,4 +22,14 @@ settings:
   label_display: '0'
   primary: true
   secondary: true
-visibility: {  }
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: ''
+    context_mapping: {  }
+  request_path:
+    id: request_path
+    pages: "/user/login\r\n/user/register\r\n/user/password"
+    negate: true
+    context_mapping: {  }
