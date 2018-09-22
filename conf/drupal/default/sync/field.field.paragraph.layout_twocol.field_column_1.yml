@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.paragraph.field_column_1
     - paragraphs.paragraphs_type.block
+    - paragraphs.paragraphs_type.faq
     - paragraphs.paragraphs_type.html
     - paragraphs.paragraphs_type.layout_twocol
     - paragraphs.paragraphs_type.title_text_media
@@ -28,6 +29,7 @@ settings:
       title_text_media: title_text_media
       html: html
       block: block
+      faq: faq
     target_bundles_drag_drop:
       title_text_media:
         enabled: true
@@ -49,5 +51,14 @@ settings:
         enabled: false
       trombinoscope_item:
         weight: -9
+        enabled: false
+      faq_element:
+        weight: 11
+        enabled: false
+      faq:
+        enabled: true
+        weight: 14
+      layout_onecol:
+        weight: 16
         enabled: false
 field_type: entity_reference_revisions
