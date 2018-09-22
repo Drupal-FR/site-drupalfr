@@ -1,26 +1,23 @@
-uuid: d439a890-be06-4299-b906-774152c6bdd6
+uuid: 86f41556-6693-417e-9209-35e3d2547cd9
 langcode: fr
 status: true
 dependencies:
   module:
+    - entity_reference_revisions
     - field_permissions
     - paragraphs
 third_party_settings:
   field_permissions:
     permission_type: public
-_core:
-  default_config_hash: 1f1Ka9TEPV00jDKNMIO7ZcLWww6hTnUcYUg9cA07bP4
-id: paragraph.field_title
-field_name: field_title
+id: paragraph.field_faq_elements
+field_name: field_faq_elements
 entity_type: paragraph
-type: string
+type: entity_reference_revisions
 settings:
-  max_length: 255
-  is_ascii: false
-  case_sensitive: false
-module: core
+  target_type: paragraph
+module: entity_reference_revisions
 locked: false
-cardinality: 1
+cardinality: -1
 translatable: true
 indexes: {  }
 persist_with_no_fields: false
