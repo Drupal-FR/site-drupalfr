@@ -6,14 +6,14 @@ dependencies:
     - field.field.node.job_offer.body
     - field.field.node.job_offer.field_job_contract_type
     - field.field.node.job_offer.field_job_nature
+    - field.field.node.job_offer.field_job_organization
     - field.field.node.job_offer.field_job_teleworking
     - field.field.node.job_offer.field_job_validity
     - field.field.node.job_offer.field_region
     - node.type.job_offer
   module:
-    - content_moderation
+    - inline_entity_form
     - path
-    - publication_date
     - text
 _core:
   default_config_hash: yLw9iAx_mWYt4RnMEqFZUEb_X7KEkkTk_QmFKS9oBm4
@@ -49,6 +49,19 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  field_job_organization:
+    weight: 32
+    settings:
+      form_mode: default
+      label_singular: ''
+      label_plural: ''
+      allow_new: true
+      allow_existing: true
+      match_operator: CONTAINS
+      override_labels: false
+    third_party_settings: {  }
+    type: inline_entity_form_complex
+    region: content
   field_job_teleworking:
     weight: 35
     settings: {  }
@@ -74,12 +87,6 @@ content:
       include_locked: true
     third_party_settings: {  }
     region: content
-  moderation_state:
-    type: moderation_state_default
-    weight: 100
-    settings: {  }
-    region: content
-    third_party_settings: {  }
   path:
     type: path
     weight: 30
@@ -93,12 +100,6 @@ content:
     weight: 15
     third_party_settings: {  }
     region: content
-  published_at:
-    type: publication_date_timestamp
-    weight: 10
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:

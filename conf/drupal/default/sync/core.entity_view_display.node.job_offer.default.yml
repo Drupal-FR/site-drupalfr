@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.job_offer.body
     - field.field.node.job_offer.field_job_contract_type
     - field.field.node.job_offer.field_job_nature
+    - field.field.node.job_offer.field_job_organization
     - field.field.node.job_offer.field_job_teleworking
     - field.field.node.job_offer.field_job_validity
     - field.field.node.job_offer.field_region
@@ -24,31 +25,34 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 1
+    weight: 101
     settings: {  }
     third_party_settings: {  }
     region: content
-  content_moderation_control:
-    weight: -20
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_job_contract_type:
-    weight: 3
+    weight: 104
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_job_nature:
-    weight: 2
+    weight: 103
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
+  field_job_organization:
+    weight: 102
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   field_job_teleworking:
-    weight: 4
+    weight: 105
     label: above
     settings:
       format: default
@@ -58,25 +62,23 @@ content:
     type: boolean
     region: content
   field_job_validity:
-    weight: 6
+    weight: 107
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_region:
-    weight: 5
+    weight: 106
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   links:
-    weight: 0
+    weight: 100
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
   langcode: true
-  published_at: true
-  user_member_entity_view_job_offer_organization: true
