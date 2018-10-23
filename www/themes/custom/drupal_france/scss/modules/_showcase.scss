@@ -1,0 +1,23 @@
+// ==========================
+//  Reference
+// ==========================
+
+// View Node Elements
+.showcase-element {
+  &--wrapper {
+    margin-bottom: $global-margin*2;
+  }
+
+  &.teaser {
+    @include shadow();
+   }
+
+  &--title {
+    padding: $global-padding $global-padding*2;
+   }
+
+  &--content {
+    padding: $global-padding $global-padding*2;
+    text-align: center;
+  }
+}
