@@ -73,19 +73,23 @@
     not node.isPublished() ? 'is-unpublished',
     view_mode ? view_mode|clean_class,
     'clearfix',
+    'showcase-element',
   ]
 %}
-<article{{ attributes.addClass(classes) }}>
+
+<article{{ attributes.addClass(classes).setAttribute('data-equalizer-watch', true) }}>
+  {% if content.field_showcase_media%}
+  {{content.field_showcase_media}}
+  {%endif%}
 
   {{ title_prefix }}
+    <h2{{ title_attributes.addClass('showcase-element--title') }}>
+      <a href="{{ url }}">{{ label }}</a>
+    </h2>
   {{ title_suffix }}
 
-  <div{{ content_attributes.addClass('content') }}>
-    {{ content.field_showcase_media }}
-    <h2{{ title_attributes }}>
-      {{ label }}
-    </h2>
+  <div{{ content_attributes.addClass('content','showcase-element--content') }}>
     {{ content|without('field_showcase_media') }}
   </div>
-
+  
 </article>

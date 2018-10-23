@@ -301,3 +301,38 @@
     }
   }
 }
+
+//8- (REFERENCES) Facets
+.block-facet--links {
+  margin-bottom: $global-margin;
+  padding-bottom: $global-padding;
+  transform: translate(35%, 50%);
+
+  @include breakpoint(medium only) {
+    transform: translate(15%, 50%);
+  }
+
+  @include breakpoint(small only) {
+    transform: translate(0%, 50%);
+  }
+
+  .block-title {
+    display: none;
+  }
+
+}
+
+.facets-widget-links {
+  ul {
+    display: flex;
+    list-style-type: none;
+
+    li {
+      a {
+        @include button(false, $secondary-color, $secondary-color, $secondary-color, 'hollow');
+        margin: 0 1rem;
+      }
+    }
+
+  }
+}
