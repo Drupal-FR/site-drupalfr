@@ -44,12 +44,6 @@ $conf['maintenance_theme'] = 'dfrtheme';
 /**
  * Local settings (databases password, domain configuration, ...).
  */
-#require dirname(__FILE__) . '/settings.local.php';
+require dirname(__FILE__) . '/settings.local.php';
 
 drupal_fast_404();
-
-// Automatically generated include for settings managed by ddev.
-$ddev_settings = dirname(__FILE__) . '/settings.ddev.php';
-if (is_readable($ddev_settings)) {
-  require $ddev_settings;
-}
