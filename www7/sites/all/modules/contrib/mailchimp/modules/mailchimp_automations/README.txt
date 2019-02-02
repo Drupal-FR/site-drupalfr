@@ -1,9 +1,9 @@
-Integrate your Drupal entities with MailChimp's workflow automation endpoints.
+Integrate your Drupal entities with Mailchimp's workflow automation endpoints.
 
 ## Installation
 
-1. Enable the MailChimp Automation module
-2. Make sure you have a recent version of the MailChimp PHP API library, which includes the MailchimpAutomations API service.
+1. Enable the Mailchimp Automation module
+2. Make sure you have a recent version of the Mailchimp PHP API library, which includes the MailchimpAutomations API service.
 
 ## Usage
 
@@ -12,10 +12,10 @@ Integrate your Drupal entities with MailChimp's workflow automation endpoints.
   * Select a Drupal entity type.
   * Select a bundle.
   * Select the email entity property.
-  * Select the appropriate MailChimp List
-  * Select the appropriate MailChimp Workflow
-  * Select the appropriate MailChimp Workflow Email
-2. Configure permissions for managing MailChimp Automations
+  * Select the appropriate Mailchimp List
+  * Select the appropriate Mailchimp Workflow
+  * Select the appropriate Mailchimp Workflow Email
+2. Configure permissions for managing Mailchimp Automations
 
 ## Notes
 
@@ -23,4 +23,4 @@ Integrate your Drupal entities with MailChimp's workflow automation endpoints.
 throw a PHP error due to a bug in Entity API. You can prevent this error by
 applying the patch in https://drupal.org/comment/8648215#comment-8648215 to
 the entity module.
-2. See additional options in the mailchimp_automations.api.php file, such as passing merge variables to MailChimp.
+2. See additional options in the mailchimp_automations.api.php file, such as passing merge variables to Mailchimp.

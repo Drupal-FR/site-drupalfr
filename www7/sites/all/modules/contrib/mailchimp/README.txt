@@ -1,7 +1,7 @@
-This module provides integration with the MailChimp email delivery service.
+This module provides integration with the Mailchimp email delivery service.
 While tools for sending email from your own server, like SimpleNews, are great,
 they lack the sophistication and ease of use of dedicated email providers like
-MailChimp. Other players in the field are Constant Contact and Campaign Monitor.
+Mailchimp. Other players in the field are Constant Contact and Campaign Monitor.
 
 The core module provides basic configuration and API integration. Features and
 site functionality are provided by a set of submodules that depend upon the core
@@ -21,7 +21,7 @@ Features
   * Compatibility with Views Bulk Operations
   * Special VBO function for creating & updating static list segments
   * Allow users to subscribe during registration by adding a field to Users
-  * Map Entity field values to your MailChimp merge fields
+  * Map Entity field values to your Mailchimp merge fields
   * Standalone subscribe and unsubscribe forms
   * Subscriptions can be maintained via cron or in real time
   * Subscription forms can be created as pages or as blocks, with one or more
@@ -36,14 +36,14 @@ Features
 Upgrading from an Earlier Version
 --------------------------------------------------------------------------------
 
-The 7.x-2.x and 7.x-3.x branches will become unsupported as MailChimp phases out
+The 7.x-2.x and 7.x-3.x branches will become unsupported as Mailchimp phases out
 their API version 2.0 by the end of 2016. We recommend upgrading to 7.x-4.x, the
-branch that is using MailChimp's latest API: version 3.0.
+branch that is using Mailchimp's latest API: version 3.0.
 
 Upgrading from 7.x-3.x
 --------------------------------------------------------------------------------
 
-  * Replace the MailChimp module on your web server with the most recent
+  * Replace the Mailchimp module on your web server with the most recent
     7.x-4.x release
 
   * Follow Installation Notes below
@@ -57,9 +57,9 @@ Upgrading from 7.x-3.x
 Upgrading from 7.x-2.x
 --------------------------------------------------------------------------------
 
-  * Uninstall the MailChimp module
+  * Uninstall the Mailchimp module
 
-  * Replace the MailChimp module on your web server with the most recent
+  * Replace the Mailchimp module on your web server with the most recent
       7.x-4.x release
 
   * Follow Installation Notes below
@@ -70,7 +70,7 @@ Upgrading from 7.x-2.x
 Please note: The major structural change between 7.x-2.x and 7.x-4.x is the
 "Lists and Users" tab has been separated into three tabs "Fields", "Lists" and
 "SignUp Forms". You will find most of the user related configuration by creating
-a MailChimp field on the user account, here: admin/config/people/accounts/fields
+a Mailchimp field on the user account, here: admin/config/people/accounts/fields
 
 For more information, please visit the FAQ (https://www.drupal.org/node/2793241)
 
@@ -78,24 +78,24 @@ For more information, please visit the FAQ (https://www.drupal.org/node/2793241)
 Installation Notes
 --------------------------------------------------------------------------------
 
-  * You need to have a MailChimp API Key.
-  * You need to have at least one list created in MailChimp to use the
+  * You need to have a Mailchimp API Key.
+  * You need to have at least one list created in Mailchimp to use the
     mailchimp_lists module.
   * If you use a drush make workflow, see the example drush makefile:
     mailchimp.make.example.
-  * The MailChimp PHP library must exist in your Drupal installation.
+  * The Mailchimp PHP library must exist in your Drupal installation.
 
-MailChimp Library Installation
+Mailchimp Library Installation
 --------------------------------------------------------------------------------
 
-    # For MailChimp version 7.x-4.x
+    # For Mailchimp version 7.x-4.x
 
     To use the Libraries module:
 
       - Install the Libraries module:
         https://www.drupal.org/project/libraries
 
-      - Download the current release of the MailChimp library:
+      - Download the current release of the Mailchimp library:
         https://github.com/thinkshout/mailchimp-api-php/files/1361112/v1.0.8-package.zip
 
       - Locate your libraries directory. Usually:
@@ -138,7 +138,7 @@ MailChimp Library Installation
         drush composer-manager update --no-dev
 
 
-    # For MailChimp version 7.x-2.x and 7.x-3.x:
+    # For Mailchimp version 7.x-2.x and 7.x-3.x:
 
       - Download version 2.0.6 of the v2 API library:
         https://bitbucket.org/mailchimp/mailchimp-api-php/downloads
@@ -185,7 +185,7 @@ Submodules
     subscription from a single form, include merge variables as desired, and
     optionally include Interest Group selection.
 
-  * mailchimp_lists: Subscribe any entity with an email address to MailChimp
+  * mailchimp_lists: Subscribe any entity with an email address to Mailchimp
     lists by creating a mailchimp_list field, and allow anyone who can edit such
     an entity to subscribe, unsubscribe, and update member information. Also
     allows other entity fields to be synced to Mailchimp list Merge Fields. Add
@@ -207,7 +207,7 @@ Related Modules
 
 Mandrill
 
-  * Mandrill is MailChimp's transactional email service. The module provides the
+  * Mandrill is Mailchimp's transactional email service. The module provides the
     ability to send all site emails through Mandrill with reporting available
     from within Drupal. Please refer to the project page for more details.
   * http://drupal.org/project/mandrill

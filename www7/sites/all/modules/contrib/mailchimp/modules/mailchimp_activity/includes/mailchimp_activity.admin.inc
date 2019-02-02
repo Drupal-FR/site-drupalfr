@@ -49,7 +49,7 @@ function mailchimp_activity_entity_form($form, &$form_state, MailchimpActivityEn
   // Prep the entity type list before creating the form item:
   $entity_types = array('' => t('-- Select --'));
   foreach (entity_get_info() as $entity_type => $info) {
-    // Ignore MailChimp entity types:
+    // Ignore Mailchimp entity types:
     if (strpos($entity_type, 'mailchimp') === FALSE) {
       $entity_types[$entity_type] = $info['label'];
     }
@@ -152,9 +152,9 @@ function mailchimp_activity_entity_form_validate($form, &$form_state) {
           $form_id != $extant_ent->mailchimp_activity_entity_id) {
         form_set_error(
           'bundle',
-          t('A MailChimp Activity Entity already exists for this Bundle. Either select a different Bundle or edit the !link for this bundle.',
+          t('A Mailchimp Activity Entity already exists for this Bundle. Either select a different Bundle or edit the !link for this bundle.',
             array(
-              '!link' => l(t('existing MailChimp Activity Entity'), "admin/config/services/mailchimp/activity/manage/{$extant_ent->name}"),
+              '!link' => l(t('existing Mailchimp Activity Entity'), "admin/config/services/mailchimp/activity/manage/{$extant_ent->name}"),
             )
           ));
       }

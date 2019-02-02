@@ -16,7 +16,7 @@ class MailChimpSignupUIController extends EntityDefaultUIController {
   public function hook_menu() {
     $items = parent::hook_menu();
     $items[$this->path]['title'] = t('Signup Forms');
-    $items[$this->path]['description'] = t('Manage MailChimp Signup blocks and pages.');
+    $items[$this->path]['description'] = t('Manage Mailchimp Signup blocks and pages.');
     $items[$this->path]['type'] = MENU_LOCAL_TASK;
     $items[$this->path]['weight'] = 10;
     $items[$this->path]['access callback'] = 'mailchimp_signup_entity_access';
@@ -75,7 +75,7 @@ class MailChimpSignupUIController extends EntityDefaultUIController {
     }
     $new_header[] = array_shift($render['#header']);
     $new_header[] = t('Display Mode(s)');
-    $new_header[] = t('MailChimp Lists');
+    $new_header[] = t('Mailchimp Lists');
     $new_header[] = t('Page Access');
     $render['#header'] = array_merge($new_header, $render['#header']);
     return $render;

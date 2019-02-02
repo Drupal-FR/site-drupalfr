@@ -11,7 +11,7 @@
 function mailchimp_activity_schema() {
 
   $schema['mailchimp_activity_entity'] = array(
-    'description' => t('MailChimp activity enabled entities.'),
+    'description' => t('Mailchimp activity enabled entities.'),
     'fields' => array(
       'mailchimp_activity_entity_id' => array(
         'type' => 'serial',
@@ -63,7 +63,7 @@ function mailchimp_activity_schema() {
         'not null' => TRUE,
         'default' => 0,
         'size' => 'tiny',
-        'description' => t('Whether or not this MailChimp activity stream is enabled.'),
+        'description' => t('Whether or not this Mailchimp activity stream is enabled.'),
       ),
       // The following fields are for supporting exportable status.
       'locked' => array(

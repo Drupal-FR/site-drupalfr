@@ -55,7 +55,7 @@ class MailChimpCampaign extends Entity {
         'value' => $this->mc_data->settings->subject_line,
       ),
       'list' => array(
-        'label' => t('MailChimp List'),
+        'label' => t('Mailchimp List'),
         'value' => l($this->list->name, 'https://admin.mailchimp.com/lists/', array(
           'attributes' => array('target' => '_blank'),
         )),
@@ -95,7 +95,7 @@ class MailChimpCampaign extends Entity {
       'content' => array(
         'label' => t('Rendered template HTML (!archive)',
           array(
-            '!archive' => l(t('View MailChimp archive'), $this->mc_data->archive_url, array(
+            '!archive' => l(t('View Mailchimp archive'), $this->mc_data->archive_url, array(
               'attributes' => array('target' => '_blank'),
             )),
           )),
