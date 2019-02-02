@@ -24,7 +24,7 @@ function mailchimp_lists_overview_page() {
       }
     }
     if ($enabled) {
-      // This is a webhook for this MailChimp Module.
+      // This is a webhook for this Mailchimp Module.
       $webhook_status = t('ENABLED') . ' (' . l(t('disable'), 'admin/config/services/mailchimp/lists/' . $mc_list->id . '/webhook/disable') . ')';
     }
     else {
@@ -45,16 +45,16 @@ function mailchimp_lists_overview_page() {
     ),
     'rows' => $rows,
   );
-  $refresh_link = l(t('Refresh lists from MailChimp'),
+  $refresh_link = l(t('Refresh lists from Mailchimp'),
     'admin/config/services/mailchimp/list_cache_clear',
     array('query' => array('destination' => 'admin/config/services/mailchimp/lists')));
   if (empty($mc_lists)) {
     $table['caption'] = $refresh_link;
-    drupal_set_message(t('You don\'t have any lists configured in your MailChimp account, (or you haven\'t configured your API key correctly on the Global Settings tab). Head over to !link and create some lists, then come back here and click "Refresh lists from MailChimp"',
-      array('!link' => l(t('MailChimp'), 'https://admin.mailchimp.com/lists/'))), 'warning');
+    drupal_set_message(t('You don\'t have any lists configured in your Mailchimp account, (or you haven\'t configured your API key correctly on the Global Settings tab). Head over to !link and create some lists, then come back here and click "Refresh lists from Mailchimp"',
+      array('!link' => l(t('Mailchimp'), 'https://admin.mailchimp.com/lists/'))), 'warning');
   }
   else {
-    $options = t('Currently Available MailChimp lists').':<i>';
+    $options = t('Currently Available Mailchimp lists').':<i>';
     foreach ($mc_lists as $mc_list) {
       $options .= ' ' . $mc_list->name . ',';
     }
@@ -81,7 +81,7 @@ function mailchimp_lists_fields_overview_page() {
             $entity_type,
             $bundle,
             $field['field_name'],
-            l(t('Update MailChimp Mergevar Values'), $link),
+            l(t('Update Mailchimp Mergevar Values'), $link),
           );
         }
       }
@@ -97,13 +97,13 @@ function mailchimp_lists_fields_overview_page() {
     'rows' => $rows,
   );
 
-  $table['caption'] = t("This displays a list of all MailChimp Subscription Fields configured on your system, with a row for each unique Instance of that field.
+  $table['caption'] = t("This displays a list of all Mailchimp Subscription Fields configured on your system, with a row for each unique Instance of that field.
     To edit each field's settings, go to the Entity Bundle's configuration screen and use the Field UI.
-    When entities with MailChimp Subscription Fields are updated, the Merge Variables configured through Field UI are automatically updated if necessary.
-    However, if you have existing subscribers on MailChimp and matching Entities on Drupal when you configure your Merge Variables, the existing values are not synced automatically,
-    as this could be a slow process. You can manually force updates of all existing Merge Values to existing MailChimp subscribers for each field configuration using the 'Batch Update'
-    option on this table. The MailChimp Subscription Field is provided by the MailChimp Lists (mailchimp_lists) module.<br/><br/>
-    The following MailChimp Subscription Field instances were found:");
+    When entities with Mailchimp Subscription Fields are updated, the Merge Variables configured through Field UI are automatically updated if necessary.
+    However, if you have existing subscribers on Mailchimp and matching Entities on Drupal when you configure your Merge Variables, the existing values are not synced automatically,
+    as this could be a slow process. You can manually force updates of all existing Merge Values to existing Mailchimp subscribers for each field configuration using the 'Batch Update'
+    option on this table. The Mailchimp Subscription Field is provided by the Mailchimp Lists (mailchimp_lists) module.<br/><br/>
+    The following Mailchimp Subscription Field instances were found:");
 
   return theme('table', $table);
 }
@@ -219,7 +219,7 @@ function mailchimp_lists_update_mergevars_form($form, &$form_state, $entity_type
           '@bundle' => $bundle_name,
         )),
       'admin/config/services/mailchimp/lists',
-      t('This can overwrite values configured directly on your MailChimp Account.'),
+      t('This can overwrite values configured directly on your Mailchimp Account.'),
       "Update Merge Values"
     );
   }

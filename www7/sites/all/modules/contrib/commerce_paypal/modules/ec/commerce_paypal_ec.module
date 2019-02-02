@@ -5,7 +5,7 @@
  * Implements PayPal Express Checkout in Drupal Commerce checkout.
  */
 
-// Define PayPal BML related keys and secrets. These are intentionally public.
+// Define PayPal Credit related keys and secrets. These are intentionally public.
 define('PAYPAL_BANNER_API_KEY', 'b934ca6ea3d9318f86edd1abe51738246e96e700');
 define('PAYPAL_BANNER_API_KEY_STAGING', '5b143c7130a51e9fe93468ee83ddadd0459b7fef');
 
@@ -260,6 +260,7 @@ function commerce_paypal_ec_default_settings() {
     'show_payment_instructions' => FALSE,
     'update_billing_profiles' => TRUE,
     'enable_bml' => FALSE,
+    'enable_on_cart' => TRUE,
   );
 
   if (module_exists('commerce_shipping')) {
@@ -414,13 +415,13 @@ function commerce_paypal_ec_settings_form($settings = array()) {
     );
   }
 
-  // Add that scripts that manage the PayPal BML popin.
+  // Add that scripts that manage the PayPal Credit popin.
   drupal_add_library('system', 'ui.dialog');
 
   $form['enable_bml'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable PayPal Bill Me Later™ button on the shopping cart page.'),
-    '#description' => t('By selecting PayPal, you also receive Bill Me Later™ absolutely FREE. Bill Me Later™ enables customers to pay you now and pay us later. Still not sure? <a href="#" class="paypal-bml-popin">Learn More</a>.'),
+    '#title' => t('Enable the PayPal Credit button on the shopping cart page.'),
+    '#description' => t('By selecting PayPal, you also receive PayPal Credit absolutely FREE. PayPal Credit enables customers to buy now and pay over time. Still not sure? <a href="#" class="paypal-bml-popin">Learn more</a>.'),
     '#default_value' => $settings['enable_bml'],
     '#attached' => array(
       'js' => array(
@@ -433,22 +434,27 @@ function commerce_paypal_ec_settings_form($settings = array()) {
     '#markup' => commerce_paypal_ec_bml_help_text(),
   );
 
+  $form['enable_on_cart'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show the PayPal Express Checkout button on the cart form.'),
+    '#default_value' => $settings['enable_on_cart'],
+  );
+
   return $form;
 }
 
 /**
- * Returns the PayPal BML help text HTML.
+ * Returns the PayPal Credit help text HTML.
  */
 function commerce_paypal_ec_bml_help_text() {
   return '<div class="paypal-bml-popin-text"><p>'
-    . t('Add Bill Me Later™ as a payment method and give your customers access to financing for 6 months on purchases of $99 or more.¹ Even though customers have more time to pay, you get paid up front. Plus, offering financing can help you increase sales and get larger orders.²')
-    . '</p><p><strong>' . t('Features:') . '</strong><ul><li>' . t('You get paid up front')
-    . '</li><li>' . t('You pay only when you get paid (No set up costs or monthly fees.)')
+    . t('Add PayPal Credit as a payment method and give your customers access to special financing for 6 months on purchases of $99 or more.¹ Even though customers can pay over time, you get paid up front. Plus, offering financing can help you increase sales and get larger orders.²')
+    . '</p><p><strong>' . t('Features:') . '</strong><ul><li>' . t('You get paid up front.')
     . '</li><li>' . t("There's no additional integration work required.")
-    . '</li><li>' . t('PayPal offers free web banner ads to advertise that financing is available.')
-    . '</li></ul></p><p>' . t('Check out the Commerce Marketplace to learn more!')
-    . '</p><p><small>' . t('¹Applicable for qualifying purchases of $99 or more if paid in full within 6 months. Customers check out with PayPal and use Bill Me Later™. Bill Me Later™ is subject to consumer credit card approval, as determined by the lender, Comenity Capital Bank.')
-    . '</small><small>' . t('²Based on a comparable year-over-year online sales study of 118 merchants who used Bill Me Later™ promotional financing banners starting in October 2012 (PayPal Study, 11/12-12/12).')
+    . '</li><li>' . t('PayPal offers free web banners to advertise that special financing is available.')
+    . '</li></ul></p><p>' . t('Learn more at DrupalCommerce.org.')
+    . '</p><p><small>' . t('¹Subject to consumer credit card approval.')
+    . '</small><br /><small>' . t("²As reported in Nielsen's PayPal Credit Average Order Value study for activity occurring from April 2015 to March 2016 (small merchants) and October 2015 to March 2016 (midsize merchants), which compared PayPal Credit transactions to credit and debit card transactions on websites that offer PayPal Credit as a payment option or within the PayPal Wallet. Nielsen measured 284,890 transactions across 27 mid and small merchants. Copyright Nielsen 2016.")
     . '</small></p></div>';
 }
 
@@ -466,18 +472,20 @@ function commerce_paypal_ec_form_alter(&$form, &$form_state, $form_id) {
     if (!empty($form_state['build_info']['args'][0]->result)) {
       $order = $form_state['order'];
 
-      // And Express Checkout is also available as a payment option in checkout...
+      // And Express Checkout is also available as a payment option in checkout.
       if (commerce_paypal_ec_enabled($order)) {
         // Add the Express Checkout form as a suffix to the cart form.
         $payment_method = commerce_payment_method_instance_load('paypal_ec|commerce_payment_paypal_ec');
 
-        $ec_form = drupal_get_form('commerce_paypal_ec_order_form', $payment_method, $order);
-        $form['#suffix'] .= drupal_render($ec_form);
+        if (!isset($payment_method['settings']['enable_on_cart']) || !empty($payment_method['settings']['enable_on_cart'])) {
+          $ec_form = drupal_get_form('commerce_paypal_ec_order_form', $payment_method, $order);
+          $form['#suffix'] .= drupal_render($ec_form);
 
-        // Add the Bill Me Later form with a separator if enabled.
-        if (!empty($payment_method['settings']['enable_bml'])) {
-          $bml_form = drupal_get_form('commerce_paypal_bml_order_form', $payment_method, $order, TRUE);
-          $form['#suffix'] .= drupal_render($bml_form);
+          // Add the PayPal Credit form with a separator if enabled.
+          if (!empty($payment_method['settings']['enable_bml'])) {
+            $bml_form = drupal_get_form('commerce_paypal_bml_order_form', $payment_method, $order, TRUE);
+            $form['#suffix'] .= drupal_render($bml_form);
+          }
         }
       }
     }
@@ -532,7 +540,7 @@ function commerce_paypal_ec_order_form($form, &$form_state, $payment_method, $or
 }
 
 /**
- * Displays a Bill Me Later button as a form that redirects to PayPal.
+ * Displays a PayPal Credit button as a form that redirects to PayPal.
  */
 function commerce_paypal_bml_order_form($form, &$form_state, $payment_method, $order, $separator = FALSE) {
   $form_state['payment_method'] = $payment_method;
@@ -552,7 +560,7 @@ function commerce_paypal_bml_order_form($form, &$form_state, $payment_method, $o
 
   $form['paypal_bml'] = array(
     '#type' => 'image_button',
-    '#value' => t('Check out with PayPal BML'),
+    '#value' => t('Check out with PayPal Credit'),
     '#src' => commerce_paypal_ec_bml_button_url(),
     '#validate' => array('commerce_paypal_ec_order_form_validate'),
     '#submit' => array('commerce_paypal_ec_order_form_submit'),
@@ -587,7 +595,7 @@ function commerce_paypal_ec_order_form_validate($form, &$form_state) {
  * Submit handler: redirect to PayPal Express Checkout.
  */
 function commerce_paypal_ec_order_form_submit($form, &$form_state) {
-  // Determine the payment flow to use: BML if that button was used or default
+  // Determine the payment flow to use: Credit if that button was used or default
   // to the EC flow.
   if (isset($form_state['values']['paypal_bml'])) {
     $flow = 'bml';
@@ -1061,7 +1069,7 @@ function commerce_paypal_ec_set_express_checkout($payment_method, $order, $flow)
     }
   }
 
-  // Overrides specific values for the BML payment method.
+  // Overrides specific values for the Credit payment method.
   if ($flow == 'bml') {
     $nvp['USERSELECTEDFUNDINGSOURCE'] = 'BML';
     $nvp['SOLUTIONTYPE'] = 'SOLE';
@@ -1320,16 +1328,8 @@ function commerce_paypal_ec_itemize_order($order, $currency_code) {
         'L_PAYMENTREQUEST_0_NAME' . $i => commerce_line_item_title($line_item_wrapper->value()),
         'L_PAYMENTREQUEST_0_AMT' . $i => commerce_paypal_price_amount($l_amt, $currency_code),
         'L_PAYMENTREQUEST_0_QTY' . $i => round($line_item_wrapper->quantity->value()),
+        'L_PAYMENTREQUEST_0_NUMBER' . $i => $line_item_wrapper->line_item_label->value(),
       );
-
-      // If it was a product line item, add the SKU.
-      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
-        $nvp['L_PAYMENTREQUEST_0_NUMBER' . $i] = $line_item_wrapper->line_item_label->value();
-      }
-      else {
-        // Otherwise add the label as the description.
-        $nvp['L_PAYMENTREQUEST_0_NUMBER' . $i] = $line_item_wrapper->line_item_label->value();
-      }
 
       $i++;
     }
@@ -1415,10 +1415,11 @@ function commerce_paypal_ec_customer_profile($order, $profile_type, $response, $
     $address['first_name'] = $response['FIRSTNAME'];
     $address['last_name'] = $response['LASTNAME'];
     $address['name_line'] = $address['first_name'] . ' ' . $address['last_name'];
+    $address['country'] = $response['COUNTRYCODE'];
   }
+  // Otherwise if it's a shipping profile, populate the address with all of
+  // the shipping information returned from PayPal.
   elseif ($profile_type == 'shipping') {
-    // Otherwise if it's a shipping profile, populate the address with all of
-    // the shipping information returned from PayPAl.
 
     // Map addressfield value keys to keys available in the response array.
     $key_map = array(
@@ -1539,14 +1540,17 @@ function commerce_paypal_ec_enabled_rules($enabled = FALSE) {
   $rules = array();
 
   // Loop over all of the enabled payment method rules.
-  foreach (rules_get_cache('event_commerce_payment_methods') as $rule) {
-    // Look in all of the Rule's actions for a payment method settings array
-    // that enables Express Checkout.
-    foreach ($rule->actions() as $action) {
-      if (!empty($action->settings['payment_method']['method_id']) &&
-        $action->settings['payment_method']['method_id'] == 'paypal_ec') {
-        // Add the present rule to the return value.
-        $rules[$rule->name] = $rule->label;
+  $event = rules_get_cache('event_commerce_payment_methods');
+  if (!empty($event)) {
+    foreach ($event as $rule) {
+      // Look in all of the Rule's actions for a payment method settings array
+      // that enables Express Checkout.
+      foreach ($rule->actions() as $action) {
+        if (!empty($action->settings['payment_method']['method_id']) &&
+          $action->settings['payment_method']['method_id'] == 'paypal_ec') {
+          // Add the present rule to the return value.
+          $rules[$rule->name] = $rule->label;
+        }
       }
     }
   }
@@ -1564,7 +1568,7 @@ function commerce_paypal_ec_button_url() {
 }
 
 /**
- * Returns the URL to a Bill Me Later button.
+ * Returns the URL to a PayPal Credit button.
  *
  * @todo Allow for localization by changing en_US to a supported locale code.
  */
@@ -1583,7 +1587,7 @@ function commerce_paypal_ec_bml_button_url() {
  * @see https://www.paypal.com/webapps/mpp/logo-center
  */
 function commerce_paypal_ec_mark_url() {
-  return url(drupal_get_path('module', 'commerce_paypal_ec') . '/images/paypal-ec-logo.gif', array('absolute' => TRUE));
+  return file_create_url(drupal_get_path('module', 'commerce_paypal_ec') . '/images/paypal-ec-logo.gif');
 }
 
 
@@ -1629,10 +1633,10 @@ function commerce_paypal_ec_block_info() {
   // @todo Do not hard code the payment method instance ID.
   $payment_method = commerce_payment_method_instance_load('paypal_ec|commerce_payment_paypal_ec');
 
-  // Only define the PayPal banners program block if BML is enabled.
+  // Only define the PayPal banners program block if PayPal Credit is enabled.
   if (isset($payment_method['settings']['enable_bml']) && $payment_method['settings']['enable_bml'] == TRUE) {
     $blocks['commerce_paypal_ec_banners'] = array(
-      'info' => t('PayPal BML banner'),
+      'info' => t('PayPal Credit banner'),
       'cache' => DRUPAL_CACHE_GLOBAL,
     );
   }
@@ -1664,7 +1668,7 @@ function commerce_paypal_ec_block_configure($delta = '') {
 
     $form['paypal_ec_banners'] = array(
       '#type' => 'fieldset',
-      '#title' => t('PayPal Banners program settings'),
+      '#title' => t('PayPal Credit¹ Banners program settings'),
       '#description' => commerce_paypal_ec_banners_help_text(),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
@@ -1674,25 +1678,12 @@ function commerce_paypal_ec_block_configure($delta = '') {
       '#tree' => TRUE,
     );
 
-    // Banner agreement.
-    $form['paypal_ec_banners']['settings']['banner_agreement'] = array(
-      '#type' => 'checkbox',
-      // We are not using l() according to https://drupal.org/node/322774.
-      '#title' => t('I agree to the <a target="_blank" href="@terms_link">PayPal Banner Program Operating Terms</a>.', array('@terms_link' => 'https://financing.paypal.com/ppfinportal/content/operatingAgmt')),
-      '#default_value' => $settings['banner_agreement'],
-    );
-
     // API Email.
     $form['paypal_ec_banners']['settings']['api_email'] = array(
       '#type' => 'textfield',
       '#title' => t('PayPal account e-mail address'),
       '#description' => t('Enter the same e-mail address used in your Express Checkout configuration.'),
       '#default_value' => $settings['api_email'],
-      '#states' => array(
-        'visible' => array(
-          ':input[name$="[banner_agreement]"]' => array('checked' => TRUE),
-        ),
-      ),
     );
 
     $form['paypal_ec_banners']['settings']['banner_size'] = array(
@@ -1724,11 +1715,6 @@ function commerce_paypal_ec_block_configure($delta = '') {
         ),
       ),
       '#default_value' => $settings['banner_size'],
-      '#states' => array(
-        'visible' => array(
-          ':input[name$="[banner_agreement]"]' => array('checked' => TRUE),
-        ),
-      ),
     );
   }
 
@@ -1742,10 +1728,10 @@ function commerce_paypal_ec_block_configure($delta = '') {
  */
 function commerce_paypal_ec_banners_help_text() {
   return '<p>' . t('Give your sales a boost when you advertise financing!')
-    . '</p><p>' . t('PayPal helps turn browsers into buyers with financing from Bill Me Later™. Your customers have more time to pay, while you get paid up front - at no additional cost to you.')
-    . '</p><p>' . t("Use PayPal's free banner ads that let you advertise Bill Me Later™ financing¹ as a payment option when your customers check out with PayPal. Many merchants who advertise financing see an average of 20% increase in their sales.²")
-    . '</p><p><small>' . t('¹Applicable for qualifying purchases of $99 or more if paid in full within 6 months. Customers check out with PayPal and use Bill Me Later™. Bill Me Later™ is subject to consumer credit card approval, as determined by the lender, Comenity Capital Bank.')
-    . '</small><small>' . t('²Based on a comparable year-over-year online sales study of 118 merchants who used Bill Me Later™ promotional financing banners starting in October 2012 (PayPal Study, 11/12-12/12).')
+    . '</p><p>' . t('PayPal Credit¹ helps turn browsers into buyers with special financing from PayPal Credit. Your customers can pay over time, while you get paid up front - at no additional cost to you.')
+    . '</p><p>' . t("Use PayPal Credit's free banners that let you advertise PayPal Credit financing as a payment option when your customers check out with PayPal. When they know they can pay over time for their purchases, shoppers are more likely to make more purchases: 53% of PayPal Credit users say they would not have made all their purchases if PayPal Credit weren't available.²")
+    . '</p><p><small>' . t('¹Subject to consumer credit approval.')
+    . '</small><br /><small>' . t("²As reported in Nielsen's PayPal Credit Average Order Value study for activity occurring from April 2015 to March 2016 (small merchants) and October 2015 to March 2016 (midsize merchants), which compared PayPal Credit transactions to credit and debit card transactions on websites that offer PayPal Credit as a payment option or within the PayPal Wallet. Nielsen measured 284,890 transactions across 27 mid and small merchants. Copyright Nielsen 2016.")
     . '</small></p>';
 }
 
@@ -1761,29 +1747,27 @@ function commerce_paypal_ec_block_save($delta = '', $edit = array()) {
       // Clean the entered values.
       $edit['settings'] = array_map('trim', $edit['settings']);
 
-      if ($edit['settings']['banner_agreement'] == TRUE) {
-        /**
-         * Using the staging server is for now unavailable, so we simply default
-         * to using the live key and secret.
-         *
-        if ($edit['settings']['server'] == 'live') {
-          $edit['settings']['api_key'] = PAYPAL_BANNER_API_KEY;
-          $edit['settings']['api_secret'] = PAYPAL_BANNER_API_SECRET;
-        }
-        else {
-          $edit['settings']['api_key'] = PAYPAL_BANNER_API_KEY_STAGING;
-          $edit['settings']['api_secret'] = PAYPAL_BANNER_API_SECRET_STAGING;
-        }
-         */
+      /**
+       * Using the staging server is for now unavailable, so we simply default
+       * to using the live key and secret.
+       *
+      if ($edit['settings']['server'] == 'live') {
         $edit['settings']['api_key'] = PAYPAL_BANNER_API_KEY;
         $edit['settings']['api_secret'] = PAYPAL_BANNER_API_SECRET;
+      }
+      else {
+        $edit['settings']['api_key'] = PAYPAL_BANNER_API_KEY_STAGING;
+        $edit['settings']['api_secret'] = PAYPAL_BANNER_API_SECRET_STAGING;
+      }
+       */
+      $edit['settings']['api_key'] = PAYPAL_BANNER_API_KEY;
+      $edit['settings']['api_secret'] = PAYPAL_BANNER_API_SECRET;
 
-        // Gets the payerId and the publisherId.
-        if (($banner_account = commerce_paypal_ec_request_banner_account($edit['settings']))
-          && (isset($banner_account['payerId']) && isset($banner_account['publisherId']))) {
-          $edit['settings']['payerId'] = $banner_account['payerId'];
-          $edit['settings']['publisherId'] = $banner_account['publisherId'];
-        }
+      // Gets the payerId and the publisherId.
+      if (($banner_account = commerce_paypal_ec_request_banner_account($edit['settings']))
+        && (isset($banner_account['payerId']) && isset($banner_account['publisherId']))) {
+        $edit['settings']['payerId'] = $banner_account['payerId'];
+        $edit['settings']['publisherId'] = $banner_account['publisherId'];
       }
 
       variable_set('commerce_paypal_ec_banners_settings', $edit['settings']);
@@ -1803,7 +1787,7 @@ function commerce_paypal_ec_block_view($delta = '') {
     // Get the PayPal Banners settings.
     $settings = (array) variable_get('commerce_paypal_ec_banners_settings', array()) + commerce_paypal_ec_banners_default_settings();
 
-    if (!empty($settings['banner_agreement']) && !empty($settings['publisherId'])) {
+    if (!empty($settings['publisherId'])) {
       $script = '<script type="text/javascript" data-pp-pubid="' . $settings['publisherId'] . '" data-pp-placementtype="' . $settings['banner_size'] . '">
           (function (d, t) {
             "use strict";

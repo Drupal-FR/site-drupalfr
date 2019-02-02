@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_edito.rules_defaults.inc

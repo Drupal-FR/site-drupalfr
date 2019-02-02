@@ -183,6 +183,9 @@ function commerce_billy_pdf_html($orders) {
     }
   }
   $css_files = variable_get('commerce_billy_pdf_css_files', array(drupal_get_path('module', 'commerce_billy_pdf') . '/css/pdf.css'));
+  if (variable_get('commerce_billy_pdf_converter', 'dompdf') == 'wkhtmltopdf') {
+    $css_files[] = drupal_get_path('module', 'commerce_billy_pdf') . '/css/pdf_wkhtmltopdf.css';
+  }
   $vars['inline_css'] = "";
   foreach ($css_files as $file) {
     $vars['inline_css'] .= file_get_contents($file);
@@ -225,25 +228,104 @@ function commerce_billy_pdf_commerce_order_view($order, $view_mode) {
     $order->content['order_id'] = array(
       '#markup' => t('Order No.: @id', array('@id' => $order->order_id)),
     );
+    $logo_path = variable_get('commerce_billy_pdf_logo', 'misc/druplicon.png');
+    if (variable_get('commerce_billy_pdf_converter', 'dompdf') == 'wkhtmltopdf') {
+      $logo_path = DRUPAL_ROOT . '/' . $logo_path;
+    }
     $order->content['invoice_logo'] = array(
-      '#value' => variable_get('commerce_billy_pdf_logo', 'misc/druplicon.png'),
+      '#value' => $logo_path,
     );
   }
 }
 
 /**
  * Transforms HTML to PDF and outputs it to the browser.
+ *
+ * @param $html
+ *   The HTML to render as PDF
+ *
+ * @param $filename
+ *   The filename to be used for the PDF.
+ *
+ * @param $as_file
+ *   TRUE if a filecontent should be returned (e.g. for mails), else as stream
+ *   for downloads.
  */
-function commerce_billy_pdf_output($html, $filename) {
-  $dompdf = commerce_billy_pdf_prepare_dompdf($html, $filename);
-  if ($dompdf) {
-    $dompdf->stream($filename, array('Attachment' => TRUE));
+function commerce_billy_pdf_output($html, $filename, $as_file = FALSE) {
+  $pdf_converter = variable_get('commerce_billy_pdf_converter', 'dompdf');
+
+  if ($pdf_converter == 'dompdf') {
+    return commerce_billy_pdf_dompdf($html, $filename, $as_file);
   }
-  else {
-    return t('DOMPDF not found');
+  elseif ($pdf_converter == 'wkhtmltopdf') {
+    return commerce_billy_pdf_wkhtmltopdf($html, $filename, $as_file);
   }
 }
 
+/**
+ * DOMPDF converter
+ */
+function commerce_billy_pdf_dompdf($html, $filename, $as_file = FALSE) {
+  $dompdf = commerce_billy_pdf_prepare_dompdf($html, $filename);
+  if ($dompdf) {
+    if ($as_file) {
+      $filecontent = $dompdf->output();
+      return $filecontent;
+    }
+    else {
+      return $dompdf->stream($filename, array('Attachment' => TRUE));
+    }
+  }
+}
+
+/**
+ * WKHTMLTOPDF converter
+ */
+function commerce_billy_pdf_wkhtmltopdf($html, $filename, $as_file = FALSE) {
+  $path = libraries_get_path('phpwkhtmltopdf');
+  if (!empty($path)) {
+    $wkhtmltopdf_path = variable_get('wkhtmltopdf_path', '/usr/bin/wkhtmltopdf');
+    require_once DRUPAL_ROOT . '/' . $path . '/WkHtmlToPdf.php';
+
+    $filename .= '.pdf';
+
+    $tmp = file_directory_temp();
+    $pdf = new WkHtmlToPdf (array(
+      'binPath' => $wkhtmltopdf_path,
+      'tmp' => $tmp,
+      'no-outline',
+      'margin-top'    => 0,
+      'margin-right'  => 0,
+      'margin-bottom' => 0,
+      'margin-left'   => 0,
+
+      // Default page options
+      'disable-smart-shrinking',
+    ));
+
+    $pdf->addPage($html);
+
+    if ($as_file) {
+      $pdf->saveAs($tmp . '/' . $filename);
+      $file_content = file_get_contents($tmp . '/' . $filename);
+      return $file_content;
+    }
+    else {
+      $output = $pdf->send($filename);
+      $error = $pdf->getError();
+
+      // Log any errors.
+      if (!empty($error)) {
+        watchdog('commerce_billy_pdf', 'WkHtmlToPdf exception while generating pdf resume: %message', array('%message' => $error), WATCHDOG_ERROR);
+        return t('Error generating PDF resume. Please contact the website administrator.');
+      }
+      else {
+        return $output;
+      }
+    }
+  }
+  return t('WkHtmlToPdf not found');
+}
 
 /**
  * Helper function that instantiates new DOMPDF class and renders the HTML.

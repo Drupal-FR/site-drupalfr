@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_user.features.field_instance.inc
@@ -560,6 +561,7 @@ function drupalfr_user_field_default_field_instances() {
     'label' => 'Newsletter ADFF',
     'required' => 0,
     'settings' => array(
+      'hide_subscribe_checkbox' => FALSE,
       'interest_groups_title' => 'Interest Groups',
       'mergefields' => array(
         'EMAIL' => '[user:mail]',
@@ -622,6 +624,7 @@ function drupalfr_user_field_default_field_instances() {
     'label' => 'Newsletter Drupal Dev Days 2015',
     'required' => 0,
     'settings' => array(
+      'hide_subscribe_checkbox' => FALSE,
       'interest_groups_title' => 'Interest Groups',
       'mergefields' => array(
         'EMAIL' => '[user:mail]',
@@ -682,6 +685,7 @@ function drupalfr_user_field_default_field_instances() {
     'label' => 'Newsletter Drupalcamp',
     'required' => 0,
     'settings' => array(
+      'hide_subscribe_checkbox' => FALSE,
       'interest_groups_title' => 'Interest Groups',
       'mergefields' => array(
         'EMAIL' => '[user:mail]',

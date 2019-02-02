@@ -10,7 +10,7 @@
  */
 function mailchimp_schema() {
   $schema['cache_mailchimp'] = drupal_get_schema_unprocessed('system', 'cache');
-  $schema['cache_mailchimp']['description'] = 'Cache table for the MailChimp module to store a list of subscribers member info.';
+  $schema['cache_mailchimp']['description'] = 'Cache table for the Mailchimp module to store a list of subscribers member info.';
 
   return $schema;
 }
@@ -34,13 +34,13 @@ function mailchimp_requirements($phase) {
       $library = FALSE;
     }
     $requirements['mailchimp'] = array(
-      'title' => $t('MailChimp'),
+      'title' => $t('Mailchimp'),
     );
 
     if ($library['installed']) {
       $requirements['mailchimp'] += array(
         'value' => $library['version'],
-        'description' => $t('The MailChimp MCAPI wrapper library is installed correctly.'),
+        'description' => $t('The Mailchimp MCAPI wrapper library is installed correctly.'),
         'severity' => REQUIREMENT_OK,
       );
     }
@@ -48,7 +48,7 @@ function mailchimp_requirements($phase) {
     elseif (class_exists('Mailchimp\Mailchimp')) {
       $requirements['mailchimp'] += array(
         'value' => Mailchimp\Mailchimp::VERSION,
-        'description' => $t('The MailChimp MCAPI wrapper library is installed correctly.'),
+        'description' => $t('The Mailchimp MCAPI wrapper library is installed correctly.'),
         'severity' => REQUIREMENT_OK,
       );
     }

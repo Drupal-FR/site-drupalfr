@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * dfr_emploi.rules_defaults.inc

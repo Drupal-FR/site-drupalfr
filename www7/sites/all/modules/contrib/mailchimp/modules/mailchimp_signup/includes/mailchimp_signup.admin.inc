@@ -6,7 +6,7 @@
  */
 
 /**
- * Return a form for adding/editing a MailChimp signup form.
+ * Return a form for adding/editing a Mailchimp signup form.
  */
 function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
   // Store the existing list for updating on submit.
@@ -106,7 +106,7 @@ function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
 
   $form['mc_lists_config'] = array(
     '#type' => 'fieldset',
-    '#title' => t('MailChimp List Selection & Configuration'),
+    '#title' => t('Mailchimp List Selection & Configuration'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
@@ -117,9 +117,9 @@ function mailchimp_signup_form($form, &$form_state, MailchimpSignup $signup) {
   }
   $form['mc_lists_config']['mc_lists'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('MailChimp Lists'),
-    '#description' => t('Select which lists to show on your signup form. You can create additional lists at !MailChimp.',
-      array('!MailChimp' => l(t('MailChimp'), 'https://admin.mailchimp.com'))),
+    '#title' => t('Mailchimp Lists'),
+    '#description' => t('Select which lists to show on your signup form. You can create additional lists at !Mailchimp.',
+      array('!Mailchimp' => l(t('Mailchimp'), 'https://admin.mailchimp.com'))),
     '#options' => $options,
     '#default_value' => is_array($signup->mc_lists) ? $signup->mc_lists : array(),
     '#required' => TRUE,

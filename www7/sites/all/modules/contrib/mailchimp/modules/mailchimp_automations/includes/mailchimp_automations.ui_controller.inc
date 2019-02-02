@@ -15,7 +15,7 @@ class MailChimpAutomationUIController extends EntityDefaultUIController {
    */
   public function hook_menu() {
     $items = parent::hook_menu();
-    $items[$this->path]['description'] = 'Manage MailChimp Automation entity settings.';
+    $items[$this->path]['description'] = 'Manage Mailchimp Automation entity settings.';
     $items[$this->path]['type'] = MENU_LOCAL_TASK;
     $items[$this->path]['access callback'] = 'mailchimp_automations_entity_access';
     $items[$this->path]['title'] = "Automations";

@@ -8,7 +8,7 @@
 class MailChimpCampaignController extends EntityAPIController {
 
   /**
-   * Implement in order to attach MailChimp data to campaign entities.
+   * Implement in order to attach Mailchimp data to campaign entities.
    */
   protected function attachLoad(&$campaigns, $revision_id = FALSE) {
     $ids = array();
@@ -36,7 +36,7 @@ class MailChimpCampaignController extends EntityAPIController {
   }
 
   /**
-   * Implement to clear MailChimp campaign data caches.
+   * Implement to clear Mailchimp campaign data caches.
    *
    * @param array $ids
    *   Optional array of campaign IDs to clear cache for.

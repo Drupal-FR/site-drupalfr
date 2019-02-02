@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_user.field_group.inc

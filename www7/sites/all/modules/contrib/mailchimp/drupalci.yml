@@ -1,0 +1,31 @@
+build:
+  assessment:
+    validate_codebase:
+      container_composer:
+        halt-on-fail: false
+      phplint: {  }
+      phpcs:
+        start_directory: null
+        sniff-all-files: false
+        halt-on-fail: false
+        coder-version: ~8.2.12@stable
+      eslint:
+        halt-on-fail: false
+    testing:
+      container_command.install-libraries:
+        commands:
+            - mkdir -p ${SOURCE_DIR}/sites/all/libraries
+            - cd ${SOURCE_DIR}/sites/all/libraries && php -r 'copy("https://github.com/thinkshout/mailchimp-api-php/files/1361112/v1.0.8-package.zip", "./mailchimp.zip");$zip = new ZipArchive();$zip->open("./mailchimp.zip", ZIPARCHIVE::CREATE);$zip->extractTo("./mailchimp");'
+            - cd ${SOURCE_DIR}/sites/all/libraries/mailchimp && composer install --ignore-platform-reqs
+      run_tests_d7:
+        testgroups: '--all'
+        types: 'Simpletest,PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional'
+        color: true
+        die-on-fail: false
+        keep-results: true
+        keep-results-table: false
+        verbose: true
+        concurrency: 0
+        halt-on-fail: false
+        repeat: 1
+        suppress-deprecations: true

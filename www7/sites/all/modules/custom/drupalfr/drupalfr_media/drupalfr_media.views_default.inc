@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_media.views_default.inc

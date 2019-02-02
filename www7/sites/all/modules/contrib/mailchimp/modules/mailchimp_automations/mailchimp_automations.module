@@ -11,8 +11,8 @@
 function mailchimp_automations_entity_info() {
   $return = array(
     'mailchimp_automations_entity' => array(
-      'label' => t('MailChimp Automations Entity'),
-      'plural label' => t('MailChimp Automations Entities'),
+      'label' => t('Mailchimp Automations Entity'),
+      'plural label' => t('Mailchimp Automations Entities'),
       'controller class' => 'EntityAPIControllerExportable',
       'entity class' => 'MailchimpAutomationsEntity',
       'base table' => 'mailchimp_automations_entity',
@@ -43,7 +43,7 @@ function mailchimp_automations_entity_info() {
  * Entity label callback.
  */
 function mailchimp_automations_entity_info_label($entity, $entity_type) {
-  return empty($entity) ? 'New MailChimp Automation' : $entity->label;
+  return empty($entity) ? 'New Mailchimp Automation' : $entity->label;
 }
 
 /**
@@ -92,10 +92,10 @@ function mailchimp_automations_load_entities($id = NULL) {
  * Wrapper for MailchimpAutomations->getAutomations().
  *
  * @param string $workflow_id
- *   The MailChimp workflow_id.
+ *   The Mailchimp workflow_id.
  *
  * @return array
- *   The workflow automations for the active MailChimp API account.
+ *   The workflow automations for the active Mailchimp API account.
  */
 function mailchimp_automations_get_automations() {
   $mc_auto = mailchimp_get_api_object('MailchimpAutomations');
@@ -107,7 +107,7 @@ function mailchimp_automations_get_automations() {
  * Wrapper for MailchimpAutomations->getWorkflow().
  *
  * @param string $workflow_id
- *   The MailChimp workflow_id.
+ *   The Mailchimp workflow_id.
  *
  * @return array
  *   The $key is workflow_id and the $value is the
@@ -128,7 +128,7 @@ function mailchimp_automations_get_automation($workflow_id) {
  * Wrapper for MailchimpAutomations->getWorkflowEmails().
  *
  * @param string $workflow_id
- *   The MailChimp workflow_id.
+ *   The Mailchimp workflow_id.
  *
  * @return array
  *   An array of email workflows associated with this automation.
@@ -148,7 +148,7 @@ function mailchimp_automations_get_emails_for_workflow($workflow_id) {
 }
 
 /**
- * Triggers a workflow automation via the MailChimp API.
+ * Triggers a workflow automation via the Mailchimp API.
  *
  * @param object $automation
  *   The MailchimpAutomationsEntity object from the database.
@@ -220,8 +220,8 @@ function mailchimp_automations_permission() {
   $return = array();
 
   $return['administer mailchimp automations'] = array(
-    'title' => t('Administer MailChimp automation entities'),
-    'description' => t('Add, Delete, and Configure MailChimp Automation entity settings.'),
+    'title' => t('Administer Mailchimp automation entities'),
+    'description' => t('Add, Delete, and Configure Mailchimp Automation entity settings.'),
   );
   return $return;
 }

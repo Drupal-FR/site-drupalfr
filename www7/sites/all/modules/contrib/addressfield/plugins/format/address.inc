@@ -240,7 +240,12 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
   if (in_array($address['country'], $countries_postal_code_after_locality)) {
     // Take the widget out of the array.
     $postal_code_widget = $format['locality_block']['postal_code'];
-    $postal_code_widget['#prefix'] = ' ';
+
+    // If the postal code not in its own row, add a separating space.
+    if (empty($postal_code_widget['#tag'])) {
+      $postal_code_widget['#prefix'] = ' ';
+    }
+
     unset($format['locality_block']['postal_code']);
 
     // Add it back.

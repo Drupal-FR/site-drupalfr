@@ -1,12 +1,12 @@
-View MailChimp campaign activity for any entity with a valid email address.
+View Mailchimp campaign activity for any entity with a valid email address.
 Activity keys off of an email address and is cached after the initial load.
 If a list has webhooks enabled, than the cache is cleared when a new campaign
 is sent.
 
 ## Installation
 
-1. Enable the MailChimp Activity module and the Entity Module
-2. To use MailChimp Activity module, you will need to install and enable the
+1. Enable the Mailchimp Activity module and the Entity Module
+2. To use Mailchimp Activity module, you will need to install and enable the
    Entity API module [http://drupal.org/project/entity]([http://drupal.org/project/entity)
 
 ## Usage
@@ -17,7 +17,7 @@ is sent.
   * Select a bundle.
   * Select the email entity property.
 2. Configure permissions for viewing campaign activity.
-3. Once setup, a new MailChimp activity local task will appear for any
+3. Once setup, a new Mailchimp activity local task will appear for any
 configured entity.
 
 ## Notes

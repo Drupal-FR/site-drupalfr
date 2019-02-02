@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_permissions.features.user_permission.inc

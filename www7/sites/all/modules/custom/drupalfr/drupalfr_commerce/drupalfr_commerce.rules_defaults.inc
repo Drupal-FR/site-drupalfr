@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_commerce.rules_defaults.inc

@@ -18,12 +18,15 @@
 <body>
 
 <?php
-  foreach ($viewed_orders as $viewed_order):
+  foreach ($viewed_orders as $key => $viewed_order):
     print '<div class="invoice">';
     print render($viewed_order);
     print '</div>';
-    // Force a page break.
-    print '<div style="page-break-after: always;" />';
+
+    // Force a page break if we have a credit memo.
+    if (count($viewed_orders) > ($key+1)) {
+      print '<div style="page-break-before: always;" />';
+    }
   endforeach;
 ?>
 </body></html>

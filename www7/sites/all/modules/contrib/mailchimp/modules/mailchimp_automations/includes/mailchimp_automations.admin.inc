@@ -50,7 +50,7 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
   // Prep the entity type list before creating the form item:
   $entity_types = array('' => t('-- Select --'));
   foreach (entity_get_info() as $entity_type => $info) {
-    // Ignore MailChimp entity types:
+    // Ignore Mailchimp entity types:
     if (strpos($entity_type, 'mailchimp') === FALSE) {
       $entity_types[$entity_type] = $info['label'];
     }
@@ -132,10 +132,10 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
         }
         if (!empty($options)) {
           $form['drupal_entity']['list_id'] = array(
-            '#title' => t('MailChimp List'),
+            '#title' => t('Mailchimp List'),
             '#type' => 'select',
             '#required' => TRUE,
-            '#description' => t('Select the list that you created in MailChimp.'),
+            '#description' => t('Select the list that you created in Mailchimp.'),
             '#options' => $options,
             '#default_value' => $entitynotnull ? $mailchimp_automations_entity->list_id : 0,
             '#maxlength' => 127,
@@ -147,7 +147,7 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
           );
         }
         else {
-          $msg = t('You must add at least one list in MailChimp for this functionality to work.');
+          $msg = t('You must add at least one list in Mailchimp for this functionality to work.');
           drupal_set_message($msg, 'error', FALSE);
         }
 
@@ -163,7 +163,7 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
               '#title' => t('Workflow ID'),
               '#type' => 'select',
               '#required' => TRUE,
-              '#description' => t('Select the workflow automation that you created in MailChimp. Untitled workflows are not included.'),
+              '#description' => t('Select the workflow automation that you created in Mailchimp. Untitled workflows are not included.'),
               '#options' => $automation_options,
               '#default_value' => $entitynotnull ? $mailchimp_automations_entity->workflow_id : 0,
               '#maxlength' => 127,
@@ -175,7 +175,7 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
             );
           }
           else {
-            $msg = t('You must add at least one workflow in MailChimp for this functionality to work.');
+            $msg = t('You must add at least one workflow in Mailchimp for this functionality to work.');
             drupal_set_message($msg, 'error', FALSE);
           }
 
@@ -192,7 +192,7 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
                 '#title' => t('Workflow Email ID'),
                 '#type' => 'select',
                 '#required' => TRUE,
-                '#description' => t('Select the workflow automation email that you created in MailChimp.'),
+                '#description' => t('Select the workflow automation email that you created in Mailchimp.'),
                 '#options' => $emails,
                 '#default_value' => $entitynotnull ? $mailchimp_automations_entity->workflow_email_id : 0,
                 '#maxlength' => 127,
@@ -200,7 +200,7 @@ function mailchimp_automations_entity_form($form, &$form_state, MailchimpAutomat
               );
             }
             else {
-              $msg = t('You must add at least one workflow email in MailChimp for this functionality to work.');
+              $msg = t('You must add at least one workflow email in Mailchimp for this functionality to work.');
               drupal_set_message($msg, 'error', FALSE);
             }
           }
@@ -254,9 +254,9 @@ function mailchimp_automations_entity_form_validate($form, &$form_state) {
           $form_id != $extant_ent->mailchimp_automations_entity_id) {
         form_set_error(
           'bundle',
-          t('A MailChimp Automation Entity already exists for this Bundle. Either select a different Bundle or edit the !link for this bundle.',
+          t('A Mailchimp Automation Entity already exists for this Bundle. Either select a different Bundle or edit the !link for this bundle.',
             array(
-              '!link' => l(t('existing MailChimp Automation Entity'), "admin/config/services/mailchimp/automations/manage/{$extant_ent->name}"),
+              '!link' => l(t('existing Mailchimp Automation Entity'), "admin/config/services/mailchimp/automations/manage/{$extant_ent->name}"),
             )
           ));
       }

@@ -240,15 +240,15 @@ function commerce_paypal_wpp_submit_form_submit($payment_method, $pane_form, $pa
   // Ensure we can determine a valid IPv4 IP address as required by PayPal WPP.
   $ip_address = ip_address();
 
-  // Go ahead and convert localhost from IPv6 to IPv4.
-  if ($ip_address == '::1') {
+  // Fallback to the localhost address if ip_address() did not return a value.
+  // This could happen due to Drupal having incorrect reverse_proxy settings.
+  if (empty($ip_address)) {
     $ip_address = '127.0.0.1';
-    watchdog('commerce_paypal_wpp', 'PayPal WPP must be able to retrieve an IPv4 IP address from the ip_address() function when not testing payments from localhost. While testing from localhost, your IPv6 address ::1 was automatically converted to 127.0.0.1.', array(), WATCHDOG_WARNING);
   }
 
-  if (!filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+  if (!filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
     drupal_set_message(t('This payment method is not supported by the current web server configuration.'), 'error');
-    watchdog('commerce_paypal_wpp', 'PayPal WPP must be able to retrieve an IPv4 IP address from the ip_address() function when not testing payments from localhost.', array(), WATCHDOG_ERROR);
+    watchdog('commerce_paypal_wpp', 'PayPal WPP must be able to retrieve an IPv4 or IPv6 IP address from the ip_address() function.', array(), WATCHDOG_ERROR);
     return FALSE;
   }
 
@@ -280,9 +280,20 @@ function commerce_paypal_wpp_submit_form_submit($payment_method, $pane_form, $pa
       $valid_billing_address = FALSE;
     }
 
-    foreach (array('thoroughfare', 'locality', 'postal_code', 'country') as $address_key) {
-      if (empty($address_value[$address_key])) {
-        $valid_billing_address = FALSE;
+    if (empty($address_value['country'])) {
+      $valid_billing_address = FALSE;
+    }
+    else {
+      // Load the predefined address format for the selected country.
+      module_load_include('inc', 'addressfield', 'addressfield.address_formats');
+      $address_format = addressfield_get_address_format($address_value['country']);
+      $address_required_fields = $address_format['required_fields'];
+
+      // Run validation based on the fields provided by the addressfield module.
+      foreach ($address_required_fields as $address_key) {
+        if (empty($address_value[$address_key])) {
+          $valid_billing_address = FALSE;
+        }
       }
     }
   }
@@ -365,11 +376,11 @@ function commerce_paypal_wpp_submit_form_submit($payment_method, $pane_form, $pa
     'CUSTOM' => substr(t('Order @number', array('@number' => $order->order_number)), 0, 256),
     'DESC' => substr(implode(', ', $description), 0, 127),
 
-    // Customer Information
+    // Customer Information.
     'EMAIL' => substr($order->mail, 0, 127),
-    'IPADDRESS' => substr($ip_address, 0, 15),
-    'FIRSTNAME' => substr($billing_address['first_name'], 0, 25),
-    'LASTNAME' => substr($billing_address['last_name'], 0, 25),
+    'IPADDRESS' => substr($ip_address, 0, filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 15 : 45),
+    'FIRSTNAME' => drupal_substr($billing_address['first_name'], 0, 25),
+    'LASTNAME' => drupal_substr($billing_address['last_name'], 0, 25),
     'STREET' => substr($billing_address['thoroughfare'], 0, 100),
     'STREET2' => substr($billing_address['premise'], 0, 100),
     'CITY' => substr($billing_address['locality'], 0, 40),

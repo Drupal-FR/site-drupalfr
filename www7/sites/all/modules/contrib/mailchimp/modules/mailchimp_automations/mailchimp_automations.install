@@ -11,7 +11,7 @@
 function mailchimp_automations_schema() {
 
   $schema['mailchimp_automations_entity'] = array(
-    'description' => 'MailChimp automation enabled entities.',
+    'description' => 'Mailchimp automation enabled entities.',
     'fields' => array(
       'mailchimp_automations_entity_id' => array(
         'type' => 'serial',
@@ -52,21 +52,21 @@ function mailchimp_automations_schema() {
         'default' => '',
       ),
       'list_id' => array(
-        'description' => 'The MailChimp automation list id.',
+        'description' => 'The Mailchimp automation list id.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
         'default' => '',
       ),
       'workflow_id' => array(
-        'description' => 'The MailChimp automation workflow id.',
+        'description' => 'The Mailchimp automation workflow id.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
         'default' => '',
       ),
       'workflow_email_id' => array(
-        'description' => 'The MailChimp automation workflow email id.',
+        'description' => 'The Mailchimp automation workflow email id.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,

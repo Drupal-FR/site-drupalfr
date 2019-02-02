@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * dfr_emploi.strongarm.inc
