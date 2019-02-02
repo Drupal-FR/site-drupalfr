@@ -63,13 +63,13 @@ function commerce_billy_default_rules_configuration() {
       "REQUIRES" : [ "rules", "entity" ],
       "ON" : [ "commerce_order_update" ],
       "IF" : [
-        { "NOT data_is" : { "data" : [ "commerce-order-unchanged:status" ], "value" : "canceled" } },
         { "data_is" : { "data" : [ "commerce-order:status" ], "value" : "canceled" } },
         { "entity_has_field" : {
             "entity" : [ "commerce-order" ],
             "field" : "field_commerce_billy_cancel_date"
           }
-        }
+        },
+        { "NOT data_is" : { "data" : [ "commerce-order-unchanged:status" ], "value" : "canceled" } }
       ],
       "DO" : [
         { "data_set" : {

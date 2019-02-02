@@ -2,8 +2,8 @@ Commerce Billy PDF
 ******************
 Enables PDF donwload of invoiced and canceled orders.
 
-Installation
-************
+Installation DOMPDF
+*******************
 
 1. Dowload dompdf lib in place it into the libraries folder, e.g. sites/all/libraries/dompdf
 
@@ -24,6 +24,17 @@ To check if everything is at the right place, you should find
   public://fonts/Courier.afm (for example at
   sites/default/files/fonts/Courier.afm).
 
+Installation WKHTMLTOPDF
+***********************
+As alternative PDF converater WKHTMLTOPDF can be used:
+
+1. Set variable 'commerce_billy_pdf_converter' to 'wkhtmltopdf'
+
+2. Install WOKHTMLTOPDF - PHP Wrapper
+libraries[phpwkhtmltopdf][download][type] = "get"
+libraries[phpwkhtmltopdf][download][url] = "https://github.com/mikehaertl/phpwkhtmltopdf/archive/2.0.1.tar.gz"
+libraries[phpwkhtmltopdf][directory_name] = "phpwkhtmltopdf"
+libraries[phpwkhtmltopdf][destination] = "libraries"
 
 Administration
 **************
