@@ -41,9 +41,9 @@ function _addressfield_sample_addresses() {
   if (!isset($fields)) {
     $filepath = DRUPAL_ROOT . '/' . drupal_get_path('module', 'addressfield');
     $fields = array();
-    if ($handle = @fopen("$filepath/addresses.txt",'r')) {
+    if ($handle = @fopen("$filepath/addresses.txt", 'r')) {
       if (is_resource($handle)) {
-        while (($buffer = fgets($handle)) !== false) {
+        while (($buffer = fgets($handle)) !== FALSE) {
           list($country, $administrative_area, $sub_administrative_area, $locality, $dependent_locality, $postal_code, $thoroughfare, $premise, $sub_premise) = explode("\t", $buffer);
           $fields[] = array(
             'country' => ($country == 'NULL') ? NULL : trim($country),

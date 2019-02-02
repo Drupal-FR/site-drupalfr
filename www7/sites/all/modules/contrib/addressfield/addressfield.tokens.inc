@@ -89,11 +89,13 @@ function addressfield_token_info() {
  */
 function addressfield_token_info_alter(&$data) {
   // Loop over every address field on the site.
-  foreach (array_filter(field_info_field_map(), 'addressfield_field_map_filter') as $field_name => $field) {
-    foreach ($data['tokens'] as $group => $token){
-      if (isset($data['tokens'][$group][$field_name]) && is_array($data['tokens'][$group][$field_name])) {
-        // Set the token type for the field to use the addressfield child tokens.
-        $data['tokens'][$group][$field_name]['type'] = 'address-field';
+  foreach (addressfield_get_address_fields() as $field_name => $field) {
+    foreach (array($field_name, strtr($field_name, '_', '-')) as $name) {
+      foreach ($data['tokens'] as $group => $token) {
+        if (isset($data['tokens'][$group][$name]) && is_array($data['tokens'][$group][$name])) {
+          // Set the token type for the field to use the addressfield child tokens.
+          $data['tokens'][$group][$name]['type'] = 'address-field';
+        }
       }
     }
   }
@@ -212,19 +214,27 @@ function addressfield_tokens($type, $tokens, array $data = array(), array $optio
   // and helps us avoid having to do the entity detection ourselves.
   if ($type == 'entity') {
     // Loop over the address fields defined on the site.
-    foreach (array_filter(field_info_field_map(), 'addressfield_field_map_filter') as $field_name => $field) {
-      // If there are any address field tokens in the token list...
-      if ($addressfield_tokens = token_find_with_prefix($tokens, $field_name)) {
-        // If the current field is on the matching entity type...
-        if (!empty($field['bundles'][$data['entity_type']])) {
-          // Extract the format handlers selected in a representative instance
-          // settings form for use in formatting tokens.
-          $instance = field_info_instance($data['entity_type'], $field_name, reset($field['bundles'][$data['entity_type']]));
-          $format_handlers = $instance['widget']['settings']['format_handlers'];
+    foreach (addressfield_get_address_fields($data['entity_type']) as $field_name => $field) {
+      // If the current field is on the matching entity type...
+      if (!empty($field['bundles'][$data['entity_type']])) {
+        // Extract the format handlers selected in a representative instance
+        // settings form for use in formatting tokens.
+        $instance = field_info_instance($data['entity_type'], $field_name, reset($field['bundles'][$data['entity_type']]));
+        $format_handlers = $instance['widget']['settings']['format_handlers'];
+      }
+
+      foreach (array($field_name, strtr($field_name, '_', '-')) as $prefix) {
+        // If there are any address field tokens in the token list...
+        $addressfield_tokens = token_find_with_prefix($tokens, $prefix);
+
+        if (!$addressfield_tokens) {
+          continue;
         }
 
-        // Generate the necessary address field tokens for the entity.
-        $replacements += token_generate('address-field', $addressfield_tokens, array('address-field' => $data['entity']->$field_name, 'format_handlers' => $format_handlers), $options);
+        if (property_exists($data['entity'], $field_name)) {
+          // Generate the necessary address field tokens for the entity.
+          $replacements += token_generate('address-field', $addressfield_tokens, array('address-field' => $data['entity']->$field_name, 'format_handlers' => $format_handlers), $options);
+        }
       }
     }
   }
