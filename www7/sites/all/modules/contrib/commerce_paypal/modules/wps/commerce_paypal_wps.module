@@ -295,9 +295,13 @@ function commerce_paypal_wps_paypal_ipn_process($order, $payment_method, &$ipn) 
     $transaction->instance_id = $payment_method['instance_id'];
   }
 
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $order_currency_code = $wrapper->commerce_order_total->currency_code->value();
+  $amount = commerce_currency_decimal_to_amount($ipn['mc_gross'], $ipn['mc_currency']);
+  $transaction->amount = commerce_currency_convert($amount, $ipn['mc_currency'], $order_currency_code);
+  $transaction->currency_code = $order_currency_code;
+
   $transaction->remote_id = $ipn['txn_id'];
-  $transaction->amount = commerce_currency_decimal_to_amount($ipn['mc_gross'], $ipn['mc_currency']);
-  $transaction->currency_code = $ipn['mc_currency'];
   $transaction->payload[REQUEST_TIME . '-ipn'] = $ipn;
 
   // Set the transaction's statuses based on the IPN's payment_status.
@@ -419,6 +423,11 @@ function commerce_paypal_wps_order_form($form, &$form_state, $order, $settings) 
   // Ensure a default value for the payment_method setting.
   $settings += array('payment_method' => '');
 
+  $line_item_types = array();
+  if (function_exists('commerce_product_line_item_types')) {
+    $line_item_types = commerce_product_line_item_types();
+  }
+
   // Build the data array that will be translated into hidden form values.
   $data = array(
     // Specify the checkout experience to present to the user.
@@ -464,12 +473,34 @@ function commerce_paypal_wps_order_form($form, &$form_state, $order, $settings) 
     // Use the timestamp to generate a unique invoice number
     'invoice' => commerce_paypal_ipn_invoice($order),
 
-    // Define a single item in the cart representing the whole order
+    // Provide a default email for non-PayPal users.
+    'email' => substr($order->mail, 0, 127),
+
+    // Define a single item in the cart representing the whole order.
     'amount_1' => commerce_paypal_price_amount(commerce_currency_convert($amount, $order_currency_code, $currency_code), $currency_code),
-    'item_name_1' => t('Order @order_number at @store', array('@order_number' => $order->order_number, '@store' => variable_get('site_name', url('<front>', array('absolute' => TRUE))))),
+    'item_name_1' => t('Order @order_number at @store', array(
+      '@order_number' => $order->order_number,
+      '@store' => variable_get('site_name',
+        url('<front>', array('absolute' => TRUE))),
+    )),
     'on0_1' => t('Product count'),
-    'os0_1' => commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()),
+    'os0_1' => commerce_line_items_quantity($wrapper->commerce_line_items, $line_item_types),
   );
+
+  // If a billing address is available, pass it to PayPal to populate
+  // field values for non-PayPal users paying with their card.
+  if (!empty($wrapper->commerce_customer_billing->commerce_customer_address)) {
+    // Assign billing address fields to hidden form values.
+    $billing_address = $wrapper->commerce_customer_billing->commerce_customer_address->value();
+    $data['address1'] = substr($billing_address['thoroughfare'], 0, 100);
+    $data['address2'] = substr($billing_address['premise'], 0, 100);
+    $data['city'] = substr($billing_address['locality'], 0, 40);
+    $data['state'] = $billing_address['administrative_area'];
+    $data['zip'] = substr($billing_address['postal_code'], 0, 32);
+    $data['country'] = $billing_address['country'];
+    $data['first_name'] = drupal_substr($billing_address['first_name'], 0, 32);
+    $data['last_name'] = drupal_substr($billing_address['last_name'], 0, 32);
+  }
 
   // Allow modules to alter parameters of the API request.
   drupal_alter('commerce_paypal_wps_order_form_data', $data, $order);
