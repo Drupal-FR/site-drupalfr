@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_general.views_default.inc

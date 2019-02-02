@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_planete.field_group.inc

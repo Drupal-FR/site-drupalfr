@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_commerce.views_default.inc

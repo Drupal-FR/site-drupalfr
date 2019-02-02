@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_general.features.field_base.inc

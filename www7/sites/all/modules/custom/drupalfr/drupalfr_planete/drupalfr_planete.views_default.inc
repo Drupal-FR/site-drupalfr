@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_planete.views_default.inc

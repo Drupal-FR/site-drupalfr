@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_commerce.features.commerce_checkout_panes.inc

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_forums.strongarm.inc

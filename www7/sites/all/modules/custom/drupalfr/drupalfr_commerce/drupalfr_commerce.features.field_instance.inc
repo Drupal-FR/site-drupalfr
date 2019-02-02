@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_commerce.features.field_instance.inc

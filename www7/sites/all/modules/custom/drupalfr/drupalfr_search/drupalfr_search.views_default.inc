@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * drupalfr_search.views_default.inc
