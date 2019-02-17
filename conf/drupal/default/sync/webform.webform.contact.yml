@@ -1,4 +1,3 @@
-uuid: d10568bf-ca4b-4a0a-85fe-fd7e7e0f3472
 langcode: fr
 status: open
 dependencies:
@@ -7,11 +6,6 @@ dependencies:
       - webform
   module:
     - honeypot
-third_party_settings:
-  honeypot:
-    honeypot: true
-_core:
-  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
 open: null
 close: null
 weight: 0
@@ -31,6 +25,7 @@ settings:
   page: false
   page_submit_path: /contact
   page_confirm_path: ''
+  form_title: both
   form_submit_once: true
   form_exception_message: ''
   form_open_message: ''
@@ -38,6 +33,7 @@ settings:
   form_previous_submissions: false
   form_confidential: false
   form_confidential_message: ''
+  form_remote_addr: true
   form_convert_anonymous: false
   form_prepopulate: false
   form_prepopulate_source_entity: false
@@ -57,6 +53,7 @@ settings:
   form_access_denied_title: ''
   form_access_denied_message: ''
   form_access_denied_attributes: {  }
+  form_file_limit: ''
   submission_label: ''
   submission_log: false
   submission_views: {  }
@@ -69,6 +66,9 @@ settings:
   submission_access_denied_attributes: {  }
   submission_exception_message: ''
   submission_locked_message: ''
+  submission_excluded_elements: {  }
+  submission_exclude_empty: false
+  submission_exclude_empty_checkbox: false
   previous_submission_message: ''
   previous_submissions_message: ''
   autofill: false
@@ -109,9 +109,11 @@ settings:
   limit_total: null
   limit_total_interval: null
   limit_total_message: ''
+  limit_total_unique: false
   limit_user: null
   limit_user_interval: null
   limit_user_message: ''
+  limit_user_unique: false
   entity_limit_total: null
   entity_limit_total_interval: null
   entity_limit_user: null
@@ -176,6 +178,10 @@ access:
     roles: {  }
     users: {  }
     permissions: {  }
+  configuration:
+    roles: {  }
+    users: {  }
+    permissions: {  }
 handlers:
   email_confirmation:
     id: email
@@ -210,7 +216,7 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
-      theme: ''
+      theme_name: ''
   email_notification:
     id: email
     label: 'Notification par courriel'
@@ -246,4 +252,10 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
-      theme: ''
+      theme_name: ''
+uuid: d10568bf-ca4b-4a0a-85fe-fd7e7e0f3472
+third_party_settings:
+  honeypot:
+    honeypot: true
+_core:
+  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
