@@ -302,37 +302,47 @@
   }
 }
 
-//8- (REFERENCES) Facets
-.block-facet--links {
-  margin-bottom: $global-margin;
-  padding-bottom: $global-padding;
-  transform: translate(35%, 50%);
+// 8 - (REFERENCES) Facets.
+.facet--reference-page {
+  &.block-facet--links {
 
-  @include breakpoint(medium only) {
-    transform: translate(15%, 50%);
-  }
+    margin-bottom: $global-margin;
+    padding-bottom: $global-padding;
+    transform: translate(35%, 50%);
 
-  @include breakpoint(small only) {
-    transform: translate(0%, 50%);
-  }
-
-  .block-title {
-    display: none;
-  }
-
-}
-
-.facets-widget-links {
-  ul {
-    display: flex;
-    list-style-type: none;
-
-    li {
-      a {
-        @include button(false, $secondary-color, $secondary-color, $secondary-color, 'hollow');
-        margin: 0 1rem;
-      }
+    @include breakpoint(medium only) {
+      transform: translate(15%, 50%);
     }
 
+    @include breakpoint(small only) {
+      transform: translate(0%, 50%);
+    }
+
+    .block-title {
+      display: none;
+    }
+
+    .facets-widget-links {
+      ul {
+        display: flex;
+        list-style-type: none;
+
+        @include breakpoint(small) {
+          display: inline-block;
+        }
+
+        li {
+          @include breakpoint(small) {
+            float: left;
+            margin-bottom: 1rem;
+          }
+
+          a {
+            @include button(false, $secondary-color, $secondary-color, $secondary-color, 'hollow');
+            margin: 0 1rem;
+          }
+        }
+      }
+    }
   }
 }
