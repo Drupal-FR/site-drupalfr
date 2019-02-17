@@ -9,7 +9,6 @@ dependencies:
     - field.field.commerce_product.membership.variations
   module:
     - commerce
-    - inline_entity_form
     - path
     - text
 id: commerce_product.membership.default
@@ -79,20 +78,5 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  variations:
-    type: inline_entity_form_complex
-    weight: 10
-    settings:
-      override_labels: true
-      label_singular: variation
-      label_plural: variations
-      form_mode: default
-      allow_new: true
-      allow_existing: false
-      match_operator: CONTAINS
-      allow_duplicate: true
-      collapsible: false
-      collapsed: false
-    third_party_settings: {  }
-    region: content
-hidden: {  }
+hidden:
+  variations: true
