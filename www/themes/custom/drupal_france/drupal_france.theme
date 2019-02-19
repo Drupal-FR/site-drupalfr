@@ -5,7 +5,6 @@
  * ZURB Foundation sub-theme.
  */
 
-use \Drupal\block\Entity\Block;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -32,10 +31,12 @@ function drupal_france_theme_suggestions_form_alter(&$suggestions, $variables) {
 
 /**
  * Implements hook_preprocess_block().
+ *
+ * Allows to use the block ID in a theme suggestion hook.
  */
 function drupal_france_preprocess_block(&$variables) {
   if (isset($variables['attributes']['id'])) {
-    $variables['content']['#attributes']['block'] = $variables['attributes']['id'];
+    $variables['content']['#attributes']['block_id'] = $variables['attributes']['id'];
   }
 }
 
@@ -45,11 +46,12 @@ function drupal_france_preprocess_block(&$variables) {
 function drupal_france_theme_suggestions_menu_alter(array &$suggestions, array $variables) {
   // Remove the block and replace dashes with underscores in the block ID to
   // use for the hook name.
-  if (isset($variables['attributes']['block'])) {
-    $hook = str_replace(array('block-', '-'), array('', '_'), $variables['attributes']['block']);
+  if (isset($variables['attributes']['block_id'])) {
+    $hook = str_replace(['block-', '-'], ['', '_'], $variables['attributes']['block_id']);
     $suggestions[] = $variables['theme_hook_original'] . '__' . $hook;
   }
 }
+
 /**
  * Implements hook_preprocess_paragraph().
  */
