@@ -26,33 +26,6 @@
 #}
 {{ menus.menu_links(items, attributes, 0) }}
 
-{#{% macro menu_links(items, attributes, menu_level) %}
-  {% import _self as menus %}
-  {% if items %}
-    {% if menu_level == 0 %}
-<ul{{ attributes.addClass('menu-main-footer', 'small-2 large-4 columns') }}>
-  {% else %}
-  <ul class="menu">
-    {% endif %}
-    {% for item in items %}
-      {%
-        set classes = [
-        'menu-item',
-        item.is_expanded ? 'menu-item--expanded',
-        item.is_collapsed ? 'menu-item--collapsed',
-        item.in_active_trail ? 'menu-item--active-trail',
-      ]
-      %}
-      <li{{ item.attributes.addClass(classes) }}>
-        {{ link(item.title, item.url) }}
-        {% if item.below %}
-          {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-  {% endmacro %}#}
 <div class="row">
 {% macro menu_links(items, attributes, menu_level) %}
   {% import _self as menus %}
@@ -61,7 +34,7 @@
       {% if menu_level == 0 %}
         <ul{{ attributes.addClass('menu-main-footer', 'small-3', 'large-6', 'columns') }}>
       {% else %}
-      <ul class="menu">
+        <ul class="menu">
       {% endif %}
       {% for item in row %}
         {%
@@ -77,8 +50,8 @@
           {% if item.below %}
             {{ link(item.title, item.url) }}
             {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
-            {% else %}
-              <i class="fa fa-angle-right"></i>{{ link(item.title, item.url) }}
+          {% else %}
+            <i class="fa fa-angle-right"></i>{{ link(item.title, item.url) }}
           {% endif %}
         </li>
       {% endfor %}
