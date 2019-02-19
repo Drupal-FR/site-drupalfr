@@ -5,6 +5,7 @@ dependencies:
   config:
     - system.menu.main
   module:
+    - block_visibility_groups
     - system
   theme:
     - drupal_france
@@ -22,5 +23,10 @@ settings:
   provider: system
   label_display: visible
   level: 1
-  depth: 1
-visibility: {  }
+  depth: 2
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: ''
+    context_mapping: {  }
