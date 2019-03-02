@@ -19,11 +19,58 @@
  */
 #}
 {% set classes = [
-  'row'
+  'row',
+  'expanded',
+  'user--full'
 ] %}
 <article{{ attributes.addClass(classes) }}>
   {% if content %}
-    {{ content.field_user_banner }}
-    {{- content|without('field_user_banner') -}}
+    <div class="column user--banner"
+         style="background-image: url('{{ content.field_user_banner[0]['#markup'] }}')"
+    ></div>
+
+    <div class="row user--head">
+      <div class="medium-2 column user--picture">
+        {{ content.user_picture }}
+      </div>
+      <div class="medium-7 column user--infos">
+        {{ content.field_user_realname }}
+        {{ content.field_user_slogan }}
+        {{ content.field_user_organization }}
+        <div class="user--social-links">
+          {{ content.field_user_website }}
+          {{ content.field_user_drupal_org }}
+          {{ content.field_user_twitter }}
+        </div>
+      </div>
+      <div class="medium-3 column user--membership"></div>
+
+      <hr class="separator">
+
+      <div class="small-12 column user--biography">
+        {{ content.field_user_biography }}
+      </div>
+
+      <hr class="separator">
+
+      <div class="small-12 column">
+
+      </div>
+
+    </div>
+    {% set hidden_fields = [
+
+    ] %}
+    {{- content|without(
+      'field_user_banner',
+      'user_picture',
+      'field_user_realname',
+      'field_user_slogan',
+      'field_user_organization',
+      'field_user_website',
+      'field_user_drupal_org',
+      'field_user_twitter',
+      'field_user_biography'
+    ) -}}
   {% endif %}
 </article>
