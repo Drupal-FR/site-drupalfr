@@ -18,8 +18,12 @@
  * @ingroup themeable
  */
 #}
-<article{{ attributes }}>
+{% set classes = [
+  'row'
+] %}
+<article{{ attributes.addClass(classes) }}>
   {% if content %}
-    {{- content -}}
+    {{ content.field_user_banner }}
+    {{- content|without('field_user_banner') -}}
   {% endif %}
 </article>
