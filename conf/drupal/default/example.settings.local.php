@@ -11,6 +11,7 @@ $databases['default']['default'] = [
 
 $settings['hash_salt'] = 'drupalfr';
 $settings['trusted_host_patterns'] = [
+  '^localhost$',
   '^127\.0\.0\.1$',
   '^varnish$',
   '^web$',
