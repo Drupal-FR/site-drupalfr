@@ -7,7 +7,7 @@ settings:
   default_submit_button_label: Soumettre
   default_reset_button_label: Réinitialiser
   default_form_submit_once: false
-  default_form_confidential_message: 'This form is confidential. You must <a href="[site:login-url]/logout?destination=[current-page:url:relative]">Log out</a> to submit it.'
+  default_form_confidential_message: 'Ce formulaire est confidentiel. Vous devez vous <a href="[site:login-url]/logout?destination=[current-page:url:relative]">déconnecter</a> pour l''utiliser.'
   default_form_access_denied_message: 'Please login to access this webform.'
   default_form_disable_back: false
   default_form_submit_back: false
@@ -32,12 +32,12 @@ settings:
   default_draft_button_label: 'Enregistrer le brouillon'
   default_draft_saved_message: 'Soumissions enregistrées. Vous pourrez revenir sur ce formulaire plus tard, cela restaurera les valeurs actuelles.'
   default_draft_loaded_message: 'Un formulaire partiellement complété a été trouvé. Veuillez compléter les portions restantes.'
-  default_confirmation_message: 'New submission added to [webform:title].'
+  default_confirmation_message: 'Nouvelle soumission ajoutée à [webform:title]'
   default_confirmation_back_label: 'Retour au formulaire'
   default_submission_label: '[webform_submission:submitted-to]: Submission #[webform_submission:serial]'
-  default_submission_access_denied_message: 'Please login to access this submission.'
+  default_submission_access_denied_message: 'Veuillez vous connecter pour accéder à cette soumission.'
   default_submission_exception_message: 'Unable to process this submission. Please contact the site administrator.'
-  default_submission_locked_message: 'This submission has been locked.'
+  default_submission_locked_message: 'Cette soumission a été verrouillée.'
   default_submission_log: false
   default_submission_views: {  }
   default_submission_views_replace:
@@ -108,7 +108,7 @@ batch:
 purge:
   cron_size: 100
 element:
-  empty_message: '{Empty}'
+  empty_message: '{Vide}'
   allowed_tags: admin
   wrapper_classes: "container-inline clearfix\nform--inline clearfix\nmessages messages--error\nmessages messages--warning\nmessages messages--status\n"
   classes: "container-inline clearfix\nform--inline clearfix\nmessages messages--error\nmessages messages--warning\nmessages messages--status\n"
@@ -136,7 +136,7 @@ html_editor:
 file:
   file_public: false
   file_private_redirect: true
-  file_private_redirect_message: 'Please login to access the uploaded file.'
+  file_private_redirect_message: 'Veuillez vous connecter accéder au fichier transféré.'
   default_max_filesize: ''
   default_managed_file_extensions: 'gif jpg png bmp eps tif pict psd txt rtf html odf pdf doc docx ppt pptx xls xlsx xml avi mov mp3 ogg wav bz2 dmg gz jar rar sit svg tar zip'
   default_audio_file_extensions: 'mp3 ogg wav'
@@ -156,7 +156,7 @@ mail:
   default_sender_name: ''
   default_subject: 'Webform submission from: [webform_submission:source-entity]'
   default_body_text: "Submitted on [webform_submission:created]\nSubmitted by: [webform_submission:user]\n\nSubmitted values are:\n[webform_submission:values]\n"
-  default_body_html: "<p>Submitted on [webform_submission:created]</p>\n<p>Submitted by: [webform_submission:user]</p>\n<p>Submitted values are:</p>\n[webform_submission:values]\n"
+  default_body_html: "<p>Envoyé le [webform_submission:created]</p>\r\n<p>Envoyé par : [webform_submission:user]</p>\r\n<p>Les valeurs soumises sont :</p>\r\n[webform_submission:values]\n"
   roles: {  }
 test:
   types: "checkbox:\n  - true\ncolor:\n  - '#ffffcc'\n  - '#ffffcc'\n  - '#ccffff'\nemail:\n  - example@example.com\n  - test@test.com\n  - random@random.com\nlanguage_select:\n  - en\nmachine_name:\n  - loremipsum\n  - oratione\n  - dixisset\ntel:\n  - 123-456-7890\n  - 098-765-4321\ntextarea:\n  - 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Negat esse eam, inquit, propter se expetendam. Primum Theophrasti, Strato, physicum se voluit; Id mihi magnum videtur. Itaque mihi non satis videmini considerare quod iter sit naturae quaeque progressio. Quare hoc videndum est, possitne nobis hoc ratio philosophorum dare. Est enim tanti philosophi tamque nobilis audacter sua decreta defendere.'\n  - 'Huius, Lyco, oratione locuples, rebus ipsis ielunior. Duo Reges: constructio interrete. Sed haec in pueris; Sed utrum hortandus es nobis, Luci, inquit, an etiam tua sponte propensus es? Sapiens autem semper beatus est et est aliquando in dolore; Immo videri fortasse. Paulum, cum regem Persem captum adduceret, eodem flumine invectio? Et ille ridens: Video, inquit, quid agas;'\n  - 'Quae cum dixisset, finem ille. Quamquam non negatis nos intellegere quid sit voluptas, sed quid ille dicat. Progredientibus autem aetatibus sensim tardeve potius quasi nosmet ipsos cognoscimus. Gloriosa ostentatio in constituendo summo bono. Qui-vere falsone, quaerere mittimus-dicitur oculis se privasse; Duarum enim vitarum nobis erunt instituta capienda. Comprehensum, quod cognitum non habet? Qui enim existimabit posse se miserum esse beatus non erit. Causa autem fuit huc veniendi ut quosdam hinc libros promerem. Nunc omni virtuti vitium contrario nomine opponitur.'\ntext_format:\n  -\n    value: '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Negat esse eam, inquit, propter se expetendam. Primum Theophrasti, Strato, physicum se voluit; Id mihi magnum videtur. Itaque mihi non satis videmini considerare quod iter sit naturae quaeque progressio. Quare hoc videndum est, possitne nobis hoc ratio philosophorum dare. Est enim tanti philosophi tamque nobilis audacter sua decreta defendere.</p>'\n  -\n    value: '<p>Huius, Lyco, oratione locuples, rebus ipsis ielunior. Duo Reges: constructio interrete. Sed haec in pueris; Sed utrum hortandus es nobis, Luci, inquit, an etiam tua sponte propensus es? Sapiens autem semper beatus est et est aliquando in dolore; Immo videri fortasse. Paulum, cum regem Persem captum adduceret, eodem flumine invectio? Et ille ridens: Video, inquit, quid agas;</p>'\n  -\n    value: '<p>Quae cum dixisset, finem ille. Quamquam non negatis nos intellegere quid sit voluptas, sed quid ille dicat. Progredientibus autem aetatibus sensim tardeve potius quasi nosmet ipsos cognoscimus. Gloriosa ostentatio in constituendo summo bono. Qui-vere falsone, quaerere mittimus-dicitur oculis se privasse; Duarum enim vitarum nobis erunt instituta capienda. Comprehensum, quod cognitum non habet? Qui enim existimabit posse se miserum esse beatus non erit. Causa autem fuit huc veniendi ut quosdam hinc libros promerem. Nunc omni virtuti vitium contrario nomine opponitur.</p>'\nurl:\n  - 'http://example.com'\n  - 'http://test.com'\nwebform_creditcard_number:\n  - '4111111111111111'\nwebform_email_confirm:\n  - example@example.com\n  - test@test.com\n  - random@random.com\nwebform_email_multiple:\n  - 'example@example.com, test@test.com, random@random.com'\nwebform_location:\n  -\n    value: 'The White House, 1600 Pennsylvania Ave NW, Washington, DC 20500, USA'\n  -\n    value: 'London SW1A 1AA, United Kingdom'\n  -\n    value: 'Moscow, Russia, 10307'\nwebform_time:\n  - '09:00'\n  - '17:00'\n"
