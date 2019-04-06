@@ -10,6 +10,7 @@ dependencies:
       - commerce_order
   module:
     - address
+    - content_moderation
 _core:
   default_config_hash: 7mnnVkJkUSPhil9xoiTfdTivMqxCUloT_71AHWNUbJg
 id: profile.customer.default
@@ -20,8 +21,7 @@ content:
   address:
     type: address_default
     weight: 0
-    settings:
-      default_country: FR
+    settings: {  }
     third_party_settings: {  }
     region: content
   moderation_state:
