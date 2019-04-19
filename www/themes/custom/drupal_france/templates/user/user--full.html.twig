@@ -43,7 +43,9 @@
           {{ content.field_user_twitter }}
         </div>
       </div>
-      <div class="medium-3 column user--membership"></div>
+      <div class="medium-3 column user--membership">
+        {{ content.extra_field_drupalfr_user_member_badge }}
+      </div>
 
       <hr class="separator">
 
@@ -58,9 +60,6 @@
       </div>
 
     </div>
-    {% set hidden_fields = [
-
-    ] %}
     {{- content|without(
       'field_user_banner',
       'user_picture',
@@ -72,5 +71,6 @@
       'field_user_twitter',
       'field_user_biography'
     ) -}}
+    {# 'extra_field_drupalfr_user_member_badge'#}
   {% endif %}
 </article>
