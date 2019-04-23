@@ -33,7 +33,7 @@
       <div class="medium-2 column user--picture">
         {{ content.user_picture }}
       </div>
-      <div class="medium-7 column user--infos">
+      <div class="medium-8 column user--infos">
         {{ content.field_user_realname }}
         {{ content.field_user_slogan }}
         {{ content.field_user_organization }}
@@ -43,24 +43,43 @@
           {{ content.field_user_twitter }}
         </div>
       </div>
-      <div class="medium-3 column user--membership">
+      <div class="medium-2 column user--membership">
         {{ content.extra_field_drupalfr_user_member_badge }}
       </div>
 
-      <hr class="separator">
-
-      <div class="small-12 column user--biography">
+      <div class="medium-9 column user--biography">
         {{ content.field_user_biography }}
       </div>
 
-      <hr class="separator">
+      <div class="medium-3 column user--events">
+        {{ content.field_user_event }}
+      </div>
+    </div>
 
-      <div class="small-12 column">
+    <hr class="separator">
+
+    <div class="row">
+      <div class="medium-6 column user--feed">
+        {{ content.planet_feed_entity_view_1 }}
+        {{ content.planet_entity_view_1 }}
 
       </div>
-
+      <div class="medium-6 column user--forum">
+        {{ content.forum_entity_view_1 }}
+      </div>
     </div>
-    {{- content|without(
+
+    <div class="row user--organization">
+      {{ content.field_organization_legal_form }}
+      {{ content.field_organization_size }}
+      {{ content.field_organization_region }}
+      {{ content.field_organization_service_type }}
+      {{ content.field_organization_contact_info }}
+      {{ content.job_offer_entity_view_organization_job_offer }}
+    </div>
+
+
+    {# {- content|without(
       'field_user_banner',
       'user_picture',
       'field_user_realname',
@@ -69,8 +88,9 @@
       'field_user_website',
       'field_user_drupal_org',
       'field_user_twitter',
+      'extra_field_drupalfr_user_member_badge',
       'field_user_biography'
-    ) -}}
+    ) -}} #}
     {# 'extra_field_drupalfr_user_member_badge'#}
   {% endif %}
 </article>
