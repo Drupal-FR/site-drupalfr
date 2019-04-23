@@ -1,0 +1,49 @@
+// ==========================
+// EVENTS
+// ==========================
+
+.event {
+
+  &.teaser {
+    @include shadow();
+    margin-top:       6rem;
+    background-color: $white;
+
+    .block-meetup--list--info-box {
+      position: absolute;
+      top:      -40px;
+      right:    38%;
+      left:     38%;
+      width:    24%;
+    }
+
+    .node-title {
+      padding:       $global-padding $global-padding*2 0;
+      border-bottom: 1px solid $light-gray;
+    }
+
+    .content {
+      padding: 0 $global-padding*2 $global-padding;
+    }
+
+    .event-date {
+      display:       block;
+      margin-bottom: $global-margin;
+
+      & * {
+        display: inline;
+      }
+
+    }
+
+    .field-node--field-event-date-start,
+    .field-node--field-event-date-end {
+      font-weight: 700;
+      text-align:  left;
+    }
+
+    .body {
+      @include clearfix;
+    }
+  }
+}

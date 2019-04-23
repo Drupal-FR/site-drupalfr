@@ -141,11 +141,55 @@
           margin-right: $global-margin/4;
           color:        $dark-gray;
         }
+
+        a {
+          &:hover,
+          &:focus {
+            color:           $drupal-blue-dark;
+            text-decoration: underline;
+          }
+        }
       }
     }
 
     .user--biography {
       margin-top: $global-margin*2;
+    }
+
+    .user-feed {
+      margin: $global-margin*3 0;
+    }
+
+    .user--publications {
+      margin:           $global-margin 0;
+      padding:          $global-padding 0;
+      background-color: $drupal-grey-light;
+
+      .section-title {
+        margin-top:    $global-margin;
+        margin-bottom: $global-margin*2;
+      }
+    }
+
+    .user--events {
+      margin: $global-margin*3 0;
+
+      .field--name-field-user-event {
+        & > .field--label {
+          text-align: center;
+        }
+      }
+    }
+
+    .user--forum {
+      margin:           $global-margin 0;
+      padding:          $global-padding 0;
+      background-color: $drupal-grey-light;
+
+      .section-title {
+        margin-top:    $global-margin;
+        margin-bottom: $global-margin*2;
+      }
     }
   }
 }

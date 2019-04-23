@@ -47,26 +47,26 @@
         {{ content.extra_field_drupalfr_user_member_badge }}
       </div>
 
-      <div class="medium-9 column user--biography">
+      <div class="medium-12 column user--biography">
         {{ content.field_user_biography }}
-      </div>
-
-      <div class="medium-3 column user--events">
-        {{ content.field_user_event }}
       </div>
     </div>
 
-    <hr class="separator">
+    <div class="user--feed">
+      {{ content.planet_feed_entity_view_1 }}
+    </div>
 
-    <div class="row">
-      <div class="medium-6 column user--feed">
-        {{ content.planet_feed_entity_view_1 }}
-        {{ content.planet_entity_view_1 }}
+    <div class="user--publications">
+      {{ content.planet_entity_view_1 }}
+    </div>
 
-      </div>
-      <div class="medium-6 column user--forum">
-        {{ content.forum_entity_view_1 }}
-      </div>
+    <div class="user--events">
+      {{ content.field_user_event }}
+    </div>
+
+    <div class="user--forum">
+      {{ content.forum_entity_view_1 }}
+
     </div>
 
     <div class="row user--organization">
@@ -77,20 +77,5 @@
       {{ content.field_organization_contact_info }}
       {{ content.job_offer_entity_view_organization_job_offer }}
     </div>
-
-
-    {# {- content|without(
-      'field_user_banner',
-      'user_picture',
-      'field_user_realname',
-      'field_user_slogan',
-      'field_user_organization',
-      'field_user_website',
-      'field_user_drupal_org',
-      'field_user_twitter',
-      'extra_field_drupalfr_user_member_badge',
-      'field_user_biography'
-    ) -}} #}
-    {# 'extra_field_drupalfr_user_member_badge'#}
   {% endif %}
 </article>

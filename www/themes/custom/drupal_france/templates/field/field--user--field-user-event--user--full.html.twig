@@ -55,8 +55,8 @@
 {%
   set item_classes = [
     'field--item',
-    'small-12',
-    'medium-6',
+    'small-6',
+    'medium-4',
     'column',
   ]
 %}
@@ -75,7 +75,7 @@
       {% endfor %}
     </div>
   {% else %}
-    {% for batched_items in items|batch(2) %}
+    {% for batched_items in items|batch(3) %}
       <div class="row">
         {% for item in batched_items %}
           <div{{ item.attributes.addClass(classes, item_classes) }}>
@@ -87,11 +87,13 @@
   {% endif %}
 {% else %}
   <div{{ attributes.addClass(classes) }}>
-    <div{{ title_attributes.addClass(title_classes) }}>{{ label }}</div>
+    <div{{ title_attributes.addClass(title_classes) }}>
+      <h2>{{ label }}</h2>
+    </div>
     {% if multiple %}
       <div class="field--items">
     {% endif %}
-        {% for batched_items in items|batch(2) %}
+        {% for batched_items in items|batch(3) %}
           <div class="row">
             {% for item in batched_items %}
               <div{{ item.attributes.addClass(item_classes) }}>
