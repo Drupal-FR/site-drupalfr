@@ -91,7 +91,7 @@
     }
 
     .user--head {
-      margin-top:    200px;
+      margin-top:    220px;
       margin-bottom: $global-margin;
     }
 
@@ -103,11 +103,19 @@
     }
 
     .user--infos {
-      margin-top: 60px;
+      margin-top: 32px;
     }
 
     .user--realname--title {
       font-size: 3rem;
+    }
+
+    .user--membership {
+      margin-top: 50px;
+    }
+
+    .user-member--become-member {
+      margin-top: $global-margin*2;
     }
 
     .field-user--field-user-slogan {
@@ -118,11 +126,14 @@
     }
 
     .user--social-links {
-      display: inline-block;
+      display:     inline-block;
+      margin-top:  .75rem;
+      padding-top: .75rem;
+      border-top:  1px solid $drupal-grey;
 
       .user--social-link {
         display:      inline;
-        margin-right: $global-margin;
+        margin-right: $global-margin*3;
         font-size:    1.1rem;
 
         i {
@@ -133,5 +144,8 @@
       }
     }
 
+    .user--biography {
+      margin-top: $global-margin*2;
+    }
   }
 }
