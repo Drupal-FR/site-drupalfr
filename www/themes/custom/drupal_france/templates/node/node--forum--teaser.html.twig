@@ -1,13 +1,15 @@
 {#
 /**
  * @file
- * Theme override to display a node.
+ * Default theme implementation to display a node.
  *
  * Available variables:
- * - node: The node entity with limited access to object properties and methods.
-     Only "getter" methods (method names starting with "get", "has", or "is")
-     and a few common methods such as "id" and "label" are available. Calling
-     other methods (such as node.delete) will result in an exception.
+ * - node: Full node entity.
+ *   - id: The node ID.
+ *   - bundle: The type of the node, for example, "page" or "article".
+ *   - authorid: The user ID of the node author.
+ *   - createdtime: Time the node was published formatted in Unix timestamp.
+ *   - changedtime: Time the node was changed formatted in Unix timestamp.
  * - label: The title of the node.
  * - content: All node items. Use {{ content }} to print them all,
  *   or print a subset such as {{ content.field_example }}. Use
@@ -56,49 +58,47 @@
  * - is_admin: Flag for admin user status. Will be true when the current user
  *   is an administrator.
  *
- * @ingroup templates
- *
  * @see template_preprocess_node()
  *
  * @todo Remove the id attribute (or make it a class), because if that gets
  *   rendered twice on a page this is invalid CSS for example: two lists
  *   in different view modes.
+ *
+ * @ingroup themeable
  */
 #}
-{% set classes = [
-  node.bundle|clean_class,
-  node.isPromoted() ? 'is-promoted',
-  node.isSticky() ? 'is-sticky',
-  not node.isPublished() ? 'is-unpublished',
-  view_mode ? view_mode|clean_class,
-  'clearfix',
-] %}
-<article{{ attributes.addClass(classes) }}>
 
-  <div class="block-meetup--list--info-box">
-    <div class="info-box--day">
-      {{ content.field_event_date_start[0]['#attributes']['datetime']|date('j') }}
-    </div>
-    <div class="info-box--month">
-      {{ content.field_event_date_start[0]['#attributes']['datetime']|date('M') }}
-    </div>
-  </div>
-
-  {{ content.field_media_teaser }}
+<article id="node-{{ node.id }}" {{ attributes }}>
 
   {{ title_prefix }}
-  <h3{{ title_attributes }}>
-    <a href="{{ url }}" rel="bookmark">{{ label }}</a>
-  </h3>
+  {% if not page %}
+    <h3{{ title_attributes }}>
+      <a href="{{ url }}" rel="bookmark">{{ label }}</a>
+    </h3>
+  {% endif %}
   {{ title_suffix }}
 
-  <div{{ content_attributes.addClass('content') }}>
-    <div class="event-date">
-      {{ content.field_event_date_start|raw }}
-      <span>&mdash;</span>
-      {{ content.field_event_date_end }}
-    </div>
-    {{ content|without('field_media_teaser', 'field_event_date_start', 'field_event_date_end') }}
+
+
+  {# We hide the comments and links now so that we can render them later. #}
+  <div{{ content_attributes }}>
+    {{ content|without('comment', 'links', 'field_tags') }}
   </div>
 
+  {% if display_submitted %}
+    <div class="posted">
+      <div{{ author_attributes }}>
+        {% trans %}Submitted by {{ author_name }} on {{ date }}{% endtrans %}
+        {{ metadata }}
+      </div>
+    </div>
+  {% endif %}
+
+
+  {% if content.field_tags|length and not is_front %}
+    {{ content.field_tags }}
+  {% endif %}
+
+  {{ content.links }}
+  {{ content.comment }}
 </article>
