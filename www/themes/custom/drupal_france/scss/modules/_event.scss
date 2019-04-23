@@ -20,6 +20,17 @@
     .node-title {
       padding:       $global-padding $global-padding*2 0;
       border-bottom: 1px solid $light-gray;
+      font-size:     1.75rem;
+
+      a {
+        color: $drupal-blue-lighter;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: $drupal-blue-dark;
+        }
+      }
     }
 
     .content {
