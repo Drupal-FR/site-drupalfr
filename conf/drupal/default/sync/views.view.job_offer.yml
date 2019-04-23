@@ -11,7 +11,6 @@ dependencies:
     - options
     - user
     - views_custom_cache_tag
-    - views_infinite_scroll
 _core:
   default_config_hash: 4AcoilaKBhyaAhHOulWqB-KpUYE0I5ZfwzQXWI3E8jA
 id: job_offer
@@ -214,6 +213,7 @@ display:
       defaults:
         use_ajax: false
         arguments: false
+        empty: false
       arguments:
         uid:
           id: uid
@@ -254,6 +254,20 @@ display:
           plugin_id: numeric
       argument_mode: None
       default_argument: null
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: '<div class="callout text-center no-job-offer">L''organisme ne propose actuellement aucune offre d''emploi.</div>'
+            format: full_html
+          plugin_id: text
     cache_metadata:
       max-age: -1
       contexts:
