@@ -65,24 +65,18 @@
  *   in different view modes.
  */
 #}
-{% set classes = [
-  node.bundle|clean_class,
-  node.isPromoted() ? 'is-promoted',
-  node.isSticky() ? 'is-sticky',
-  not node.isPublished() ? 'is-unpublished',
-  view_mode ? view_mode|clean_class,
-  'clearfix',
-] %}
-<article{{ attributes.addClass(classes) }}>
+{%
+  set classes = [
+    node.bundle|clean_class,
+    node.isPromoted() ? 'is-promoted',
+    node.isSticky() ? 'is-sticky',
+    not node.isPublished() ? 'is-unpublished',
+    view_mode ? view_mode|clean_class,
+    'clearfix',
+  ]
+%}
 
-  <div class="block-meetup--list--info-box">
-    <div class="info-box--day">
-      {{ content.field_event_date_start[0]['#attributes']['datetime']|date('j') }}
-    </div>
-    <div class="info-box--month">
-      {{ content.field_event_date_start[0]['#attributes']['datetime']|date('M') }}
-    </div>
-  </div>
+<article{{ attributes.addClass(classes) }}>
 
   {{ content.field_media_teaser }}
 
@@ -94,11 +88,10 @@
 
   <div{{ content_attributes.addClass('content') }}>
     <div class="event-date">
-      {{ content.field_event_date_start|raw }}
+      {{ content.field_event_date_start }}
       <span>&mdash;</span>
       {{ content.field_event_date_end }}
     </div>
     {{ content|without('field_media_teaser', 'field_event_date_start', 'field_event_date_end') }}
   </div>
-
 </article>
