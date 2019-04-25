@@ -52,9 +52,6 @@ $settings['cache']['default'] = 'cache.backend.redis';
 // Varnish.
 $config['varnish_purger.settings.varnish']['hostname'] = 'varnish';
 
-// Solr.
-$config['search_api.server.solr']['backend_config']['connector_config']['host'] = 'solr';
-
 // Twitter.
 // Go to https://apps.twitter.com to get these tokens.
 $config['drupalfr_social.twitter']['consumer_key'] = '';

@@ -2,16 +2,15 @@ uuid: bab1f740-dc5d-403d-bd19-be0ca90ae5e0
 langcode: fr
 status: true
 dependencies:
+  module:
+    - node
+    - taxonomy
+    - search_api
   config:
     - field.storage.node.field_showcase_category
     - field.storage.node.field_showcase_sector
     - field.storage.node.field_showcase_drupal_version
-    - search_api.server.solr
-  module:
-    - taxonomy
-    - search_api
-    - search_api_solr
-    - node
+    - search_api.server.database
 _core:
   default_config_hash: bZXvXb7f6hAFqvN2YQ3Ihg-oG-ZZskk9pi1l68XbXWk
 id: showcase
@@ -24,6 +23,9 @@ field_settings:
     datasource_id: 'entity:node'
     property_path: created
     type: date
+    dependencies:
+      module:
+        - node
   name:
     label: Typologie
     datasource_id: 'entity:node'
@@ -33,6 +35,7 @@ field_settings:
       config:
         - field.storage.node.field_showcase_category
       module:
+        - taxonomy
         - taxonomy
   name_1:
     label: Secteur
@@ -44,6 +47,7 @@ field_settings:
         - field.storage.node.field_showcase_sector
       module:
         - taxonomy
+        - taxonomy
   name_2:
     label: 'Version de Drupal'
     datasource_id: 'entity:node'
@@ -53,6 +57,7 @@ field_settings:
       config:
         - field.storage.node.field_showcase_drupal_version
       module:
+        - taxonomy
         - taxonomy
   node_grants:
     label: 'Node access information'
@@ -68,6 +73,9 @@ field_settings:
     type: boolean
     indexed_locked: true
     type_locked: true
+    dependencies:
+      module:
+        - node
   uid:
     label: uid
     datasource_id: 'entity:node'
@@ -75,6 +83,9 @@ field_settings:
     type: integer
     indexed_locked: true
     type_locked: true
+    dependencies:
+      module:
+        - node
 datasource_settings:
   'entity:node':
     bundles:
@@ -90,16 +101,9 @@ processor_settings:
   content_access:
     weights:
       preprocess_query: -30
+  entity_status: {  }
   ignore_character:
-    all_fields: true
-    fields:
-      - name
-      - name_1
-      - name_2
     ignorable: '[''¿¡!?,.:;]'
-    weights:
-      preprocess_index: -10
-      preprocess_query: -10
     ignorable_classes:
       - Pc
       - Pd
@@ -108,14 +112,15 @@ processor_settings:
       - Pi
       - Po
       - Ps
-  rendered_item: {  }
-  solr_date_range:
+    all_fields: false
     weights:
-      preprocess_index: 0
+      preprocess_index: -10
+      preprocess_query: -10
+  rendered_item: {  }
 tracker_settings:
   default:
     indexing_order: fifo
 options:
   index_directly: false
   cron_limit: 50
-server: solr
+server: database

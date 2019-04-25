@@ -49,14 +49,3 @@ services:
     entrypoint:
       - docker-entrypoint.sh
       - /usr/local/etc/redis/redis.conf
-
-
-  solr:
-    image: solr:7.6-alpine
-    volumes:
-      - ./conf/solr:/solr-drupal/conf
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr-precreate
-      - drupal
-      - /solr-drupal

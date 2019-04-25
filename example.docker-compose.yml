@@ -44,12 +44,6 @@ services:
       - ./data/db:/var/lib/mysql
 
 
-  solr:
-    extends:
-      file: ./docker-compose-common.yml
-      service: solr
-
-
   redis:
     extends:
       file: ./docker-compose-common.yml
