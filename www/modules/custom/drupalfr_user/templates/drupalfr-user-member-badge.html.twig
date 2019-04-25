@@ -12,6 +12,8 @@
 #}
 {% if is_member %}
   <div>{{ 'Member'|t }}</div>
+{% elseif is_organization %}
+  <div>{{ 'Organization member'|t }}</div>
 {% elseif is_profile_owner %}
   <div>
     <a href="/association/adhesion">{{ 'Become a member'|t }}</a>

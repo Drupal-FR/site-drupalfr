@@ -15,6 +15,10 @@
   <div class="user-member--badge">
     <img src="/{{ directory }}/images/Badge_Adherent_Ind_ADFF.svg" alt="{{ 'Member'|t }}">
   </div>
+{% elseif is_organization %}
+  <div class="user-member--badge">
+    <img src="/{{ directory }}/images/Badge_Adherent_Org_ADFF.svg" alt="{{ 'Organization member'|t }}">
+  </div>
 {% elseif is_profile_owner %}
   <div class="user-member--become-member">
     <a class="button hollow primary"
