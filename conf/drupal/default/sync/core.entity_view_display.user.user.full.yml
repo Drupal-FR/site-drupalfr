@@ -24,6 +24,7 @@ dependencies:
     - field.field.user.user.field_user_twitter
     - field.field.user.user.field_user_website
     - field.field.user.user.user_picture
+    - image.style.raw
     - image.style.square_165
   module:
     - image
@@ -84,7 +85,7 @@ content:
     region: content
     label: hidden
     settings:
-      image_style: ''
+      image_style: raw
     third_party_settings: {  }
   field_user_biography:
     type: text_default
