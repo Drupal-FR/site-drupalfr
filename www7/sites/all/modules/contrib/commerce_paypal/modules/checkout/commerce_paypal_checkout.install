@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Remove variables required by Commerce PayPal Checkout.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_paypal_checkout_uninstall() {
+  variable_del('commerce_paypal_checkout_review_embedded_panes');
+}

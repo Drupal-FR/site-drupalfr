@@ -1212,6 +1212,35 @@ function commerce_paypal_ec_do_payment($payment_method, $order, $charge) {
     $transaction->data['commerce_paypal_ec']['parenttransactionid'] = $transaction->remote_id;
   }
 
+  // Check if there is an error code in the response.
+  if (!empty($response['L_ERRORCODE0'])) {
+    // Log the error in a payment transaction.
+    $transaction->status = COMMERCE_PAYMENT_STATUS_FAILURE;
+    $transaction->remote_status = '';
+    $message = array();
+    $message[] = '<strong>' . t('Payment failed') . '</strong>';
+    $message[] = t('Error @code: @message', array('@code' => $response['L_ERRORCODE0'], '@message' => $response['L_SHORTMESSAGE0']));
+    $transaction->message = implode('<br />', $message);
+    commerce_payment_transaction_save($transaction);
+
+    // If the response error indicates a funding failure, redirect the customer
+    // back to PayPal for another attempt.
+    // @see: https://developer.paypal.com/docs/classic/express-checkout/ht_ec_fundingfailure10486/
+    if ($response['L_ERRORCODE0'] === '10486') {
+      // Log the error in watchdog.
+      watchdog('commerce_paypal_ec', 'PayPal Express Checkout transaction funding failed for order @order_number. Redirecting the user back to PayPal.', array('@order_number' => $order->order_number), WATCHDOG_NOTICE);
+      // Update order.
+      commerce_order_status_update($order, 'checkout_payment', FALSE, NULL, t('Customer payment transaction funding failed. Redirecting customer back to the PayPal Express Checkout page.'));
+      // Redirect the user back to PayPal.
+      drupal_goto(commerce_paypal_ec_checkout_url($payment_method['settings']['server'], $order->data['commerce_paypal_ec']['token']));
+    }
+
+    // Log the error in watchdog.
+    watchdog('commerce_paypal_ec', 'PayPal Express Checkout transaction failed for order @order_number.', array('@order_number' => $order->order_number), WATCHDOG_ERROR);
+
+    return FALSE;
+  }
+
   // If we received an unknown response status...
   if (!isset($response['PAYMENTINFO_0_PAYMENTSTATUS']) || !in_array($response['PAYMENTINFO_0_PAYMENTSTATUS'], array('Failed', 'Voided', 'Pending', 'Completed', 'Refunded'))) {
     // Display an error message and remain on the same page.

@@ -1,0 +1,1233 @@
+<?php
+
+/**
+ * @file
+ * Implements PayPal Checkout in Drupal Commerce checkout.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_paypal_checkout_menu() {
+  return array(
+    // Add a menu item for capturing authorizations.
+    'admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/paypal-checkout-capture' => array(
+      'title' => 'Capture',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_paypal_checkout_capture_form', 3, 5),
+      'access callback' => 'commerce_paypal_checkout_capture_void_access',
+      'access arguments' => array(3, 5),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 2,
+      'file' => 'includes/commerce_paypal_checkout.admin.inc',
+    ),
+    // Add a menu item for voiding authorizations.
+    'admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/paypal-checkout-void' => array(
+      'title' => 'Void',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_paypal_checkout_void_form', 3, 5),
+      'access callback' => 'commerce_paypal_checkout_capture_void_access',
+      'access arguments' => array(3, 5),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 4,
+      'file' => 'includes/commerce_paypal_checkout.admin.inc',
+    ),
+    // Add a menu item for refunding settled transactions.
+    'admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/paypal-checkout-refund' => array(
+      'title' => 'Refund',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_paypal_checkout_refund_form', 3, 5),
+      'access callback' => 'commerce_paypal_checkout_refund_access',
+      'access arguments' => array(3, 5),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 4,
+      'file' => 'includes/commerce_paypal_checkout.admin.inc',
+    ),
+    'commerce-paypal-checkout/create-order/%commerce_order/%commerce_paypal_checkout_method_instance' => array(
+      'page callback' => 'commerce_paypal_checkout_create_order',
+      'page arguments' => array(2, 3),
+      'access callback' => 'commerce_checkout_access',
+      'access arguments' => array(2),
+      'type' => MENU_CALLBACK,
+    ),
+    'commerce-paypal-checkout/approve-order/%commerce_order/%commerce_paypal_checkout_method_instance/%' => array(
+      'page callback' => 'commerce_paypal_checkout_approve_order',
+      'page arguments' => array(2, 3, 4),
+      'access callback' => 'commerce_checkout_access',
+      'access arguments' => array(2),
+      'type' => MENU_CALLBACK,
+    ),
+  );
+}
+
+/**
+ * Determines access to the prior authorization capture form or void form for
+ * Paypal Checkout transactions.
+ *
+ * @param $order
+ *   The order the transaction is on.
+ * @param $transaction
+ *   The payment transaction object to be captured.
+ *
+ * @return
+ *   TRUE or FALSE indicating access.
+ */
+function commerce_paypal_checkout_capture_void_access($order, $transaction) {
+  // Return FALSE if the transaction isn't for Paypal Checkout or isn't
+  // awaiting capture.
+  if ($transaction->payment_method != 'paypal_checkout' || strtolower($transaction->remote_status) != 'created') {
+    return FALSE;
+  }
+
+  // Return FALSE if the transaction is not pending.
+  if ($transaction->status != COMMERCE_PAYMENT_STATUS_PENDING) {
+    return FALSE;
+  }
+
+  // Return FALSE if it is more than 29 days past the original authorization.
+  if (REQUEST_TIME - $transaction->created > 86400 * 29) {
+    return FALSE;
+  }
+
+  // Allow access if the user can update payments on this transaction.
+  return commerce_payment_transaction_access('update', $transaction);
+}
+
+/**
+ * Determines access to the refund form for Paypal Checkout transactions.
+ *
+ * @param $order
+ *   The order the transaction is on.
+ * @param $transaction
+ *   The payment transaction object to be captured.
+ *
+ * @return
+ *   TRUE or FALSE indicating access.
+ */
+function commerce_paypal_checkout_refund_access($order, $transaction) {
+  // Return FALSE if the transaction isn't Completed.
+  if ($transaction->payment_method != 'paypal_checkout' || strtolower($transaction->remote_status) != 'completed') {
+    return FALSE;
+  }
+
+  // Return FALSE if the transaction was not a success.
+  if ($transaction->status != COMMERCE_PAYMENT_STATUS_SUCCESS) {
+    return FALSE;
+  }
+
+  // Return FALSE if it is more than 60 days since the original transaction.
+  if (REQUEST_TIME - $transaction->created > 86400 * 60) {
+    return FALSE;
+  }
+
+  // Allow access if the user can update payments on this transaction.
+  return commerce_payment_transaction_access('update', $transaction);
+}
+
+/**
+ * Load the given PayPal checkout payment method instance.
+ *
+ * @param $rule_name
+ *   The enabling's rule name.
+ *
+ * @return
+ *   The payment method instance object which is identical to the payment method
+ *   object with the addition of the settings array.
+ */
+function commerce_paypal_checkout_method_instance_load($rule_name) {
+  return commerce_payment_method_instance_load("paypal_checkout|$rule_name");
+}
+
+/**
+ * Implements hook_commerce_checkout_page_info().
+ */
+function commerce_paypal_checkout_commerce_checkout_page_info() {
+  $checkout_pages = array();
+
+  $checkout_pages['paypal_checkout'] = array(
+    'title' => t('Confirm order'),
+    'help' => t('Confirm your order information and use the button at the bottom of the page to finalize your payment.'),
+    'status_cart' => FALSE,
+    'locked' => TRUE,
+    'buttons' => FALSE,
+    'weight' => 30,
+  );
+
+  return $checkout_pages;
+}
+
+/**
+ * Implements hook_commerce_checkout_pane_info().
+ */
+function commerce_paypal_checkout_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+
+  $checkout_panes['paypal_checkout_review'] = array(
+    'title' => t('Review and confirm your order'),
+    'name' => t('PayPal Checkout review and confirm (only to be used on the confirm order page)'),
+    'file' => 'includes/commerce_paypal_checkout.checkout_pane.inc',
+    'base' => 'commerce_paypal_checkout_review_pane',
+    'page' => 'paypal_checkout',
+    'fieldset' => FALSE,
+  );
+
+  return $checkout_panes;
+}
+
+/**
+ * Implements hook_commerce_checkout_router().
+ */
+function commerce_paypal_checkout_commerce_checkout_router($order, $checkout_page) {
+  // If the current page is the PayPal Checkout page but the current order did
+  // not use the shortcut Checkout flow...
+  if ($checkout_page['page_id'] == 'paypal_checkout' &&
+    (empty($order->data['commerce_paypal_checkout']['flow']) || $order->data['commerce_paypal_checkout']['flow'] != 'shortcut')) {
+    // Update the order status to the next checkout page.
+    $next_page = $checkout_page['next_page'];
+    $order = commerce_order_status_update($order, 'checkout_' . $next_page, FALSE, FALSE);
+
+    // Inform modules of checkout completion if the next page is Completed.
+    if ($next_page == 'complete') {
+      commerce_checkout_complete($order);
+    }
+
+    // Redirect to the URL for the new checkout page.
+    $target_uri = commerce_checkout_order_uri($order);
+    return drupal_goto($target_uri);
+  }
+}
+
+/**
+ * Returns the checkout pane IDs of checkout panes that should be embedded in
+ * the PayPal Checkout review and confirm page.
+ */
+function commerce_paypal_checkout_embedded_checkout_panes() {
+  return array_filter(variable_get('commerce_paypal_checkout_review_embedded_panes', array()));
+}
+
+/**
+ * Implements hook_commerce_payment_method_info().
+ */
+function commerce_paypal_checkout_commerce_payment_method_info() {
+  $payment_methods = array();
+
+  $payment_methods['paypal_checkout'] = array(
+    'base' => 'commerce_paypal_checkout',
+    'title' => t('PayPal Checkout'),
+    'display_title' => t('PayPal'),
+    'short_title' => t('PayPal Checkout'),
+    'description' => t('PayPal Checkout'),
+    'terminal' => FALSE,
+    'offsite' => TRUE,
+    'offsite_autoredirect' => FALSE,
+  );
+
+  return $payment_methods;
+}
+
+/**
+ * Returns the default settings for the PayPal Checkout payment method.
+ */
+function commerce_paypal_checkout_default_settings() {
+  $default_settings = array(
+    'client_id' => '',
+    'secret' => '',
+    'server' => 'sandbox',
+    'intent' => 'capture',
+    'disable_funding' => array(),
+    'disable_card' => array(),
+    'shipping_preference' => 'get_from_file',
+    'update_billing_profiles' => TRUE,
+    'style' => array(),
+    'enable_on_cart' => TRUE,
+  );
+
+  if (module_exists('commerce_shipping')) {
+    $default_settings['update_shipping_profiles'] = TRUE;
+  }
+
+  return $default_settings;
+}
+
+/**
+ * Payment method callback: settings form.
+ */
+function commerce_paypal_checkout_settings_form($settings = array()) {
+  $form = array();
+
+  // Merge default settings into the stored settings array.
+  $settings = (array) $settings + commerce_paypal_checkout_default_settings();
+  $shipping_module_enabled = module_exists('commerce_shipping');
+
+  $form['client_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Client ID'),
+    '#maxlength' => 255,
+    '#default_value' => $settings['client_id'],
+    '#required' => TRUE,
+  );
+  $form['secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret'),
+    '#maxlength' => 255,
+    '#default_value' => $settings['secret'],
+    '#required' => TRUE,
+  );
+  $form['server'] = array(
+    '#type' => 'radios',
+    '#title' => t('PayPal server'),
+    '#options' => array(
+      'sandbox' => ('Sandbox - use for testing, requires a PayPal Sandbox account'),
+      'live' => ('Live - use for processing real transactions'),
+    ),
+    '#default_value' => $settings['server'],
+  );
+  $form['intent'] = array(
+    '#type' => 'radios',
+    '#title' => t('Transaction type'),
+    '#options' => array(
+      'capture' => t('Capture'),
+      'authorize' => t('Authorize'),
+    ),
+    '#default_value' => $settings['intent'],
+  );
+  $form['disable_funding'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Disable funding sources'),
+    '#description' => t('The disabled funding sources for the transaction. Any funding sources passed are not displayed in the Smart payment buttons. By default, funding source eligibility is smartly decided based on a variety of factors.'),
+    '#options' => array(
+      'card' => t('Credit or Debit Cards'),
+      'credit' => t('PayPal Credit'),
+      'sepa' => t('SEPA-Lastschrift'),
+    ),
+    '#default_value' => $settings['disable_funding'],
+    '#element_validate' => array('commerce_paypal_checkout_disable_funding_validate'),
+  );
+  $form['disable_card'] = array(
+    '#title' => t('Disable card types'),
+    '#description' => t('The disabled cards for the transaction. Any cards passed do not display in the Smart payment buttons. By default, card eligibility is smartly decided based on a variety of factors.'),
+    '#type' => 'checkboxes',
+    '#options' => array(
+      'visa' => t('Visa'),
+      'mastercard' => t('Mastercard'),
+      'amex' => t('American Express'),
+      'discover' => t('Discover'),
+      'jcb' => t('JCB'),
+      'elo' => t('Elo'),
+      'hiper' => t('Hiper'),
+    ),
+    '#default_value' => $settings['disable_card'],
+    '#element_validate' => array('commerce_paypal_checkout_disable_card_validate'),
+  );
+  $form['shipping_preference'] = array(
+    '#type' => 'radios',
+    '#title' => t('Shipping address collection'),
+    '#description' => t('PayPal Checkout will only request a shipping address if the Shipping module is enabled to store the address in the order.'),
+    '#options' => array(
+      'no_shipping' => t('Do not ask for a shipping address at PayPal.'),
+    ),
+    '#default_value' => 'no_shipping',
+  );
+
+  if ($shipping_module_enabled) {
+    $form['shipping_preference']['#options'] += array(
+      'get_from_file' => t('Ask for a shipping address at PayPal even if the order already has one.'),
+      'set_provided_address' => t('Ask for a shipping address at PayPal if the order does not have one yet.'),
+    );
+    $form['shipping_preference']['#default_value'] = $settings['shipping_preference'];
+  }
+
+  $form['update_billing_profiles'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Update billing customer profiles with address information the customer enters at PayPal.'),
+    '#default_value' => $settings['update_billing_profiles'],
+  );
+
+  if ($shipping_module_enabled) {
+    $form['update_shipping_profiles'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Update shipping customer profiles with address information the customer enters at PayPal.'),
+      '#default_value' => $settings['update_shipping_profiles'],
+    );
+  }
+
+  $form['customize_buttons'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Smart button style'),
+    '#default_value' => !empty($settings['style']),
+    '#title_display' => 'before',
+    '#field_suffix' => t('Customize'),
+    '#description_display' => 'before',
+    '#element_validate' => array('commerce_paypal_checkout_customize_buttons_validate'),
+  );
+  $form['style'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Settings'),
+    '#description' => t('For more information, please visit <a href="@url" target="_blank">customize the PayPal buttons</a>.', array('@url' => 'https://developer.paypal.com/docs/checkout/integration-features/customize-button/#layout')),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][customize_buttons]"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  // Define some default values for the style configuration.
+  $settings['style'] += [
+    'layout' => 'vertical',
+    'color' => 'gold',
+    'shape' => 'rect',
+    'label' => 'paypal',
+    'tagline' => FALSE,
+  ];
+  $form['style']['layout'] = array(
+    '#type' => 'select',
+    '#title' => t('Layout'),
+    '#default_value' => $settings['style']['layout'],
+    '#options' => array(
+      'vertical' => t('Vertical (Recommended)'),
+      'horizontal' => t('Horizontal'),
+    ),
+  );
+  $form['style']['color'] = array(
+    '#type' => 'select',
+    '#title' => t('Color'),
+    '#options' => array(
+      'gold' => t('Gold (Recommended)'),
+      'blue' => t('Blue'),
+      'silver' => t('Silver'),
+    ),
+    '#default_value' => $settings['style']['color'],
+  );
+  $form['style']['shape'] = array(
+    '#type' => 'select',
+    '#title' => t('Shape'),
+    '#options' => array(
+      'rect' => t('Rect (Default)'),
+      'pill' => t('Pill'),
+    ),
+    '#default_value' => $settings['style']['shape'],
+  );
+  $form['style']['label'] = array(
+    '#type' => 'select',
+    '#title' => t('Label'),
+    '#options' => array(
+      'paypal' => t('Displays the PayPal logo (Default)'),
+      'checkout' => t('Displays the PayPal Checkout button'),
+      'pay' => t('Displays the Pay With PayPal button and initializes the checkout flow'),
+    ),
+    '#default_value' => $settings['style']['label'],
+  );
+  $form['style']['tagline'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display tagline'),
+    '#default_value' => $settings['style']['tagline'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][style][layout]"]' => array('value' => 'horizontal'),
+      ),
+    ),
+  );
+
+  $form['enable_on_cart'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show the Smart payment buttons on the cart form.'),
+    '#default_value' => $settings['enable_on_cart'],
+  );
+
+  return $form;
+}
+
+/**
+ * Element validate callback for the customize_buttons payment method setting.
+ */
+function commerce_paypal_checkout_customize_buttons_validate($element, &$form_state, $form) {
+  // Make sure no style is saved when the the "customize_buttons" checkbox
+  // is unchecked.
+  $parents = $element['#parents'];
+  array_pop($parents);
+  $parents[] = 'style';
+  if (empty($element['#value'])) {
+    drupal_array_set_nested_value($form_state['values'], $parents, array(), TRUE);
+  }
+  else {
+    $style = drupal_array_get_nested_value($form_state['values'], $parents);
+    // The tagline is not allowed for the vertical layout.
+    if ($style['layout'] == 'vertical') {
+      unset($style['tagline']);
+      drupal_array_set_nested_value($form_state['values'], $parents, $style, TRUE);
+    }
+  }
+}
+
+/**
+ * Element validate callback for the disable_funding payment method setting.
+ */
+function commerce_paypal_checkout_disable_funding_validate($element, &$form_state, $form) {
+  form_set_value($element, array_filter($element['#value']), $form_state);
+}
+
+/**
+ * Element validate callback for the disable_card payment method setting.
+ */
+function commerce_paypal_checkout_disable_card_validate($element, &$form_state, $form) {
+  $parents = $element['#parents'];
+  array_pop($parents);
+  $parents[] = 'disable_funding';
+  $disable_funding = drupal_array_get_nested_value($form_state['values'], $parents);
+
+  // When the "card" funding source is disabled, the "disable_card" setting
+  // cannot be specified.
+  if (isset($disable_funding['card'])) {
+    $element['#value'] = array();
+  }
+  form_set_value($element, array_filter($element['#value']), $form_state);
+}
+
+/**
+ * Page callback: Provide the createOrder() callback expected by the SDK.
+ */
+function commerce_paypal_checkout_create_order($order, $payment_method) {
+  $settings = $payment_method['settings'];
+  $api_client = commerce_paypal_checkout_api_client($settings);
+
+  if (!$api_client) {
+    drupal_json_output(array());
+    drupal_exit();
+  }
+  try {
+    $request_body = commerce_paypal_checkout_prepare_order_request($order, $payment_method['settings']);
+    drupal_alter('commerce_paypal_checkout_create_order_request', $request_body, $order);
+    $json = $api_client->createOrder($request_body);
+    drupal_json_output(array('id' => $json['id']));
+    drupal_exit();
+  }
+  catch (\Exception $exception) {
+    watchdog_exception('commerce_paypal_checkout', $exception);
+  }
+  drupal_json_output(array());
+  drupal_exit();
+}
+
+/**
+ * Page callback: Provide the onApprove() callback expected by the SDK.
+ */
+function commerce_paypal_checkout_approve_order($order, $payment_method, $flow) {
+  $data = drupal_json_decode(file_get_contents('php://input'));
+
+  if (!in_array($flow, array('shortcut', 'mark')) || !isset($data['id'])) {
+    drupal_json_output(array());
+    drupal_exit();
+  }
+  // Store the PayPal order ID, and the "flow" used ("shortcut"|"mark").
+  // Note that we don't perform any validation here, that happens inside
+  // commerce_paypal_checkout_redirect_form_validate().
+  $order->data['commerce_paypal_checkout'] = array(
+    'flow' => $flow,
+    'remote_id' => $data['id'],
+  );
+
+  // The payment_redirect key is required in the payment return url.
+  if (empty($order->data['payment_redirect_key'])) {
+    $order->data['payment_redirect_key'] = drupal_hash_base64(time());
+  }
+  // We have to manually set the payment method if empty, it's also required
+  // by the payment redirect form validate callback.
+  if (empty($order->data['payment_method'])) {
+    $order->data['payment_method'] = $payment_method['instance_id'];
+  }
+
+  // Update the order status to the payment page for the shortcut flow.
+  if ($flow == 'shortcut') {
+    commerce_order_status_update($order, 'checkout_payment', FALSE, NULL, t('Customer clicked the Smart payment buttons on the cart page.'));
+  }
+  else {
+    commerce_order_save($order);
+  }
+
+  $return_url = url('checkout/' . $order->order_id . '/payment/return/' . $order->data['payment_redirect_key']);
+  drupal_json_output(array('redirectUri' => $return_url));
+  drupal_exit();
+}
+
+/**
+ * Prepare the request parameters for the create/update order request.
+ *
+ * @param $order
+ *   The order to prepare the request for.
+ * @param array $settings
+ *   The payment method settings.
+ */
+function commerce_paypal_checkout_prepare_order_request($order, $settings) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $product_line_item_types = commerce_product_line_item_types();
+  $item_total = 0;
+  $discount_total = 0;
+  $shipping_total = 0;
+  $items = array();
+  $order_total = $order_wrapper->commerce_order_total->value();
+  $currency_code = $order_total['currency_code'];
+  foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+    if (!$line_item_wrapper->value()) {
+      continue;
+    }
+    $unit_price = $line_item_wrapper->commerce_unit_price->value();
+    if ($line_item_wrapper->getBundle() == 'shipping') {
+      $shipping_total += $unit_price['amount'];
+    }
+    elseif ($line_item_wrapper->getBundle() == 'commerce_discount') {
+      $discount_total += -$unit_price['amount'];
+    }
+    // PayPal Checkout doesn't support passing negative items.
+    elseif ($unit_price['amount'] >= 0) {
+      $item_total += $line_item_wrapper->commerce_total->amount->value();
+      $item = array(
+        'name' => mb_substr(commerce_line_item_title($line_item_wrapper->value()), 0, 127),
+        'unit_amount' => array(
+          'currency_code' => $currency_code,
+          'value' => commerce_paypal_checkout_price_amount($unit_price['amount'], $unit_price['currency_code']),
+        ),
+        'quantity' => intval($line_item_wrapper->quantity->value()),
+      );
+      // Pass the "SKU" for product line items.
+      if (in_array($line_item_wrapper->getBundle(), $product_line_item_types)) {
+        $item['sku'] = $line_item_wrapper->commerce_product->sku->value();
+      }
+      $items[] = $item;
+    }
+  }
+
+  // @todo: Support passing discount in the breakdown when
+  // https://github.com/paypal/paypal-checkout-components/issues/1016 is fixed.
+  $breakdown = array(
+    'item_total' => array(
+      'currency_code' => $currency_code,
+      'value' => commerce_paypal_checkout_price_amount($item_total, $currency_code),
+    ),
+  );
+
+  if ($shipping_total) {
+    $breakdown['shipping'] = array(
+      'currency_code' => $currency_code,
+      'value' => commerce_paypal_checkout_price_amount($shipping_total, $currency_code),
+    );
+  }
+
+  if (module_exists('commerce_tax')) {
+    $tax_total = commerce_round(COMMERCE_ROUND_HALF_UP, commerce_tax_total_amount($order_total['data']['components'], FALSE, $currency_code));
+    if ($tax_total) {
+      $breakdown['tax_total'] = array(
+        'currency_code' => $currency_code,
+        'value' => commerce_paypal_checkout_price_amount($tax_total, $currency_code),
+      );
+    }
+  }
+
+  if ($discount_total) {
+    $breakdown['discount'] = array(
+      'currency_code' => $currency_code,
+      'value' => commerce_paypal_checkout_price_amount($discount_total, $currency_code),
+    );
+  }
+
+  $payer = array();
+  if (!empty($order->mail)) {
+    $payer['email_address'] = $order->mail;
+  }
+
+  // If we have a billing address, pass it to PayPal.
+  if (isset($order_wrapper->commerce_customer_billing) && !empty($order_wrapper->commerce_customer_billing->commerce_customer_address)) {
+    $address = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
+    $payer += commerce_paypal_checkout_format_address($address, 'billing');
+  }
+
+  $request_body = array(
+    'intent' => strtoupper($settings['intent']),
+    'purchase_units' => array(
+      array(
+        'reference_id' => 'default',
+        'custom_id' => $order->order_id,
+        'invoice_id' => $order->order_id . '-' . time(),
+        'amount' => array(
+          'currency_code' => $currency_code,
+          'value' => commerce_paypal_checkout_price_amount($order_total['amount'], $order_total['currency_code']),
+          'breakdown' => $breakdown,
+        ),
+        'items' => $items,
+      ),
+    ),
+    'application_context' => array(
+      'brand_name' => mb_substr(variable_get('site_name', ''), 0, 127),
+    ),
+  );
+
+  // Send the payer if not empty.
+  if ($payer) {
+    $request_body['payer'] = $payer;
+  }
+
+  $shipping_exists = module_exists('commerce_shipping');
+  $shipping_address = FALSE;
+  // If the shipping module is enabled...
+  if ($shipping_exists) {
+    // If we have a shipping address, pass it to PayPal.
+    if (isset($order_wrapper->commerce_customer_shipping) && !empty($order_wrapper->commerce_customer_shipping->commerce_customer_address)) {
+      $address = $order_wrapper->commerce_customer_shipping->commerce_customer_address->value();
+      $shipping_address = commerce_paypal_checkout_format_address($address, 'shipping');
+    }
+  }
+  $shipping_preference = $settings['shipping_preference'];
+
+  // The shipping module isn't enabled, override the shipping preference
+  // configured.
+  if (!$shipping_exists) {
+    $shipping_preference = 'no_shipping';
+  }
+  else {
+    // If no shipping address was already collected, override the shipping
+    // preference to "GET_FROM_FILE" so that the shipping address is collected
+    // on the PayPal site.
+    if ($shipping_preference == 'set_provided_address' && !$shipping_address) {
+      $shipping_preference = 'get_from_file';
+    }
+  }
+
+  // No need to pass a shipping_address if the shipping address collection
+  // is configured to "no_shipping".
+  if ($shipping_address && $shipping_preference !== 'no_shipping') {
+    $request_body['purchase_units'][0]['shipping'] = $shipping_address;
+  }
+  $request_body['application_context']['shipping_preference'] = strtoupper($shipping_preference);
+  return $request_body;
+}
+
+/**
+ * Formats the given address into a format expected by PayPal.
+ *
+ * @param array $address
+ *   The address to format.
+ * @param $profile_type
+ *   The profile type ("billing"|"shipping").
+ *
+ * @return array
+ *   The formatted address.
+ */
+function commerce_paypal_checkout_format_address($address, $profile_type) {
+  $return = array(
+    'address' => array(
+      'address_line_1' => $address['thoroughfare'],
+      'address_line_2' => $address['premise'],
+      'admin_area_2' => mb_substr($address['locality'], 0, 120),
+      'admin_area_1' => $address['administrative_area'],
+      'postal_code' => mb_substr($address['postal_code'], 0, 60),
+      'country_code' => $address['country'],
+    ),
+  );
+  if ($profile_type == 'billing') {
+    $return['name'] = array(
+      'given_name' => $address['first_name'],
+      'surname' => $address['last_name'],
+    );
+  }
+  elseif ($profile_type == 'shipping') {
+    $return['name'] = array(
+      'full_name' => $address['name_line'],
+    );
+  }
+  return $return;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_paypal_checkout_theme($existing, $type, $theme, $path) {
+  return array(
+    'commerce_paypal_checkout_smart_payment_buttons' => array(
+      'variables' => array(
+        'payment_method' => array(),
+        'commit' => FALSE,
+        'order' => NULL,
+        'flow' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Returns HTML for the Smart payment buttons.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - payment_method: The payment method instance.
+ *   - commit: A boolean indicating whether to commit the transaction.
+ *   - order: The order.
+ *   - flow: The flow ("shortcut"|"mark").
+ *
+ * @ingroup themeable
+ */
+function theme_commerce_paypal_checkout_smart_payment_buttons($variables) {
+  $payment_method = $variables['payment_method'];
+  $settings = $payment_method['settings'] + commerce_paypal_checkout_default_settings();
+  if (empty($settings['client_id']) || empty($variables['order']) || empty($variables['flow'])) {
+    return;
+  }
+  $order = $variables['order'];
+  $order_total = field_get_items('commerce_order', $order, 'commerce_order_total', LANGUAGE_NONE);
+  if (!isset($order_total[0]['currency_code'])) {
+    return;
+  }
+  $flow = $variables['flow'];
+  list(, $rule_name) = explode('|', $payment_method['instance_id']);
+  $options = array(
+    'external' => TRUE,
+    'query' => array(
+      'client-id' => $settings['client_id'],
+      'commit' => $variables['commit'] ? 'true' : 'false',
+      'intent' => $settings['intent'],
+      'currency' => $order_total[0]['currency_code'],
+    ),
+  );
+  if (!empty($settings['disable_funding'])) {
+    $options['query']['disable-funding'] = implode(',', $settings['disable_funding']);
+  }
+  if (!empty($settings['disable_card'])) {
+    $options['query']['disable-card'] = implode(',', $settings['disable_card']);
+  }
+  $path = drupal_get_path('module', 'commerce_paypal_checkout');
+  $js_settings = array(
+    'paypalCheckout' => array(
+      'src' => url('https://www.paypal.com/sdk/js', $options),
+      'createOrderUri' => url("commerce-paypal-checkout/create-order/$order->order_id/$rule_name"),
+      'onApproveUri' => url("commerce-paypal-checkout/approve-order/$order->order_id/$rule_name/$flow"),
+      'style' => $settings['style'],
+    ),
+  );
+  drupal_add_css($path . '/css/commerce_paypal_checkout.css');
+  drupal_add_js($js_settings, 'setting');
+  drupal_add_js($path . '/js/commerce_paypal_checkout.js');
+  $id = drupal_html_id('paypal-buttons-container');
+  return '<div id="' . $id . '" class="paypal-buttons-container"></div>';
+}
+
+/**
+ * Returns the first configured PayPal checkout payment method instance for the
+ * given order, if any.
+ *
+ * @param $order
+ *   The order that needs to be checked.
+ *
+ * @return array|bool
+ *   The first payment method instance found for given order, FALSE otherwise.
+ */
+function commerce_paypal_checkout_get_payment_method_instance($order) {
+  if (empty($order->payment_methods)) {
+    $order->payment_methods = array();
+    rules_invoke_all('commerce_payment_methods', $order);
+
+    // Sort the payment methods array by the enabling Rules' weight values.
+    uasort($order->payment_methods, 'drupal_sort_weight');
+  }
+
+  foreach (array_keys($order->payment_methods) as $instance_id) {
+    // Explode the method key into its component parts.
+    list($method_id) = explode('|', $instance_id);
+    if ($method_id != 'paypal_checkout') {
+      continue;
+    }
+    return commerce_payment_method_instance_load($instance_id);
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function commerce_paypal_checkout_form_alter(&$form, &$form_state, $form_id) {
+  if (!is_string($form_id)) {
+    return;
+  }
+
+  // If we're altering a shopping cart form.
+  if (strpos($form_id, 'views_form_commerce_cart_form_') === 0) {
+    // If the cart form View shows line items...
+    if (!empty($form_state['build_info']['args'][0]->result)) {
+      $order = $form_state['order'];
+      $payment_method = commerce_paypal_checkout_get_payment_method_instance($order);
+
+      // If no PayPal checkout payment method is configured, or if the buttons
+      // are explicitly not shown on the cart page, stop here.
+      if (!$payment_method || empty($payment_method['settings']['enable_on_cart'])) {
+        return;
+      }
+
+      $form['smart_payment_buttons'] = array(
+        '#theme' => 'commerce_paypal_checkout_smart_payment_buttons',
+        '#payment_method' => $payment_method,
+        '#commit' => FALSE,
+        '#flow' => 'shortcut',
+        '#order' => $order,
+        '#weight' => 100,
+      );
+    }
+  }
+}
+
+/**
+ * Returns an instantiated PayPal Checkout API client for the given settings.
+ *
+ * @param array $config
+ *   An associative array containing at least the following keys:
+ *   - client_id: The client ID.
+ *   - secret: The client secret.
+ *   - server: The API server ("sandbox or "live").
+ *
+ * @return PayPalCheckoutClient|NULL.
+ *   An instantiated PayPalCheckout client, NULL if no client_id/secret were
+ *   specified.
+ */
+function commerce_paypal_checkout_api_client($config) {
+  if (!isset($config['client_id']) || !isset($config['secret'])) {
+    return NULL;
+  }
+  $instances = &drupal_static(__FUNCTION__, array());
+
+  if (isset($instances[$config['client_id']])) {
+    return $instances[$config['client_id']];
+  }
+
+  $instances[$config['client_id']] = new PayPalCheckoutClient($config);
+  return $instances[$config['client_id']];
+}
+
+/**
+ * Payment method callback: redirect form.
+ */
+function commerce_paypal_checkout_redirect_form($form, &$form_state, $order, $payment_method) {
+  $form['smart_payment_buttons'] = array(
+    '#theme' => 'commerce_paypal_checkout_smart_payment_buttons',
+    '#payment_method' => $payment_method,
+    '#commit' => TRUE,
+    '#order' => $order,
+    '#flow' => 'mark',
+  );
+  return $form;
+}
+
+/**
+ * Payment method callback: redirect form return validation.
+ */
+function commerce_paypal_checkout_redirect_form_validate($order, $payment_method) {
+  $payment_method['settings'] += commerce_paypal_checkout_default_settings();
+
+  // Check if the PayPal order ID is known, as well as the "flow".
+  if (empty($order->data['commerce_paypal_checkout']['remote_id'] ||
+    !isset($order->data['commerce_paypal_checkout']['flow']))) {
+    return FALSE;
+  }
+  $flow = $order->data['commerce_paypal_checkout']['flow'];
+  $api_client = commerce_paypal_checkout_api_client($payment_method['settings']);
+  if (!$api_client) {
+    return FALSE;
+  }
+  $remote_id = $order->data['commerce_paypal_checkout']['remote_id'];
+  try {
+    $paypal_order = $api_client->getOrder($remote_id);
+  }
+  catch (\Exception $exception) {
+    watchdog_exception('commerce_paypal_checkout', $exception);
+    return FALSE;
+  }
+  $order_total = field_get_items('commerce_order', $order, 'commerce_order_total', LANGUAGE_NONE);
+  $paypal_amount = $paypal_order['purchase_units'][0]['amount'];
+  $paypal_total = commerce_currency_decimal_to_amount($paypal_amount['value'], $paypal_amount['currency_code']);
+  // Check the remote status, and that the PayPal total matches the order total.
+  if (!in_array($paypal_order['status'], ['APPROVED', 'SAVED']) ||
+    $paypal_total != $order_total[0]['amount'] ||
+    $paypal_amount['currency_code'] !=  $order_total[0]['currency_code']) {
+    return FALSE;
+  }
+  // Store the intent for later reuse, it can't be updated, so no risk in
+  // being out of sync.
+  $order->data['commerce_paypal_checkout']['intent'] = strtolower($paypal_order['intent']);
+
+  $payer = $paypal_order['payer'];
+  // If the user is anonymous, add their PayPal e-mail to the order.
+  if (empty($order->mail)) {
+    $order->mail = $payer['email_address'];
+  }
+  // Create a billing information profile for the order with the available info.
+  if (!empty($payment_method['settings']['update_billing_profiles'])) {
+    commerce_paypal_checkout_customer_profile($order, 'billing', $paypal_order);
+  }
+  // If the shipping module exists on the site, create a shipping information
+  // profile for the order with the available info.
+  if (module_exists('commerce_shipping') && !empty($payment_method['settings']['update_shipping_profiles'])) {
+    commerce_paypal_checkout_customer_profile($order, 'shipping', $paypal_order);
+  }
+
+  // Recalculate the price of products on the order in case taxes have
+  // changed or prices have otherwise been affected.
+  if ($flow == 'shortcut') {
+    commerce_cart_order_refresh($order);
+  }
+  // Save the changes to the order.
+  commerce_order_save($order);
+
+  if ($flow == 'mark') {
+    return commerce_paypal_checkout_do_payment($order, $payment_method);
+  }
+}
+
+/**
+ * Capture/authorize a PayPal order and create a payment transaction.
+ *
+ * @param $order
+ *   The order the payment is for.
+ * @param $payment_method
+ *   The PayPal Checkout payment method instance whose settings should
+ *   be used to submit the request.
+ *
+ * @return
+ *   Boolean indicating the success or failure of the payment request.
+ */
+function commerce_paypal_checkout_do_payment($order, $payment_method) {
+  if (empty($order->data['commerce_paypal_checkout']['remote_id'])) {
+    return FALSE;
+  }
+  $paypal_checkout_data = $order->data['commerce_paypal_checkout'];
+  $intent = isset($paypal_checkout_data['intent']) ? $paypal_checkout_data['intent'] : $payment_method['settings']['intent'];
+  $api_client = commerce_paypal_checkout_api_client($payment_method['settings']);
+  try {
+    if ($intent == 'capture') {
+      $response = $api_client->captureOrder($paypal_checkout_data['remote_id']);
+      $remote_payment = $response['purchase_units'][0]['payments']['captures'][0];
+    }
+    else {
+      $response = $api_client->authorizeOrder($paypal_checkout_data['remote_id']);
+      $remote_payment = $response['purchase_units'][0]['payments']['authorizations'][0];
+    }
+  }
+  catch (\Exception $exception) {
+    watchdog_exception('commerce_paypal_checkout', $exception);
+    // Display an error message and remain on the same page.
+    drupal_set_message(t('We could not complete your payment with PayPal. Please try again or contact us if the problem persists.'), 'error');
+    watchdog('commerce_paypal_checkout', 'PayPal Checkout transaction failed for order @order_number.', array('@order_number' => $order->order_number), WATCHDOG_ERROR);
+    return FALSE;
+  }
+  $remote_status = strtolower($remote_payment['status']);
+
+  // Prepare a transaction object to log the API response.
+  $transaction = commerce_payment_transaction_new('paypal_checkout', $order->order_id);
+  $transaction->instance_id = $payment_method['instance_id'];
+  $transaction->amount = commerce_currency_decimal_to_amount($remote_payment['amount']['value'], $remote_payment['amount']['currency_code']);
+  $transaction->currency_code = $remote_payment['amount']['currency_code'];
+  $transaction->payload[REQUEST_TIME] = $response;
+  $transaction->remote_id = $remote_payment['id'];
+  $transaction->remote_status = $remote_payment['status'];
+
+  // Store the transaction ID as the parent transaction ID in case subsequent
+  // API operations alter this transaction's remote ID.
+  if (!empty($transaction->remote_id)) {
+    $transaction->data['commerce_paypal_checkout']['original_remote_id'] = $transaction->remote_id;
+  }
+
+  if (in_array($remote_status, ['denied', 'expired', 'declined'])) {
+    $transaction->status = COMMERCE_PAYMENT_STATUS_FAILURE;
+    commerce_payment_transaction_save($transaction);
+    // Display an error message and remain on the same page.
+    drupal_set_message(t('We could not complete your payment with PayPal. Please try again or contact us if the problem persists.'), 'error');
+    watchdog('commerce_paypal_checkout', 'PayPal Checkout transaction failed for order @order_number.', array('@order_number' => $order->order_number), WATCHDOG_ERROR);
+    return FALSE;
+  }
+
+  // Map the remote status to a Drupal commerce payment status.
+  $status_mapping = array(
+    'created' => COMMERCE_PAYMENT_STATUS_PENDING,
+    'pending' => COMMERCE_PAYMENT_STATUS_PENDING,
+    'completed' => COMMERCE_PAYMENT_STATUS_SUCCESS,
+  );
+
+  // If we do not know how to handle this remote payment status, set the payment
+  // status to failure and stop here.
+  if (!isset($status_mapping[$remote_status])) {
+    $transaction->status = COMMERCE_PAYMENT_STATUS_FAILURE;
+    commerce_payment_transaction_save($transaction);
+    // Display an error message and remain on the same page.
+    drupal_set_message(t('We could not complete your payment with PayPal. Please try again or contact us if the problem persists.'), 'error');
+    watchdog('commerce_paypal_checkout', 'PayPal Checkout transaction failed for order @order_number.', array('@order_number' => $order->order_number), WATCHDOG_ERROR);
+    return FALSE;
+  }
+  $transaction->status = $status_mapping[$remote_status];
+  commerce_payment_transaction_save($transaction);
+  return TRUE;
+}
+
+/**
+ * Creates or updates a customer profile for an order based on information
+ * obtained from PayPal after a payment via PayPal Checkout.
+ *
+ * @param $order
+ *   The order that was paid via PayPal Checkout.
+ * @param $profile_type
+ *   The type of the customer profile that should be created or updated.
+ * @param array $paypal_order
+ *   The PayPal order retrieved via the getOrder() API call.
+ * @param $skip_save
+ *   Boolean indicating whether or not this function should skip saving the
+ *   order after setting it to reference the newly created customer profile;
+ *   defaults to TRUE, requiring the caller to save the order.
+ */
+function commerce_paypal_checkout_customer_profile($order, $profile_type, $paypal_order, $skip_save = TRUE) {
+  // First check if the order already references a customer profile of the
+  // specified type.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $field_name = variable_get('commerce_customer_profile_' . $profile_type . '_field', '');
+
+  // If the associated order field has been set and the order currently
+  // references a customer profile through it...
+  if (!empty($field_name) && !empty($order_wrapper->{$field_name})) {
+    // Update the existing customer profile.
+    $profile = $order_wrapper->{$field_name}->value();
+  }
+  elseif (!empty($order->data['profiles']['customer_profile_' . $profile_type])) {
+    // Otherwise look for an association stored in the order's data array.
+    $profile = commerce_customer_profile_load($order->data['profiles']['customer_profile_' . $profile_type]);
+  }
+
+  // Create a new profile if we could not find an existing one.
+  if (empty($profile)) {
+    $profile = commerce_customer_profile_new($profile_type, $order->uid);
+  }
+
+  // Add the order context to the profile to ensure it can be updated without
+  // resulting in customer profile duplication.
+  $profile->entity_context = array(
+    'entity_type' => 'commerce_order',
+    'entity_id' => $order->order_id,
+  );
+
+  // Prepare an addressfield array to set to the customer profile.
+  $field = field_info_field('commerce_customer_address');
+  $instance = field_info_instance('commerce_customer_profile', 'commerce_customer_address', $profile_type);
+  $address = addressfield_default_values($field, $instance);
+
+  $paypal_address = array();
+  // Use the first name and last name if the profile is a billing profile.
+  if ($profile_type == 'billing') {
+    $address['first_name'] = $paypal_order['payer']['name']['given_name'];
+    $address['last_name'] = $paypal_order['payer']['name']['surname'];
+    $address['name_line'] = $address['first_name'] . ' ' . $address['last_name'];
+    if (isset($paypal_order['payer']['address'])) {
+      $paypal_address = $paypal_order['payer']['address'];
+    }
+  }
+  // Otherwise if it's a shipping profile, populate the address with all of
+  // the shipping information returned from PayPal.
+  elseif ($profile_type == 'shipping') {
+    // If no shipping info was returned by PayPal.
+    if (empty($paypal_order['purchase_units'][0]['shipping'])) {
+      return;
+    }
+    $shipping_info = $paypal_order['purchase_units'][0]['shipping'];
+    $names = explode(' ', $shipping_info['name']['full_name']);
+    $first_name = array_shift($names);
+    $last_name = implode(' ', $names);
+    $address['first_name'] = $first_name;
+    $address['last_name'] = $last_name;
+    $address['name_line'] = $first_name . ' ' . $last_name;
+    if (isset($shipping_info['address'])) {
+      $paypal_address = $shipping_info['address'];
+    }
+  }
+
+  if ($paypal_address) {
+    // Map PayPal address keys to Address field keys.
+    $mapping = array(
+      'address_line_1' => 'thoroughfare',
+      'address_line_2' => 'premise',
+      'admin_area_1' => 'administrative_area',
+      'admin_area_2' => 'locality',
+      'postal_code' => 'postal_code',
+      'country_code' => 'country',
+    );
+    foreach ($paypal_address as $key => $value) {
+      if (!isset($mapping[$key])) {
+        continue;
+      }
+      // PayPal address fields have a higher maximum length than ours.
+      $value = $key == 'country_code' ? $value : mb_substr($value, 0, 255);
+      $address[$mapping[$key]] = $value;
+    }
+  }
+
+  // Add the addressfield value to the customer profile.
+  $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
+  $profile_wrapper->commerce_customer_address = $address;
+
+  // Save the customer profile and update the order to reference it.
+  $profile_wrapper->save();
+  $order_wrapper->{'commerce_customer_' . $profile_type} = $profile_wrapper;
+
+  // Save the order if specified.
+  if (!$skip_save) {
+    $order_wrapper->save();
+  }
+}
+
+/**
+ * Update the PayPal order.
+ *
+ * @param $order
+ *   The order.
+ * @param $payment_method
+ *   The payment method instance.
+ *
+ * @return bool
+ *   TRUE if the update was successful, FALSE otherwise.
+ *
+ * @see commerce_paypal_checkout_review_pane_checkout_form_submit()
+ */
+function commerce_paypal_checkout_update_order($order, $payment_method) {
+  if (!isset($order->data['commerce_paypal_checkout']['remote_id'])) {
+    return FALSE;
+  }
+  $remote_id = $order->data['commerce_paypal_checkout']['remote_id'];
+  $request_body = commerce_paypal_checkout_prepare_order_request($order, $payment_method['settings']);
+  $update_params = array(
+    array(
+      'op' => 'replace',
+      'path' => "/purchase_units/@reference_id=='default'",
+      'value' => $request_body['purchase_units'][0],
+    ),
+  );
+  drupal_alter('commerce_paypal_checkout_update_order_request', $update_params, $order);
+  $api_client = commerce_paypal_checkout_api_client($payment_method['settings']);
+  try {
+    $api_client->updateOrder($remote_id, $update_params);
+    // Assume the update worked if we ended up here, if the update failed,
+    // an exception was thrown.
+    return TRUE;
+  }
+  catch (\Exception $exception) {
+    watchdog_exception('commerce_paypal_checkout', $exception);
+    return FALSE;
+  }
+}
+
+/**
+ * Formats a price amount into a decimal value as expected by PayPal.
+ *
+ * @param $amount
+ *   An integer price amount.
+ * @param $currency_code
+ *   The currency code of the price.
+ *
+ * @return
+ *   The decimal price amount as expected by PayPal API servers.
+ */
+function commerce_paypal_checkout_price_amount($amount, $currency_code) {
+  $rounded_amount = commerce_currency_round($amount, commerce_currency_load($currency_code));
+  return number_format(commerce_currency_amount_to_decimal($rounded_amount, $currency_code), 2, '.', '');
+}
