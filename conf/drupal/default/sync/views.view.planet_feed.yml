@@ -301,7 +301,7 @@ display:
         style: false
         row: false
       display_description: ''
-      title: 'Flux du planète'
+      title: ''
       header: {  }
       style:
         type: default
@@ -311,7 +311,11 @@ display:
           default_row_class: true
       row:
         type: fields
-        options: {  }
+        options:
+          default_field_elements: false
+          inline: {  }
+          separator: ''
+          hide_empty: true
       show_title: true
     cache_metadata:
       max-age: -1
