@@ -41,24 +41,30 @@
           {{ content.field_user_website }}
           {{ content.field_user_drupal_org }}
           {{ content.field_user_twitter }}
+          {{ content.planet_feed_entity_view_1 }}
         </div>
       </div>
       <div class="medium-2 column user--membership">
         {{ content.extra_field_drupalfr_user_member_badge }}
       </div>
 
-      <div class="medium-12 column user--biography">
+      <div class="medium-8 column user--biography">
         {{ content.field_user_biography }}
+      </div>
+      <div class="medium-4 column user--organization">
+        {{ content.field_organization_legal_form }}
+        {{ content.field_organization_size }}
+        {{ content.field_organization_region }}
+        {{ content.field_organization_service_type }}
+        {{ content.field_organization_contact_info }}
       </div>
     </div>
 
-    <div class="user--feed">
-      {{ content.planet_feed_entity_view_1 }}
-    </div>
-
-    <div class="user--publications">
-      {{ content.planet_entity_view_1 }}
-    </div>
+    {% if content.planet_entity_view_1['#view'].result %}
+      <div class="user--publications">
+        {{ content.planet_entity_view_1 }}
+      </div>
+    {% endif %}
 
     <div class="user--events">
       {{ content.field_user_event }}
@@ -66,16 +72,9 @@
 
     <div class="user--forum">
       {{ content.forum_entity_view_1 }}
-
     </div>
 
-    <div class="row user--organization">
-      {{ content.field_organization_legal_form }}
-      {{ content.field_organization_size }}
-      {{ content.field_organization_region }}
-      {{ content.field_organization_service_type }}
-      {{ content.field_organization_contact_info }}
-      {{ content.job_offer_entity_view_organization_job_offer }}
-    </div>
+    {{ content.job_offer_entity_view_organization_job_offer }}
+
   {% endif %}
 </article>

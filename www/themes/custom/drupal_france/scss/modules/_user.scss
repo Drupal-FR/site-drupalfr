@@ -150,10 +150,49 @@
           }
         }
       }
+
+      .views-element-container {
+        display:      inline;
+        margin-right: $global-margin*3;
+        font-size:    1.1rem;
+      }
     }
 
     .user--biography {
       margin-top: $global-margin*2;
+    }
+
+    .user--organization {
+
+      margin-top: $global-margin;
+
+      .field-wrapper {
+        @include grid-row();
+
+        padding:       $global-padding;
+        border:        1px solid $light-gray;
+        border-bottom: 0;
+
+        &:nth-of-type(even) {
+          background-color: lighten($drupal-grey-light, 5);
+        }
+
+        &:last-child {
+          border-bottom: 1px solid $light-gray;
+        }
+
+        .field-label {
+          @include grid-col(5);
+
+          font-weight: 700;
+          color:       get-color(primary);
+          text-align:  right;
+        }
+
+        .field-items {
+          @include grid-col(7);
+        }
+      }
     }
 
     .user-feed {
@@ -182,14 +221,17 @@
     }
 
     .user--forum {
-      margin:           $global-margin 0;
-      padding:          $global-padding 0;
+      padding:          $global-padding*2 0;
       background-color: $drupal-grey-light;
 
       .section-title {
-        margin-top:    $global-margin;
         margin-bottom: $global-margin*2;
       }
+    }
+
+    .view-job-offer {
+      @include grid-row();
+      margin: $global-margin auto;
     }
   }
 }
