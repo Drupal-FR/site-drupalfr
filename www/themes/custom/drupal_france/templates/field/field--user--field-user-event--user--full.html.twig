@@ -61,39 +61,11 @@
   ]
 %}
 
-{% if label_hidden %}
-  {% if multiple %}
-    <div{{ attributes.addClass(classes, 'field--items') }}>
-      {% for batched_items in items|batch(2) %}
-        <div class="row">
-          {% for item in batched_items %}
-            <div{{ item.attributes.addClass(item_classes) }}>
-              {{ item.content }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    {% for batched_items in items|batch(3) %}
-      <div class="row">
-        {% for item in batched_items %}
-          <div{{ item.attributes.addClass(classes, item_classes) }}>
-            {{ item.content }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endfor %}
-  {% endif %}
-{% else %}
-  <div{{ attributes.addClass(classes) }}>
-    <div{{ title_attributes.addClass(title_classes) }}>
-      <h2>{{ label }}</h2>
-    </div>
+<div class="user--events">
+  {% if label_hidden %}
     {% if multiple %}
-      <div class="field--items">
-    {% endif %}
-        {% for batched_items in items|batch(3) %}
+      <div{{ attributes.addClass(classes, 'field--items') }}>
+        {% for batched_items in items|batch(2) %}
           <div class="row">
             {% for item in batched_items %}
               <div{{ item.attributes.addClass(item_classes) }}>
@@ -102,8 +74,38 @@
             {% endfor %}
           </div>
         {% endfor %}
-    {% if multiple %}
       </div>
+    {% else %}
+      {% for batched_items in items|batch(3) %}
+        <div class="row">
+          {% for item in batched_items %}
+            <div{{ item.attributes.addClass(classes, item_classes) }}>
+              {{ item.content }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
     {% endif %}
-  </div>
-{% endif %}
+  {% else %}
+    <div{{ attributes.addClass(classes) }}>
+      <div{{ title_attributes.addClass(title_classes) }}>
+        <h2>{{ label }}</h2>
+      </div>
+      {% if multiple %}
+        <div class="field--items">
+      {% endif %}
+          {% for batched_items in items|batch(3) %}
+            <div class="row">
+              {% for item in batched_items %}
+                <div{{ item.attributes.addClass(item_classes) }}>
+                  {{ item.content }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+      {% if multiple %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
