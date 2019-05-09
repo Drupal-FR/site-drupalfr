@@ -62,20 +62,9 @@
       </div>
     </div>
 
-    {% if content.planet_entity_view_1['#view'].result %}
-      <div class="user--publications">
-        {{ content.planet_entity_view_1 }}
-      </div>
-    {% endif %}
-
-    <div class="user--events">
-      {{ content.field_user_event }}
-    </div>
-
-    <div class="user--forum">
-      {{ content.forum_entity_view_1 }}
-    </div>
-
+    {{ content.planet_entity_view_1 }}
+    {{ content.field_user_event }}
+    {{ content.forum_entity_view_1 }}
     {{ content.job_offer_entity_view_organization_job_offer }}
 
   {% endif %}
