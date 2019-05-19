@@ -17,7 +17,6 @@ dependencies:
     - paragraphs.paragraphs_type.title_text_media
   module:
     - color_field
-    - content_moderation
     - entity_browser
     - field_group
     - link_attributes
@@ -209,12 +208,6 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
-  moderation_state:
-    type: moderation_state_default
-    weight: 100
-    settings: {  }
-    region: content
-    third_party_settings: {  }
 hidden:
   created: true
   status: true
