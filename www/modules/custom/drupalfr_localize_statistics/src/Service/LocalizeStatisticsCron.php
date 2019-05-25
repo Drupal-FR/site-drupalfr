@@ -240,7 +240,7 @@ class LocalizeStatisticsCron implements LocalizeStatisticsCronInterface {
     // Check that all the statistics could have been extracted.
     foreach ($mapping as $localize_statistics_type => $info) {
       if (is_null($info['value'])) {
-        $this->logger->error('Impossible to get statistics for type @type', [
+        $this->logger->error('Impossible to get statistics for type @type.', [
           '@type' => $localize_statistics_type,
         ]);
       }
