@@ -15,8 +15,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "list_builder" = "Drupal\drupalfr_localize_statistics\LocalizeStatisticsTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeForm",
- *       "edit" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeForm"
- *     }
+ *       "edit" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeForm",
+ *       "delete" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
  *   },
  *   config_prefix = "localize_statistics_type",
  *   admin_permission = "administer site configuration",

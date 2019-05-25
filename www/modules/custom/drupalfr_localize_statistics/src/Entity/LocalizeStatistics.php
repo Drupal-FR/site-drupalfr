@@ -24,7 +24,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *       "default" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsForm",
  *       "add" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsForm",
  *       "edit" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsForm",
- *       "delete" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsDeleteForm",
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *     },
  *     "access" = "Drupal\drupalfr_localize_statistics\LocalizeStatisticsAccessControlHandler",
  *     "route_provider" = {
