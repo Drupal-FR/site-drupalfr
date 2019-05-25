@@ -8,7 +8,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 
 /**
- * Access controller for the Statistique de la traduction entity.
+ * Access controller for the localize statistics entity.
  *
  * @see \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatistics.
  */
@@ -21,16 +21,13 @@ class LocalizeStatisticsAccessControlHandler extends EntityAccessControlHandler 
     /** @var \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatisticsInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished statistique de la traduction entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published statistique de la traduction entities');
+        return AccessResult::allowedIfHasPermission($account, 'view localize statistics entities');
 
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit statistique de la traduction entities');
+        return AccessResult::allowedIfHasPermission($account, 'edit localize statistics entities');
 
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete statistique de la traduction entities');
+        return AccessResult::allowedIfHasPermission($account, 'delete localize statistics entities');
     }
 
     // Unknown operation, no opinion.
@@ -41,7 +38,7 @@ class LocalizeStatisticsAccessControlHandler extends EntityAccessControlHandler 
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add statistique de la traduction entities');
+    return AccessResult::allowedIfHasPermission($account, 'add localize statistics entities');
   }
 
 }

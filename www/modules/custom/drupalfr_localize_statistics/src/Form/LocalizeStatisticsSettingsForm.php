@@ -35,7 +35,7 @@ class LocalizeStatisticsSettingsForm extends FormBase {
   }
 
   /**
-   * Defines the settings form for Statistique de la traduction entities.
+   * Defines the settings form for localize statistics entities.
    *
    * @param array $form
    *   An associative array containing the structure of the form.
@@ -46,7 +46,7 @@ class LocalizeStatisticsSettingsForm extends FormBase {
    *   Form definition array.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['localizestatistics_settings']['#markup'] = 'Settings form for Statistique de la traduction entities. Manage field settings here.';
+    $form['localizestatistics_settings']['#markup'] = 'Settings form for localize statistics entities. Manage field settings here.';
     return $form;
   }
 

@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Link;
 
 /**
- * Defines a class to build a listing of Statistique de la traduction entities.
+ * Defines a class to build a listing of localize statistics entities.
  *
  * @ingroup drupalfr_localize_statistics
  */
@@ -18,7 +18,7 @@ class LocalizeStatisticsListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['id'] = $this->t('Statistique de la traduction ID');
+    $header['id'] = $this->t('localize statistics ID');
     $header['name'] = $this->t('Name');
     return $header + parent::buildHeader();
   }

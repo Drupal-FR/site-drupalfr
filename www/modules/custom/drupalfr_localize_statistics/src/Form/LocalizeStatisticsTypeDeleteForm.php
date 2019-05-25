@@ -7,7 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
- * Builds the form to delete Statistique de la traduction type entities.
+ * Builds the form to delete localize statistics type entities.
  */
 class LocalizeStatisticsTypeDeleteForm extends EntityConfirmFormBase {
 

@@ -4,13 +4,13 @@
  * @file
  * Contains localize_statistics.page.inc.
  *
- * Page callback for Statistique de la traduction entities.
+ * Page callback for localize statistics entities.
  */
 
 use Drupal\Core\Render\Element;
 
 /**
- * Prepares variables for Statistique de la traduction templates.
+ * Prepares variables for localize statistics templates.
  *
  * Default template: localize_statistics.html.twig.
  *
@@ -20,9 +20,6 @@ use Drupal\Core\Render\Element;
  *   - attributes: HTML attributes for the containing element.
  */
 function template_preprocess_localize_statistics(array &$variables) {
-  // Fetch LocalizeStatistics Entity Object.
-  $localize_statistics = $variables['elements']['#localize_statistics'];
-
   // Helpful $content variable for templates.
   foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];

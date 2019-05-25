@@ -5,22 +5,18 @@ namespace Drupal\drupalfr_localize_statistics\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Statistique de la traduction type entity.
+ * Defines the localize statistics type entity.
  *
  * @ConfigEntityType(
  *   id = "localize_statistics_type",
- *   label = @Translation("Statistique de la traduction type"),
+ *   label = @Translation("localize statistics type"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\drupalfr_localize_statistics\LocalizeStatisticsTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeForm",
- *       "edit" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeForm",
- *       "delete" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeDeleteForm"
- *     },
- *     "route_provider" = {
- *       "html" = "Drupal\drupalfr_localize_statistics\LocalizeStatisticsTypeHtmlRouteProvider",
- *     },
+ *       "edit" = "Drupal\drupalfr_localize_statistics\Form\LocalizeStatisticsTypeForm"
+ *     }
  *   },
  *   config_prefix = "localize_statistics_type",
  *   admin_permission = "administer site configuration",
@@ -42,14 +38,14 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 class LocalizeStatisticsType extends ConfigEntityBundleBase implements LocalizeStatisticsTypeInterface {
 
   /**
-   * The Statistique de la traduction type ID.
+   * The localize statistics type ID.
    *
    * @var string
    */
   protected $id;
 
   /**
-   * The Statistique de la traduction type label.
+   * The localize statistics type label.
    *
    * @var string
    */

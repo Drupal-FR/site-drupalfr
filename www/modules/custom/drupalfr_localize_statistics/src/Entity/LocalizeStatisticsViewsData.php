@@ -5,7 +5,7 @@ namespace Drupal\drupalfr_localize_statistics\Entity;
 use Drupal\views\EntityViewsData;
 
 /**
- * Provides Views data for Statistique de la traduction entities.
+ * Provides Views data for localize statistics entities.
  */
 class LocalizeStatisticsViewsData extends EntityViewsData {
 

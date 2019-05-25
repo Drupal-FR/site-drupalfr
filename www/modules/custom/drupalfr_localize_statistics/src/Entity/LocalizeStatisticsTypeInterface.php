@@ -5,7 +5,7 @@ namespace Drupal\drupalfr_localize_statistics\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface for defining Statistique de la traduction type entities.
+ * Provides an interface for defining localize statistics type entities.
  */
 interface LocalizeStatisticsTypeInterface extends ConfigEntityInterface {
 

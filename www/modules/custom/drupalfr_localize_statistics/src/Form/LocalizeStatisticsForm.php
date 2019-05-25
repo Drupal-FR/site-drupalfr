@@ -6,23 +6,11 @@ use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Form controller for Statistique de la traduction edit forms.
+ * Form controller for localize statistics edit forms.
  *
  * @ingroup drupalfr_localize_statistics
  */
 class LocalizeStatisticsForm extends ContentEntityForm {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatistics */
-    $form = parent::buildForm($form, $form_state);
-
-    $entity = $this->entity;
-
-    return $form;
-  }
 
   /**
    * {@inheritdoc}
@@ -34,13 +22,13 @@ class LocalizeStatisticsForm extends ContentEntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Statistique de la traduction.', [
+        drupal_set_message($this->t('Created the %label localize statistics.', [
           '%label' => $entity->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Statistique de la traduction.', [
+        drupal_set_message($this->t('Saved the %label localize statistics.', [
           '%label' => $entity->label(),
         ]));
     }

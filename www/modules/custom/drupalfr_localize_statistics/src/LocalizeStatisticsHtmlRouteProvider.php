@@ -7,7 +7,7 @@ use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Symfony\Component\Routing\Route;
 
 /**
- * Provides routes for Statistique de la traduction entities.
+ * Provides routes for localize statistics entities.
  *
  * @see \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider
  * @see \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider

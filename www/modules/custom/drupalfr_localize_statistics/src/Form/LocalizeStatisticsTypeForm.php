@@ -22,7 +22,7 @@ class LocalizeStatisticsTypeForm extends EntityForm {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $localize_statistics_type->label(),
-      '#description' => $this->t("Label for the Statistique de la traduction type."),
+      '#description' => $this->t("Label for the localize statistics type."),
       '#required' => TRUE,
     ];
 
@@ -49,13 +49,13 @@ class LocalizeStatisticsTypeForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Statistique de la traduction type.', [
+        drupal_set_message($this->t('Created the %label localize statistics type.', [
           '%label' => $localize_statistics_type->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Statistique de la traduction type.', [
+        drupal_set_message($this->t('Saved the %label localize statistics type.', [
           '%label' => $localize_statistics_type->label(),
         ]));
     }
