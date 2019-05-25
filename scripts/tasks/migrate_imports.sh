@@ -32,6 +32,9 @@ $DRUSH migrate:import drupalfr_product_variation_membership --update
 $DRUSH migrate:import drupalfr_product_membership --update
 $DRUSH migrate:import drupalfr_forum_tag --update
 $DRUSH migrate:import drupalfr_forum_hierarchy --update
+$DRUSH migrate:import drupalfr_localize_glossary_language --update
+$DRUSH migrate:import drupalfr_localize_glossary_context --update
+$DRUSH migrate:import drupalfr_localize_glossary_translation --update
 $DRUSH migrate:import drupalfr_basic_block --update
 $DRUSH migrate:import drupalfr_menu_link --update
 # Re-import users to update references as we do not create stub.

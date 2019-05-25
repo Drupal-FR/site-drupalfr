@@ -2,12 +2,14 @@ uuid: f7d6e4f2-1542-4199-81de-facc7c09c47a
 langcode: fr
 status: true
 dependencies:
+  config:
+    - flag.flag.spam_comment
   module:
     - flag
-id: flag_action.spam_comment.unflag
+id: flag_action.spam_comment_unflag
 label: 'Retirer le signalement comme spam'
 type: comment
-plugin: 'flag_action:spam_comment.unflag'
+plugin: 'flag_action:spam_comment_unflag'
 configuration:
   flag_id: spam_comment
   flag_action: unflag

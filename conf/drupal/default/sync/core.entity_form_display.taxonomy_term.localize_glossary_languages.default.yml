@@ -1,0 +1,53 @@
+uuid: f1bbda00-1de8-4fc0-bb78-2d75c4ca1edd
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.localize_glossary_languages.field_langcode
+    - taxonomy.vocabulary.localize_glossary_languages
+  module:
+    - path
+    - text
+id: taxonomy_term.localize_glossary_languages.default
+targetEntityType: taxonomy_term
+bundle: localize_glossary_languages
+mode: default
+content:
+  description:
+    type: text_textarea
+    weight: 2
+    region: content
+    settings:
+      placeholder: ''
+      rows: 5
+    third_party_settings: {  }
+  field_langcode:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  langcode:
+    type: language_select
+    weight: 3
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

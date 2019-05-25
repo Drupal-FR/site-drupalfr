@@ -1,0 +1,37 @@
+uuid: cf1cdc15-3350-452d-ba6d-3d49e72124ce
+langcode: fr
+status: true
+dependencies:
+  config:
+    - comment.type.localize_glossary_suggestion
+    - field.field.comment.localize_glossary_suggestion.comment_body
+    - field.field.comment.localize_glossary_suggestion.field_suggestion
+  module:
+    - text
+id: comment.localize_glossary_suggestion.default
+targetEntityType: comment
+bundle: localize_glossary_suggestion
+mode: default
+content:
+  comment_body:
+    label: hidden
+    type: text_default
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_suggestion:
+    weight: 0
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  links:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  langcode: true
