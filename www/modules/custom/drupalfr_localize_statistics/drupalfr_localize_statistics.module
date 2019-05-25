@@ -40,3 +40,10 @@ function drupalfr_localize_statistics_theme_suggestions_localize_statistics(arra
   $suggestions[] = 'localize_statistics__' . $entity->id() . '__' . $sanitized_view_mode;
   return $suggestions;
 }
+
+/**
+ * Implements hook_cron().
+ */
+function drupalfr_localize_statistics_cron() {
+  \Drupal::service('drupalfr_localize_statistics.cron')->cron();
+}
