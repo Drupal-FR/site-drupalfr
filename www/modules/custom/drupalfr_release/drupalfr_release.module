@@ -14,10 +14,10 @@ function drupalfr_release_cron() {
   $current_time = \Drupal::time()->getRequestTime();
   $state = \Drupal::state();
 
-  $last_uuid_check = $state->get('drupalfr_release.last_uuid_check', 0);
+  $last_check_timestamp = $state->get('drupalfr_release.last_check_timestamp', 0);
 
   // Check the releases every day (3600x24).
-  if (($last_uuid_check + 86400) < $current_time) {
+  if (($last_check_timestamp + 86400) < $current_time) {
     $advanced_queue_storage = \Drupal::entityTypeManager()->getStorage('advancedqueue_queue');
     /** @var \Drupal\advancedqueue\Entity\QueueInterface $advanced_queue */
     $advanced_queue = $advanced_queue_storage->load('drupalfr_release_import');
@@ -28,13 +28,13 @@ function drupalfr_release_cron() {
 
     // Add items to the queue only if it has been created after the last import.
     foreach ($data as $result) {
-      if ($last_uuid_check < $result['date']) {
+      if ($last_check_timestamp < $result['date']) {
         $release_import_job = Job::create('drupalfr_release_import', [
           'data' => $result,
         ]);
         $advanced_queue->enqueueJob($release_import_job);
       }
     }
-    $state->set('drupalfr_release.last_uuid_check', $current_time);
+    $state->set('drupalfr_release.last_check_timestamp', $current_time);
   }
 }
