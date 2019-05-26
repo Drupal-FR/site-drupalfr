@@ -31,7 +31,6 @@
         "bower-asset/dropzone": "4.3.0",
         "bower-asset/fontawesome": "4.7.0",
         "bower-asset/fontawesome-iconpicker": "1.3.1",
-        "bower-asset/highcharts": "7.1.1",
         "bower-asset/jquery-simple-color": "1.2.2",
         "bower-asset/spectrum": "1.8.0",
         "composer/installers": "^1.0.21",
@@ -44,6 +43,7 @@
         "drupal/blazy": "2.0.0-rc3",
         "drupal/block_field": "1.0.0-alpha8",
         "drupal/block_visibility_groups": "1.3.0",
+        "drupal/charts": "3.0.0-beta3",
         "drupal/color_field": "2.0.0",
         "drupal/commerce": "2.13.0",
         "drupal/commerce_license": "2.0.0-alpha18",
@@ -217,6 +217,7 @@
         ],
         "merge-plugin": {
             "include": [
+                "www/modules/contrib/charts/modules/charts_highcharts/composer.json",
                 "www/modules/contrib/webform/composer.libraries.json",
                 "www/modules/custom/*/composer.json",
                 "www/profiles/custom/*/composer.json",
