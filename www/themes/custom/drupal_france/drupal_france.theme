@@ -30,6 +30,16 @@ function drupal_france_theme_suggestions_form_alter(&$suggestions, $variables) {
 }
 
 /**
+ * Implements hook_theme_suggestions_form_element_alter().
+ */
+function drupal_france_theme_suggestions_form_element_alter(&$suggestions, $variables) {
+  $current_route_name = \Drupal::service('current_route_match')->getRouteName();
+  if ($current_route_name === 'view.user_member.page_organization_member') {
+    $suggestions[] = 'form_element__organismes';
+  }
+}
+
+/**
  * Implements hook_preprocess_block().
  *
  * Allows to use the block ID in a theme suggestion hook.
