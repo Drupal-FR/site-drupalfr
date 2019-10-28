@@ -72,11 +72,10 @@
     node.isSticky() ? 'is-sticky',
     not node.isPublished() ? 'is-unpublished',
     view_mode ? view_mode|clean_class,
-    'clearfix',
   ]
 %}
 
-<article{{ attributes.addClass(classes) }}>
+<article{{ attributes.addClass(classes).setAttribute('data-equalizer-watch', true) }}>
 
   {{ content.field_media_teaser }}
 

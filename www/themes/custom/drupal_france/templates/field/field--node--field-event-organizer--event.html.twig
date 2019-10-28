@@ -45,6 +45,8 @@
   'field-type-' ~ field_type|clean_class,
   'field-label-' ~ label_display,
   label_display == 'inline' ? 'clearfix',
+  'row',
+  'event-organizers'
 ]
 %}
 {%
@@ -53,13 +55,26 @@
   label_display == 'visually_hidden' ? 'visually-hidden',
 ]
 %}
+
+{%
+  set item_classes = [
+  'field-item',
+  'small-2',
+  'column'
+]
+%}
 <div{{ attributes.addClass(classes) }}>
   {% if not label_hidden %}
-    <div{{ title_attributes.addClass(title_classes) }}>{{ label }}</div>
+    <h2{{ title_attributes.addClass(title_classes) }}>{{ label }}</h2>
   {% endif %}
   <div{{ content_attributes.addClass('field-items') }}>
     {% for item in items %}
-      <div{{ item.attributes.addClass('field-item') }}>{{ item.content }}</div>
+      {% if loop.last %}
+        {% set item_classes = item_classes|merge(['end']) %}
+      {% endif %}
+      <div{{ item.attributes.addClass(item_classes) }}>
+        {{ item.content }}
+      </div>
     {% endfor %}
   </div>
 </div>

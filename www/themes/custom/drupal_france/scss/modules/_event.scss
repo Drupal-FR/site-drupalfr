@@ -4,6 +4,23 @@
 
 .event {
 
+  &-banner {
+    img {
+      width: 100vw;
+    }
+  }
+
+  &-date {
+    display:       block;
+    margin-bottom: $global-margin;
+
+    & * {
+      display: inline;
+    }
+
+  }
+
+
   &.teaser {
     @include shadow();
     margin-top:       $global-margin*2;
@@ -37,15 +54,7 @@
       padding: 0 $global-padding*2 $global-padding;
     }
 
-    .event-date {
-      display:       block;
-      margin-bottom: $global-margin;
 
-      & * {
-        display: inline;
-      }
-
-    }
 
     .field-node--field-event-date-start,
     .field-node--field-event-date-end {
@@ -56,5 +65,33 @@
     .body {
       @include clearfix;
     }
+  }
+
+  &.full {
+
+    .date {
+      color:      $white;
+      text-align: center;
+
+      &--day {
+        padding:          $global-padding*2 $global-padding/2 0;
+        background-color: $drupal-blue-dark;
+        font-size:        2rem;
+        line-height:      1.5rem;
+      }
+
+      &--month {
+        padding:          0 $global-padding/2 $global-padding;
+        background-color: $drupal-blue-dark;
+        font-size:        1.25rem;
+      }
+
+      &--year {
+        padding:          $global-padding/4 $global-padding/2;
+        background-color: $drupal-blue-lighter;
+        font-size:        1rem;
+      }
+    }
+
   }
 }
