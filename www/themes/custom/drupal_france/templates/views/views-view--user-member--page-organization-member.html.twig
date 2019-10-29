@@ -30,21 +30,58 @@
  * @see template_preprocess_views_view()
  */
 #}
-{%
-  set classes = [
-    dom_id ? 'js-view-dom-id-' ~ dom_id,
-    'row',
-  ]
-%}
+{% set classes = [
+  dom_id ? 'js-view-dom-id-' ~ dom_id,
+  'row',
+] %}
 <div{{ attributes.addClass(classes) }}>
   <div{{ content_attributes.addClass('medium-12', 'column', 'organismes') }}>
     {{ title_prefix }}
-    {{ title }}
+      {{ title }}
     {{ title_suffix }}
 
     {% if header %}
       <header>
-        {{ header }}
+        <div class="row">
+          <h1 class="column">
+            {% trans %}L'annuaire des prestataires Drupal en France{% endtrans %}
+          </h1>
+        </div>
+
+        <div class="row">
+          <div class="small-12 medium-8 column">
+            <h2 class="h3">
+              {% trans %}Vous recherchez un prestataire en France&nbsp;?{% endtrans %}
+            </h2>
+            <p class="lead">
+              <strong>
+                {{ header }}
+              </strong>
+            </p>
+            <p>
+              <strong class="text-underline">{% trans %}Remarque&nbsp;:{% endtrans %}</strong>
+              {% trans %}Cet annuaire est libre d'accès.
+              Pensez donc à vérifier par vous-même les références et
+              compétences du prestataire que vous choisissez.
+              {% endtrans %}
+            </p>
+          </div>
+
+          <div class="small-12 medium-4 column">
+            <div class="callout" data-closable="slide-out-right">
+              <h2 class="h6">{% trans %}Vous êtes un prestataire de service Drupal{% endtrans %}</h2>
+              <p>
+                {% trans %}... et vous voulez apparaître dans l'annuaire&nbsp;?{% endtrans %}
+              </p>
+              <p>
+                <a href="/user/register">{% trans %}Créer un compte{% endtrans %}</a>{% trans %} et devenez adhérent dès aujourd'hui&nbsp;!{% endtrans %}
+              </p>
+              <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </header>
     {% endif %}
 

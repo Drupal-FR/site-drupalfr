@@ -1135,7 +1135,7 @@ display:
           group_type: group
           admin_label: ''
           empty: true
-          content: "<h1>L'annuaire des prestataires Drupal en France</h1>\n<h3>Vous recherchez un prestataire en France&nbsp;?</h3>\n  <p><strong>Nous avons aujourd'hui @total prestataires inscrits dans notre annuaire. Ils sont prêts à vous aider pour tirer le meilleur de votre solution Drupal&nbsp;!</strong></p>\n  <p><cite>Remarque&nbsp;: Cet annuaire est libre d'accès. Pensez donc à vérifier par vous-même les références et compétences du prestataire que vous choisissez.</cite></p>\n<h3>Vous êtes un prestataire de service Drupal et vous voulez apparaître dans l'annuaire&nbsp;?</h3>\n  <p><a href=\"/user/register\">Créer un compte</a> et devenez adhérent dès aujourd'hui&nbsp;!</p>"
+          content: "Nous avons aujourd'hui @total prestataires inscrits dans notre annuaire.<br>\r\n Ils sont prêts à vous aider pour tirer le meilleur de votre solution Drupal&nbsp;!"
           plugin_id: result
       title: 'L''annuaire des prestataires Drupal en France'
       style:
@@ -1695,6 +1695,48 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           plugin_id: boolean
+        field_user_realname_value:
+          id: field_user_realname_value
+          table: user__field_user_realname
+          field: field_user_realname_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_user_realname_value_op
+            label: 'Nom de l''organisme'
+            description: ''
+            use_operator: false
+            operator: field_user_realname_value_op
+            identifier: field_user_realname_value
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
+            placeholder: ''
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          plugin_id: string
         field_organization_size_value:
           id: field_organization_size_value
           table: user__field_organization_size
@@ -1867,48 +1909,6 @@ display:
             group_items: {  }
           reduce_duplicates: false
           plugin_id: list_field
-        field_user_realname_value:
-          id: field_user_realname_value
-          table: user__field_user_realname
-          field: field_user_realname_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: contains
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_user_realname_value_op
-            label: 'Nom de l''organisme'
-            description: ''
-            use_operator: false
-            operator: field_user_realname_value_op
-            identifier: field_user_realname_value
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              administrator: '0'
-              member: '0'
-              moderator: '0'
-              member_organization: '0'
-            placeholder: ''
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          plugin_id: string
       filter_groups:
         operator: AND
         groups:
