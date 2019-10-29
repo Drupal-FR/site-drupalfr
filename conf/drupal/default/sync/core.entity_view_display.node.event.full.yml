@@ -90,6 +90,16 @@ content:
           x: ''
           'y': ''
       hide_empty_map: 0
+      disable_wheel: 0
+      fullscreen_control: 1
+      reset_map:
+        control: 0
+        position: topright
+      popup_content: ''
+      leaflet_markercluster:
+        control: 0
+        options: '{"spiderfyOnMaxZoom":true,"showCoverageOnHover":true,"removeOutsideVisibleBounds": false}'
+      path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2"}'
     third_party_settings: {  }
     type: leaflet_formatter_default
     region: content
@@ -118,8 +128,8 @@ content:
     weight: 0
     label: hidden
     settings:
-      link: true
-      view_mode: default
+      view_mode: banner
+      link: false
     third_party_settings: {  }
     type: entity_reference_entity_view
     region: content
