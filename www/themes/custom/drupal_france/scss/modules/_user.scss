@@ -235,3 +235,33 @@
     }
   }
 }
+
+
+// ==========================
+// Company User Display
+// ==========================
+
+// Company Users view
+//--------------------
+.organismes {
+
+  form {
+    margin: $global-margin*2 0;
+
+    .form-item-field-user-realname-value {
+      width: 100%;
+    }
+
+    .form-actions {
+      padding: $global-padding;
+
+      @include breakpoint(medium) {
+        width: 25%;
+      }
+
+      [type='submit'] {
+        padding: $global-padding * 1.5;
+      }
+    }
+  }
+}
