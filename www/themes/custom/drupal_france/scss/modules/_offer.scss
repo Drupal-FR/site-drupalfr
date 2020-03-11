@@ -1,0 +1,54 @@
+// ==========================
+// Offer page
+// ==========================
+
+.offer {
+  .criteres  {
+    .field {
+      display: inline-block;
+      padding-bottom: $global-padding;
+    }
+
+    .field-items {
+      &::before {
+        content: '\/ ';
+      }
+
+      .field-item {
+        display: inline-block;
+      }
+    }
+  }
+
+  .callout {
+    margin: $global-margin*3 0;
+  }
+}
+
+.offer-page {
+  .return-link {
+    padding: $global-padding 0;
+  }
+
+  .criteres  {
+    column-count: 2;
+
+    .field-label {
+      display: inline-block;
+
+      &::before {
+        content: '\f00c ';
+        font: normal normal normal 14px/1 FontAwesome;
+        color: $drupal-blue-dark;
+      }
+
+      &::after {
+        content: ' : ';
+      }
+    }
+
+    .field-items {
+      display: inline-block;
+    }
+  }
+}

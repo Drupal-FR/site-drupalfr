@@ -245,22 +245,29 @@
 //--------------------
 .organismes {
 
+  h1 {
+    margin: $global-margin*3 0;
+  }
+
   form {
     margin: $global-margin*2 0;
 
-    .form-item-field-user-realname-value {
-      width: 100%;
-    }
-
     .form-actions {
-      padding: $global-padding;
-
       @include breakpoint(medium) {
-        width: 25%;
+        float:         left;
+        width:         calc(100% / 2);
+        margin-top:    $global-padding * 2;
+        padding-right: $global-padding;
+        padding-left:  $global-padding;
+      }
+
+      @include breakpoint(large) {
+        width:         calc(100% / 3);
       }
 
       [type='submit'] {
-        padding: $global-padding * 1.5;
+        margin-top: 3px;
+        padding: $global-padding;
       }
     }
   }

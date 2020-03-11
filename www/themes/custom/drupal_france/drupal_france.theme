@@ -35,7 +35,10 @@ function drupal_france_theme_suggestions_form_alter(&$suggestions, $variables) {
 function drupal_france_theme_suggestions_form_element_alter(&$suggestions, $variables) {
   $current_route_name = \Drupal::service('current_route_match')->getRouteName();
   if ($current_route_name === 'view.user_member.page_organization_member') {
-    $suggestions[] = 'form_element__organismes';
+    $suggestions[] = 'form_element__organizations';
+  }
+  elseif ($current_route_name === 'view.job_offer.page_job_offer') {
+    $suggestions[] = 'form_element__job-offers';
   }
 }
 
