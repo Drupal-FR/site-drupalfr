@@ -13,6 +13,7 @@ dependencies:
     - node.type.job_offer
   module:
     - options
+    - text
     - user
 _core:
   default_config_hash: oLJ3IGid-L33KAFteGfXGbh1easPcpr0QZQf80Y7AbQ
@@ -21,57 +22,52 @@ targetEntityType: node
 bundle: job_offer
 mode: listing
 content:
+  body:
+    type: text_trimmed
+    weight: 4
+    region: content
+    label: hidden
+    settings:
+      trim_length: 400
+    third_party_settings: {  }
   content_moderation_control:
-    weight: -20
+    weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
   field_job_contract_type:
-    weight: 1
-    label: inline
-    settings: {  }
-    third_party_settings: {  }
     type: list_default
-    region: content
-  field_job_nature:
-    weight: 2
-    label: inline
-    settings: {  }
-    third_party_settings: {  }
-    type: list_default
-    region: content
-  field_job_teleworking:
-    weight: 4
-    label: inline
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_job_validity:
-    weight: 0
-    label: inline
-    settings: {  }
-    third_party_settings: {  }
-    type: list_default
-    region: content
-  field_region:
     weight: 3
-    label: above
+    region: content
+    label: hidden
     settings: {  }
     third_party_settings: {  }
+  field_region:
     type: list_default
+    weight: 2
     region: content
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
   links:
     weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
+  published_at:
+    type: timestamp
+    weight: 1
+    region: content
+    label: inline
+    settings:
+      date_format: jour_mois_annee
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
 hidden:
-  body: true
+  field_job_nature: true
+  field_job_teleworking: true
+  field_job_validity: true
   langcode: true
-  published_at: true
   search_api_excerpt: true
   user_member_entity_view_job_offer_organization: true
