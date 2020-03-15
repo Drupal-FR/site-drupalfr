@@ -32,7 +32,7 @@
   {% if items %}
     {% for row in items|batch(3) %}
       {% if menu_level == 0 %}
-        <ul{{ attributes.addClass('menu-main-footer', 'small-3', 'large-6', 'columns') }}>
+        <ul{{ attributes.addClass('menu-main-footer', 'small-12', 'large-6', 'columns') }}>
       {% else %}
         <ul class="menu">
       {% endif %}
