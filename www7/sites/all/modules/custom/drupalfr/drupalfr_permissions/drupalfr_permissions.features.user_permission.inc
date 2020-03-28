@@ -187,15 +187,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'user',
   );
 
-  // Exported permission: 'add JS snippets for google analytics'.
-  $permissions['add JS snippets for google analytics'] = array(
-    'name' => 'add JS snippets for google analytics',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'googleanalytics',
-  );
-
   // Exported permission: 'add content to books'.
   $permissions['add content to books'] = array(
     'name' => 'add content to books',
@@ -416,15 +407,6 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'forum',
-  );
-
-  // Exported permission: 'administer google analytics'.
-  $permissions['administer google analytics'] = array(
-    'name' => 'administer google analytics',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'googleanalytics',
   );
 
   // Exported permission: 'administer image styles'.
@@ -1975,15 +1957,6 @@ function drupalfr_permissions_user_default_permissions() {
     'module' => 'pathauto',
   );
 
-  // Exported permission: 'opt-in or out of tracking'.
-  $permissions['opt-in or out of tracking'] = array(
-    'name' => 'opt-in or out of tracking',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'googleanalytics',
-  );
-
   // Exported permission: 'post comments'.
   $permissions['post comments'] = array(
     'name' => 'post comments',
@@ -2231,15 +2204,6 @@ function drupalfr_permissions_user_default_permissions() {
       'admin' => 'admin',
     ),
     'module' => 'commerce_payment',
-  );
-
-  // Exported permission: 'use PHP for tracking visibility'.
-  $permissions['use PHP for tracking visibility'] = array(
-    'name' => 'use PHP for tracking visibility',
-    'roles' => array(
-      'admin' => 'admin',
-    ),
-    'module' => 'googleanalytics',
   );
 
   // Exported permission: 'use advanced search'.
