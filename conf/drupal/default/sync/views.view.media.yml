@@ -17,7 +17,6 @@ description: ''
 tag: ''
 base_table: media_field_data
 base_field: mid
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -263,7 +262,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Nom du media'
+          label: 'Media name'
           exclude: false
           alter:
             alter_text: false
@@ -660,6 +659,8 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: true
           group_info:
             label: 'Statut de publication'
@@ -709,6 +710,8 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -750,6 +753,8 @@ display:
               anonymous: '0'
               administrator: '0'
             placeholder: ''
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -791,6 +796,8 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -806,6 +813,45 @@ display:
           entity_type: media
           entity_field: langcode
           plugin_id: language
+        status_extra:
+          group_info:
+            widget: select
+            group_items: {  }
+            multiple: false
+            description: ''
+            default_group_multiple: {  }
+            default_group: All
+            label: ''
+            identifier: ''
+            optional: true
+            remember: false
+          group: 1
+          relationship: none
+          exposed: false
+          expose:
+            use_operator: false
+            remember: false
+            operator_id: ''
+            multiple: false
+            description: ''
+            required: false
+            label: ''
+            operator_limit_selection: false
+            operator: ''
+            identifier: ''
+            operator_list: {  }
+            remember_roles:
+              authenticated: authenticated
+          entity_type: media
+          value: ''
+          field: status_extra
+          is_grouped: false
+          admin_label: ''
+          operator: '='
+          table: media_field_data
+          plugin_id: media_status
+          id: status_extra
+          group_type: group
       sorts:
         created:
           id: created
@@ -847,6 +893,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - user.permissions
       tags: {  }
   media_page_list:
@@ -874,5 +921,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - user.permissions
       tags: {  }

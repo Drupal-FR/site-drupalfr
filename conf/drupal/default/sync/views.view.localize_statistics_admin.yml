@@ -17,7 +17,6 @@ description: ''
 tag: Drupalfr
 base_table: localize_statistics
 base_field: id
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -197,13 +196,10 @@ display:
           clear_on_exposed: false
           action_title: Action
           selected_actions:
-            comment_delete_action: 0
-            views_bulk_edit: 0
-            views_bulk_operations_delete_entity: views_bulk_operations_delete_entity
-            pathauto_update_alias: 0
-          preconfiguration:
-            views_bulk_operations_delete_entity:
-              label_override: ''
+            -
+              action_id: views_bulk_operations_delete_entity
+              preconfiguration:
+                label_override: ''
           plugin_id: views_bulk_operations_bulk_form
         id:
           id: id
@@ -615,6 +611,8 @@ display:
               moderator: '0'
               member_organization: '0'
             placeholder: ''
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -659,6 +657,8 @@ display:
               moderator: '0'
               member_organization: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -709,6 +709,8 @@ display:
             placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -758,6 +760,8 @@ display:
             placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''

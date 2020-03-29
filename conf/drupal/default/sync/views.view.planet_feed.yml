@@ -19,7 +19,6 @@ description: ''
 tag: Drupalfr
 base_table: feeds_feed
 base_field: fid
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -204,6 +203,9 @@ display:
           entity_type: feeds_feed
           entity_field: type
           plugin_id: bundle
+          expose:
+            operator_limit_selection: false
+            operator_list: {  }
       sorts:
         field_feed_website_title:
           id: field_feed_website_title

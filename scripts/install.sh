@@ -18,14 +18,14 @@ echo -e "${LIGHT_GREEN}Clear Redis cache because otherwise it is no emptied on s
 $REDIS_FLUSH_COMMAND
 
 echo -e "${LIGHT_GREEN}Install Drupal.${NC}"
-$DRUSH site:install config_installer \
+$DRUSH site:install minimal \
   --account-mail="${ACCOUNT_MAIL}" \
   --account-name="${ACCOUNT_NAME}" \
   --account-pass="${ACCOUNT_PASS}" \
   --site-mail="${SITE_MAIL}" \
   --site-name="${SITE_NAME}" \
-  --locale="${DEFAULT_LANGUAGE}" \
-  -y
+  --locale="${DEFAULT_LANGUAGE}" -y \
+  --existing-config
 
 echo -e "${LIGHT_GREEN}Set the site mail on install because it is ignored by config ignore.${NC}"
 $DRUSH config:set system.site mail $SITE_MAIL -y
@@ -44,6 +44,13 @@ $DRUSH core:cron
 
 echo -e "${LIGHT_GREEN}Flush caches to be clean.${NC}"
 $DRUSH cache:rebuild
+
+
+echo -e "${LIGHT_GREEN}Change files directory permission.${NC}"
+#chmod 777 -R $WWW_PATH/site/default/files
+find $WWW_PATH/sites/default/files/ -type d -exec chmod 775 '{}' \;
+find $WWW_PATH/sites/default/files/ -type f -exec chmod 644 '{}' \;
+chown www-data:www-data $WWW_PATH/sites/default/files/ -R
 
 echo -e "${LIGHT_GREEN}Back to the current directory.${NC}"
 cd $CURRENT_PATH
