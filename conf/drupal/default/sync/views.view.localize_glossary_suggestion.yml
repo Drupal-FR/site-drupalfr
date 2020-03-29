@@ -16,7 +16,6 @@ description: ''
 tag: Drupalfr
 base_table: comment_field_data
 base_field: cid
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -195,6 +194,8 @@ display:
           id: status
           expose:
             operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
           group: 1
         status_node:
           value: '1'
@@ -207,6 +208,8 @@ display:
           id: status_node
           expose:
             operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
           group: 1
         comment_type:
           id: comment_type
@@ -217,6 +220,9 @@ display:
           entity_type: comment
           entity_field: comment_type
           plugin_id: bundle
+          expose:
+            operator_limit_selection: false
+            operator_list: {  }
         pid:
           id: pid
           table: comment_field_data
@@ -246,6 +252,8 @@ display:
             placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''

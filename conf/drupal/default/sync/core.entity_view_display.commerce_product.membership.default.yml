@@ -5,8 +5,6 @@ dependencies:
   config:
     - commerce_product.commerce_product_type.membership
     - field.field.commerce_product.membership.body
-    - field.field.commerce_product.membership.stores
-    - field.field.commerce_product.membership.variations
   module:
     - commerce_product
     - text
@@ -41,5 +39,6 @@ content:
 hidden:
   created: true
   langcode: true
+  search_api_excerpt: true
   stores: true
   uid: true

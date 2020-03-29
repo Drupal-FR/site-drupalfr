@@ -20,19 +20,19 @@ translatable: false
 default_value:
   -
     value:
-      subscribe: 0
+      subscribe: false
     subscribe: null
     interest_groups: null
 default_value_callback: ''
 settings:
-  show_interest_groups: 0
+  show_interest_groups: false
   interest_groups_label: 'Interest Groups'
   merge_fields:
     EMAIL: mail
     FNAME: field_user_realname
     LNAME: ''
-  unsubscribe_on_delete: 1
+  unsubscribe_on_delete: true
   subscribe_checkbox_label: Subscribe
-  interest_groups_hidden: 0
-  hide_subscribe_checkbox: 0
+  interest_groups_hidden: false
+  hide_subscribe_checkbox: false
 field_type: mailchimp_lists_subscription
