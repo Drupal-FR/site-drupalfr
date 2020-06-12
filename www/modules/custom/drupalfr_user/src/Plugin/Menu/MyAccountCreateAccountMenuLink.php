@@ -6,6 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Menu\MenuLinkDefault;
 use Drupal\Core\Menu\StaticMenuLinkOverridesInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -75,7 +76,7 @@ class MyAccountCreateAccountMenuLink extends MenuLinkDefault {
     }
     else {
       $user_settings = $this->configFactory->get('user.settings');
-      if ($user_settings->get('register') != USER_REGISTER_ADMINISTRATORS_ONLY) {
+      if ($user_settings->get('register') != UserInterface::USER_REGISTER_ADMINISTRATORS_ONLY) {
         return $this->t('Create an account');
       }
     }
