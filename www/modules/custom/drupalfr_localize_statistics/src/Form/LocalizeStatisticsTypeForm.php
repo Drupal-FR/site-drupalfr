@@ -49,13 +49,13 @@ class LocalizeStatisticsTypeForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label localize statistics type.', [
+        $this->messenger()->addStatus($this->t('Created the %label localize statistics type.', [
           '%label' => $localize_statistics_type->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label localize statistics type.', [
+        $this->messenger()->addStatus($this->t('Saved the %label localize statistics type.', [
           '%label' => $localize_statistics_type->label(),
         ]));
     }
