@@ -76,7 +76,7 @@ class MyAccountCreateAccountMenuLink extends MenuLinkDefault {
     }
     else {
       $user_settings = $this->configFactory->get('user.settings');
-      if ($user_settings->get('register') != UserInterface::USER_REGISTER_ADMINISTRATORS_ONLY) {
+      if ($user_settings->get('register') != UserInterface::REGISTER_ADMINISTRATORS_ONLY) {
         return $this->t('Create an account');
       }
     }
