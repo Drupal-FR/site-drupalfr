@@ -27,6 +27,7 @@ dependencies:
     - image.style.square_230
   module:
     - image
+    - link
     - user
 _core:
   default_config_hash: Jfba4UqSwUw3gaMCEca8UeeUAZzlMNdHy3MdcGwRCV8
@@ -35,6 +36,31 @@ targetEntityType: user
 bundle: user
 mode: teaser
 content:
+  field_user_drupal_org:
+    type: link
+    weight: 2
+    region: content
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+  field_user_realname:
+    type: string
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  member_for:
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   user_picture:
     type: image
     weight: 0
@@ -55,21 +81,18 @@ hidden:
   field_organization_size: true
   field_user_banner: true
   field_user_biography: true
-  field_user_drupal_org: true
   field_user_event: true
   field_user_in_directory: true
   field_user_membership_number: true
   field_user_newsletter_adff: true
   field_user_newsletter_drupalcamp: true
   field_user_organization: true
-  field_user_realname: true
   field_user_slogan: true
   field_user_twitter: true
   field_user_website: true
   forum_entity_view_1: true
   job_offer_entity_view_organization_job_offer: true
   langcode: true
-  member_for: true
   planet_entity_view_1: true
   planet_feed_entity_view_1: true
   profile_customer: true

@@ -265,3 +265,52 @@
     }
   }
 }
+
+// ==========================
+// Members User Display
+// ==========================
+
+// Members Users view
+//---------------------
+
+.card-user-container {
+  margin-bottom: $card-user-container-margin-bottom;
+  padding: 0;
+  border-radius: $card-user-container-radius;
+  overflow: hidden;
+  color: $black;
+  text-align: center;
+
+  article {
+
+    .field-user--user-picture {
+
+      .field-item {
+        .user-image {
+          display: block;
+          width: $card-user-container-image-size;
+          height: $card-user-container-image-size;
+          margin: auto;
+          padding: rem-calc(15);
+          border-radius: 50%;
+
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+
+      }
+
+    }
+
+    .field-user--field-user-realname {
+
+      .field-item {
+        font-weight: bold;
+        color: $drupal-blue-light;
+      }
+    }
+  }
+
+
+}
