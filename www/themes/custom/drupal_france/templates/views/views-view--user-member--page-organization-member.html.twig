@@ -68,13 +68,16 @@
 
           <div class="small-12 medium-4 column">
             <div class="callout" data-closable="slide-out-right">
-              <h2 class="h6">{% trans %}Vous êtes un prestataire de service Drupal{% endtrans %}</h2>
+              <h2 class="h4">{% trans %}Vous êtes prestataire de service Drupal{% endtrans %}</h2>
               <p>
-                {% trans %}... et vous voulez apparaître dans l'annuaire&nbsp;?{% endtrans %}
+                {% trans %}... et vous souhaitez apparaître dans l'annuaire&nbsp;?{% endtrans %}
               </p>
               <p>
-                <a href="/user/register">{% trans %}Créer un compte{% endtrans %}</a> {% trans %}et devenez adhérent dès aujourd'hui&nbsp;!{% endtrans %}
+                <a href="{{ path('user.register') }}">{% trans %}Créez un compte{% endtrans %}</a> {% trans %}et devenez adhérent dès aujourd'hui&nbsp;!{% endtrans %}
               </p>
+              <div class="text-align-center">
+                <a href="{{ path('user.register') }}" class="button">Je créé mon compte</a>
+              </div>
               <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
                 <span aria-hidden="true">&times;</span>
               </button>
