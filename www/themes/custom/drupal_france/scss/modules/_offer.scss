@@ -3,9 +3,9 @@
 // ==========================
 
 .offer {
-  .criteres  {
+  .criteria {
     .field {
-      display: inline-block;
+      display:        inline-block;
       padding-bottom: $global-padding;
     }
 
@@ -26,20 +26,17 @@
 }
 
 .offer-page {
-  .return-link {
-    padding: $global-padding 0;
-  }
-
-  .criteres  {
+  .criteria {
     column-count: 2;
 
     .field-label {
       display: inline-block;
 
       &::before {
-        content: '\f00c ';
-        font: normal normal normal 14px/1 FontAwesome;
-        color: $drupal-blue-dark;
+        margin-right: $global-margin/2;
+        content:      '\f00c ';
+        font:         normal normal normal 14px/1 FontAwesome;
+        color:        $drupal-blue-dark;
       }
 
       &::after {
@@ -51,4 +48,24 @@
       display: inline-block;
     }
   }
+
+  // EVA overload
+  .view-eva {
+    .section-title {
+      text-align: left;
+    }
+
+    // Organization display
+    table {
+      margin-bottom: $global-margin;
+
+      @include breakpoint(medium) {
+        width: 66%;
+      }
+      @include breakpoint(large) {
+        width: 50%;
+      }
+    }
+  }
+
 }
