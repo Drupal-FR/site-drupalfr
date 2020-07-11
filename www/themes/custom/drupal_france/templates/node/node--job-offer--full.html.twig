@@ -89,22 +89,17 @@
 
   {# We hide the comments and links now so that we can render them later. #}
   <div class="row">
-    <div class="medium-12 column offer-page">
+    <div class="medium-12 large-9 column offer-page">
       <div{{ content_attributes }}>
-        <div class="return-link h6">
-          <a href="/emploi/">
-            <i class="fa fa-arrow-left" aria-hidden="true"></i> {% trans %}Retour à la liste des offres{% endtrans %}
-          </a>
-        </div>
-        <div class="criteres callout">
+        <div class="criteria callout">
           {{ content|without('body', 'comment', 'links', 'field_tags', 'user_member_entity_view_job_offer_organization') }}
         </div>
-        {% trans %}<h2 class="section-title text-center">Description du poste</h2>{% endtrans %}
+        {% trans %}<h2 class="section-title">Description du poste</h2>{% endtrans %}
         {{ content.body }}
         {{ content.user_member_entity_view_job_offer_organization }}
-        <div class="return-link h6">
-          <a href="/emploi/">
-            <i class="fa fa-arrow-left" aria-hidden="true"></i> {% trans %}Retour à la liste des offres{% endtrans %}
+        <div class="return-link">
+          <a class="button" href="{{ path('view.job_offer.page_job_offer') }}">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp; {% trans %}Retour à la liste des offres{% endtrans %}
           </a>
         </div>
       </div>
