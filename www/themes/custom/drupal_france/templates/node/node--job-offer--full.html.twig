@@ -94,7 +94,7 @@
         <div class="criteria callout">
           {{ content|without('body', 'comment', 'links', 'field_tags', 'user_member_entity_view_job_offer_organization') }}
         </div>
-        {% trans %}<h2 class="section-title">Description du poste</h2>{% endtrans %}
+       <h2 class="section-title">{% trans %}Description du poste{% endtrans %}</h2>
         {{ content.body }}
         {{ content.user_member_entity_view_job_offer_organization }}
         <div class="return-link">
