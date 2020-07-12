@@ -1,5 +1,5 @@
 uuid: 8fe161a9-7c62-4229-9ecc-3b93ac4046d8
-langcode: fr
+langcode: en
 status: true
 dependencies:
   config:
@@ -25,14 +25,14 @@ content:
   body:
     label: hidden
     type: text_summary_or_trimmed
-    weight: 1
+    weight: 0
     settings:
       trim_length: 200
     third_party_settings: {  }
     region: content
   field_media_teaser:
     type: field_formatter_with_inline_settings
-    weight: 0
+    weight: 1
     region: content
     label: hidden
     settings:
@@ -40,33 +40,11 @@ content:
       label: visually_hidden
       type: blazy
       settings:
-        image_style: rect_400_200
-        thumbnail_style: ''
+        image_style: thumbnail
         responsive_image_style: ''
         media_switch: ''
+        thumbnail_style: ''
         ratio: ''
-        sizes: ''
-        breakpoints:
-          xs:
-            image_style: ''
-            width: ''
-            breakpoint: ''
-          sm:
-            image_style: ''
-            width: ''
-            breakpoint: ''
-          md:
-            image_style: ''
-            width: ''
-            breakpoint: ''
-          lg:
-            image_style: ''
-            width: ''
-            breakpoint: ''
-          xl:
-            image_style: ''
-            width: ''
-            breakpoint: ''
         current_view_mode: _custom
         background: false
         caption:

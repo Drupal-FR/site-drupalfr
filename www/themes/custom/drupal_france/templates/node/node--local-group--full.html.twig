@@ -75,26 +75,28 @@
     view_mode ? view_mode|clean_class,
     'clearfix',
     'row',
+    'expanded'
   ]
 %}
 <article{{ attributes.addClass(classes) }}>
+    <div class="column banner" style="background-image: url('{{ file_url(node.field_media_banner.entity.field_media_image.entity.fileuri) }}')"
+    ></div>
 
-  {{ content.field_media_banner }}
+    <div class="row">
+      <div{{ content_attributes.addClass('content', 'medium-8', 'column') }}>
+        {{ title_prefix }}
+        <h1{{ title_attributes }}>
+          {{ label }}
+        </h1>
+        {{ title_suffix }}
 
-  <div{{ content_attributes.addClass('content', 'medium-8', 'column') }}>
-    {{ title_prefix }}
-    <h1{{ title_attributes }}>
-      {{ label }}
-    </h1>
-    {{ title_suffix }}
+        {{ content.body }}
+        {{ content.local_group_entity_view_1 }}
+      </div>
 
-    {{ content.body }}
-    {{ content.local_group_entity_view_1 }}
+      <div class="medium-4 column view-mode-full">
+        {{ content.field_local_group_organizer }}
+        {{ content.field_twitter_account }}
+      </div>
   </div>
-
-  <div class="medium-4 column">
-    {{ content.field_local_group_organizer }}
-    {{ content.field_twitter_account }}
-  </div>
-
 </article>

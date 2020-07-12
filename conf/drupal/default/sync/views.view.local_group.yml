@@ -1,5 +1,5 @@
 uuid: 70e827d5-00f9-4822-a161-f7089bfbb549
-langcode: fr
+langcode: en
 status: true
 dependencies:
   config:
@@ -211,27 +211,43 @@ display:
         options:
           grouping: {  }
           data_source: field_local_group_place
+          entity_source: __base_table
           name_field: title
           description_field: title
           view_mode: full
           leaflet_map: 'OSM Mapnik'
-          height: '400'
+          height: '1000'
+          height_unit: px
           hide_empty_map: 0
+          disable_wheel: 0
+          fullscreen_control: 1
+          gesture_handling: 0
+          reset_map:
+            control: 0
+            position: topright
           map_position:
             force: 0
             center:
-              lat: '0'
-              lon: '0'
-            zoom: '12'
+              lat: '48.8566969'
+              lon: '2.3514616'
+            zoom: '8'
             minZoom: '1'
-            maxZoom: '18'
+            maxZoom: '12'
+            zoomFiner: ''
           icon:
+            iconType: marker
             iconUrl: ''
             shadowUrl: ''
+            html: '<div></div>'
+            html_class: leaflet-map-divicon
+            circle_marker_options: '{"radius":100,"color":"red","fillColor":"#f03","fillOpacity":0.5}'
             iconSize:
               x: ''
               'y': ''
             iconAnchor:
+              x: ''
+              'y': ''
+            shadowSize:
               x: ''
               'y': ''
             shadowAnchor:
@@ -240,6 +256,7 @@ display:
             popupAnchor:
               x: ''
               'y': ''
+          path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2"}'
       defaults:
         style: false
         row: false

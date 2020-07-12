@@ -77,15 +77,18 @@
 %}
 <article{{ attributes.addClass(classes) }}>
 
-  {{ content.field_media_teaser }}
 
   {{ title_prefix }}
+  <div class="medium-2 columns">
+  {{ content.field_media_teaser }}
+  </div>
+  {{ title_suffix }}
+
+  <div{{ content_attributes.addClass('content', 'medium-10', 'columns') }}>
   <h2{{ title_attributes }}>
     <a href="{{ url }}" rel="bookmark">{{ label }}</a>
   </h2>
-  {{ title_suffix }}
 
-  <div{{ content_attributes.addClass('content') }}>
     {{ content.body }}
   </div>
 

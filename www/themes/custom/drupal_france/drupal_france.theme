@@ -374,3 +374,14 @@ function drupal_france_preprocess_field(&$variables) {
     }
   }
 }
+
+/**
+ * Implements hook_theme_suggestions_leaflet_map_alter().
+ */
+function drupal_france_theme_suggestions_leaflet_map_alter(&$suggestions, $variables) {
+  $current_path = \Drupal::service('path.current')->getPath();
+  $current_path_alias = \Drupal::service('path.alias_manager')->getAliasByPath($current_path);
+  if ($current_path_alias === '/communaute/groupes-locaux') {
+    $suggestions[] = 'leaflet_map__local_group';
+  }
+}
