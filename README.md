@@ -37,3 +37,8 @@ For example, you can edit your /etc/hosts file and add an entry like:
 ```
 127.0.0.1  web.drupalfr8.docker.localhost varnish.drupalfr8.docker.localhost mail.drupalfr8.docker.localhost
 ```
+
+## Documentation
+
+Make sure to check [the project wiki on Github](https://github.com/Drupal-FR/site-drupalfr/wiki) 
+to know how to install the project and all to contribute.
