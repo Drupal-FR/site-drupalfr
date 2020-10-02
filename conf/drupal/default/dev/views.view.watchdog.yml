@@ -14,7 +14,6 @@ description: 'Entrées récentes du journal'
 tag: ''
 base_table: watchdog
 base_field: wid
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -588,6 +587,8 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -627,6 +628,8 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''

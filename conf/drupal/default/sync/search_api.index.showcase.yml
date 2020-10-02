@@ -36,7 +36,6 @@ field_settings:
         - field.storage.node.field_showcase_category
       module:
         - taxonomy
-        - taxonomy
   name_1:
     label: Secteur
     datasource_id: 'entity:node'
@@ -47,7 +46,6 @@ field_settings:
         - field.storage.node.field_showcase_sector
       module:
         - taxonomy
-        - taxonomy
   name_2:
     label: 'Version de Drupal'
     datasource_id: 'entity:node'
@@ -57,7 +55,6 @@ field_settings:
       config:
         - field.storage.node.field_showcase_drupal_version
       module:
-        - taxonomy
         - taxonomy
   node_grants:
     label: 'Node access information'
@@ -116,6 +113,7 @@ processor_settings:
     weights:
       preprocess_index: -10
       preprocess_query: -10
+  language_with_fallback: {  }
   rendered_item: {  }
 tracker_settings:
   default:

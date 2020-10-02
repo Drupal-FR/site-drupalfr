@@ -29,7 +29,6 @@ field_settings:
       module:
         - node
         - user
-        - user
   name_1:
     label: 'Tags » Taxonomy term » Name'
     datasource_id: 'entity:node'
@@ -39,7 +38,6 @@ field_settings:
       config:
         - field.storage.node.field_planet_tag
       module:
-        - taxonomy
         - taxonomy
   name_2:
     label: 'Version de Drupal » Taxonomy term » Name'
@@ -51,7 +49,6 @@ field_settings:
         - field.storage.node.field_drupal_version
       module:
         - taxonomy
-        - taxonomy
   name_3:
     label: 'Tags » Taxonomy term » Name'
     datasource_id: 'entity:node'
@@ -61,7 +58,6 @@ field_settings:
       config:
         - field.storage.node.field_forum_tag
       module:
-        - taxonomy
         - taxonomy
   node_grants:
     label: 'Node access information'
@@ -188,6 +184,7 @@ processor_settings:
     weights:
       preprocess_index: -20
       preprocess_query: -20
+  language_with_fallback: {  }
   rendered_item: {  }
   tokenizer:
     all_fields: true
