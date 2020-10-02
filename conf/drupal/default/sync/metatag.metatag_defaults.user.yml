@@ -7,6 +7,12 @@ _core:
 id: user
 label: Utilisateur
 tags:
-  canonical_url: '[user:url]'
-  description: '[site:name]'
   title: '[user:display-name] | [site:name]'
+  description: '[site:name]'
+  image_src: '[user:user_picture]'
+  canonical_url: '[user:url]'
+  og_image: '[user:user_picture]'
+  og_image_alt: '[user:field_user_realname]'
+  twitter_cards_type: summary
+  twitter_cards_image: '[user:user_picture]'
+  twitter_cards_image_alt: '[user:field_user_realname]'
