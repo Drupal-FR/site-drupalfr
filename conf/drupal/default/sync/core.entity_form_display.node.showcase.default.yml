@@ -3,7 +3,6 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - entity_browser.browser.media_image
     - field.field.node.showcase.field_showcase_category
     - field.field.node.showcase.field_showcase_drupal_version
     - field.field.node.showcase.field_showcase_media
@@ -12,8 +11,8 @@ dependencies:
     - node.type.showcase
   module:
     - content_moderation
-    - entity_browser
     - link_attributes
+    - media_library
     - path
     - publication_date
 _core:
@@ -30,7 +29,7 @@ content:
     third_party_settings: {  }
     region: content
   field_showcase_category:
-    weight: 3
+    weight: 2
     settings: {  }
     third_party_settings: {  }
     type: options_buttons
@@ -42,22 +41,14 @@ content:
     type: options_buttons
     region: content
   field_showcase_media:
-    weight: 1
-    settings:
-      entity_browser: media_image
-      field_widget_display: rendered_entity
-      field_widget_edit: true
-      field_widget_remove: true
-      open: true
-      selection_mode: selection_append
-      field_widget_display_settings:
-        view_mode: editor
-      field_widget_replace: false
-    third_party_settings: {  }
-    type: entity_browser_entity_reference
+    type: media_library_widget
+    weight: 3
     region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
   field_showcase_sector:
-    weight: 2
+    weight: 1
     settings: {  }
     third_party_settings: {  }
     type: options_buttons
@@ -87,13 +78,13 @@ content:
     region: content
   moderation_state:
     type: moderation_state_default
-    weight: 100
+    weight: 14
     settings: {  }
     region: content
     third_party_settings: {  }
   path:
     type: path
-    weight: 11
+    weight: 12
     settings: {  }
     third_party_settings: {  }
     region: content
@@ -106,7 +97,7 @@ content:
     region: content
   published_at:
     type: publication_date_timestamp
-    weight: 10
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -114,7 +105,7 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 121
+    weight: 15
     third_party_settings: {  }
     region: content
   sticky:
@@ -143,7 +134,7 @@ content:
     third_party_settings: {  }
     region: content
   url_redirects:
-    weight: 50
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }

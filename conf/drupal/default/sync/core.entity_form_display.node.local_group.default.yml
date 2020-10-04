@@ -3,7 +3,6 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - entity_browser.browser.media_image
     - field.field.node.local_group.body
     - field.field.node.local_group.field_local_group_organizer
     - field.field.node.local_group.field_local_group_place
@@ -13,9 +12,9 @@ dependencies:
     - node.type.local_group
   module:
     - content_moderation
-    - entity_browser
     - field_group
     - geofield
+    - media_library
     - path
     - publication_date
     - text
@@ -121,33 +120,19 @@ content:
     type: geofield_default
     region: content
   field_media_banner:
-    weight: 11
-    settings:
-      entity_browser: media_image
-      field_widget_display: rendered_entity
-      field_widget_edit: true
-      field_widget_remove: true
-      open: true
-      selection_mode: selection_append
-      field_widget_display_settings:
-        view_mode: editor
-    third_party_settings: {  }
-    type: entity_browser_entity_reference
+    type: media_library_widget
+    weight: 0
     region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
   field_media_teaser:
-    weight: 12
-    settings:
-      entity_browser: media_image
-      field_widget_display: rendered_entity
-      field_widget_edit: true
-      field_widget_remove: true
-      open: true
-      selection_mode: selection_append
-      field_widget_display_settings:
-        view_mode: editor
-    third_party_settings: {  }
-    type: entity_browser_entity_reference
+    type: media_library_widget
+    weight: 1
     region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
   field_twitter_account:
     weight: 11
     settings:
