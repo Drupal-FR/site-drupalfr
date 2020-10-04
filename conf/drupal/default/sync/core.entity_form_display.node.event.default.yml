@@ -3,7 +3,6 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - entity_browser.browser.media_image
     - field.field.node.event.body
     - field.field.node.event.field_event_date_end
     - field.field.node.event.field_event_date_start
@@ -17,10 +16,10 @@ dependencies:
   module:
     - content_moderation
     - datetime
-    - entity_browser
     - field_group
     - geofield
     - link
+    - media_library
     - path
     - publication_date
     - text
@@ -160,33 +159,19 @@ content:
     type: link_default
     region: content
   field_media_banner:
-    weight: 40
-    settings:
-      entity_browser: media_image
-      field_widget_display: rendered_entity
-      field_widget_edit: true
-      field_widget_remove: true
-      open: true
-      selection_mode: selection_append
-      field_widget_display_settings:
-        view_mode: editor
-    third_party_settings: {  }
-    type: entity_browser_entity_reference
+    type: media_library_widget
+    weight: 0
     region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
   field_media_teaser:
-    weight: 41
-    settings:
-      entity_browser: media_image
-      field_widget_display: rendered_entity
-      field_widget_edit: true
-      field_widget_remove: true
-      open: true
-      selection_mode: selection_append
-      field_widget_display_settings:
-        view_mode: editor
-    third_party_settings: {  }
-    type: entity_browser_entity_reference
+    type: media_library_widget
+    weight: 1
     region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
   langcode:
     type: language_select
     weight: 1

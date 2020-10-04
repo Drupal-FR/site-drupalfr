@@ -3,14 +3,13 @@ langcode: fr
 status: true
 dependencies:
   config:
-    - entity_browser.browser.media_image
     - field.field.paragraph.banner.field_banner_link
     - field.field.paragraph.banner.field_media
     - field.field.paragraph.banner.field_text
     - paragraphs.paragraphs_type.banner
   module:
-    - entity_browser
     - link
+    - media_library
     - text
 _core:
   default_config_hash: bZgbevKcbE_DpeucR_CliF8DnPOOl-ehxOdsZyFijiU
@@ -20,7 +19,7 @@ bundle: banner
 mode: default
 content:
   field_banner_link:
-    weight: 1
+    weight: 2
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -28,19 +27,12 @@ content:
     type: link_default
     region: content
   field_media:
-    weight: 2
-    settings:
-      entity_browser: media_image
-      field_widget_display: rendered_entity
-      field_widget_edit: true
-      field_widget_remove: true
-      open: true
-      selection_mode: selection_append
-      field_widget_display_settings:
-        view_mode: editor
-    third_party_settings: {  }
-    type: entity_browser_entity_reference
+    type: media_library_widget
+    weight: 1
     region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
   field_text:
     weight: 0
     settings:
