@@ -23,5 +23,20 @@
       line-height: $global-lineheight*.9;
       color:       $drupal-blue-desaturate-light;
     }
+
+    a {
+      display: inline-block;
+      color:   $drupal-blue-desaturate-light;
+
+      &:hover {
+        background-color: transparent;
+        color:            $white;
+      }
+    }
+
+  }
+
+  .full-with {
+    clear: both;
   }
 }
