@@ -230,9 +230,15 @@
                 {{ page.footer_last }}
               </div>
             {% endif %}
+            {% if page.footer_full_with %}
+              <div id="footer-full-with" class="large-12 full-with">
+                {{ page.footer_full_with }}
+              </div>
+            {% endif %}
           </footer>
         </div>
       {% endif %}
+
       <div class="bottom-bar panel hidden">
         <div class="row">
           <div class="large-12 column">
