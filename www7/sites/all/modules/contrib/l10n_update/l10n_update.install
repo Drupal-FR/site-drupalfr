@@ -15,7 +15,7 @@ function l10n_update_schema() {
       'name' => array(
         'description' => 'A unique short name to identify the project.',
         'type' => 'varchar',
-        'length' => '50',
+        'length' => '255',
         'not null' => TRUE,
       ),
       'project_type' => array(
@@ -68,7 +68,7 @@ function l10n_update_schema() {
       'project' => array(
         'description' => 'A unique short name to identify the project.',
         'type' => 'varchar',
-        'length' => '50',
+        'length' => '255',
         'not null' => TRUE,
       ),
       'language' => array(
@@ -207,6 +207,27 @@ function l10n_update_requirements($phase) {
       $requirements['l10n_update']['value'] = t('Not enabled');
       $requirements['l10n_update']['severity'] = REQUIREMENT_INFO;
     }
+
+    // Test the contents of the .htaccess file in the translations directory.
+    $directory = variable_get('l10n_update_download_store', '');
+    if ($directory) {
+      l10n_update_ensure_htaccess();
+      $htaccess_file = $directory . '/.htaccess';
+      // Check for the string which was added to the recommended .htaccess file
+      // in the latest security update.
+      if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || strpos($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003') === FALSE) {
+        $requirements['l10n_update_htaccess'] = array(
+          'title' => t('Translations directory'),
+          'value' => t('Not fully protected'),
+          'severity' => REQUIREMENT_ERROR,
+          'description' => t('See <a href="@url">@url</a> for information about the recommended .htaccess file which should be added to the %directory directory to help protect against arbitrary code execution.', array(
+            '@url' => 'http://drupal.org/SA-CORE-2013-003',
+            '%directory' => $directory
+          )),
+        );
+      }
+    }
+
     return $requirements;
   }
   // We must always return array, the installer doesn't use module_invoke_all()
@@ -296,4 +317,37 @@ function l10n_update_update_7005() {
  */
 function l10n_update_update_7006() {
   registry_rebuild();
+}
+
+/**
+ * Increase the length of the {l10n_update_project}.name column.
+ */
+function l10n_update_update_7007() {
+  $schema = l10n_update_schema();
+  db_change_field('l10n_update_project', 'name', 'name', $schema['l10n_update_project']['fields']['name']);
+}
+
+/**
+ * Increase the length of the {l10n_update_file}.project column.
+ */
+function l10n_update_update_7008() {
+  $schema = l10n_update_schema();
+  db_change_field('l10n_update_file', 'project', 'project', $schema['l10n_update_file']['fields']['project']);
+}
+
+/**
+ * Remove 'headers' field from cache table.
+ */
+function l10n_update_update_7009() {
+  if (db_field_exists('cache_l10n_update', 'headers')) {
+    db_drop_field('cache_l10n_update', 'headers');
+  }
+}
+
+/**
+ * Add a .htaccess file to the translations directory.
+ */
+function l10n_update_update_7010() {
+  module_load_include('module', 'l10n_update');
+  l10n_update_ensure_htaccess();
 }

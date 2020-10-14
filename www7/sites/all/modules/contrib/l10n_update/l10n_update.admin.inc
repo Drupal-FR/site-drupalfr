@@ -202,7 +202,11 @@ function l10n_update_admin_settings_form($form, &$form_state) {
     '#default_value' => variable_get('l10n_update_download_store', ''),
     '#description' => t('A path relative to the Drupal installation directory where translation files will be stored, e.g. sites/all/translations. Saved translation files can be reused by other installations. If left empty the downloaded translation will not be saved.'),
   );
-  return system_settings_form($form);
+
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'l10n_update_admin_settings_form_submit';
+
+  return $form;
 }
 
 /**
@@ -218,6 +222,14 @@ function l10n_update_admin_settings_form_validate($form, &$form_state) {
       watchdog('file system', 'The directory %directory does not exist or is not writable.', array('%directory' => $form_values['l10n_update_download_store']), WATCHDOG_ERROR);
     }
   }
+}
+
+/**
+ * Additional submit handler for update settings.
+ */
+function l10n_update_admin_settings_form_submit($form, &$form_state) {
+  // Add .htaccess file to the translations directory.
+  l10n_update_ensure_htaccess();
 }
 
 /**

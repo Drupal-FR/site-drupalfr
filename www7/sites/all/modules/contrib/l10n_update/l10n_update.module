@@ -494,3 +494,13 @@ function l10n_update_flush_caches() {
   }
   return array();
 }
+
+/**
+ * Creates a .htaccess file in the translations directory if it is missing.
+ */
+function l10n_update_ensure_htaccess() {
+  $directory = variable_get('l10n_update_download_store', '');
+  if ($directory) {
+    file_create_htaccess($directory, FALSE);
+  }
+}
