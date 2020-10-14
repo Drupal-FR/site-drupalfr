@@ -47,42 +47,18 @@ function l10n_update_build_projects($refresh = FALSE) {
 
   $default_server = l10n_update_default_server();
 
-  if (module_exists('update')) {
-    $projects_info = update_get_available(TRUE);
-  }
   foreach ($projects as $name => $data) {
-
-    // Force update fetch of project data in cases where Drupal's performance
-    // optimized approach is missing out on some projects.
-    // @see http://drupal.org/node/1671570#comment-6216090
-    if (module_exists('update') && !isset($projects_info[$name])) {
-      module_load_include('fetch.inc', 'update');
-      _update_process_fetch_task($data);
-      $available = _update_get_cached_available_releases();
-      if (!empty($available[$name])) {
-        $projects_info[$name] = $available[$name];
+    // For dev releases, remove the '-dev' part and trust the translation server
+    // to fall back to the latest stable release for that branch.
+    if (isset($data['info']['version']) && strpos($data['info']['version'], '-dev')) {
+      if (preg_match("/^(\d+\.x-\d+\.).*$/", $data['info']['version'], $matches)) {
+        // Example matches: 7.x-1.x-dev, 7.x-1.0-alpha1+5-dev => 7.x-1.x
+        $data['info']['version'] = $matches[1] . 'x';
       }
-    }
-
-    if (isset($projects_info[$name]['releases']) && $projects_info[$name]['project_status'] != 'not-fetched') {
-      // Find out if a dev version is installed.
-      if (preg_match("/^[0-9]+\.x-([0-9]+)\..*-dev$/", $data['info']['version'], $matches)) {
-        // Find a suitable release to use as alternative translation.
-        foreach ($projects_info[$name]['releases'] as $project_release) {
-          // The first release with the same major release number which is not
-          // a dev release is the one. Releases are sorted the most recent first.
-          if ($project_release['version_major'] == $matches[1] &&
-              (!isset($project_release['version_extra']) || $project_release['version_extra'] != 'dev')) {
-            $release = $project_release;
-            break;
-          }
-        }
+      elseif (preg_match("/^(\d+\.).*$/", $data['info']['version'], $matches)) {
+        // Example match: 7.33-dev => 7.x (Drupal core)
+        $data['info']['version'] = $matches[1] . 'x';
       }
-      if (!empty($release['version'])) {
-        $data['info']['version'] = $release['version'];
-      }
-
-      unset($release);
     }
 
     $data += array(
@@ -228,7 +204,7 @@ function _l10n_update_project_info_list(&$projects, $list, $project_type, $disab
         'name' => $project_name,
         'info' => $file->info,
         'datestamp' => isset($file->info['datestamp']) ? $file->info['datestamp'] : 0,
-        'includes' => array($file->name => $file->info['name']),
+        'includes' => array($file->name => isset($file->info['name']) ? $file->info['name'] : $file->name),
         'project_type' => $project_name == 'drupal' ? 'core' : $project_type,
       );
     }
