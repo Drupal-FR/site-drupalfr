@@ -10,8 +10,6 @@ dependencies:
 third_party_settings:
   honeypot:
     honeypot: true
-_core:
-  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
 open: null
 close: null
 weight: 0
@@ -64,7 +62,6 @@ settings:
   form_access_denied_message: ''
   form_access_denied_attributes: {  }
   form_file_limit: ''
-  form_elements_attributes: {  }
   share: false
   share_node: false
   share_theme_name: ''
@@ -153,6 +150,7 @@ settings:
   results_customize: false
   token_view: false
   token_update: false
+  token_delete: false
   serial_disabled: false
   form_submit_label: 'Envoyer le message'
   form_submit_attributes: {  }
@@ -215,6 +213,7 @@ handlers:
   email_confirmation:
     id: email
     label: 'Courriel de confirmation'
+    notes: ''
     handler_id: email_confirmation
     status: true
     conditions: {  }
@@ -251,6 +250,7 @@ handlers:
   email_notification:
     id: email
     label: 'Notification par courriel'
+    notes: ''
     handler_id: email_notification
     status: true
     conditions: {  }
@@ -287,3 +287,5 @@ handlers:
       theme_name: ''
       parameters: {  }
 variants: {  }
+_core:
+  default_config_hash: 0EUZXttYMrETHVPtVvt7E9pG0avPwA9kEUJWxGyM4Y0
