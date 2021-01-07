@@ -2,6 +2,16 @@ uuid: fed8b057-8f2d-4610-8b50-350e45654582
 langcode: fr
 status: true
 dependencies:
+  config:
+    - node.type.event
+    - node.type.forum
+    - node.type.job_offer
+    - node.type.local_group
+    - node.type.news
+    - node.type.page
+    - node.type.planet
+    - node.type.release
+    - node.type.showcase
   module:
     - node
     - user
@@ -406,7 +416,16 @@ display:
           group_type: group
           admin_label: ''
           operator: in
-          value: {  }
+          value:
+            news: news
+            planet: planet
+            release: release
+            local_group: local_group
+            job_offer: job_offer
+            page: page
+            showcase: showcase
+            forum: forum
+            event: event
           group: 1
           exposed: true
           expose:
@@ -415,6 +434,8 @@ display:
             description: ''
             use_operator: false
             operator: type_op
+            operator_limit_selection: false
+            operator_list: {  }
             identifier: type
             required: false
             remember: false
@@ -423,9 +444,10 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
-            reduce: false
-            operator_limit_selection: false
-            operator_list: {  }
+              member: '0'
+              moderator: '0'
+              member_organization: '0'
+            reduce: true
           is_grouped: false
           group_info:
             label: ''
