@@ -66,14 +66,18 @@
         }
       }
     }
+    @include breakpoint(medium) {
+      .user--realname {
+        margin-top: $global-margin*3;
+        margin-left: $global-padding;
+      }
+    }
 
     .user--realname {
-      display:     block;
-      float:       left;
-      margin-top:  $global-margin*3;
-      margin-left: $global-padding;
-      font-style:  italic;
-      color:       $dark-gray;
+      display: block;
+      float: left;
+      font-style: italic;
+      color: $dark-gray;
     }
   }
 

@@ -13,8 +13,11 @@ dependencies:
     - field.field.node.event.field_event_website
     - field.field.node.event.field_media_banner
     - field.field.node.event.field_media_teaser
+    - image.style.square_230
     - node.type.event
   module:
+    - commerce_store
+    - media
     - smart_trim
     - user
 _core:
@@ -27,7 +30,7 @@ content:
   body:
     label: hidden
     type: smart_trim
-    weight: 1
+    weight: 4
     settings:
       trim_length: 200
       trim_type: chars
@@ -42,19 +45,40 @@ content:
       wrap_class: trimmed
     third_party_settings: {  }
     region: content
-  field_media_teaser:
-    weight: 0
+  field_event_date_end:
+    type: commerce_store_datetime
+    weight: 3
+    region: content
     label: hidden
     settings:
-      view_mode: default
-      link: false
+      date_format: jour_mois_annee
     third_party_settings: {  }
-    type: entity_reference_entity_view
+  field_event_date_start:
+    type: commerce_store_datetime
+    weight: 2
     region: content
+    label: hidden
+    settings:
+      date_format: jour_mois_annee
+    third_party_settings: {  }
+  field_event_organizer:
+    type: entity_reference_label
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_media_teaser:
+    type: media_thumbnail
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: square_230
+      image_link: ''
+    third_party_settings: {  }
 hidden:
-  field_event_date_end: true
-  field_event_date_start: true
-  field_event_organizer: true
   field_event_place: true
   field_event_sponsor: true
   field_event_website: true

@@ -80,7 +80,7 @@
     {% if display_submitted %}
       <div class="posted row">
         <div class="columns small-5 large-4">
-        {{ author_picture }}
+          {{ author_picture }}
         </div>
         <div class="columns small-7 large-8">
           <p class="submitted">{% trans %}Submitted by {{ author_name }} on {{ date }}{% endtrans %}</p>
@@ -91,14 +91,13 @@
 
     {# We hide the comments and links now so that we can render them later. #}
     <div{{ content_attributes }}>
-      {{ content|without('comment', 'links', 'field_tags') }}
+      {{ content.body }}
     </div>
+    <hr class="invisible">
 
-    {% if content.field_tags|length and not is_front %}
-      {{ content.field_tags }}
-    {% endif %}
-
-    {{ content.links }}
-    {{ content.comment }}
+    <div class="callout lead planet-element--readmore">
+      <strong>Lire l'article sur son site d'origine</strong>
+      {{ content.field_planet_url }}
+    </div>
   </div>
 </article>

@@ -23,7 +23,7 @@ content:
   body:
     label: hidden
     type: smart_trim
-    weight: 2
+    weight: 0
     settings:
       trim_length: 200
       trim_type: chars
@@ -34,27 +34,14 @@ content:
       trim_options:
         text: true
       more_class: more-link
+      wrap_output: false
+      wrap_class: trimmed
     third_party_settings: {  }
-    region: content
-  field_media_teaser:
-    weight: 0
-    label: hidden
-    settings:
-      view_mode: default
-      link: false
-    third_party_settings: {  }
-    type: entity_reference_entity_view
-    region: content
-  field_news_type:
-    weight: 1
-    label: hidden
-    settings:
-      link: false
-    third_party_settings: {  }
-    type: entity_reference_label
     region: content
 hidden:
   field_media_banner: true
+  field_media_teaser: true
+  field_news_type: true
   field_paragraph: true
   langcode: true
   links: true

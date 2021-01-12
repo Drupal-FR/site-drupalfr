@@ -7,6 +7,7 @@
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_theme_suggestions_user_alter().
@@ -368,9 +369,17 @@ function drupal_france_form_user_pass_alter(&$form, FormStateInterface $form_sta
  * Implements hook_preprocess_field().
  */
 function drupal_france_preprocess_field(&$variables) {
+  $current_url = Url::fromRoute('<current>');
+  $path = $current_url->toString();
   if ($variables['entity_type'] == 'user' && $variables['field_name'] == 'user_picture') {
     foreach ($variables['items'] as $key => $item) {
       $variables['items'][$key]['content']['#item_attributes']['class'][] = 'user-image';
     }
   }
+
+  // Add class 'recherche' if search page.
+  if ($path == "/recherche") {
+    $variables['recherche'] = 'recherche';
+  }
+
 }
