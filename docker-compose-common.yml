@@ -1,39 +1,15 @@
 version: "2.3"
 
 services:
-  httpd:
-    image: httpd:2.4-alpine
-    volumes:
-      - ./conf/httpd/httpd.conf:/usr/local/apache2/conf/httpd.conf
-      - ./conf/httpd/extra/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
-      - .:/project
-
-
-
   # PHP + Apache.
   drupal-php-apache-dev:
     image: florenttorregrosa/drupal-php-dev:7.3-apache
+    env_file:
+      - ".env"
     volumes:
       - .:/project
       - ./conf/php/php.ini:/usr/local/etc/php/php.ini
       - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf
-
-  drupal-php-apache:
-    image: florenttorregrosa/drupal-php:7.3-apache
-    volumes:
-      - .:/project
-      - ./conf/php/php.ini:/usr/local/etc/php/php.ini
-      - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf
-
-
-
-  varnish:
-    image: florenttorregrosa/varnish:6-alpine
-    environment:
-      VCL_CONFIG: /varnish-drupal/varnish.vcl
-    volumes:
-      - ./conf/varnish:/varnish-drupal
-
 
   mysql:
     image: mysql:5.7

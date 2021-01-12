@@ -18,20 +18,6 @@ services:
       - redis
       - mail
 
-
-  varnish:
-    extends:
-      file: ./docker-compose-common.yml
-      service: varnish
-    labels:
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:${VARNISH_TRAEFIK_FRONTEND_RULE_HOSTNAME:-varnish.drupalfr8.docker.localhost}"
-    depends_on:
-      - web
-    ports:
-      - 8100:80
-
-
   mysql:
     extends:
       file: ./docker-compose-common.yml
