@@ -68,37 +68,28 @@
  */
 #}
 <article id="node-{{ node.id }}" {{ attributes }}>
-  <div class="search_result">
-    {{ title_prefix }}
-    {% if not page %}
-      <h3{{ title_attributes }}>
-        <a href="{{ url }}" rel="bookmark">{{ label }}</a>
-      </h3>
-    {% endif %}
-    {{ title_suffix }}
 
-    {% if display_submitted %}
-      <div class="posted row">
-        <div class="columns small-5 large-4">
-        {{ author_picture }}
-        </div>
-        <div class="columns small-7 large-8">
-          <p class="submitted">{% trans %}Submitted by {{ author_name }} on {{ date }}{% endtrans %}</p>
-          {{ metadata }}
-        </div>
+  {{ title_prefix }}
+  {% if not page %}
+    <h3{{ title_attributes }}>
+      <a href="{{ url }}" rel="bookmark">{{ label }}</a>
+    </h3>
+  {% endif %}
+  {{ title_suffix }}
+
+  {% if content.field_tags|length and not is_front %}
+    {{ content.field_tags }}
+  {% endif %}
+
+    <div class="row">
+      <div class="columns small-4 large-3">
+        {{ content.field_media_teaser }}
       </div>
-    {% endif %}
-
-    {# We hide the comments and links now so that we can render them later. #}
-    <div{{ content_attributes }}>
-      {{ content|without('comment', 'links', 'field_tags') }}
+      <div class="columns small-8 large-9">
+        {{ content.field_event_organizer }}
+        <i class="fa fa-calendar" aria-hidden="true"></i> <small>{{ content.field_event_date_start }}</small> <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+         <small>{{ content.field_event_date_end }}</small>
+        {{ content.body }}
+      </div>
     </div>
-
-    {% if content.field_tags|length and not is_front %}
-      {{ content.field_tags }}
-    {% endif %}
-
-    {{ content.links }}
-    {{ content.comment }}
-  </div>
 </article>
