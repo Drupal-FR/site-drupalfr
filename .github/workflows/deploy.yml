@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     if: contains( github.ref, '8.x-1.x')
     steps:
-    - uses: shimataro/ssh-key-action@v2
+    - uses: webfactory/ssh-agent@v0.4.1
       with:
-        key: ${{ secrets.ssh_private_key }}
+        ssh-private-key: ${{ secrets.ssh_private_key }}
     - uses: actions/checkout@v2
     - name: Disable StrictHostKeyChecking
       run: |
