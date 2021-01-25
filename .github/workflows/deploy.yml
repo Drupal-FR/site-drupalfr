@@ -16,11 +16,12 @@ jobs:
       env:
         SSH_KEY: ${{ secrets.ssh_private_key }}
       run: |
-      apt update && apt install openssh-client
-      echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-      mkdir -p ~/.ssh
-      chmod 700 ~/.ssh
-      echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+        apt update
+        apt install openssh-client
+        echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - name: Deploy website
       env:
         GIT_URL: ${{ secrets.git_url }}
