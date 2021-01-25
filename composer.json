@@ -129,6 +129,7 @@
         "anam/phantomjs-linux-x86-binary": "~2.1.1",
         "bower-asset/d3": "3.5.*",
         "bower-asset/highlightjs": "9.12.*",
+        "drupal/coder": "^8.3.1",
         "drupal/config_inspector": "1.*",
         "drupal/console": "1.*",
         "drupal/core-dev": "8.9.11",
@@ -141,7 +142,8 @@
         "drupal/pistachio": "1.*",
         "drupal/renderviz": "1.*",
         "drupal/search_kint": "1.*",
-        "drupal/speedboxes": "1.*"
+        "drupal/speedboxes": "1.*",
+        "mglaman/drupal-check": "^1.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -155,12 +157,6 @@
     "scripts": {
         "post-create-project-cmd": [
             "bash ./scripts/init.sh"
-        ],
-        "post-install-cmd": [
-            "bash ./scripts/update-libraries.sh"
-        ],
-        "post-update-cmd": [
-            "bash ./scripts/update-libraries.sh"
         ]
     },
     "extra": {
