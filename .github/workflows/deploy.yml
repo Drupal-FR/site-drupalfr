@@ -1,0 +1,16 @@
+name: Drupal8 Deploy
+
+on:
+  push:
+    branches: [ 8.x-1.x ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: contains( github.ref, '8.x-1.x')
+    steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.3'
+    - uses: actions/checkout@v2
+    - name: Deploy Drupal
+      run: echo OK
