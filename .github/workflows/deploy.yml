@@ -1,0 +1,35 @@
+name: Drupal8 Deploy
+
+on:
+  push:
+    branches: [ 8.x-1.x ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: contains( github.ref, '8.x-1.x')
+    steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.3'
+    - uses: actions/checkout@v2
+    - name: Install and configure ssh
+      env:
+        SSH_KEY: ${{ secrets.ssh_private_key }}
+      run: |
+        eval `ssh-agent -s`
+        echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - name: Deploy website
+      env:
+        GIT_URL: ${{ secrets.git_url }}
+      run: |
+        git remote add upstream $GIT_URL
+        git fetch upstream
+        git checkout upstream/test_ci
+        git merge origin/8.x-1.x -m "Merge from github"
+        git push upstream/develop
+
+
+

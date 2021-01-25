@@ -1,0 +1,21 @@
+name: Drupal8 Pr
+
+on:
+  pull_request:
+    branches: [ 8.x-1.x ]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.3'
+    - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: phpcs
+      run: |
+        ./vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer/
+        ./vendor/bin/phpcs --standard=Drupal,DrupalPractice www/modules/custom/
+    - name: phpstan
+      run: ./vendor/bin/drupal-check www/modules/custom/
