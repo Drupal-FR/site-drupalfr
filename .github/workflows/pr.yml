@@ -19,6 +19,6 @@ jobs:
     - name: phpcs
       run: |
         ./vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer/
-        ./vendor/bin/phpcs www/modules/custom/
+        ./vendor/bin/phpcs --standard=Drupal,DrupalPractice www/modules/custom/
     - name: phpstan
       run: ./vendor/bin/drupal-check www/modules/custom/
