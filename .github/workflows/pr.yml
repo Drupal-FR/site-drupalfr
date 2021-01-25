@@ -1,0 +1,22 @@
+name: Drupal8 Pr
+
+on:
+  push:
+    branches: [ test_ci ]
+  pull_request:
+    branches: [ test_ci ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.3'
+    - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: phpcs
+      run: ./vendor/bin/phpcs www/modules/custom/
+    - name: phpstan
+      run: ./vendor/bin/drupal-check www/modules/custom/
