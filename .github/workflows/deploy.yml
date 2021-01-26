@@ -22,5 +22,5 @@ jobs:
         git remote add upstream $GIT_URL
         git fetch --depth=30 upstream
         git checkout upstream/test_ci -b deploy
-        git merge origin/8.x-1.x -m "Merge from github"
+        git merge origin/8.x-1.x -m "Merge from github" --allow-unrelated-histories
         git push -f upstream deploy:test_ci
