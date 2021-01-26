@@ -8,28 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     if: contains( github.ref, '8.x-1.x')
     steps:
-    - uses: shivammathur/setup-php@v2
+    - uses: webfactory/ssh-agent@v0.4.1
       with:
-        php-version: '7.3'
+        ssh-private-key: ${{ secrets.ssh_private_key }}
     - uses: actions/checkout@v2
-    - name: Install and configure ssh
-      env:
-        SSH_KEY: ${{ secrets.ssh_private_key }}
+      with:
+        fetch-depth: 0
+    - name: Disable StrictHostKeyChecking
       run: |
-        eval `ssh-agent -s`
-        echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-        mkdir -p ~/.ssh
-        chmod 700 ~/.ssh
-        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - name: Deploy website
+        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+        git config --global user.email "github@drupal.fr"
+        git config --global user.name "Github"
+    - name: Deploy website to develop plateform
       env:
         GIT_URL: ${{ secrets.git_url }}
       run: |
         git remote add upstream $GIT_URL
-        git fetch upstream
-        git checkout upstream/test_ci
-        git merge origin/8.x-1.x -m "Merge from github"
-        git push upstream/develop
-
-
-
+        git fetch --depth=30 upstream
+        git checkout upstream/develop -b deploy
+        git merge origin/8.x-1.x -m "Merge from github" --allow-unrelated-histories
+        git push -f upstream deploy:develop
