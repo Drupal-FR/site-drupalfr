@@ -19,12 +19,12 @@ jobs:
         echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
         git config --global user.email "github@drupal.fr"
         git config --global user.name "Github"
-    - name: Deploy website
+    - name: Deploy website to develop plateform
       env:
         GIT_URL: ${{ secrets.git_url }}
       run: |
         git remote add upstream $GIT_URL
         git fetch --depth=30 upstream
-        git checkout upstream/test_ci -b deploy
+        git checkout upstream/develop -b deploy
         git merge origin/8.x-1.x -m "Merge from github" --allow-unrelated-histories
-        git push -f upstream deploy:test_ci
+        git push -f upstream deploy:develop
