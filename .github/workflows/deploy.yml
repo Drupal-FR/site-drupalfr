@@ -13,7 +13,7 @@ jobs:
         ssh-private-key: ${{ secrets.ssh_private_key }}
     - uses: actions/checkout@v2
       with:
-        fetch-depth: '10'
+        fetch-depth: 0
     - name: Disable StrictHostKeyChecking
       run: |
         echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
