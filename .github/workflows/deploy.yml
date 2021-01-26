@@ -20,7 +20,7 @@ jobs:
         GIT_URL: ${{ secrets.git_url }}
       run: |
         git remote add upstream $GIT_URL
-        git fetch --depth=1 upstream
-        git checkout upstream/test_ci
+        git fetch --depth=30 upstream
+        git checkout upstream/test_ci -b deploy
         git merge origin/8.x-1.x -m "Merge from github"
-        git push upstream test_ci
+        git push -f upstream deploy:test_ci
