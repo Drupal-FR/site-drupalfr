@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
- * Class TwitterService.
+ * Twitter service interface.
  *
  * @package Drupal\drupalfr_social
  */

@@ -100,7 +100,7 @@ class MyAccountCreateAccountMenuLink extends MenuLinkDefault {
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    // TODO: Cache should depend on the config user.settings value?
+    // @todo Cache should depend on the config user.settings value?
     return ['user.roles:authenticated'];
   }
 

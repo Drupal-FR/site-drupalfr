@@ -3,7 +3,7 @@
 namespace Drupal\drupalfr_localize_statistics\Service;
 
 /**
- * Interface LocalizeStatisticsCronInterface.
+ * Localize Statistics cron.
  *
  * @package Drupal\drupalfr_localize_statistics
  */

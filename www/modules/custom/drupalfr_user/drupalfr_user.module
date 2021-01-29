@@ -11,11 +11,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
 
-
 /**
  * Implements hook_theme().
  */
 function drupalfr_user_theme($existing, $type, $theme, $path) {
+
   return [
     'drupalfr_user_member_badge' => [
       'variables' => [
@@ -172,4 +172,3 @@ function drupalfr_user_user_view_alter(array &$build, UserInterface $account, En
     ];
   }
 }
-

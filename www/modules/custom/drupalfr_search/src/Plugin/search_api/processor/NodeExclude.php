@@ -7,7 +7,7 @@ use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
 
 /**
- * Class NodeExclude.
+ * Exclude node if body field is empty.
  *
  * @package Drupal\drupalfr_search\Plugin\Plugin\search_api\processor
  *

@@ -15,6 +15,10 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class NewsletterSubscriptionBlock extends BlockBase {
 
+  const DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH = "eb7ebedd32b3b2fc0ac192ee9";
+  const DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH = "27e99cb1af";
+  const DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN = "b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af";
+
   /**
    * {@inheritdoc}
    */

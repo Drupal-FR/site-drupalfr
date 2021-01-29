@@ -98,7 +98,7 @@ class LocalizeStatisticsCron implements LocalizeStatisticsCronInterface {
         $langcode = $this->extractLangcode($language);
 
         if (!empty($langcode)) {
-          $html = $this->FetchData($langcode);
+          $html = $this->fetchData($langcode);
 
           if (!empty($html)) {
             $data = $this->extractData($html);
@@ -160,7 +160,7 @@ class LocalizeStatisticsCron implements LocalizeStatisticsCronInterface {
    * @return string
    *   The HTML string.
    */
-  protected function FetchData(string $langcode) : string {
+  protected function fetchData(string $langcode) : string {
     $html = '';
     $url = 'https://localize.drupal.org/translate/languages/' . $langcode;
 

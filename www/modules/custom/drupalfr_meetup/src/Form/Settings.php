@@ -6,7 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class Settings.
+ * Class Settings for meetup module.
  *
  * @package Drupal\drupalfr_meetup\Form
  */

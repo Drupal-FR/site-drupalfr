@@ -3,7 +3,7 @@
 namespace Drupal\drupalfr_release\Service;
 
 /**
- * Interface ReleaseHelperInterface.
+ * Release Helper.
  *
  * @package Drupal\drupalfr_release
  */

@@ -6,12 +6,14 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+// @codingStandardsIgnoreStart
 use MeetupEvents;
 use MeetupKeyAuthConnection;
 use MeetupUnauthorizedRequestException;
+// @codingStandardsIgnoreEnd
 
 /**
- * Class MeetupHelper.
+ * Helper.
  *
  * @package Drupal\drupalfr_meetup
  */

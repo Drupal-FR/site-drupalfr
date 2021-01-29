@@ -6,7 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class LocalizeStatisticsSettingsForm.
+ * Localize statistic settings.
  *
  * @ingroup drupalfr_localize_statistics
  */
