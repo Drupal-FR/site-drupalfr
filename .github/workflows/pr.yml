@@ -3,6 +3,8 @@ name: Drupal8 Pr
 on:
   pull_request:
     branches: [ 8.x-1.x ]
+  push:
+    branches: [ 8.x-1.x ]
 jobs:
   tests:
     runs-on: ubuntu-latest
