@@ -7,24 +7,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: contains( github.ref, '8.x-1.x')
-    steps:
+    steps:    
     - uses: webfactory/ssh-agent@v0.4.1
       with:
         ssh-private-key: ${{ secrets.ssh_private_key }}
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Disable StrictHostKeyChecking
+    - name: Clone Drupalfr Project
       run: |
         echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
         git config --global user.email "github@drupal.fr"
         git config --global user.name "Github"
+        git clone https://github.com/Drupal-FR/site-drupalfr.git
     - name: Deploy website to develop plateform
       env:
         GIT_URL: ${{ secrets.git_url }}
       run: |
+        cd site-drupalfr
         git remote add upstream $GIT_URL
-        git fetch --depth=30 upstream
+        git fetch upstream
         git checkout upstream/develop -b deploy
         git merge origin/8.x-1.x -m "Merge from github" --allow-unrelated-histories
         git push -f upstream deploy:develop
