@@ -18,7 +18,7 @@ function drupalfr_localize_statistics_theme() {
   $theme['localize_statistics_content_add_list'] = [
     'render element' => 'content',
     'variables' => [
-      'content' => NULL
+      'content' => NULL,
     ],
     'file' => 'localize_statistics.page.inc',
   ];
@@ -26,8 +26,8 @@ function drupalfr_localize_statistics_theme() {
 }
 
 /**
-* Implements hook_theme_suggestions_HOOK().
-*/
+ * Implements hook_theme_suggestions_HOOK().
+ */
 function drupalfr_localize_statistics_theme_suggestions_localize_statistics(array $variables) {
   $suggestions = [];
   $entity = $variables['elements']['#localize_statistics'];

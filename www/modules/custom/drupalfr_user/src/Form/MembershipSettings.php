@@ -9,7 +9,7 @@ use Drupal\Core\State\StateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class MembershipSettings.
+ * Membership setting.
  *
  * @package Drupal\drupalfr_user\Form
  */
@@ -65,7 +65,7 @@ class MembershipSettings extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['next_membership_number'] = [
       '#type' => 'number',
-      '#title' => t('Next membership number'),
+      '#title' => $this->t('Next membership number'),
       '#default_value' => $this->state->get('drupalfr_user.next_membership_number', 1),
     ];
 

@@ -9,7 +9,7 @@ use Drupal\leaflet\LeafletService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class MeetupController.
+ * Meetup list.
  *
  * @package Drupal\drupalfr_meetup\Controller
  */

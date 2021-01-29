@@ -3,7 +3,7 @@
 namespace Drupal\drupalfr_meetup\Service;
 
 /**
- * Interface MeetupHelperInterface.
+ * Interface Helper.
  *
  * @package Drupal\drupalfr_meetup
  */

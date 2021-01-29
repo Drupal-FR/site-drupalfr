@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  admin_label = @Translation("Drupalfr meetup sidebar block"),
  * )
  */
-class DrupalfrMeetupsidebarBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * Drupal\drupalfr_meetup\Service\MeetupHelper definition.

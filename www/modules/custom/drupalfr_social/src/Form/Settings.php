@@ -6,7 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class Settings.
+ * Twitter configuration.
  *
  * @package Drupal\drupalfr_social\Form
  */

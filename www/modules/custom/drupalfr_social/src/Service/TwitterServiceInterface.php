@@ -3,7 +3,7 @@
 namespace Drupal\drupalfr_social\Service;
 
 /**
- * Interface TwitterServiceInterface.
+ * Twitter service interface.
  *
  * @package Drupal\drupalfr_social
  */

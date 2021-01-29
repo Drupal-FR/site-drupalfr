@@ -9,9 +9,10 @@
  * Implements hook_unistall().
  */
 function drupalfr_migrate_d7_uninstall() {
-  $files = file_scan_directory(drupal_get_path('module', 'drupalfr_migrate_d7') . "/config/install", "/.*\.yml/");
+  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+  $file_system = \Drupal::service('file_system');
+  $files = $file_system->scanDirectory(drupal_get_path('module', 'drupalfr_migrate_d7') . "/config/install", "/.*\.yml/");
   foreach ($files as $file) {
     \Drupal::configFactory()->getEditable($file->name)->delete();
   }
 }
-
