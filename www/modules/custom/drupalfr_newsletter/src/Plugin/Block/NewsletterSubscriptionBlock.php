@@ -15,9 +15,9 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class NewsletterSubscriptionBlock extends BlockBase {
 
-  const DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH = "eb7ebedd32b3b2fc0ac192ee9";
-  const DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH = "27e99cb1af";
-  const DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN = "b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af";
+  public const DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH = "eb7ebedd32b3b2fc0ac192ee9";
+  public const DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH = "27e99cb1af";
+  public const DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN = "b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af";
 
   /**
    * {@inheritdoc}
@@ -76,9 +76,9 @@ class NewsletterSubscriptionBlock extends BlockBase {
    */
   public function defaultConfiguration() {
     return [
-      'account_hash' => DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
-      'mailing_list_hash' => DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
-      'anti_spam_token' => DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
+      'account_hash' => $this->DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
+      'mailing_list_hash' => $this->DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
+      'anti_spam_token' => $this->DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
     ];
   }
 
