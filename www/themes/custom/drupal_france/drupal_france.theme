@@ -383,3 +383,26 @@ function drupal_france_preprocess_field(&$variables) {
   }
 
 }
+
+function drupal_france_preprocess_page(&$variables) {
+  $site_name = isset($variables['site_name']) ? $variables['site_name'] : \Drupal::config('system.site')->get('name');
+
+  $variables['logo_img'] = '';
+
+  $logo = theme_get_setting('logo.url');
+
+  if (!empty($logo)) {
+    $elements = [
+      '#theme' => 'image',
+      '#uri' => $logo,
+      '#attributes' => [
+        'alt' => strip_tags($site_name) . ' ' . t('logo'),
+        'title' => strip_tags($site_name) . ' ' . t('Home'),
+        'class' => array('logo'),
+      ],
+    ];
+
+    $variables['logo_img'] = $elements;
+  }
+
+}

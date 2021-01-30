@@ -111,28 +111,13 @@
             </button>
           </div>
           {% endif %}
-
           {# Logo / Title#}
-          {% if linked_logo or linked_site_name %}
 
-            <div class="small-4 large-2 column">
-              {% if linked_logo %}
-                {% if is_front %}
-                  <h1 id="site-name" class="site-name">{{ linked_logo }}</h1>
-                {% else %}
-                  <div id="site-name" class="site-name">{{ linked_logo }}</div>
-                {% endif %}
-              {% elseif linked_site_name %}
-
-                {% if is_front %}
-                  <h1 id="site-name" class="site-name">{{ linked_site_name }}</h1>
-                {% else %}
-                  <div id="site-name" class="site-name">{{ linked_site_name }}</div>
-                {% endif %}
-
-              {% endif %}
-            </div>
-          {% endif %}
+          <div class="small-4 large-2 column">
+            {% if logo_img %}
+                <a href="{{ front_page }}"><h1 id="site-name" class="site-name">{{ logo_img }}</h1></a>
+            {% endif %}
+          </div>
 
           {# Main Menu #}
           {% if page.main_menu %}
