@@ -76,9 +76,9 @@ class NewsletterSubscriptionBlock extends BlockBase {
    */
   public function defaultConfiguration() {
     return [
-      'account_hash' => $this->DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
-      'mailing_list_hash' => $this->DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
-      'anti_spam_token' => $this->DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
+      'account_hash' => self::DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
+      'mailing_list_hash' => self::DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
+      'anti_spam_token' => self::DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
     ];
   }
 
