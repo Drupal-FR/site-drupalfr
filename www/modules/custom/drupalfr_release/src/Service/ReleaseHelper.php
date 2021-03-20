@@ -97,7 +97,7 @@ class ReleaseHelper implements ReleaseHelperInterface {
         $node = Node::create(['type' => 'release']);
       }
       else {
-        $this->entityTypeManager->getStorage('node')->load($nid);
+        $node = $this->entityTypeManager->getStorage('node')->load($nid);
       }
 
       // Set values of fields.
