@@ -6,6 +6,7 @@ dependencies:
     - commerce_order.commerce_order_type.default
   module:
     - commerce_order
+    - commerce_price
     - state_machine
     - user
 _core:
@@ -15,6 +16,15 @@ targetEntityType: commerce_order
 bundle: default
 mode: default
 content:
+  balance:
+    type: commerce_price_default
+    label: inline
+    weight: 9
+    settings:
+      strip_trailing_zeroes: false
+      currency_display: symbol
+    third_party_settings: {  }
+    region: content
   changed:
     type: timestamp
     weight: 4
