@@ -11,8 +11,22 @@
 function drupalfr_migrate_d7_uninstall() {
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
   $file_system = \Drupal::service('file_system');
-  $files = $file_system->scanDirectory(drupal_get_path('module', 'drupalfr_migrate_d7') . "/config/install", "/.*\.yml/");
+  $files = $file_system->scanDirectory(drupal_get_path('module', 'drupalfr_migrate_d7') . '/config/install', "/.*\.yml/");
   foreach ($files as $file) {
     \Drupal::configFactory()->getEditable($file->name)->delete();
+  }
+
+  // Uninstall Migration Entities.
+  $group = \Drupal::entityTypeManager()->getStorage('migration_group')->load('drupalfr_d7');
+  if ($group) {
+    $group->delete();
+  }
+  $entity = \Drupal::entityTypeManager()->getStorage('migration')->load('drupalfr_nodetypes_d7');
+  if ($entity) {
+    $entity->delete();
+  }
+  $entity = \Drupal::entityTypeManager()->getStorage('migration')->load('drupalfr_node_doc_d7');
+  if ($entity) {
+    $entity->delete();
   }
 }
