@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Contains drupalfr_migrate_content.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function drupalfr_migrate_content_help($route_name, RouteMatchInterface $route_match)
+{
+    switch ($route_name) {
+    // Main module help for the drupalfr_migrate_content module.
+    case 'help.page.drupalfr_migrate_content':
+      $output = '';
+      $output .= '<h3>'.t('About').'</h3>';
+      $output .= '<p>'.t('Module to migrate targeted content').'</p>';
+
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_migrate_content_theme()
+{
+    return [
+    'drupalfr_migrate_content' => [
+      'render element' => 'children',
+    ],
+  ];
+}

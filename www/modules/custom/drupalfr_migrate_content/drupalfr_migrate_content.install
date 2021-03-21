@@ -1,0 +1,13 @@
+<?php
+
+function drupalfr_migrate_content_uninstall()
+{
+    $group = \Drupal::entityTypeManager()->getStorage('migration_group')->load('drupalfr_d7');
+    if ($group) {
+      $group->delete();
+    }
+    $entity = \Drupal::entityTypeManager()->getStorage('migration')->load('d7_node_doc');
+    if($entity) {
+      $entity->delete();
+    }
+}
