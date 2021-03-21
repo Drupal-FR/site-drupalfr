@@ -103,7 +103,9 @@ class ReleaseHelper implements ReleaseHelperInterface {
       // Set values of fields.
       $node->set('title', $result['name']);
       $node->set('status', NodeInterface::PUBLISHED);
-      $node->set('created', $result['date']);
+      if (isset($result['date'])) {
+        $node->set('created', $result['date']);
+      }
       $node->set('field_release_version_major', $result['version_major']);
       if (isset($result['version_minor'])) {
         $node->set('field_release_version_minor', $result['version_minor']);
