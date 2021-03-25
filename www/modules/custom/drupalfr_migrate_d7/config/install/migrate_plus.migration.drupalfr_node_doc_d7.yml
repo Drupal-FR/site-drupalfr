@@ -1,4 +1,4 @@
-id: d7_node_doc
+id: drupalfr_node_doc_d7
 label: 'Nodes Documents (doc type in D7)'
 audit: true
 migration_group: drupalfr_d7
@@ -7,7 +7,7 @@ migration_tags:
   - Content
 deriver: Drupal\node\Plugin\migrate\D7NodeDeriver
 source:
-  plugin: d7_node_doc
+  plugin: d7_node
   node_type: doc
 process:
   # If you are using this file to build a custom migration consider removing
@@ -15,6 +15,7 @@ process:
   # In D7, nodes always have a tnid, but it's zero for untranslated nodes.
   # We normalize it to equal the nid in that case.
   # @see \Drupal\node\Plugin\migrate\source\d7\Node::prepareRow().
+  nid: vid
   langcode:
     plugin: default_value
     source: language
@@ -48,6 +49,7 @@ migration_dependencies:
   required:
     - d7_user
     - d7_node_type
+    - drupalfr_nodetypes_d7
   optional:
     - d7_field_instance
     - d7_comment_field_instance

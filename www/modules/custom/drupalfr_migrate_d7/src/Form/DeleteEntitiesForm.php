@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\drupalfr_migrate_content\Form;
+namespace Drupal\drupalfr_migrate_d7\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -152,7 +152,7 @@ class DeleteEntitiesForm extends FormBase
             'title' => $this->t('Deleting nodes'),
             'init_message' => $this->t('Get nodes to delete.'),
             'progress_message' => $this->t('Completed step @current of @total.'),
-            'file' => drupal_get_path('module', 'drupalfr_migrate_content') . '/includes/nodes.batch.inc',
+            'file' => drupal_get_path('module', 'drupalfr_migrate_d7') . '/includes/nodes.batch.inc',
             'finished' => ['finishBatch', $nids],
         ];
         while (count($nids) > 0) {
