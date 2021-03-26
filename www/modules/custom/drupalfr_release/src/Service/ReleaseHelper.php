@@ -15,7 +15,6 @@ use GuzzleHttp\ClientInterface;
  */
 class ReleaseHelper implements ReleaseHelperInterface
 {
-\StringTranslationTrait
 
 /**
  * The factory for configuration objects.

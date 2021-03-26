@@ -103,7 +103,9 @@ class NodeType extends DrupalSqlBase {
     $row->setSourceProperty('node_preview', $this->nodePreview);
 
     $type = $row->getSourceProperty('type');
-    $source_options = $this->variableGet('node_options_' . $type, ['promote', 'sticky']);
+    $source_options = $this->variableGet(
+      'node_options_' . $type, ['promote', 'sticky']
+    );
     $options = [];
     foreach (['promote', 'sticky', 'status', 'revision'] as $item) {
       $options[$item] = in_array($item, $source_options);

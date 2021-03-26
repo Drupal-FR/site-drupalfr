@@ -104,19 +104,7 @@ class DeleteEntitiesForm extends FormBase {
   }
 
   /**
-   *
-   */
-  private function getUsersUids(): array {
-    $uids = \Drupal::database()->select('users', 'u')
-      ->fields('u', ['uid'])
-      ->execute()
-      ->fetchAllKeyed();
-    dump($uids);
-    return $uids;
-  }
-
-  /**
-   *
+   * Get Nodes Types.
    */
   private function getNodesTypes() {
     $query = $this->entityTypeManager->getStorage('node')->getAggregateQuery()
@@ -138,7 +126,7 @@ class DeleteEntitiesForm extends FormBase {
   }
 
   /**
-   *
+   * Delete Nodes by types.
    */
   private function deleteNodesByTypes($types) {
     $res = \Drupal::database()->select('node', 'n')
