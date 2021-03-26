@@ -60,96 +60,95 @@ class ReleaseHelper implements ReleaseHelperInterface
    * @param \GuzzleHttp\ClientInterface $http_client
    *   The http client.
    */
-    public function __construct(
-        ConfigFactoryInterface $config_factory,
-        EntityTypeManagerInterface $entity_type_manager,
-        LoggerChannelFactoryInterface $logger_factory,
-        ClientInterface $http_client
-    ) {
-        $this->configFactory = $config_factory;
-        $this->entityTypeManager = $entity_type_manager;
-        $this->loggerFactory = $logger_factory;
-        $this->httpClient = $http_client;
-    }
+public function __construct(
+    ConfigFactoryInterface $config_factory,
+    EntityTypeManagerInterface $entity_type_manager,
+    LoggerChannelFactoryInterface $logger_factory,
+    ClientInterface $http_client
+) {
+    $this->configFactory = $config_factory;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->loggerFactory = $logger_factory;
+    $this->httpClient = $http_client;
+}
 
   /**
    * {@inheritdoc}
    */
-    public function getFeedReleases()
-    {
-        $release_config = $this->configFactory->get('drupalfr_release.settings');
+public function getFeedReleases()
+{
+    $release_config = $this->configFactory->get('drupalfr_release.settings');
 
-        $response = $this->httpClient->get($release_config->get('xml_address'));
+    $response = $this->httpClient->get($release_config->get('xml_address'));
 
-      // Parsed XML and convert it back to array recursively.
-        $parsed_response = json_decode(json_encode((array) simplexml_load_string($response->getBody()->getContents())), 1);
-        return $parsed_response['releases']['release'];
-    }
+  // Parsed XML and convert it back to array recursively.
+    $parsed_response = json_decode(json_encode((array) simplexml_load_string($response->getBody()->getContents())), 1);
+    return $parsed_response['releases']['release'];
+}
 
   /**
    * {@inheritdoc}
    */
-    public function importReleaseListData(array $data)
-    {
-        $imported_release_ids = [];
-        foreach ($data as $result) {
-          // If node exist, we update it.
-            $nid = $this->checkNodeExist('release', $result['name']);
+public function importReleaseListData(array $data)
+{
+    $imported_release_ids = [];
+    foreach ($data as $result) {
+      // If node exist, we update it.
+        $nid = $this->checkNodeExist('release', $result['name']);
 
-            if (empty($nid)) {
-                $node = Node::create(['type' => 'release']);
-            } else {
-                $this->entityTypeManager->getStorage('node')->load($nid);
-            }
-
-          // Set values of fields.
-            $node->set('title', $result['name']);
-            $node->set('status', NodeInterface::PUBLISHED);
-            $node->set('created', $result['date']);
-            $node->set('field_release_version_major', $result['version_major']);
-            if (isset($result['version_minor'])) {
-                $node->set('field_release_version_minor', $result['version_minor']);
-            }
-            if (isset($result['version_patch'])) {
-                $node->set('field_release_version_patch', $result['version_patch']);
-            }
-            if (isset($result['version_extra'])) {
-                $node->set('field_release_version_extra', $result['version_extra']);
-            }
-            $node->set('field_release_link', [
-            'uri' => $result['release_link'],
-            'title' => $result['name'],
-            ]);
-            $node->set('field_release_file_targz', [
-            'uri' => $result['files']['file'][0]['url'],
-            'title' => $this->t('Download (tar.gz)'),
-            'options' => [
-              'attributes' => [
-              'class' => 'button hollow',
-              ],
-            ],
-            ]);
-            $node->set('field_release_file_zip', [
-            'uri' => $result['files']['file'][1]['url'],
-            'title' => $this->t('Download (zip)'),
-            'options' => [
-              'attributes' => [
-              'class' => 'button primary',
-              ],
-            ],
-            ]);
-            if (isset($result['terms'])) {
-                  $node->set('field_release_type', $this->extractReleaseTypes($result['terms']['term']));
-            }
-
-            $node->save();
-
-            $imported_release_ids[] = $node->id();
-            $this->loggerFactory->get('drupalfr_release_import')
-            ->notice('Release (' . $result['name'] . ') was imported/updated');
+        if (empty($nid)) {
+            $node = Node::create(['type' => 'release']);
+        } else {
+            $node = $this->entityTypeManager->getStorage('node')->load($nid);
         }
 
-        return $imported_release_ids;
+      // Set values of fields.
+        $node->set('title', $result['name']);
+        $node->set('status', NodeInterface::PUBLISHED);
+        if (isset($result['date'])) {
+            $node->set('created', $result['date']);
+        }
+        $node->set('field_release_version_major', $result['version_major']);
+        if (isset($result['version_minor'])) {
+            $node->set('field_release_version_minor', $result['version_minor']);
+        }
+        if (isset($result['version_patch'])) {
+            $node->set('field_release_version_patch', $result['version_patch']);
+        }
+        if (isset($result['version_extra'])) {
+            $node->set('field_release_version_extra', $result['version_extra']);
+        }
+        $node->set('field_release_link', [
+        'uri' => $result['release_link'],
+        'title' => $result['name'],
+        ]);
+        $node->set('field_release_file_targz', [
+        'uri' => $result['files']['file'][0]['url'],
+        'title' => $this->t('Download (tar.gz)'),
+        'options' => [
+          'attributes' => [
+            'class' => 'button hollow',
+          ],
+        ],
+        ]);
+        $node->set('field_release_file_zip', [
+        'uri' => $result['files']['file'][1]['url'],
+        'title' => $this->t('Download (zip)'),
+        'options' => [
+          'attributes' => [
+            'class' => 'button primary',
+          ],
+        ],
+        ]);
+        if (isset($result['terms'])) {
+            $node->set('field_release_type', $this->extractReleaseTypes($result['terms']['term']));
+        }
+
+        $node->save();
+
+        $imported_release_ids[] = $node->id();
+        $this->loggerFactory->get('drupalfr_release_import')
+        ->notice('Release (' . $result['name'] . ') was imported/updated');
     }
 
   /**

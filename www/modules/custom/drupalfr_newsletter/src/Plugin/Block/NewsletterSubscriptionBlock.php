@@ -15,14 +15,13 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class NewsletterSubscriptionBlock extends BlockBase
 {
+    public const DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH = 'eb7ebedd32b3b2fc0ac192ee9';
+    public const DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH = '27e99cb1af';
+    public const DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN = 'b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af';
 
-    public const DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH = "eb7ebedd32b3b2fc0ac192ee9";
-    public const DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH = "27e99cb1af";
-    public const DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN = "b_eb7ebedd32b3b2fc0ac192ee9_27e99cb1af";
-
-  /**
-   * {@inheritdoc}
-   */
+    /**
+     * {@inheritdoc}
+     */
     public function blockForm($form, FormStateInterface $form_state)
     {
         $form['account_hash'] = [
@@ -50,9 +49,9 @@ class NewsletterSubscriptionBlock extends BlockBase
         return $form;
     }
 
-  /**
-   * {@inheritdoc}
-   */
+    /**
+     * {@inheritdoc}
+     */
     public function blockSubmit($form, FormStateInterface $form_state)
     {
         $this->configuration['account_hash'] = $form_state->getValue('account_hash');
@@ -60,9 +59,9 @@ class NewsletterSubscriptionBlock extends BlockBase
         $this->configuration['anti_spam_token'] = $form_state->getValue('anti_spam_token');
     }
 
-  /**
-   * {@inheritdoc}
-   */
+    /**
+     * {@inheritdoc}
+     */
     public function build()
     {
         $build = [
@@ -75,15 +74,15 @@ class NewsletterSubscriptionBlock extends BlockBase
         return $build;
     }
 
-  /**
-   * {@inheritdoc}
-   */
+    /**
+     * {@inheritdoc}
+     */
     public function defaultConfiguration()
     {
         return [
-        'account_hash' => $this->DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
-        'mailing_list_hash' => $this->DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
-        'anti_spam_token' => $this->DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
+        'account_hash' => self::DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
+        'mailing_list_hash' => self::DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
+        'anti_spam_token' => self::DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
         ];
     }
 }

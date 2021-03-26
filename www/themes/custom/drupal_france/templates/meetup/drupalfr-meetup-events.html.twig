@@ -30,17 +30,17 @@
       <div class="block-meetup--list--text-box small-9 medium-10 column">
         <h5><a href="{{ event.event_url }}">{{ event.name }}</a></h5>
         <dl class="text-box--list">
-          <dt><i class="fa fa-map-marker"></i> </dt>
+          <dt><i class="fas fa-map-marker-alt"></i> </dt>
           <dd>
             {{ event.venue.address_1 }}<br>
             {{ event.venue.city }}
           </dd>
 
-          <dt><i class="fa fa-clock-o"></i></dt>
+          <dt><i class="fas fa-clock"></i></dt>
           <dd>
             {{ prepared_time|format_date('meetup_date') }}
           </dd>
-          <dt><i class="fa fa-users"></i></dt>
+          <dt><i class="fas fa-users"></i></dt>
           <dd>
             {% trans %}
               {{ registered_number }} registered
