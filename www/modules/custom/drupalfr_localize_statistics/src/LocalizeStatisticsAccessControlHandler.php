@@ -12,35 +12,33 @@ use Drupal\Core\Access\AccessResult;
  *
  * @see \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatistics.
  */
-class LocalizeStatisticsAccessControlHandler extends EntityAccessControlHandler
-{
+class LocalizeStatisticsAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
    */
-    protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account)
-    {
-      /** @var \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatisticsInterface $entity */
-        switch ($operation) {
-            case 'view':
-                return AccessResult::allowedIfHasPermission($account, 'view localize statistics entities');
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    /** @var \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatisticsInterface $entity */
+    switch ($operation) {
+      case 'view':
+        return AccessResult::allowedIfHasPermission($account, 'view localize statistics entities');
 
-            case 'update':
-                return AccessResult::allowedIfHasPermission($account, 'edit localize statistics entities');
+      case 'update':
+        return AccessResult::allowedIfHasPermission($account, 'edit localize statistics entities');
 
-            case 'delete':
-                return AccessResult::allowedIfHasPermission($account, 'delete localize statistics entities');
-        }
-
-      // Unknown operation, no opinion.
-        return AccessResult::neutral();
+      case 'delete':
+        return AccessResult::allowedIfHasPermission($account, 'delete localize statistics entities');
     }
+
+    // Unknown operation, no opinion.
+    return AccessResult::neutral();
+  }
 
   /**
    * {@inheritdoc}
    */
-    protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = null)
-    {
-        return AccessResult::allowedIfHasPermission($account, 'add localize statistics entities');
-    }
+  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    return AccessResult::allowedIfHasPermission($account, 'add localize statistics entities');
+  }
+
 }

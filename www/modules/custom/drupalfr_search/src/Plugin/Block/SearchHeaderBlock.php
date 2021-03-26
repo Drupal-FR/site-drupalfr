@@ -13,22 +13,21 @@ use Drupal\Core\Url;
  *  admin_label = @Translation("Search header block"),
  * )
  */
-class SearchHeaderBlock extends BlockBase
-{
+class SearchHeaderBlock extends BlockBase {
 
   /**
    * {@inheritdoc}
    */
-    public function build()
-    {
-        $build = [
-        'search_link' => [
+  public function build() {
+    $build = [
+      'search_link' => [
         '#type' => 'link',
         '#url' => Url::fromUserInput('/recherche'),
         '#title' => $this->t('Search'),
-        ],
-        ];
+      ],
+    ];
 
-        return $build;
-    }
+    return $build;
+  }
+
 }

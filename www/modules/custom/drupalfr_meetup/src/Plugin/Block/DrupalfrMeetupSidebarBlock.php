@@ -15,15 +15,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  admin_label = @Translation("Drupalfr meetup sidebar block"),
  * )
  */
-class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPluginInterface
-{
+class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * Drupal\drupalfr_meetup\Service\MeetupHelper definition.
    *
    * @var \Drupal\drupalfr_meetup\Service\MeetupHelperInterface
    */
-    protected $meetupHelper;
+  protected $meetupHelper;
 
   /**
    * Constructs a new DrupalfrMeetupHomeBlock object.
@@ -37,50 +36,49 @@ class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPl
    * @param \Drupal\drupalfr_meetup\Service\MeetupHelperInterface $drupalfr_meetup_meetup_helper
    *   The meetup helper service.
    */
-    public function __construct(
+  public function __construct(
         array $configuration,
         $plugin_id,
         $plugin_definition,
         MeetupHelperInterface $drupalfr_meetup_meetup_helper
     ) {
-        parent::__construct($configuration, $plugin_id, $plugin_definition);
-        $this->meetupHelper = $drupalfr_meetup_meetup_helper;
-    }
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->meetupHelper = $drupalfr_meetup_meetup_helper;
+  }
 
   /**
    * {@inheritdoc}
    */
-    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
-    {
-        return new static(
-            $configuration,
-            $plugin_id,
-            $plugin_definition,
-            $container->get('drupalfr_meetup.meetup_helper')
-        );
-    }
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('drupalfr_meetup.meetup_helper')
+      );
+  }
 
   /**
    * {@inheritdoc}
    */
-    public function build()
-    {
-        $build = [
-        '#cache' => [
-        // 15 minutes.
+  public function build() {
+    $build = [
+      '#cache' => [
+      // 15 minutes.
         'max-age' => '900',
-        ],
-        ];
-        $events = $this->meetupHelper->getEvents();
-        if (!empty($events)) {
-          // Limit to three meetups.
-            $events = array_slice($events, 0, 3);
-            $build['events_list'] = [
-            '#theme' => 'drupalfr_meetup_events',
-            '#events' => $events,
-            ];
-        }
-
-        return $build;
+      ],
+    ];
+    $events = $this->meetupHelper->getEvents();
+    if (!empty($events)) {
+      // Limit to three meetups.
+      $events = array_slice($events, 0, 3);
+      $build['events_list'] = [
+        '#theme' => 'drupalfr_meetup_events',
+        '#events' => $events,
+      ];
     }
+
+    return $build;
+  }
+
 }

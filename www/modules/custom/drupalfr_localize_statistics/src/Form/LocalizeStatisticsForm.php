@@ -10,30 +10,29 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ingroup drupalfr_localize_statistics
  */
-class LocalizeStatisticsForm extends ContentEntityForm
-{
+class LocalizeStatisticsForm extends ContentEntityForm {
 
   /**
    * {@inheritdoc}
    */
-    public function save(array $form, FormStateInterface $form_state)
-    {
-        $entity = $this->entity;
+  public function save(array $form, FormStateInterface $form_state) {
+    $entity = $this->entity;
 
-        $status = parent::save($form, $form_state);
+    $status = parent::save($form, $form_state);
 
-        switch ($status) {
-            case SAVED_NEW:
-                $this->messenger()->addStatus($this->t('Created the %label localize statistics.', [
-                '%label' => $entity->label(),
-                ]));
-                break;
+    switch ($status) {
+      case SAVED_NEW:
+        $this->messenger()->addStatus($this->t('Created the %label localize statistics.', [
+          '%label' => $entity->label(),
+        ]));
+        break;
 
-            default:
-                $this->messenger()->addStatus($this->t('Saved the %label localize statistics.', [
-                '%label' => $entity->label(),
-                ]));
-        }
-        $form_state->setRedirect('entity.localize_statistics.canonical', ['localize_statistics' => $entity->id()]);
+      default:
+        $this->messenger()->addStatus($this->t('Saved the %label localize statistics.', [
+          '%label' => $entity->label(),
+        ]));
     }
+    $form_state->setRedirect('entity.localize_statistics.canonical', ['localize_statistics' => $entity->id()]);
+  }
+
 }

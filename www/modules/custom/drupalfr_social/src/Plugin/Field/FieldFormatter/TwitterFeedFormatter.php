@@ -20,15 +20,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPluginInterface
-{
+class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
    * The twitter service.
    *
    * @var \Drupal\drupalfr_social\Service\TwitterServiceInterface
    */
-    protected $twitterService;
+  protected $twitterService;
 
   /**
    * Constructs a TwitterFeedFormatter object.
@@ -50,7 +49,7 @@ class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPlug
    * @param \Drupal\drupalfr_social\Service\TwitterServiceInterface $twitter_service
    *   The twitter service.
    */
-    public function __construct(
+  public function __construct(
         $plugin_id,
         $plugin_definition,
         FieldDefinitionInterface $field_definition,
@@ -60,52 +59,51 @@ class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPlug
         array $third_party_settings,
         TwitterServiceInterface $twitter_service
     ) {
-        parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-        $this->twitterService = $twitter_service;
-    }
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+    $this->twitterService = $twitter_service;
+  }
 
   /**
    * {@inheritdoc}
    */
-    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
-    {
-        return new static(
-            $plugin_id,
-            $plugin_definition,
-            $configuration['field_definition'],
-            $configuration['settings'],
-            $configuration['label'],
-            $configuration['view_mode'],
-            $configuration['third_party_settings'],
-            $container->get('drupalfr_social.twitter')
-        );
-    }
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+          $plugin_id,
+          $plugin_definition,
+          $configuration['field_definition'],
+          $configuration['settings'],
+          $configuration['label'],
+          $configuration['view_mode'],
+          $configuration['third_party_settings'],
+          $container->get('drupalfr_social.twitter')
+      );
+  }
 
   /**
    * {@inheritdoc}
    */
-    public function viewElements(FieldItemListInterface $items, $langcode = null)
-    {
-        $element = [];
+  public function viewElements(FieldItemListInterface $items, $langcode = NULL) {
+    $element = [];
 
-        foreach ($items as $delta => $item) {
-            $statuses = $this->twitterService->getStatuses('statuses/user_timeline', [
-            'screen_name' => $item->value,
-            'count' => 3,
-            'exclude_replies' => false,
-            ]);
+    foreach ($items as $delta => $item) {
+      $statuses = $this->twitterService->getStatuses('statuses/user_timeline', [
+        'screen_name' => $item->value,
+        'count' => 3,
+        'exclude_replies' => FALSE,
+      ]);
 
-            if (!empty($statuses)) {
-                  $element[$delta] = [
-                    '#theme' => 'drupalfr_social_twitter_statuses',
-                    '#statuses' => $statuses,
-                    '#cache' => [
-                  // 15 minutes.
-                  'max-age' => '900',
-                    ],
-                  ];
-            }
-        }
-        return $element;
+      if (!empty($statuses)) {
+        $element[$delta] = [
+          '#theme' => 'drupalfr_social_twitter_statuses',
+          '#statuses' => $statuses,
+          '#cache' => [
+        // 15 minutes.
+            'max-age' => '900',
+          ],
+        ];
+      }
     }
+    return $element;
+  }
+
 }

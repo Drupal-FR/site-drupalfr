@@ -19,10 +19,9 @@ use Drupal\Core\Render\Element;
  *   - elements: An associative array containing the user information and any
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_localize_statistics(array &$variables)
-{
+function template_preprocess_localize_statistics(array &$variables) {
   // Helpful $content variable for templates.
-    foreach (Element::children($variables['elements']) as $key) {
-        $variables['content'][$key] = $variables['elements'][$key];
-    }
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
 }

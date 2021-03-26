@@ -10,8 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ingroup drupalfr_localize_statistics
  */
-class LocalizeStatisticsSettingsForm extends FormBase
-{
+class LocalizeStatisticsSettingsForm extends FormBase {
 
   /**
    * Returns a unique string identifying the form.
@@ -19,10 +18,9 @@ class LocalizeStatisticsSettingsForm extends FormBase
    * @return string
    *   The unique string identifying the form.
    */
-    public function getFormId()
-    {
-        return 'localizestatistics_settings';
-    }
+  public function getFormId() {
+    return 'localizestatistics_settings';
+  }
 
   /**
    * Form submission handler.
@@ -32,10 +30,9 @@ class LocalizeStatisticsSettingsForm extends FormBase
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-    public function submitForm(array &$form, FormStateInterface $form_state)
-    {
-      // Empty implementation of the abstract submit class.
-    }
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Empty implementation of the abstract submit class.
+  }
 
   /**
    * Defines the settings form for localize statistics entities.
@@ -48,9 +45,9 @@ class LocalizeStatisticsSettingsForm extends FormBase
    * @return array
    *   Form definition array.
    */
-    public function buildForm(array $form, FormStateInterface $form_state)
-    {
-        $form['localizestatistics_settings']['#markup'] = 'Settings form for localize statistics entities. Manage field settings here.';
-        return $form;
-    }
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['localizestatistics_settings']['#markup'] = 'Settings form for localize statistics entities. Manage field settings here.';
+    return $form;
+  }
+
 }

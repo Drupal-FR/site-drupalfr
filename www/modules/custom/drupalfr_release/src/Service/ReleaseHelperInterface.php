@@ -7,8 +7,7 @@ namespace Drupal\drupalfr_release\Service;
  *
  * @package Drupal\drupalfr_release
  */
-interface ReleaseHelperInterface
-{
+interface ReleaseHelperInterface {
 
   /**
    * Request the XML feed to get the releases information.
@@ -16,7 +15,7 @@ interface ReleaseHelperInterface
    * @return array
    *   A list of releases information.
    */
-    public function getFeedReleases();
+  public function getFeedReleases();
 
   /**
    * Import releases during cron.
@@ -27,5 +26,6 @@ interface ReleaseHelperInterface
    * @return array
    *   An array of ids of entity updated or created.
    */
-    public function importReleaseListData(array $data);
+  public function importReleaseListData(array $data);
+
 }

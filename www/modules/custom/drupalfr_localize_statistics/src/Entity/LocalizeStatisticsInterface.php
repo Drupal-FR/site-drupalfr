@@ -9,8 +9,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *
  * @ingroup drupalfr_localize_statistics
  */
-interface LocalizeStatisticsInterface extends ContentEntityInterface
-{
+interface LocalizeStatisticsInterface extends ContentEntityInterface {
 
   /**
    * Gets the localize statistics creation timestamp.
@@ -18,7 +17,7 @@ interface LocalizeStatisticsInterface extends ContentEntityInterface
    * @return int
    *   Creation timestamp of the localize statistics.
    */
-    public function getCreatedTime();
+  public function getCreatedTime();
 
   /**
    * Sets the localize statistics creation timestamp.
@@ -29,5 +28,6 @@ interface LocalizeStatisticsInterface extends ContentEntityInterface
    * @return \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatisticsInterface
    *   The called localize statistics entity.
    */
-    public function setCreatedTime($timestamp);
+  public function setCreatedTime($timestamp);
+
 }

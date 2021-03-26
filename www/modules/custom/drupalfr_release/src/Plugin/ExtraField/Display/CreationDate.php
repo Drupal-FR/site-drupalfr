@@ -20,52 +20,49 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class CreationDate extends ExtraFieldDisplayBase implements ContainerFactoryPluginInterface
-{
-    use StringTranslationTrait;
+class CreationDate extends ExtraFieldDisplayBase implements ContainerFactoryPluginInterface {
+  use StringTranslationTrait;
 
   /**
    * The date formatter service.
    *
    * @var \Drupal\Core\Datetime\DateFormatterInterface
    */
-    protected $dateFormatter;
+  protected $dateFormatter;
 
   /**
    * {@inheritdoc}
    */
-    public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter)
-    {
-        parent::__construct($configuration, $plugin_id, $plugin_definition);
-        $this->dateFormatter = $date_formatter;
-    }
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->dateFormatter = $date_formatter;
+  }
 
   /**
    * {@inheritdoc}
    */
-    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
-    {
-        return new static(
-            $configuration,
-            $plugin_id,
-            $plugin_definition,
-            $container->get('date.formatter')
-        );
-    }
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('date.formatter')
+      );
+  }
 
   /**
    * {@inheritdoc}
    */
-    public function view(ContentEntityInterface $entity)
-    {
-      /** @var \Drupal\node\NodeInterface $entity */
+  public function view(ContentEntityInterface $entity) {
+    /** @var \Drupal\node\NodeInterface $entity */
 
-        $elements = [
-        '#markup' => $this->t('Created the @date', [
+    $elements = [
+      '#markup' => $this->t('Created the @date', [
         '@date' => $this->dateFormatter->format($entity->getCreatedTime(), 'jour_mois_annee_heure'),
-        ]),
-        ];
+      ]),
+    ];
 
-        return $elements;
-    }
+    return $elements;
+  }
+
 }

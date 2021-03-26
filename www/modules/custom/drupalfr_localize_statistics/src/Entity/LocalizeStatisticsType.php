@@ -39,20 +39,20 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class LocalizeStatisticsType extends ConfigEntityBundleBase implements LocalizeStatisticsTypeInterface
-{
+class LocalizeStatisticsType extends ConfigEntityBundleBase implements LocalizeStatisticsTypeInterface {
 
   /**
    * The localize statistics type ID.
    *
    * @var string
    */
-    protected $id;
+  protected $id;
 
   /**
    * The localize statistics type label.
    *
    * @var string
    */
-    protected $label;
+  protected $label;
+
 }

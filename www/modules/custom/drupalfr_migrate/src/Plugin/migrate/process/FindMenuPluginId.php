@@ -19,52 +19,50 @@ use Drupal\migrate\Row;
  *   id = "drupalfr_findmenupluginid"
  * )
  */
-class FindMenuPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface
-{
+class FindMenuPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * An entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-    protected $entityTypeManager;
+  protected $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
-    public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager)
-    {
-        parent::__construct($configuration, $plugin_id, $plugin_definition);
-        $this->entityTypeManager = $entity_type_manager;
-    }
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->entityTypeManager = $entity_type_manager;
+  }
 
   /**
    * {@inheritdoc}
    */
-    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = null)
-    {
-        return new static(
-            $configuration,
-            $plugin_id,
-            $plugin_definition,
-            $migration,
-            $container->get('entity_type.manager')
-        );
-    }
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+    return new static(
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $migration,
+          $container->get('entity_type.manager')
+      );
+  }
 
   /**
    * {@inheritdoc}
    */
-    public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property)
-    {
-      /** @var \Drupal\menu_link_content\Entity\MenuLinkContent[] $menu_links */
-        $menu_links = $this->entityTypeManager->getStorage('menu_link_content')->loadByProperties(['uuid' => $value]);
+  public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
+    /** @var \Drupal\menu_link_content\Entity\MenuLinkContent[] $menu_links */
+    $menu_links = $this->entityTypeManager->getStorage('menu_link_content')->loadByProperties(['uuid' => $value]);
 
-        if (!empty($menu_links)) {
-            $menu_link = array_shift($menu_links);
-            return $menu_link->getPluginId();
-        } else {
-            return $value;
-        }
+    if (!empty($menu_links)) {
+      $menu_link = array_shift($menu_links);
+      return $menu_link->getPluginId();
     }
+    else {
+      return $value;
+    }
+  }
+
 }

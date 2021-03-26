@@ -14,20 +14,19 @@ use Drupal\migrate\Row;
  *   id = "drupalfr_licence_type_role_configuration"
  * )
  */
-class LicenseTypeRoleConfiguration extends ProcessPluginBase
-{
+class LicenseTypeRoleConfiguration extends ProcessPluginBase {
 
   /**
    * {@inheritdoc}
    */
-    public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property)
-    {
-        if (empty($this->configuration['license_role_property'])) {
-            throw new MigrateException('license_role_property is empty');
-        }
-
-        return [
-        'license_role' => $row->getSourceProperty($this->configuration['license_role_property']),
-        ];
+  public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
+    if (empty($this->configuration['license_role_property'])) {
+      throw new MigrateException('license_role_property is empty');
     }
+
+    return [
+      'license_role' => $row->getSourceProperty($this->configuration['license_role_property']),
+    ];
+  }
+
 }
