@@ -27,6 +27,8 @@ class DeleteEntitiesForm extends FormBase {
    */
   protected $messenger;
 
+  protected $database;
+
   /**
    * {@inheritdoc}
    */
@@ -34,6 +36,7 @@ class DeleteEntitiesForm extends FormBase {
     $instance = parent::create($container);
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->messenger = $container->get('messenger');
+    $instance->database = $container->get('database');
 
     return $instance;
   }
@@ -66,18 +69,6 @@ class DeleteEntitiesForm extends FormBase {
       '#weight' => '0',
     ];
 
-    // $users = $this->getUsersUids();
-
-    /*if (count($users)>0) {
-    $form['deletable_users'] = [
-    '#type' => 'checkbox',
-    '#title' => $this->t('Delete Users'),
-    '#default_value' => false,
-    '#required' => true,
-    '#weight' => '0',
-    ];
-    }*/
-
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
@@ -93,7 +84,6 @@ class DeleteEntitiesForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Display result.
     $selection = $form_state->getValue('deletable_nodes');
-    $selectionUsers = $form_state->getValue('deletable_users');
     $selections = [];
     foreach ($selection as $sel) {
       if (0 !== $sel) {
@@ -115,7 +105,7 @@ class DeleteEntitiesForm extends FormBase {
       $types[$res['type']] = $res['type'];
     }
     foreach ($types as $key => $type) {
-      $res = \Drupal::database()->select('node', 'n')
+      $res = $this->database->select('node', 'n')
         ->fields('n', ['nid'])
         ->condition('type', $key)
         ->execute()
@@ -129,7 +119,7 @@ class DeleteEntitiesForm extends FormBase {
    * Delete Nodes by types.
    */
   private function deleteNodesByTypes($types) {
-    $res = \Drupal::database()->select('node', 'n')
+    $res = $this->database->select('node', 'n')
       ->fields('n', ['nid'])
       ->condition('type', $types, 'in')
       ->execute()
