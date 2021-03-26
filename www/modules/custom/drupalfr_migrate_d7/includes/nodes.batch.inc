@@ -2,12 +2,13 @@
 
 /**
  * @file
+ * Include to delete all nodes of a type.
  */
 
 /**
- *
+ * Delete nodes multiple.
  */
-function deleteNodesMultiple($nids) {
+function delete_nodes_multiple($nids) {
   $storage_controller = \Drupal::service('entity_type.manager')->getStorage('node');
 
   $nodes = $storage_controller->loadMultiple($nids);
@@ -15,17 +16,8 @@ function deleteNodesMultiple($nids) {
 }
 
 /**
- *
+ * Message at end of batch.
  */
-function deleteNodeFromNid($nid) {
-  $storage_controller = \Drupal::service('entity_type.manager')->getStorage('node');
-  $node = $storage_controller->load($nid);
-  $storage_controller->delete([$node]);
-}
-
-/**
- *
- */
-function finishBatch($nids): void {
+function finish_batch($nids) {
   \Drupal::service('messenger')->addMessage(sprintf('%s nodes deleted.', count($nids)));
 }

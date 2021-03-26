@@ -159,7 +159,7 @@ class DeleteEntitiesForm extends FormBase {
       $numberToExtract = count($nids) >= self::DELETE_NUMBER_MAX ? self::DELETE_NUMBER_MAX : count($nids);
       $extract = array_slice($nids, 0, $numberToExtract);
       array_splice($nids, 0, $numberToExtract);
-      $batch['operations'][] = ['deleteNodesMultiple', [$extract]];
+      $batch['operations'][] = ['delete_nodes_multiple', [$extract]];
       $batch['error_message'] = $this->t('Error deleting nodes.');
     }
     batch_set($batch);
