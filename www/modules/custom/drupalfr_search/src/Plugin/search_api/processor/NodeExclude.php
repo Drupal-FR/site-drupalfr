@@ -20,35 +20,37 @@ use Drupal\search_api\Processor\ProcessorPluginBase;
  *   }
  * )
  */
-class NodeExclude extends ProcessorPluginBase {
+class NodeExclude extends ProcessorPluginBase
+{
 
   /**
    * {@inheritdoc}
    */
-  public static function supportsIndex(IndexInterface $index) {
-    foreach ($index->getDatasources() as $datasource) {
-      if ($datasource->getEntityTypeId() === 'node') {
-        return TRUE;
-      }
-    }
-
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alterIndexedItems(array &$items) {
-    /** @var \Drupal\search_api\Item\ItemInterface $item */
-    foreach ($items as $item_id => $item) {
-      $object = $item->getOriginalObject()->getValue();
-      if ($object instanceof NodeInterface) {
-        $body = $object->get('body')->isEmpty();
-        if ($body) {
-          unset($items[$item_id]);
+    public static function supportsIndex(IndexInterface $index)
+    {
+        foreach ($index->getDatasources() as $datasource) {
+            if ($datasource->getEntityTypeId() === 'node') {
+                return true;
+            }
         }
-      }
-    }
-  }
 
+        return false;
+    }
+
+  /**
+   * {@inheritdoc}
+   */
+    public function alterIndexedItems(array &$items)
+    {
+      /** @var \Drupal\search_api\Item\ItemInterface $item */
+        foreach ($items as $item_id => $item) {
+            $object = $item->getOriginalObject()->getValue();
+            if ($object instanceof NodeInterface) {
+                $body = $object->get('body')->isEmpty();
+                if ($body) {
+                    unset($items[$item_id]);
+                }
+            }
+        }
+    }
 }

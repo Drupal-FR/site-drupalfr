@@ -50,89 +50,93 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   field_ui_base_route = "entity.localize_statistics_type.edit_form"
  * )
  */
-class LocalizeStatistics extends ContentEntityBase implements LocalizeStatisticsInterface {
+class LocalizeStatistics extends ContentEntityBase implements LocalizeStatisticsInterface
+{
 
   /**
    * {@inheritdoc}
    *
    * Format as: langcode - type - date.
    */
-  public function label() {
-    $label_parts = [];
-    /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
-    $date_formatter = \Drupal::service('date.formatter');
+    public function label()
+    {
+        $label_parts = [];
+      /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+        $date_formatter = \Drupal::service('date.formatter');
 
-    // Langcode.
-    $languages = $this->get('language')->referencedEntities();
-    if (!empty($languages)) {
-      /** @var \Drupal\taxonomy\TermInterface $language */
-      $language = array_shift($languages);
+      // Langcode.
+        $languages = $this->get('language')->referencedEntities();
+        if (!empty($languages)) {
+          /** @var \Drupal\taxonomy\TermInterface $language */
+            $language = array_shift($languages);
 
-      if ($language->hasField('field_langcode')) {
-        $langcode = $language->get('field_langcode')->getValue();
-        if (!empty($langcode)) {
-          $label_parts[] = $langcode[0]['value'];
+            if ($language->hasField('field_langcode')) {
+                $langcode = $language->get('field_langcode')->getValue();
+                if (!empty($langcode)) {
+                    $label_parts[] = $langcode[0]['value'];
+                }
+            }
         }
-      }
+
+        $label_parts[] = $this->bundle();
+        $label_parts[] = $date_formatter->format($this->getCreatedTime(), 'fallback');
+        return implode(' - ', $label_parts);
     }
 
-    $label_parts[] = $this->bundle();
-    $label_parts[] = $date_formatter->format($this->getCreatedTime(), 'fallback');
-    return implode(' - ', $label_parts);
-  }
+  /**
+   * {@inheritdoc}
+   */
+    public function getCreatedTime()
+    {
+        return $this->get('created')->value;
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
+    public function setCreatedTime($timestamp)
+    {
+        $this->set('created', $timestamp);
+        return $this;
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
+    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
+    {
+        $fields = parent::baseFieldDefinitions($entity_type);
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = parent::baseFieldDefinitions($entity_type);
+        $fields['created'] = BaseFieldDefinition::create('created')
+        ->setLabel(t('Created'))
+        ->setDescription(t('The time that the entity was created.'));
 
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
-
-    $fields['language'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Language'))
-      ->setDescription(t('The statistics language.'))
-      ->setCardinality(1)
-      ->setRequired(TRUE)
-      ->setSetting('target_type', 'taxonomy_term')
-      ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', [
+        $fields['language'] = BaseFieldDefinition::create('entity_reference')
+        ->setLabel(t('Language'))
+        ->setDescription(t('The statistics language.'))
+        ->setCardinality(1)
+        ->setRequired(true)
+        ->setSetting('target_type', 'taxonomy_term')
+        ->setSetting('handler', 'default')
+        ->setSetting('handler_settings', [
         'target_bundles' => [
           'localize_glossary_languages' => 'localize_glossary_languages',
         ],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+        ])
+        ->setDisplayConfigurable('form', true)
+        ->setDisplayConfigurable('view', true);
 
-    $fields['value'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Value'))
-      ->setDescription(t('The statistics value.'))
-      ->setCardinality(1)
-      ->setRequired(TRUE)
-      // Positive only.
-      ->setSetting('unsigned', TRUE)
-      ->setSetting('min', 0)
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+        $fields['value'] = BaseFieldDefinition::create('integer')
+        ->setLabel(t('Value'))
+        ->setDescription(t('The statistics value.'))
+        ->setCardinality(1)
+        ->setRequired(true)
+        // Positive only.
+        ->setSetting('unsigned', true)
+        ->setSetting('min', 0)
+        ->setDisplayConfigurable('form', true)
+        ->setDisplayConfigurable('view', true);
 
-    return $fields;
-  }
-
+        return $fields;
+    }
 }

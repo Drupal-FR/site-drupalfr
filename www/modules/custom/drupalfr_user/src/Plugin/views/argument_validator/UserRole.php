@@ -18,14 +18,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   entity_type = "user",
  * )
  */
-class UserRole extends ArgumentValidatorPluginBase implements CacheableDependencyInterface {
+class UserRole extends ArgumentValidatorPluginBase implements CacheableDependencyInterface
+{
 
   /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+    protected $entityTypeManager;
 
   /**
    * Constructs a new CurrentUser object.
@@ -39,110 +40,117 @@ class UserRole extends ArgumentValidatorPluginBase implements CacheableDependenc
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    EntityTypeManagerInterface $entity_type_manager
-  ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function defineOptions() {
-    $options = parent::defineOptions();
-    $options['roles'] = ['default' => []];
-
-    return $options;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
-    parent::buildOptionsForm($form, $form_state);
-
-    /** @var \Drupal\user\Entity\Role[] $roles */
-    $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
-
-    $roles_options = [];
-    foreach ($roles as $role) {
-      $roles_options[$role->id()] = $role->label();
+    public function __construct(
+        array $configuration,
+        $plugin_id,
+        $plugin_definition,
+        EntityTypeManagerInterface $entity_type_manager
+    ) {
+        parent::__construct($configuration, $plugin_id, $plugin_definition);
+        $this->entityTypeManager = $entity_type_manager;
     }
 
-    $form['roles'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Roles'),
-      '#options' => $roles_options,
-      '#default_value' => $this->options['roles'],
-    ];
-  }
-
   /**
    * {@inheritdoc}
    */
-  public function submitOptionsForm(&$form, FormStateInterface $form_state, &$options = []) {
-    // Filter out unused options.
-    $options['roles'] = array_filter($options['roles']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateArgument($argument) {
-    if (!is_numeric($argument)) {
-      return FALSE;
-    }
-    $user_storage = $this->entityTypeManager->getStorage('user');
-    /** @var \Drupal\user\UserInterface $user */
-    $user = $user_storage->load($argument);
-    if (empty($user)) {
-      return FALSE;
+    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+    {
+        return new static(
+            $configuration,
+            $plugin_id,
+            $plugin_definition,
+            $container->get('entity_type.manager')
+        );
     }
 
-    foreach ($this->options['roles'] as $expected_role) {
-      if ($user->hasRole($expected_role)) {
-        return TRUE;
-      }
+  /**
+   * {@inheritdoc}
+   */
+    protected function defineOptions()
+    {
+        $options = parent::defineOptions();
+        $options['roles'] = ['default' => []];
+
+        return $options;
     }
 
-    return FALSE;
-  }
+  /**
+   * {@inheritdoc}
+   */
+    public function buildOptionsForm(&$form, FormStateInterface $form_state)
+    {
+        parent::buildOptionsForm($form, $form_state);
+
+      /** @var \Drupal\user\Entity\Role[] $roles */
+        $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
+
+        $roles_options = [];
+        foreach ($roles as $role) {
+            $roles_options[$role->id()] = $role->label();
+        }
+
+        $form['roles'] = [
+        '#type' => 'checkboxes',
+        '#title' => $this->t('Roles'),
+        '#options' => $roles_options,
+        '#default_value' => $this->options['roles'],
+        ];
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheMaxAge() {
-    return Cache::PERMANENT;
-  }
+    public function submitOptionsForm(&$form, FormStateInterface $form_state, &$options = [])
+    {
+      // Filter out unused options.
+        $options['roles'] = array_filter($options['roles']);
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheContexts() {
-    return ['user.roles'];
-  }
+    public function validateArgument($argument)
+    {
+        if (!is_numeric($argument)) {
+            return false;
+        }
+        $user_storage = $this->entityTypeManager->getStorage('user');
+      /** @var \Drupal\user\UserInterface $user */
+        $user = $user_storage->load($argument);
+        if (empty($user)) {
+            return false;
+        }
+
+        foreach ($this->options['roles'] as $expected_role) {
+            if ($user->hasRole($expected_role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheTags() {
-    return [];
-  }
+    public function getCacheMaxAge()
+    {
+        return Cache::PERMANENT;
+    }
 
+  /**
+   * {@inheritdoc}
+   */
+    public function getCacheContexts()
+    {
+        return ['user.roles'];
+    }
+
+  /**
+   * {@inheritdoc}
+   */
+    public function getCacheTags()
+    {
+        return [];
+    }
 }

@@ -16,22 +16,23 @@ use Drupal\extra_field\Plugin\ExtraFieldDisplayBase;
  *   }
  * )
  */
-class MemberBadge extends ExtraFieldDisplayBase {
+class MemberBadge extends ExtraFieldDisplayBase
+{
 
   /**
    * {@inheritdoc}
    */
-  public function view(ContentEntityInterface $entity) {
-    $elements = [
-      '#lazy_builder' => ['drupalfr_user.member_badge_builder:build',
+    public function view(ContentEntityInterface $entity)
+    {
+        $elements = [
+        '#lazy_builder' => ['drupalfr_user.member_badge_builder:build',
         [
           $entity->id(),
         ],
-      ],
-      '#create_placeholder' => TRUE,
-    ];
+        ],
+        '#create_placeholder' => true,
+        ];
 
-    return $elements;
-  }
-
+        return $elements;
+    }
 }

@@ -19,55 +19,58 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class PlanetFeedImage extends ExtraFieldDisplayBase implements ContainerFactoryPluginInterface {
+class PlanetFeedImage extends ExtraFieldDisplayBase implements ContainerFactoryPluginInterface
+{
 
   /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+    protected $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function view(ContentEntityInterface $entity) {
-    /** @var \Drupal\node\NodeInterface $entity */
-
-    $elements = [];
-
-    if ($entity->hasField('feeds_item')) {
-      $feed = $entity->get('feeds_item')->getValue();
-      if (!empty($feed)) {
-        /** @var \Drupal\feeds\FeedInterface $feed */
-        $feed = $this->entityTypeManager->getStorage('feeds_feed')->load($feed[0]['target_id']);
-        if ($feed->hasField('field_feed_image') && !$feed->get('field_feed_image')->isEmpty()) {
-          $elements = $feed->get('field_feed_image')->view('default');
-        }
-      }
+    public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager)
+    {
+        parent::__construct($configuration, $plugin_id, $plugin_definition);
+        $this->entityTypeManager = $entity_type_manager;
     }
 
-    return $elements;
-  }
+  /**
+   * {@inheritdoc}
+   */
+    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+    {
+        return new static(
+            $configuration,
+            $plugin_id,
+            $plugin_definition,
+            $container->get('entity_type.manager')
+        );
+    }
 
+  /**
+   * {@inheritdoc}
+   */
+    public function view(ContentEntityInterface $entity)
+    {
+      /** @var \Drupal\node\NodeInterface $entity */
+
+        $elements = [];
+
+        if ($entity->hasField('feeds_item')) {
+            $feed = $entity->get('feeds_item')->getValue();
+            if (!empty($feed)) {
+                /** @var \Drupal\feeds\FeedInterface $feed */
+                $feed = $this->entityTypeManager->getStorage('feeds_feed')->load($feed[0]['target_id']);
+                if ($feed->hasField('field_feed_image') && !$feed->get('field_feed_image')->isEmpty()) {
+                    $elements = $feed->get('field_feed_image')->view('default');
+                }
+            }
+        }
+
+        return $elements;
+    }
 }

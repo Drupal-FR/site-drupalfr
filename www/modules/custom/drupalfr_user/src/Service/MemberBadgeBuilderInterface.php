@@ -5,7 +5,8 @@ namespace Drupal\drupalfr_user\Service;
 /**
  * Provides a lazy builder for member's badge.
  */
-interface MemberBadgeBuilderInterface {
+interface MemberBadgeBuilderInterface
+{
 
   /**
    * Lazy builder callback for displaying a member's badge.
@@ -16,6 +17,5 @@ interface MemberBadgeBuilderInterface {
    * @return array
    *   A render array for the member's badge.
    */
-  public function build(int $user_id): array;
-
+    public function build(int $user_id): array;
 }

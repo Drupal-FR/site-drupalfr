@@ -14,21 +14,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * Inspired from \Drupal\user\Plugin\Menu\LoginLogoutMenuLink.
  */
-class MyAccountCreateAccountMenuLink extends MenuLinkDefault {
+class MyAccountCreateAccountMenuLink extends MenuLinkDefault
+{
 
   /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+    protected $currentUser;
 
   /**
    * A config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+    protected $configFactory;
 
   /**
    * Constructs a new MyAccountCreateAccountMenuLink.
@@ -46,62 +47,64 @@ class MyAccountCreateAccountMenuLink extends MenuLinkDefault {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   A config factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override, AccountInterface $current_user, ConfigFactoryInterface $config_factory) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $static_override);
+    public function __construct(array $configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override, AccountInterface $current_user, ConfigFactoryInterface $config_factory)
+    {
+        parent::__construct($configuration, $plugin_id, $plugin_definition, $static_override);
 
-    $this->currentUser = $current_user;
-    $this->configFactory = $config_factory;
-  }
+        $this->currentUser = $current_user;
+        $this->configFactory = $config_factory;
+    }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('menu_link.static.overrides'),
-      $container->get('current_user'),
-      $container->get('config.factory')
-    );
-  }
+    public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+    {
+        return new static(
+            $configuration,
+            $plugin_id,
+            $plugin_definition,
+            $container->get('menu_link.static.overrides'),
+            $container->get('current_user'),
+            $container->get('config.factory')
+        );
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function getTitle() {
-    if ($this->currentUser->isAuthenticated()) {
-      return $this->t('My account');
-    }
-    else {
-      $user_settings = $this->configFactory->get('user.settings');
-      if ($user_settings->get('register') != UserInterface::REGISTER_ADMINISTRATORS_ONLY) {
-        return $this->t('Create an account');
-      }
-    }
+    public function getTitle()
+    {
+        if ($this->currentUser->isAuthenticated()) {
+            return $this->t('My account');
+        } else {
+            $user_settings = $this->configFactory->get('user.settings');
+            if ($user_settings->get('register') != UserInterface::REGISTER_ADMINISTRATORS_ONLY) {
+                return $this->t('Create an account');
+            }
+        }
 
-    return '';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRouteName() {
-    if ($this->currentUser->isAuthenticated()) {
-      return 'user.page';
+        return '';
     }
-    else {
-      return 'user.register';
-    }
-  }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheContexts() {
-    // @todo Cache should depend on the config user.settings value?
-    return ['user.roles:authenticated'];
-  }
+    public function getRouteName()
+    {
+        if ($this->currentUser->isAuthenticated()) {
+            return 'user.page';
+        } else {
+            return 'user.register';
+        }
+    }
 
+  /**
+   * {@inheritdoc}
+   */
+    public function getCacheContexts()
+    {
+      // @todo Cache should depend on the config user.settings value?
+        return ['user.roles:authenticated'];
+    }
 }

@@ -54,7 +54,7 @@ class DeleteEntitiesForm extends FormBase
     public function buildForm(array $form, FormStateInterface $form_state)
     {
         $options = $this->getNodesTypes();
-        if(empty($options)) {
+        if (empty($options)) {
             return [
                 '#type' => 'markup',
                 '#markup' => $this->t('No entities existing.'),
@@ -101,19 +101,18 @@ class DeleteEntitiesForm extends FormBase
         $selection = $form_state->getValue('deletable_nodes');
         $selectionUsers = $form_state->getValue('deletable_users');
         $selections = [];
-        foreach($selection as $sel) {
+        foreach ($selection as $sel) {
             if (0!==$sel) {
                 $selections[] = $sel;
             }
-
         }
         $this->deleteNodesByTypes($selections);
-
     }
 
-    private function getUsersUids(): array {
-        $uids = \Drupal::database()->select('users','u')
-                ->fields('u',['uid'])
+    private function getUsersUids(): array
+    {
+        $uids = \Drupal::database()->select('users', 'u')
+                ->fields('u', ['uid'])
                 ->execute()
                 ->fetchAllKeyed();
                 dump($uids);
@@ -126,13 +125,13 @@ class DeleteEntitiesForm extends FormBase
             ->groupBy('type');
         $result = $query->execute();
         $types = [];
-        foreach($result as $res) {
+        foreach ($result as $res) {
             $types[$res['type']] = $res['type'];
         }
-        foreach($types as $key => $type) {
-            $res = \Drupal::database()->select('node','n')
-                ->fields('n',['nid'])
-                ->condition('type',$key)
+        foreach ($types as $key => $type) {
+            $res = \Drupal::database()->select('node', 'n')
+                ->fields('n', ['nid'])
+                ->condition('type', $key)
                 ->execute()
                 ->fetchAll();
             $types[$key] = sprintf('%s (%s nodes)', $key, count($res));
@@ -140,10 +139,11 @@ class DeleteEntitiesForm extends FormBase
         return $types;
     }
 
-    private function deleteNodesByTypes($types) {
-        $res = \Drupal::database()->select('node','n')
-        ->fields('n',['nid'])
-        ->condition('type',$types,'in')
+    private function deleteNodesByTypes($types)
+    {
+        $res = \Drupal::database()->select('node', 'n')
+        ->fields('n', ['nid'])
+        ->condition('type', $types, 'in')
         ->execute()
         ->fetchAllKeyed();
         $nids = array_keys($res);

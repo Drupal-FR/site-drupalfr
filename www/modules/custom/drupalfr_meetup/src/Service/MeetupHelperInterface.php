@@ -7,7 +7,8 @@ namespace Drupal\drupalfr_meetup\Service;
  *
  * @package Drupal\drupalfr_meetup
  */
-interface MeetupHelperInterface {
+interface MeetupHelperInterface
+{
 
   /**
    * Get the upcoming events.
@@ -18,7 +19,7 @@ interface MeetupHelperInterface {
    * @see: https://github.com/blobaugh/Meetup-API-client-for-PHP/wiki
    * @see: https://www.meetup.com/meetup_api/docs/2/open_events/
    */
-  public function getEvents();
+    public function getEvents();
 
   /**
    * Prepare Leaflet features from meetup events.
@@ -29,6 +30,5 @@ interface MeetupHelperInterface {
    * @return array
    *   An array of events.
    */
-  public function prepareLeafletFeatures(array $events);
-
+    public function prepareLeafletFeatures(array $events);
 }

@@ -13,21 +13,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @package Drupal\drupalfr_meetup\Controller
  */
-class MeetupController extends ControllerBase implements ContainerInjectionInterface {
+class MeetupController extends ControllerBase implements ContainerInjectionInterface
+{
 
   /**
    * A meetup helper service.
    *
    * @var \Drupal\drupalfr_meetup\Service\MeetupHelperInterface
    */
-  protected $meetupHelper;
+    protected $meetupHelper;
 
   /**
    * The leaflet service.
    *
    * @var \Drupal\leaflet\LeafletService
    */
-  protected $leafletService;
+    protected $leafletService;
 
   /**
    * Construct.
@@ -37,23 +38,24 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
    * @param \Drupal\leaflet\LeafletService $leaflet_service
    *   The leaflet service.
    */
-  public function __construct(
-    MeetupHelperInterface $meetup_helper,
-    LeafletService $leaflet_service
-  ) {
-    $this->meetupHelper = $meetup_helper;
-    $this->leafletService = $leaflet_service;
-  }
+    public function __construct(
+        MeetupHelperInterface $meetup_helper,
+        LeafletService $leaflet_service
+    ) {
+        $this->meetupHelper = $meetup_helper;
+        $this->leafletService = $leaflet_service;
+    }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('drupalfr_meetup.meetup_helper'),
-      $container->get('leaflet.service')
-    );
-  }
+    public static function create(ContainerInterface $container)
+    {
+        return new static(
+            $container->get('drupalfr_meetup.meetup_helper'),
+            $container->get('leaflet.service')
+        );
+    }
 
   /**
    * Index.
@@ -61,28 +63,28 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
    * @return array
    *   Return renderable array.
    */
-  public function index() {
-    $page = [
-      '#theme' => 'drupalfr_meetup_page',
-      '#title' => $this->t('Drupal Meetups'),
-      '#cache' => [
+    public function index()
+    {
+        $page = [
+        '#theme' => 'drupalfr_meetup_page',
+        '#title' => $this->t('Drupal Meetups'),
+        '#cache' => [
         // 15 minutes.
         'max-age' => '900',
-      ],
-    ];
+        ],
+        ];
 
-    $events = $this->meetupHelper->getEvents();
-    if (!empty($events)) {
-      $page['#events_list'] = [
-        '#theme' => 'drupalfr_meetup_events',
-        '#events' => $events,
-      ];
+        $events = $this->meetupHelper->getEvents();
+        if (!empty($events)) {
+            $page['#events_list'] = [
+            '#theme' => 'drupalfr_meetup_events',
+            '#events' => $events,
+            ];
 
-      $map = leaflet_map_get_info('OSM Mapnik');
-      $page['#map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '600px');
+            $map = leaflet_map_get_info('OSM Mapnik');
+            $page['#map'] = $this->leafletService->leafletRenderMap($map, $this->meetupHelper->prepareLeafletFeatures($events), '600px');
+        }
+
+        return $page;
     }
-
-    return $page;
-  }
-
 }

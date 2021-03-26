@@ -50,19 +50,19 @@ class NodeType extends DrupalSqlBase
     public function fields()
     {
         $fields = [
-      'type' => $this->t('Machine name of the node type.'),
-      'name' => $this->t('Human name of the node type.'),
-      'description' => $this->t('Description of the node type.'),
-      'help' => $this->t('Help text for the node type.'),
-      'title_label' => $this->t('Title label.'),
-      'disabled' => $this->t('Flag indicating the node type is enable'),
-      'base' => $this->t('base node.'),
-      'custom' => $this->t('Flag.'),
-      'modified' => $this->t('Flag.'),
-      'locked' => $this->t('Flag.'),
-      'orig_type' => $this->t('The original type.'),
-      'teaser_length' => $this->t('Teaser length'),
-    ];
+        'type' => $this->t('Machine name of the node type.'),
+        'name' => $this->t('Human name of the node type.'),
+        'description' => $this->t('Description of the node type.'),
+        'help' => $this->t('Help text for the node type.'),
+        'title_label' => $this->t('Title label.'),
+        'disabled' => $this->t('Flag indicating the node type is enable'),
+        'base' => $this->t('base node.'),
+        'custom' => $this->t('Flag.'),
+        'modified' => $this->t('Flag.'),
+        'locked' => $this->t('Flag.'),
+        'orig_type' => $this->t('The original type.'),
+        'teaser_length' => $this->t('Teaser length'),
+        ];
         if ($this->moduleExists('comment')) {
             $fields += $this->getCommentFields();
         }
@@ -79,14 +79,14 @@ class NodeType extends DrupalSqlBase
     protected function getCommentFields()
     {
         return [
-      'comment' => $this->t('Default comment setting'),
-      'comment_default_mode' => $this->t('Default display mode'),
-      'comment_default_per_page' => $this->t('Default comments per page'),
-      'comment_anonymous' => $this->t('Anonymous commenting'),
-      'comment_subject_field' => $this->t('Comment subject field'),
-      'comment_preview' => $this->t('Preview comment'),
-      'comment_form_location' => $this->t('Location of comment submission form'),
-    ];
+        'comment' => $this->t('Default comment setting'),
+        'comment_default_mode' => $this->t('Default display mode'),
+        'comment_default_per_page' => $this->t('Default comments per page'),
+        'comment_anonymous' => $this->t('Anonymous commenting'),
+        'comment_subject_field' => $this->t('Comment subject field'),
+        'comment_preview' => $this->t('Preview comment'),
+        'comment_form_location' => $this->t('Location of comment submission form'),
+        ];
     }
 
     /**
@@ -122,12 +122,12 @@ class NodeType extends DrupalSqlBase
         if ($this->moduleExists('field')) {
             // Find body field for this node type.
             $body = $this->select('field_config_instance', 'fci')
-        ->fields('fci', ['data'])
-        ->condition('entity_type', 'node')
-        ->condition('bundle', $row->getSourceProperty('type'))
-        ->condition('field_name', 'body')
-        ->execute()
-        ->fetchAssoc();
+            ->fields('fci', ['data'])
+            ->condition('entity_type', 'node')
+            ->condition('bundle', $row->getSourceProperty('type'))
+            ->condition('field_name', 'body')
+            ->execute()
+            ->fetchAssoc();
             if ($body) {
                 $row->setSourceProperty('create_body', true);
                 $body['data'] = unserialize($body['data']);

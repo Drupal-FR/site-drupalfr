@@ -7,7 +7,8 @@ namespace Drupal\drupalfr_social\Service;
  *
  * @package Drupal\drupalfr_social
  */
-interface TwitterServiceInterface {
+interface TwitterServiceInterface
+{
 
   /**
    * Retrieve statuses from Twitter.
@@ -23,6 +24,5 @@ interface TwitterServiceInterface {
    * @see: https://twitteroauth.com/
    * @see: https://dev.twitter.com/rest/public
    */
-  public function getStatuses($path, array $options);
-
+    public function getStatuses($path, array $options);
 }
