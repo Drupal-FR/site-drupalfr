@@ -27,6 +27,11 @@ class DeleteEntitiesForm extends FormBase {
    */
   protected $messenger;
 
+  /**
+   * Drupal\Core\Database\Connection definition.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
   protected $database;
 
   /**
