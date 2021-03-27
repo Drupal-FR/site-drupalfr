@@ -30,10 +30,10 @@ class LocalizeStatisticsListBuilder extends EntityListBuilder {
     /** @var \Drupal\drupalfr_localize_statistics\Entity\LocalizeStatistics $entity */
     $row['id'] = $entity->id();
     $row['name'] = Link::createFromRoute(
-      $entity->label(),
-      'entity.localize_statistics.edit_form',
-      ['localize_statistics' => $entity->id()]
-    );
+          $entity->label(),
+          'entity.localize_statistics.edit_form',
+          ['localize_statistics' => $entity->id()]
+      );
     $row['value'] = $entity->get('value')->value;
     return $row + parent::buildRow($entity);
   }

@@ -110,7 +110,6 @@ class MeetupHelper implements MeetupHelperInterface {
       }
     }
     return $events;
-
   }
 
   /**

@@ -53,7 +53,7 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
         $plugin_definition,
         MeetupHelperInterface $drupalfr_meetup_meetup_helper,
         LeafletService $leaflet_service
-  ) {
+    ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->meetupHelper = $drupalfr_meetup_meetup_helper;
     $this->leafletService = $leaflet_service;
@@ -64,12 +64,12 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('drupalfr_meetup.meetup_helper'),
-      $container->get('leaflet.service')
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('drupalfr_meetup.meetup_helper'),
+          $container->get('leaflet.service')
+      );
   }
 
   /**
@@ -136,7 +136,7 @@ class DrupalfrMeetupHomeBlock extends BlockBase implements ContainerFactoryPlugi
         '#theme' => 'drupalfr_meetup_events',
         '#events' => $events,
         '#cache' => [
-          // 15 minutes.
+      // 15 minutes.
           'max-age' => '900',
         ],
       ];

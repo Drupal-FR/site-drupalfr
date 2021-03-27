@@ -41,12 +41,12 @@ class FindMenuPluginId extends ProcessPluginBase implements ContainerFactoryPlug
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $migration,
-      $container->get('entity_type.manager')
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $migration,
+          $container->get('entity_type.manager')
+      );
   }
 
   /**

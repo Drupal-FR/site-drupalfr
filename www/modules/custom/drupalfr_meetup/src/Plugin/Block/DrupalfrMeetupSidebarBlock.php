@@ -41,7 +41,7 @@ class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPl
         $plugin_id,
         $plugin_definition,
         MeetupHelperInterface $drupalfr_meetup_meetup_helper
-  ) {
+    ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->meetupHelper = $drupalfr_meetup_meetup_helper;
   }
@@ -51,11 +51,11 @@ class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPl
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('drupalfr_meetup.meetup_helper')
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('drupalfr_meetup.meetup_helper')
+      );
   }
 
   /**
@@ -64,7 +64,7 @@ class DrupalfrMeetupSidebarBlock extends BlockBase implements ContainerFactoryPl
   public function build() {
     $build = [
       '#cache' => [
-        // 15 minutes.
+      // 15 minutes.
         'max-age' => '900',
       ],
     ];

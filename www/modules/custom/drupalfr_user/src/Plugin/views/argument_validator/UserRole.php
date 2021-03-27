@@ -40,11 +40,11 @@ class UserRole extends ArgumentValidatorPluginBase implements CacheableDependenc
    *   The entity type manager.
    */
   public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    EntityTypeManagerInterface $entity_type_manager
-  ) {
+        array $configuration,
+        $plugin_id,
+        $plugin_definition,
+        EntityTypeManagerInterface $entity_type_manager
+    ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -54,11 +54,11 @@ class UserRole extends ArgumentValidatorPluginBase implements CacheableDependenc
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager')
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('entity_type.manager')
+      );
   }
 
   /**

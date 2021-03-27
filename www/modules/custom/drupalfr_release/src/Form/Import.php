@@ -48,9 +48,9 @@ class Import extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('drupalfr_release.release_helper'),
-      $container->get('messenger')
-    );
+          $container->get('drupalfr_release.release_helper'),
+          $container->get('messenger')
+      );
   }
 
   /**
@@ -89,10 +89,10 @@ class Import extends FormBase {
     $batch = [
       'title' => $this->t('Import releases'),
       'operations' => [
-        [
-          '\Drupal\drupalfr_release\ReleaseBatchHelper::importReleaseListBatch',
-          [$this->releaseHelper->getFeedReleases()],
-        ],
+      [
+        '\Drupal\drupalfr_release\ReleaseBatchHelper::importReleaseListBatch',
+        [$this->releaseHelper->getFeedReleases()],
+      ],
       ],
       'finished' => '\Drupal\drupalfr_release\ReleaseBatchHelper::importReleaseBatchBatchFinished',
     ];

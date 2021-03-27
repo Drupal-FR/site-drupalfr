@@ -58,13 +58,13 @@ class MyAccountCreateAccountMenuLink extends MenuLinkDefault {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('menu_link.static.overrides'),
-      $container->get('current_user'),
-      $container->get('config.factory')
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('menu_link.static.overrides'),
+          $container->get('current_user'),
+          $container->get('config.factory')
+      );
   }
 
   /**

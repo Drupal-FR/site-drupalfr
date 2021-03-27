@@ -54,9 +54,9 @@ class MembershipSettings extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory'),
-      $container->get('state')
-    );
+          $container->get('config.factory'),
+          $container->get('state')
+      );
   }
 
   /**
