@@ -26,7 +26,7 @@ display:
   default:
     display_plugin: default
     id: default
-    display_title: Master
+    display_title: Maître
     position: 0
     display_options:
       access:
@@ -62,18 +62,18 @@ display:
           id: 0
           total_pages: null
           tags:
-            previous: ‹‹
-            next: ››
+            previous: '‹ précédent'
+            next: 'suivant ›'
             first: '« premier'
             last: 'dernier »'
           expose:
             items_per_page: false
-            items_per_page_label: 'Items per page'
+            items_per_page_label: 'Éléments par page'
             items_per_page_options: '6, 12, 24, 48'
             items_per_page_options_all: false
-            items_per_page_options_all_label: '- All -'
+            items_per_page_options_all_label: '- Tout -'
             offset: false
-            offset_label: Offset
+            offset_label: Décalage
           quantity: 9
       style:
         type: default
@@ -255,7 +255,7 @@ display:
           exposed: true
           expose:
             operator_id: name_op
-            label: Name
+            label: Nom
             description: ''
             use_operator: false
             operator: name_op
@@ -382,7 +382,7 @@ display:
           exposed: true
           expose:
             operator_id: langcode_op
-            label: Language
+            label: Langue
             description: ''
             use_operator: false
             operator: langcode_op
@@ -1077,7 +1077,7 @@ display:
           exception:
             value: all
             title_enable: false
-            title: All
+            title: Tout
           title_enable: false
           title: ''
           default_argument_type: fixed
@@ -1356,7 +1356,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Modifié
+          label: 'Mis à jour'
           exclude: false
           alter:
             alter_text: false
@@ -1563,7 +1563,7 @@ display:
           exception:
             value: all
             title_enable: false
-            title: All
+            title: Tout
           title_enable: false
           title: ''
           default_argument_type: fixed
