@@ -287,8 +287,8 @@ display:
           type: boolean
           settings:
             format: custom
-            format_custom_true: Publié
-            format_custom_false: 'Non publié'
+            format_custom_true: Published
+            format_custom_false: Unpublished
           plugin_id: field
           entity_type: node
           entity_field: status
@@ -501,11 +501,11 @@ display:
             default_group_multiple: {  }
             group_items:
               1:
-                title: Publié
+                title: Published
                 operator: '='
                 value: '1'
               2:
-                title: 'Non publié'
+                title: Unpublished
                 operator: '='
                 value: '0'
           plugin_id: boolean
