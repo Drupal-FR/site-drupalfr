@@ -3,7 +3,6 @@
 namespace Drupal\drupalfr_user\Plugin\ExtraField\Display;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\extra_field\Plugin\ExtraFieldDisplayBase;
 
 /**
@@ -17,7 +16,7 @@ use Drupal\extra_field\Plugin\ExtraFieldDisplayBase;
  *   }
  * )
  */
-class MemberBadge extends ExtraFieldDisplayBase implements TrustedCallbackInterface {
+class MemberBadge extends ExtraFieldDisplayBase {
 
   /**
    * {@inheritdoc}
@@ -33,13 +32,6 @@ class MemberBadge extends ExtraFieldDisplayBase implements TrustedCallbackInterf
     ];
 
     return $elements;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function trustedCallbacks(): array {
-    return ['view'];
   }
 
 }
