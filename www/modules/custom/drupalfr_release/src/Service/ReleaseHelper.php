@@ -106,12 +106,12 @@ class ReleaseHelper implements ReleaseHelperInterface {
       if (isset($result['date'])) {
         $node->set('created', $result['date']);
       }
-      $node->set('field_release_version_major', $result['version_major']);
-      if (isset($result['version_minor'])) {
-        $node->set('field_release_version_minor', $result['version_minor']);
-      }
-      if (isset($result['version_patch'])) {
-        $node->set('field_release_version_patch', $result['version_patch']);
+
+      if (isset($result['version'])) {
+        list($major, $minor, $patch) = explode('.', $result['version']);
+        $node->set('field_release_version_major', $major);
+        $node->set('field_release_version_minor', $minor);
+        $node->set('field_release_version_patch', $patch);
       }
       if (isset($result['version_extra'])) {
         $node->set('field_release_version_extra', $result['version_extra']);
