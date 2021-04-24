@@ -59,10 +59,10 @@ display:
           id: 0
           total_pages: null
           tags:
-            previous: ‹‹
-            next: ››
-            first: '« Première page'
-            last: 'Dernière page »'
+            previous: '‹ précédent'
+            next: 'suivant ›'
+            first: '« premier'
+            last: 'dernier »'
           expose:
             items_per_page: false
             items_per_page_label: 'Éléments par page'
@@ -153,6 +153,71 @@ display:
           expose:
             operator_limit_selection: false
             operator_list: {  }
+        field_release_version_major_value:
+          id: field_release_version_major_value
+          table: node__field_release_version_major
+          field: field_release_version_major_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value:
+            min: ''
+            max: ''
+            value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_release_version_major_value_op
+            label: 'Version majeure (field_release_version_major)'
+            description: null
+            use_operator: false
+            operator: field_release_version_major_value_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_release_version_major_value
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+            placeholder: null
+            min_placeholder: null
+            max_placeholder: null
+          is_grouped: true
+          group_info:
+            label: Version
+            description: ''
+            identifier: major_version
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: 'Drupal 9'
+                operator: '='
+                value:
+                  value: '9'
+                  min: ''
+                  max: ''
+              2:
+                title: 'Drupal 8'
+                operator: '='
+                value:
+                  value: '8'
+                  min: ''
+                  max: ''
+              3:
+                title: ''
+                operator: '='
+                value:
+                  value: ''
+                  min: ''
+                  max: ''
+          plugin_id: numeric
       sorts:
         created:
           id: created
@@ -181,6 +246,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
@@ -198,6 +264,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
