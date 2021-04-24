@@ -1,0 +1,29 @@
+uuid: 3360c932-fd1e-4ed1-90b8-ba0dee182947
+langcode: fr
+status: true
+dependencies:
+  module:
+    - block_visibility_groups
+    - system
+  theme:
+    - drupal_france
+id: breadcrumbs
+theme: drupal_france
+region: header
+weight: -6
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  provider: system
+  label_display: '0'
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: ''
+  request_path:
+    id: request_path
+    pages: "/\r\n/home"
+    negate: true
