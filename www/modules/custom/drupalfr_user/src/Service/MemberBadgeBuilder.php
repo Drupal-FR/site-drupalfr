@@ -3,12 +3,13 @@
 namespace Drupal\drupalfr_user\Service;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 
 /**
  * Provides a lazy builder for flag links.
  */
-class MemberBadgeBuilder implements MemberBadgeBuilderInterface {
+class MemberBadgeBuilder implements MemberBadgeBuilderInterface, TrustedCallbackInterface {
 
   /**
    * The current user.
@@ -50,6 +51,13 @@ class MemberBadgeBuilder implements MemberBadgeBuilderInterface {
       '#is_organization' => $user->hasRole('member_organization'),
       '#is_profile_owner' => ($this->currentUser->id() === $user->id()),
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks() {
+    return ['build'];
   }
 
 }
