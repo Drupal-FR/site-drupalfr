@@ -1,0 +1,31 @@
+uuid: ea7308ea-1679-4d5b-add5-b4f8117c8b2c
+langcode: fr
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: dYr8-CkLwexiIZIsuCmkEpwowUilJSFy0sXwWyTUmcw
+id: forum_topic_solved
+label: 'Forum : sujet résolu'
+bundles:
+  - forum
+entity_type: node
+global: true
+weight: 0
+flag_short: 'Marquer comme résolu'
+flag_long: ''
+flag_message: ''
+unflag_short: 'Retirer l''indication "résolu"'
+unflag_long: ''
+unflag_message: ''
+unflag_denied_text: ''
+flag_type: 'entity:node'
+link_type: ajax_link
+flagTypeConfig:
+  show_in_links:
+    full: full
+  show_as_field: true
+  show_on_form: true
+  show_contextual_link: false
+  extra_permissions:
+    owner: owner
+linkTypeConfig: {  }

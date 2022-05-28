@@ -1,0 +1,32 @@
+uuid: e3d89af0-1b83-4203-90c7-2b568f349c34
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_media_banner
+    - media.type.image
+    - node.type.event
+_core:
+  default_config_hash: UKXDZvBtnxhXd1X0dD2BvOFoyCi2jwJxJ6PXBQW5a88
+id: node.event.field_media_banner
+field_name: field_media_banner
+entity_type: node
+bundle: event
+label: Bannière
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    target_uuid: media_image_1
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

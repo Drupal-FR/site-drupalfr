@@ -1,0 +1,31 @@
+uuid: cc674a29-4de3-40d4-9c02-21199fe84c31
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_user_event
+    - node.type.event
+  module:
+    - user
+_core:
+  default_config_hash: YKvCcDArq-XMk87k9F1qurCKsTJzDnsp7fLiWXG6LlI
+id: user.user.field_user_event
+field_name: field_user_event
+entity_type: user
+bundle: user
+label: Événements
+description: 'Indiquez les événements auxquels vous avez été participant.<br>Pour les organismes ayant sponsorisé l''événement, l''information est remplie sur la fiche de l''événement par les administrateurs du site.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      event: event
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

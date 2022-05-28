@@ -1,0 +1,141 @@
+uuid: 0766b3aa-5fcb-49bf-8262-72d910aa2f83
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
+    - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
+    - field.field.node.event.field_media_banner
+    - field.field.node.event.field_media_teaser
+    - node.type.event
+  module:
+    - datetime
+    - leaflet
+    - link
+    - text
+    - user
+_core:
+  default_config_hash: XCVi1PMOlczOYf-O29aUqVDVnPaRZlRiKneiosCYOsI
+id: node.event.full
+targetEntityType: node
+bundle: event
+mode: full
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 5
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_event_date_end:
+    weight: 2
+    label: hidden
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_event_date_start:
+    weight: 1
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_event_organizer:
+    weight: 7
+    label: above
+    settings:
+      view_mode: teaser
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  field_event_place:
+    weight: 4
+    label: hidden
+    settings:
+      multiple_map: '0'
+      popup: '1'
+      leaflet_map: 'OSM Mapnik'
+      height: '400'
+      map_position:
+        zoom: '12'
+        minZoom: '1'
+        maxZoom: '18'
+        force: 0
+      icon:
+        iconUrl: ''
+        shadowUrl: ''
+        iconSize:
+          x: ''
+          'y': ''
+        iconAnchor:
+          x: ''
+          'y': ''
+        shadowAnchor:
+          x: ''
+          'y': ''
+        popupAnchor:
+          x: ''
+          'y': ''
+      hide_empty_map: 0
+      disable_wheel: 0
+      fullscreen_control: 1
+      reset_map:
+        control: 0
+        position: topright
+      popup_content: ''
+      leaflet_markercluster:
+        control: 0
+        options: '{"spiderfyOnMaxZoom":true,"showCoverageOnHover":true,"removeOutsideVisibleBounds": false}'
+      path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2"}'
+    third_party_settings: {  }
+    type: leaflet_formatter_default
+    region: content
+  field_event_sponsor:
+    weight: 6
+    label: above
+    settings:
+      view_mode: teaser
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  field_event_website:
+    weight: 3
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+  field_media_banner:
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: banner
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+hidden:
+  field_media_teaser: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

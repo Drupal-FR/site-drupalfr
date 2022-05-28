@@ -1,0 +1,64 @@
+uuid: 65181bc1-8572-4cd9-823d-33e6261757e8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.full
+    - field.field.media.file.field_media_file
+    - image.style.thumbnail
+    - media.type.file
+  module:
+    - file
+    - image
+    - user
+_core:
+  default_config_hash: mO0JrMZxPxp74Delc6FUFscHfNuKjA9xzMBroJt9ra0
+id: media.file.full
+targetEntityType: media
+bundle: file
+mode: full
+content:
+  created:
+    label: hidden
+    type: timestamp
+    weight: 2
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+    region: content
+  field_media_file:
+    type: file_default
+    weight: 4
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  name:
+    label: hidden
+    type: string
+    weight: 0
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    region: content
+  thumbnail:
+    type: image
+    weight: 3
+    label: hidden
+    settings:
+      image_style: thumbnail
+      image_link: ''
+    third_party_settings: {  }
+    region: content
+  uid:
+    label: hidden
+    type: author
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  langcode: true
+  search_api_excerpt: true

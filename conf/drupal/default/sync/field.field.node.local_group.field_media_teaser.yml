@@ -1,0 +1,32 @@
+uuid: d3bfbcb9-328b-4442-9e6f-0578290f1afc
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_media_teaser
+    - media.type.image
+    - node.type.local_group
+_core:
+  default_config_hash: AxJiwmoELXnXmIOIcLagJbbGum9NKiMzzx7-MbQ7j1w
+id: node.local_group.field_media_teaser
+field_name: field_media_teaser
+entity_type: node
+bundle: local_group
+label: 'Image d''accroche'
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    target_uuid: media_image_1
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,16 @@
+uuid: 4ef8d069-8ebf-4c73-b9f6-043f4f4f6242
+langcode: fr
+status: true
+dependencies:
+  enforced:
+    module:
+      - commerce_order
+id: order_default
+label: Default
+targetEntityType: commerce_order
+plugin: infinite
+configuration:
+  pattern: '[pattern:number]'
+  initial_number: 1
+  padding: 0
+  per_store_sequence: true

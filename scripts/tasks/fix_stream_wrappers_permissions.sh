@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+CURRENT_SITE_FOLDER_NAME="DRUPAL_SITE_${DRUPAL_SITE^^}_FOLDER_NAME"
+
+echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Fix permissions in ${APP_PATH}/sites/${!CURRENT_SITE_FOLDER_NAME}/files.${COLOR_NC}"
+chown "${WEBSERVER_USER}":"${WEBSERVER_GROUP}" -R "${APP_PATH}"/sites/"${!CURRENT_SITE_FOLDER_NAME}"/files
+
+echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Fix permissions in ${PROJECT_PATH}/private_files/${!CURRENT_SITE_FOLDER_NAME}.${COLOR_NC}"
+chown "${WEBSERVER_USER}":"${WEBSERVER_GROUP}" -R "${PROJECT_PATH}"/private_files/"${!CURRENT_SITE_FOLDER_NAME}"

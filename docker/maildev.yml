@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  mail:
+    image: ${DOCKER_SERVICE_MAIL_IMAGE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}_mail.loadbalancer.server.port=1080"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_mail.entrypoints=http"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_mail.rule=Host(`${MAIL_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_mail.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_mail_secure.entrypoints=https"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_mail_secure.rule=Host(`${MAIL_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_mail_secure.tls=true"
+
+  web:
+    depends_on:
+      - mail
+
+  drupal_cron:
+    depends_on:
+      - mail

@@ -1,0 +1,25 @@
+uuid: f928e48d-6c1d-420a-86c6-aba5e341d381
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_job_teleworking
+    - node.type.job_offer
+_core:
+  default_config_hash: lH7CW1IXbPNThUNfh3qbjXzH3Z0AMN2tF01MhN7RNkg
+id: node.job_offer.field_job_teleworking
+field_name: field_job_teleworking
+entity_type: node
+bundle: job_offer
+label: Télétravail
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Oui
+  off_label: Non
+field_type: boolean

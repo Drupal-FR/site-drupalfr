@@ -1,0 +1,35 @@
+uuid: af062f0a-5caf-48a1-b371-0ebfc1f55aaa
+langcode: fr
+status: true
+dependencies:
+  content:
+    - 'block_content:basic:block_footer_login'
+  module:
+    - block_content
+    - user
+  theme:
+    - drupal_france
+_core:
+  default_config_hash: G_LJLGtBgBM_Vn6mBx_TiGIgf_9-TsSx8SI0osyJNRM
+id: drupal_france_footer_login
+theme: drupal_france
+region: footer_first
+weight: -8
+provider: null
+plugin: 'block_content:block_footer_login'
+settings:
+  id: 'block_content:block_footer_login'
+  label: Connexion
+  provider: block_content
+  label_display: '0'
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  user_role:
+    id: user_role
+    roles:
+      anonymous: anonymous
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'

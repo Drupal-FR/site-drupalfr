@@ -1,0 +1,13 @@
+services:
+  logger.channel.drupalfr_localize_statistics:
+    parent: logger.channel_base
+    arguments: ['drupalfr_localize_statistics']
+
+  drupalfr_localize_statistics.cron:
+    class: Drupal\drupalfr_localize_statistics\Service\LocalizeStatisticsCron
+    arguments:
+      - '@datetime.time'
+      - '@state'
+      - '@entity_type.manager'
+      - '@logger.channel.drupalfr_localize_statistics'
+      - '@http_client_factory'

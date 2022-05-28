@@ -1,0 +1,89 @@
+uuid: e039a0c0-c0a0-4fb1-b305-79259bc6d34c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_result
+    - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
+    - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
+    - field.field.node.event.field_media_banner
+    - field.field.node.event.field_media_teaser
+    - image.style.square_230
+    - node.type.event
+  module:
+    - commerce_store
+    - media
+    - smart_trim
+    - user
+_core:
+  default_config_hash: X_3K9u36RFdKSs7genj8Fk4RQBnrJVk73YdpXVOnpLY
+id: node.event.search_result
+targetEntityType: node
+bundle: event
+mode: search_result
+content:
+  body:
+    label: hidden
+    type: smart_trim
+    weight: 4
+    settings:
+      trim_length: 200
+      trim_type: chars
+      trim_suffix: ...
+      more_link: false
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: true
+      more_class: more-link
+      wrap_output: false
+      wrap_class: trimmed
+    third_party_settings: {  }
+    region: content
+  field_event_date_end:
+    type: commerce_store_datetime
+    weight: 3
+    region: content
+    label: hidden
+    settings:
+      date_format: jour_mois_annee
+    third_party_settings: {  }
+  field_event_date_start:
+    type: commerce_store_datetime
+    weight: 2
+    region: content
+    label: hidden
+    settings:
+      date_format: jour_mois_annee
+    third_party_settings: {  }
+  field_event_organizer:
+    type: entity_reference_label
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_media_teaser:
+    type: media_thumbnail
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: square_230
+      image_link: ''
+    third_party_settings: {  }
+hidden:
+  field_event_place: true
+  field_event_sponsor: true
+  field_event_website: true
+  field_media_banner: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

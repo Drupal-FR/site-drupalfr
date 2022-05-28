@@ -1,0 +1,43 @@
+{#
+/**
+ * @file
+ * Default theme implementation to meetup events.
+ *
+ * Available variables:
+ * - events: A list of Meetup events provided by the meetup API.
+ *
+ * @ingroup themeable
+ */
+#}
+{% if events is not empty %}
+  <div>
+    {% for event in events %}
+      {% set prepared_time = event.time / 1000 %}
+      {% set registered_number = event.yes_rsvp_count + event.waitlist_count %}
+      <div>
+        <h3>
+          <a href="{{ event.event_url }}">{{ event.name }}</a>
+        </h3>
+        <p>{{ prepared_time|format_date('long') }}</p>
+        <p>{{ event.venue.name }}</p>
+        <p>{{ event.venue.address_1 }}</p>
+        <p>{{ event.venue.city }}</p>
+        <p>
+          {% trans %}
+            {{ registered_number }} registered
+          {% plural registered_number %}
+            {{ registered_number }} registered
+          {% endtrans %}
+          {% if event.rsvp_limit %}
+            {{ 'for'|t }}
+            {% trans %}
+              {{ event.rsvp_limit }} spot
+            {% plural event.rsvp_limit %}
+              {{ event.rsvp_limit }} spots
+            {% endtrans %}
+          {% endif %}
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<ruleset name="project">
+  <description>Scan custom code.</description>
+
+  <file>../../../app/modules/custom</file>
+  <file>../../../app/profiles/custom</file>
+  <file>../../../app/themes/custom</file>
+  <file>../../../conf/drupal</file>
+
+  <arg name="basepath" value="."/>
+  <arg name="colors"/>
+  <arg name="extensions" value="inc,info,install,module,php,profile,test,theme,txt,yml"/>
+<!--  Official extensions. -->
+<!--  <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml"/>-->
+  <arg name="parallel" value="75"/>
+  <arg value="p"/>
+
+  <!-- Ignore various version control directories. -->
+  <exclude-pattern>*/\.git/*</exclude-pattern>
+  <exclude-pattern>*/\.svn/*</exclude-pattern>
+  <exclude-pattern>*/\.hg/*</exclude-pattern>
+  <exclude-pattern>*/\.bzr/*</exclude-pattern>
+
+  <!-- Drupal coding standards. -->
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+
+  <rule ref="Generic.PHP.RequireStrictTypes"/>
+  <rule ref="Squiz.PHP.Eval"/>
+
+</ruleset>

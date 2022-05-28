@@ -1,0 +1,53 @@
+uuid: 4a554bf9-d9e5-454a-bb33-fd25c987192b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.planet.body
+    - field.field.node.planet.feeds_item
+    - field.field.node.planet.field_planet_tag
+    - field.field.node.planet.field_planet_url
+    - node.type.planet
+  module:
+    - smart_trim
+    - user
+_core:
+  default_config_hash: AT7KaX3r_rGAcrwv_5IpdefMJCMT1qCCGfVkkCL77KI
+id: node.planet.teaser
+targetEntityType: node
+bundle: planet
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: smart_trim
+    weight: 1
+    settings:
+      trim_length: 200
+      trim_type: chars
+      trim_suffix: ...
+      more_link: false
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: true
+      more_class: more-link
+      wrap_output: false
+      wrap_class: trimmed
+    third_party_settings: {  }
+    region: content
+  extra_field_drupalfr_planet_feed_image:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  extra_field_drupalfr_planet_feed_image_url: true
+  feeds_item: true
+  field_planet_tag: true
+  field_planet_url: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

@@ -1,0 +1,46 @@
+uuid: d0e0171f-31e9-4728-9f30-eb929ceeb7cc
+langcode: fr
+status: true
+dependencies:
+  config:
+    - comment.type.forum
+    - field.field.comment.forum.comment_body
+  module:
+    - text
+_core:
+  default_config_hash: wb46_glXUSDfgssv521OGoDPGbXnCYwuerNooFK2kZo
+id: comment.forum.default
+targetEntityType: comment
+bundle: forum
+mode: default
+content:
+  comment_body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  flag_forum_comment_vote:
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  flag_spam_comment:
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  forum_comment_vote_entity_view_1:
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  links:
+    weight: 100
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  langcode: true
+  search_api_excerpt: true

@@ -1,0 +1,76 @@
+uuid: e765b417-c9b2-4f01-806d-eb14ab5cd582
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.localize_glossary_translation.field_localize_glossary_comment
+    - field.field.node.localize_glossary_translation.field_localize_glossary_context
+    - field.field.node.localize_glossary_translation.field_localize_glossary_export
+    - field.field.node.localize_glossary_translation.field_localize_glossary_language
+    - field.field.node.localize_glossary_translation.field_localize_glossary_link
+    - field.field.node.localize_glossary_translation.field_localize_glossary_status
+    - field.field.node.localize_glossary_translation.field_translation
+    - node.type.localize_glossary_translation
+  module:
+    - link
+    - options
+    - user
+id: node.localize_glossary_translation.default
+targetEntityType: node
+bundle: localize_glossary_translation
+mode: default
+content:
+  field_localize_glossary_context:
+    weight: 4
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_localize_glossary_language:
+    weight: 0
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_localize_glossary_link:
+    weight: 3
+    label: inline
+    settings:
+      trim_length: 80
+      rel: nofollow
+      target: _blank
+      url_only: false
+      url_plain: false
+    third_party_settings: {  }
+    type: link
+    region: content
+  field_localize_glossary_status:
+    weight: 2
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_translation:
+    weight: 1
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  links:
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_localize_glossary_comment: true
+  field_localize_glossary_export: true
+  langcode: true
+  published_at: true
+  search_api_excerpt: true

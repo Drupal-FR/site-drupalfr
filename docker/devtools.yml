@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  chrome:
+    image: ${DOCKER_SERVICE_CHROME_IMAGE}
+    ulimits:
+      core:
+        soft: -1
+        hard: -1
+#    ports:
+#      - "4444:4444"
+#      - "9515:9515"
+    entrypoint:
+      - chromedriver
+      - "--log-path=/tmp/chromedriver.log"
+      - "--verbose"
+      - "--whitelisted-ips="
+
+  node:
+    image: ${DOCKER_SERVICE_NODE_IMAGE}
+    volumes:
+      - .:/project:delegated
+    tty: true
+
+  pa11y_ci:
+    image: ${DOCKER_SERVICE_PA11Y_CI_IMAGE}
+    volumes:
+      - ./scripts/tests/pa11y/pa11y-dev.json:/workspace/config.json:delegated
+    shm_size: '1gb'

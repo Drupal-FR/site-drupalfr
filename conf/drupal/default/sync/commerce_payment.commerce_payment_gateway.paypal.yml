@@ -1,0 +1,25 @@
+uuid: fb618fd3-7a34-4991-98ea-20c8d00f1e1e
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_paypal
+_core:
+  default_config_hash: t9PFBCHdGIHAmoYVHcdSmoJBx1aBBkw6Zwjw6NhjJlU
+id: paypal
+label: Paypal
+weight: null
+plugin: paypal_express_checkout
+configuration:
+  api_username: ''
+  api_password: ''
+  shipping_prompt: shipping_skip
+  signature: ''
+  solution_type: SoleBilling
+  display_label: PayPal
+  mode: live
+  payment_method_types:
+    - credit_card
+  collect_billing_information: true
+conditions: {  }
+conditionOperator: AND

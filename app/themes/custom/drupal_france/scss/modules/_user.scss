@@ -1,0 +1,327 @@
+// ==========================
+// User Forms
+// ==========================
+
+// Log in
+//--------
+.user--login-form,
+.user--pass,
+.user--register-form {
+  &--wrapper {
+    padding-top:    $global-padding;
+    padding-bottom: $global-padding;
+
+    @include breakpoint(medium) {
+      @include shadow();
+      margin-top:    $global-margin * 2;
+      margin-bottom: $global-margin * 2;
+    }
+  }
+}
+
+// Create an account
+//-------------------
+
+// Reset your password
+//---------------------
+
+// ==========================
+// User Display
+// ==========================
+
+.user {
+  &--compact {
+    @include clearfix();
+
+    position:      static;
+    margin-bottom: $global-margin;
+
+    .user--picture {
+      float:            left;
+      width:            65px;
+      height:           65px;
+      background-color: $white;
+
+      a {
+        display:       block;
+        width:         100%;
+        height:        100%;
+        border:        thin solid $light-gray;
+        border-radius: 5px;
+
+        > img {
+          filter:        grayscale(50%);
+          border:        5px solid $white;
+          border-radius: 5px;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+
+          > img {
+            filter: grayscale(0%);
+            border: 2px solid $white;
+          }
+        }
+      }
+    }
+    @include breakpoint(medium) {
+      .user--realname {
+        margin-top: $global-margin*3;
+        margin-left: $global-padding;
+      }
+    }
+
+    .user--realname {
+      display: block;
+      float: left;
+      font-style: italic;
+      color: $dark-gray;
+    }
+  }
+
+  &--full {
+    .user--banner {
+      position:            absolute;
+      z-index:             -1;
+      width:               100%;
+      height:              300px;
+      margin-top:          -$global-margin*4;
+
+      background-position: center;
+      background-repeat:   no-repeat;
+      background-size:     cover;
+    }
+
+    .user--head {
+      margin-top:    220px;
+      margin-bottom: $global-margin;
+    }
+
+    .field-user--user-picture {
+      img {
+        border:        5px solid $white;
+        border-radius: $global-radius;
+      }
+    }
+
+    .user--infos {
+      margin-top: 32px;
+    }
+
+    .user--realname--title {
+      font-size: 3rem;
+    }
+
+    .user--membership {
+      margin-top: 50px;
+    }
+
+    .user-member--become-member {
+      margin-top: $global-margin*2;
+    }
+
+    .field-user--field-user-slogan {
+      .field-item {
+        margin-top: -$global-margin;
+        font-size:  1.5rem;
+      }
+    }
+
+    .user--social-links {
+      display:     inline-block;
+      margin-top:  .75rem;
+      padding-top: .75rem;
+      border-top:  1px solid $drupal-grey;
+
+      .user--social-link {
+        display:      inline;
+        margin-right: $global-margin*3;
+        font-size:    1.1rem;
+
+        i {
+          display:      inline-block;
+          margin-right: $global-margin/4;
+          color:        $dark-gray;
+        }
+
+        a {
+          &:hover,
+          &:focus {
+            color:           $drupal-blue-dark;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .views-element-container {
+        display:      inline;
+        margin-right: $global-margin*3;
+        font-size:    1.1rem;
+      }
+    }
+
+    .user--biography {
+      margin-top: $global-margin*2;
+    }
+
+    .user--organization {
+
+      margin-top: $global-margin;
+
+      .field-wrapper {
+        @include grid-row();
+
+        padding:       $global-padding;
+        border:        1px solid $light-gray;
+        border-bottom: 0;
+
+        &:nth-of-type(even) {
+          background-color: lighten($drupal-grey-light, 5);
+        }
+
+        &:last-child {
+          border-bottom: 1px solid $light-gray;
+        }
+
+        .field-label {
+          @include grid-col(5);
+
+          font-weight: 700;
+          color:       get-color(primary);
+          text-align:  right;
+        }
+
+        .field-items {
+          @include grid-col(7);
+        }
+      }
+    }
+
+    .user-feed {
+      margin: $global-margin*3 0;
+    }
+
+    .user--publications {
+      margin:           $global-margin 0;
+      padding:          $global-padding 0;
+      background-color: $drupal-grey-light;
+
+      .section-title {
+        margin-top:    $global-margin;
+        margin-bottom: $global-margin*2;
+      }
+    }
+
+    .user--events {
+      margin: $global-margin*3 0;
+
+      .field--name-field-user-event {
+        & > .field--label {
+          text-align: center;
+        }
+      }
+    }
+
+    .user--forum {
+      padding:          $global-padding*2 0;
+      background-color: $drupal-grey-light;
+
+      .section-title {
+        margin-bottom: $global-margin*2;
+      }
+    }
+
+    .view-job-offer {
+      @include grid-row();
+      margin: $global-margin auto;
+    }
+  }
+}
+
+
+// ==========================
+// Company User Display
+// ==========================
+
+// Company Users view
+//--------------------
+.organizations {
+
+  h1 {
+    margin: $global-margin*3 0;
+  }
+
+  form {
+    margin: $global-margin*2 0;
+
+    .form-actions {
+      @include breakpoint(medium) {
+        float:         left;
+        width:         calc(100% / 2);
+        margin-top:    $global-padding * 2;
+        padding-right: $global-padding;
+        padding-left:  $global-padding;
+      }
+
+      @include breakpoint(large) {
+        width:         calc(100% / 3);
+      }
+
+      [type='submit'] {
+        margin-top: 3px;
+        padding: $global-padding;
+      }
+    }
+  }
+}
+
+// ==========================
+// Members User Display
+// ==========================
+
+// Members Users view
+//---------------------
+
+.card-user-container {
+  margin-bottom: $card-user-container-margin-bottom;
+  padding: 0;
+  border-radius: $card-user-container-radius;
+  overflow: hidden;
+  color: $black;
+  text-align: center;
+
+  article {
+
+    .field-user--user-picture {
+
+      .field-item {
+        .user-image {
+          display: block;
+          width: $card-user-container-image-size;
+          height: $card-user-container-image-size;
+          margin: auto;
+          padding: rem-calc(15);
+          border-radius: 50%;
+
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+
+      }
+
+    }
+
+    .field-user--field-user-realname {
+
+      .field-item {
+        font-weight: bold;
+        color: $drupal-blue-light;
+      }
+    }
+  }
+
+
+}

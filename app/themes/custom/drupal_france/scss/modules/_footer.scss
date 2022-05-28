@@ -1,0 +1,42 @@
+// ==========================
+// FOOTER
+// ==========================
+
+.footer {
+  nav,
+  .block {
+    padding: $global-padding;
+
+    .block-title {
+      margin-top:    0;
+      margin-bottom: $global-margin;
+      font-family:   'Open Sans', sans-serif;
+      font-size:     $global-font-size*1.25;
+      font-weight:   700;
+      color:         $drupal-blue-desaturate-light;
+    }
+
+    p,
+    ul {
+      padding:     $global-padding 0;
+      font-size:   $global-font-size*.9;
+      line-height: $global-lineheight*.9;
+      color:       $drupal-blue-desaturate-light;
+    }
+
+    a {
+      display: inline-block;
+      color:   $drupal-blue-desaturate-light;
+
+      &:hover {
+        background-color: transparent;
+        color:            $white;
+      }
+    }
+
+  }
+
+  .full-with {
+    clear: both;
+  }
+}

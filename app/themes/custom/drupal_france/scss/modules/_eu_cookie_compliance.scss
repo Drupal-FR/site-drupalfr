@@ -1,0 +1,73 @@
+.sliding-popup-bottom {
+  position:   fixed;
+  z-index:    9999999;
+  background: $drupal-blue-dark !important;
+  text-align: center;
+
+  .popup-content {
+    margin:  0 auto;
+    padding: 0;
+
+    .popup-text {
+      float:       left;
+      max-width:   60%;
+      margin:      $global-margin 0 0 $global-margin;
+      font-weight: bold;
+      color:       $white;
+      text-align:  left;
+
+      h2,
+      p {
+        display:     block;
+        margin:      0 0 5px;
+        font-size:   16px;
+        font-weight: bold;
+        line-height: 1.4;
+        color:       $white;
+      }
+
+      p {
+        font-size: 12px;
+      }
+    }
+
+    .popup-buttons {
+      float:     right;
+      max-width: 40%;
+      margin:    $global-margin;
+
+      button {
+        display:         inline;
+
+        vertical-align:  middle;
+        width:           auto;
+        margin:          5px;
+        overflow:        visible;
+        text-decoration: none;
+        cursor:          pointer;
+      }
+    }
+  }
+
+}
+
+@media screen and (max-width: 600px) {
+  .popup-content {
+    max-width: 95%;
+
+    .popup-text {
+      max-width: 100%;
+    }
+
+    .popup-buttons {
+      float:     none;
+      max-width: 100%;
+      margin:    5px 0;
+
+      button {
+        margin-bottom: 1em;
+      }
+    }
+  }
+}
+

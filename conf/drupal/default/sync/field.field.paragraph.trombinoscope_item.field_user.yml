@@ -1,0 +1,30 @@
+uuid: a76ce193-536f-47c5-aa31-e85641bbdf53
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_user
+    - paragraphs.paragraphs_type.trombinoscope_item
+_core:
+  default_config_hash: LXIlrGcSb-7oYTbYqCBSItBBAZcGm2KwyaSt3ObhLCI
+id: paragraph.trombinoscope_item.field_user
+field_name: field_user
+entity_type: paragraph
+bundle: trombinoscope_item
+label: Utilisateur
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: entity_reference

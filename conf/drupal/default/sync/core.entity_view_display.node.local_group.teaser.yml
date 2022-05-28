@@ -1,0 +1,85 @@
+uuid: 8fe161a9-7c62-4229-9ecc-3b93ac4046d8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.local_group.body
+    - field.field.node.local_group.field_local_group_organizer
+    - field.field.node.local_group.field_local_group_place
+    - field.field.node.local_group.field_media_banner
+    - field.field.node.local_group.field_media_teaser
+    - field.field.node.local_group.field_twitter_account
+    - node.type.local_group
+  module:
+    - field_formatter
+    - text
+    - user
+_core:
+  default_config_hash: eskULiTViP2MQsQK-01QmFQAISmCh1zCjg8GdhnXsDo
+id: node.local_group.teaser
+targetEntityType: node
+bundle: local_group
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 1
+    settings:
+      trim_length: 200
+    third_party_settings: {  }
+    region: content
+  field_media_teaser:
+    type: field_formatter_with_inline_settings
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      field_name: field_media_image
+      label: visually_hidden
+      type: blazy
+      settings:
+        image_style: rect_400_200
+        thumbnail_style: ''
+        responsive_image_style: ''
+        media_switch: ''
+        ratio: ''
+        sizes: ''
+        breakpoints:
+          xs:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          sm:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          md:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          lg:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+          xl:
+            image_style: ''
+            width: ''
+            breakpoint: ''
+        current_view_mode: _custom
+        background: false
+        caption:
+          title: '0'
+          alt: '0'
+    third_party_settings: {  }
+hidden:
+  field_local_group_organizer: true
+  field_local_group_place: true
+  field_media_banner: true
+  field_twitter_account: true
+  langcode: true
+  links: true
+  local_group_entity_view_1: true
+  published_at: true
+  search_api_excerpt: true

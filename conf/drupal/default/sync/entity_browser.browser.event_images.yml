@@ -1,0 +1,52 @@
+uuid: c4ed3f69-0ef4-4403-aaeb-d606ee0343fd
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.files_entity_browser
+  module:
+    - dropzonejs_eb_widget
+    - views
+_core:
+  default_config_hash: OA7vX61lyCrAC88Xaq1a9FR0FGa_H_Zm34Y0SSf3vFs
+name: event_images
+label: 'Images Event'
+display: modal
+display_configuration:
+  width: ''
+  height: ''
+  link_text: 'Sélectionner des images'
+  auto_open: false
+selection_display: no_display
+selection_display_configuration: {  }
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  25a100dc-c57f-4fc2-8f69-7331137e2cd5:
+    settings:
+      upload_location: 'public://events/[date:custom:Y]-[date:custom:m]'
+      dropzone_description: 'Déposez les fichiers ici pour les télécharger'
+      max_filesize: 2M
+      extensions: 'jpg jpeg gif png'
+      clientside_resize: false
+      resize_width: 0
+      resize_height: 0
+      resize_quality: !!float 1
+      resize_method: contain
+      thumbnail_method: contain
+      submit_text: 'Sélectionner les images'
+      auto_select: false
+    uuid: 25a100dc-c57f-4fc2-8f69-7331137e2cd5
+    weight: 1
+    label: Dropzonejs
+    id: dropzonejs
+  61a3cb07-d2c5-419e-91a1-25b0de82362f:
+    settings:
+      view: files_entity_browser
+      view_display: entity_browser_1
+      submit_text: 'Sélectionner les images'
+      auto_select: false
+    uuid: 61a3cb07-d2c5-419e-91a1-25b0de82362f
+    weight: 2
+    label: 'Liste de fichiers'
+    id: view

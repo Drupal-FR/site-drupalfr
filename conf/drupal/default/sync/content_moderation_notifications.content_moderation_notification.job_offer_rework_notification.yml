@@ -1,0 +1,17 @@
+uuid: c74388ed-6d60-4984-88c2-2b37498abead
+langcode: fr
+status: true
+dependencies: {  }
+id: job_offer_rework_notification
+workflow: job_offer
+transitions:
+  waiting_approval_draft: waiting_approval_draft
+roles:
+  moderator: moderator
+author: false
+emails: ''
+subject: '[[site:name]] : Offre d''emploi à reprendre'
+body:
+  value: "<p>Bonjour,</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>L'offre d'emploi, [node:url], a été modérée et l'auteur doit reprendre son contenu.</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Cordialement,</p>\r\n\r\n<p>L'équipe du site&nbsp;[site:name].</p>\r\n"
+  format: full_html
+label: 'Offre d''emploi : à reprendre notification'

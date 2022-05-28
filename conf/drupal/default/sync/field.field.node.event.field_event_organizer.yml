@@ -1,0 +1,30 @@
+uuid: 6c2dbab3-a355-4f37-b8a0-329281eb8bd2
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_event_organizer
+    - node.type.event
+_core:
+  default_config_hash: TNGXYhUqa5P4ioMcCiWOGGsDVyYOkMH51ndfUDVmARA
+id: node.event.field_event_organizer
+field_name: field_event_organizer
+entity_type: node
+bundle: event
+label: Organisateurs
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: entity_reference

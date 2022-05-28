@@ -1,0 +1,83 @@
+uuid: 36ce89dd-f408-4e66-9a60-71cc0408a3de
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.user.compact
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_organization_contact_info
+    - field.field.user.user.field_organization_legal_form
+    - field.field.user.user.field_organization_region
+    - field.field.user.user.field_organization_service_type
+    - field.field.user.user.field_organization_size
+    - field.field.user.user.field_user_banner
+    - field.field.user.user.field_user_biography
+    - field.field.user.user.field_user_drupal_org
+    - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_in_directory
+    - field.field.user.user.field_user_membership_number
+    - field.field.user.user.field_user_newsletter_adff
+    - field.field.user.user.field_user_newsletter_drupalcamp
+    - field.field.user.user.field_user_organization
+    - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_slogan
+    - field.field.user.user.field_user_twitter
+    - field.field.user.user.field_user_website
+    - field.field.user.user.user_picture
+    - image.style.square_65
+  module:
+    - image
+    - user
+_core:
+  default_config_hash: ZpPuIJ3CNNSNVmhX-MNPBbQfch98xz1Ycp3i3nNcrwc
+id: user.user.compact
+targetEntityType: user
+bundle: user
+mode: compact
+content:
+  field_user_realname:
+    type: string
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  user_picture:
+    type: image
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: square_65
+      image_link: content
+    third_party_settings: {  }
+hidden:
+  commerce_remote_id: true
+  customer_profiles: true
+  extra_field_drupalfr_user_member_badge: true
+  field_organization_contact_info: true
+  field_organization_legal_form: true
+  field_organization_region: true
+  field_organization_service_type: true
+  field_organization_size: true
+  field_user_banner: true
+  field_user_biography: true
+  field_user_drupal_org: true
+  field_user_event: true
+  field_user_in_directory: true
+  field_user_membership_number: true
+  field_user_newsletter_adff: true
+  field_user_newsletter_drupalcamp: true
+  field_user_organization: true
+  field_user_slogan: true
+  field_user_twitter: true
+  field_user_website: true
+  forum_entity_view_1: true
+  job_offer_entity_view_organization_job_offer: true
+  langcode: true
+  member_for: true
+  planet_entity_view_1: true
+  planet_feed_entity_view_1: true
+  profile_customer: true
+  search_api_excerpt: true

@@ -1,0 +1,35 @@
+uuid: 316b310e-fb48-4b3d-a57c-8f141bd3a4ae
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.faq_element.field_text
+    - field.field.paragraph.faq_element.field_title
+    - paragraphs.paragraphs_type.faq_element
+  module:
+    - text
+id: paragraph.faq_element.default
+targetEntityType: paragraph
+bundle: faq_element
+mode: default
+content:
+  field_text:
+    weight: 102
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_title:
+    weight: 101
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+hidden:
+  created: true
+  status: true
+  uid: true

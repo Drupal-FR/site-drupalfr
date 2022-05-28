@@ -1,0 +1,24 @@
+uuid: 9c2a455e-e9ed-4274-b295-1f6258164c2d
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: 4oS4H87DdXAJgZ_nhU-JLvdPWEsDrYAxumyzQ4WMEnI
+id: local_group
+label: 'Groupes locaux'
+type: 'canonical_entities:node'
+pattern: 'communaute/groupes-locaux/[node:title]'
+selection_criteria:
+  ba63b795-c07b-402d-aec2-9022da6e4118:
+    id: node_type
+    bundles:
+      local_group: local_group
+    negate: false
+    context_mapping:
+      node: node
+    uuid: ba63b795-c07b-402d-aec2-9022da6e4118
+selection_logic: and
+weight: -5
+relationships: {  }

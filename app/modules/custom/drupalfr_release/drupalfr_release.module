@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_release module.
+ */
+
+use Drupal\advancedqueue\Job;
+
+/**
+ * Implements hook_cron().
+ */
+function drupalfr_release_cron() {
+  $current_time = \Drupal::time()->getRequestTime();
+  $state = \Drupal::state();
+
+  $last_check_timestamp = $state->get('drupalfr_release.last_check_timestamp', 0);
+
+  // Check the releases every day (3600x24).
+  if (($last_check_timestamp + 86400) < $current_time) {
+    $advanced_queue_storage = \Drupal::entityTypeManager()->getStorage('advancedqueue_queue');
+    /** @var \Drupal\advancedqueue\Entity\QueueInterface $advanced_queue */
+    $advanced_queue = $advanced_queue_storage->load('drupalfr_release_import');
+
+    /** @var \Drupal\drupalfr_release\Service\ReleaseHelperInterface $release_helper */
+    $release_helper = \Drupal::service('drupalfr_release.release_helper');
+    $data = $release_helper->getFeedReleases();
+
+    // Add items to the queue only if it has been created after the last import.
+    foreach ($data as $result) {
+      if ($last_check_timestamp < $result['date']) {
+        $release_import_job = Job::create('drupalfr_release_import', [
+          'data' => $result,
+        ]);
+        $advanced_queue->enqueueJob($release_import_job);
+      }
+    }
+    $state->set('drupalfr_release.last_check_timestamp', $current_time);
+  }
+}

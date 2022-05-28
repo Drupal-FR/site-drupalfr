@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Default theme implementation to meetup page.
+ *
+ * Available variables:
+ * - title: The title of the page.
+ * - events_list: A renderable array of meetup events.
+ * - map: The markup  for the map.
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="meetup-page">
+  <div class="row">
+    <h1 class="column">
+      {{ title }}
+    </h1>
+
+    <div class="medium-6 column list">
+      {{ events_list }}
+    </div>
+
+    <div class="medium-6 column">
+      {{ map }}
+    </div>
+  </div>
+</div>
+

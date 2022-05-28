@@ -1,0 +1,26 @@
+uuid: 014ba690-1a99-49c6-a4ae-9e54ea745037
+langcode: fr
+status: true
+dependencies:
+  module:
+    - block_visibility_groups
+    - drupalfr_search
+  theme:
+    - drupal_france
+id: drupal_france_search_header_block
+theme: drupal_france
+region: main_menu_extra
+weight: -8
+provider: null
+plugin: search_header_block
+settings:
+  id: search_header_block
+  label: 'Search header block'
+  provider: drupalfr_search
+  label_display: '0'
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    block_visibility_group: ''
+    context_mapping: {  }

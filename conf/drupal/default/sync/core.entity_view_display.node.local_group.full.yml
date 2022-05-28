@@ -1,0 +1,68 @@
+uuid: 2d73e757-58fb-4612-98d5-ea09ea10f346
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.local_group.body
+    - field.field.node.local_group.field_local_group_organizer
+    - field.field.node.local_group.field_local_group_place
+    - field.field.node.local_group.field_media_banner
+    - field.field.node.local_group.field_media_teaser
+    - field.field.node.local_group.field_twitter_account
+    - node.type.local_group
+  module:
+    - drupalfr_social
+    - text
+    - user
+_core:
+  default_config_hash: ELyIFCTrRJ3dD5sViI_UJnQrmAlSHiW_mPqatlBxgjg
+id: node.local_group.full
+targetEntityType: node
+bundle: local_group
+mode: full
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_local_group_organizer:
+    weight: 3
+    label: above
+    settings:
+      view_mode: highlight
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  field_media_banner:
+    weight: 0
+    label: hidden
+    settings:
+      link: true
+      view_mode: default
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  field_twitter_account:
+    type: drupalfr_social_twitter_feed
+    weight: 4
+    region: content
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+  local_group_entity_view_1:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_local_group_place: true
+  field_media_teaser: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

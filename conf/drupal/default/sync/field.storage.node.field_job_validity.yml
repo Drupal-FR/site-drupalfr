@@ -1,0 +1,36 @@
+uuid: 18b9a8e6-ab1f-49ab-961d-c13728b27224
+langcode: fr
+status: true
+dependencies:
+  module:
+    - field_permissions
+    - node
+    - options
+third_party_settings:
+  field_permissions:
+    permission_type: public
+_core:
+  default_config_hash: jJ_TZS0LsxJxCvUp9dI8bwLFFfek68EiRStj-X-w5R0
+id: node.field_job_validity
+field_name: field_job_validity
+entity_type: node
+type: list_integer
+settings:
+  allowed_values:
+    -
+      value: 1
+      label: '1 mois'
+    -
+      value: 3
+      label: '3 mois'
+    -
+      value: 6
+      label: '6 mois'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,81 @@
+<ruleset
+  name="Drupal PHP MD rules"
+  xmlns="http://pmd.sf.net/ruleset/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+  xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd"
+>
+<!--
+As there are no official Drupal PHP MD rules, those ones had been taken from
+https://gitlab.com/beram-drupal/drupal-ci. And slightly modified if needed.
+-->
+
+  <!-- Clean Code Rules. -->
+  <rule ref="rulesets/cleancode.xml">
+    <exclude name="StaticAccess" />
+    <exclude name="ElseExpression" />
+    <!-- Detected using PHPCS. -->
+    <exclude name="MissingImport" />
+  </rule>
+
+  <!-- Code Size Rules. -->
+  <rule ref="rulesets/codesize.xml">
+<!--    <exclude name="CyclomaticComplexity" />-->
+<!--    <exclude name="ExcessiveClassComplexity" />-->
+<!--    <exclude name="ExcessiveClassLength" />-->
+<!--    <exclude name="ExcessiveMethodLength" />-->
+<!--    <exclude name="ExcessiveParameterList" />-->
+<!--    <exclude name="NPathComplexity" />-->
+<!--    <exclude name="TooManyFields" />-->
+<!--    <exclude name="TooManyPublicMethods" />-->
+  </rule>
+  <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity">
+    <properties>
+      <property name="maximum" value="100" />
+    </properties>
+  </rule>
+  <rule ref="rulesets/codesize.xml/TooManyMethods">
+    <properties>
+      <property name="maxmethods" value="50" />
+    </properties>
+  </rule>
+
+  <!-- Controversial Rules. -->
+  <rule ref="rulesets/controversial.xml">
+    <exclude name="CamelCaseParameterName" />
+    <exclude name="CamelCaseVariableName" />
+  </rule>
+
+  <!-- Design Rules. -->
+  <rule ref="rulesets/design.xml">
+<!--    <exclude name="CouplingBetweenObjects" />-->
+  </rule>
+
+  <!-- Naming Rules. -->
+  <rule ref="rulesets/naming.xml">
+<!--    <exclude name="LongClassName" />-->
+    <exclude name="LongVariable" />
+    <exclude name="ShortMethodName" />
+    <exclude name="ShortVariable" />
+  </rule>
+  <rule ref="rulesets/naming.xml/ShortMethodName">
+    <properties>
+      <property name="minimum" value="3" />
+      <!-- Allow id method name. -->
+      <property name="exceptions" description="Comma-separated list of exceptions" value="id" />
+    </properties>
+  </rule>
+  <rule ref="rulesets/naming.xml/ShortVariable">
+    <properties>
+      <property name="minimum" value="3" />
+      <!-- Allow $id and $op as a variable name. -->
+      <property name="exceptions" description="Comma-separated list of exceptions" value="id,op" />
+    </properties>
+  </rule>
+
+  <!-- Unused Code Rules. -->
+  <rule ref="rulesets/unusedcode.xml">
+    <exclude name="UnusedFormalParameter" />
+  </rule>
+
+</ruleset>

@@ -1,0 +1,68 @@
+id: drupalfr_paragraph_title_text_media
+label: 'Paragraph title text media import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - paragraphs
+migration_dependencies:
+  required:
+    - drupalfr_media
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/paragraph_title_text_media.csv
+  header_row_count: 1
+  keys:
+    - pid
+  column_names:
+    - pid: Identifier
+    - field_media: Media
+    - field_text_value: 'Field text value'
+    - field_text_format: 'Field text format'
+    - field_call_to_action_uris: 'CTAs URI'
+    - field_call_to_action_titles: 'CTAs title'
+    - field_call_to_action_targets: 'CTAs target'
+    - field_call_to_action_rels: 'CTAs rel'
+    - field_call_to_action_classes: 'CTAs class'
+    - field_media_width_class: 'Media width class'
+    - field_media_position: 'Media position'
+    - field_title_level: 'Title level'
+    - field_title: 'Title'
+    - field_sub_title: 'Sub title'
+    - field_css_class: 'Paragraph CSS Class'
+    - field_background_color: 'Background color'
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+process:
+  type:
+    plugin: default_value
+    default_value: title_text_media
+  field_media:
+    -
+      plugin: migration_lookup
+      migration: drupalfr_media
+      source: field_media
+  field_text/value: field_text_value
+  field_text/format: field_text_format
+  field_media_width_class: field_media_width_class
+  field_media_position: field_media_position
+  field_title_level: field_title_level
+  field_title: field_title
+  field_sub_title: field_sub_title
+  field_call_to_action:
+    -
+      plugin: drupalfr_multilinks
+      uri_property: field_call_to_action_uris
+      title_property: field_call_to_action_titles
+      target_property: field_call_to_action_targets
+      rel_property: field_call_to_action_rels
+      class_property: field_call_to_action_classes
+      delimiter: ;
+  field_css_class: field_css_class
+  field_background_color/color: field_background_color

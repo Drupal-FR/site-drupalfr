@@ -1,0 +1,229 @@
+uuid: a913ed74-397a-475e-80cf-6a9f2117309b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - flag.flag.forum_comment_vote
+  module:
+    - eva
+    - flag
+    - user
+_core:
+  default_config_hash: DWE_-KRT1ugI-byDLV8wjnTXwnevPhbKTEzT9REkDyo
+id: forum_comment_vote
+label: 'Drupalfr forum comment vote'
+module: views
+description: ''
+tag: ''
+base_table: flagging
+base_field: id
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Master
+    position: 0
+    display_options:
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      query:
+        type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_comment: ''
+          query_tags: {  }
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Apply
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      pager:
+        type: some
+        options:
+          items_per_page: 1
+          offset: 0
+      style:
+        type: default
+        options:
+          grouping: {  }
+          row_class: ''
+          default_row_class: true
+          uses_fields: false
+      row:
+        type: fields
+        options:
+          inline: {  }
+          separator: ''
+          hide_empty: false
+          default_field_elements: true
+      fields:
+        count:
+          id: count
+          table: flag_counts
+          field: count
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: 'Nombre de votes :'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          set_precision: false
+          precision: 0
+          decimal: .
+          separator: ' '
+          format_plural: false
+          format_plural_string: !!binary MQNAY291bnQ=
+          prefix: ''
+          suffix: ''
+          plugin_id: numeric
+      filters:
+        flag_id:
+          id: flag_id
+          table: flagging
+          field: flag_id
+          value:
+            forum_comment_vote: forum_comment_vote
+          entity_type: flagging
+          entity_field: flag_id
+          plugin_id: bundle
+          expose:
+            operator_limit_selection: false
+            operator_list: {  }
+      sorts: {  }
+      header: {  }
+      footer: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: '<p>Nombre de vote : 0</p>'
+            format: full_html
+          plugin_id: text
+      relationships: {  }
+      arguments:
+        entity_id:
+          id: entity_id
+          table: flagging
+          field: entity_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: 'not found'
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: fixed
+          default_argument_options:
+            argument: ''
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: false
+          validate:
+            type: none
+            fail: 'not found'
+          validate_options: {  }
+          glossary: false
+          limit: 0
+          case: none
+          path_case: none
+          transform_dash: false
+          break_phrase: false
+          entity_type: flagging
+          entity_field: entity_id
+          plugin_id: string
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }
+  entity_view_1:
+    display_plugin: entity_view
+    id: entity_view_1
+    display_title: 'EVA vote counter'
+    position: 1
+    display_options:
+      display_extenders: {  }
+      entity_type: comment
+      bundles:
+        - forum
+      argument_mode: id
+      default_argument: null
+      display_description: ''
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }

@@ -1,0 +1,263 @@
+uuid: 871223f5-f14d-4228-8a87-ebdef42cf2c0
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.release.body
+    - field.field.node.release.field_release_file_targz
+    - field.field.node.release.field_release_file_zip
+    - field.field.node.release.field_release_link
+    - field.field.node.release.field_release_security
+    - field.field.node.release.field_release_type
+    - field.field.node.release.field_release_version_extra
+    - field.field.node.release.field_release_version_major
+    - field.field.node.release.field_release_version_minor
+    - field.field.node.release.field_release_version_patch
+    - node.type.release
+  module:
+    - content_moderation
+    - field_group
+    - link
+    - link_attributes
+    - path
+    - publication_date
+    - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_texts
+        - group_informations
+        - group_download
+      parent_name: ''
+      weight: 0
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: Onglets
+      region: content
+    group_texts:
+      children:
+        - title
+        - body
+      parent_name: group_tabs
+      weight: 9
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Textes
+      region: content
+    group_informations:
+      children:
+        - field_release_type
+        - field_release_version_major
+        - field_release_version_minor
+        - field_release_version_patch
+        - field_release_version_extra
+        - field_release_security
+        - field_release_link
+      parent_name: group_tabs
+      weight: 10
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Informations
+      region: content
+    group_download:
+      children:
+        - field_release_file_targz
+        - field_release_file_zip
+      parent_name: group_tabs
+      weight: 11
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Téléchargement
+      region: content
+_core:
+  default_config_hash: Ec_GWeV-kDu7BiMHFa1j5xGCGZbEswP66vjqRGPzz7k
+id: node.release.default
+targetEntityType: node
+bundle: release
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 13
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+    region: content
+  created:
+    type: datetime_timestamp
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_release_file_targz:
+    weight: 9
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      enabled_attributes:
+        class: true
+        id: false
+        name: false
+        target: false
+        rel: false
+        accesskey: false
+    third_party_settings: {  }
+    type: link_attributes
+    region: content
+  field_release_file_zip:
+    weight: 10
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      enabled_attributes:
+        class: true
+        id: false
+        name: false
+        target: false
+        rel: false
+        accesskey: false
+    third_party_settings: {  }
+    type: link_attributes
+    region: content
+  field_release_link:
+    weight: 23
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
+  field_release_security:
+    weight: 22
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  field_release_type:
+    weight: 17
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_release_version_extra:
+    weight: 21
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_release_version_major:
+    weight: 18
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  field_release_version_minor:
+    weight: 19
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  field_release_version_patch:
+    weight: 20
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  langcode:
+    type: language_select
+    weight: 1
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    settings: {  }
+    region: content
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 6
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 4
+    region: content
+    third_party_settings: {  }
+  published_at:
+    type: publication_date_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 8
+    third_party_settings: {  }
+    region: content
+  sticky:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 5
+    region: content
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 12
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+      match_limit: 10
+    region: content
+    third_party_settings: {  }
+  url_redirects:
+    weight: 7
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

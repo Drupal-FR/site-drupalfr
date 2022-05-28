@@ -1,0 +1,15 @@
+uuid: ac8bfc43-600e-49f5-818f-a432c78b272e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - flag.flag.forum_comment_vote
+  module:
+    - flag
+id: flag_action.forum_comment_vote_flag
+label: '+1'
+type: comment
+plugin: 'flag_action:forum_comment_vote_flag'
+configuration:
+  flag_id: forum_comment_vote
+  flag_action: flag

@@ -1,0 +1,205 @@
+uuid: 71b3df9b-9645-459c-942f-7425c168561f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.title_text_media.field_background_color
+    - field.field.paragraph.title_text_media.field_call_to_action
+    - field.field.paragraph.title_text_media.field_css_class
+    - field.field.paragraph.title_text_media.field_media
+    - field.field.paragraph.title_text_media.field_media_position
+    - field.field.paragraph.title_text_media.field_media_width_class
+    - field.field.paragraph.title_text_media.field_sub_title
+    - field.field.paragraph.title_text_media.field_text
+    - field.field.paragraph.title_text_media.field_title
+    - field.field.paragraph.title_text_media.field_title_level
+    - paragraphs.paragraphs_type.title_text_media
+  module:
+    - color_field
+    - field_group
+    - link_attributes
+    - media_library
+    - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_configuration
+        - group_heading
+        - group_text
+        - group_cta
+        - group_media
+      parent_name: ''
+      weight: 0
+      format_type: tabs
+      format_settings:
+        direction: horizontal
+        id: ''
+        classes: ''
+      label: Tabs
+      region: content
+    group_heading:
+      children:
+        - field_title
+        - field_title_level
+        - field_sub_title
+      parent_name: group_tabs
+      weight: 23
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: En-tête
+      region: content
+    group_text:
+      children:
+        - field_text
+      parent_name: group_tabs
+      weight: 24
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Texte
+      region: content
+    group_cta:
+      children:
+        - field_call_to_action
+      parent_name: group_tabs
+      weight: 25
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: CTA
+      region: content
+    group_media:
+      children:
+        - field_media_width_class
+        - field_media_position
+        - field_media
+      parent_name: group_tabs
+      weight: 26
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: Média
+      region: content
+    group_configuration:
+      children:
+        - field_css_class
+        - field_background_color
+      parent_name: group_tabs
+      weight: 22
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: open
+        description: ''
+        required_fields: true
+      label: Configuration
+      region: content
+_core:
+  default_config_hash: rpwIOa63kqGpiVszyR-oVYOJab9ce3-_VCGwNP6Wrq4
+id: paragraph.title_text_media.default
+targetEntityType: paragraph
+bundle: title_text_media
+mode: default
+content:
+  field_background_color:
+    weight: 29
+    settings:
+      default_colors: '#064771,#0678BE,#4D9DCC,#245D82,#82A3B8,#CCCCCC,#EEEEEE,#14435D,#007C8F,#72B0B4,#E3E3D8'
+    third_party_settings: {  }
+    type: color_field_widget_box
+    region: content
+  field_call_to_action:
+    weight: 2
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      enabled_attributes:
+        target: true
+        rel: true
+        class: true
+        id: false
+        name: false
+        accesskey: false
+    third_party_settings: {  }
+    type: link_attributes
+    region: content
+  field_css_class:
+    weight: 28
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_media:
+    type: media_library_widget
+    weight: 3
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_media_position:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  field_media_width_class:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_sub_title:
+    weight: 2
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_text:
+    weight: 21
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_title:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_title_level:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+hidden:
+  created: true
+  status: true
+  uid: true

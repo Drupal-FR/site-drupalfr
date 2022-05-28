@@ -1,0 +1,25 @@
+uuid: b65991f7-0d08-4140-922e-0838a60a57c2
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_call_to_action
+    - paragraphs.paragraphs_type.title_text_media
+  module:
+    - link
+_core:
+  default_config_hash: HUtL4CgRmSJm9fOU5ckS820fCJgDjU7bxEM-dtUEhsU
+id: paragraph.title_text_media.field_call_to_action
+field_name: field_call_to_action
+entity_type: paragraph
+bundle: title_text_media
+label: CTAs
+description: '<strong>Besoin d''aide ? </strong> La documentation de ZURB Foundation sur les boutons est <a href="https://foundation.zurb.com/sites/docs/button.html" target="_blank">ici</a>.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 17
+  title: 1
+field_type: link

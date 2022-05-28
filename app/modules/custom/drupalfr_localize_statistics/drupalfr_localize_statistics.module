@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Contains drupalfr_localize_statistics.module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_localize_statistics_theme() {
+  $theme = [];
+  $theme['localize_statistics'] = [
+    'render element' => 'elements',
+    'file' => 'localize_statistics.page.inc',
+    'template' => 'localize_statistics',
+  ];
+  $theme['localize_statistics_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => [
+      'content' => NULL,
+    ],
+    'file' => 'localize_statistics.page.inc',
+  ];
+  return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function drupalfr_localize_statistics_theme_suggestions_localize_statistics(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#localize_statistics'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'localize_statistics__' . $sanitized_view_mode;
+  $suggestions[] = 'localize_statistics__' . $entity->bundle();
+  $suggestions[] = 'localize_statistics__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'localize_statistics__' . $entity->id();
+  $suggestions[] = 'localize_statistics__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function drupalfr_localize_statistics_cron() {
+  \Drupal::service('drupalfr_localize_statistics.cron')->cron();
+}

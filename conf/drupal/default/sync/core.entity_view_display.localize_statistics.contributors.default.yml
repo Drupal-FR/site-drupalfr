@@ -1,0 +1,30 @@
+uuid: e95eaf35-6cef-4013-92d8-aaedd7da3c42
+langcode: fr
+status: true
+dependencies:
+  config:
+    - drupalfr_localize_statistics.localize_statistics_type.contributors
+id: localize_statistics.contributors.default
+targetEntityType: localize_statistics
+bundle: contributors
+mode: default
+content:
+  language:
+    type: entity_reference_label
+    weight: 0
+    region: content
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+  value:
+    type: number_integer
+    weight: 1
+    region: content
+    label: inline
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+hidden:
+  search_api_excerpt: true

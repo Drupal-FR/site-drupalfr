@@ -1,0 +1,41 @@
+id: drupalfr_localize_statistics
+label: 'Localize statistics import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+migration_dependencies:
+  required:
+    - drupalfr_localize_glossary_language
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/localize_statistics.csv
+  header_row_count: 1
+  keys:
+    - uuid
+  column_names:
+    - uuid: UUID
+    - type: Type
+    - statistics_value: Value
+    - created: Created
+    - language: Language
+destination:
+  plugin: 'entity:localize_statistics'
+process:
+  uuid: uuid
+  type: type
+  created: created
+  value: statistics_value
+  language:
+    -
+      plugin: migration_lookup
+      migration: drupalfr_localize_glossary_language
+      source: language
+      no_stub: true

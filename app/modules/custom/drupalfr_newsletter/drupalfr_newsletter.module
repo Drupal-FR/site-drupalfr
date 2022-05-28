@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for drupalfr_newsletter module.
+ */
+
+use Drupal\drupalfr_newsletter\Plugin\Block\NewsletterSubscriptionBlock;
+
+/**
+ * Implements hook_theme().
+ */
+function drupalfr_newsletter_theme($existing, $type, $theme, $path) {
+  return [
+    'drupalfr_newsletter_subscription_block' => [
+      'variables' => [
+        'account_hash' => NewsletterSubscriptionBlock::DRUPALFR_NEWSLETTER_DEFAULT_ACCOUNT_HASH,
+        'mailing_list_hash' => NewsletterSubscriptionBlock::DRUPALFR_NEWSLETTER_DEFAULT_MAILING_LIST_HASH,
+        'anti_spam_token' => NewsletterSubscriptionBlock::DRUPALFR_NEWSLETTER_DEFAULT_ANTI_SPAM_TOKEN,
+      ],
+    ],
+  ];
+}
