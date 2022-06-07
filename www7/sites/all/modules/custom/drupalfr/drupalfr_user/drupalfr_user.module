@@ -171,3 +171,20 @@ function drupalfr_user_user_view($account, $view_mode, $langcode) {
     );
   }
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function drupalfr_user_form_user_register_form_alter(&$form, &$form_state) {
+  $form['#validate'][] = '_drupalfr_user_registration_reduce_spam';
+  $form['field_motivation'][LANGUAGE_NONE][0]['value']['#description'] .= '<br>' . t('10 caractères minimum.');
+}
+
+/**
+ * Reduce spam on registration by simple checks.
+ */
+function _drupalfr_user_registration_reduce_spam(&$form, &$form_state) {
+  if (strlen(trim($form_state['values']['field_motivation'][LANGUAGE_NONE][0]['value'])) < 10) {
+    form_error($form['field_motivation'][LANGUAGE_NONE][0]['value'], t('Vous devez saisir au moins 10 caractères'));
+  }
+}
