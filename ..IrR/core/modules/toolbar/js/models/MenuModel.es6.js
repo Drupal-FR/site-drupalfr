@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/toolbar/js/models/MenuModel.es6.js

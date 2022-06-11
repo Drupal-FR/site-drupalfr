@@ -1,0 +1,1 @@
+../../../../app/core/modules/locale/locale.bulk.es6.js

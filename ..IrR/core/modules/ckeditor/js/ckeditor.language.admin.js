@@ -1,0 +1,1 @@
+../../../../../app/core/modules/ckeditor/js/ckeditor.language.admin.js

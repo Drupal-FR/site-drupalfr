@@ -1,0 +1,1 @@
+../../../../../../../../app/core/modules/ckeditor5/tests/src/Nightwatch/Tests/drupalHtmlBuilderTest.js

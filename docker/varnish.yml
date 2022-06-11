@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  varnish:
+    image: ${DOCKER_SERVICE_VARNISH_IMAGE}
+    volumes:
+      - ./conf/varnish/default.vcl:/etc/varnish/default.vcl:delegated
+    tmpfs:
+      - /var/lib/varnish:exec
+    environment:
+      VARNISH_SIZE: 512M
+    command: "-p default_ttl=3600 -p default_grace=3600 -p default_keep=0"
+    extra_hosts:
+      - "${MATOMO_DOMAIN}:${DOCKER_BRIDGE_GATEWAY_IP}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish.entrypoints=http"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish.rule=Host(`${DRUPAL_SITE_DEFAULT_DOMAIN_1_VARNISH}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_2_VARNISH}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_3_VARNISH}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish_secure.entrypoints=https"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish_secure.rule=Host(`${DRUPAL_SITE_DEFAULT_DOMAIN_1_VARNISH}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_2_VARNISH}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_3_VARNISH}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish_secure.middlewares=remove-signature-headers@file"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_varnish_secure.tls=true"
+    networks:
+      default:
+        aliases:
+          - ${DRUPAL_SITE_DEFAULT_DOMAIN_1_VARNISH}
+          - ${DRUPAL_SITE_DEFAULT_DOMAIN_2_VARNISH}
+          - ${DRUPAL_SITE_DEFAULT_DOMAIN_3_VARNISH}
+    depends_on:
+      - web

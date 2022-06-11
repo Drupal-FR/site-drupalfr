@@ -1,0 +1,85 @@
+{
+  "version": "0.1",
+  "language": "en-US",
+  "allowCompoundWords": false,
+  "ignorePaths": [
+    ".*.json",
+    ".*ignore",
+    "composer.lock",
+    "assets/vendor/**",
+    "lib/Drupal/Component/Diff/**",
+    "lib/Drupal/Component/Transliteration/data/**",
+    "lib/Drupal/Core/File/MimeType/ExtensionMimeTypeGuesser.php",
+    "**/LICENSE.txt",
+    "../**/LICENSE.txt",
+    "modules/**/Migrate*Test.php",
+    "modules/ckeditor5/js/build/*",
+    "modules/color/preview.html",
+    "modules/color/tests/modules/color_test/themes/color_test_theme/color/preview.html",
+    "modules/media/tests/fixtures/oembed/*",
+    "modules/migrate_drupal/tests/fixtures/drupal6.php",
+    "modules/migrate_drupal/tests/fixtures/drupal7.php",
+    "modules/search/tests/UnicodeTest.txt",
+    "modules/system/tests/logo.svgz",
+    "node_modules/*",
+    "profiles/demo_umami/modules/demo_umami_content/default_content/languages/es/**/*",
+    "tests/fixtures/files/*",
+    "tests/Drupal/Tests/Component/Annotation/Doctrine/**",
+    "themes/bartik/color/preview.html",
+    "themes/olivero/fonts/**",
+    "COPYRIGHT.txt",
+    "MAINTAINERS.txt",
+    "package.json",
+    "yarn.lock",
+    "misc/cspell/dictionary.txt",
+    "**/core",
+    "*.svg"
+  ],
+  "ignoreRegExpList": [
+    "^msgstr .*",
+    "!!binary .*",
+    "%[0-9][0-9A-F]",
+    "\\Wi18n",
+    "\\x{[0-9A-F]{4,5}}"
+  ],
+  "dictionaries": [
+    "drupal",
+    "bash",
+    "companies",
+    "css",
+    "fonts",
+    "html",
+    "lorem-ipsum",
+    "php",
+    "softwareTerms",
+    "custom",
+    "custom_companies",
+    "custom_drupal_modules",
+    "custom_maintainers",
+    "custom_technical",
+    "custom_tools"
+  ],
+  "dictionaryDefinitions": [
+    { "name": "drupal", "path": "../../../app/core/misc/cspell/dictionary.txt"},
+    { "name": "custom", "path": "./cspell_dictionary.txt"},
+    { "name": "custom_companies", "path": "./cspell_dictionary_custom_companies.txt"},
+    { "name": "custom_drupal_modules", "path": "./cspell_dictionary_drupal_modules.txt"},
+    { "name": "custom_maintainers", "path": "./cspell_dictionary_maintainers.txt"},
+    { "name": "custom_technical", "path": "./cspell_dictionary_technical.txt"},
+    { "name": "custom_tools", "path": "./cspell_dictionary_tools.txt"}
+  ],
+  "flagWords": [
+    "grey",
+    "hte"
+  ],
+  "overrides": [
+    {
+      "filename": "**/{*.engine,*.inc,*.install,*.module,*.profile,*.theme}",
+      "languageId": "php"
+    },
+    {
+      "filename": "**/scripts/{*.php.txt, *.sh}",
+      "languageId": "php"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+../../../../app/core/modules/book/book.es6.js

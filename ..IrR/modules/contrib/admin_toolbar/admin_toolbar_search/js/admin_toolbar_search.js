@@ -1,0 +1,1 @@
+../../../../../../app/modules/contrib/admin_toolbar/admin_toolbar_search/js/admin_toolbar_search.js

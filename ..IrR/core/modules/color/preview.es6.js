@@ -1,0 +1,1 @@
+../../../../app/core/modules/color/preview.es6.js

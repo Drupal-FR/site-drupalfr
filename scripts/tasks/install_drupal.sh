@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+CURRENT_SITE_DRUSH_ALIAS="DRUPAL_SITE_${DRUPAL_SITE^^}_DRUSH_ALIAS"
+CURRENT_SITE_FOLDER_NAME="DRUPAL_SITE_${DRUPAL_SITE^^}_FOLDER_NAME"
+
+CURRENT_SITE_REDIS="DRUPAL_SITE_${DRUPAL_SITE^^}_REDIS"
+CURRENT_SITE_REDIS_HOST="DRUPAL_SITE_${DRUPAL_SITE^^}_REDIS_HOST"
+CURRENT_SITE_REDIS_PORT="DRUPAL_SITE_${DRUPAL_SITE^^}_REDIS_PORT"
+CURRENT_SITE_REDIS_PASSWORD="DRUPAL_SITE_${DRUPAL_SITE^^}_REDIS_PASSWORD"
+CURRENT_SITE_REDIS_BASE="DRUPAL_SITE_${DRUPAL_SITE^^}_REDIS_BASE"
+
+CURRENT_SITE_HAS_EXPORTED_CONFIG="DRUPAL_SITE_${DRUPAL_SITE^^}_HAS_EXPORTED_CONFIG"
+CURRENT_SITE_INSTALLATION_PROFILE="DRUPAL_SITE_${DRUPAL_SITE^^}_INSTALLATION_PROFILE"
+CURRENT_SITE_ACCOUNT_MAIL="DRUPAL_SITE_${DRUPAL_SITE^^}_ACCOUNT_MAIL"
+CURRENT_SITE_ACCOUNT_NAME="DRUPAL_SITE_${DRUPAL_SITE^^}_ACCOUNT_NAME"
+CURRENT_SITE_ACCOUNT_PASS="DRUPAL_SITE_${DRUPAL_SITE^^}_ACCOUNT_PASS"
+CURRENT_SITE_SITE_MAIL="DRUPAL_SITE_${DRUPAL_SITE^^}_SITE_MAIL"
+CURRENT_SITE_SITE_NAME="DRUPAL_SITE_${DRUPAL_SITE^^}_SITE_NAME"
+CURRENT_SITE_DEFAULT_LANGUAGE="DRUPAL_SITE_${DRUPAL_SITE^^}_DEFAULT_LANGUAGE"
+
+if [ "${CURRENT_SITE_REDIS}" = "yes" ]; then
+  echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Clear Redis cache because otherwise it is no emptied on site install and it provokes errors.${COLOR_NC}"
+  if [ -z "${!CURRENT_SITE_REDIS_PASSWORD}" ]; then
+    redis-cli -h "${!CURRENT_SITE_REDIS_HOST}" -p "${!CURRENT_SITE_REDIS_PORT}" -n "${!CURRENT_SITE_REDIS_BASE}" FLUSHDB
+  else
+    redis-cli -h "${!CURRENT_SITE_REDIS_HOST}" -p "${!CURRENT_SITE_REDIS_PORT}" -n "${!CURRENT_SITE_REDIS_BASE}" -a "${!CURRENT_SITE_REDIS_PASSWORD}" FLUSHDB
+  fi
+fi
+
+if [ "${!CURRENT_SITE_HAS_EXPORTED_CONFIG}" = "true" ]; then
+  echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Install Drupal using existing config.${COLOR_NC}"
+  $DRUSH site:install "${!CURRENT_SITE_INSTALLATION_PROFILE}" \
+    --account-mail="${!CURRENT_SITE_ACCOUNT_MAIL}" \
+    --account-name="${!CURRENT_SITE_ACCOUNT_NAME}" \
+    --account-pass="${!CURRENT_SITE_ACCOUNT_PASS}" \
+    --site-mail="${!CURRENT_SITE_SITE_MAIL}" \
+    --site-name="${!CURRENT_SITE_SITE_NAME}" \
+    --locale="${!CURRENT_SITE_DEFAULT_LANGUAGE}" \
+    --sites-subdir="${!CURRENT_SITE_FOLDER_NAME}" \
+    --existing-config \
+    -y
+else
+  echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Install Drupal.${COLOR_NC}"
+  $DRUSH site:install "${!CURRENT_SITE_INSTALLATION_PROFILE}" \
+    --account-mail="${!CURRENT_SITE_ACCOUNT_MAIL}" \
+    --account-name="${!CURRENT_SITE_ACCOUNT_NAME}" \
+    --account-pass="${!CURRENT_SITE_ACCOUNT_PASS}" \
+    --site-mail="${!CURRENT_SITE_SITE_MAIL}" \
+    --site-name="${!CURRENT_SITE_SITE_NAME}" \
+    --locale="${!CURRENT_SITE_DEFAULT_LANGUAGE}" \
+    --sites-subdir="${!CURRENT_SITE_FOLDER_NAME}" \
+    -y
+fi
+
+echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Sometimes there is a cache issue after the install. Launch a command to help fix the cache.${COLOR_NC}"
+$DRUSH "${!CURRENT_SITE_DRUSH_ALIAS}" core:status
+
+# shellcheck source=scripts/tasks/flush_cache.sh
+. "${SCRIPTS_PATH}"/tasks/flush_cache.sh
+
+echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Fix user 1 in case of install problem.${COLOR_NC}"
+$DRUSH "${!CURRENT_SITE_DRUSH_ALIAS}" php:script install-fix-user-1 \
+  "${!CURRENT_SITE_ACCOUNT_NAME}" \
+  "${!CURRENT_SITE_ACCOUNT_MAIL}" \
+  "${!CURRENT_SITE_ACCOUNT_PASS}" \
+  --script-path="${PROJECT_PATH}"/drush/scripts
+
+echo -e "${COLOR_LIGHT_GREEN}${DRUPAL_SITE}: Add the administrator role to user 1.${COLOR_NC}"
+$DRUSH "${!CURRENT_SITE_DRUSH_ALIAS}" user:role:add "administrator" "${!CURRENT_SITE_ACCOUNT_NAME}"

@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/quickedit/js/models/EntityModel.es6.js

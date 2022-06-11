@@ -1,0 +1,1 @@
+../../../../app/core/modules/file/file.es6.js

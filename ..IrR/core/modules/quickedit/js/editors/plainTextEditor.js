@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/quickedit/js/editors/plainTextEditor.js

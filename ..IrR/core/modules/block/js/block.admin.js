@@ -1,0 +1,1 @@
+../../../../../app/core/modules/block/js/block.admin.js

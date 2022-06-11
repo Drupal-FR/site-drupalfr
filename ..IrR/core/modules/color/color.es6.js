@@ -1,0 +1,1 @@
+../../../../app/core/modules/color/color.es6.js

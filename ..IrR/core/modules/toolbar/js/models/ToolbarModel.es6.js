@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/toolbar/js/models/ToolbarModel.es6.js

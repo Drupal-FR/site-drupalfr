@@ -1,0 +1,626 @@
+image: "florenttorregrosa/ci-php:8.1-cli-alpine"
+
+stages:
+  - Build
+  - Installation
+  - Security
+  - Code quality
+  - Tests
+  - Package
+  - Deploy
+
+variables:
+  COMPOSER_MEMORY_LIMIT: -1
+  SKIP_INSTALLATION: 0
+  SKIP_SECURITY: 0
+  SKIP_CODE_QUALITY: 0
+  SKIP_TESTS: 0
+  SKIP_DEPLOY: 0
+
+.security_default:
+  stage: Security
+  needs: ['Build dev']
+  rules:
+    - if: '$SKIP_SECURITY == "1"'
+      when: never
+    - when: on_success
+
+.code_quality_default:
+  stage: Code quality
+  needs: ['Build dev']
+  rules:
+    - if: '$SKIP_CODE_QUALITY == "1"'
+      when: never
+    - when: on_success
+
+.test_default:
+  stage: Tests
+  needs: ['Build dev']
+  rules:
+    - if: '$SKIP_TESTS == "1"'
+      when: never
+    - when: on_success
+
+.need_database:
+  variables:
+    # https://docs.gitlab.com/runner/executors/docker.html#network-per-build
+    FF_NETWORK_PER_BUILD: 1
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: drupal
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: drupal
+  services:
+    - name: mariadb:10.5
+      alias: mysql
+    - name: redis:6-alpine
+      alias: redis
+
+.use_existing_database:
+  before_script:
+    - gunzip ./backups/default-ci.sql.gz
+    - ./vendor/bin/drush @default.alias sql:cli < ./backups/default-ci.sql
+    - ./vendor/bin/drush @default.alias cache:rebuild
+
+.ssh:
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo -n "${CI_SSH_KEY}" | tr -d '\r' | ssh-add -
+
+# Build sources once and for all jobs and stages.
+# This build is done with development tools included.
+'Build dev':
+  stage: Build
+  script:
+    - composer install
+      --ignore-platform-reqs
+      --no-interaction
+      --no-progress
+    - ./scripts/init.sh -e gitlab
+    - yarn --cwd ./app/core install
+    - yarn --cwd ./scripts/assets install
+    - yarn --cwd ./scripts/assets run gulp-prod
+    - composer drupal:paranoia
+  artifacts:
+    expire_in: 4 hrs
+    paths:
+      - app/
+      - conf/
+      - vendor/
+      - www/
+      - .env
+
+'Installation dev':
+  stage: Installation
+  extends: .need_database
+  script:
+    - cd ./app && php -S 0.0.0.0:8888 .ht.router.php >> webserver.log 2>&1 &
+    - ./scripts/install-dev.sh default
+    - ./vendor/bin/drush @default.alias sql:dump
+      --result-file="${CI_PROJECT_DIR}/backups/default-ci.sql"
+      --gzip
+  artifacts:
+    expire_in: 4 hrs
+    paths:
+      - app/
+      - backups/
+      - conf/
+      - vendor/
+      - www/
+      - .env
+  rules:
+    - if: '$SKIP_INSTALLATION == "1"'
+      when: never
+    - when: on_success
+
+################################################################################
+## Security checks.
+################################################################################
+
+'PHP check':
+  extends: .security_default
+  script:
+    - ./vendor/bin/drush pm:security-php
+
+'Drupal check':
+  extends: .security_default
+  script:
+    - ./vendor/bin/drush pm:security
+
+################################################################################
+## Code quality analysis.
+################################################################################
+
+'ShellCheck':
+  extends: .code_quality_default
+  image: "koalaman/shellcheck-alpine:stable"
+  script:
+    - shellcheck scripts/*.sh scripts/**/*.sh
+
+'PHP CS':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/phpcs
+      --standard=./scripts/quality/phpcs/phpcs.xml.dist
+
+'PHP MD':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/phpmd
+      ./app/modules/custom,./app/profiles/custom,./app/themes/custom
+      ansi
+      ./scripts/quality/phpmd/phpmd.xml.dist
+      --suffixes inc,info,install,module,php,profile,test,theme
+
+'PHP CPD':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/phpcpd
+      --min-lines=5
+      --min-tokens=70
+      --suffix=".inc,.info,.install,.module,.php,.profile,.test,.theme"
+      ./app/index.php
+      ./app/modules/custom
+      ./app/profiles/custom
+      ./app/themes/custom
+
+'PHP MND':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/phpmnd
+      --extensions=all
+      --hint
+      --non-zero-exit-on-violation
+      --suffixes="inc,info,install,module,php,profile,test,theme"
+      --exclude=tests
+      --ignore-funcs=intval,floatval,strval
+      ./app/modules/custom
+      ./app/profiles/custom
+      ./app/themes/custom
+  # Allow failure because it is currently no possible to ignore specific lines
+  # or array keys (example with Form API).
+  allow_failure: true
+
+'PHPStan':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/phpstan
+      analyse
+      --configuration=./scripts/quality/phpstan/phpstan.neon.dist
+      --memory-limit 2G
+
+'Psalm (security)':
+  extends: .code_quality_default
+  script:
+    - cp -f ./scripts/quality/psalm/psalm.xml ./app/psalm.xml
+    - cd ./app
+    - php ../vendor/mortenson/psalm-plugin-drupal/scripts/dump_script.php
+#    - php ../vendor/mortenson/psalm-plugin-drupal/scripts/generate_entrypoint.php modules/custom/my_module,modules/custom/my_module_bis
+    - ../vendor/bin/psalm
+
+'Composer validate':
+  extends: .code_quality_default
+  script:
+    - composer validate
+
+'Composer validate custom':
+  extends: .code_quality_default
+  script:
+    - ./scripts/quality/composer_validate/composer-validate-custom.sh
+
+'Composer normalize':
+  extends: .code_quality_default
+  script:
+    - composer-normalize
+      --dry-run
+      --indent-size=4
+      --indent-style=space
+
+'Composer normalize custom':
+  extends: .code_quality_default
+  script:
+    - ./scripts/quality/composer_normalize/composer-normalize-custom.sh
+
+'Configuration Inspector':
+  extends:
+    - .code_quality_default
+    - .need_database
+    - .use_existing_database
+  needs: ['Installation dev']
+  script:
+    - ./scripts/quality/config_inspector/config-inspector.sh default
+  # Allow failure because a lot of contrib modules does not have proper config
+  # schema.
+  allow_failure: true
+  rules:
+    - if: '$SKIP_CODE_QUALITY == "1" || $SKIP_INSTALLATION == "1"'
+      when: never
+    - when: on_success
+
+'Rector':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/rector
+      process
+      app/modules/custom
+      app/profiles/custom
+      app/themes/custom
+      --dry-run
+      --config=./scripts/quality/rector/rector.php
+  allow_failure: true
+
+'PHP CS Fixer':
+  extends: .code_quality_default
+  script:
+    - ./vendor/bin/php-cs-fixer
+      fix
+      app/modules/custom
+      app/profiles/custom
+      app/themes/custom
+      --dry-run
+      --config=./scripts/quality/phpcs_fixer/.php-cs-fixer.dist.php
+
+'YAML Lint':
+  extends: .code_quality_default
+  script:
+    - cd app/core && ./node_modules/.bin/eslint
+      --config ./.eslintrc.json
+      --no-error-on-unmatched-pattern
+      --ext .yml
+      "../modules/custom"
+      "../profiles/custom"
+      "../themes/custom"
+      "../../conf/drupal"
+      "../../drush"
+      "../../scripts"
+
+'CSS Lint':
+  extends: .code_quality_default
+  script:
+    - ./app/core/node_modules/.bin/stylelint
+      --config ./app/core/.stylelintrc.json
+      --formatter verbose
+      --ignore-path ./scripts/quality/stylelint/.stylelintignore
+      --allow-empty-input
+      "./app/**/custom/**/*.css"
+
+'SASS Lint':
+  extends: .code_quality_default
+  script:
+    - ./app/core/node_modules/.bin/stylelint
+      --config ./scripts/quality/sasslint/.stylelintrc.json
+      --config-basedir ./app/core/
+      --formatter verbose
+      --ignore-path ./scripts/quality/sasslint/.stylelintignore
+      --allow-empty-input
+      "./app/**/custom/**/*.{scss,sass}"
+
+'JS Lint':
+  extends: .code_quality_default
+  script:
+    - cd ./app && ./core/node_modules/.bin/eslint
+      --config ./core/.eslintrc.legacy.json
+      --no-error-on-unmatched-pattern
+      --ignore-path ../scripts/quality/eslint/.eslintignore
+      "./modules/custom/**/*.js"
+      "./profiles/custom/**/*.js"
+      "./themes/custom/**/*.js"
+
+'JS Lint ES6':
+  extends: .code_quality_default
+  script:
+    - cd ./app && ./core/node_modules/.bin/eslint
+      --config ./core/.eslintrc.json
+      --no-error-on-unmatched-pattern
+      --ignore-path ../scripts/quality/eslint_es6/.eslintignore
+      "./modules/custom/**/*.es6.js"
+      "./profiles/custom/**/*.es6.js"
+      "./themes/custom/**/*.es6.js"
+
+'Spellcheck':
+  extends: .code_quality_default
+  script:
+    - ./app/core/node_modules/.bin/cspell
+      --config ./scripts/quality/spellcheck/.cspell.json
+      --no-must-find-files
+      --no-progress
+      "./app/**/custom/**/*"
+
+################################################################################
+## Tests.
+################################################################################
+
+#'Behat':
+#  extends:
+#    - .test_default
+#    - .need_database
+#    - .use_existing_database
+#  needs: ['Installation dev']
+#  variables:
+#    PHP_CLI_SERVER_WORKERS: 100
+#  script:
+#    - cd ./app && php -S 0.0.0.0:8888 .ht.router.php >> webserver.log 2>&1 &
+#    - ./scripts/tests/behat/run-tests-behat.sh
+#  artifacts:
+#    expire_in: 4 hrs
+#    # Force artifacts even if the job fail.
+#    when: always
+#    reports:
+#      junit: "./report/default.xml"
+#  rules:
+#    - if: '$SKIP_TESTS == "1" || $SKIP_INSTALLATION == "1"'
+#      when: never
+#    - when: on_success
+
+'Gulp':
+  extends: .test_default
+  needs: ['Installation dev']
+  script:
+    - ./scripts/tests/gulp/test-gulp-compilation.sh
+
+'Pa11y':
+  extends:
+    - .test_default
+    - .need_database
+    - .use_existing_database
+  needs: ['Installation dev']
+  variables:
+    PHP_CLI_SERVER_WORKERS: 100
+  script:
+    - cd ./app && php -S 0.0.0.0:8888 .ht.router.php >> webserver.log 2>&1 &
+    - pa11y-ci --config ./scripts/tests/pa11y/pa11y-gitlab.json
+  # Allow failure because Drupal core has errors.
+  allow_failure: true
+  rules:
+    - if: '$SKIP_TESTS == "1" || $SKIP_INSTALLATION == "1"'
+      when: never
+    - when: on_success
+
+'PHPUnit':
+  extends: .test_default
+  variables:
+    # https://docs.gitlab.com/runner/executors/docker.html#network-per-build
+    FF_NETWORK_PER_BUILD: 1
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: drupal
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: drupal
+    PHP_CLI_SERVER_WORKERS: 100
+    SIMPLETEST_BASE_URL: http://build:8888
+  services:
+    - name: mariadb:10.5
+      alias: mysql
+    - name: drupalci/webdriver-chromedriver:production
+      alias: chrome
+      entrypoint:
+        - chromedriver
+        - "--log-path=/tmp/chromedriver.log"
+        - "--verbose"
+        - "--whitelisted-ips="
+  script:
+    - cd ./app && php -S 0.0.0.0:8888 .ht.router.php >> webserver.log 2>&1 &
+    - ./scripts/tests/phpunit/run-tests-phpunit.sh
+  artifacts:
+    expire_in: 4 hrs
+    # Force artifacts even if the job fail.
+    when: always
+    reports:
+      junit: "phpunit.xml"
+
+################################################################################
+## Package and deployment.
+################################################################################
+
+#'Package integ':
+#  stage: Package
+#  script:
+#    - mkdir -p build/${CI_COMMIT_BRANCH}
+#    - git clone . ./build/${CI_COMMIT_BRANCH}
+#    - composer install
+#      --ignore-platform-reqs
+#      --no-interaction
+#      --no-progress
+#      --working-dir="build/${CI_COMMIT_BRANCH}"
+#    - yarn --cwd ./build/${CI_COMMIT_BRANCH}/scripts/assets install
+#    - yarn --cwd ./build/${CI_COMMIT_BRANCH}/scripts/assets run gulp-prod
+#    - composer drupal:paranoia
+#      --working-dir="build/${CI_COMMIT_BRANCH}"
+#    - ./scripts/package-finalize.sh integ branch ${CI_COMMIT_BRANCH}
+#  artifacts:
+#    expire_in: 4 hrs
+#    paths:
+#      - build/
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # A tagged release should already have been deployed on integration.
+#    - if: $CI_COMMIT_TAG
+#      when: never
+#    - if: $CI_COMMIT_BRANCH == '9.x'
+#
+#'Deploy integ':
+#  stage: Deploy
+#  extends: .ssh
+#  needs: ['Package integ']
+#  script:
+#    - ./scripts/deploy-package.sh integ $(cat build/version_name)
+#    - ./scripts/fix-permissions.sh integ $(cat build/version_name)
+#    - ./scripts/make-backup.sh integ all
+#    - ./scripts/make-symlink.sh integ $(cat build/version_name) all
+#    - ./scripts/update.sh integ all
+#  environment:
+#    name: Integration
+#    url: https://example.com
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # A tagged release should already have been deployed on integration.
+#    - if: $CI_COMMIT_TAG
+#      when: never
+#    - if: $CI_COMMIT_BRANCH == '9.x'
+
+#'Deploy integ docker':
+#  stage: Deploy
+#  extends: .ssh
+#  needs: ['Package integ']
+#  script:
+#    - ./scripts/deploy-package-docker.sh integ $(cat build/version_name)
+#  environment:
+#    name: Integration
+#    url: https://example.com
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # A tagged release should already have been deployed on integration.
+#    - if: $CI_COMMIT_TAG
+#      when: never
+#    - if: $CI_COMMIT_BRANCH == '9.x'
+
+#'Package staging':
+#  stage: Package
+#  script:
+#    - mkdir -p build/${CI_COMMIT_TAG}
+#    - git clone . ./build/${CI_COMMIT_TAG}
+#    - composer install
+#      --ignore-platform-reqs
+#      --no-dev
+#      --no-interaction
+#      --no-progress
+#      --working-dir="build/${CI_COMMIT_TAG}"
+#    - yarn --cwd ./build/${CI_COMMIT_TAG}/scripts/assets install
+#    - yarn --cwd ./build/${CI_COMMIT_TAG}/scripts/assets run gulp-prod
+#    - composer drupal:paranoia
+#      --working-dir="build/${CI_COMMIT_TAG}"
+#    - ./scripts/package-finalize.sh staging tag ${CI_COMMIT_TAG}
+#  artifacts:
+#    expire_in: 4 hrs
+#    paths:
+#      - build/
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # Execute job for a tagged beta version.
+#    - if: '$CI_COMMIT_TAG =~ /^[\d]+\.[\d]+.[\d]+-beta[\d]+$/i'
+#      when: manual
+#
+#'Deploy staging':
+#  stage: Deploy
+#  extends: .ssh
+#  needs: ['Package staging']
+#  script:
+#    - ./scripts/deploy-package.sh staging $(cat build/version_name)
+#    - ./scripts/fix-permissions.sh staging $(cat build/version_name)
+#    - ./scripts/make-backup.sh staging all
+#    - ./scripts/make-symlink.sh staging $(cat build/version_name) all
+#    - ./scripts/update.sh staging all
+#  environment:
+#    name: Staging
+#    url: https://example.com
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # Execute job for a tagged beta version.
+#    - if: '$CI_COMMIT_TAG =~ /^[\d]+\.[\d]+.[\d]+-beta[\d]+$/i'
+#      when: manual
+
+#'Package preprod':
+#  stage: Package
+#  script:
+#    - mkdir -p build/${CI_COMMIT_TAG}
+#    - git clone . ./build/${CI_COMMIT_TAG}
+#    - composer install
+#      --ignore-platform-reqs
+#      --no-dev
+#      --no-interaction
+#      --no-progress
+#      --working-dir="build/${CI_COMMIT_TAG}"
+#    - yarn --cwd ./build/${CI_COMMIT_TAG}/scripts/assets install
+#    - yarn --cwd ./build/${CI_COMMIT_TAG}/scripts/assets run gulp-prod
+#    - composer drupal:paranoia
+#      --working-dir="build/${CI_COMMIT_TAG}"
+#    - ./scripts/package-finalize.sh preprod tag ${CI_COMMIT_TAG}
+#  artifacts:
+#    expire_in: 1 week
+#    paths:
+#      - build/
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # Execute job for a tagged release candidate version.
+#    - if: '$CI_COMMIT_TAG =~ /^[\d]+\.[\d]+.[\d]+-rc[\d]+$/i'
+#      when: manual
+#
+#'Deploy preprod':
+#  stage: Deploy
+#  extends: .ssh
+#  needs: ['Package preprod']
+#  script:
+#    - ./scripts/deploy-package.sh preprod $(cat build/version_name)
+#    - ./scripts/fix-permissions.sh preprod $(cat build/version_name)
+#    - ./scripts/make-backup.sh preprod all
+#    - ./scripts/make-symlink.sh preprod $(cat build/version_name) all
+#    - ./scripts/update.sh preprod all
+#  environment:
+#    name: Preproduction
+#    url: https://example.com
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # Execute job for a tagged release candidate version.
+#    - if: '$CI_COMMIT_TAG =~ /^[\d]+\.[\d]+.[\d]+-rc[\d]+$/i'
+#      when: manual
+
+#'Package prod':
+#  stage: Package
+#  script:
+#    - mkdir -p build/${CI_COMMIT_TAG}
+#    - git clone . ./build/${CI_COMMIT_TAG}
+#    - composer install
+#      --ignore-platform-reqs
+#      --no-dev
+#      --no-interaction
+#      --no-progress
+#      --working-dir="build/${CI_COMMIT_TAG}"
+#    - yarn --cwd ./build/${CI_COMMIT_TAG}/scripts/assets install
+#    - yarn --cwd ./build/${CI_COMMIT_TAG}/scripts/assets run gulp-prod
+#    - composer drupal:paranoia
+#      --working-dir="build/${CI_COMMIT_TAG}"
+#    - ./scripts/package-finalize.sh prod tag ${CI_COMMIT_TAG}
+#  artifacts:
+#    expire_in: 1 week
+#    paths:
+#      - build/
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # Execute job for a tagged release.
+#    - if: '$CI_COMMIT_TAG =~ /^[\d]+\.[\d]+.[\d]+$/i'
+#      when: manual
+#
+#'Deploy prod':
+#  stage: Deploy
+#  extends: .ssh
+#  needs: ['Package prod']
+#  script:
+#    - ./scripts/deploy-package.sh prod $(cat build/version_name)
+#    - ./scripts/fix-permissions.sh prod $(cat build/version_name)
+#    - ./scripts/make-backup.sh prod all
+#    - ./scripts/make-symlink.sh prod $(cat build/version_name) all
+#    - ./scripts/update.sh prod all
+#  environment:
+#    name: Production
+#    url: https://example.com
+#  rules:
+#    - if: '$SKIP_DEPLOY == "1"'
+#      when: never
+#    # Execute job for a tagged release.
+#    - if: '$CI_COMMIT_TAG =~ /^[\d]+\.[\d]+.[\d]+$/i'
+#      when: manual
+
+workflow:
+  rules:
+    # Execute jobs in merge request context.
+    - if: $CI_MERGE_REQUEST_ID
+    # Execute jobs when a new tag is created.
+    - if: $CI_COMMIT_TAG
+    # Execute jobs when a new commit is pushed to 9.x branch.
+    - if: $CI_COMMIT_BRANCH == '9.x'

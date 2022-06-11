@@ -1,0 +1,1 @@
+../../../../app/core/modules/content_translation/content_translation.admin.js

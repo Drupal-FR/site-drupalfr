@@ -1,0 +1,1 @@
+../../../../../app/core/modules/comment/js/comment-new-indicator.js

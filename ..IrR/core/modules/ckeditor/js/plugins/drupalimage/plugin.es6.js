@@ -1,0 +1,1 @@
+../../../../../../../app/core/modules/ckeditor/js/plugins/drupalimage/plugin.es6.js

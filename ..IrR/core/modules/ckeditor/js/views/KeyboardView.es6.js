@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/ckeditor/js/views/KeyboardView.es6.js

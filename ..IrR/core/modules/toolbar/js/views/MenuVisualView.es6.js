@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/toolbar/js/views/MenuVisualView.es6.js

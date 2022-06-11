@@ -1,0 +1,1 @@
+../../../../app/core/modules/locale/locale.admin.js

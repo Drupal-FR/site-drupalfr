@@ -1,0 +1,1 @@
+../../../../app/core/modules/menu_ui/menu_ui.admin.js

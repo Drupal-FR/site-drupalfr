@@ -1,0 +1,1 @@
+../../../../../../../../app/core/modules/system/tests/modules/tabledrag_test/js/tabledrag_test.js

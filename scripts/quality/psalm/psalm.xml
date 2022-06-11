@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<psalm
+  autoloader="../vendor/mortenson/psalm-plugin-drupal/scripts/autoload.php"
+  errorLevel="6"
+  resolveFromConfigFile="true"
+  runTaintAnalysis="true"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="https://getpsalm.org/schema/config"
+  xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+
+<!--
+This file is copied in the app directory. Otherwise autoloading does not work.
+-->
+
+  <fileExtensions>
+    <extension name=".inc"/>
+    <extension name=".install"/>
+    <extension name=".module"/>
+    <extension name=".php"/>
+    <extension name=".profile"/>
+<!--    <extension name=".test"/>-->
+    <extension name=".theme"/>
+  </fileExtensions>
+
+  <projectFiles>
+    <directory name="modules/custom"/>
+    <directory name="profiles/custom"/>
+    <directory name="themes/custom"/>
+<!--    <ignoreFiles>-->
+<!--      <directory name="modules/custom/**/tests" />-->
+<!--      <directory name="profiles/custom/**/tests" />-->
+<!--      <directory name="themes/custom/**/tests" />-->
+<!--    </ignoreFiles>-->
+<!--    <file name="psalm_drupal_entrypoint.module"></file>-->
+  </projectFiles>
+
+  <plugins>
+    <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin">
+      <containerXml>DrupalContainerDump.xml</containerXml>
+    </pluginClass>
+    <pluginClass class="mortenson\PsalmPluginDrupal\Plugin">
+      <containerXml>DrupalContainerDump.xml</containerXml>
+      <extensions>
+        <!--
+        List your modules explicitly here (with dependencies), as the scan may
+        happen without a database.
+        Also update the command to generate the entrypoint in the Makefile and
+        .gitlab-ci.yml with only the custom modules.
+        -->
+<!--        <module name="my_custom_module" />-->
+<!--        <module name="my_module_dependency" />-->
+      </extensions>
+    </pluginClass>
+  </plugins>
+
+</psalm>

@@ -1,0 +1,1 @@
+../../../../../app/core/modules/image/js/theme.js

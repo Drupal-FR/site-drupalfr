@@ -1,0 +1,1 @@
+../../../../../../../app/modules/contrib/examples/modules/js_example/js/red.js

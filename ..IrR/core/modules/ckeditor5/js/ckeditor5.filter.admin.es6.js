@@ -1,0 +1,1 @@
+../../../../../app/core/modules/ckeditor5/js/ckeditor5.filter.admin.es6.js

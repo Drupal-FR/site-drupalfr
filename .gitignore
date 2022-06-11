@@ -1,0 +1,87 @@
+# This .gitignore file assume that you have a global .gitignore file configured
+# to ignore for example IDE related files.
+# See docs/01-developer/12-git.md or see https://www.drupal.org/node/1542048.
+
+# Package management systems.
+bower_components
+node_modules
+vendor
+yarn-error.log
+
+# Contrib files.
+/app/core
+/app/libraries
+/app/modules/contrib
+/app/profiles/contrib
+/app/themes/contrib
+/app/translations/contrib
+/drush/contrib
+
+/app/autoload.php
+/app/index.php
+
+/app/.htaccess
+/app/robots.txt
+
+# Development config files.
+/.editorconfig
+/app/.eslintignore
+/app/.ht.router.php
+
+# Compilation.
+*.css.map
+*.js.map
+## Theme
+/app/themes/custom/*/assets/css/**/*.css
+/app/themes/custom/*/assets/js/**/*.js
+!/app/themes/custom/*/assets/js/**/*.es6.js
+/app/themes/custom/*/assets/images/optimized
+/app/themes/custom/*/templates/patterns/*/styles/**/*.css
+/app/themes/custom/*/templates/patterns/*/js/**/*.js
+!/app/themes/custom/*/templates/patterns/*/js/**/*.es6.js
+## Modules
+/app/modules/custom/*/assets/styles/**/*.css
+/app/modules/custom/*/assets/js/**/*.js
+!/app/modules/custom/*/assets/js/**/*.es6.js
+/app/modules/custom/*/templates/patterns/*/styles/**/*.css
+/app/modules/custom/*/templates/patterns/*/js/**/*.js
+!/app/modules/custom/*/templates/patterns/*/js/**/*.es6.js
+
+# Drupal's file directory.
+/app/sites/default/default.services.yml
+/app/sites/default/default.settings.php
+/app/sites/development.services.yml
+/app/sites/example.settings.local.php
+/app/sites/example.sites.php
+/app/sites/*/files
+/private_files
+/app/sites/simpletest
+
+# Drupal local settings.
+/conf/drupal/**/settings.local.php
+/conf/drupal/sites.php
+
+# Drupal config.
+/conf/drupal/**/overrides
+
+# Backups.
+backups/*
+
+# Build.
+build
+
+# Docker.
+/.env
+/conf/env/composer.env
+/data
+/docker-compose.override.yml
+
+# Drupal paranoia.
+/www
+
+# Cloned repositories.
+/contrib
+
+# Cypress.
+/scripts/tests/cypress/cypress/screenshots
+/scripts/tests/cypress/cypress/videos

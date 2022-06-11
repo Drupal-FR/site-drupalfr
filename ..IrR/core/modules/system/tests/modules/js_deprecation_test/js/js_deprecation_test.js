@@ -1,0 +1,1 @@
+../../../../../../../../app/core/modules/system/tests/modules/js_deprecation_test/js/js_deprecation_test.js

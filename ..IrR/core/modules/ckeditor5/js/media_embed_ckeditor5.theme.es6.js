@@ -1,0 +1,1 @@
+../../../../../app/core/modules/ckeditor5/js/media_embed_ckeditor5.theme.es6.js

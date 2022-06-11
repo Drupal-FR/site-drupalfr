@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  chrome:
+    image: ${DOCKER_SERVICE_CHROME_IMAGE}
+    ulimits:
+      core:
+        soft: -1
+        hard: -1
+#    ports:
+#      - "4444:4444"
+#      - "9515:9515"
+    entrypoint:
+      - chromedriver
+      - "--log-path=/tmp/chromedriver.log"
+      - "--verbose"
+      - "--whitelisted-ips="
+
+  node:
+    image: ${DOCKER_SERVICE_NODE_IMAGE}
+    volumes:
+      - .:/project:delegated
+    tty: true
+
+  pa11y_ci:
+    image: ${DOCKER_SERVICE_PA11Y_CI_IMAGE}
+    volumes:
+      - ./scripts/tests/pa11y/pa11y-dev.json:/workspace/config.json:delegated
+    shm_size: '1gb'
+
+  cypress:
+    image: ${DOCKER_SERVICE_CYPRESS_IMAGE}
+    volumes:
+      - ./scripts/tests/cypress/cypress:/cypress:delegated
+      - ./scripts/tests/cypress/cypress.json:/cypress.json:delegated
+    extra_hosts:
+      - "${MATOMO_DOMAIN}:${DOCKER_BRIDGE_GATEWAY_IP}"
+      # To have requests going out to be able to use HTTPS.
+      - "${DRUPAL_SITE_DEFAULT_DOMAIN_1}:${DOCKER_BRIDGE_GATEWAY_IP}"
+      - "${DRUPAL_SITE_DEFAULT_DOMAIN_2}:${DOCKER_BRIDGE_GATEWAY_IP}"
+      - "${DRUPAL_SITE_DEFAULT_DOMAIN_3}:${DOCKER_BRIDGE_GATEWAY_IP}"
+    # Trick to have the container launched properly without running tests on
+    # start.
+    command: "--help"
+    depends_on:
+      - web

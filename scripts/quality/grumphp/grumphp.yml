@@ -1,0 +1,148 @@
+# https://github.com/phpro/grumphp/tree/master/doc/tasks.
+grumphp:
+  process_timeout: 480
+  git_hook_variables:
+    EXEC_GRUMPHP_COMMAND: docker-compose run --rm --no-deps web
+    VAGRANT_PROJECT_DIR: /project/
+  ascii:
+    failed: scripts/quality/grumphp/grumphp_ko.txt
+    succeeded: scripts/quality/grumphp/grumphp_ok.txt
+  tasks:
+    composer:
+      no_check_all: true
+    composer_normalize:
+      indent_size: 4
+      indent_style: space
+      use_standalone: true
+    git_blacklist:
+      keywords:
+        - "console\\.log\\("
+        - "die\\("
+        - "var_dump\\("
+        - "dump\\("
+        # Devel module functions.
+        - "devel_breakpoint\\("
+        - "dd\\("
+        - "ddm\\("
+        - "dpm\\("
+        - "dpq\\("
+        - "dpr\\("
+        - "dsm\\("
+        - "dvm\\("
+        - "dvr\\("
+        - "dsr\\("
+        - "kpr\\("
+        - "ksm\\("
+        - "kint\\("
+        # Git conflicts.
+        - "<<<<<<<"
+        - "======="
+        - ">>>>>>>"
+        # Xdebug breakpoint macro.
+        - "\\$foo"
+        # The list of keywords can not end with an opening parenthesis.
+        # See https://github.com/phpro/grumphp/issues/700.
+        - "exit;"
+      whitelist_patterns: []
+      triggered_by:
+        - inc
+        - info
+        - install
+        - js
+        - module
+        - php
+        - profile
+        - test
+        - theme
+        - twig
+      regexp_type: E
+      match_word: true
+    git_commit_message:
+      enforce_capitalized_subject: false
+      matchers:
+        Start with 'Type ': /^(ci|chore|docs|feat|fix|refactor|test)\:\s/
+        Contain issue number: /\#(\d)+/
+        Contain a message: /\s(.)+/
+      max_body_width: 0
+      max_subject_width: 0
+      case_insensitive: true
+      multiline: false
+
+    jsonlint: ~
+    phpcpd:
+      directory:
+        - ./app/index.php
+        - ./app/modules/custom
+        - ./app/profiles/custom
+        - ./app/themes/custom
+      triggered_by:
+        - inc
+        - info
+        - install
+        - module
+        - php
+        - profile
+        - test
+        - theme
+    phpmnd:
+      # As directory is a string and not an array, it is not possible to
+      # scan several directories and excluding contrib takes too much memory.
+      directory: ./app/modules/custom
+      exclude:
+        - tests
+      extensions:
+        - all
+      triggered_by:
+        - inc
+        - info
+        - install
+        - module
+        - php
+        - profile
+        - test
+        - theme
+    phpcs:
+      # Impossible to link to the custom phpcs.xml.dist file.
+      standard:
+        - vendor/drupal/coder/coder_sniffer/Drupal
+        - vendor/drupal/coder/coder_sniffer/DrupalPractice
+      triggered_by:
+        - inc
+        - info
+        - install
+        - module
+        - php
+        - profile
+        - test
+        - theme
+        - txt
+        - yml
+    phpcsfixer:
+      config: /project/scripts/quality/phpcs_fixer/.php-cs-fixer.dist.php
+      diff: true
+      triggered_by:
+        - inc
+        - info
+        - install
+        - module
+        - php
+        - profile
+        - test
+        - theme
+    phpstan:
+      configuration: /project/scripts/quality/phpstan/phpstan.neon.dist
+      memory_limit: "-1"
+      use_grumphp_paths: true
+      triggered_by:
+        - inc
+        - info
+        - install
+        - module
+        - php
+        - profile
+        - test
+        - theme
+      ignore_patterns:
+        - conf/drupal
+    securitychecker_enlightn: ~
+    yamllint: ~

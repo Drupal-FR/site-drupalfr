@@ -1,0 +1,12 @@
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# The previous line is required otherwise PATH does not include php bin.
+
+# When changing this file, reload the configuration using
+# 'make docker-enable-crontab'.
+
+# Drupal Cron.
+# Execute as the webserver user.
+*/5 * * * * su -s /bin/bash -c 'cd "${PROJECT_PATH}" && "${SCRIPTS_PATH}"/crontab-dev.sh all' ${WEBSERVER_USER}
+
+# Execute as the root user.
+#*/5 * * * * cd "${PROJECT_PATH}" && "${SCRIPTS_PATH}"/crontab-dev.sh all

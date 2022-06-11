@@ -1,0 +1,1 @@
+../../../../../app/modules/contrib/search_api/js/search_api.processors.js

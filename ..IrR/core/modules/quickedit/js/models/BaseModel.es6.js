@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/quickedit/js/models/BaseModel.es6.js

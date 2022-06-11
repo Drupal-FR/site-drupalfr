@@ -1,0 +1,1 @@
+../../../../../../../../app/core/modules/system/tests/modules/js_ajax_test/js/js_ajax_test.ajax.es6.js

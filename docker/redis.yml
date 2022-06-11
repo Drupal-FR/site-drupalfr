@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  redis:
+    image: ${DOCKER_SERVICE_REDIS_IMAGE}
+    volumes:
+      - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf:delegated
+    entrypoint:
+      - docker-entrypoint.sh
+      - /usr/local/etc/redis/redis.conf
+
+  web:
+    depends_on:
+      - redis
+
+  drupal_cron:
+    depends_on:
+      - redis

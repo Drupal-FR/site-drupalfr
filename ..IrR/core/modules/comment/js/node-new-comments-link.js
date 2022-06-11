@@ -1,0 +1,1 @@
+../../../../../app/core/modules/comment/js/node-new-comments-link.js

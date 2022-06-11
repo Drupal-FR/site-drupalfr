@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/ckeditor/js/views/AuralView.es6.js

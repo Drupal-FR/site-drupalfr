@@ -1,0 +1,1 @@
+../../../../../app/core/modules/layout_builder/js/layout-builder.js

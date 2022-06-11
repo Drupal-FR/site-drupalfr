@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  web:
+    image: ${DOCKER_SERVICE_WEB_IMAGE}
+    volumes:
+      - .:/project:delegated
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini:delegated
+      - ./conf/httpd/conf-available/security.conf:/etc/apache2/conf-available/security.conf:delegated
+      - ./conf/httpd/extra/httpd-vhosts.conf:/etc/apache2/sites-enabled/httpd-vhosts.conf:delegated
+      # Composer cache.
+      - ~/.cache/composer/:/root/.composer/cache/
+    env_file:
+      - .env
+      - ./conf/env/composer.env
+    extra_hosts:
+      - "${MATOMO_DOMAIN}:${DOCKER_BRIDGE_GATEWAY_IP}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.entrypoints=http"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.rule=Host(`${DRUPAL_SITE_DEFAULT_DOMAIN_1}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_2}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_3}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web_secure.entrypoints=https"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web_secure.rule=Host(`${DRUPAL_SITE_DEFAULT_DOMAIN_1}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_2}`, `${DRUPAL_SITE_DEFAULT_DOMAIN_3}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web_secure.middlewares=remove-signature-headers@file"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_web_secure.tls=true"
+    networks:
+      default:
+        # Aliases for Docker network to have the containers aware of this domain
+        # names.
+        aliases:
+          - ${DRUPAL_SITE_DEFAULT_DOMAIN_1}
+          - ${DRUPAL_SITE_DEFAULT_DOMAIN_2}
+          - ${DRUPAL_SITE_DEFAULT_DOMAIN_3}
+
+  drupal_cron:
+    image: ${DOCKER_SERVICE_WEB_IMAGE}
+    volumes:
+      - .:/project:delegated
+      - ./conf/crontab:/etc/crontabs/:delegated
+      - ./conf/php/php.ini:/usr/local/etc/php/php.ini:delegated
+      # This allows to have environment variables properly loaded during Cron
+      # execution.
+      - ./.env:/etc/environment:delegated
+    env_file:
+      - .env
+      - ./conf/env/composer.env
+    extra_hosts:
+      - "${MATOMO_DOMAIN}:${DOCKER_BRIDGE_GATEWAY_IP}"

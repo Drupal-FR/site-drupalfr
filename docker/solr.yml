@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  solr:
+    image: ${DOCKER_SERVICE_SOLR_IMAGE}
+    volumes:
+      - ./conf/solr:/solr-drupal/conf:delegated
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - drupal
+      - /solr-drupal

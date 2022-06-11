@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  mysql:
+    image: ${DOCKER_SERVICE_DRUPAL_SITE_DEFAULT_DB_IMAGE}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DRUPAL_SITE_DEFAULT_DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DRUPAL_SITE_DEFAULT_DB_USER}
+      MYSQL_PASSWORD: ${DRUPAL_SITE_DEFAULT_DB_PASSWORD}
+      MYSQL_DATABASE: ${DRUPAL_SITE_DEFAULT_DB_DATABASE}
+    volumes:
+      - ./conf/mysql:/etc/mysql/conf.d:delegated
+      - ./data/db:/var/lib/mysql:delegated
+
+  web:
+    depends_on:
+      - mysql
+
+  drupal_cron:
+    depends_on:
+      - mysql

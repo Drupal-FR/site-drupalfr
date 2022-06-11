@@ -1,0 +1,1 @@
+../../../../../app/core/modules/media_library/js/media_library.click_to_select.es6.js

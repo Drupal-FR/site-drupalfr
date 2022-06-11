@@ -1,0 +1,1 @@
+../../../../../../../app/core/modules/media/js/plugins/drupalmedia/plugin.js

@@ -1,0 +1,1 @@
+../../../../../app/core/modules/editor/js/editor.formattedTextEditor.es6.js

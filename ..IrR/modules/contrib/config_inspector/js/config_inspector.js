@@ -1,0 +1,1 @@
+../../../../../app/modules/contrib/config_inspector/js/config_inspector.js

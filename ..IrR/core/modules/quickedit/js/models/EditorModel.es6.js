@@ -1,0 +1,1 @@
+../../../../../../app/core/modules/quickedit/js/models/EditorModel.es6.js
