@@ -622,5 +622,3 @@ workflow:
     - if: $CI_MERGE_REQUEST_ID
     # Execute jobs when a new tag is created.
     - if: $CI_COMMIT_TAG
-    # Execute jobs when a new commit is pushed to 9.x branch.
-    - if: $CI_COMMIT_BRANCH == '9.x'
