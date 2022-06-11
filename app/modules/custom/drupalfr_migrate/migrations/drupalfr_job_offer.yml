@@ -1,0 +1,63 @@
+id: drupalfr_job_offer
+label: 'Job offer import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - node
+migration_dependencies:
+  required:
+    - drupalfr_user
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/job_offer.csv
+  header_row_count: 1
+  keys:
+    - uuid
+  column_names:
+    - uuid: UUID
+    - title: Title
+    - published: Published
+    - author: Author
+    - nature: Nature
+    - regions: Regions
+    - validity: Validity
+    - contract_type: 'Contract type'
+    - teleworking: Teleworking
+    - body_value: Body
+    - body_format: 'Body format'
+destination:
+  plugin: 'entity:node'
+process:
+  uuid: uuid
+  type:
+    plugin: default_value
+    default_value: job_offer
+  title: title
+  body/value: body_value
+  body/format: body_format
+  field_job_nature: nature
+  field_region:
+    -
+      plugin: explode
+      source: regions
+      delimiter: ;
+  field_job_validity: validity
+  field_job_contract_type: contract_type
+  field_job_teleworking: teleworking
+  status: published
+  uid:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: author
+    -
+      plugin: migration_lookup
+      migration: drupalfr_user
+      no_stub: true

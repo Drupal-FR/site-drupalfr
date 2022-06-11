@@ -1,0 +1,63 @@
+id: drupalfr_menu_link
+label: 'Menu link import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - menu_link_content
+    - migrate_plus
+    - migrate_source_csv
+migration_dependencies:
+  required:
+    - drupalfr_page
+source:
+  plugin: drupalfr_migrate_menu_link_csv
+  path: modules/custom/drupalfr_migrate/migrations/data/menu_link.csv
+  keys:
+    - uuid
+  header_row_count: 1
+  column_names:
+    - uuid: UUID
+    - title: Title
+    - uri: URI
+    - parent: Parent
+    - weight: Weight
+    - menu_name: 'Menu name'
+    - expanded: Expanded
+    - enabled: Enabled
+    - attributes_title: Link attribute - title
+    - attributes_id: Link attribute - id
+    - attributes_name: Link attribute - name
+    - attributes_rel: Link attribute - relation
+    - attributes_class: Link attribute - class
+    - attributes_style: Link attribute - style
+    - attributes_target: Link attribute - target
+    - attributes_accesskey: Link attribute - accesskey
+    - item_attributes_id: Menu link attribute - id
+    - item_attributes_class: Menu link attribute - class
+    - item_attributes_style: Menu link attribute - style
+    - fa_icon: Fontawesome menu icon
+    - fa_icon_appearance: Fontawesome menu icon appearance
+destination:
+  plugin: entity:menu_link_content
+process:
+  uuid: uuid
+  title: title
+  'link/uri':
+    plugin: drupalfr_geturifromuuid
+    source: uri
+  weight: weight
+  parent:
+    plugin: drupalfr_findmenupluginid
+    source: parent
+  bundle:
+    plugin: default_value
+    default_value: menu_link_content
+  menu_name: menu_name
+  expanded: expanded
+  enabled: enabled
+  'link/options': options

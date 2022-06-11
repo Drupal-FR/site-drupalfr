@@ -1,0 +1,408 @@
+<?php
+
+/**
+ * @file
+ * ZURB Foundation sub-theme.
+ */
+
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_theme_suggestions_user_alter().
+ */
+function drupal_france_theme_suggestions_user_alter(&$suggestions, $variables) {
+  $suggestions[] = 'user__' . $variables['elements']['#view_mode'];
+}
+
+/**
+ * Implements hook_theme_suggestions_field_alter().
+ */
+function drupal_france_theme_suggestions_field_alter(&$suggestions, $variables) {
+  $suggestions[] = 'field__' . $variables['element']['#entity_type'] . '__' . $variables['element']['#field_name'] . '__' . $variables['element']['#bundle'] . '__' . $variables['element']['#view_mode'];
+}
+
+/**
+ * Implements hook_theme_suggestions_form_alter().
+ */
+function drupal_france_theme_suggestions_form_alter(&$suggestions, $variables) {
+  $suggestions[] = 'form__' . $variables['element']['#form_id'];
+}
+
+/**
+ * Implements hook_theme_suggestions_form_element_alter().
+ */
+function drupal_france_theme_suggestions_form_element_alter(&$suggestions, $variables) {
+  $current_route_name = \Drupal::service('current_route_match')->getRouteName();
+  if ($current_route_name === 'view.user_member.page_organization_member') {
+    $suggestions[] = 'form_element__organizations';
+  }
+  elseif ($current_route_name === 'view.job_offer.page_job_offer') {
+    $suggestions[] = 'form_element__job-offers';
+  }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ *
+ * Allows to use the block ID in a theme suggestion hook.
+ */
+function drupal_france_preprocess_block(&$variables) {
+  if (isset($variables['attributes']['id'])) {
+    $variables['content']['#attributes']['block_id'] = $variables['attributes']['id'];
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function drupal_france_theme_suggestions_menu_alter(array &$suggestions, array $variables) {
+  // Remove the block and replace dashes with underscores in the block ID to
+  // use for the hook name.
+  if (isset($variables['attributes']['block_id'])) {
+    $hook = str_replace(['block-', '-'], [
+      '',
+      '_',
+    ], $variables['attributes']['block_id']);
+    $suggestions[] = $variables['theme_hook_original'] . '__' . $hook;
+  }
+}
+
+/**
+ * Implements hook_preprocess_paragraph().
+ */
+function drupal_france_preprocess_paragraph(&$variables) {
+  /** @var \Drupal\paragraphs\ParagraphInterface $paragraph */
+  $paragraph = $variables['paragraph'];
+  if ($paragraph->bundle() == 'title_text_media') {
+    $variables['media_position'] = 'right';
+    $variables['media_width_class'] = 'medium-6';
+    $variables['text_width_class'] = 'medium-6';
+
+    // Paragraph CSS Class.
+    if ($paragraph->hasField('field_css_class')) {
+      $css_class = $paragraph->get('field_css_class')->getValue();
+      if (!empty($css_class)) {
+        $variables['attributes']['class'][] = $css_class[0]['value'];
+      }
+    }
+
+    // Paragraph background color.
+    if ($paragraph->hasField('field_background_color')) {
+      $background_color = $paragraph->get('field_background_color')->getValue();
+      if (!empty($background_color)) {
+        $variables['background_color'] = $background_color[0]['color'];
+      }
+    }
+
+    // Media position.
+    if ($paragraph->hasField('field_media_position')) {
+      $media_position = $paragraph->get('field_media_position')->getValue();
+      if (!empty($media_position)) {
+        $variables['media_position'] = $media_position[0]['value'] ? 'left' : 'right';
+      }
+    }
+
+    // Media width.
+    if ($paragraph->hasField('field_media_width_class')) {
+      $media_width_class = $paragraph->get('field_media_width_class')
+        ->getValue();
+      if (!empty($media_width_class)) {
+        $media_width_class = $media_width_class[0]['value'];
+        // Edge cases.
+        if ($media_width_class == 0) {
+          unset($variables['content']['field_media']);
+        }
+        elseif ($media_width_class == 12) {
+          unset($variables['content']['field_title']);
+          unset($variables['content']['field_sub_title']);
+          unset($variables['content']['field_text']);
+          unset($variables['content']['field_call_to_action']);
+        }
+        $text_width_class = 12 - (int) $media_width_class;
+        $variables['media_width_class'] = 'medium-' . $media_width_class;
+        $variables['text_width_class'] = 'medium-' . $text_width_class;
+      }
+    }
+
+    // Title level.
+    if (
+      $paragraph->hasField('field_title_level') &&
+      $paragraph->hasField('field_title') &&
+      isset($variables['content']['field_title'])
+    ) {
+      $title_level = $paragraph->get('field_title_level')->getValue();
+      if (!empty($title_level)) {
+        $title_level = $title_level[0]['value'];
+        $variables['content']['field_title']['#prefix'] = "<$title_level>";
+        $variables['content']['field_title']['#suffix'] = "</$title_level>";
+      }
+    }
+  }
+
+  if ($paragraph->bundle() == 'layout_twocol') {
+    // Second column width.
+    if ($paragraph->hasField('field_column_2_width')) {
+      $second_column_width_class = $paragraph->get('field_column_2_width')
+        ->getValue();
+      if (!empty($second_column_width_class)) {
+        $second_column_width_class = $second_column_width_class[0]['value'];
+        // Edge cases.
+        if ($second_column_width_class == 0) {
+          unset($variables['content']['field_column_2']);
+        }
+        elseif ($second_column_width_class == 12) {
+          unset($variables['content']['field_column_1']);
+        }
+        $first_column_width_class = 12 - (int) $second_column_width_class;
+        $variables['first_column_width_class'] = 'medium-' . $first_column_width_class;
+        $variables['second_column_width_class'] = 'medium-' . $second_column_width_class;
+      }
+    }
+  }
+
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function drupal_france_preprocess_node(&$variables) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+
+  // Add the formatted date to all nodes.
+  /** @var Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+  $date_formatter = \Drupal::service('date.formatter');
+  $creation_time = $node->getCreatedTime();
+  $formatted_date = $date_formatter->format($creation_time, 'custom', '<\s\p\a\n \c\l\a\s\s="\d\a\t\e">d<\b\r>M</\s\p\a\n><\s\p\a\n \c\l\a\s\s="\t\i\m\e">H\hi</\s\p\a\n>');
+  $variables['square_publication_date'] = new FormattableMarkup($formatted_date, []);
+}
+
+/**
+ * Implements hook_preprocess_block_search_header_block().
+ */
+function drupal_france_preprocess_block__drupal_france_search_header_block(&$variables) {
+  $variables['content']['search_link']['#options'] = [
+    'attributes' => [
+      'title' => $variables['content']['search_link']['#title'],
+      'aria-label' => $variables['content']['search_link']['#title'],
+      'class' => [
+        'clear',
+        'button',
+        'inverted',
+        'button--search',
+      ],
+    ],
+  ];
+  $variables['content']['search_link']['#title'] = new FormattableMarkup('<i class="fas fa-search" aria-hidden="true"></i>', []);
+}
+
+/**
+ * Implements hook_preprocess_menu__account().
+ */
+function drupal_france_preprocess_menu__account(&$variables) {
+  if (isset($variables['items']['drupalfr_user.account.compte'])) {
+    $variables['items']['drupalfr_user.account.compte']['attributes']->addClass([
+      'button',
+      'primary',
+      'button--user-account',
+    ]);
+
+    $variables['items']['drupalfr_user.account.compte']['title'] = new FormattableMarkup(
+      '<i class="fas fa-user-circle" aria-hidden="true"></i><span class="sr-only">@original_title</span>',
+      [
+        '@original_title' => $variables['items']['drupalfr_user.account.compte']['title'],
+      ]
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add classes on links to password reset and create account forms.
+ */
+function drupal_france_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['title'] = [
+    '#type' => 'item',
+    '#markup' => t('Login'),
+    '#weight' => -1,
+    '#prefix' => '<h1>',
+    '#suffix' => '</h1>',
+  ];
+
+  if (isset($form['actions'])) {
+    $form['actions']['submit']['#attributes']['class'] = [
+      'button',
+      'large',
+      'expanded',
+      'primary',
+    ];
+  }
+
+  if (isset($form['create_account_link'])) {
+    $form['create_account_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-left',
+      ],
+    ];
+  }
+
+  if (isset($form['password_reset_link'])) {
+    $form['password_reset_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-right',
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add classes on links to password reset and Login forms.
+ */
+function drupal_france_form_user_register_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['title'] = [
+    '#type' => 'item',
+    '#markup' => t('Register'),
+    '#weight' => -1,
+    '#prefix' => '<h1>',
+    '#suffix' => '</h1>',
+  ];
+
+  if (isset($form['actions'])) {
+    $form['actions']['submit']['#attributes']['class'] = [
+      'button',
+      'large',
+      'expanded',
+      'primary',
+    ];
+  }
+
+  if (isset($form['login_link'])) {
+    $form['login_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-left',
+      ],
+    ];
+  }
+
+  if (isset($form['password_reset_link'])) {
+    $form['password_reset_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-right',
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add classes on links to Login and create account forms.
+ */
+function drupal_france_form_user_pass_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['title'] = [
+    '#type' => 'item',
+    '#markup' => t('Reset your password'),
+    '#weight' => -1,
+    '#prefix' => '<h1>',
+    '#suffix' => '</h1>',
+  ];
+
+  if (isset($form['actions'])) {
+    $form['actions']['submit']['#attributes']['class'] = [
+      'button',
+      'large',
+      'expanded',
+      'primary',
+    ];
+  }
+
+  if (isset($form['login_link'])) {
+    $form['login_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-left',
+      ],
+    ];
+  }
+
+  if (isset($form['create_account_link'])) {
+    $form['create_account_link']['#attributes'] = [
+      'class' => [
+        'button',
+        'small',
+        'secondary',
+        'clear',
+        'float-right',
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function drupal_france_preprocess_field(&$variables) {
+  $current_url = Url::fromRoute('<current>');
+  $path = $current_url->toString();
+  if ($variables['entity_type'] == 'user' && $variables['field_name'] == 'user_picture') {
+    foreach ($variables['items'] as $key => $item) {
+      $variables['items'][$key]['content']['#item_attributes']['class'][] = 'user-image';
+    }
+  }
+
+  // Add class 'recherche' if search page.
+  if ($path == "/recherche") {
+    $variables['recherche'] = 'recherche';
+  }
+
+}
+
+function drupal_france_preprocess_page(&$variables) {
+  $site_name = isset($variables['site_name']) ? $variables['site_name'] : \Drupal::config('system.site')->get('name');
+
+  $variables['logo_img'] = '';
+
+  $logo = theme_get_setting('logo.url');
+
+  if (!empty($logo)) {
+    $elements = [
+      '#theme' => 'image',
+      '#uri' => $logo,
+      '#attributes' => [
+        'alt' => strip_tags($site_name) . ' ' . t('logo'),
+        'title' => strip_tags($site_name) . ' ' . t('Home'),
+        'class' => array('logo'),
+      ],
+    ];
+
+    $variables['logo_img'] = $elements;
+  }
+
+}

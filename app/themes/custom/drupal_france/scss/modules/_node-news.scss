@@ -1,0 +1,48 @@
+// ==========================
+// Node News
+// ==========================
+
+// View Element
+.news-element {
+
+  &.teaser {
+    @include shadow();
+
+    @include breakpoint(small only) {
+      margin-top: $global-margin;
+    }
+    background-color: $white;
+
+    .news-element--feature-image {
+      border-bottom: thin solid $light-gray;
+    }
+
+    .news-element--author {
+      margin-top: -$global-padding*2;
+      padding:    0 $global-padding*2;
+
+    }
+
+    .news-element--title {
+      padding:    $global-padding $global-padding*2 $global-padding/2;
+      font-size: 1.75rem;
+
+      a {
+        color: $drupal-blue-lighter;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: $drupal-blue-dark;
+        }
+      }
+    }
+
+    .news-element--content {
+      padding: 0 $global-padding*2 $global-padding*3;
+      color:   $dark-gray;
+    }
+
+  }
+}
+

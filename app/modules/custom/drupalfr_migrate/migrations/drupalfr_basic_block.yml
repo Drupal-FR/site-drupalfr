@@ -1,0 +1,36 @@
+id: drupalfr_basic_block
+label: 'Default blocks import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - block_content
+    - migrate_plus
+    - migrate_source_csv
+migration_dependencies: {}
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/basic_block.csv
+  header_row_count: 1
+  keys:
+    - uuid
+  column_names:
+    - uuid: UUID
+    - info: Title
+    - body_value: Body
+    - body_format: 'Body format'
+destination:
+  plugin: 'entity:block_content'
+  no_stub: true
+process:
+  uuid: uuid
+  type:
+    plugin: default_value
+    default_value: basic
+  info: info
+  body/value: body_value
+  body/format: body_format

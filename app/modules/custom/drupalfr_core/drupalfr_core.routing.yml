@@ -1,0 +1,9 @@
+drupalfr_core.config_list:
+  path: '/admin/config/drupalfr'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Drupal France'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE

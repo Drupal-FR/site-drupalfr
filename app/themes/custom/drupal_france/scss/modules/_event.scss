@@ -1,0 +1,97 @@
+// ==========================
+// EVENTS
+// ==========================
+
+.event {
+
+  &-banner {
+    img {
+      width: 100vw;
+    }
+  }
+
+  &-date {
+    display:       block;
+    margin-bottom: $global-margin;
+
+    & * {
+      display: inline;
+    }
+
+  }
+
+
+  &.teaser {
+    @include shadow();
+    margin-top:       $global-margin*2;
+    background-color: $white;
+
+    .block-meetup--list--info-box {
+      position: absolute;
+      top:      -40px;
+      right:    38%;
+      left:     38%;
+      width:    24%;
+    }
+
+    .node-title {
+      padding:       $global-padding $global-padding*2 0;
+      border-bottom: 1px solid $light-gray;
+      font-size:     1.75rem;
+
+      a {
+        color: $drupal-blue-lighter;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: $drupal-blue-dark;
+        }
+      }
+    }
+
+    .content {
+      padding: 0 $global-padding*2 $global-padding;
+    }
+
+
+
+    .field-node--field-event-date-start,
+    .field-node--field-event-date-end {
+      font-weight: 700;
+      text-align:  left;
+    }
+
+    .body {
+      @include clearfix;
+    }
+  }
+
+  &.full {
+
+    .date {
+      color:      $white;
+      text-align: center;
+
+      &--day {
+        padding:          $global-padding*2 $global-padding/2 0;
+        background-color: $drupal-blue-dark;
+        font-size:        2rem;
+        line-height:      1.5rem;
+      }
+
+      &--month {
+        padding:          0 $global-padding/2 $global-padding;
+        background-color: $drupal-blue-dark;
+        font-size:        1.25rem;
+      }
+
+      &--year {
+        padding:          $global-padding/4 $global-padding/2;
+        background-color: $drupal-blue-lighter;
+        font-size:        1rem;
+      }
+    }
+
+  }
+}

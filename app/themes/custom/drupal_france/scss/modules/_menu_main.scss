@@ -1,0 +1,194 @@
+// ==========================
+// MENUS
+// --------------------------
+// 1 - Main Menu
+// 2 - User account Menu
+// ==========================
+
+// 1 - Main Menu
+.main-menu {
+  &[role='menubar'] {
+    z-index: 500;
+
+    @include breakpoint(small only) {
+      li {
+        border-top: 1px solid rgba($white, .25);
+
+        &:last-child {
+          border-bottom: 1px solid rgba($white, .25);
+        }
+
+        a {
+          background-color: transparent;
+          color:            $white;
+
+          &::before {
+            border-color: transparent $white transparent transparent;
+          }
+
+          &::after {
+            border-color: transparent transparent transparent $white;
+          }
+
+        }
+
+        .submenu {
+          background-color: $drupal-blue-dark;
+        }
+      }
+    }
+
+    @include breakpoint(medium) {
+      display:         flex;
+      flex-direction:  row;
+      flex-wrap:       nowrap;
+      justify-content: space-between;
+      align-content:   center;
+      align-items:     center;
+      height:          75px;
+
+      > li {
+        height: 75px;
+
+        > a {
+          display:       block;
+          height:        75px;
+          padding-right: 2.5rem !important;
+          font-weight:   700;
+          line-height:   50px;
+          color:         $white;
+
+          &.is-active {
+            border-bottom: 5px solid $drupal-blue-light;
+          }
+
+          &:hover,
+          &:focus,
+          &:active {
+            background-color: $drupal-blue-light;
+            color:            $white;
+
+            &::after {
+              border-color: $white transparent transparent !important;
+            }
+          }
+
+          &::after {
+            right: 15px !important;
+          }
+        }
+
+        &.is-active {
+          > a {
+            background-color: $drupal-blue-light;
+            color:            $white;
+          }
+        }
+
+        > .submenu {
+          border-color:     $drupal-blue-light;
+          background-color: $drupal-blue-light;
+
+          > li {
+            > a {
+              padding: 1rem;
+              color:   $white;
+
+              &.is-active {
+                font-weight:     700;
+                text-decoration: underline;
+              }
+
+              &:hover,
+              &:focus,
+              &:active {
+                background-color: $white;
+                color:            $drupal-blue-dark;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 2 - Topbar User account Menu
+.menu--user-account {
+  > li {
+    &.button--user-account {
+      margin-bottom: 0;
+
+      @include breakpoint(small only) {
+        padding: .25rem;
+      }
+
+      @include breakpoint(medium) {
+        padding: 15px 0;
+      }
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $drupal-blue-light;
+      }
+
+      > a {
+        padding-right: 1rem !important;
+        color:         $white;
+
+        @include breakpoint(small only) {
+          padding: .25rem !important;
+        }
+
+        &::after {
+          display: none !important;
+        }
+
+        > .fa {
+          font-size: 1.5rem;
+        }
+      }
+
+      &.is-active {
+        > a {
+          color: $white;
+
+          &:hover,
+          &:focus,
+          &:active {
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+
+  .submenu {
+    right:            -1px !important;
+    border-color:     $drupal-blue-light;
+    background-color: $drupal-blue-light;
+
+    @include breakpoint(small only) {
+      border: 0;
+    }
+
+    > li {
+      > a {
+        padding:        1rem;
+        font-size:      16px;
+        font-weight:    400;
+        color:          $white;
+        text-align:     left;
+        text-transform: none;
+
+        &:hover,
+        &:focus,
+        &:active {
+          background-color: $white;
+          color:            $drupal-blue-dark;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+id: drupalfr_paragraph_layout_twocol
+label: 'Paragraph layout two col import'
+migration_group: drupalfr
+migration_tags:
+  - drupalfr
+dependencies:
+  enforced:
+    module:
+      - drupalfr_migrate
+  module:
+    - migrate_plus
+    - migrate_source_csv
+    - paragraphs
+migration_dependencies:
+  required:
+    - drupalfr_paragraph_block
+    - drupalfr_paragraph_html
+    - drupalfr_paragraph_title_text_media
+source:
+  plugin: csv
+  path: modules/custom/drupalfr_migrate/migrations/data/paragraph_layout_twocol.csv
+  header_row_count: 1
+  keys:
+    - pid
+  column_names:
+    - pid: Identifier
+    - field_column_1: 'First column'
+    - field_column_2: 'Second column'
+    - field_column_2_width: 'Second column width'
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+process:
+  type:
+    plugin: default_value
+    default_value: layout_twocol
+  field_column_1:
+    -
+      plugin: explode
+      delimiter: ;
+      source: field_column_1
+    -
+      plugin: migration_lookup
+      migration:
+        - drupalfr_paragraph_block
+        - drupalfr_paragraph_html
+        - drupalfr_paragraph_title_text_media
+      no_stub: true
+    -
+      plugin: sub_process
+      process:
+        target_id: '0'
+        target_revision_id: '1'
+  field_column_2:
+    -
+      plugin: explode
+      delimiter: ;
+      source: field_column_2
+    -
+      plugin: migration_lookup
+      migration:
+        - drupalfr_paragraph_block
+        - drupalfr_paragraph_html
+        - drupalfr_paragraph_title_text_media
+      no_stub: true
+    -
+      plugin: sub_process
+      process:
+        target_id: '0'
+        target_revision_id: '1'
+  field_column_2_width: field_column_2_width

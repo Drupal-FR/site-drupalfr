@@ -1,0 +1,55 @@
+// ==========================
+// Node Release
+// ==========================
+
+// Download Page
+.release {
+  margin-bottom: $global-margin;
+  padding:       $global-padding 0;
+  border-bottom: 1px solid $light-gray;
+
+  .title {
+    font-size:      2rem;
+    font-weight:    700;
+    line-height:    2rem;
+    text-transform: capitalize;
+  }
+
+  &--date {
+    color: $drupal-blue-dark;
+  }
+
+  &--content {
+    padding-top:   $global-padding;
+    padding-right: $global-padding * 5;
+  }
+
+  &--type {
+    &--label {
+      display:       inline-block;
+      float:         left;
+      padding-right: $global-padding;
+      font-style:    italic;
+      color:         $dark-gray;
+    }
+
+    .field-items {
+      margin-left: 0;
+    }
+  }
+
+  &--button {
+    padding: $global-padding;
+  }
+
+  &--block {
+    padding:          $global-padding * 2 $global-padding * 3;
+    border-color:     $drupal-grey;
+    background-color: $drupal-grey-light;
+    text-align:       center;
+
+    > h2 {
+      font-size: 1.75rem;
+    }
+  }
+}

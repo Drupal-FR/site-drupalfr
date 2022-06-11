@@ -4,8 +4,70 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fad98b935d3889057e852e30b4d4bf5",
+    "content-hash": "df8881efe158815aff98db472d2bf0bf",
     "packages": [
+        {
+            "name": "abraham/twitteroauth",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/abraham/twitteroauth.git",
+                "reference": "55dcddb3bb8e87325acab2f219c08750b68efb74"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/abraham/twitteroauth/zipball/55dcddb3bb8e87325acab2f219c08750b68efb74",
+                "reference": "55dcddb3bb8e87325acab2f219c08750b68efb74",
+                "shasum": ""
+            },
+            "require": {
+                "composer/ca-bundle": "^1.2",
+                "ext-curl": "*",
+                "php": "^7.4 || ^8.0 || ^8.1"
+            },
+            "require-dev": {
+                "php-vcr/php-vcr": "^1",
+                "php-vcr/phpunit-testlistener-vcr": "dev-php-8",
+                "phpmd/phpmd": "^2",
+                "phpunit/phpunit": "^8 || ^9",
+                "rector/rector": "^0.12.19",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Abraham\\TwitterOAuth\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Abraham Williams",
+                    "email": "abraham@abrah.am",
+                    "homepage": "https://abrah.am",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The most popular PHP library for use with the Twitter OAuth REST API.",
+            "homepage": "https://twitteroauth.com",
+            "keywords": [
+                "Twitter API",
+                "Twitter oAuth",
+                "api",
+                "oauth",
+                "rest",
+                "social",
+                "twitter"
+            ],
+            "support": {
+                "issues": "https://github.com/abraham/twitteroauth/issues",
+                "source": "https://github.com/abraham/twitteroauth"
+            },
+            "time": "2022-04-02T16:47:22+00:00"
+        },
         {
             "name": "asm89/stack-cors",
             "version": "1.3.0",
@@ -61,6 +123,48 @@
                 "source": "https://github.com/asm89/stack-cors/tree/1.3.0"
             },
             "time": "2019-12-24T22:41:47+00:00"
+        },
+        {
+            "name": "blobaugh/meetup-api-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/blobaugh/Meetup-API-client-for-PHP.git",
+                "reference": "760113eb6548d160a5148f5ca4210e2c30bdd00c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/blobaugh/Meetup-API-client-for-PHP/zipball/760113eb6548d160a5148f5ca4210e2c30bdd00c",
+                "reference": "760113eb6548d160a5148f5ca4210e2c30bdd00c",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "Meetup.php"
+                ],
+                "classmap": [
+                    "."
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Ben Lobaugh",
+                    "email": "ben@lobaugh.net"
+                }
+            ],
+            "description": "A PHP API wrapper for the Meetup.com API",
+            "keywords": [
+                "api",
+                "meetup"
+            ],
+            "support": {
+                "issues": "https://github.com/blobaugh/Meetup-API-client-for-PHP/issues",
+                "source": "https://github.com/blobaugh/Meetup-API-client-for-PHP/tree/master"
+            },
+            "time": "2012-12-10T15:43:05+00:00"
         },
         {
             "name": "bower-asset/blazy",
@@ -395,6 +499,82 @@
                 "source": "https://github.com/commerceguys/intl/tree/v1.1.1"
             },
             "time": "2021-10-30T18:07:14+00:00"
+        },
+        {
+            "name": "composer/ca-bundle",
+            "version": "1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/ca-bundle.git",
+                "reference": "fd5dd441932a7e10ca6e5b490e272d34c8430640"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/fd5dd441932a7e10ca6e5b490e272d34c8430640",
+                "reference": "fd5dd441932a7e10ca6e5b490e272d34c8430640",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "ext-pcre": "*",
+                "php": "^5.3.2 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.12.55",
+                "psr/log": "^1.0",
+                "symfony/phpunit-bridge": "^4.2 || ^5",
+                "symfony/process": "^2.5 || ^3.0 || ^4.0 || ^5.0 || ^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\CaBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Lets you find a path to the system CA bundle, and includes a fallback to the Mozilla CA bundle.",
+            "keywords": [
+                "cabundle",
+                "cacert",
+                "certificate",
+                "ssl",
+                "tls"
+            ],
+            "support": {
+                "irc": "irc://irc.freenode.org/composer",
+                "issues": "https://github.com/composer/ca-bundle/issues",
+                "source": "https://github.com/composer/ca-bundle/tree/1.3.2"
+            },
+            "funding": [
+                {
+                    "url": "https://packagist.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-05-24T11:56:16+00:00"
         },
         {
             "name": "composer/installers",
@@ -6024,6 +6204,107 @@
             "homepage": "https://www.drupal.org/project/linked_field",
             "support": {
                 "source": "https://git.drupalcode.org/project/linked_field"
+            }
+        },
+        {
+            "name": "drupal/mailchimp",
+            "version": "2.1.0-rc1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/mailchimp.git",
+                "reference": "2.1.0-rc1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/mailchimp-2.1.0-rc1.zip",
+                "reference": "2.1.0-rc1",
+                "shasum": "a13c964c316ad7729dd5f8c70b97b155d756917a"
+            },
+            "require": {
+                "drupal/core": "^8.7.7 || ^9",
+                "thinkshout/mailchimp-api-php": "^2.1"
+            },
+            "require-dev": {
+                "drupal/mailchimp_events": "*",
+                "drupal/mailchimp_lists": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "2.1.0-rc1",
+                    "datestamp": "1626366691",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "RC releases are not covered by Drupal security advisories."
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "5adiyah",
+                    "homepage": "https://www.drupal.org/user/3622346"
+                },
+                {
+                    "name": "Pastenes",
+                    "homepage": "https://www.drupal.org/user/3640659"
+                },
+                {
+                    "name": "aprice42",
+                    "homepage": "https://www.drupal.org/user/369147"
+                },
+                {
+                    "name": "bobpotter",
+                    "homepage": "https://www.drupal.org/user/3653774"
+                },
+                {
+                    "name": "brendanthinkshout",
+                    "homepage": "https://www.drupal.org/user/3578399"
+                },
+                {
+                    "name": "gcb",
+                    "homepage": "https://www.drupal.org/user/1682976"
+                },
+                {
+                    "name": "itrebecca",
+                    "homepage": "https://www.drupal.org/user/1604434"
+                },
+                {
+                    "name": "kescoto-thinkshout",
+                    "homepage": "https://www.drupal.org/user/3664824"
+                },
+                {
+                    "name": "levelos",
+                    "homepage": "https://www.drupal.org/user/54135"
+                },
+                {
+                    "name": "mariacha1",
+                    "homepage": "https://www.drupal.org/user/2210776"
+                },
+                {
+                    "name": "mshaver",
+                    "homepage": "https://www.drupal.org/user/39079"
+                },
+                {
+                    "name": "spncr",
+                    "homepage": "https://www.drupal.org/user/3664814"
+                },
+                {
+                    "name": "tauno",
+                    "homepage": "https://www.drupal.org/user/105595"
+                },
+                {
+                    "name": "wxactly",
+                    "homepage": "https://www.drupal.org/user/3181097"
+                }
+            ],
+            "description": "Mailchimp is an integration with the Mailchimp Mass email tool.",
+            "homepage": "http://drupal.org/project/mailchimp",
+            "support": {
+                "source": "https://git.drupalcode.org/project/mailchimp"
             }
         },
         {
@@ -13668,6 +13949,50 @@
             "time": "2021-11-18T18:49:23+00:00"
         },
         {
+            "name": "thinkshout/mailchimp-api-php",
+            "version": "v2.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thinkshout/mailchimp-api-php.git",
+                "reference": "b402bd67308974cae6186b386957d910cd808f0d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thinkshout/mailchimp-api-php/zipball/b402bd67308974cae6186b386957d910cd808f0d",
+                "reference": "b402bd67308974cae6186b386957d910cd808f0d",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2.1|^7.0.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.2.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mailchimp\\": "src/",
+                    "Mailchimp\\http\\": "src/http/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "PHP library for v3 of the MailChimp API",
+            "homepage": "https://github.com/thinkshout/mailchimp-api-php",
+            "keywords": [
+                "mail",
+                "mailchimp"
+            ],
+            "support": {
+                "issues": "https://github.com/thinkshout/mailchimp-api-php/issues",
+                "source": "https://github.com/thinkshout/mailchimp-api-php/tree/v2.1.3"
+            },
+            "time": "2021-12-29T19:57:45+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.4",
             "source": {
@@ -15074,82 +15399,6 @@
                 "source": "https://github.com/Behat/Transliterator/tree/v1.5.0"
             },
             "time": "2022-03-30T09:27:43+00:00"
-        },
-        {
-            "name": "composer/ca-bundle",
-            "version": "1.3.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/ca-bundle.git",
-                "reference": "fd5dd441932a7e10ca6e5b490e272d34c8430640"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/fd5dd441932a7e10ca6e5b490e272d34c8430640",
-                "reference": "fd5dd441932a7e10ca6e5b490e272d34c8430640",
-                "shasum": ""
-            },
-            "require": {
-                "ext-openssl": "*",
-                "ext-pcre": "*",
-                "php": "^5.3.2 || ^7.0 || ^8.0"
-            },
-            "require-dev": {
-                "phpstan/phpstan": "^0.12.55",
-                "psr/log": "^1.0",
-                "symfony/phpunit-bridge": "^4.2 || ^5",
-                "symfony/process": "^2.5 || ^3.0 || ^4.0 || ^5.0 || ^6.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Composer\\CaBundle\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
-                    "homepage": "http://seld.be"
-                }
-            ],
-            "description": "Lets you find a path to the system CA bundle, and includes a fallback to the Mozilla CA bundle.",
-            "keywords": [
-                "cabundle",
-                "cacert",
-                "certificate",
-                "ssl",
-                "tls"
-            ],
-            "support": {
-                "irc": "irc://irc.freenode.org/composer",
-                "issues": "https://github.com/composer/ca-bundle/issues",
-                "source": "https://github.com/composer/ca-bundle/tree/1.3.2"
-            },
-            "funding": [
-                {
-                    "url": "https://packagist.com",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/composer",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-05-24T11:56:16+00:00"
         },
         {
             "name": "composer/composer",
@@ -23787,7 +24036,8 @@
     "stability-flags": {
         "drupal-composer/drupal-security-advisories": 20,
         "mortenson/psalm-plugin-drupal": 20,
-        "roave/security-advisories": 20
+        "roave/security-advisories": 20,
+        "blobaugh/meetup-api-client": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display member badge.
+ *
+ * Available variables:
+ * - is_member: A boolean idicating if the user is a member.
+ * - is_profile_owner: A boolean indicating if the user viewing the badge is the
+ *   owner of the account.
+ * @ingroup themeable
+ */
+#}
+
+{% if is_member %}
+  <div class="user-member--badge">
+    <img src="/{{ directory }}/images/Badge_Adherent_Ind_ADFF.svg" alt="{{ 'Member'|t }}">
+  </div>
+{% elseif is_organization %}
+  <div class="user-member--badge">
+    <img src="/{{ directory }}/images/Badge_Adherent_Org_ADFF.svg" alt="{{ 'Organization member'|t }}">
+  </div>
+{% elseif is_profile_owner %}
+  <div class="user-member--become-member">
+    <a class="button hollow primary"
+       href="/association/adhesion">
+      {{ 'Become a member'|t }}
+    </a>
+  </div>
+{% endif %}

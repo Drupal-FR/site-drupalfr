@@ -1,0 +1,60 @@
+// ==========================
+// TOPBAR
+// --------------------------
+// 1 - Site Name
+// 2 - Search Button
+// 3 - User Account Button
+// ==========================
+
+// 1 - Site Name
+.site-name {
+  > a {
+    display: block;
+    color:   $white;
+
+    @include breakpoint(small only) {
+      text-align: center;
+
+      > img {
+        max-height: 42px;
+      }
+    }
+
+    @include breakpoint(medium only) {
+      margin-top: 8px;
+    }
+  }
+}
+
+// 2 - Search Button
+.header--search-block {
+  @include breakpoint(medium) {
+    float: right;
+  }
+
+  .button--search {
+    margin-bottom: 0;
+    padding:       .25rem 1rem;
+    font-size:     1.3rem !important;
+    line-height:   2rem;
+
+    @include breakpoint(medium) {
+      height:      75px;
+      padding:     1.1rem 1rem;
+      line-height: 40px;
+    }
+
+    &:hover,
+    &:focus {
+      background-color: $drupal-blue-light;
+      color:            $white !important;
+    }
+  }
+}
+
+// 3 - User Account Button
+.header--user-account {
+  @include breakpoint(medium) {
+    float: right;
+  }
+}
