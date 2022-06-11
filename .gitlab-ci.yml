@@ -618,6 +618,6 @@ variables:
 
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH || $CI_OPEN_MERGE_REQUESTS
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "9.x" || $CI_COMMIT_BRANCH == "9.x"
 
 
