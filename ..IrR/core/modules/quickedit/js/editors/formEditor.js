@@ -1,1 +1,0 @@
-../../../../../../app/core/modules/quickedit/js/editors/formEditor.js

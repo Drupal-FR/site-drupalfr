@@ -1,1 +1,0 @@
-../../../../../app/core/modules/comment/js/comment-by-viewer.es6.js

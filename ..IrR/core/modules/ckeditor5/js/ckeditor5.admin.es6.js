@@ -1,1 +1,0 @@
-../../../../../app/core/modules/ckeditor5/js/ckeditor5.admin.es6.js

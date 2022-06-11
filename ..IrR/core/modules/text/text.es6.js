@@ -1,1 +1,0 @@
-../../../../app/core/modules/text/text.es6.js

@@ -1,1 +1,0 @@
-../../../../../../../../app/core/modules/system/tests/modules/jquery_keyevent_polyfilll_test/js/jquery.keyevent.polyfill.es6.js

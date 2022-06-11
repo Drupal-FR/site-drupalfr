@@ -1,1 +1,0 @@
-../../../../app/core/modules/comment/comment-entity-form.js

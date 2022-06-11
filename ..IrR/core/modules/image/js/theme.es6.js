@@ -1,1 +1,0 @@
-../../../../../app/core/modules/image/js/theme.es6.js

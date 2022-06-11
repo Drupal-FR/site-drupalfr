@@ -1,1 +1,0 @@
-../../../../../../../../app/core/modules/system/tests/themes/test_theme/js/collapse.js

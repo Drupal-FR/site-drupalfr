@@ -1,1 +1,0 @@
-../../../../../app/core/modules/views_ui/js/dialog.views.js

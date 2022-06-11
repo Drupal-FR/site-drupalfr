@@ -1,1 +1,0 @@
-../../../../../app/core/modules/locale/tests/locale_test.es6.js

@@ -1,1 +1,0 @@
-../../../../../app/core/modules/media_library/js/media_library.ui.es6.js

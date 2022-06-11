@@ -1,1 +1,0 @@
-../../../../../../app/modules/contrib/examples/modules/field_example/field_example.js

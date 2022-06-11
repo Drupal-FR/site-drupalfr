@@ -1,1 +1,0 @@
-../../../../../app/core/modules/media_library/js/media_library.widget.es6.js

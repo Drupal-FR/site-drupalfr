@@ -1,1 +1,0 @@
-../../../../../../../../app/core/modules/system/tests/modules/js_cookie_test/js/js_cookie_shim_test.es6.js

@@ -1,1 +1,0 @@
-../../../../../app/core/modules/responsive_image/js/responsive_image.ajax.js

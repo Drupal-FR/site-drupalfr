@@ -1,1 +1,0 @@
-../../../../../app/core/modules/editor/js/editor.js

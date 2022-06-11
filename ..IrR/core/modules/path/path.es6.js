@@ -1,1 +1,0 @@
-../../../../app/core/modules/path/path.es6.js

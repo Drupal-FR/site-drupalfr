@@ -1,1 +1,0 @@
-../../../../../app/core/modules/ckeditor/js/ckeditor.drupalimage.admin.es6.js

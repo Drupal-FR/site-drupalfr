@@ -1,1 +1,0 @@
-../../../../../app/core/modules/views_ui/js/views-admin.es6.js

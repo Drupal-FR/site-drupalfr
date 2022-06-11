@@ -1,1 +1,0 @@
-../../../../../../../app/core/modules/contextual/js/toolbar/views/VisualView.es6.js

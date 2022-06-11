@@ -1,1 +1,0 @@
-../../../../app/core/modules/language/language.admin.es6.js

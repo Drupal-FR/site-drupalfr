@@ -1,1 +1,0 @@
-../../../../../../../../app/core/modules/user/tests/themes/password_theme_function_test/js/password-theme-functions.js

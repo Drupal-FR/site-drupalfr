@@ -1,1 +1,0 @@
-../../../../../../../app/core/modules/ckeditor/js/plugins/drupalimagecaption/plugin.js

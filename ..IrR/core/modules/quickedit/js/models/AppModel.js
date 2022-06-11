@@ -1,1 +1,0 @@
-../../../../../../app/core/modules/quickedit/js/models/AppModel.js

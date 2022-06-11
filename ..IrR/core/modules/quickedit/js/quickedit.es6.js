@@ -1,1 +1,0 @@
-../../../../../app/core/modules/quickedit/js/quickedit.es6.js

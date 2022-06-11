@@ -1,1 +1,0 @@
-../../../../../../../../app/core/modules/system/tests/modules/off_canvas_test/js/resize-helper.js

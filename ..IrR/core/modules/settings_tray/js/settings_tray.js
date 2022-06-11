@@ -1,1 +1,0 @@
-../../../../../app/core/modules/settings_tray/js/settings_tray.js

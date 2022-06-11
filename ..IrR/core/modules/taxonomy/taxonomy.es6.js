@@ -1,1 +1,0 @@
-../../../../app/core/modules/taxonomy/taxonomy.es6.js

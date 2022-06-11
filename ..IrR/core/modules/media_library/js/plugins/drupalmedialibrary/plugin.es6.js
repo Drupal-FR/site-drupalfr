@@ -1,1 +1,0 @@
-../../../../../../../app/core/modules/media_library/js/plugins/drupalmedialibrary/plugin.es6.js

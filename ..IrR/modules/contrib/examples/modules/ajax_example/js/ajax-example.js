@@ -1,1 +1,0 @@
-../../../../../../../app/modules/contrib/examples/modules/ajax_example/js/ajax-example.js

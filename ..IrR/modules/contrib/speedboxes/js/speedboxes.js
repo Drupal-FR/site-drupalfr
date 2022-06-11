@@ -1,1 +1,0 @@
-../../../../../app/modules/contrib/speedboxes/js/speedboxes.js

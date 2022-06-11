@@ -1,1 +1,0 @@
-../../../../../../../app/core/modules/ckeditor/tests/modules/js/ajax-css.js

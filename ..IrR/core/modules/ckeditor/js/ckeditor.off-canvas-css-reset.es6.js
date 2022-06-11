@@ -1,1 +1,0 @@
-../../../../../app/core/modules/ckeditor/js/ckeditor.off-canvas-css-reset.es6.js

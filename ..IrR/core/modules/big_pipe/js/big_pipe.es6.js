@@ -1,1 +1,0 @@
-../../../../../app/core/modules/big_pipe/js/big_pipe.es6.js

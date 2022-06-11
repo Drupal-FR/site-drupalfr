@@ -1,1 +1,0 @@
-../../../../../../../../app/modules/contrib/devel/webprofiler/js/app/models/collector.js

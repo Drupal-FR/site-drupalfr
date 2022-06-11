@@ -1,1 +1,0 @@
-../../../../../../app/core/modules/image/js/editors/image.es6.js

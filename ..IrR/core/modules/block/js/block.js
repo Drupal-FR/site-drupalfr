@@ -1,1 +1,0 @@
-../../../../../app/core/modules/block/js/block.js

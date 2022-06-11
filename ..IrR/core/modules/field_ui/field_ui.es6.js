@@ -1,1 +1,0 @@
-../../../../app/core/modules/field_ui/field_ui.es6.js

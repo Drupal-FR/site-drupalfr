@@ -1,1 +1,0 @@
-../../../../../app/core/modules/tour/js/tour.es6.js

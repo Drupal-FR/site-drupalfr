@@ -1,1 +1,0 @@
-../../../../../../../../app/core/profiles/demo_umami/themes/umami/js/classy/media_embed_ckeditor.theme.js

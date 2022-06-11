@@ -1,1 +1,0 @@
-../../../../../app/core/modules/toolbar/js/escapeAdmin.es6.js

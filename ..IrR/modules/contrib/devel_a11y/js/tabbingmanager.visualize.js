@@ -1,1 +1,0 @@
-../../../../../app/modules/contrib/devel_a11y/js/tabbingmanager.visualize.js

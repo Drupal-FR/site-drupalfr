@@ -1,1 +1,0 @@
-../../../../../app/core/modules/history/js/mark-as-read.js
