@@ -1,0 +1,70 @@
+uuid: 466ff483-f234-4fc0-8506-f33fb1e3e3e8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.trombinoscope_item.field_title
+    - field.field.paragraph.trombinoscope_item.field_user
+    - paragraphs.paragraphs_type.trombinoscope_item
+  module:
+    - field_formatter
+_core:
+  default_config_hash: 49LaDAUzsRQkofaMQ7Nn1F58zKgFeE0G0t8FxoU0sS0
+id: paragraph.trombinoscope_item.default
+targetEntityType: paragraph
+bundle: trombinoscope_item
+mode: default
+content:
+  field_title:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_user:
+    type: field_formatter_with_inline_settings
+    label: hidden
+    settings:
+      field_name: user_picture
+      type: blazy
+      settings:
+        caption:
+          title: '0'
+          alt: '0'
+        background: false
+        responsive_image_style: ''
+        image_style: square_230
+        media_switch: ''
+        ratio: ''
+        thumbnail_style: ''
+        breakpoints:
+          xs:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          sm:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          md:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          lg:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          xl:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+        current_view_mode: _custom
+        sizes: ''
+      label: visually_hidden
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  search_api_excerpt: true

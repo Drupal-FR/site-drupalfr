@@ -1,0 +1,18 @@
+uuid: b5433d66-7225-4a09-afef-ff9de608bf42
+langcode: fr
+status: true
+dependencies:
+  module:
+    - focal_point
+name: rect_220x150
+label: 'Rectangulaire (220x150)'
+effects:
+  7e384ab3-67d6-4640-9f57-0b00f42cd2aa:
+    uuid: 7e384ab3-67d6-4640-9f57-0b00f42cd2aa
+    id: focal_point_scale_and_crop
+    weight: 1
+    data:
+      width: 220
+      height: 150
+      crop_type: focal_point
+pipeline: __default__

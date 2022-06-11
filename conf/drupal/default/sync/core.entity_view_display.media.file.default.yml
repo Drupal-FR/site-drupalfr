@@ -1,0 +1,30 @@
+uuid: b4c69753-498d-4a7a-aa5f-4de8417fb315
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.media.file.field_media_file
+    - media.type.file
+  module:
+    - file
+_core:
+  default_config_hash: SFsGOlZLLaeVHDyQlGBe8pa8Ay_QkFPowaZx1cm64Gw
+id: media.file.default
+targetEntityType: media
+bundle: file
+mode: default
+content:
+  field_media_file:
+    type: file_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  langcode: true
+  name: true
+  search_api_excerpt: true
+  thumbnail: true
+  uid: true

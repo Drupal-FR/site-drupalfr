@@ -1,0 +1,74 @@
+uuid: 98693e1c-623c-4a51-a206-814405af4c31
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.showcase.field_showcase_category
+    - field.field.node.showcase.field_showcase_drupal_version
+    - field.field.node.showcase.field_showcase_media
+    - field.field.node.showcase.field_showcase_sector
+    - field.field.node.showcase.field_showcase_website
+    - node.type.showcase
+  module:
+    - link
+    - user
+_core:
+  default_config_hash: TK68TI7H45UteSZEJ4mZxZCVfJjbTEMVZq0NGlcril4
+id: node.showcase.default
+targetEntityType: node
+bundle: showcase
+mode: default
+content:
+  field_showcase_category:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  field_showcase_drupal_version:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 106
+    region: content
+  field_showcase_media:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 104
+    region: content
+  field_showcase_sector:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 107
+    region: content
+  field_showcase_website:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  langcode: true
+  published_at: true
+  search_api_excerpt: true

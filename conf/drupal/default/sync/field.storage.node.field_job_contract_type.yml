@@ -1,0 +1,38 @@
+uuid: 8992f47e-5843-4c89-9b9e-4c90f0532ec5
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - options
+_core:
+  default_config_hash: XKJAWhsAzOv0M04Wx9ntrgFVWRSiijf9H2GTyBiHmOs
+id: node.field_job_contract_type
+field_name: field_job_contract_type
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: Alternance
+      label: Alternance
+    -
+      value: CDD
+      label: CDD
+    -
+      value: CDI
+      label: CDI
+    -
+      value: Freelance
+      label: Freelance
+    -
+      value: Stage
+      label: Stage
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

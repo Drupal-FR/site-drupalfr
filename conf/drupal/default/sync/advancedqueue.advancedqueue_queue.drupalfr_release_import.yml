@@ -1,0 +1,12 @@
+uuid: 9277b1a5-0cb9-4992-b0cc-0a637ffd1e3e
+langcode: fr
+status: true
+dependencies: {  }
+id: drupalfr_release_import
+label: 'Release import'
+backend: database
+backend_configuration:
+  lease_time: 60
+processor: cron
+processing_time: 30
+locked: false

@@ -1,0 +1,25 @@
+uuid: dc05814a-e110-4245-8103-5aeaa1bf14a3
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_user_twitter
+  module:
+    - link
+    - user
+_core:
+  default_config_hash: 9pz9Rh0Fu1jwAOf53QZoUBP35-l0rrLB5m0QtrMnF5M
+id: user.user.field_user_twitter
+field_name: field_user_twitter
+entity_type: user
+bundle: user
+label: Twitter
+description: 'Nous vous recommandons de mettre votre pseudo Twitter en texte du lien. Ex. : @drupalfr.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 16
+field_type: link

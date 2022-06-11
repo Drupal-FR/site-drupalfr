@@ -1,0 +1,19 @@
+uuid: 14ae5162-e454-4b2e-a80c-bb4bbe4a507e
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: forum
+label: 'Contenu : forum'
+logic: and
+conditions:
+  1ab11b24-f3ad-44ae-8165-c7c4aa13012f:
+    id: node_type
+    negate: false
+    uuid: 1ab11b24-f3ad-44ae-8165-c7c4aa13012f
+    context_mapping:
+      node: '@node.node_route_context:node'
+    bundles:
+      forum: forum
+allow_other_conditions: true

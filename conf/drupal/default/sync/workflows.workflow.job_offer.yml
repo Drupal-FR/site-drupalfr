@@ -1,0 +1,82 @@
+uuid: 28ebdbba-2153-466b-894f-65d8e66a0c90
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.job_offer
+  module:
+    - content_moderation
+id: job_offer
+label: 'Offre d''emploi'
+type: content_moderation
+type_settings:
+  states:
+    archived:
+      label: Archivée
+      weight: 1
+      published: false
+      default_revision: true
+    draft:
+      label: Brouillon
+      weight: -2
+      published: false
+      default_revision: false
+    published:
+      label: Publiée
+      weight: 0
+      published: true
+      default_revision: true
+    waiting_approval:
+      label: 'Attente validation'
+      weight: -1
+      published: false
+      default_revision: true
+  transitions:
+    archive:
+      label: Archiver
+      from:
+        - published
+      to: archived
+      weight: 0
+    archived_draft:
+      label: 'Restaurer en brouillon'
+      from:
+        - archived
+      to: draft
+      weight: 1
+    archived_published:
+      label: Restaurer
+      from:
+        - archived
+      to: published
+      weight: 2
+    create_new_draft:
+      label: 'Créer nouveau brouillon'
+      from:
+        - draft
+        - published
+      to: draft
+      weight: -4
+    draft_waiting_approval:
+      label: 'Proposer à la validation'
+      from:
+        - draft
+      to: waiting_approval
+      weight: -3
+    publish:
+      label: Publier
+      from:
+        - published
+        - waiting_approval
+      to: published
+      weight: -1
+    waiting_approval_draft:
+      label: 'À reprendre'
+      from:
+        - waiting_approval
+      to: draft
+      weight: -2
+  entity_types:
+    node:
+      - job_offer
+  default_moderation_state: draft

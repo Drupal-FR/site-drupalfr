@@ -1,0 +1,24 @@
+uuid: 963be7b8-12ab-46f2-b1ca-9a0061116fd1
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_local_group_place
+    - node.type.local_group
+  module:
+    - geofield
+_core:
+  default_config_hash: '-nO9gPA8CJ_dp6Rp8En6XBjGL8wEjAQLpgxi5BlqVvw'
+id: node.local_group.field_local_group_place
+field_name: field_local_group_place
+entity_type: node
+bundle: local_group
+label: 'Zones concernées'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  backend: geofield_backend_default
+field_type: geofield

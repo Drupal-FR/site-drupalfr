@@ -1,0 +1,56 @@
+uuid: 42832269-3b4e-451e-ac4b-48b8c29bfecb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.release.body
+    - field.field.node.release.field_release_file_targz
+    - field.field.node.release.field_release_file_zip
+    - field.field.node.release.field_release_link
+    - field.field.node.release.field_release_security
+    - field.field.node.release.field_release_type
+    - field.field.node.release.field_release_version_extra
+    - field.field.node.release.field_release_version_major
+    - field.field.node.release.field_release_version_minor
+    - field.field.node.release.field_release_version_patch
+    - node.type.release
+  module:
+    - options
+    - text
+    - user
+_core:
+  default_config_hash: 1pYVZyelNvQslWQr4Nyod_ijMbaP1GdTAP6sVVhR-ew
+id: node.release.search_index
+targetEntityType: node
+bundle: release
+mode: search_index
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_release_type:
+    type: list_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  extra_field_drupalfr_release_creation_date: true
+  field_release_file_targz: true
+  field_release_file_zip: true
+  field_release_link: true
+  field_release_security: true
+  field_release_version_extra: true
+  field_release_version_major: true
+  field_release_version_minor: true
+  field_release_version_patch: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

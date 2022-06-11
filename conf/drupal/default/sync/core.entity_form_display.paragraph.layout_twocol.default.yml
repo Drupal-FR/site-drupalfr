@@ -1,0 +1,109 @@
+uuid: 404856b0-bdbc-4154-9eb3-19cf96945f60
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.layout_twocol.field_column_1
+    - field.field.paragraph.layout_twocol.field_column_2
+    - field.field.paragraph.layout_twocol.field_column_2_width
+    - paragraphs.paragraphs_type.layout_twocol
+  module:
+    - field_group
+    - paragraphs
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_configuration
+        - group_column_1
+        - group_column_2
+      label: Onglets
+      region: content
+      parent_name: ''
+      weight: 0
+      format_type: tabs
+      format_settings:
+        classes: ''
+        id: ''
+        direction: horizontal
+    group_configuration:
+      children:
+        - field_column_2_width
+      label: Configuration
+      region: content
+      parent_name: group_tabs
+      weight: 6
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_column_1:
+      children:
+        - field_column_1
+      label: 'Première colonne'
+      region: content
+      parent_name: group_tabs
+      weight: 7
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_column_2:
+      children:
+        - field_column_2
+      label: 'Seconde colonne'
+      region: content
+      parent_name: group_tabs
+      weight: 8
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+id: paragraph.layout_twocol.default
+targetEntityType: paragraph
+bundle: layout_twocol
+mode: default
+content:
+  field_column_1:
+    type: entity_reference_paragraphs
+    weight: 1
+    region: content
+    settings:
+      title: Paragraphe
+      title_plural: Paragraphes
+      edit_mode: closed
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+    third_party_settings: {  }
+  field_column_2:
+    type: entity_reference_paragraphs
+    weight: 2
+    region: content
+    settings:
+      title: Paragraphe
+      title_plural: Paragraphes
+      edit_mode: closed
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+    third_party_settings: {  }
+  field_column_2_width:
+    type: options_select
+    weight: 9
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true
+  uid: true

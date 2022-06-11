@@ -1,0 +1,40 @@
+uuid: 9f76685a-cfa8-4a1b-bcf5-3edaff86edfe
+langcode: fr
+status: true
+dependencies:
+  config:
+    - feeds.feed_type.planet_feed_rss
+    - field.storage.feeds_feed.field_feed_image
+  module:
+    - image
+_core:
+  default_config_hash: _Rz1AqasVBNFoGZGEQfuF2HsLkYYu12fQB3DAs6B4eE
+id: feeds_feed.planet_feed_rss.field_feed_image
+field_name: field_feed_image
+entity_type: feeds_feed
+bundle: planet_feed_rss
+label: 'Image du flux'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'feeds/[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'png gif jpg jpeg'
+  max_filesize: ''
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  alt_field_required: false
+  title_field: true
+  title_field_required: false
+  default_image:
+    uuid: default_user_picture
+    alt: 'Image de flux par défaut'
+    title: ''
+    width: 200
+    height: 239
+field_type: image

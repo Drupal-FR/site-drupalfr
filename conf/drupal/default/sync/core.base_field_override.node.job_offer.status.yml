@@ -1,0 +1,24 @@
+uuid: 6f07483d-95e9-42c4-8551-702a1d9c39c6
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.job_offer
+_core:
+  default_config_hash: tEU-30f-8QqIGDQh5eF196H7HfLul8gydi21cc1FVJ4
+id: node.job_offer.status
+field_name: status
+entity_type: node
+bundle: job_offer
+label: 'Statut de publication'
+description: 'Un booléen indiquant si le nœud est publié ou non.'
+required: false
+translatable: true
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Activé
+  off_label: Désactivé
+field_type: boolean

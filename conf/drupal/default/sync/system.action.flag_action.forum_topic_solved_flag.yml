@@ -1,0 +1,15 @@
+uuid: 11cc9c0d-a259-40f4-a2e7-4ea8fd34fb02
+langcode: fr
+status: true
+dependencies:
+  config:
+    - flag.flag.forum_topic_solved
+  module:
+    - flag
+id: flag_action.forum_topic_solved_flag
+label: 'Marquer comme résolu'
+type: node
+plugin: 'flag_action:forum_topic_solved_flag'
+configuration:
+  flag_id: forum_topic_solved
+  flag_action: flag

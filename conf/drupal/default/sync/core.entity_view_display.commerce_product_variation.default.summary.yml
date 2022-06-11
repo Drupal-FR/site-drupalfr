@@ -1,0 +1,47 @@
+uuid: 6aba6a3c-06e2-4bc5-bb84-f677640a908c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.default
+    - core.entity_view_mode.commerce_product_variation.summary
+  enforced:
+    module:
+      - commerce_checkout
+_core:
+  default_config_hash: FZNRP3e--QCbG69eQ4ekdrlzlfpBHRYCuAkM5QStgSQ
+id: commerce_product_variation.default.summary
+targetEntityType: commerce_product_variation
+bundle: default
+mode: summary
+content:
+  list_price:
+    type: commerce_price_default
+    label: above
+    settings:
+      strip_trailing_zeroes: false
+      currency_display: symbol
+    third_party_settings: {  }
+    weight: -1
+    region: content
+  product_id:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  title:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: -5
+    region: content
+hidden:
+  langcode: true
+  price: true
+  search_api_excerpt: true
+  sku: true

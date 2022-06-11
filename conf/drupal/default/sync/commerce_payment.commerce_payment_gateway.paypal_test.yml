@@ -1,0 +1,32 @@
+uuid: 480c25cf-f27b-443c-9df3-1b644109adeb
+langcode: fr
+status: true
+dependencies:
+  module:
+    - commerce_paypal
+_core:
+  default_config_hash: l6ASUh0epARqswEFF4zCMkuhk3DbUwf6qd-WFKAdr2A
+id: paypal_test
+label: 'Paypal test'
+weight: null
+plugin: paypal_express_checkout
+configuration:
+  display_label: 'PayPal test'
+  mode: test
+  payment_method_types:
+    - credit_card
+  collect_billing_information: true
+  api_username: ''
+  api_password: ''
+  shipping_prompt: shipping_skip
+  signature: ''
+  solution_type: SoleBilling
+  redirect_method: post
+  _entity_id: null
+conditions:
+  -
+    plugin: order_customer_role
+    configuration:
+      roles:
+        - administrator
+conditionOperator: AND

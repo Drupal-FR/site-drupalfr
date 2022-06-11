@@ -1,0 +1,32 @@
+uuid: 50b68cc8-2ad8-4582-99f8-0a379f864190
+langcode: fr
+status: true
+dependencies:
+  module:
+    - file
+    - image
+    - user
+_core:
+  default_config_hash: tbNj7eiD_FzoX2pMEdpo_wn83eZkud-KiY-dqV0xbKY
+id: user.field_user_banner
+field_name: field_user_banner
+entity_type: user
+type: image
+settings:
+  target_type: file
+  display_field: false
+  display_default: false
+  uri_scheme: public
+  default_image:
+    uuid: ''
+    alt: ''
+    title: ''
+    width: null
+    height: null
+module: image
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

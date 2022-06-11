@@ -1,0 +1,30 @@
+uuid: 3f511803-a23f-4954-af0b-f87a9b52fe2d
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_media_teaser
+    - media.type.image
+    - node.type.news
+_core:
+  default_config_hash: 2uGTl8uKU0_x3ki5czHzsG5ZA5GG8HPKjXC4SHgePkQ
+id: node.news.field_media_teaser
+field_name: field_media_teaser
+entity_type: node
+bundle: news
+label: 'Image d''accroche'
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

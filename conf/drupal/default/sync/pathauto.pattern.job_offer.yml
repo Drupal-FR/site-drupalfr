@@ -1,0 +1,24 @@
+uuid: abd47c6d-9b46-48da-a833-dfd98509a9f2
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: 7fPIX07OuEXra02JdSrmchT-4eruaxu4sY8kL_rnJ9w
+id: job_offer
+label: 'Offres d''emploi'
+type: 'canonical_entities:node'
+pattern: 'emploi/[node:title]'
+selection_criteria:
+  df009e2b-14c4-4958-90a2-56a5dad577c0:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: df009e2b-14c4-4958-90a2-56a5dad577c0
+    context_mapping:
+      node: node
+    bundles:
+      job_offer: job_offer
+selection_logic: and
+weight: -5
+relationships: {  }

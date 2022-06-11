@@ -1,0 +1,29 @@
+uuid: 86a7635f-4cdf-4d7b-9bce-2a4a50e8aa70
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_attachment
+    - node.type.page
+  module:
+    - file
+_core:
+  default_config_hash: dgSpdSEK0O-rOuEb0b3Ollh0Cetbc4R6H_09XYP91U0
+id: node.page.field_attachment
+field_name: field_attachment
+entity_type: node
+bundle: page
+label: 'Pièces jointes'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'attachments/[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'txt pdf odt odp ods doc docx ppt pptx xls xlsx'
+  max_filesize: ''
+  description_field: true
+field_type: file

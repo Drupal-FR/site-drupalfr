@@ -1,0 +1,24 @@
+uuid: ef64e605-4a27-43cd-9fb1-d64d0c0c7c26
+langcode: fr
+status: true
+dependencies:
+  module:
+    - mailchimp_lists
+    - user
+_core:
+  default_config_hash: UrGMOxSi-uvh71ftqrP-xkEIppv-FF9IgKcYaHME0AI
+id: user.field_user_newsletter_adff
+field_name: field_user_newsletter_adff
+entity_type: user
+type: mailchimp_lists_subscription
+settings:
+  mc_list_id: 27e99cb1af
+  double_opt_in: true
+  send_welcome: false
+module: mailchimp_lists
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

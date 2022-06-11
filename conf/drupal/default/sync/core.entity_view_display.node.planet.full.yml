@@ -1,0 +1,65 @@
+uuid: 10e61c1b-aa3b-4c3b-a68b-c4fdb0c2717c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.planet.body
+    - field.field.node.planet.feeds_item
+    - field.field.node.planet.field_planet_tag
+    - field.field.node.planet.field_planet_url
+    - node.type.planet
+  module:
+    - link
+    - text
+    - user
+_core:
+  default_config_hash: qwVsfciypnk1EDvIkjzSLtM5v0WspMJN45U18WnTubA
+id: node.planet.full
+targetEntityType: node
+bundle: planet
+mode: full
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  extra_field_drupalfr_planet_feed_image_url:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_planet_tag:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_planet_url:
+    type: link
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden:
+  extra_field_drupalfr_planet_feed_image: true
+  feeds_item: true
+  langcode: true
+  published_at: true
+  search_api_excerpt: true

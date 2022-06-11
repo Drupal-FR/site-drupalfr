@@ -1,0 +1,29 @@
+uuid: 04bff80c-51e8-4427-b651-0481bd52eaf3
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_user_organization
+  module:
+    - user
+id: user.user.field_user_organization
+field_name: field_user_organization
+entity_type: user
+bundle: user
+label: Organisme
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+    filter:
+      type: _none
+    include_anonymous: false
+field_type: entity_reference

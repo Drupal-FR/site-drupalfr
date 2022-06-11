@@ -1,0 +1,69 @@
+uuid: ffde8de2-a667-4649-a773-8fd400319f10
+langcode: fr
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.default
+  module:
+    - commerce_price
+  enforced:
+    module:
+      - commerce_product
+_core:
+  default_config_hash: YvPk7-s7bZEOuxWBbu1G5wo4qc-OOnZpmCwPUdhp40o
+id: commerce_order_item.default.default
+targetEntityType: commerce_order_item
+bundle: default
+mode: default
+content:
+  created:
+    type: timestamp
+    label: hidden
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  purchased_entity:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  quantity:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  total_price:
+    type: commerce_price_default
+    label: above
+    settings:
+      strip_trailing_zeroes: false
+      display_currency_code: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  unit_price:
+    type: commerce_price_default
+    label: above
+    settings:
+      strip_trailing_zeroes: false
+      display_currency_code: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+hidden:
+  adjustments: true
+  search_api_excerpt: true

@@ -1,0 +1,38 @@
+uuid: 84d2b081-69f0-4f0a-a067-e1940db7c42b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_user_newsletter_drupalcamp
+  module:
+    - mailchimp_lists
+    - user
+_core:
+  default_config_hash: WNXMunqV18d4kyr7feZi1IqK3yMT7CmxpcRXG55PMPY
+id: user.user.field_user_newsletter_drupalcamp
+field_name: field_user_newsletter_drupalcamp
+entity_type: user
+bundle: user
+label: 'Newsletter Drupalcamp'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value:
+      subscribe: false
+    subscribe: null
+    interest_groups: null
+default_value_callback: ''
+settings:
+  subscribe_checkbox_label: Subscribe
+  show_interest_groups: false
+  hide_subscribe_checkbox: false
+  interest_groups_hidden: false
+  interest_groups_label: 'Interest Groups'
+  merge_fields:
+    EMAIL: mail
+    FNAME: field_user_realname
+    LNAME: ''
+  unsubscribe_on_delete: true
+field_type: mailchimp_lists_subscription

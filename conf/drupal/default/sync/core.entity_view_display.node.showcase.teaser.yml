@@ -1,0 +1,107 @@
+uuid: 712331be-7843-4012-b9c2-0b8b8521a250
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.showcase.field_showcase_category
+    - field.field.node.showcase.field_showcase_drupal_version
+    - field.field.node.showcase.field_showcase_media
+    - field.field.node.showcase.field_showcase_sector
+    - field.field.node.showcase.field_showcase_website
+    - node.type.showcase
+  module:
+    - field_formatter
+    - link
+    - user
+_core:
+  default_config_hash: _jY7oyM3LBrLtDkWi6Rqi_GEnebAXMqtEv_Yk9D2j3c
+id: node.showcase.teaser
+targetEntityType: node
+bundle: showcase
+mode: teaser
+content:
+  field_showcase_category:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_showcase_drupal_version:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_showcase_media:
+    type: field_formatter_with_inline_settings
+    label: hidden
+    settings:
+      field_name: field_media_image
+      type: blazy
+      settings:
+        caption:
+          title: '0'
+          alt: '0'
+        background: false
+        responsive_image_style: ''
+        image_style: rect_400_200
+        media_switch: ''
+        ratio: ''
+        thumbnail_style: ''
+        breakpoints:
+          xs:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          sm:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          md:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          lg:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          xl:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+        current_view_mode: _custom
+        sizes: ''
+      label: visually_hidden
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_showcase_sector:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_showcase_website:
+    type: link
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden:
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

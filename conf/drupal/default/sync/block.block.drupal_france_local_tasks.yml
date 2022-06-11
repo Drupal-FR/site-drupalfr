@@ -1,0 +1,35 @@
+uuid: 23f9d44c-a2a3-4263-8508-62ffdc755675
+langcode: fr
+status: true
+dependencies:
+  module:
+    - block_visibility_groups
+    - system
+  theme:
+    - drupal_france
+_core:
+  default_config_hash: ZVsiyh-rmHZnMeUiNnQgtZFnc-VCL3x2mSvYCkW2yi4
+id: drupal_france_local_tasks
+theme: drupal_france
+region: header
+weight: -4
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Tabs
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    context_mapping: {  }
+    block_visibility_group: ''
+  request_path:
+    id: request_path
+    negate: true
+    context_mapping: {  }
+    pages: "/user/login\r\n/user/register\r\n/user/password"

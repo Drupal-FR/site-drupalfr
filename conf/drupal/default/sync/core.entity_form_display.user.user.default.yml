@@ -1,0 +1,327 @@
+uuid: 36363bad-188c-4229-afcb-df138d9d3ea8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_organization_contact_info
+    - field.field.user.user.field_organization_legal_form
+    - field.field.user.user.field_organization_region
+    - field.field.user.user.field_organization_service_type
+    - field.field.user.user.field_organization_size
+    - field.field.user.user.field_user_banner
+    - field.field.user.user.field_user_biography
+    - field.field.user.user.field_user_drupal_org
+    - field.field.user.user.field_user_event
+    - field.field.user.user.field_user_in_directory
+    - field.field.user.user.field_user_membership_number
+    - field.field.user.user.field_user_newsletter_adff
+    - field.field.user.user.field_user_newsletter_drupalcamp
+    - field.field.user.user.field_user_organization
+    - field.field.user.user.field_user_realname
+    - field.field.user.user.field_user_slogan
+    - field.field.user.user.field_user_twitter
+    - field.field.user.user.field_user_website
+    - field.field.user.user.user_picture
+    - image.style.thumbnail
+  module:
+    - field_group
+    - image
+    - link
+    - mailchimp_lists
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_drupal_settings
+        - group_information
+        - group_informations_organization
+        - group_community
+        - group_member
+        - group_newsletters
+      label: Onglets
+      region: content
+      parent_name: ''
+      weight: 1
+      format_type: tabs
+      format_settings:
+        classes: ''
+        id: ''
+        direction: vertical
+    group_newsletters:
+      children:
+        - field_user_newsletter_adff
+        - field_user_newsletter_drupalcamp
+      label: Newsletters
+      region: content
+      parent_name: group_tabs
+      weight: 26
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_drupal_settings:
+      children:
+        - account
+        - timezone
+        - contact
+      label: 'Paramètres Drupal'
+      region: content
+      parent_name: group_tabs
+      weight: 20
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_member:
+      children:
+        - field_user_membership_number
+        - field_user_in_directory
+      label: Adhérent
+      region: content
+      parent_name: group_tabs
+      weight: 25
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_information:
+      children:
+        - field_user_realname
+        - field_user_slogan
+        - field_user_organization
+        - field_user_website
+        - field_user_twitter
+        - field_user_drupal_org
+        - field_user_biography
+        - user_picture
+        - field_user_banner
+      label: Informations
+      region: content
+      parent_name: group_tabs
+      weight: 22
+      format_type: tab
+      format_settings:
+        label: Informations
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_community:
+      children:
+        - field_user_event
+      label: Communauté
+      region: content
+      parent_name: group_tabs
+      weight: 24
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_informations_organization:
+      children:
+        - field_organization_size
+        - field_organization_legal_form
+        - field_organization_service_type
+        - field_organization_region
+        - field_organization_contact_info
+      label: 'Informations (organisme)'
+      region: content
+      parent_name: group_tabs
+      weight: 23
+      format_type: tab
+      format_settings:
+        label: 'Informations (organisme)'
+        classes: ''
+        id: ''
+        formatter: closed
+        description: 'Informations réservées aux organismes adhérents.'
+        required_fields: true
+_core:
+  default_config_hash: lAfBDRbBotlPrp8V88to2Z2Bozg059Xtk3PK_xjxk1A
+id: user.user.default
+targetEntityType: user
+bundle: user
+mode: default
+content:
+  account:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  contact:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_organization_contact_info:
+    type: string_textarea
+    weight: 38
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_organization_legal_form:
+    type: options_select
+    weight: 35
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_organization_region:
+    type: options_select
+    weight: 37
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_organization_service_type:
+    type: options_select
+    weight: 36
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_organization_size:
+    type: options_select
+    weight: 34
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_user_banner:
+    type: image_image
+    weight: 33
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+  field_user_biography:
+    type: text_textarea_with_summary
+    weight: 31
+    region: content
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+  field_user_drupal_org:
+    type: link_default
+    weight: 30
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_user_event:
+    type: entity_reference_autocomplete
+    weight: 6
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_user_in_directory:
+    type: boolean_checkbox
+    weight: 4
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_user_membership_number:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_user_newsletter_adff:
+    type: mailchimp_lists_select
+    weight: 9
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_user_newsletter_drupalcamp:
+    type: mailchimp_lists_select
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_user_organization:
+    type: entity_reference_autocomplete
+    weight: 27
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_user_realname:
+    type: string_textfield
+    weight: 25
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_user_slogan:
+    type: string_textfield
+    weight: 26
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_user_twitter:
+    type: link_default
+    weight: 29
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_user_website:
+    type: link_default
+    weight: 28
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  timezone:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  user_picture:
+    type: image_image
+    weight: 32
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+hidden:
+  commerce_remote_id: true
+  customer_profiles: true
+  langcode: true
+  language: true
+  path: true

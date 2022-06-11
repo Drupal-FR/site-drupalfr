@@ -1,0 +1,50 @@
+uuid: 0aca1f70-c2d6-4eae-b1a4-19c72ba3f7a3
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.trombinoscope.field_sub_title
+    - field.field.paragraph.trombinoscope.field_title
+    - field.field.paragraph.trombinoscope.field_trombinoscope_items
+    - paragraphs.paragraphs_type.trombinoscope
+  module:
+    - paragraphs
+_core:
+  default_config_hash: b4XHEwrOVJ69P9fEdYb5aITgcZq1hy4FmHV2zrLKtXo
+id: paragraph.trombinoscope.default
+targetEntityType: paragraph
+bundle: trombinoscope
+mode: default
+content:
+  field_sub_title:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_trombinoscope_items:
+    type: entity_reference_paragraphs
+    weight: 2
+    region: content
+    settings:
+      title: Paragraphe
+      title_plural: Paragraphs
+      edit_mode: closed
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true
+  uid: true

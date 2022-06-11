@@ -1,0 +1,116 @@
+uuid: f9d979fd-8ccc-44f5-8e03-f62367891adb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.event.body
+    - field.field.node.event.field_event_date_end
+    - field.field.node.event.field_event_date_start
+    - field.field.node.event.field_event_organizer
+    - field.field.node.event.field_event_place
+    - field.field.node.event.field_event_sponsor
+    - field.field.node.event.field_event_website
+    - field.field.node.event.field_media_banner
+    - field.field.node.event.field_media_teaser
+    - node.type.event
+  module:
+    - datetime
+    - field_formatter
+    - smart_trim
+    - user
+_core:
+  default_config_hash: iCXYhC7tbfOY7BF7d5NNI-BfWL4lRnV2re-5sIP6tlM
+id: node.event.teaser
+targetEntityType: node
+bundle: event
+mode: teaser
+content:
+  body:
+    type: smart_trim
+    label: hidden
+    settings:
+      trim_length: 600
+      trim_type: chars
+      trim_suffix: ''
+      wrap_output: false
+      wrap_class: trimmed
+      more_link: false
+      more_class: more-link
+      more_text: More
+      summary_handler: full
+      trim_options: {  }
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_event_date_end:
+    type: datetime_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: jour_mois_annee
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_event_date_start:
+    type: datetime_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: jour_mois_annee
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_media_teaser:
+    type: field_formatter_with_inline_settings
+    label: hidden
+    settings:
+      field_name: field_media_image
+      type: blazy
+      settings:
+        caption:
+          title: '0'
+          alt: '0'
+        background: false
+        responsive_image_style: ''
+        image_style: rect_400_200
+        media_switch: ''
+        ratio: ''
+        thumbnail_style: ''
+        breakpoints:
+          xs:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          sm:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          md:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          lg:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          xl:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+        current_view_mode: _custom
+        sizes: ''
+      label: visually_hidden
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_event_organizer: true
+  field_event_place: true
+  field_event_sponsor: true
+  field_event_website: true
+  field_media_banner: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

@@ -1,0 +1,60 @@
+uuid: 9b0b0e92-4a6d-49ac-a4cb-9b567534a7c6
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_column_1
+    - paragraphs.paragraphs_type.banner
+    - paragraphs.paragraphs_type.block
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.layout_onecol
+    - paragraphs.paragraphs_type.title_text_media
+    - paragraphs.paragraphs_type.trombinoscope
+  module:
+    - entity_reference_revisions
+id: paragraph.layout_onecol.field_column_1
+field_name: field_column_1
+entity_type: paragraph
+bundle: layout_onecol
+label: 'Contenu de la colonne'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      banner: banner
+      block: block
+      html: html
+      title_text_media: title_text_media
+      trombinoscope: trombinoscope
+    negate: 0
+    target_bundles_drag_drop:
+      banner:
+        weight: 10
+        enabled: true
+      block:
+        weight: 11
+        enabled: true
+      html:
+        weight: 12
+        enabled: true
+      layout_onecol:
+        weight: 9
+        enabled: false
+      layout_twocol:
+        weight: 13
+        enabled: false
+      title_text_media:
+        weight: 14
+        enabled: true
+      trombinoscope:
+        weight: 15
+        enabled: true
+      trombinoscope_item:
+        weight: 16
+        enabled: false
+field_type: entity_reference_revisions

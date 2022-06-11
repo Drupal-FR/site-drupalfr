@@ -1,0 +1,33 @@
+uuid: 0c1f3d8c-b1a2-4c4b-8a0f-6e55d004357f
+langcode: fr
+status: true
+dependencies:
+  module:
+    - comment
+_core:
+  default_config_hash: wAw21phC2Huv99IyRo0Kxzy97jWzDisC21p21i5X4k8
+id: spam_comment
+label: 'Signalement spam : commentaire'
+bundles:
+  - forum
+entity_type: comment
+global: false
+flag_short: 'Signaler comme spam'
+flag_long: ''
+flag_message: ''
+unflag_short: 'Retirer le signalement comme spam'
+unflag_long: ''
+unflag_message: ''
+unflag_denied_text: ''
+weight: 0
+flag_type: 'entity:comment'
+link_type: ajax_link
+flagTypeConfig:
+  show_in_links: {  }
+  show_as_field: true
+  show_on_form: false
+  show_contextual_link: false
+  extra_permissions:
+    owner: '0'
+    parent_owner: '0'
+linkTypeConfig: {  }

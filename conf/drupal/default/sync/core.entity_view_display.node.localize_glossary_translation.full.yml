@@ -1,0 +1,87 @@
+uuid: 82275483-7937-4221-a1ba-e40df13bccce
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_display.comment.localize_glossary_suggestion.default
+    - core.entity_view_mode.node.full
+    - field.field.node.localize_glossary_translation.field_localize_glossary_comment
+    - field.field.node.localize_glossary_translation.field_localize_glossary_context
+    - field.field.node.localize_glossary_translation.field_localize_glossary_export
+    - field.field.node.localize_glossary_translation.field_localize_glossary_language
+    - field.field.node.localize_glossary_translation.field_localize_glossary_link
+    - field.field.node.localize_glossary_translation.field_localize_glossary_status
+    - field.field.node.localize_glossary_translation.field_translation
+    - node.type.localize_glossary_translation
+  module:
+    - comment
+    - link
+    - options
+    - user
+id: node.localize_glossary_translation.full
+targetEntityType: node
+bundle: localize_glossary_translation
+mode: full
+content:
+  field_localize_glossary_comment:
+    type: comment_default
+    label: above
+    settings:
+      view_mode: default
+      pager_id: 0
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_localize_glossary_context:
+    type: entity_reference_label
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_localize_glossary_language:
+    type: entity_reference_label
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_localize_glossary_link:
+    type: link
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: nofollow
+      target: _blank
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_localize_glossary_status:
+    type: list_default
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_translation:
+    type: string
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 5
+    region: content
+hidden:
+  field_localize_glossary_export: true
+  langcode: true
+  published_at: true
+  search_api_excerpt: true

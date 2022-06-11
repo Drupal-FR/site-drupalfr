@@ -1,0 +1,99 @@
+uuid: 5c8a80d9-33d3-4d66-a22a-8cf36f9fac42
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.news.body
+    - field.field.node.news.field_media_banner
+    - field.field.node.news.field_media_teaser
+    - field.field.node.news.field_news_type
+    - field.field.node.news.field_paragraph
+    - node.type.news
+  module:
+    - field_formatter
+    - smart_trim
+    - user
+_core:
+  default_config_hash: 7cKW-zhQBOaoDsP8VbPUDPSUgThXwsVHYIJQgdKAc6A
+id: node.news.teaser
+targetEntityType: node
+bundle: news
+mode: teaser
+content:
+  body:
+    type: smart_trim
+    label: hidden
+    settings:
+      trim_length: 200
+      trim_type: chars
+      trim_suffix: ...
+      wrap_output: false
+      wrap_class: trimmed
+      more_link: false
+      more_class: more-link
+      more_text: More
+      summary_handler: full
+      trim_options:
+        text: true
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_media_teaser:
+    type: field_formatter_with_inline_settings
+    label: hidden
+    settings:
+      field_name: field_media_image
+      type: blazy
+      settings:
+        caption:
+          title: '0'
+          alt: '0'
+        background: false
+        responsive_image_style: ''
+        image_style: rect_400_200
+        media_switch: ''
+        ratio: ''
+        thumbnail_style: ''
+        breakpoints:
+          xs:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          sm:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          md:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          lg:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+          xl:
+            breakpoint: ''
+            width: ''
+            image_style: ''
+        current_view_mode: _custom
+        sizes: ''
+      label: visually_hidden
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_news_type:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  field_media_banner: true
+  field_paragraph: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

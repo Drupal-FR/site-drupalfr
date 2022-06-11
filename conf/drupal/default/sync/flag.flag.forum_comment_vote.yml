@@ -1,0 +1,33 @@
+uuid: d5d7b183-504f-43f2-811a-a6356cdddf29
+langcode: fr
+status: true
+dependencies:
+  module:
+    - comment
+_core:
+  default_config_hash: R_zT2kRa9-D0dW5FrHy-avSLOEccFaGfT3xE0mFAUGw
+id: forum_comment_vote
+label: 'Forum : vote de commentaire'
+bundles:
+  - forum
+entity_type: comment
+global: false
+flag_short: '+1'
+flag_long: ''
+flag_message: ''
+unflag_short: '-1'
+unflag_long: ''
+unflag_message: ''
+unflag_denied_text: ''
+weight: 0
+flag_type: 'entity:comment'
+link_type: reload
+flagTypeConfig:
+  show_in_links: {  }
+  show_as_field: true
+  show_on_form: false
+  show_contextual_link: false
+  extra_permissions:
+    owner: owner
+    parent_owner: '0'
+linkTypeConfig: {  }

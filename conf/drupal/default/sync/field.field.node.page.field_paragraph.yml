@@ -1,0 +1,66 @@
+uuid: d5fb9995-e03a-4040-acab-73889e43feba
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_paragraph
+    - node.type.page
+    - paragraphs.paragraphs_type.banner
+    - paragraphs.paragraphs_type.block
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.layout_onecol
+    - paragraphs.paragraphs_type.layout_twocol
+    - paragraphs.paragraphs_type.title_text_media
+    - paragraphs.paragraphs_type.trombinoscope
+  module:
+    - entity_reference_revisions
+_core:
+  default_config_hash: ckNt4LkVOHEZJ6UxMDV8nVjKyeOV5_GWVUOy5flTHbg
+id: node.page.field_paragraph
+field_name: field_paragraph
+entity_type: node
+bundle: page
+label: Paragraphes
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      title_text_media: title_text_media
+      banner: banner
+      layout_onecol: layout_onecol
+      layout_twocol: layout_twocol
+      html: html
+      block: block
+      trombinoscope: trombinoscope
+    negate: 0
+    target_bundles_drag_drop:
+      banner:
+        weight: -16
+        enabled: true
+      block:
+        weight: -12
+        enabled: true
+      html:
+        weight: -13
+        enabled: true
+      layout_onecol:
+        weight: -15
+        enabled: true
+      layout_twocol:
+        weight: -14
+        enabled: true
+      title_text_media:
+        weight: -17
+        enabled: true
+      trombinoscope:
+        weight: -11
+        enabled: true
+      trombinoscope_item:
+        weight: -10
+        enabled: false
+field_type: entity_reference_revisions

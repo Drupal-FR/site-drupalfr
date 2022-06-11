@@ -1,0 +1,47 @@
+uuid: 06189da5-0c00-4844-886d-a8692aff7439
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_result
+    - field.field.node.forum.body
+    - field.field.node.forum.field_forum_comment
+    - field.field.node.forum.field_forum_hierarchy
+    - field.field.node.forum.field_forum_tag
+    - node.type.forum
+  module:
+    - smart_trim
+    - user
+_core:
+  default_config_hash: hv4o68On5mbGd5d6pegId_6uXNWN41zhlwF_FHxZVH8
+id: node.forum.search_result
+targetEntityType: node
+bundle: forum
+mode: search_result
+content:
+  body:
+    type: smart_trim
+    label: hidden
+    settings:
+      trim_length: 200
+      trim_type: chars
+      trim_suffix: ...
+      more_link: false
+      more_class: more-link
+      more_text: More
+      summary_handler: trim
+      trim_options:
+        text: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_forum_comment: true
+  field_forum_hierarchy: true
+  field_forum_tag: true
+  flag_forum_topic_solved: true
+  flag_spam_node: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

@@ -1,0 +1,37 @@
+uuid: 93c8dde3-e5b8-4aef-932b-fa14e07abbf0
+langcode: fr
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.membership
+    - field.field.commerce_order_item.membership.license
+id: commerce_order_item.membership.default
+targetEntityType: commerce_order_item
+bundle: membership
+mode: default
+content:
+  created:
+    type: timestamp
+    label: hidden
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  license:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
+    region: hidden
+hidden:
+  adjustments: true
+  purchased_entity: true
+  quantity: true
+  search_api_excerpt: true
+  total_price: true
+  unit_price: true

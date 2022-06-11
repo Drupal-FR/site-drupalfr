@@ -1,0 +1,55 @@
+uuid: 9c584747-7412-4108-9817-a8094da23830
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_display.comment.forum.default
+    - core.entity_view_mode.node.search_index
+    - field.field.node.forum.body
+    - field.field.node.forum.field_forum_comment
+    - field.field.node.forum.field_forum_hierarchy
+    - field.field.node.forum.field_forum_tag
+    - node.type.forum
+  module:
+    - comment
+    - text
+    - user
+_core:
+  default_config_hash: S3uL3tGtGK1y5MUeWHavgTWQbPx0jXr-GqH452jecmI
+id: node.forum.search_index
+targetEntityType: node
+bundle: forum
+mode: search_index
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_forum_comment:
+    type: comment_default
+    label: hidden
+    settings:
+      view_mode: default
+      pager_id: 0
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_forum_tag:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  field_forum_hierarchy: true
+  flag_forum_topic_solved: true
+  flag_spam_node: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

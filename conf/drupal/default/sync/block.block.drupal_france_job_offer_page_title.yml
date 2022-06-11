@@ -1,0 +1,27 @@
+uuid: 41c8cc42-37a9-4150-ba66-6038efbf815c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_visibility_groups.block_visibility_group.job_offer
+  module:
+    - block_visibility_groups
+  theme:
+    - drupal_france
+id: drupal_france_job_offer_page_title
+theme: drupal_france
+region: header
+weight: -7
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Titre de page (offre d''emploi)'
+  label_display: '0'
+  provider: core
+visibility:
+  condition_group:
+    id: condition_group
+    negate: false
+    context_mapping: {  }
+    block_visibility_group: job_offer

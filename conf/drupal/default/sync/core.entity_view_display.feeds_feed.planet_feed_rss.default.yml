@@ -1,0 +1,93 @@
+uuid: 2588f041-2e5e-4584-88f8-f67d1f67af08
+langcode: fr
+status: true
+dependencies:
+  config:
+    - feeds.feed_type.planet_feed_rss
+    - field.field.feeds_feed.planet_feed_rss.field_feed_image
+    - field.field.feeds_feed.planet_feed_rss.field_feed_website
+    - image.style.rect_400_200
+  module:
+    - blazy
+    - feeds
+    - link
+    - user
+_core:
+  default_config_hash: XvkR1Mp9XU_ENj8X0vYgrDdRig3WIzddjqnVJltUOec
+id: feeds_feed.planet_feed_rss.default
+targetEntityType: feeds_feed
+bundle: planet_feed_rss
+mode: default
+content:
+  field_feed_image:
+    type: blazy
+    label: hidden
+    settings:
+      caption:
+        title: '0'
+        alt: '0'
+      layout: ''
+      view_mode: ''
+      cache: 0
+      skin: ''
+      lazy: ''
+      style: ''
+      background: false
+      box_caption: ''
+      box_caption_custom: ''
+      box_media_style: ''
+      loading: lazy
+      preload: false
+      responsive_image_style: ''
+      box_style: ''
+      image_style: rect_400_200
+      media_switch: ''
+      ratio: ''
+      thumbnail_style: ''
+      grid: ''
+      grid_medium: ''
+      grid_small: ''
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_feed_website:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  imported:
+    type: timestamp
+    label: inline
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  next:
+    type: timestamp
+    label: inline
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  source:
+    type: feeds_uri_link
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+    weight: -3
+    region: content
+hidden:
+  search_api_excerpt: true

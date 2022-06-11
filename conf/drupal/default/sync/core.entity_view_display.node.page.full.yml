@@ -1,0 +1,65 @@
+uuid: d47ca709-fd69-44d9-bb4d-141c9c737f6a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.page.body
+    - field.field.node.page.field_attachment
+    - field.field.node.page.field_drupal_version
+    - field.field.node.page.field_metatags
+    - field.field.node.page.field_paragraph
+    - node.type.page
+  module:
+    - entity_reference_revisions
+    - file
+    - text
+    - user
+_core:
+  default_config_hash: jXS6bXp0GpnBSputyshq8p8iUndEE9tpwf6tBNogw3E
+id: node.page.full
+targetEntityType: node
+bundle: page
+mode: full
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_attachment:
+    type: file_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_drupal_version:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_paragraph:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden:
+  field_metatags: true
+  langcode: true
+  published_at: true
+  search_api_excerpt: true

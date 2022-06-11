@@ -1,0 +1,68 @@
+uuid: 2f2259cf-d7e7-447c-b0f5-4998bafb281d
+langcode: fr
+status: true
+dependencies:
+  config:
+    - search_api.index.content
+    - views.view.search
+  module:
+    - search_api
+_core:
+  default_config_hash: M9xtsA6Am38k7lM41RA10mZZeXuSE4wE1Zccxud2GMs
+id: drupal_version
+name: 'Version de Drupal'
+weight: 0
+min_count: 1
+url_alias: drupal_version
+facet_source_id: 'search_api:views_block__search__block_page_recherche'
+field_identifier: name_2
+query_operator: and
+hard_limit: 0
+exclude: false
+use_hierarchy: false
+keep_hierarchy_parents_active: false
+hierarchy:
+  type: taxonomy
+  config: {  }
+expand_hierarchy: false
+enable_parent_when_child_gets_disabled: true
+widget:
+  type: checkbox
+  config:
+    show_numbers: true
+    soft_limit: 0
+    soft_limit_settings:
+      show_less_label: 'Show less'
+      show_more_label: 'Show more'
+empty_behavior:
+  behavior: text
+  text_format: full_html
+  text: "<p>Aucun résultat pour ce filtre.</p>\r\n"
+only_visible_when_facet_source_is_visible: false
+show_only_one_result: false
+show_title: false
+processor_configs:
+  active_widget_order:
+    processor_id: active_widget_order
+    weights:
+      sort: -10
+    settings:
+      sort: DESC
+  count_widget_order:
+    processor_id: count_widget_order
+    weights:
+      sort: -10
+    settings:
+      sort: DESC
+  display_value_widget_order:
+    processor_id: display_value_widget_order
+    weights:
+      sort: -10
+    settings:
+      sort: ASC
+  url_processor_handler:
+    processor_id: url_processor_handler
+    weights:
+      pre_query: -10
+      build: -10
+    settings: {  }

@@ -1,0 +1,45 @@
+uuid: d4661b04-9edc-4ed4-83b3-fe5df6f6a2bc
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.listing
+    - field.field.node.news.body
+    - field.field.node.news.field_media_banner
+    - field.field.node.news.field_media_teaser
+    - field.field.node.news.field_news_type
+    - field.field.node.news.field_paragraph
+    - node.type.news
+  module:
+    - text
+    - user
+_core:
+  default_config_hash: qL3szhRyssifOa3xjCSxXNM3SvZwzr6oDwgIgQlPGQo
+id: node.news.listing
+targetEntityType: node
+bundle: news
+mode: listing
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_news_type:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_media_banner: true
+  field_media_teaser: true
+  field_paragraph: true
+  langcode: true
+  links: true
+  published_at: true
+  search_api_excerpt: true

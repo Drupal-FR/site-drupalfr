@@ -1,0 +1,41 @@
+uuid: 823c3828-24c7-4aa5-a4ba-1d77759f82ac
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.editor
+    - field.field.media.image.field_media_image
+    - image.style.thumbnail
+    - media.type.image
+  module:
+    - image
+_core:
+  default_config_hash: yTkAxC3PIkQXt87sSpn5RTj8z6Ju6l8fJSHRmCv-dOo
+id: media.image.editor
+targetEntityType: media
+bundle: image
+mode: editor
+content:
+  name:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  thumbnail:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: thumbnail
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  created: true
+  field_media_image: true
+  langcode: true
+  search_api_excerpt: true
+  uid: true

@@ -1,0 +1,30 @@
+uuid: d571b16f-787a-4374-b2ea-2111a44a9d9e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.layout_onecol.field_column_1
+    - paragraphs.paragraphs_type.layout_onecol
+  module:
+    - paragraphs
+id: paragraph.layout_onecol.default
+targetEntityType: paragraph
+bundle: layout_onecol
+mode: default
+content:
+  field_column_1:
+    type: entity_reference_paragraphs
+    weight: 0
+    region: content
+    settings:
+      title: Paragraphe
+      title_plural: Paragraphes
+      edit_mode: closed
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true
+  uid: true

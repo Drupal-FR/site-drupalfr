@@ -1,0 +1,30 @@
+uuid: 988dec02-0754-48f0-9e65-58c32e9deb94
+langcode: fr
+status: true
+dependencies:
+  config:
+    - drupalfr_localize_statistics.localize_statistics_type.to_translate
+id: localize_statistics.to_translate.default
+targetEntityType: localize_statistics
+bundle: to_translate
+mode: default
+content:
+  language:
+    type: entity_reference_label
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  value:
+    type: number_integer
+    label: inline
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  search_api_excerpt: true
