@@ -55,10 +55,10 @@ class ReleaseBatchHelper {
     $messenger = \Drupal::messenger();
     if ($success) {
       $message = new PluralTranslatableMarkup(
-        count($results),
-        'One release processed.',
-        '@count releases processed.'
-      );
+            count($results),
+            'One release processed.',
+            '@count releases processed.'
+        );
       $messenger->addStatus($message);
     }
     else {

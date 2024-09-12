@@ -67,12 +67,12 @@ class LocalizeStatisticsCron implements LocalizeStatisticsCronInterface {
    *   The HTTP client factory.
    */
   public function __construct(
-    TimeInterface $time,
-    StateInterface $state,
-    EntityTypeManagerInterface $entity_type_manager,
-    LoggerInterface $logger,
-    ClientFactory $http_client_factory
-  ) {
+        TimeInterface $time,
+        StateInterface $state,
+        EntityTypeManagerInterface $entity_type_manager,
+        LoggerInterface $logger,
+        ClientFactory $http_client_factory
+    ) {
     $this->time = $time;
     $this->state = $state;
     $this->entityTypeManager = $entity_type_manager;

@@ -126,7 +126,7 @@ class LocalizeStatistics extends ContentEntityBase implements LocalizeStatistics
       ->setDescription(t('The statistics value.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
-      // Positive only.
+        // Positive only.
       ->setSetting('unsigned', TRUE)
       ->setSetting('min', 0)
       ->setDisplayConfigurable('form', TRUE)

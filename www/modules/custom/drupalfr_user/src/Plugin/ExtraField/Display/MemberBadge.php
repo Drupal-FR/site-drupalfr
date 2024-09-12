@@ -24,9 +24,9 @@ class MemberBadge extends ExtraFieldDisplayBase {
   public function view(ContentEntityInterface $entity) {
     $elements = [
       '#lazy_builder' => ['drupalfr_user.member_badge_builder:build',
-        [
-          $entity->id(),
-        ],
+      [
+        $entity->id(),
+      ],
       ],
       '#create_placeholder' => TRUE,
     ];

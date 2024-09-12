@@ -50,15 +50,15 @@ class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPlug
    *   The twitter service.
    */
   public function __construct(
-    $plugin_id,
-    $plugin_definition,
-    FieldDefinitionInterface $field_definition,
-    array $settings,
-    $label,
-    $view_mode,
-    array $third_party_settings,
-    TwitterServiceInterface $twitter_service
-  ) {
+        $plugin_id,
+        $plugin_definition,
+        FieldDefinitionInterface $field_definition,
+        array $settings,
+        $label,
+        $view_mode,
+        array $third_party_settings,
+        TwitterServiceInterface $twitter_service
+    ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->twitterService = $twitter_service;
   }
@@ -68,15 +68,15 @@ class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPlug
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['label'],
-      $configuration['view_mode'],
-      $configuration['third_party_settings'],
-      $container->get('drupalfr_social.twitter')
-    );
+          $plugin_id,
+          $plugin_definition,
+          $configuration['field_definition'],
+          $configuration['settings'],
+          $configuration['label'],
+          $configuration['view_mode'],
+          $configuration['third_party_settings'],
+          $container->get('drupalfr_social.twitter')
+      );
   }
 
   /**
@@ -97,7 +97,7 @@ class TwitterFeedFormatter extends FormatterBase implements ContainerFactoryPlug
           '#theme' => 'drupalfr_social_twitter_statuses',
           '#statuses' => $statuses,
           '#cache' => [
-            // 15 minutes.
+        // 15 minutes.
             'max-age' => '900',
           ],
         ];

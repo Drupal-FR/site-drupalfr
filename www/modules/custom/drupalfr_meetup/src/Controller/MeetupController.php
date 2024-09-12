@@ -38,9 +38,9 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
    *   The leaflet service.
    */
   public function __construct(
-    MeetupHelperInterface $meetup_helper,
-    LeafletService $leaflet_service
-  ) {
+        MeetupHelperInterface $meetup_helper,
+        LeafletService $leaflet_service
+    ) {
     $this->meetupHelper = $meetup_helper;
     $this->leafletService = $leaflet_service;
   }
@@ -50,9 +50,9 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('drupalfr_meetup.meetup_helper'),
-      $container->get('leaflet.service')
-    );
+          $container->get('drupalfr_meetup.meetup_helper'),
+          $container->get('leaflet.service')
+      );
   }
 
   /**
@@ -66,7 +66,7 @@ class MeetupController extends ControllerBase implements ContainerInjectionInter
       '#theme' => 'drupalfr_meetup_page',
       '#title' => $this->t('Drupal Meetups'),
       '#cache' => [
-        // 15 minutes.
+      // 15 minutes.
         'max-age' => '900',
       ],
     ];

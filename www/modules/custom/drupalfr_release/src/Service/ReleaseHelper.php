@@ -5,7 +5,6 @@ namespace Drupal\drupalfr_release\Service;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use GuzzleHttp\ClientInterface;
@@ -14,7 +13,6 @@ use GuzzleHttp\ClientInterface;
  * Functions for parse the xml, return the last stable release ...
  */
 class ReleaseHelper implements ReleaseHelperInterface {
-  use StringTranslationTrait;
 
   /**
    * The factory for configuration objects.
@@ -60,11 +58,11 @@ class ReleaseHelper implements ReleaseHelperInterface {
    *   The http client.
    */
   public function __construct(
-    ConfigFactoryInterface $config_factory,
-    EntityTypeManagerInterface $entity_type_manager,
-    LoggerChannelFactoryInterface $logger_factory,
-    ClientInterface $http_client
-  ) {
+        ConfigFactoryInterface $config_factory,
+        EntityTypeManagerInterface $entity_type_manager,
+        LoggerChannelFactoryInterface $logger_factory,
+        ClientInterface $http_client
+    ) {
     $this->configFactory = $config_factory;
     $this->entityTypeManager = $entity_type_manager;
     $this->loggerFactory = $logger_factory;
@@ -148,8 +146,6 @@ class ReleaseHelper implements ReleaseHelperInterface {
       $this->loggerFactory->get('drupalfr_release_import')
         ->notice('Release (' . $result['name'] . ') was imported/updated');
     }
-
-    return $imported_release_ids;
   }
 
   /**

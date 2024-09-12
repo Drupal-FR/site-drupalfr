@@ -1,0 +1,27 @@
+id: drupalfr_nodetypes_d7
+label: Node type configuration
+migration_group: drupalfr_d7
+migration_tags:
+  - Drupal 7
+  - Configuration
+source:
+  plugin: drupalfr_nodetypes_d7
+  types:
+    - doc
+  constants:
+    preview: 1 # DRUPAL_OPTIONAL
+process:
+  type: type
+  name: name
+  description: description
+  help: help
+  title_label: title_label
+  preview_mode: 'constants/preview'
+  display_submitted: display_submitted
+  new_revision: 'options/revision'
+  create_body: create_body
+  create_body_label: body_label
+  'third_party_settings/menu_ui/available_menus': available_menus
+  'third_party_settings/menu_ui/parent': parent
+destination:
+  plugin: entity:node_type
